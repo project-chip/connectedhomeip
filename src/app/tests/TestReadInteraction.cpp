@@ -24,6 +24,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
+#include <app/MessageDef/ClusterPathIB.h>
+#include <app/MessageDef/DataVersionFilterIB.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDServerConfig.h>
@@ -43,6 +45,7 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/TextOnlyLogging.h>
@@ -52,6 +55,7 @@
 #include <protocols/interaction_model/Constants.h>
 
 #include <optional>
+#include <string.h>
 
 namespace {
 using namespace chip::app::Clusters::Globals::Attributes;
@@ -559,6 +563,25 @@ public:
     void TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter();
     void TestReadRoundtripWithNoMatchPathDataVersionFilter();
     void TestReadRoundtripWithSameDifferentPathsDataVersionFilter();
+    void TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters();
+    void TestSubscribeWithEmptyParamsListUsesCallbackOnly();
+    void TestSubscribePacketFullDuringSupplementalEncodeRollsBack();
+    void TestSubscribeFullMtuPersistedFiltersRollback();
+    void TestSubscribeWireMTURollbackUsesHeapAllocatedFilterArrays();
+    void TestSubscribeWireMTURollbackScalesTo1024PersistedFilters();
+    void TestSubscribeHeapAllocatedFiltersProduceEncodingMatchingStackBaseline();
+    void TestSubscribeDuplicatePersistedFiltersAccepted();
+    void TestSubscribeEmptyParamsAndEmptyCallbackEncodesNothing();
+    void TestSubscribeCallbackEncodeErrorPropagates();
+    void TestGetMinEventNumberBlendsCallerAndCallback();
+    void TestGetMinEventNumberCallbackErrorSwallowedWhenCallerSet();
+    void TestGetMinEventNumberCallbackErrorPropagatesWithoutCallerSet();
+    void TestGetMinEventNumberMaxIsIdempotentAtEquality();
+    void TestGetMinEventNumberZeroBoundary();
+    void TestSubscribePersistedFilterForIrrelevantClusterIsDropped();
+    void TestSubscribeInvalidPersistedFilterRejected();
+    void TestGetMinEventNumberCallbackMaxValueWrapBehaviour();
+    void TestGetMinEventNumberCallbackErrorWithCallerSetFallsBack();
     void TestReadShutdown();
     void TestReadUnexpectedSubscriptionId();
     void TestReadWildcard();
@@ -1476,6 +1499,1175 @@ void TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilt
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+namespace {
+
+// Callback that encodes a fixed list of DataVersionFilters into the supplied builder
+// (mimicking ClusterStateCache::OnUpdateDataVersionFilterList partially populating the
+// list from RAM-cached versions).
+class DataVersionFilterCapturingCallback : public MockInteractionModelApp
+{
+public:
+    DataVersionFilterCapturingCallback(const Span<chip::app::DataVersionFilter> & aFiltersToEncode) :
+        mFiltersToEncode(aFiltersToEncode)
+    {}
+
+    CHIP_ERROR OnUpdateDataVersionFilterList(chip::app::DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             const chip::Span<chip::app::AttributePathParams> & aAttributePaths,
+                                             bool & aEncodedDataVersionList) override
+    {
+        for (auto & filter : mFiltersToEncode)
+        {
+            ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(filter));
+            aEncodedDataVersionList = true;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    Span<chip::app::DataVersionFilter> mFiltersToEncode;
+};
+
+// Count encoded DataVersionFilterIBs by parsing the closed builder TLV.
+//
+// Uses a raw TLVWriter / ContiguousBufferTLVReader (rather than PacketBuffer*) so the test fixture
+// is self-contained and not subject to PacketBuffer pool/MTU variation across platforms — same
+// pattern as TestSubscribePacketFullDuringSupplementalEncodeRollsBack.
+size_t CountEncodedDataVersionFilters(chip::TLV::TLVWriter & writer, ReadRequestMessage::Builder & request,
+                                      const uint8_t * backingBuf)
+{
+    EXPECT_EQ(request.EndOfReadRequestMessage(), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    chip::TLV::ContiguousBufferTLVReader reader;
+    reader.Init(backingBuf, writer.GetLengthWritten());
+
+    ReadRequestMessage::Parser parser;
+    EXPECT_EQ(parser.Init(reader), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Parser dvfParser;
+    CHIP_ERROR err = parser.GetDataVersionFilters(&dvfParser);
+    if (err == CHIP_END_OF_TLV)
+    {
+        return 0;
+    }
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    chip::TLV::TLVReader dvfReader;
+    dvfParser.GetReader(&dvfReader);
+
+    size_t count = 0;
+    while ((err = dvfReader.Next()) == CHIP_NO_ERROR)
+    {
+        ++count;
+    }
+    EXPECT_EQ(err, CHIP_END_OF_TLV);
+    return count;
+}
+
+} // namespace
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters)
+void TestReadInteraction::TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters()
+{
+    // Simulates MTRDevice resubscribe path:
+    //  - mReadPrepareParams.mpDataVersionFilterList carries N=5 persisted DVFs (one per cluster).
+    //  - The Callback (e.g. ClusterStateCache) only encodes 1 DVF from RAM (partial warm-up).
+    //  - After the fix, GenerateDataVersionFilterList must blend the two: the callback's 1 RAM
+    //    DVF plus all 5 persisted DVFs (6 total). The first cluster appears twice with two
+    //    different versions; the Matter spec (12.8.2.5) permits duplicate DVFs and leaves the
+    //    receiver free to pick one, so no deduplication is performed.
+    constexpr size_t kClusterCount = 5;
+    chip::app::AttributePathParams attributePathParams[kClusterCount];
+    chip::app::DataVersionFilter persistedFilters[kClusterCount];
+    for (size_t i = 0; i < kClusterCount; ++i)
+    {
+        attributePathParams[i].mEndpointId = kTestEndpointId;
+        attributePathParams[i].mClusterId  = kTestClusterId + static_cast<chip::ClusterId>(i);
+
+        persistedFilters[i].mEndpointId = kTestEndpointId;
+        persistedFilters[i].mClusterId  = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mDataVersion.SetValue(static_cast<chip::DataVersion>(100 + i));
+    }
+
+    // Callback supplies just one DVF (RAM-cached for the first cluster, with a different version),
+    // simulating a partially-warm ClusterStateCache after a resubscribe.
+    chip::app::DataVersionFilter ramFilter[1];
+    ramFilter[0].mEndpointId = kTestEndpointId;
+    ramFilter[0].mClusterId  = kTestClusterId;
+    ramFilter[0].mDataVersion.SetValue(999);
+
+    DataVersionFilterCapturingCallback delegate(Span<chip::app::DataVersionFilter>(ramFilter, 1));
+
+    // Use a raw stack-buffer TLVWriter + ContiguousBufferTLVReader (rather than PacketBuffer*)
+    // so the test fixture is self-contained and not subject to PacketBuffer pool/MTU variation
+    // across platforms — same pattern as TestSubscribePacketFullDuringSupplementalEncodeRollsBack.
+    constexpr size_t kBufSize = 2048;
+    uint8_t backingBuf[kBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+
+    // IsFabricFiltered must be written before DataVersionFilters because the on-wire
+    // schema requires context tags to appear in ascending order
+    // (kIsFabricFiltered=3 before kDataVersionFilters=4 — see ReadRequestMessage.h).
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(
+                  dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, kClusterCount),
+                  Span<chip::app::DataVersionFilter>(persistedFilters, kClusterCount), encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(encodedList);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    // Total encoded = 1 (callback RAM) + 5 (persisted, fix applied) = 6 with one duplicate cluster
+    // (Matter spec 12.8.2.5 permits duplicate DVFs; the receiver picks one). Without the fix this
+    // would be 1 (only the callback's RAM entry).
+    size_t encodedCount = CountEncodedDataVersionFilters(writer, request, backingBuf);
+    EXPECT_EQ(encodedCount, kClusterCount + 1u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeWithEmptyParamsListUsesCallbackOnly)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeWithEmptyParamsListUsesCallbackOnly)
+void TestReadInteraction::TestSubscribeWithEmptyParamsListUsesCallbackOnly()
+{
+    // Pins the !aDataVersionFilters.empty() guard: when no persisted params list is supplied
+    // (MTRBaseDevice / non-MTRDevice callers), GenerateDataVersionFilterList must NOT call into
+    // BuildDataVersionFilterList — only the callback's encodings should be present.
+    chip::app::AttributePathParams attributePathParams[2];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+    attributePathParams[0].mClusterId  = kTestClusterId;
+    attributePathParams[1].mEndpointId = kTestEndpointId;
+    attributePathParams[1].mClusterId  = kTestClusterId + 1;
+
+    chip::app::DataVersionFilter callbackFilters[2];
+    callbackFilters[0].mEndpointId = kTestEndpointId;
+    callbackFilters[0].mClusterId  = kTestClusterId;
+    callbackFilters[0].mDataVersion.SetValue(1);
+    callbackFilters[1].mEndpointId = kTestEndpointId;
+    callbackFilters[1].mClusterId  = kTestClusterId + 1;
+    callbackFilters[1].mDataVersion.SetValue(2);
+
+    DataVersionFilterCapturingCallback delegate(Span<chip::app::DataVersionFilter>(callbackFilters, 2));
+
+    // Raw stack buffer + ContiguousBufferTLVReader — see ordering/fixture comment in
+    // TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    constexpr size_t kBufSize = 2048;
+    uint8_t backingBuf[kBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+
+    // See ordering comment in TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, 2),
+                                                       Span<chip::app::DataVersionFilter>(), encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(encodedList);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    // Exactly the 2 callback DVFs, no supplemental encoding from BuildDataVersionFilterList.
+    EXPECT_EQ(CountEncodedDataVersionFilters(writer, request, backingBuf), 2u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribePacketFullDuringSupplementalEncodeRollsBack)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribePacketFullDuringSupplementalEncodeRollsBack)
+void TestReadInteraction::TestSubscribePacketFullDuringSupplementalEncodeRollsBack()
+{
+    // Pins the existing Checkpoint/Rollback path inside BuildDataVersionFilterList: when the
+    // packet fills mid-supplemental-encode, GenerateDataVersionFilterList must return CHIP_NO_ERROR
+    // (not propagate CHIP_ERROR_NO_MEMORY) and the callback's encodings must be preserved.
+    //
+    // We use a stack-allocated raw byte buffer + chip::TLV::TLVWriter (rather than a
+    // PacketBufferTLVWriter) so that the writer's capacity is exactly kSmallBufSize on every
+    // platform. PacketBufferHandle::New() only guarantees a *minimum* size, so on platforms with
+    // a larger pool/MTU (e.g. Zephyr native_posix_64) the underlying buffer can be much bigger
+    // than the requested size, in which case the supplemental encode would never hit
+    // CHIP_ERROR_NO_MEMORY and the rollback path would never be exercised.
+    constexpr size_t kPersistedCount = 64;
+    chip::app::AttributePathParams attributePathParams[kPersistedCount];
+    chip::app::DataVersionFilter persistedFilters[kPersistedCount];
+    for (size_t i = 0; i < kPersistedCount; ++i)
+    {
+        attributePathParams[i].mEndpointId = kTestEndpointId;
+        attributePathParams[i].mClusterId  = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mEndpointId    = kTestEndpointId;
+        persistedFilters[i].mClusterId     = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mDataVersion.SetValue(static_cast<chip::DataVersion>(i));
+    }
+
+    chip::app::DataVersionFilter callbackFilter[1];
+    callbackFilter[0].mEndpointId = kTestEndpointId;
+    callbackFilter[0].mClusterId  = kTestClusterId;
+    callbackFilter[0].mDataVersion.SetValue(7);
+
+    DataVersionFilterCapturingCallback delegate(Span<chip::app::DataVersionFilter>(callbackFilter, 1));
+
+    // Fixed-size stack buffer: small enough that 64 persisted DVFs cannot all fit, but large
+    // enough to encode the message header + the callback's single DVF. This deterministically
+    // forces the supplemental encode loop to hit CHIP_ERROR_NO_MEMORY and trip the rollback path.
+    //
+    // Round-2 review fix: document the byte budget so a future TLV-overhead bump produces a
+    // diagnosable failure rather than mysterious "buffer too small" errors:
+    //   ReadRequest container (~3B) + IsFabricFiltered (~3B) + DataVersionFilterIBs container
+    //   (~3B) + one DVF (endpoint=2 + cluster=4 + dataVersion=4 + struct overhead ~5B = ~15B)
+    //   ≈ 24B required, well within kSmallBufSize=100; 64 persisted filters (~960B) cannot
+    //   fit, so the rollback path is exercised deterministically.
+    constexpr size_t kSmallBufSize = 100;
+    uint8_t backingBuf[kSmallBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+
+    // See ordering comment in TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(
+                  dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, kPersistedCount),
+                  Span<chip::app::DataVersionFilter>(persistedFilters, kPersistedCount), encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(encodedList);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    // Per Gemini code-review feedback: finalize the writer, verify the encoded TLV is well-formed,
+    // and assert that the callback's filter is preserved (>=1) while at least one persisted filter
+    // was rolled back due to the small buffer (<kPersistedCount + 1). This pins the Checkpoint /
+    // Rollback path against future regressions that might corrupt the TLV or drop the callback's
+    // filter on packet-full.
+    EXPECT_EQ(request.EndOfReadRequestMessage(), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    chip::TLV::ContiguousBufferTLVReader reader;
+    reader.Init(backingBuf, writer.GetLengthWritten());
+
+    ReadRequestMessage::Parser parser;
+    EXPECT_EQ(parser.Init(reader), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Parser dvfParser;
+    CHIP_ERROR err = parser.GetDataVersionFilters(&dvfParser);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    chip::TLV::TLVReader dvfReader;
+    dvfParser.GetReader(&dvfReader);
+
+    size_t encodedCount             = 0;
+    bool sawCallbackEndpointCluster = false;
+    while ((err = dvfReader.Next()) == CHIP_NO_ERROR)
+    {
+        // Round-2 review fix: assert the callback's specific (endpoint, cluster) made it onto
+        // the wire, not just count >= 1. Without this a regression that drops the callback DVF
+        // and lets a persisted DVF take its place would still satisfy the count check but
+        // silently lose the in-RAM cache's contribution.
+        DataVersionFilterIB::Parser dvfIb;
+        if (dvfIb.Init(dvfReader) == CHIP_NO_ERROR)
+        {
+            ClusterPathIB::Parser path;
+            if (dvfIb.GetPath(&path) == CHIP_NO_ERROR)
+            {
+                chip::EndpointId endpointId = 0;
+                chip::ClusterId clusterId   = 0;
+                if (path.GetEndpoint(&endpointId) == CHIP_NO_ERROR && path.GetCluster(&clusterId) == CHIP_NO_ERROR &&
+                    endpointId == kTestEndpointId && clusterId == kTestClusterId)
+                {
+                    sawCallbackEndpointCluster = true;
+                }
+            }
+        }
+        ++encodedCount;
+    }
+    EXPECT_EQ(err, CHIP_END_OF_TLV);
+    EXPECT_GE(encodedCount, 1u);
+    EXPECT_LT(encodedCount, kPersistedCount + 1u);
+    EXPECT_TRUE(sawCallbackEndpointCluster);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeFullMtuPersistedFiltersRollback)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeFullMtuPersistedFiltersRollback)
+void TestReadInteraction::TestSubscribeFullMtuPersistedFiltersRollback()
+{
+    // Hardening: at the *real* wire MTU (kMaxSecureSduLengthBytes ≈ 1232 bytes per spec), a
+    // sufficiently large persisted DataVersionFilter list must not overflow the SubscribeRequest.
+    // The supplemental BuildDataVersionFilterList path must engage Checkpoint/Rollback once the
+    // packet fills, return CHIP_NO_ERROR, leave the encoded TLV well-formed, and emit fewer than
+    // the requested kPersistedCount filters.
+    //
+    // This complements TestSubscribePacketFullDuringSupplementalEncodeRollsBack (which uses a
+    // synthetic 100-byte buffer) by exercising the rollback path against the production-sized
+    // PacketBufferTLVWriter that ReadClient uses on the wire.
+    //
+    // Each encoded DataVersionFilterIB is ~14 bytes (endpoint=2, cluster=4, dataVersion=4 + TLV
+    // overhead). 256 persisted entries (~3.5KB) deterministically exceed the ~1.2KB SDU on every
+    // platform we ship, even accounting for variation in PacketBuffer pool sizes.
+    //
+    // The two large arrays are heap-allocated via Platform::ScopedMemoryBuffer so this test
+    // function's stack frame stays well under the 8KB embedded-target limit
+    // (-Werror=stack-usage=8192 on ESP32, nRF Connect SDK, etc.). Stack-allocating
+    // AttributePathParams[256] (~5KB) + DataVersionFilter[256] (~3KB) + the wire-MTU backing
+    // buffer would push the frame past 9KB and break the embedded build. Using Alloc (not
+    // Calloc) because both element types are non-trivial and ScopedMemoryBuffer placement-news
+    // each element via the default ctor — Calloc's pre-zero would just be overwritten.
+    constexpr size_t kPersistedCount = 256;
+    chip::Platform::ScopedMemoryBuffer<chip::app::AttributePathParams> attributePathParamsBuf;
+    chip::Platform::ScopedMemoryBuffer<chip::app::DataVersionFilter> persistedFiltersBuf;
+    attributePathParamsBuf.Alloc(kPersistedCount);
+    persistedFiltersBuf.Alloc(kPersistedCount);
+    ASSERT_NE(attributePathParamsBuf.Get(), nullptr);
+    ASSERT_NE(persistedFiltersBuf.Get(), nullptr);
+    chip::app::AttributePathParams * attributePathParams = attributePathParamsBuf.Get();
+    chip::app::DataVersionFilter * persistedFilters      = persistedFiltersBuf.Get();
+    for (size_t i = 0; i < kPersistedCount; ++i)
+    {
+        attributePathParams[i].mEndpointId = kTestEndpointId;
+        attributePathParams[i].mClusterId  = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mEndpointId    = kTestEndpointId;
+        persistedFilters[i].mClusterId     = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mDataVersion.SetValue(static_cast<chip::DataVersion>(i));
+    }
+
+    // No callback-encoded filters: this isolates the supplemental encode path so a regression
+    // that fails to roll back (e.g. propagating CHIP_ERROR_NO_MEMORY) is unambiguously visible.
+    DataVersionFilterCapturingCallback delegate{ Span<chip::app::DataVersionFilter>{} };
+
+    // Use a raw buffer of the production wire-MTU size + ContiguousBufferTLVReader so the
+    // rollback path engages deterministically across platforms (some PacketBuffer pools allocate
+    // larger buffers than requested). Static (function-local) so this 1232-byte buffer adds
+    // zero to the stack frame; safe because TEST_F bodies run sequentially.
+    constexpr size_t kMtuBufSize = chip::app::kMaxSecureSduLengthBytes;
+    static uint8_t backingBuf[kMtuBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+
+    // See ordering comment in TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(
+                  dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, kPersistedCount),
+                  Span<chip::app::DataVersionFilter>(persistedFilters, kPersistedCount), encodedList),
+              CHIP_NO_ERROR);
+    // Round-2 review fix: mirror production's guard. GenerateDataVersionFilterList only calls
+    // EndOfDataVersionFilterIBs when encodedList==true; assert it explicitly so a regression
+    // that drops all filters but doesn't fail the call is caught here.
+    EXPECT_TRUE(encodedList);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    // The encoded TLV must remain well-formed after rollback.
+    size_t encodedCount = CountEncodedDataVersionFilters(writer, request, backingBuf);
+    EXPECT_GT(encodedCount, 0u);
+    EXPECT_LT(encodedCount, kPersistedCount);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeWireMTURollbackUsesHeapAllocatedFilterArrays)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeWireMTURollbackUsesHeapAllocatedFilterArrays)
+void TestReadInteraction::TestSubscribeWireMTURollbackUsesHeapAllocatedFilterArrays()
+{
+    // Companion to TestSubscribeFullMtuPersistedFiltersRollback. That test heap-allocates the
+    // two large filter arrays so its stack frame stays under the 8KB embedded-target limit
+    // (-Werror=stack-usage=8192). This test pins the *invariant* that the rollback semantics
+    // produced by GenerateDataVersionFilterList are independent of where the caller's filter
+    // arrays live: heap-backed Spans must produce the same outcome (CHIP_NO_ERROR, well-formed
+    // TLV, encoded count strictly less than requested) as stack-backed arrays would. A future
+    // refactor that, e.g., took the address of an entry expecting stack semantics would fail
+    // this test deterministically.
+    constexpr size_t kPersistedCount = 256;
+    chip::Platform::ScopedMemoryBuffer<chip::app::AttributePathParams> attributePathParamsBuf;
+    chip::Platform::ScopedMemoryBuffer<chip::app::DataVersionFilter> persistedFiltersBuf;
+    attributePathParamsBuf.Alloc(kPersistedCount);
+    persistedFiltersBuf.Alloc(kPersistedCount);
+    ASSERT_NE(attributePathParamsBuf.Get(), nullptr);
+    ASSERT_NE(persistedFiltersBuf.Get(), nullptr);
+    chip::app::AttributePathParams * attributePathParams = attributePathParamsBuf.Get();
+    chip::app::DataVersionFilter * persistedFilters      = persistedFiltersBuf.Get();
+    for (size_t i = 0; i < kPersistedCount; ++i)
+    {
+        attributePathParams[i].mEndpointId = kTestEndpointId;
+        attributePathParams[i].mClusterId  = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mEndpointId    = kTestEndpointId;
+        persistedFilters[i].mClusterId     = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mDataVersion.SetValue(static_cast<chip::DataVersion>(i));
+    }
+
+    DataVersionFilterCapturingCallback delegate{ Span<chip::app::DataVersionFilter>{} };
+
+    constexpr size_t kMtuBufSize = chip::app::kMaxSecureSduLengthBytes;
+    static uint8_t backingBuf[kMtuBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(
+                  dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, kPersistedCount),
+                  Span<chip::app::DataVersionFilter>(persistedFilters, kPersistedCount), encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    size_t encodedCount = CountEncodedDataVersionFilters(writer, request, backingBuf);
+    EXPECT_GT(encodedCount, 0u);
+    EXPECT_LT(encodedCount, kPersistedCount);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeWireMTURollbackScalesTo1024PersistedFilters)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeWireMTURollbackScalesTo1024PersistedFilters)
+void TestReadInteraction::TestSubscribeWireMTURollbackScalesTo1024PersistedFilters()
+{
+    // With the filter arrays moved to the heap, the rollback path must scale to filter counts
+    // that would have been impossible on the stack. 1024 entries (~16KB+8KB combined) far exceeds
+    // any embedded stack budget; encoding still terminates cleanly because the Checkpoint /
+    // Rollback path inside BuildDataVersionFilterList stops once the SDU fills, regardless of
+    // how many candidates remain unconsumed. This pins that the loop's exit condition is
+    // 'packet full', not 'caller-supplied count'.
+    constexpr size_t kPersistedCount = 1024;
+    chip::Platform::ScopedMemoryBuffer<chip::app::AttributePathParams> attributePathParamsBuf;
+    chip::Platform::ScopedMemoryBuffer<chip::app::DataVersionFilter> persistedFiltersBuf;
+    attributePathParamsBuf.Alloc(kPersistedCount);
+    persistedFiltersBuf.Alloc(kPersistedCount);
+    // OOM guard: tight Zephyr / nRF heap configs may not have ~24KB free. Skip cleanly rather
+    // than null-deref. (In production CI runners and host builds this allocation succeeds.)
+    if (attributePathParamsBuf.Get() == nullptr || persistedFiltersBuf.Get() == nullptr)
+    {
+        GTEST_SKIP() << "Heap too small for 1024-entry stress test on this platform.";
+    }
+    chip::app::AttributePathParams * attributePathParams = attributePathParamsBuf.Get();
+    chip::app::DataVersionFilter * persistedFilters      = persistedFiltersBuf.Get();
+    for (size_t i = 0; i < kPersistedCount; ++i)
+    {
+        attributePathParams[i].mEndpointId = kTestEndpointId;
+        attributePathParams[i].mClusterId  = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mEndpointId    = kTestEndpointId;
+        persistedFilters[i].mClusterId     = kTestClusterId + static_cast<chip::ClusterId>(i);
+        persistedFilters[i].mDataVersion.SetValue(static_cast<chip::DataVersion>(i));
+    }
+
+    DataVersionFilterCapturingCallback delegate{ Span<chip::app::DataVersionFilter>{} };
+
+    constexpr size_t kMtuBufSize = chip::app::kMaxSecureSduLengthBytes;
+    static uint8_t backingBuf[kMtuBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(
+                  dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, kPersistedCount),
+                  Span<chip::app::DataVersionFilter>(persistedFilters, kPersistedCount), encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    size_t encodedCount = CountEncodedDataVersionFilters(writer, request, backingBuf);
+    EXPECT_GT(encodedCount, 0u);
+    // Far fewer than 1024 fit in a 1232-byte SDU; cap by the realistic per-DVFilter encoding.
+    EXPECT_LT(encodedCount, kPersistedCount);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeHeapAllocatedFiltersProduceEncodingMatchingStackBaseline)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeHeapAllocatedFiltersProduceEncodingMatchingStackBaseline)
+void TestReadInteraction::TestSubscribeHeapAllocatedFiltersProduceEncodingMatchingStackBaseline()
+{
+    // Equivalence guard for the heap-allocation refactor: at a small (stack-safe) count, encode
+    // the same logical filter set twice — once with stack-allocated arrays, once with
+    // heap-allocated arrays via Platform::ScopedMemoryBuffer — and assert the encoded TLV is
+    // byte-for-byte identical. Pins that swapping storage for the caller-supplied Spans does
+    // not perturb the on-wire output. Uses a small count so the rollback path is NOT engaged
+    // (encodedCount == kSmallCount), isolating "encoding equivalence" from "rollback semantics".
+    constexpr size_t kSmallCount = 8;
+
+    auto encodeWith = [&](chip::app::AttributePathParams * paths, chip::app::DataVersionFilter * filters, uint8_t * outBuf,
+                          size_t outBufSize, size_t & outWritten) -> size_t {
+        for (size_t i = 0; i < kSmallCount; ++i)
+        {
+            paths[i].mEndpointId   = kTestEndpointId;
+            paths[i].mClusterId    = kTestClusterId + static_cast<chip::ClusterId>(i);
+            filters[i].mEndpointId = kTestEndpointId;
+            filters[i].mClusterId  = kTestClusterId + static_cast<chip::ClusterId>(i);
+            filters[i].mDataVersion.SetValue(static_cast<chip::DataVersion>(i));
+        }
+        DataVersionFilterCapturingCallback delegate{ Span<chip::app::DataVersionFilter>{} };
+        chip::TLV::TLVWriter writer;
+        writer.Init(outBuf, outBufSize);
+        ReadRequestMessage::Builder request;
+        EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+        EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+        DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+        EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Subscribe);
+        bool encodedList = false;
+        EXPECT_EQ(readClient.GenerateDataVersionFilterList(dvfBuilder, Span<chip::app::AttributePathParams>(paths, kSmallCount),
+                                                           Span<chip::app::DataVersionFilter>(filters, kSmallCount), encodedList),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+        size_t count = CountEncodedDataVersionFilters(writer, request, outBuf);
+        outWritten   = writer.GetLengthWritten();
+        return count;
+    };
+
+    constexpr size_t kBufSize = chip::app::kMaxSecureSduLengthBytes;
+    static uint8_t stackEncodedBuf[kBufSize];
+    static uint8_t heapEncodedBuf[kBufSize];
+
+    chip::app::AttributePathParams stackPaths[kSmallCount];
+    chip::app::DataVersionFilter stackFilters[kSmallCount];
+    size_t stackWritten            = 0;
+    size_t stackEncodedFilterCount = encodeWith(stackPaths, stackFilters, stackEncodedBuf, sizeof(stackEncodedBuf), stackWritten);
+
+    chip::Platform::ScopedMemoryBuffer<chip::app::AttributePathParams> heapPathsBuf;
+    chip::Platform::ScopedMemoryBuffer<chip::app::DataVersionFilter> heapFiltersBuf;
+    heapPathsBuf.Alloc(kSmallCount);
+    heapFiltersBuf.Alloc(kSmallCount);
+    ASSERT_NE(heapPathsBuf.Get(), nullptr);
+    ASSERT_NE(heapFiltersBuf.Get(), nullptr);
+    size_t heapWritten = 0;
+    size_t heapEncodedFilterCount =
+        encodeWith(heapPathsBuf.Get(), heapFiltersBuf.Get(), heapEncodedBuf, sizeof(heapEncodedBuf), heapWritten);
+
+    // No rollback should have engaged at this small count.
+    EXPECT_EQ(stackEncodedFilterCount, kSmallCount);
+    EXPECT_EQ(heapEncodedFilterCount, kSmallCount);
+    // Byte-for-byte equivalence: storage location of the input arrays must not affect the wire output.
+    EXPECT_EQ(stackWritten, heapWritten);
+    EXPECT_EQ(memcmp(stackEncodedBuf, heapEncodedBuf, stackWritten), 0);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeDuplicatePersistedFiltersAccepted)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeDuplicatePersistedFiltersAccepted)
+void TestReadInteraction::TestSubscribeDuplicatePersistedFiltersAccepted()
+{
+    // Hardening: per Matter spec §12.8.2.5, the receiver tolerates duplicate DataVersionFilterIBs
+    // for the same (endpoint, cluster) and picks one. The ReadClient must not reject or dedupe
+    // such duplicates client-side — they go on the wire as supplied. This pins the existing
+    // behaviour against a future "helpful" dedupe that would silently drop persisted entries
+    // when the callback also encoded a RAM-cached filter for the same path (the resubscribe
+    // blend case in production).
+    constexpr size_t kCallbackCount  = 2;
+    constexpr size_t kPersistedCount = 3;
+
+    chip::app::AttributePathParams attributePathParams[2];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+    attributePathParams[0].mClusterId  = kTestClusterId;
+    attributePathParams[1].mEndpointId = kTestEndpointId;
+    attributePathParams[1].mClusterId  = kTestClusterId + 1;
+
+    // Callback encodes 2 DVFs, both for kTestClusterId — duplicates within the callback's own
+    // contribution.
+    chip::app::DataVersionFilter callbackFilters[kCallbackCount];
+    callbackFilters[0].mEndpointId = kTestEndpointId;
+    callbackFilters[0].mClusterId  = kTestClusterId;
+    callbackFilters[0].mDataVersion.SetValue(10);
+    callbackFilters[1].mEndpointId = kTestEndpointId;
+    callbackFilters[1].mClusterId  = kTestClusterId;
+    callbackFilters[1].mDataVersion.SetValue(11);
+
+    // Persisted list also contains duplicates of kTestClusterId, plus one for the second path.
+    chip::app::DataVersionFilter persistedFilters[kPersistedCount];
+    persistedFilters[0].mEndpointId = kTestEndpointId;
+    persistedFilters[0].mClusterId  = kTestClusterId;
+    persistedFilters[0].mDataVersion.SetValue(20);
+    persistedFilters[1].mEndpointId = kTestEndpointId;
+    persistedFilters[1].mClusterId  = kTestClusterId;
+    persistedFilters[1].mDataVersion.SetValue(21);
+    persistedFilters[2].mEndpointId = kTestEndpointId;
+    persistedFilters[2].mClusterId  = kTestClusterId + 1;
+    persistedFilters[2].mDataVersion.SetValue(22);
+
+    DataVersionFilterCapturingCallback delegate(Span<chip::app::DataVersionFilter>(callbackFilters, kCallbackCount));
+
+    // Raw stack buffer + ContiguousBufferTLVReader — see ordering/fixture comment in
+    // TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    constexpr size_t kBufSize = 2048;
+    uint8_t backingBuf[kBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+
+    // See ordering comment in TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, 2),
+                                                       Span<chip::app::DataVersionFilter>(persistedFilters, kPersistedCount),
+                                                       encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(encodedList);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    // Spec §12.8.2.5: duplicates must not be rejected. Total = 2 (callback) + 3 (persisted) = 5.
+    // If a future change adds client-side dedup, this count would drop and the test would fail.
+    EXPECT_EQ(CountEncodedDataVersionFilters(writer, request, backingBuf), kCallbackCount + kPersistedCount);
+}
+
+namespace {
+
+// Callback whose GetHighestReceivedEventNumber returns a fixed value, mimicking ClusterStateCache
+// after it has observed an event in RAM (and/or been seeded with a persisted highest-observed
+// number at construction time).
+class FixedHighestEventNumberCallback : public MockInteractionModelApp
+{
+public:
+    explicit FixedHighestEventNumberCallback(Optional<chip::EventNumber> aHighest) : mHighest(aHighest) {}
+
+    CHIP_ERROR GetHighestReceivedEventNumber(Optional<chip::EventNumber> & aEventNumber) override
+    {
+        aEventNumber = mHighest;
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    Optional<chip::EventNumber> mHighest;
+};
+
+} // namespace
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestGetMinEventNumberBlendsCallerAndCallback)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestGetMinEventNumberBlendsCallerAndCallback)
+void TestReadInteraction::TestGetMinEventNumberBlendsCallerAndCallback()
+{
+    // GetMinEventNumber has the same callback-vs-caller asymmetry shape as
+    // GenerateDataVersionFilterList. Pin the contract: when both the caller (e.g. persisted
+    // ReadPrepareParams::mEventNumber) AND the Callback (e.g. ClusterStateCache's in-RAM
+    // mHighestReceivedEventNumber + 1) can speak, take the maximum so the resubscribe filter
+    // never asks the server for events the client has already received. A *lower* min on the
+    // EventFilter would cause redundant event redelivery on the resubscribe.
+    //
+    // Today's only consumers either set mEventNumber (Java/Python/MTRCluster) without a
+    // tracking callback, or use a ClusterStateCache and leave mEventNumber unset (MTRDevice).
+    // A future caller that does both should not regress to the lower of the two.
+    using chip::app::ReadClient;
+    using chip::app::ReadPrepareParams;
+
+    // Case 1: only caller-supplied. Callback returns no value. Result = caller's value (as-is,
+    // because mEventNumber is already "first event _after_ the last received").
+    {
+        FixedHighestEventNumberCallback delegate(Optional<chip::EventNumber>{});
+        ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Subscribe);
+        ReadPrepareParams params;
+        params.mEventNumber.SetValue(100);
+
+        Optional<chip::EventNumber> result;
+        EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+        ASSERT_TRUE(result.HasValue());
+        EXPECT_EQ(result.Value(), 100u);
+    }
+
+    // Case 2: only callback. Caller leaves mEventNumber unset. Result = callback value + 1.
+    {
+        FixedHighestEventNumberCallback delegate(MakeOptional<chip::EventNumber>(static_cast<chip::EventNumber>(50)));
+        ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Subscribe);
+        ReadPrepareParams params;
+
+        Optional<chip::EventNumber> result;
+        EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+        ASSERT_TRUE(result.HasValue());
+        EXPECT_EQ(result.Value(), 51u);
+    }
+
+    // Case 3: both present, callback higher (callback+1 > caller). Result = callback+1.
+    {
+        FixedHighestEventNumberCallback delegate(MakeOptional<chip::EventNumber>(static_cast<chip::EventNumber>(200)));
+        ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Subscribe);
+        ReadPrepareParams params;
+        params.mEventNumber.SetValue(100);
+
+        Optional<chip::EventNumber> result;
+        EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+        ASSERT_TRUE(result.HasValue());
+        EXPECT_EQ(result.Value(), 201u);
+    }
+
+    // Case 4: both present, caller higher. Result = caller (callback's value is stale relative
+    // to what was persisted; never regress to it).
+    {
+        FixedHighestEventNumberCallback delegate(MakeOptional<chip::EventNumber>(static_cast<chip::EventNumber>(50)));
+        ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Subscribe);
+        ReadPrepareParams params;
+        params.mEventNumber.SetValue(500);
+
+        Optional<chip::EventNumber> result;
+        EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+        ASSERT_TRUE(result.HasValue());
+        EXPECT_EQ(result.Value(), 500u);
+    }
+
+    // Case 5: neither. Result = no value (server gets no EventFilter).
+    {
+        FixedHighestEventNumberCallback delegate(Optional<chip::EventNumber>{});
+        ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Subscribe);
+        ReadPrepareParams params;
+
+        Optional<chip::EventNumber> result;
+        EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+        EXPECT_FALSE(result.HasValue());
+    }
+}
+
+namespace {
+
+// Callback that fails OnUpdateDataVersionFilterList with a specific error, used to pin error
+// propagation behaviour of GenerateDataVersionFilterList.
+class FailingUpdateDvfCallback : public MockInteractionModelApp
+{
+public:
+    explicit FailingUpdateDvfCallback(CHIP_ERROR aError) : mError(aError) {}
+
+    CHIP_ERROR OnUpdateDataVersionFilterList(chip::app::DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             const chip::Span<chip::app::AttributePathParams> & aAttributePaths,
+                                             bool & aEncodedDataVersionList) override
+    {
+        return mError;
+    }
+
+private:
+    CHIP_ERROR mError;
+};
+
+// Callback whose GetHighestReceivedEventNumber fails with a specific error, used to pin error
+// propagation in GetMinEventNumber when the production code now unconditionally consults the
+// callback (previously skipped when caller mEventNumber was set).
+class FailingHighestEventNumberCallback : public MockInteractionModelApp
+{
+public:
+    explicit FailingHighestEventNumberCallback(CHIP_ERROR aError) : mError(aError) {}
+
+    CHIP_ERROR GetHighestReceivedEventNumber(Optional<chip::EventNumber> & aEventNumber) override { return mError; }
+
+private:
+    CHIP_ERROR mError;
+};
+
+} // namespace
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeEmptyParamsAndEmptyCallbackEncodesNothing)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeEmptyParamsAndEmptyCallbackEncodesNothing)
+void TestReadInteraction::TestSubscribeEmptyParamsAndEmptyCallbackEncodesNothing()
+{
+    // Hardening of the new `if (!aDataVersionFilters.empty())` guard introduced by this PR.
+    //
+    // Before the fix, the gate was `if (!aEncodedDataVersionList)` — i.e. when a Callback encoded
+    // nothing AND the caller supplied no persisted list, BuildDataVersionFilterList still ran
+    // (against an empty filter list, harmlessly). The new gate keys off the *caller-supplied*
+    // list instead. This test pins the resulting contract: with both inputs empty,
+    // GenerateDataVersionFilterList must succeed, leave aEncodedDataVersionList=false, and
+    // produce a SubscribeRequest carrying zero DataVersionFilterIBs on the wire. A regression
+    // that flips the guard back (or accidentally encodes empty filters) would surface here.
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+    attributePathParams[0].mClusterId  = kTestClusterId;
+
+    // Empty callback contribution (zero DVFs to encode).
+    DataVersionFilterCapturingCallback delegate{ Span<chip::app::DataVersionFilter>{} };
+
+    constexpr size_t kBufSize = 2048;
+    uint8_t backingBuf[kBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+
+    // See ordering comment in TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    // Match the production caller's initialization: ReadClient::GenerateMsg and
+    // ReadClient::SendSubscribeRequestImpl both seed `bool encodedDataVersionList = false`.
+    // Neither GenerateDataVersionFilterList nor the callback contract ever drives the flag
+    // back down to false — callees only ever set it to true. The meaningful assertion for the
+    // all-empty case is "stays false AND no IBs land on the wire", not "the function resets
+    // a pre-existing true".
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, 1),
+                                                       Span<chip::app::DataVersionFilter>(), encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_FALSE(encodedList);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(CountEncodedDataVersionFilters(writer, request, backingBuf), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeCallbackEncodeErrorPropagates)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeCallbackEncodeErrorPropagates)
+void TestReadInteraction::TestSubscribeCallbackEncodeErrorPropagates()
+{
+    // Hardening: when the Callback returns a non-success CHIP_ERROR from
+    // OnUpdateDataVersionFilterList, GenerateDataVersionFilterList must surface that error to
+    // its caller (via the ReturnErrorOnFailure on the callback line) and MUST NOT fall through
+    // to BuildDataVersionFilterList against a half-encoded DVF list (which could otherwise
+    // overwrite/clobber state or silently mask the callback failure).
+    //
+    // The new `!aDataVersionFilters.empty()` gate would still match here (we deliberately
+    // supply a non-empty persisted list to prove the propagation short-circuits the supplemental
+    // encode); a regression that swallows the callback error would expose persisted DVFs the
+    // caller never expected to be encoded after the callback failed.
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+    attributePathParams[0].mClusterId  = kTestClusterId;
+
+    chip::app::DataVersionFilter persistedFilters[1];
+    persistedFilters[0].mEndpointId = kTestEndpointId;
+    persistedFilters[0].mClusterId  = kTestClusterId;
+    persistedFilters[0].mDataVersion.SetValue(42);
+
+    FailingUpdateDvfCallback delegate(CHIP_ERROR_INTERNAL);
+
+    constexpr size_t kBufSize = 2048;
+    uint8_t backingBuf[kBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, 1),
+                                                       Span<chip::app::DataVersionFilter>(persistedFilters, 1), encodedList),
+              CHIP_ERROR_INTERNAL);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestGetMinEventNumberCallbackErrorSwallowedWhenCallerSet)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestGetMinEventNumberCallbackErrorSwallowedWhenCallerSet)
+void TestReadInteraction::TestGetMinEventNumberCallbackErrorSwallowedWhenCallerSet()
+{
+    // Round-2 review fix: GetMinEventNumber now treats callback errors as advisory when the
+    // caller has supplied a persisted mEventNumber. Pre-PR the callback was bypassed entirely
+    // on this path, so a callback that started returning errors would have been invisible.
+    // Failing the entire subscribe in that case would be a silent regression for callers that
+    // already have their own persisted progress value. Verify: callback error is swallowed,
+    // GetMinEventNumber returns CHIP_NO_ERROR, and aEventMin is the caller-supplied value.
+    using chip::app::ReadClient;
+    using chip::app::ReadPrepareParams;
+
+    FailingHighestEventNumberCallback delegate(CHIP_ERROR_INCORRECT_STATE);
+    ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                          ReadClient::InteractionType::Subscribe);
+
+    ReadPrepareParams params;
+    params.mEventNumber.SetValue(123);
+
+    Optional<chip::EventNumber> result;
+    EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+    ASSERT_TRUE(result.HasValue());
+    EXPECT_EQ(result.Value(), 123u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestGetMinEventNumberCallbackErrorPropagatesWithoutCallerSet)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestGetMinEventNumberCallbackErrorPropagatesWithoutCallerSet)
+void TestReadInteraction::TestGetMinEventNumberCallbackErrorPropagatesWithoutCallerSet()
+{
+    // Companion to TestGetMinEventNumberCallbackErrorSwallowedWhenCallerSet: covers the OTHER
+    // branch of the new conditional, where the caller did NOT set ReadPrepareParams::mEventNumber
+    // and the callback's GetHighestReceivedEventNumber returns an error. The error path is
+    // shared (same ReturnErrorOnFailure on the unconditional callback call), but the post-error
+    // selection branches differ — pin both so a refactor that re-orders the two-branch select
+    // cannot regress one without the other.
+    using chip::app::ReadClient;
+    using chip::app::ReadPrepareParams;
+
+    FailingHighestEventNumberCallback delegate(CHIP_ERROR_BUSY);
+    ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                          ReadClient::InteractionType::Subscribe);
+
+    ReadPrepareParams params; // mEventNumber intentionally unset
+
+    Optional<chip::EventNumber> result;
+    EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_ERROR_BUSY);
+    EXPECT_FALSE(result.HasValue());
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestGetMinEventNumberMaxIsIdempotentAtEquality)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestGetMinEventNumberMaxIsIdempotentAtEquality)
+void TestReadInteraction::TestGetMinEventNumberMaxIsIdempotentAtEquality()
+{
+    // Boundary: caller's mEventNumber exactly equals (callback highest received + 1). std::max
+    // of two equal values must yield that same value (not regress to a lower one, not drift
+    // higher by an off-by-one). This pins the increment-then-max ordering: if a future refactor
+    // accidentally takes max() before adding 1 to the callback value (e.g. max(100, 100) = 100
+    // instead of max(100, 101) = 101), it would silently re-deliver the event with EventNumber=100.
+    using chip::app::ReadClient;
+    using chip::app::ReadPrepareParams;
+
+    // callback=100 → callback+1=101; caller=101 → expected min=101.
+    FixedHighestEventNumberCallback delegate(MakeOptional<chip::EventNumber>(static_cast<chip::EventNumber>(100)));
+    ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                          ReadClient::InteractionType::Subscribe);
+    ReadPrepareParams params;
+    params.mEventNumber.SetValue(101);
+
+    Optional<chip::EventNumber> result;
+    EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+    ASSERT_TRUE(result.HasValue());
+    EXPECT_EQ(result.Value(), 101u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestGetMinEventNumberZeroBoundary)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestGetMinEventNumberZeroBoundary)
+void TestReadInteraction::TestGetMinEventNumberZeroBoundary()
+{
+    // Zero-boundary: caller mEventNumber=0 (legitimate persisted "we have not yet seen any
+    // events past 0"), callback returns 0 (received event 0 in RAM). Production code increments
+    // the callback value to 1, then std::max(0, 1) must yield 1 — i.e. the resubscribe filter
+    // asks for events strictly after the one already received. A regression that took the max
+    // BEFORE incrementing (max(0, 0) = 0, then +1 = 1) would coincidentally produce the same
+    // answer here, but if a future refactor drops the +1 entirely (max(0, 0) = 0), the server
+    // would re-send event 0 on every resubscribe. Pin the post-condition.
+    using chip::app::ReadClient;
+    using chip::app::ReadPrepareParams;
+
+    FixedHighestEventNumberCallback delegate(MakeOptional<chip::EventNumber>(static_cast<chip::EventNumber>(0)));
+    ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                          ReadClient::InteractionType::Subscribe);
+    ReadPrepareParams params;
+    params.mEventNumber.SetValue(0);
+
+    Optional<chip::EventNumber> result;
+    EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+    ASSERT_TRUE(result.HasValue());
+    EXPECT_EQ(result.Value(), 1u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribePersistedFilterForIrrelevantClusterIsDropped)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribePersistedFilterForIrrelevantClusterIsDropped)
+void TestReadInteraction::TestSubscribePersistedFilterForIrrelevantClusterIsDropped()
+{
+    // Hardening: BuildDataVersionFilterList silently drops persisted DVFs whose cluster does
+    // not intersect any path in aAttributePaths (the "irrelevant filter" branch — see
+    // ReadClient.cpp `if (!intersected) continue;`). This must continue to hold after the new
+    // blend, otherwise the resubscribe SubscribeRequest could carry stale DVFs for clusters the
+    // client is no longer subscribing to — wasting MTU and producing a spec-non-compliant
+    // request whose filter clusters are not referenced by any AttributePath.
+    //
+    // A regression that drops the relevance check (e.g. blanket-encoding everything the caller
+    // persisted) would surface here as encodedCount > 1.
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+    attributePathParams[0].mClusterId  = kTestClusterId;
+
+    chip::app::DataVersionFilter persistedFilters[2];
+    // Relevant: matches the only attribute path.
+    persistedFilters[0].mEndpointId = kTestEndpointId;
+    persistedFilters[0].mClusterId  = kTestClusterId;
+    persistedFilters[0].mDataVersion.SetValue(7);
+    // Irrelevant: no attribute path subscribes to this cluster — must be silently dropped.
+    persistedFilters[1].mEndpointId = kTestEndpointId;
+    persistedFilters[1].mClusterId  = kTestClusterId + 99;
+    persistedFilters[1].mDataVersion.SetValue(8);
+
+    DataVersionFilterCapturingCallback delegate{ Span<chip::app::DataVersionFilter>{} };
+
+    // Raw stack buffer + ContiguousBufferTLVReader — see ordering/fixture comment in
+    // TestSubscribeResubscribeEncodesAllPersistedDataVersionFilters.
+    constexpr size_t kBufSize = 2048;
+    uint8_t backingBuf[kBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, 1),
+                                                       Span<chip::app::DataVersionFilter>(persistedFilters, 2), encodedList),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(encodedList);
+    EXPECT_EQ(dvfBuilder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+
+    // Only the relevant DVF should appear on the wire; the irrelevant one is dropped.
+    EXPECT_EQ(CountEncodedDataVersionFilters(writer, request, backingBuf), 1u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeInvalidPersistedFilterRejected)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeInvalidPersistedFilterRejected)
+void TestReadInteraction::TestSubscribeInvalidPersistedFilterRejected()
+{
+    // Hardening: BuildDataVersionFilterList validates each entry via IsValidDataVersionFilter()
+    // and returns CHIP_ERROR_INVALID_ARGUMENT on the first malformed one (missing mDataVersion,
+    // kInvalidClusterId, or kInvalidEndpointId). Pre-fix, that validation only ran when the
+    // caller-supplied list was non-empty AND the callback encoded nothing; post-fix the
+    // caller-supplied list is now consulted whenever it is non-empty, regardless of what the
+    // callback did. That broadens the surface that can return CHIP_ERROR_INVALID_ARGUMENT.
+    //
+    // Pin the propagation: a persisted entry without mDataVersion (e.g. corrupted disk state,
+    // partial deserialization from MTRDevice's storage layer) must surface as
+    // CHIP_ERROR_INVALID_ARGUMENT to the caller — not silently encode garbage on the wire.
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+    attributePathParams[0].mClusterId  = kTestClusterId;
+
+    // Persisted filter is missing mDataVersion — fails IsValidDataVersionFilter().
+    chip::app::DataVersionFilter persistedFilters[1];
+    persistedFilters[0].mEndpointId = kTestEndpointId;
+    persistedFilters[0].mClusterId  = kTestClusterId;
+    // mDataVersion intentionally left unset.
+
+    // Empty callback contribution — isolates the failure to the supplemental encode path.
+    DataVersionFilterCapturingCallback delegate{ Span<chip::app::DataVersionFilter>{} };
+
+    constexpr size_t kBufSize = 2048;
+    uint8_t backingBuf[kBufSize];
+    chip::TLV::TLVWriter writer;
+    writer.Init(backingBuf, sizeof(backingBuf));
+    ReadRequestMessage::Builder request;
+    EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+    EXPECT_EQ(request.IsFabricFiltered(false).GetError(), CHIP_NO_ERROR);
+    DataVersionFilterIBs::Builder & dvfBuilder = request.CreateDataVersionFilters();
+    EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+
+    bool encodedList = false;
+    EXPECT_EQ(readClient.GenerateDataVersionFilterList(dvfBuilder, Span<chip::app::AttributePathParams>(attributePathParams, 1),
+                                                       Span<chip::app::DataVersionFilter>(persistedFilters, 1), encodedList),
+              CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestGetMinEventNumberCallbackMaxValueWrapBehaviour)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestGetMinEventNumberCallbackMaxValueWrapBehaviour)
+void TestReadInteraction::TestGetMinEventNumberCallbackMaxValueWrapBehaviour()
+{
+    // Boundary regression guard: GetMinEventNumber unconditionally adds 1 to the callback's
+    // highest-received EventNumber. If the callback ever returned EventNumber=UINT64_MAX,
+    // a naive (callback + 1) would wrap to 0 — and with caller unset the result would be 0,
+    // which silently asks the server to re-deliver every event from the start of the log.
+    //
+    // Round-2 review fix added a saturating-increment guard: when the callback returns
+    // UINT64_MAX the production code clears the value instead of wrapping. Pin both branches
+    // of that guard so a future regression that restores the naive `+1` is caught.
+    using chip::app::ReadClient;
+    using chip::app::ReadPrepareParams;
+
+    // Sub-case A: caller unset, callback=UINT64_MAX. With the saturating-increment guard the
+    // computed min is empty (no EventFilter on the wire) rather than 0. A regression that
+    // wraps to 0 would silently request a full event-log replay on every resubscribe.
+    {
+        FixedHighestEventNumberCallback delegate(MakeOptional<chip::EventNumber>(UINT64_MAX));
+        ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Subscribe);
+        ReadPrepareParams params;
+
+        Optional<chip::EventNumber> result;
+        EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+        EXPECT_FALSE(result.HasValue());
+    }
+
+    // Sub-case B: caller=UINT64_MAX, callback=UINT64_MAX. Callback saturates to "no value";
+    // caller stays at UINT64_MAX; the blended path picks the caller. Demonstrates that
+    // persisted caller state continues to drive the min at the extreme boundary.
+    {
+        FixedHighestEventNumberCallback delegate(MakeOptional<chip::EventNumber>(UINT64_MAX));
+        ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Subscribe);
+        ReadPrepareParams params;
+        params.mEventNumber.SetValue(UINT64_MAX);
+
+        Optional<chip::EventNumber> result;
+        EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+        ASSERT_TRUE(result.HasValue());
+        EXPECT_EQ(result.Value(), UINT64_MAX);
+    }
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestGetMinEventNumberCallbackErrorWithCallerSetFallsBack)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestGetMinEventNumberCallbackErrorWithCallerSetFallsBack)
+void TestReadInteraction::TestGetMinEventNumberCallbackErrorWithCallerSetFallsBack()
+{
+    // Round-2 review fix: pin the advisory-error semantics. When the caller has supplied a
+    // persisted ReadPrepareParams::mEventNumber, a callback that returns an error MUST be
+    // logged-and-swallowed (not propagated) so the caller's persisted value is used. Pre-PR
+    // the callback was bypassed entirely on this path; failing the entire subscribe would be
+    // a silent regression for callers like MTRDevice that have their own progress value.
+    //
+    // Companion to TestGetMinEventNumberCallbackErrorPropagatesWithoutCallerSet, which pins
+    // the OTHER branch (caller unset → error propagates because we have nothing to fall back
+    // to). Together they fence the advisory-error semantics on both sides.
+    using chip::app::ReadClient;
+    using chip::app::ReadPrepareParams;
+
+    FailingHighestEventNumberCallback delegate(CHIP_ERROR_INCORRECT_STATE);
+    ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                          ReadClient::InteractionType::Subscribe);
+
+    ReadPrepareParams params;
+    params.mEventNumber.SetValue(100);
+
+    Optional<chip::EventNumber> result;
+    EXPECT_EQ(readClient.GetMinEventNumber(params, result), CHIP_NO_ERROR);
+    ASSERT_TRUE(result.HasValue());
+    EXPECT_EQ(result.Value(), 100u);
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadWildcard)
