@@ -25,27 +25,17 @@ the Matter Device Library Specification) to determine:
 
 ---
 
-## Design Principles: Generic Structure & Dependency Injection
+## Designing for Modularity & ReUse
 
-To ensure application code portability and testability, adhere strictly to these
-architectural patterns:
+When implementing your device, keep these key architectural patterns in mind to make your code highly reusable across different platforms and easy to test:
 
-1. **Keep the `devices/` Directory Platform-Agnostic**:
+1. **Abstract Hardware Interactions**:
+    - Build your core device class so it doesn't depend on specific RTOS or platform libraries.
+    - Abstract hardware-specific actions (like toggling LED pins or playing sound) behind pure virtual delegate interfaces. This allows contributors to reuse your exact device behavior on their specific target boards.
 
-    - Avoid injecting platform-specific code, RTOS dependencies, or direct
-      application state management inside core device classes.
-    - Any hardware interactions or platform services (e.g., playing audio,
-      toggling GPIO pins, interacting with network interfaces) must be
-      abstracted behind pure virtual delegate interfaces.
-
-2. **Strict Dependency Injection**:
-    - Do not instantiate, manage, or copy global system dependencies (such as
-      `TimerDelegate`, custom platform delegates, or hardware drivers) inside
-      the device implementation.
-    - Inject all required dependencies via the device constructor. This allows
-      platform-specific specializations to be instantiated and managed
-      externally in the application's main setup, keeping core device classes
-      100% generic.
+2. **Pass Dependencies via Constructors**:
+    - Rather than managing global singletons (like system timers or hardware drivers) inside your device logic, accept them as references in your constructor.
+    - This allows platform entry points to inject exactly what they need at boot while keeping your class standalone.
 
 ---
 
@@ -96,10 +86,7 @@ protected:
 
 ### The Source (`MySensorDevice.cpp`)
 
-Implement `Register()` to instantiate dynamic clusters and register them with
-the provider. Ensure strict error handling: if any registration step fails,
-gracefully roll back to prevent orphaned configurations. Implement
-`Unregister()` to destroy them cleanly.
+In `Register()`, create your strongly typed clusters and bind them to the provider. If an intermediate setup step fails, remember to roll back clean so no orphaned structures remain. Use `Unregister()` to shut down cleanly.
 
 ```cpp
 #include "MySensorDevice.h"
@@ -225,11 +212,10 @@ your device creation callback in
 
 ## Step 3: Register Files in Build Configurations
 
-Register your new device files and macros across the core build configurations.
+Next, register your implementation files across our core build scripts.
 
-> [!IMPORTANT] Matter builds enforce strict alphabetical sorting in many list
-> configurations. Ensure any insertions respect alphabetical ordering or
-> `# keep-sorted` block checks to prevent automated CI failures.
+> [!NOTE]
+> To keep project lists clean, our build systems enforce alphabetical sorting. Please insert your new device entries in alphabetical order to ensure automated CI formatting checks pass successfully.
 
 ### 1. Macro Template (`all-devices-common/device-factory/enabled_devices_config.h.in`)
 
@@ -324,11 +310,9 @@ _ALL_DEVICES_APP_DEVICES = [
 ]
 ```
 
-### 2. Update Unit Test Snapshots
+### 2. Update Build Test Golden Snapshots
 
-Because the list of generated build targets is verified against a golden
-snapshot file, modifying `targets.py` will cause `scripts/build/test.py` to
-fail. Follow this exact execution recipe to update the snapshot:
+Our automated PR workflows verify that build variants match a golden snapshot. Updating `targets.py` will temporarily cause `scripts/build/test.py` to fail until you regenerate this golden file:
 
 1. Run the build script tests within the activated build environment (this run
    will fail but generate an actual output file):
