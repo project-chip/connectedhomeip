@@ -161,7 +161,7 @@ Clusters::MySensorCluster & MySensorDevice::MySensorCluster()
 Create `all-devices-common/devices/my-sensor/BUILD.gn` to define your standalone
 source set:
 
-```gn
+```text
 # Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -243,7 +243,7 @@ Add the compile-time CMake hook:
 
 Add the device entry to `_available_devices` (keep sorted):
 
-```gn
+```text
 _available_devices = [
   ...
   [
@@ -281,11 +281,14 @@ foreach(_key
 ```
 
 ### 4. Device Factory Dependency (`all-devices-common/device-factory/BUILD.gn`)
+<<<<<<< conflict 2 of 3
++++++++ lntxykqw 2a6a8351 "Fix misspell CI check failures in all-devices-app documentation" (rebase destination)
 
 Add your new device target to the `public_deps` of `device-factory` (keep
 sorted):
 
 ```gn
+```text
   public_deps = [
     ...
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
@@ -294,12 +297,15 @@ sorted):
 ```
 
 ### 5. Platform Executable Dependencies (`BUILD.gn` files)
+<<<<<<< conflict 3 of 3
++++++++ lntxykqw 2a6a8351 "Fix misspell CI check failures in all-devices-app documentation" (rebase destination)
 
 Add the target dependency to the relevant platform executable targets where
 `all-devices-app` is built (e.g., `examples/all-devices-app/posix/BUILD.gn`, and
 embedded platform builds such as Silicon Labs or ESP32):
 
 ```gn
+```text
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
 ```
 
