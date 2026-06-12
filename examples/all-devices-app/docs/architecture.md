@@ -1,8 +1,11 @@
 # Architecture & Design
 
-The `all-devices-app` is a reference application demonstrating the **Code-Driven Data Model** within the Matter SDK. It implements a runtime-configurable data model.
+The `all-devices-app` is a reference application demonstrating the **Code-Driven
+Data Model** within the Matter SDK. It implements a runtime-configurable data
+model.
 
-This document describes the architectural layers, core classes, and design principles of the application.
+This document describes the architectural layers, core classes, and design
+principles of the application.
 
 ---
 
