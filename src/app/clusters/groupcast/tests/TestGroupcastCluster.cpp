@@ -2129,11 +2129,9 @@ TEST_F(TestGroupcastCluster, TestTotalMaxMembership)
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
 }
 
-// When a LeaveGroup command's Endpoints list size exceeds the maximum constraint, the
-// LeaveGroupResponse Endpoints list must be empty (the endpoints are still removed). The response is
-// collected into a fixed-size buffer, so an oversized request must neither populate that response nor
-// write past the buffer.
-TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsEmptyResponse)
+// A LeaveGroup command whose Endpoints list exceeds the maximum constraint ("1 to 20") is rejected
+// with CONSTRAINT_ERROR, without writing past the fixed-size response buffer.
+TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsConstraintError)
 {
     static constexpr uint16_t kMaxCommandEndpoints = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     // exceeds kMaxMembershipEndpoints (response buffer sizing) and kMaxCommandEndpoints
@@ -2169,8 +2167,8 @@ TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsEmptyResp
         }
     }
 
-    // Leave the group naming every member endpoint (more than the maximum constraint). The command
-    // succeeds and the returned Endpoints list is empty.
+    // Leaving the group while naming more than the maximum number of endpoints is rejected with
+    // CONSTRAINT_ERROR; no response payload is produced.
     {
         EndpointId leaveEndpoints[kEndpointsInGroup];
         for (uint16_t i = 0; i < kEndpointsInGroup; i++)
@@ -2183,23 +2181,8 @@ TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsEmptyResp
         data.endpoints = MakeOptional(DataModel::List<const EndpointId>(leaveEndpoints, kEndpointsInGroup));
 
         auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
-        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
-        ASSERT_TRUE(result.response.has_value());
-        size_t responseEndpointCount = 0;
-        EXPECT_EQ(result.response->endpoints.ComputeSize(&responseEndpointCount), CHIP_NO_ERROR);
-        EXPECT_EQ(responseEndpointCount, 0u);
-    }
-
-    // The endpoints were removed: the group is no longer present in the Membership attribute.
-    {
-        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        auto it = memberships.begin();
-        while (it.Next())
-        {
-            EXPECT_NE(it.GetValue().groupID, kGroup);
-        }
-        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+        EXPECT_FALSE(result.response.has_value());
     }
 }
 

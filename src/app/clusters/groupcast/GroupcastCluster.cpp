@@ -545,6 +545,15 @@ Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::Decod
     Status err                 = Status::Success;
 
     endpoints.count = 0;
+
+    // The Endpoints field is constrained to "1 to 20" per the spec; reject an oversized request.
+    if (data.endpoints.HasValue())
+    {
+        size_t endpoint_count = 0;
+        VerifyOrReturnError(data.endpoints.Value().ComputeSize(&endpoint_count) == CHIP_NO_ERROR, Status::Failure);
+        VerifyOrReturnError(endpoint_count <= kMaxCommandEndpoints, Status::ConstraintError);
+    }
+
     if (kUndefinedGroupId == data.groupID)
     {
         // Apply changes to all groups
@@ -702,25 +711,16 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
 
     if (data.endpoints.HasValue())
     {
-        // Per the LeaveGroupResponse specification, when the requested Endpoints list size exceeds the
-        // maximum constraint, the response Endpoints list SHALL be empty. The endpoints are still
-        // removed, but they are not collected into the (fixed-size) response in that case.
-        size_t requestedCount = 0;
-        auto iter             = data.endpoints.Value().begin();
+        // Remove endpoints
+        auto iter = data.endpoints.Value().begin();
         while (iter.Next())
         {
-            requestedCount++;
             auto endpoint_id = iter.GetValue();
             if (groups.HasEndpoint(fabricIndex, group_id, endpoint_id))
             {
-                EndpointList * responseEndpoints = (requestedCount <= kMaxCommandEndpoints) ? endpoints : nullptr;
-                stat                             = RemoveGroupEndpoint(fabricIndex, group_id, endpoint_id, responseEndpoints);
+                stat = RemoveGroupEndpoint(fabricIndex, group_id, endpoint_id, endpoints);
                 VerifyOrReturnError(Status::Success == stat, stat);
             }
-        }
-        if (requestedCount > kMaxCommandEndpoints && endpoints != nullptr)
-        {
-            endpoints->count = 0;
         }
     }
     else
@@ -771,7 +771,7 @@ Status GroupcastCluster::RemoveGroupEndpoint(FabricIndex fabricIndex, GroupId gr
     {
         found = (endpoints->entries[i] == endpoint_id);
     }
-    if (!found)
+    if (!found && endpoints->count < kMaxMembershipEndpoints)
     {
         endpoints->entries[endpoints->count++] = endpoint_id;
     }
