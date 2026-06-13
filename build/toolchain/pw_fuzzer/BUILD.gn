@@ -82,8 +82,8 @@ config("fuzztest_libfuzzer_engine") {
 #    -fsanitize=pointer-subtract, which only fire with ASAN_OPTIONS=detect_invalid_pointer_pairs=2.
 config("fuzztest_asan_options") {
   cflags = [
+    # -fsanitize-address-use-after-scope is omitted: it is ASan-default-on in modern clang.
     "-fsanitize-address-use-after-return=always",  # force stack-use-after-return on (no env needed)
-    "-fsanitize-address-use-after-scope",          # stack-use-after-scope (also ASan default-on)
   ]
 }
 
@@ -94,8 +94,13 @@ config("fuzztest_asan_options") {
 config("fuzztest_ubsan") {
   cflags = [
     "-fsanitize=undefined",
-    "-fno-sanitize=vptr",
-    "-fno-sanitize-recover=undefined",
+    "-fno-sanitize=vptr",  # pigweed builds -fno-rtti
+    # chip's global is_ubsan config is broad (-fsanitize=integer). Unsigned overflow / shift are
+    # DEFINED behavior, not UB -- they fire constantly on intentional wraps (e.g. abseil's PRNG)
+    # and are pure noise for fuzzing, so disable them here.
+    "-fno-sanitize=unsigned-integer-overflow",
+    "-fno-sanitize=unsigned-shift-base",
+    "-fno-sanitize-recover=undefined",  # make real UB fatal so libFuzzer records it
   ]
   ldflags = [ "-fsanitize=undefined" ]
 }
