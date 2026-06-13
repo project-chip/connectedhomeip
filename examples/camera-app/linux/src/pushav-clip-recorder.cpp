@@ -26,7 +26,6 @@
 #include <regex>
 #include <sys/stat.h>
 
-constexpr int kSegmentIdOffset       = 1000;
 constexpr int kMPDDefaultStartNumber = 1001;
 constexpr int kInitialSegmentId      = 1;
 
@@ -114,10 +113,13 @@ PushAVClipRecorder::~PushAVClipRecorder()
     std::filesystem::path mpdPath = mUploadFileBasePath / "index.mpd";
     if (IsFileReadyForUpload(mpdPath))
     {
-        UpdateMPDParams(mpdPath);
-        ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %" PRIu64 ", connectionID: %u", mpdPath.c_str(),
-                        mClipInfo.mTrackName.c_str(), mClipInfo.mSessionNumber, mConnectionID);
-        CheckAndUploadFile(mpdPath.string());
+        UpdateMPDParams(mpdPath.string());
+        std::string finalMpdPath = GetUploadMpdPath(mpdPath);
+        // Add SegmentTimeline to the MPD per spec
+        FinalizeMPD(finalMpdPath);
+        ChipLogProgress(Camera, "Uploading final MPD: %s for track: %s, sessionID: %" PRIu64 ", connectionID: %u",
+                        finalMpdPath.c_str(), mClipInfo.mTrackName.c_str(), mClipInfo.mSessionNumber, mConnectionID);
+        CheckAndUploadFile(finalMpdPath);
     }
 }
 
@@ -468,7 +470,7 @@ RecorderStatus PushAVClipRecorder::SetupOutput(const std::string & outputPrefix,
     double segSeconds = static_cast<double>(mClipInfo.mSegmentDurationMs) / 1000.0;
     // Set DASH/CMAF options
     av_opt_set(mFormatContext->priv_data, "increment_tc", "1", 0);
-    av_opt_set(mFormatContext->priv_data, "use_timeline", "1", 0);
+    av_opt_set(mFormatContext->priv_data, "use_timeline", "0", 0);
 
     if (mClipInfo.mChunkDurationMs == 0)
     {
@@ -485,9 +487,8 @@ RecorderStatus PushAVClipRecorder::SetupOutput(const std::string & outputPrefix,
     av_opt_set(mFormatContext->priv_data, "media_seg_name", mediaSegPattern.c_str(), 0);
     av_opt_set_int(mFormatContext->priv_data, "use_template", 1, 0);
     av_dict_set_int(&options, "dash_segment_type", 1, 0);
-    av_dict_set_int(&options, "use_timeline", 1, 0);
+    av_dict_set_int(&options, "use_timeline", 0, 0);
     av_dict_set(&options, "strict", "experimental", 0);
-    av_dict_set(&options, "start_number", std::to_string(kSegmentIdOffset).c_str(), 0);
     if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) == RecorderStatus::kFail))
     {
         ChipLogError(Camera, "ERROR: adding video stream to output");
@@ -820,9 +821,9 @@ void PushAVClipRecorder::UpdateMPDParams(const std::string & mpdPath)
 
             if (startNumberStart != std::string::npos && startNumberEnd != std::string::npos)
             {
-                // Replace the entire pattern
+                // Replace the entire pattern - use $Number$ (no zero-padding) per spec: segment_<SegmentNumber>.m4s
                 replacement = "initialization=\"" + streamName + "/" + streamName + ".init\" media=\"" + streamName +
-                    "/segment_$Number%04d$.m4s\" startNumber=\"" + std::to_string(kMPDDefaultStartNumber) + "\"";
+                    "/segment_$Number$.m4s\" startNumber=\"" + std::to_string(kMPDDefaultStartNumber) + "\"";
 
                 line.replace(pos, startNumberEnd - pos + 1, replacement);
                 foundAndReplaced = true;
@@ -836,13 +837,16 @@ void PushAVClipRecorder::UpdateMPDParams(const std::string & mpdPath)
     }
     inFile.close();
 
-    // Write the modified lines back to the file
+    // Write the modified lines to a separate .upload file to avoid race condition
+    // with FFmpeg which continuously overwrites the original MPD during recording.
+    // The uploader will strip the .upload suffix when constructing the remote URL.
     if (foundAndReplaced)
     {
-        std::ofstream outFile(mpdPath);
+        std::string uploadMpdPath = mpdPath + ".upload";
+        std::ofstream outFile(uploadMpdPath);
         if (!outFile)
         {
-            ChipLogError(Camera, "ERROR: Failed to open MPD file for writing: %s", mpdPath.c_str());
+            ChipLogError(Camera, "ERROR: Failed to open upload MPD file for writing: %s", uploadMpdPath.c_str());
             return;
         }
 
@@ -853,7 +857,7 @@ void PushAVClipRecorder::UpdateMPDParams(const std::string & mpdPath)
                 outFile << "\n";
         }
         outFile.close();
-        ChipLogProgress(Camera, "Successfully updated stream info in MPD file: %s", mpdPath.c_str());
+        ChipLogProgress(Camera, "Successfully updated stream info in upload MPD file: %s", uploadMpdPath.c_str());
     }
     else
     {
@@ -861,9 +865,237 @@ void PushAVClipRecorder::UpdateMPDParams(const std::string & mpdPath)
     }
 }
 
+void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
+{
+    std::ifstream inFile(mpdPath);
+    if (!inFile)
+    {
+        ChipLogError(Camera, "ERROR: Failed to open MPD file for finalization: %s", mpdPath.c_str());
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+
+    // Track segment counts per stream for SegmentTimeline generation
+    // mUploadSegmentID[i] is the next segment number to upload, so count = mUploadSegmentID[i] - kInitialSegmentId
+    std::vector<int> segmentCounts;
+    for (size_t i = 0; i < mUploadSegmentID.size(); i++)
+    {
+        segmentCounts.push_back(mUploadSegmentID[i] - kInitialSegmentId);
+    }
+
+    while (std::getline(inFile, line))
+    {
+        lines.push_back(line);
+    }
+    inFile.close();
+
+    if (segmentCounts.empty())
+    {
+        ChipLogProgress(Camera, "FinalizeMPD: No segments to add to timeline for %s", mpdPath.c_str());
+        return;
+    }
+
+    // Add SegmentTimeline to each SegmentTemplate.
+    // After av_write_trailer, the MPD is already static with type="static",
+    // mediaPresentationDuration, and no minimumUpdatePeriod/suggestedPresentationDelay.
+    // The only missing piece is the SegmentTimeline inside each SegmentTemplate.
+    bool modified = false;
+    std::vector<std::string> outputLines;
+    size_t streamIdx = 0;
+
+    // State for tracking multi-line SegmentTemplate elements where the opening tag
+    // and closing tag are on different lines (e.g., after av_write_trailer converts
+    // the MPD to static with multi-line formatting).
+    bool inMultiLineSegmentTemplate = false;
+    std::string pendingTimelineOpen;
+    std::string pendingTimelineEntry;
+    std::string pendingTimelineClose;
+
+    for (size_t i = 0; i < lines.size(); i++)
+    {
+        // If we're inside a multi-line SegmentTemplate, look for the closing tag
+        if (inMultiLineSegmentTemplate)
+        {
+            size_t closeTagPos = lines[i].find("</SegmentTemplate>");
+            if (closeTagPos != std::string::npos)
+            {
+                // Insert SegmentTimeline before the closing tag line
+                outputLines.push_back(pendingTimelineOpen);
+                outputLines.push_back(pendingTimelineEntry);
+                outputLines.push_back(pendingTimelineClose);
+                outputLines.push_back(lines[i]);
+                modified                   = true;
+                inMultiLineSegmentTemplate = false;
+                streamIdx++;
+                continue;
+            }
+            outputLines.push_back(lines[i]);
+            continue;
+        }
+
+        outputLines.push_back(lines[i]);
+
+        // Look for SegmentTemplate opening tag
+        size_t stPos = lines[i].find("<SegmentTemplate");
+        if (stPos == std::string::npos)
+        {
+            continue;
+        }
+
+        // Check if this is a self-closing tag or has a closing tag on the same line
+        size_t selfClosePos = lines[i].find("/>", stPos);
+        size_t closeTagPos  = lines[i].find("</SegmentTemplate>", stPos);
+
+        // Extract timescale and duration from this SegmentTemplate line
+        int64_t timescale     = 90000; // default
+        int64_t segDurationTs = 0;     // segment duration in timescale units
+
+        size_t tsPos = lines[i].find("timescale=\"", stPos);
+        if (tsPos != std::string::npos)
+        {
+            size_t valStart = tsPos + 11;
+            size_t valEnd   = lines[i].find("\"", valStart);
+            if (valEnd != std::string::npos)
+            {
+                std::string valStr = lines[i].substr(valStart, valEnd - valStart);
+                char * endPtr      = nullptr;
+                long val           = std::strtol(valStr.c_str(), &endPtr, 10);
+                if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                {
+                    timescale = val;
+                }
+            }
+        }
+
+        size_t durPos = lines[i].find("duration=\"", stPos);
+        if (durPos != std::string::npos)
+        {
+            size_t valStart = durPos + 10;
+            size_t valEnd   = lines[i].find("\"", valStart);
+            if (valEnd != std::string::npos)
+            {
+                std::string valStr = lines[i].substr(valStart, valEnd - valStart);
+                char * endPtr      = nullptr;
+                long val           = std::strtol(valStr.c_str(), &endPtr, 10);
+                if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+                {
+                    segDurationTs = val;
+                }
+            }
+        }
+
+        // If no duration attribute, calculate from configured segment duration
+        if (segDurationTs == 0 && streamIdx < segmentCounts.size())
+        {
+            segDurationTs = (static_cast<int64_t>(mClipInfo.mSegmentDurationMs) * timescale) / 1000;
+        }
+
+        int segCount = (streamIdx < segmentCounts.size()) ? segmentCounts[streamIdx] : 0;
+        if (segCount <= 0 || segDurationTs <= 0)
+        {
+            streamIdx++;
+            continue;
+        }
+
+        // Build SegmentTimeline XML - derive indentation from the SegmentTemplate line
+        std::string indent;
+        for (char c : lines[i])
+        {
+            if (c == ' ' || c == '\t')
+            {
+                indent += c;
+            }
+            else
+            {
+                break;
+            }
+        }
+        std::string timelineOpen = indent + "<SegmentTimeline>";
+        // Use r attribute for repeat count: r="N" means the S element repeats N additional times (total N+1)
+        std::string timelineEntry;
+        if (segCount == 1)
+        {
+            timelineEntry = indent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" />";
+        }
+        else
+        {
+            // r = segCount - 1 (the S element itself counts as 1, r adds segCount-1 more)
+            timelineEntry =
+                indent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" + std::to_string(segCount - 1) + "\" />";
+        }
+        std::string timelineClose = indent + "</SegmentTimeline>";
+
+        if (selfClosePos != std::string::npos && (closeTagPos == std::string::npos || selfClosePos < closeTagPos))
+        {
+            // Self-closing tag: convert to open/close with SegmentTimeline inside
+            // Replace "/>" with ">"
+            std::string & currentLine = outputLines.back();
+            currentLine.replace(selfClosePos, 2, ">");
+            // Add SegmentTimeline lines
+            outputLines.push_back(timelineOpen);
+            outputLines.push_back(timelineEntry);
+            outputLines.push_back(timelineClose);
+            outputLines.push_back(indent + "</SegmentTemplate>");
+            modified = true;
+        }
+        else if (closeTagPos != std::string::npos)
+        {
+            // Has a closing tag on the same line - insert SegmentTimeline before it
+            outputLines.push_back(timelineOpen);
+            outputLines.push_back(timelineEntry);
+            outputLines.push_back(timelineClose);
+            modified = true;
+        }
+        else
+        {
+            // Neither /> nor </SegmentTemplate> on the same line - multi-line SegmentTemplate.
+            // Store the timeline entries and insert them when we find the closing tag.
+            inMultiLineSegmentTemplate = true;
+            pendingTimelineOpen        = timelineOpen;
+            pendingTimelineEntry       = timelineEntry;
+            pendingTimelineClose       = timelineClose;
+        }
+
+        streamIdx++;
+    }
+
+    // Write the modified MPD
+    if (modified)
+    {
+        std::ofstream outFile(mpdPath);
+        if (!outFile)
+        {
+            ChipLogError(Camera, "ERROR: Failed to open MPD file for writing finalization: %s", mpdPath.c_str());
+            return;
+        }
+        for (size_t i = 0; i < outputLines.size(); i++)
+        {
+            outFile << outputLines[i];
+            if (i < outputLines.size() - 1)
+            {
+                outFile << "\n";
+            }
+        }
+        outFile.close();
+        ChipLogProgress(Camera, "FinalizeMPD: Successfully finalized MPD: %s", mpdPath.c_str());
+    }
+    else
+    {
+        ChipLogProgress(Camera, "FinalizeMPD: No modifications needed for %s", mpdPath.c_str());
+    }
+}
+
 bool PushAVClipRecorder::IsFileReadyForUpload(const std::filesystem::path & path) const
 {
     return std::filesystem::exists(path) && !std::filesystem::exists(path.string() + ".tmp");
+}
+
+std::string PushAVClipRecorder::GetUploadMpdPath(const std::filesystem::path & mpdPath) const
+{
+    std::string uploadMpdPath = mpdPath.string() + ".upload";
+    return std::filesystem::exists(uploadMpdPath) ? uploadMpdPath : mpdPath.string();
 }
 
 /**
@@ -961,7 +1193,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
         if (IsFileReadyForUpload(mpdPath))
         {
             UpdateMPDParams(mpdPath.string());
-            CheckAndUploadFile(mpdPath.string());
+            CheckAndUploadFile(GetUploadMpdPath(mpdPath));
             mUploadMPD = false; // Reset flag after successful upload
         }
         else
