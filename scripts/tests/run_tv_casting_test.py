@@ -256,6 +256,9 @@ def cmd_execute_list(app_path):
 
     cmd.append(app_path)
 
+    cmd.append("--KVS")
+    cmd.append("/tmp/chip_casting_kvs")
+
     # Our applications support better debugging logs. Enable them
     cmd.append("--trace-to")
     cmd.append("json:log")
