@@ -22,10 +22,20 @@ import("${build_root}/toolchain/gcc_toolchain.gni")
 # Provides the `oss_fuzz` build arg (set true by OSS-Fuzz's build.sh).
 import("${build_root}/config/compiler/compiler.gni")
 
-# --- OSS-Fuzz / libFuzzer-compatibility-mode support for FuzzTest (b/295961502) ---
-# The pw_fuzzer FuzzTest targets build as libFuzzer-compatible binaries (the mode OSS-Fuzz
-# drives). The configs below are applied toolchain-wide so they reach the FuzzTest library
-# as well as the test harness.
+declare_args() {
+  # Build the pw_fuzzer / Google FuzzTest targets in libFuzzer-compatibility mode (the mode
+  # OSS-Fuzz drives) instead of FuzzTest's native engine. Always enabled under `oss_fuzz`;
+  # set true to opt into libFuzzer mode for a LOCAL build (e.g. to reproduce OSS-Fuzz, or to
+  # use libFuzzer corpus/merge/minimize features). Default false -> local builds use
+  # FuzzTest's native run mode.
+  chip_pw_fuzz_libfuzzer_compat = false
+}
+
+# --- libFuzzer-compatibility-mode support for FuzzTest (b/295961502) ---
+# When enabled (always under OSS-Fuzz, otherwise opt-in via chip_pw_fuzz_libfuzzer_compat),
+# the FuzzTest targets build as libFuzzer-compatible binaries. The configs below are applied
+# toolchain-wide so they reach the FuzzTest library as well as the test harness.
+_use_libfuzzer_compat = oss_fuzz || chip_pw_fuzz_libfuzzer_compat
 
 # Compiler used to resolve clang runtime libraries: the OSS-Fuzz-provided $CXX when building
 # under OSS-Fuzz, otherwise the local CIPD clang the toolchain itself uses. Keeping these in
@@ -81,13 +91,16 @@ gcc_toolchain("chip_pw_fuzztest") {
     # This is needed to have the defaults passed from pw_target_toolchain_host.clang_fuzz to the current scope
     forward_variables_from(defaults, "*")
 
-    # SPIKE (b/295961502): build FuzzTest targets in libFuzzer-compatibility mode so they
-    # can be driven by OSS-Fuzz. Toolchain-wide so the define reaches both the FuzzTest
-    # library (compatibility_mode.cc) and the harness; see configs above.
-    default_configs += [
-      "//build/toolchain/pw_fuzzer:fuzztest_compatibility_mode",
-      "//build/toolchain/pw_fuzzer:fuzztest_libfuzzer_engine",
-    ]
+    # Build in libFuzzer-compatibility mode when enabled (always under OSS-Fuzz, otherwise
+    # opt-in via chip_pw_fuzz_libfuzzer_compat). Toolchain-wide so the define reaches both
+    # the FuzzTest library (compatibility_mode.cc) and the harness; see configs above. When
+    # disabled, the targets use FuzzTest's native engine.
+    if (_use_libfuzzer_compat) {
+      default_configs += [
+        "//build/toolchain/pw_fuzzer:fuzztest_compatibility_mode",
+        "//build/toolchain/pw_fuzzer:fuzztest_libfuzzer_engine",
+      ]
+    }
 
     pw_unit_test_MAIN = "$dir_pw_fuzzer:fuzztest_main"
     pw_unit_test_BACKEND = "$dir_pw_fuzzer:gtest"
