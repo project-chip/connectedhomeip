@@ -73,7 +73,7 @@ def GenerateVerifier(passcode: int, salt: bytes, iterations: int) -> bytes:
 
 
 def TestFail(message, doCrash=False):
-    logger.fatal("Testfail: {}".format(message))
+    logger.fatal(f"Testfail: {message}")
 
     if (doCrash):
         logger.fatal("--------------------------------")

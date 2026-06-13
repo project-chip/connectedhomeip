@@ -72,14 +72,14 @@ class GnBuilder(Builder):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
-            '--root=%s' % self.root,
+            f'--root={self.root}',
         ]
 
         if self.quiet:
             cmd.append("--ninja-extra-args=--quiet")
 
         if args := self.GnBuildArgs():
-            cmd += ['--args=%s' % ' '.join(args)]
+            cmd += ['--args={}'.format(' '.join(args))]
 
         cmd += [self.output_dir]
 
@@ -88,7 +88,7 @@ class GnBuilder(Builder):
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
+                    [f'{key}="{value}" \\\n' for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]
@@ -114,7 +114,7 @@ class GnBuilder(Builder):
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
+                    [f'{key}="{value}" \\\n' for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]

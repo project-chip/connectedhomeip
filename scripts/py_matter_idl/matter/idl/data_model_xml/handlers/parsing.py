@@ -271,7 +271,7 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
             log.warning("Found an event with 'desc' priority: '%s'", attrs.items())
             priority = EventPriority.CRITICAL
         else:
-            raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
+            raise Exception("UNKNOWN event priority: {!r}".format(attrs["priority"]))
     else:
         priority = EventPriority.INFO
 
@@ -291,7 +291,7 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         return AccessPrivilege.MANAGE
     if value == "admin":
         return AccessPrivilege.ADMINISTER
-    raise Exception("UNKNOWN privilege level: %r" % value)
+    raise Exception(f"UNKNOWN privilege level: {value!r}")
 
 
 def AttributesToCommand(attrs: AttributesImpl) -> Command:

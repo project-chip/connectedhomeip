@@ -358,7 +358,7 @@ class Flasher(firmware_utils.Flasher):
             try:
                 flashtool_exe = flashtool_path + "/" + bflb_tools_dict[sys.platform]["flash_tool"]
             except Exception:
-                raise Exception("Do NOT support {} operating system to program firmware.".format(sys.platform))
+                raise Exception(f"Do NOT support {sys.platform} operating system to program firmware.")
 
             if not os.path.exists(flashtool_exe):
                 log.fatal("*" * 80)
@@ -410,8 +410,8 @@ class Flasher(firmware_utils.Flasher):
 
         def exe_gen_ota_image_cmd(flashtool_exe):
 
-            os.system("rm -rf {}/FW_OTA.bin*".format(self.work_dir))
-            os.system("rm -rf {}/ota_images".format(self.work_dir))
+            os.system(f"rm -rf {self.work_dir}/FW_OTA.bin*")
+            os.system(f"rm -rf {self.work_dir}/ota_images")
 
             if not self.args["build_ota"]:
                 return
@@ -440,12 +440,12 @@ class Flasher(firmware_utils.Flasher):
             if not fw_ota_images or len(fw_ota_images) == 0:
                 raise Exception("Failed to generate Bouffalo Lab OTA image.")
 
-            os.system("mkdir -p {}/ota_images".format(self.work_dir))
+            os.system(f"mkdir -p {self.work_dir}/ota_images")
             fw_name = os.path.basename(self.args["firmware"])[:-len(".bin")]
             for img in fw_ota_images:
                 ota_img_name = os.path.basename(img)
                 new_name = os.path.join(self.work_dir, "ota_images", fw_name + ota_img_name[len("FW_OTA"):])
-                os.system("mv {} {}".format(img, new_name))
+                os.system(f"mv {img} {new_name}")
 
         def construct_prog_confg():
 
@@ -579,7 +579,7 @@ class Flasher(firmware_utils.Flasher):
             lhex = ((intvalue & 0xff000000) >> 24) | ((intvalue & 0xff0000) >> 8)
             lhex |= ((intvalue & 0xff00) << 8) | ((intvalue & 0xff) << 24)
 
-            return "%08x" % lhex
+            return f"{lhex:08x}"
 
         def get_tools():
             bflb_tools = os.path.join(MATTER_ROOT, "third_party/bouffalolab/repo_bouffalo_sdk/tools/bflb_tools")
@@ -593,7 +593,7 @@ class Flasher(firmware_utils.Flasher):
                 fw_proc_exe = os.path.join(bflb_tools, bflb_tools_dict[sys.platform]["fw_proc"])
                 flashtool_exe = os.path.join(bflb_tools, bflb_tools_dict[sys.platform]["flash_tool"])
             except Exception:
-                raise Exception("Do NOT support {} operating system to program firmware.".format(sys.platform))
+                raise Exception(f"Do NOT support {sys.platform} operating system to program firmware.")
 
             if not os.path.exists(flashtool_exe) or not os.path.exists(fw_proc_exe):
                 log.fatal("*" * 80)
@@ -650,7 +650,7 @@ class Flasher(firmware_utils.Flasher):
 
         def exe_proc_cmd(fw_proc_exe):
 
-            os.system("rm -rf {}/ota_images".format(self.work_dir))
+            os.system(f"rm -rf {self.work_dir}/ota_images")
 
             fw_proc_cmd = [
                 fw_proc_exe,
@@ -678,8 +678,8 @@ class Flasher(firmware_utils.Flasher):
                 if line:
                     log.info(line)
 
-            os.system("mkdir -p {}/ota_images".format(self.work_dir))
-            os.system("mv {}/*.ota {}/ota_images/".format(self.work_dir, self.work_dir))
+            os.system(f"mkdir -p {self.work_dir}/ota_images")
+            os.system(f"mv {self.work_dir}/*.ota {self.work_dir}/ota_images/")
 
         def exe_prog_cmd(flashtool_exe):
             prog_cmd = [
@@ -748,9 +748,9 @@ class Flasher(firmware_utils.Flasher):
             ota_image_tool.generate_image(ota_image_cfg)
 
             if re.match(r".+\.(xz.ota|xz.hash)$", img):
-                self.log(0, 'Matter OTA compressed image generated: {}'.format(ota_image_cfg.output_file))
+                self.log(0, f'Matter OTA compressed image generated: {ota_image_cfg.output_file}')
             else:
-                self.log(0, 'Matter OTA image generated: {}'.format(ota_image_cfg.output_file))
+                self.log(0, f'Matter OTA image generated: {ota_image_cfg.output_file}')
 
     def verify(self):
         """Not supported"""

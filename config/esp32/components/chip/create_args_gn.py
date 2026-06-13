@@ -88,9 +88,9 @@ with open(compile_commands_path) as compile_commands_json:
 
         # Keep ESP-IDF libc overrides ahead of toolchain libc headers, matching native ESP-IDF builds
         def normalize_idf_include(flag):
-            if flag == "-I%s/components/esp_libc/platform_include" % args.idf_path:
+            if flag == f"-I{args.idf_path}/components/esp_libc/platform_include":
                 return flag
-            return flag.replace("-I%s" % args.idf_path, "-isystem%s" % args.idf_path)
+            return flag.replace(f"-I{args.idf_path}", f"-isystem{args.idf_path}")
 
         # Escape any embedded double quotes for GN string syntax, then wrap in quotes
         def quote_for_gn(flag):
@@ -112,6 +112,6 @@ with open(compile_commands_path) as compile_commands_json:
     with open(args.input) as args_input, open(args.output, "w") as args_output:
         args_output.write(args_input.read())
 
-        args_output.write("target_cflags_c = [%s]" % ', '.join(c_flags))
+        args_output.write("target_cflags_c = [{}]".format(', '.join(c_flags)))
         args_output.write("\n")
-        args_output.write("target_cflags_cc = [%s]" % ', '.join(cpp_flags))
+        args_output.write("target_cflags_cc = [{}]".format(', '.join(cpp_flags)))

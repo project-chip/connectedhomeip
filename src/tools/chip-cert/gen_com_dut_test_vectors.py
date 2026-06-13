@@ -728,7 +728,7 @@ class DevCertBuilder:
         self.valid_from = valid_from
 
         if not os.path.exists(self.chipcert):
-            raise Exception('Path not found: %s' % self.chipcert)
+            raise Exception(f'Path not found: {self.chipcert}')
 
         if not os.path.exists(test_case_out_dir):
             os.mkdir(test_case_out_dir)
@@ -747,8 +747,8 @@ class DevCertBuilder:
         """Creates the PEM and DER certs and keyfiles"""
         error_type_flag = ' -I -E ' + self.error_type
         subject_name = self.custom_cn_attribute
-        vid_flag = ' -V 0x{:X}'.format(self.vid)
-        pid_flag = ' -P 0x{:X}'.format(self.pid)
+        vid_flag = f' -V 0x{self.vid:X}'
+        pid_flag = f' -P 0x{self.pid:X}'
         if (len(self.valid_from) == 0):
             validity_flags = ' -l 4294967295 '
         else:
@@ -867,7 +867,7 @@ def main():
     chipcert = args.chipcertdir + 'chip-cert'
 
     if not os.path.exists(chipcert):
-        raise Exception('Path not found: %s' % chipcert)
+        raise Exception(f'Path not found: {chipcert}')
 
     cd_cert = args.cdpath + 'Cert.pem'
     cd_key = args.cdpath + 'Key.pem'
@@ -924,8 +924,8 @@ def main():
             builder.make_certs_and_keys()
 
             # Generate Certification Declaration (CD)
-            vid_flag = ' -V 0x{:X}'.format(vid)
-            pid_flag = ' -p 0x{:X}'.format(pid)
+            vid_flag = f' -V 0x{vid:X}'
+            pid_flag = f' -p 0x{pid:X}'
             cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
                 ' -f 1 ' + vid_flag + pid_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
             subprocess.run(cmd, shell=True)
@@ -1016,14 +1016,14 @@ def main():
         builder.make_certs_and_keys()
 
         # Generate Certification Declaration (CD)
-        vid_flag = ' -V 0x{:X}'.format(vid)
-        pid_flag = ' -p 0x{:X}'.format(pid)
+        vid_flag = f' -V 0x{vid:X}'
+        pid_flag = f' -p 0x{pid:X}'
 
         dac_origin_flag = ' '
         if origin_vid:
-            dac_origin_flag += ' -o 0x{:X}'.format(origin_vid)
+            dac_origin_flag += f' -o 0x{origin_vid:X}'
         if origin_pid:
-            dac_origin_flag += ' -r 0x{:X}'.format(origin_pid)
+            dac_origin_flag += f' -r 0x{origin_pid:X}'
 
         if test_case["error_flag"] == 'authorized-paa-list-count0' or test_case["error_flag"] == 'authorized-paa-list-count1-valid'\
                 or test_case["error_flag"] == 'authorized-paa-list-count2-valid'\
@@ -1081,8 +1081,8 @@ def main():
     builder.make_certs_and_keys()
 
     # Generate Certification Declaration (CD)
-    vid_flag = ' -V 0x{:X}'.format(vid)
-    pid_flag = ' -p 0x{:X}'.format(pid)
+    vid_flag = f' -V 0x{vid:X}'
+    pid_flag = f' -p 0x{pid:X}'
     cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
         ' -f 1 ' + vid_flag + pid_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
     subprocess.run(cmd, shell=True)

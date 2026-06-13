@@ -66,7 +66,7 @@ class Efr32App(Enum):
             return 'smoke-co-alarm-app'
         if self == Efr32App.ALL_DEVICES:
             return 'all-devices-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == Efr32App.EVSE:
@@ -95,7 +95,7 @@ class Efr32App(Enum):
             return 'matter-silabs-smoke-co-alarm-example'
         if self == Efr32App.ALL_DEVICES:
             return 'matter-silabs-all-devices-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
         if self == Efr32App.EVSE:
@@ -124,7 +124,7 @@ class Efr32App(Enum):
             return 'smoke_co_alarm_app.flashbundle.txt'
         if self == Efr32App.ALL_DEVICES:
             return 'all_devices_app.flashbundle.txt'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         if self == Efr32App.UNIT_TEST:
@@ -186,7 +186,7 @@ class Efr32Board(Enum):
             return 'BRD2708A'
         if self == Efr32Board.BRD2911A:
             return 'BRD2911A'
-        raise Exception('Unknown board #: %r' % self)
+        raise Exception(f'Unknown board #: {self!r}')
 
 
 class Efr32Builder(GnBuilder):
@@ -221,7 +221,7 @@ class Efr32Builder(GnBuilder):
                  ):
         super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
-        self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
+        self.extra_gn_options = [f'silabs_board="{board.GnArgName()}"']
         self.all_devices_enabled_devices = all_devices_enabled_devices or []
         if self.all_devices_enabled_devices:
             devices_str = '[' + ','.join(f'\"{d}\"' for d in self.all_devices_enabled_devices) + ']'
@@ -379,13 +379,13 @@ class Efr32Builder(GnBuilder):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
-            '--root=%s' % self.root
+            f'--root={self.root}'
         ]
         if self.dotfile:
-            cmd += ['--dotfile=%s' % self.dotfile]
+            cmd += [f'--dotfile={self.dotfile}']
 
         if args := self.GnBuildArgs():
-            cmd += ['--args=%s' % ' '.join(args)]
+            cmd += ['--args={}'.format(' '.join(args))]
 
         cmd += [self.output_dir]
 
@@ -394,7 +394,7 @@ class Efr32Builder(GnBuilder):
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
+                    [f'{key}="{value}" \\\n' for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]

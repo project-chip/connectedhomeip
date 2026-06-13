@@ -300,10 +300,9 @@ class IDMBaseTest(BasicCompositionTests):
         if isinstance(sub, Clusters.Attribute.SubscriptionTransaction):
             sub_attrs = sub.GetAttributes()
 
-        asserts.assert_true(ep in sub_attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in sub_attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in sub_attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
+        asserts.assert_true(ep in sub_attrs, f"Must have read endpoint {ep} data")
+        asserts.assert_true(cluster in sub_attrs[ep], f"Must have read {cluster.__name__} cluster data")
+        asserts.assert_true(attribute in sub_attrs[ep][cluster], f"Must have read back attribute {attribute.__name__}")
 
     def verify_attribute_path(self, read_response: dict, path: AttributePath):
         """Verify read response for an attribute path.

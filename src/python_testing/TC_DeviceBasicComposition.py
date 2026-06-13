@@ -1132,22 +1132,23 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
 
         self.print_step(3, "TH reads PartsList attribute- covered in step 2")
         for endpoint_id, endpoint in self.endpoints.items():
-            self.print_step(8, "TH reads ServerList attribute for endpoint :{endpoint_id}".format(endpoint_id=endpoint_id))
+            self.print_step(8, f"TH reads ServerList attribute for endpoint :{endpoint_id}")
             if endpoint_id != 0:
 
-                self.print_step("1b", "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint {endpoint_id} supported by DUT (except Endpoint 0).".format(
-                    endpoint_id=endpoint_id))
+                self.print_step("1b",
+                                f"TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint {endpoint_id} supported "
+                                "by DUT (except Endpoint 0).")
                 parts_list_per_ep_non_0 = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
                 listed_device_types_ep_non_0 = [i.deviceType for i in endpoint
                                                 [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
-                self.print_step("1b.1", "Verify that the DeviceTypeList count is at least one for end point {endpoint_id}".format(
-                    endpoint_id=endpoint_id))
+                self.print_step("1b.1", f"Verify that the DeviceTypeList count is at least one for end point {endpoint_id}")
                 if not listed_device_types_ep_non_0:
                     self.fail_current_test("DeviceTypeList count is not at least 1")
 
-                self.print_step("1b.2", "the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset for end point {endpoint_id}".format(
-                    endpoint_id=endpoint_id))
+                self.print_step("1b.2",
+                                "the DeviceTypeList contains more than one Application Device Type, verify that all the "
+                                f"Application Device Types are part of the same superset for end point {endpoint_id}")
 
                 supersets = get_supersets(self.xml_device_types)
                 for item in non_application_device_types:
@@ -1167,8 +1168,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                     if not device_type_is_part_of_superset:
                         self.fail_current_test("Device type list is more than 1 and it is not matching any superset")
 
-                self.print_step("1b.3", "Verify the DeviceTypeList does not contain the Root Node Device Type {endpoint_id}".format(
-                    endpoint_id=endpoint_id))
+                self.print_step("1b.3", f"Verify the DeviceTypeList does not contain the Root Node Device Type {endpoint_id}")
                 if ROOT_NODE_DEVICE_TYPE in listed_device_types_ep_non_0:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                       problem="Root node device type is listed on non zero endpoints",
@@ -1197,37 +1197,36 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
 
                 if parts_list_per_ep_non_0:
                     for ep in parts_list_per_ep_non_0:
-                        self.print_step("4.1", "Endpoint is in the range of 1 to 65534 for endpoint {endpoint_id}".format(
-                            endpoint_id=endpoint_id))
+                        self.print_step("4.1", f"Endpoint is in the range of 1 to 65534 for endpoint {endpoint_id}")
                         if ep not in range(EP_RANGE_MIN, EP_RANGE_MAX):
                             self.fail_current_test("Endpoint is not in the range of 1 to 65534")
 
                         self.print_step(
-                            "4.2", "Endpoint is not equal to the Endpoint of the Endpoint where this PartsList was read (i.e. no self-reference) for {endpoint_id}".format(endpoint_id=endpoint_id))
+                            "4.2",
+                            "Endpoint is not equal to the Endpoint of the Endpoint where this PartsList was read (i.e. no "
+                            f"self-reference) for {endpoint_id}")
                         if ep == endpoint_id:
                             self.fail_current_test("Endpoint is self referencing")
         for endpoint_id, endpoint in self.endpoints.items():
             if Clusters.Descriptor.Attributes.TagList not in endpoint[Clusters.Descriptor]:
                 continue
 
-            self.print_step(5, "TH reads TagList attribute for endpoint {endpoint_id}.".format(endpoint_id=endpoint_id))
+            self.print_step(5, f"TH reads TagList attribute for endpoint {endpoint_id}.")
 
             taglist = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
 
-            self.print_step(5.1, "verifying tagList is in the range of 1 to 6 for endpoint: {endpoint_id}".format(
-                endpoint_id=endpoint_id))
+            self.print_step(5.1, f"verifying tagList is in the range of 1 to 6 for endpoint: {endpoint_id}")
             if taglist:
                 if len(taglist) not in range(TAG_LIST_EP_RANGE_MIN, TAG_LIST_EP_RANGE_MAX):
                     self.fail_current_test("Number of tagList is not in the range of 1 to 6")
 
             no_duplicate_tag_keys = set()
             for tag_struct in taglist:
-                self.print_step(5.1, "verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}".format(
-                    endpoint_id=endpoint_id))
+                self.print_step(
+                    5.1, f"verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}")
                 if not tag_struct.namespaceID:
                     self.fail_current_test("Atleast 1 NamespaceID is not present")
-                self.print_step(5.1, "verifying Tag property in the taglist struct for endpoint: {endpoint_id}".format(
-                    endpoint_id=endpoint_id))
+                self.print_step(5.1, f"verifying Tag property in the taglist struct for endpoint: {endpoint_id}")
                 if not isinstance(tag_struct.tag, int):
                     self.fail_current_test("Atleast 1 Tag is not present")
 
@@ -1238,8 +1237,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                                       problem=f"duplicate Tag found in taglist struct: {tag_key}", spec_location="TagList")
                     self.fail_current_test(f"Duplicate tag found: {tag_key}")
                 no_duplicate_tag_keys.add(tag_key)
-                self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
-                    endpoint_id=endpoint_id))
+                self.print_step(5.2, f"verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}")
 
                 if isinstance(tag_struct.mfgCode, Nullable):
                     if tag_struct.namespaceID not in [COMMON_CLOSURE_NAMESPACE_NAMESPACE_ID,
@@ -1262,8 +1260,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                         self.fail_current_test("Non manufacturer specific tag is not a tag from namespace defined in spec")
                 else:
 
-                    self.print_step(5.5, "verifying label field is not null in the tag list construct for end point {endpoint_id}".format(
-                        endpoint_id=endpoint_id))
+                    self.print_step(5.5, f"verifying label field is not null in the tag list construct for end point {endpoint_id}")
                     if tag_struct.label is None:
                         self.fail_current_test("The Label field is null when the MfgCode is not null.")
 
@@ -1274,13 +1271,15 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
             descriptor_cluster = endpoint_to_clusters[endpoint_id][Clusters.Descriptor]
             if Clusters.Descriptor.Attributes.EndpointUniqueID in descriptor_cluster:
                 value = descriptor_cluster[Clusters.Descriptor.Attributes.EndpointUniqueID]
-                self.print_step(7.1, "Validate EndpointUniqueId attribute in Descriptor cluster is of string type for endpoint : {endpoint_id}".format(
-                    endpoint_id=endpoint_id))
+                self.print_step(
+                    7.1,
+                    f"Validate EndpointUniqueId attribute in Descriptor cluster is of string type for endpoint : {endpoint_id}")
                 if isinstance(value, str):
                     if not value:
                         continue
-                    self.print_step(7.2, "Validate EndpointUniqueId attribute in Descriptor cluster is not more than 32 bytes for endpoint : {endpoint_id}".format(
-                        endpoint_id=endpoint_id))
+                    self.print_step(7.2,
+                                    "Validate EndpointUniqueId attribute in Descriptor cluster is not more than 32 bytes for "
+                                    f"endpoint : {endpoint_id}")
                     if len(value) > END_POINT_UNIQUE_ID_LENGTH_BYTES:
                         location = AttributePathLocation(
                             endpoint_id,
@@ -1296,8 +1295,8 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                         )
                         self.fail_current_test(
                             "EndpointUniqueId attribute in Descriptor cluster is more than 32 bytes for endpoint")
-                    self.print_step(7.3, "Validate EndpointUniqueId attribute in Descriptor cluster is not a duplicate for endpoint : {endpoint_id}".format(
-                        endpoint_id=endpoint_id))
+                    self.print_step(
+                        7.3, f"Validate EndpointUniqueId attribute in Descriptor cluster is not a duplicate for endpoint : {endpoint_id}")
 
                     if value in unique_ids:
                         location = AttributePathLocation(endpoint_id, Clusters.Descriptor.id,

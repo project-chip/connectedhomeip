@@ -95,8 +95,7 @@ def main(argv):
                     continue
                 offset = i.address - section['sh_addr']
                 assert section['sh_size'] == len(data)
-                print('\n{:08X} length {} in section {} of {}'.format(
-                    i.address, i.size, i.section, i.input), file=fp)
+                print(f'\n{i.address:08X} length {i.size} in section {i.section} of {i.input}', file=fp)
                 for i in hexdump(data, offset, i.size, i.address):
                     print(i, file=fp)
 

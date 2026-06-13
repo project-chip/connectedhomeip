@@ -136,7 +136,7 @@ class TC_RR_1_1(MatterBaseTest):
         has_user_labels = len(endpoints_with_user_label_list) > 0
         if has_user_labels:
             log.info("--> User label cluster present on endpoints %s",
-                     ", ".join(["%d" % ep for ep in endpoints_with_user_label_list]))
+                     ", ".join([str(ep) for ep in endpoints_with_user_label_list]))
         else:
             log.info("--> User label cluster not present on any endpoitns")
 
@@ -335,7 +335,7 @@ class TC_RR_1_1(MatterBaseTest):
             client = client_by_name[client_name]
 
             # Send the UpdateLabel command
-            label = (("%d." % fabric.fabricIndex) * 16)[:32]
+            label = ((f"{fabric.fabricIndex}." * 16)[:32])
             log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s", fabric.fabricIndex, label, client_name)
             await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))
 
@@ -419,7 +419,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_true(Clusters.BasicInformation in basic_info[0], "Must have read Basic Information cluster data")
         for attribute in large_read_contents:
             asserts.assert_true(attribute in basic_info[0][Clusters.BasicInformation],
-                                "Must have read back attribute %s" % (attribute.__name__))
+                                f"Must have read back attribute {attribute.__name__}")
 
         # Step 7: Trigger a change on NodeLabel
         log.info(
@@ -823,8 +823,7 @@ class TC_RR_1_1(MatterBaseTest):
             ipk_group_key_id: set[int] = set(read_group_key_ids) - set(known_group_key_ids)
 
             asserts.assert_equal(keys_per_fabric, len(read_group_key_ids),
-                                 "KeySetReadAllIndicesResponse length does "
-                                 "not match the key support indicated: %d." % (keys_per_fabric))
+                                 f"KeySetReadAllIndicesResponse length does not match the key support indicated: {keys_per_fabric}.")
 
             asserts.assert_equal(len(ipk_group_key_id), 1,
                                  "Read more than 1 key ID that did not match written values after IPK (only expected 1 for IPK).")
@@ -1130,7 +1129,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_true(Clusters.SoftwareDiagnostics in swdiag_info[0], "Must have read Software Diagnostics cluster data")
         for attribute in diagnostics_contents:
             asserts.assert_true(attribute in swdiag_info[0][Clusters.SoftwareDiagnostics],
-                                "Must have read back attribute %s" % (attribute.__name__))
+                                f"Must have read back attribute {attribute.__name__}")
         high_watermark = swdiag_info[0][Clusters.SoftwareDiagnostics][
             Clusters.SoftwareDiagnostics.Attributes.CurrentHeapHighWatermark]
         current_usage = swdiag_info[0][Clusters.SoftwareDiagnostics][

@@ -112,7 +112,7 @@ class TestOnOffCluster(CHIPVirtualHome):
                 "Thread initialized.",
                 "LightingManager::InitiateAction(ON_ACTION)",
                 "LightingManager::InitiateAction(OFF_ACTION)"
-            ]), "Datamodel test failed: cannot find matching string from device {}".format(device_id))
+            ]), f"Datamodel test failed: cannot find matching string from device {device_id}")
 
 
 if __name__ == "__main__":

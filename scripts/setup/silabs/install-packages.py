@@ -444,9 +444,9 @@ def get_installed_sdk_versions(repo_root):
 
     missing = []
     if simplicity_sdk_version is None:
-        missing.append("sdk_version from %s" % simplicity_slcs)
+        missing.append(f"sdk_version from {simplicity_slcs}")
     if wiseconnect_version is None:
-        missing.append("version from %s" % wiseconnect_slce)
+        missing.append(f"version from {wiseconnect_slce}")
     if missing:
         logger.error("Could not read required version fields: %s", "; ".join(missing))
         sys.exit(1)
