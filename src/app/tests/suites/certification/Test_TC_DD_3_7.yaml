@@ -316,7 +316,6 @@ tests:
     - label:
           "Step 9: Commissioner SHALL configure regulatory information in the
           Commissionee."
-      PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in DUT as client side
 
