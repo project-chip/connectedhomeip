@@ -43,6 +43,7 @@ public:
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+    void InitiateFactoryResetSkipReboot(void);
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
