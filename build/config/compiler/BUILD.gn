@@ -573,7 +573,15 @@ config("oss_fuzz") {
   cflags = string_split(getenv("CFLAGS"))
   cflags_cc = string_split(getenv("CXXFLAGS"))
   ldflags = string_split(getenv("CXXFLAGS"))
-  ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+
+  # pw_fuzzer / Google FuzzTest binaries (built in the chip_pw_fuzztest toolchain) provide
+  # their own main (fuzztest_gtest_main) and link the no-main libFuzzer runtime, so they
+  # must NOT also link $LIB_FUZZING_ENGINE, which carries its own main (a duplicate-main
+  # link error). Every other target (the legacy chip_fuzz_target libFuzzer targets) still
+  # links it. See //build/toolchain/pw_fuzzer:fuzztest_libfuzzer_engine.
+  if (current_toolchain != "//build/toolchain/pw_fuzzer:chip_pw_fuzztest") {
+    ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+  }
 }
 
 config("fuzzing_default") {
