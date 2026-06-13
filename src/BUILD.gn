@@ -128,6 +128,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/water-heater-management-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
+      "${chip_root}/src/app/clusters/window-covering-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",

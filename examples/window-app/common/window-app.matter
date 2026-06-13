@@ -2863,7 +2863,7 @@ endpoint 1 {
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 0;
     persist  attribute currentPositionTiltPercentage default = 0;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute targetPositionLiftPercent100ths;
     ram      attribute targetPositionTiltPercent100ths;
     ram      attribute endProductType default = 0x00;
@@ -2874,7 +2874,7 @@ endpoint 1 {
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x0;
-    ram      attribute safetyStatus default = 0x0000;
+    callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2945,7 +2945,7 @@ endpoint 2 {
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 0;
     persist  attribute currentPositionTiltPercentage default = 0;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute targetPositionLiftPercent100ths;
     ram      attribute targetPositionTiltPercent100ths;
     ram      attribute endProductType default = 0x00;
@@ -2956,7 +2956,7 @@ endpoint 2 {
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x00;
-    ram      attribute safetyStatus default = 0x0000;
+    callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
