@@ -1144,7 +1144,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     // Groupcast Testing
     auto & testing = chip::Groupcast::GetTesting();
 
-    bool decrypted = false;
+    bool decrypted                    = false;
     bool hasAnyKeysForFabricUnderTest = false;
     while (!decrypted && iter->Next(groupContext))
     {
@@ -1194,10 +1194,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         else
         {
             // FAILURE CASE: No valid groupContext or decryption failed. This can happen
-            // for example, when there is an empty group key map. This means GroupSessions 
+            // for example, when there is an empty group key map. This means GroupSessions
             // cannot be iterated over to populate groupContext, and the fabric index cannot be
             // explicitly checked here.
-            testing.SetTestResult(hasAnyKeysForFabricUnderTest ? chip::Groupcast::Testing::Result::kFailedAuth : chip::Groupcast::Testing::Result::kNoAvailableKey);
+            testing.SetTestResult(hasAnyKeysForFabricUnderTest ? chip::Groupcast::Testing::Result::kFailedAuth
+                                                               : chip::Groupcast::Testing::Result::kNoAvailableKey);
             testing.NotifyDelegate();
         }
     }
