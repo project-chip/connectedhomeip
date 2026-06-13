@@ -53,7 +53,8 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan acti
     return SetAttribute(*path, decoder);
 }
 
-std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
+std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path,
+                                                                   AttributeValueDecoder & decoder)
 {
     if (path.mClusterId == BooleanState::Id)
     {
