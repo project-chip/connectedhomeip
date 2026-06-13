@@ -71,6 +71,17 @@ config("fuzztest_libfuzzer_engine") {
                           "trim string") ]
 }
 
+# 3) Extra ASan options for LOCAL FuzzTest builds, layered on the toolchain's base
+#    -fsanitize=address. Only flags that take effect from the build alone are included here
+#    (no runtime ASAN_OPTIONS needed). Deliberately omitted: -fsanitize=pointer-compare /
+#    -fsanitize=pointer-subtract, which only fire with ASAN_OPTIONS=detect_invalid_pointer_pairs=2.
+config("fuzztest_asan_options") {
+  cflags = [
+    "-fsanitize-address-use-after-return=always",  # force stack-use-after-return on (no env needed)
+    "-fsanitize-address-use-after-scope",          # stack-use-after-scope (also ASan default-on)
+  ]
+}
+
 # creating a secondary toolchain to be used with pw_fuzzer FuzzTests
 # This toolchain is downstreamed from pigweed's pw_target_toolchain_host.clang_fuzz
 # it allows us to specifically use googletest for fuzzing (instead of the lighter version of googletest used for unit testing)
@@ -138,6 +149,9 @@ gcc_toolchain("chip_pw_fuzztest") {
         "$dir_pw_fuzzer:instrumentation",
         "$dir_pw_toolchain/host_clang:sanitize_address",
       ]
+    } else {
+      # Local builds keep pigweed's base -fsanitize=address; layer extra ASan options on top.
+      default_configs += [ "//build/toolchain/pw_fuzzer:fuzztest_asan_options" ]
     }
 
     # the third_party abseil-cpp triggers warnings related to [-Wformat-nonliteral]
