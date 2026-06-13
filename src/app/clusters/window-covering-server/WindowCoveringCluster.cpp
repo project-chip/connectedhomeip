@@ -592,7 +592,7 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOp
 
     if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
-        SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
+        SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
 
     WindowCoveringDelegate * delegate = GetDelegate();
