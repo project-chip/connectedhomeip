@@ -403,7 +403,6 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
     SessionInfo.peer_id       = kUndefinedWiFiPafSessionId;
     SessionInfo.nodeId        = kUndefinedNodeId;
     SessionInfo.discriminator = UINT16_MAX;
-    return;
 }
 
 CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
@@ -506,8 +505,7 @@ WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession 
         {
             if (pPafSession->id != kUndefinedWiFiPafSessionId)
                 return pPafSession;
-            else
-                continue;
+            continue;
         }
         switch (accType)
         {
