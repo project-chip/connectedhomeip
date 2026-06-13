@@ -268,7 +268,7 @@ struct ContainerOptionsStorage : public ContainerOptionsStruct
     {
         containerType = aContainerOptions.containerType;
 
-        if (containerType == ContainerFormatEnum::kCmaf)
+        if (containerType == ContainerFormatEnum::kCmaf && aContainerOptions.CMAFContainerOptions.HasValue())
         {
             mCMAFContainerStorage = aContainerOptions.CMAFContainerOptions.Value();
             CMAFContainerOptions.SetValue(mCMAFContainerStorage);
@@ -335,6 +335,13 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         // Copy video streams storage (base types only)
         mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
 
+        // Rebind video stream name CharSpans to our own name buffer
+        for (size_t i = 0; i < mVideoStreamsStorage.size(); i++)
+        {
+            mVideoStreamsStorage[i].videoStreamName =
+                CharSpan(mVideoStreamNameBuffer.data() + i * kMaxStreamNameLength, mVideoStreamsStorage[i].videoStreamName.size());
+        }
+
         // Rebind videoStreams list view to point to our storage
         if (!mVideoStreamsStorage.empty())
         {
@@ -348,6 +355,13 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         // Copy audio streams storage (base types only)
         mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
+
+        // Rebind audio stream name CharSpans to our own name buffer
+        for (size_t i = 0; i < mAudioStreamsStorage.size(); i++)
+        {
+            mAudioStreamsStorage[i].audioStreamName =
+                CharSpan(mAudioStreamNameBuffer.data() + i * kMaxStreamNameLength, mAudioStreamsStorage[i].audioStreamName.size());
+        }
 
         // Rebind audioStreams list view to point to our storage
         if (!mAudioStreamsStorage.empty())
@@ -393,6 +407,13 @@ struct TransportOptionsStorage : public TransportOptionsStruct
             auto iter                  = transportOptions.videoStreams.Value().begin();
             while (iter.Next())
             {
+                // Defense-in-depth: stop if flat buffer is full
+                if (mVideoStreamNameBufferUsed + kMaxStreamNameLength > mVideoStreamNameBuffer.size())
+                {
+                    ChipLogError(Zcl, "Push-AV: video stream list exceeds buffer capacity, truncating");
+                    break;
+                }
+
                 auto & videoStream = iter.GetValue();
                 Structs::VideoStreamStruct::Type newStream;
                 newStream.videoStreamID = videoStream.videoStreamID;
@@ -424,6 +445,13 @@ struct TransportOptionsStorage : public TransportOptionsStruct
             auto iter                  = transportOptions.audioStreams.Value().begin();
             while (iter.Next())
             {
+                // Defense-in-depth: stop if flat buffer is full
+                if (mAudioStreamNameBufferUsed + kMaxStreamNameLength > mAudioStreamNameBuffer.size())
+                {
+                    ChipLogError(Zcl, "Push-AV: audio stream list exceeds buffer capacity, truncating");
+                    break;
+                }
+
                 auto & audioStream = iter.GetValue();
                 Structs::AudioStreamStruct::Type newStream;
                 newStream.audioStreamID = audioStream.audioStreamID;
@@ -462,6 +490,13 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
     void AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
     {
+        // Defense-in-depth: reject if flat buffer is full
+        if (mVideoStreamNameBufferUsed + kMaxStreamNameLength > mVideoStreamNameBuffer.size())
+        {
+            ChipLogError(Zcl, "Push-AV: AddVideoStream rejected, video stream buffer full");
+            return;
+        }
+
         // Deep copy stream name into flat buffer
         size_t offset = mVideoStreamNameBufferUsed;
         MutableCharSpan nameBuffer(mVideoStreamNameBuffer.data() + offset, kMaxStreamNameLength);
@@ -501,6 +536,13 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
     void AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
     {
+        // Defense-in-depth: reject if flat buffer is full
+        if (mAudioStreamNameBufferUsed + kMaxStreamNameLength > mAudioStreamNameBuffer.size())
+        {
+            ChipLogError(Zcl, "Push-AV: AddAudioStream rejected, audio stream buffer full");
+            return;
+        }
+
         // Deep copy stream name into flat buffer
         size_t offset = mAudioStreamNameBufferUsed;
         MutableCharSpan nameBuffer(mAudioStreamNameBuffer.data() + offset, kMaxStreamNameLength);
@@ -540,8 +582,8 @@ private:
     std::vector<Structs::AudioStreamStruct::Type> mAudioStreamsStorage;
 
     // Separate flat storage for stream names (deep copy buffers)
-    std::array<char, 16 * kMaxStreamNameLength> mVideoStreamNameBuffer;
-    std::array<char, 16 * kMaxStreamNameLength> mAudioStreamNameBuffer;
+    std::array<char, kMaxVideoStreams * kMaxStreamNameLength> mVideoStreamNameBuffer;
+    std::array<char, kMaxAudioStreams * kMaxStreamNameLength> mAudioStreamNameBuffer;
 
     size_t mVideoStreamNameBufferUsed = 0;
     size_t mAudioStreamNameBufferUsed = 0;

@@ -495,6 +495,166 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
 }
 
+TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOptions_StreamCountConstraint)
+{
+    // Test that ValidateIncomingTransportOptions rejects >16 video streams
+    PushAvStreamTransportServerLogic logic(1, BitFlags<Feature>(1));
+
+    // Create valid base transport options
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    // Create valid CMAF container options
+    cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    // Create valid trigger options
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    // Create empty motion zones (valid for this test)
+    uint8_t tlvBuffer[512];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(writer.GetLengthWritten()));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+
+    // Create valid transport options
+    transportOptions.streamUsage      = StreamUsageEnum::kAnalysis;
+    transportOptions.TLSEndpointID    = 1;
+    std::string url                   = "https://192.168.1.100:554/stream/";
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    // Test 1: Create video streams with 17 entries (>kMaxVideoStreams=16)
+    // Use fixed char arrays to avoid dangling pointer issues with Span
+    // Pre-allocate to prevent vector reallocation from invalidating pointers
+    constexpr size_t kNumTestStreams = 17;
+    static char sVideoStreamNames[kNumTestStreams][16];
+    std::vector<Structs::VideoStreamStruct::Type> videoStreams;
+    videoStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        snprintf(sVideoStreamNames[i], sizeof(sVideoStreamNames[i]), "Stream%zu", i);
+        Structs::VideoStreamStruct::Type videoStream;
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = Span(sVideoStreamNames[i], strlen(sVideoStreamNames[i]));
+        videoStreams.push_back(videoStream);
+    }
+
+    // Encode video streams into TLV
+    uint8_t videoTlvBuffer[1024];
+    TLV::TLVWriter videoWriter;
+    videoWriter.Init(videoTlvBuffer, sizeof(videoTlvBuffer));
+    TLV::TLVWriter videoArrayWriter;
+    err = videoWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & vs : videoStreams)
+    {
+        err = DataModel::Encode(videoArrayWriter, TLV::AnonymousTag(), vs);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = videoWriter.CloseContainer(videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader videoReader;
+    videoReader.Init(videoTlvBuffer, static_cast<uint32_t>(videoWriter.GetLengthWritten()));
+    err = videoReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::VideoStreamStruct::DecodableType> videoDecodableList;
+    err = videoDecodableList.Decode(videoReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.videoStreams.SetValue(videoDecodableList);
+
+    // Should return ConstraintError for >16 video streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
+
+    // Test 2: Create audio streams with 17 entries (>kMaxAudioStreams=16)
+    transportOptions.videoStreams.ClearValue();
+
+    static char sAudioStreamNames[kNumTestStreams][16];
+    std::vector<Structs::AudioStreamStruct::Type> audioStreams;
+    audioStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        snprintf(sAudioStreamNames[i], sizeof(sAudioStreamNames[i]), "AudioStream%zu", i);
+        Structs::AudioStreamStruct::Type audioStream;
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = Span(sAudioStreamNames[i], strlen(sAudioStreamNames[i]));
+        audioStreams.push_back(audioStream);
+    }
+
+    // Encode audio streams into TLV
+    uint8_t audioTlvBuffer[1024];
+    TLV::TLVWriter audioWriter;
+    audioWriter.Init(audioTlvBuffer, sizeof(audioTlvBuffer));
+    TLV::TLVWriter audioArrayWriter;
+    err = audioWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & as : audioStreams)
+    {
+        err = DataModel::Encode(audioArrayWriter, TLV::AnonymousTag(), as);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = audioWriter.CloseContainer(audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader audioReader;
+    audioReader.Init(audioTlvBuffer, static_cast<uint32_t>(audioWriter.GetLengthWritten()));
+    err = audioReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::AudioStreamStruct::DecodableType> audioDecodableList;
+    err = audioDecodableList.Decode(audioReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.audioStreams.SetValue(audioDecodableList);
+
+    // Should return ConstraintError for >16 audio streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
+}
+
 void PrintBufHex(const uint8_t * buf, size_t size)
 {
     for (size_t i = 0; i < size; ++i)
