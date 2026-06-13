@@ -17,12 +17,12 @@ on:
     schedule:
       - cron: '0 0 * * *'
 # --- TEST SECTION: Uncomment below to test on PRs ---
-    # push:
-    #     branches:
-    #         - master
-    #         - 'v*-branch'
-    # pull_request:
-    # merge_group:
+    push:
+        branches:
+            - master
+            - 'v*-branch'
+    pull_request:
+    merge_group:
 # --- END TEST SECTION ---
     workflow_dispatch:
         inputs:
@@ -434,6 +434,100 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-tests-msan-clang build"
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    # Whole-tree clang-tidy using the stock bootstrap clang-tidy and the repo
+    # .clang-tidy check set (no custom/patched binary, no --checks override),
+    # published to GitHub Code Scanning as SARIF. ADVISORY: never blocks.
+    nightly_clang_tidy_sarif:
+        name: Nightly clang-tidy whole-tree (.clang-tidy) -> Code Scanning
+        if: github.actor != 'restyled-io[bot]'
+        permissions:
+            contents: read
+            security-events: write
+        env:
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+
+        # CPU-bound whole-tree scan; same class of runner as the other build jobs.
+        runs-on: namespace-profile-4x16
+
+        container:
+            image: ghcr.io/project-chip/chip-build:200
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: --privileged
+
+        steps:
+            - name: Set up additional environment
+              run: echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
+            - name: Checkout
+              uses: actions/checkout@v6.0.3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-clang-tidy-sarif
+            - name: Setup and Restore ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                  disable: ${{ env.DISABLE_CCACHE }}
+                  cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+
+            # Plain host config (NO sanitizers — clang-tidy ignores -fsanitize).
+            # gn_gen writes the compile DB; `ninja -k 0 ... || true` then builds so the
+            # zap-generated headers exist on disk (a TU only parses when its generated
+            # headers are present). chip_build_tests=true pulls the whole src/ tree into
+            # the graph so those headers get generated; without it ~all cluster TUs fail
+            # to parse (missing headers) and produce no findings. We build but never run
+            # the suite (no `ninja check`); -k 0 || true tolerates pw_pystamp test stamps
+            # that execute during the build.
+            - name: Generate compile DB (host build for generated headers)
+              run: >-
+                  ./scripts/run_in_build_env.sh "
+                  BUILD_TYPE=host scripts/build/gn_gen.sh --args='is_clang=true chip_build_tests=true' --add-export-compile-commands=* &&
+                  (ninja -k 0 -C out/host || true)"
+
+            # Stock bootstrap clang-tidy (resolved on PATH inside the build env) + the
+            # repo .clang-tidy check set: no custom/patched binary, no --checks override.
+            # Advisory: `|| true` so findings never fail the job.
+            #
+            # ci-apply-runner-overrides.py injects CI-only mechanics the runner exposes
+            # no flag for: -Wno-error (compile commands
+            # carry -Werror; glib system-header warnings would otherwise abort ~200 TUs
+            # before the check runs), --header-filter=src/ (frontend checks hide
+            # header-located findings) and --warnings-as-errors=-* (a TU that merely HAS
+            # a finding is not miscounted as a failed TU). These do not change the check
+            # set — only the repo .clang-tidy decides that.
+            #
+            # CodegenIntegration excluded: those TUs hard-include a specific app's
+            # generated static-cluster-config header a single host build cannot produce
+            # for every cluster (benign "file not found", not a real finding).
+            - name: Run clang-tidy (whole tree, advisory)
+              run: |
+                  python3 scripts/tools/clang-tidy/ci-apply-runner-overrides.py
+                  ./scripts/run_in_build_env.sh './scripts/run-clang-tidy-on-compile-commands.py --compile-database out/host/compile_commands.json --file-include-regex "(src|examples)/" --file-exclude-regex "/(repo|zzz_generated|lwip)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting|/tests/|CodegenIntegration" check' 2>&1 | tee clang-tidy.log || true
+
+            # --build-dir matches the compile DB above: the runner emits diagnostic
+            # paths relative to out/host, so the converter must resolve them there.
+            - name: Convert clang-tidy log to SARIF
+              run: python3 scripts/tools/clang-tidy/clang_tidy_to_sarif.py clang-tidy.log --repo-root . --build-dir out/host > clang-tidy.sarif
+
+            - name: Upload SARIF to Code Scanning
+              uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e
+              with:
+                  sarif_file: clang-tidy.sarif
+                  category: clang-tidy
+
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure
