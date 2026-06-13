@@ -73,10 +73,7 @@ static_library("nxp_platform") {
     "-Wno-sign-compare",
   ]
   deps = []
-  defines = [
-    "NXP_DEVICE_MCXW7X=1",
-    "NXP_USE_MML=1",
-  ]
+  defines = [ "NXP_DEVICE_MCXW7X=1" ]
 
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
