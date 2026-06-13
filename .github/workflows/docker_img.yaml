@@ -47,7 +47,7 @@ jobs:
                     - "-minimal"
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -85,7 +85,7 @@ jobs:
                     - "-crosscompile"
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -125,13 +125,14 @@ jobs:
                     - "-nxp-zephyr"
                     - "-nrf-platform"
                     - "-realtek-zephyr"
+                    - "-silabs-zephyr"
                     - "-telink"
                     - "-telink-zephyr_3_3"
                     - "-ti"
                     - "-tizen"
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -162,7 +163,7 @@ jobs:
                     - "-tizen-qemu"
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -190,7 +191,7 @@ jobs:
                     - "-vscode"
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |

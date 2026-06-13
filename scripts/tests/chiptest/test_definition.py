@@ -468,7 +468,8 @@ class TestDefinition:
             op_network: str = 'WiFi',
             thread_ba_host: str | None = None,
             thread_ba_port: int | None = None,
-            wifipaf_wifi: bool = False
+            wifipaf_wifi: bool = False,
+            value_wait_extra_duration_ms: int | None = None
             ):
         """
         Executes the given test case using the provided runner for execution.
@@ -478,7 +479,7 @@ class TestDefinition:
             log.info('Executing %s::%s', self.name, target.name)
             self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
                           test_runtime, ble_controller_app, ble_controller_tool, op_network, thread_ba_host, thread_ba_port,
-                          wifipaf_wifi)
+                          wifipaf_wifi, value_wait_extra_duration_ms)
 
     def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
                  pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
@@ -488,7 +489,8 @@ class TestDefinition:
                  op_network: str = 'WiFi',
                  thread_ba_host: str | None = None,
                  thread_ba_port: int | None = None,
-                 wifipaf_wifi: bool = False):
+                 wifipaf_wifi: bool = False,
+                 value_wait_extra_duration_ms: int | None = None):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
@@ -557,6 +559,8 @@ class TestDefinition:
                     "Matter REPL YAML tester should have been set for selected test runtime"
                 python_cmd = subproc_info_repo['matter-repl-yaml-tester'].with_args(
                     '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", str(pics_file))
+                if value_wait_extra_duration_ms is not None:
+                    python_cmd = python_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
 
                 if dry_run:
                     log.info(shlex.join(python_cmd.to_cmd()))
@@ -594,6 +598,8 @@ class TestDefinition:
                     pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
                 test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))
+                if value_wait_extra_duration_ms is not None:
+                    test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
 
                 interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
 

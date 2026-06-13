@@ -13,9 +13,11 @@
         "administrator-commissioning-cluster.xml",
         "air-quality-cluster.xml",
         "ambient-context-sensing-cluster.xml",
+        "ambient-sensing-union-cluster.xml",
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",
+        "av-analysis-cluster.xml",
         "ballast-configuration-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
@@ -26,7 +28,6 @@
         "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
-        "chip-ota.xml",
         "channel-cluster.xml",
         "closure-control-cluster.xml",
         "closure-dimension-cluster.xml",
@@ -47,6 +48,7 @@
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "dynamic-lighting-cluster.xml",
+        "electrical-alarm-cluster.xml",
         "electrical-distribution-cluster.xml",
         "electrical-protection-alarm-cluster.xml",
         "groupcast-cluster.xml",
@@ -92,6 +94,8 @@
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "network-identity-management-cluster.xml",
+        "ota-provider-cluster.xml",
+        "ota-requestor-cluster.xml",
         "proximity-ranging-cluster.xml",
         "push-av-stream-transport-cluster.xml",
         "semantic-tag-namespace-enums.xml",
@@ -127,6 +131,7 @@
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
         "microwave-oven-control-cluster.xml",
+        "temperature-controlled-cabinet-topology-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thermostat-cluster.xml",
@@ -283,7 +288,8 @@
             "PowerAdjustmentCapability",
             "Forecast",
             "OptOutState",
-            "FeatureMap"
+            "FeatureMap",
+            "PowerRangeAdjustment"
         ],
         "Device Energy Management Mode": [
             "SupportedModes",
@@ -337,6 +343,17 @@
             "TxErrCount",
             "CollisionCount",
             "OverrunCount",
+            "ClusterRevision"
+        ],
+        "Fan Control": [
+            "FanMode",
+            "PercentSetting",
+            "PercentCurrent",
+            "SpeedSetting",
+            "SpeedCurrent",
+            "RockSetting",
+            "WindSetting",
+            "AirflowDirection",
             "ClusterRevision"
         ],
         "General Commissioning": [
@@ -835,7 +852,13 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
-        "Power Source": ["ClusterRevision"],
+        "Power Source": [
+            "ClusterRevision",
+            "ActiveWiredFaults",
+            "ActiveBatFaults",
+            "ActiveBatChargeFaults",
+            "EndpointList"
+        ],
         "Valve Configuration and Control": [
             "OpenDuration",
             "AutoCloseTime",

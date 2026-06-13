@@ -10,7 +10,7 @@ This example demonstrates the Matter Lighting application on Ameba platform.
     -   [Commissioning](#commissioning)
         -   [BLE mode](#ble-mode)
         -   [IP mode](#ip-mode)
-    -   [Cluster control](#cluster-control)
+    -   [Cluster Control](#cluster-control)
 
 ---
 
@@ -23,19 +23,19 @@ The CHIP demo application is supported on
 
 -   Pull docker image:
 
-          $ docker pull ghcr.io/project-chip/chip-build-ameba:181
+            $ docker pull ghcr.io/project-chip/chip-build-ameba:200
 
 -   Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:181
+            $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:200
 
 -   Setup build environment:
 
-          $ source ./scripts/bootstrap.sh
+            $ source ./scripts/bootstrap.sh
 
 -   To build the demo application:
 
-          $ ./scripts/build/build_examples.py --target ameba-amebad-lighting build
+            $ ./scripts/build/build_examples.py --target ameba-amebad-lighting build
 
     The output image files are stored in `out/ameba-amebad-lighting/asdk/image`
     folder.
@@ -80,5 +80,5 @@ to be On or Off.
 -   Via
     [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
 
-          $ ./chip-tool onoff on ${NODE_ID_TO_ASSIGN} 1
-          $ ./chip-tool onoff off ${NODE_ID_TO_ASSIGN} 1
+            $ ./chip-tool onoff on ${NODE_ID_TO_ASSIGN} 1
+            $ ./chip-tool onoff off ${NODE_ID_TO_ASSIGN} 1

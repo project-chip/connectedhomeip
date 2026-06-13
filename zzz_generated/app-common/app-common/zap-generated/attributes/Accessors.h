@@ -1014,6 +1014,34 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace LaundryDryerControls
 
+namespace TemperatureControlledCabinetTopology {
+namespace Attributes {
+
+namespace Topology {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum * value); // TopologyEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace Topology
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TemperatureControlledCabinetTopology
+
 namespace ModeSelect {
 namespace Attributes {
 
@@ -1791,6 +1819,120 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 } // namespace Attributes
 } // namespace ElectricalGridConditions
+
+namespace ElectricalAlarm {
+namespace Attributes {
+
+namespace Mask {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value); // AlarmBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace Mask
+
+namespace Latch {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value); // AlarmBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace Latch
+
+namespace State {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value); // AlarmBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace State
+
+namespace Supported {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> * value); // AlarmBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::ElectricalAlarm::AlarmBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace Supported
+
+namespace OverVoltageThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // voltage_mv
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace OverVoltageThreshold
+
+namespace UnderVoltageThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // voltage_mv
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace UnderVoltageThreshold
+
+namespace OverFrequencyThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // int64s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace OverFrequencyThreshold
+
+namespace UnderFrequencyThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // int64s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace UnderFrequencyThreshold
+
+namespace OverPowerThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // power_mw
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace OverPowerThreshold
+
+namespace UnderPowerThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // power_mw
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace UnderPowerThreshold
+
+namespace OverCurrentThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // amperage_ma
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace OverCurrentThreshold
+
+namespace UnderCurrentThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // amperage_ma
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace UnderCurrentThreshold
+
+namespace PowerImportThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // power_mw
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace PowerImportThreshold
+
+namespace PowerExportThreshold {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int64_t * value); // power_mw
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int64_t value, MarkAttributeDirty markDirty);
+} // namespace PowerExportThreshold
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectricalAlarm
 
 namespace ElectricalDistribution {
 namespace Attributes {
@@ -3151,112 +3293,28 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, Mar
 namespace FanControl {
 namespace Attributes {
 
-namespace FanMode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum * value); // FanModeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace FanMode
-
 namespace FanModeSequence {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::FanControl::FanModeSequenceEnum * value); // FanModeSequenceEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::FanControl::FanModeSequenceEnum * value); // FanModeSequenceEnum
 } // namespace FanModeSequence
 
-namespace PercentSetting {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace PercentSetting
-
-namespace PercentCurrent {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value); // percent
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
-} // namespace PercentCurrent
-
 namespace SpeedMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace SpeedMax
 
-namespace SpeedSetting {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace SpeedSetting
-
-namespace SpeedCurrent {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace SpeedCurrent
-
 namespace RockSupport {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value); // RockBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value); // RockBitmap
 } // namespace RockSupport
 
-namespace RockSetting {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> * value); // RockBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value,
-                                        MarkAttributeDirty markDirty);
-} // namespace RockSetting
-
 namespace WindSupport {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value); // WindBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value); // WindBitmap
 } // namespace WindSupport
 
-namespace WindSetting {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> * value); // WindBitmap
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value,
-                                        MarkAttributeDirty markDirty);
-} // namespace WindSetting
-
-namespace AirflowDirection {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::FanControl::AirflowDirectionEnum * value); // AirflowDirectionEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace AirflowDirection
-
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
 
 } // namespace Attributes
 } // namespace FanControl
@@ -4270,11 +4328,11 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace AudioContextDetected
 
-namespace ObjectCountReached {
+namespace ObjectCountThresholdReached {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
-} // namespace ObjectCountReached
+} // namespace ObjectCountThresholdReached
 
 namespace ObjectCount {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
@@ -4308,6 +4366,38 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 
 } // namespace Attributes
 } // namespace AmbientContextSensing
+
+namespace AmbientSensingUnion {
+namespace Attributes {
+
+namespace UnionName {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+} // namespace UnionName
+
+namespace UnionHealth {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum * value); // UnionHealthEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace UnionHealth
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace AmbientSensingUnion
 
 namespace ProximityRanging {
 namespace Attributes {
@@ -5026,6 +5116,42 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 
 } // namespace Attributes
 } // namespace Chime
+
+namespace AvAnalysis {
+namespace Attributes {
+
+namespace MaxAnalysisStreamCount {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace MaxAnalysisStreamCount
+
+namespace CurrentAnalysisStreamCount {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+} // namespace CurrentAnalysisStreamCount
+
+namespace TrackingEnabled {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace TrackingEnabled
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace AvAnalysis
 
 namespace CommodityTariff {
 namespace Attributes {

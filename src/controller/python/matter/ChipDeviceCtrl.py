@@ -209,7 +209,8 @@ def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_vo
             ipkBytes = string_at(ipk, ipkLen)[:]
         nocChain = NOCChain(nocBytes, icacBytes, rcacBytes, ipkBytes, adminSubject)
     else:
-        LOGGER.error(f"Failure to generate NOC Chain: {status}. All NOCChain field will be None and commissioning will fail!")
+        # We need to eagerly stringify as specified in PyChipError docstring.
+        LOGGER.error("Failure to generate NOC Chain: %s. All NOCChain field will be None and commissioning will fail!", str(status))
     devCtrl.NOCChainCallback(nocChain)
 
 
@@ -529,7 +530,8 @@ class ChipDeviceControllerBase:
             if err.is_success:
                 LOGGER.info("Commissioning complete")
             else:
-                LOGGER.warning("Failed to commission: {}".format(err))
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to commission: %s", str(err))
 
             self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
 
@@ -556,7 +558,8 @@ class ChipDeviceControllerBase:
                 commissioningParameters = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
-                LOGGER.warning("Failed to open commissioning window: {}".format(err))
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to open commissioning window: %s", str(err))
 
             if self._open_window_context.future is None:
                 LOGGER.exception("HandleOpenWindowComplete called unexpectedly")
@@ -571,7 +574,8 @@ class ChipDeviceControllerBase:
             if err.is_success:
                 LOGGER.info("Successfully unpaired device with node ID 0x%016X", nodeId)
             else:
-                LOGGER.warning("Failed to unpair device: {}".format(err))
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to unpair device: %s", str(err))
 
             if self._unpair_device_context.future is None:
                 LOGGER.exception("HandleUnpairDeviceComplete called unexpectedly")
@@ -584,7 +588,8 @@ class ChipDeviceControllerBase:
 
         def HandlePASEEstablishmentComplete(err: PyChipError):
             if not err.is_success:
-                LOGGER.warning("Failed to establish secure session to device: {}".format(err))
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                LOGGER.warning("Failed to establish secure session to device: %s", str(err))
             else:
                 LOGGER.info("Established secure session with Device")
 
@@ -1192,6 +1197,23 @@ class ChipDeviceControllerBase:
 
         # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
+
+    def GetLastThreadMeshcopDiscoveryDiagnostic(self) -> dict[str, typing.Any]:
+        '''
+        Get diagnostic data captured during the most recent Thread MeshCoP discovery.
+
+        Returns:
+            dict: Parsed JSON diagnostic data from the native Thread MeshCoP proxy.
+        '''
+        self.CheckIsActive()
+
+        diagnostic = create_string_buffer(2048)
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(
+                self.devCtrl, diagnostic, len(diagnostic))
+        ).raise_on_error()
+
+        return json.loads(diagnostic.value.decode())
 
     async def DiscoverCommissionableNodes(self,
                                             filterType: discovery.FilterType = discovery.FilterType.NONE,
@@ -2695,6 +2717,10 @@ class ChipDeviceControllerBase:
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.argtypes = [
                 c_void_p, c_char_p, c_uint16, c_char_p, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.argtypes = [
+                c_void_p, c_char_p, c_uint32]
+            self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]

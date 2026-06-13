@@ -44,16 +44,20 @@ from .target import BuildTarget, TargetPart
 # in all-devices: examples/all-devices-app/all-devices-common/devices
 _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
+    'aggregator',
+    'bridged-node',
     'chime',
     'contact-sensor',
     'dimmable-light',
+    'fan',
     'occupancy-sensor',
     'on-off-light',
+    'power-source',
+    'proximity-ranger',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
     'water-leak-detector',
-    'proximity-ranger',
     # keep-sorted: end
 ]
 
@@ -86,9 +90,11 @@ def BuildHostFakeTarget():
     ])
 
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
@@ -212,9 +218,11 @@ def BuildHostTarget():
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
