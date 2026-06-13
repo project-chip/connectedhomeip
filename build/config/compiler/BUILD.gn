@@ -581,6 +581,13 @@ config("oss_fuzz") {
   # links it. See //build/toolchain/pw_fuzzer:fuzztest_libfuzzer_engine.
   if (current_toolchain != "//build/toolchain/pw_fuzzer:chip_pw_fuzztest") {
     ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+  } else {
+    # The pw_fuzzer / FuzzTest toolchain pulls in pigweed modules that compile with
+    # -fno-rtti, which is incompatible with UBSan's -fsanitize=vptr (included in $CFLAGS when
+    # SANITIZER=undefined). Disable just the vptr check for these targets; no-op for other
+    # sanitizers. Appended after $CFLAGS/$CXXFLAGS so it wins (sanitizer flags are last-set).
+    cflags += [ "-fno-sanitize=vptr" ]
+    cflags_cc += [ "-fno-sanitize=vptr" ]
   }
 }
 
