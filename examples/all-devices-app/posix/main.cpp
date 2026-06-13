@@ -35,6 +35,14 @@
 
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#include <accessors/common/AccessorRegistry.h>
+#include <accessors/common/OOBAccessor.h>
+#if PW_RPC_ENABLED
+#include <accessors/pigweed/PigweedAttributeAccessor.h>
+#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
+#endif // PW_RPC_ENABLED
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
@@ -47,6 +55,9 @@
 
 #include <BleInit.h>
 #include <TermHandling.h>
+#if PW_RPC_ENABLED
+#include <Rpc.h>
+#endif // PW_RPC_ENABLED
 
 using namespace chip;
 using namespace chip::app;
@@ -159,6 +170,14 @@ public:
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
             ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+            auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, device.get());
+            if (accessor)
+            {
+                ReturnErrorOnFailure(AccessorRegistry::Instance().Register(accessor.get()));
+                mConstructedAccessors.push_back(std::move(accessor));
+            }
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
             mConstructedDevices.push_back(std::move(device));
         }
 
@@ -167,6 +186,9 @@ public:
 
     void Shutdown()
     {
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+        mConstructedAccessors.clear();
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
         for (auto & device : mConstructedDevices)
         {
             device->Unregister(mDataModelProvider);
@@ -185,6 +207,10 @@ private:
 
     AppRootNode mRootNode;
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+
+#if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+    std::vector<std::unique_ptr<chip::app::OOBAccessor>> mConstructedAccessors;
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 };
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
@@ -281,6 +307,16 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");
+
+#if CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#if PW_RPC_ENABLED
+    static chip::app::PigweedAttributeAccessor sPwOobAccessor;
+    chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
+
+    chip::rpc::Init(33000); // TODO: Add an arg for Pw port.
+    ChipLogProgress(AppServer, "PW_RPC initialized.");
+#endif // PW_RPC_ENABLED
+#endif // CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);

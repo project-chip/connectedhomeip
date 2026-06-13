@@ -13,18 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//with_pw_rpc.gni")
 
-import("${chip_root}/config/standalone/args.gni")
-import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/accessors/accessors.gni")
-
-chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_system_project_config_include = "<SystemProjectConfig.h>"
-
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/all-devices-app/posix/include" ]
-chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
-
-chip_config_enable_groupcast = true
+declare_args() {
+  # Enable Out-Of-Band (OOB) accessors for device simulation/control in all-devices-app.
+  chip_all_devices_app_enable_oob_accessors = true
+}
