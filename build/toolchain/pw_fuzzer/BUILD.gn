@@ -29,6 +29,11 @@ declare_args() {
   # use libFuzzer corpus/merge/minimize features). Default false -> local builds use
   # FuzzTest's native run mode.
   chip_pw_fuzz_libfuzzer_compat = false
+
+  # Build the local pw_fuzzer / FuzzTest targets with UBSan in addition to the default ASan
+  # (set by the `ubsan` build_examples modifier on a -pw-fuzztest target). Local builds only;
+  # under OSS-Fuzz the engine drives sanitizers via $CFLAGS.
+  chip_pw_fuzz_ubsan = false
 }
 
 # --- libFuzzer-compatibility-mode support for FuzzTest (b/295961502) ---
@@ -80,6 +85,19 @@ config("fuzztest_asan_options") {
     "-fsanitize-address-use-after-return=always",  # force stack-use-after-return on (no env needed)
     "-fsanitize-address-use-after-scope",          # stack-use-after-scope (also ASan default-on)
   ]
+}
+
+# 4) Optional UBSan for LOCAL FuzzTest builds, layered on top of the base ASan (enabled via the
+#    `ubsan` build_examples modifier on a -pw-fuzztest target -> chip_pw_fuzz_ubsan). vptr is
+#    disabled because pigweed builds -fno-rtti; -fno-sanitize-recover makes UB fatal so the
+#    fuzzer records it as a crash.
+config("fuzztest_ubsan") {
+  cflags = [
+    "-fsanitize=undefined",
+    "-fno-sanitize=vptr",
+    "-fno-sanitize-recover=undefined",
+  ]
+  ldflags = [ "-fsanitize=undefined" ]
 }
 
 # creating a secondary toolchain to be used with pw_fuzzer FuzzTests
@@ -152,6 +170,11 @@ gcc_toolchain("chip_pw_fuzztest") {
     } else {
       # Local builds keep pigweed's base -fsanitize=address; layer extra ASan options on top.
       default_configs += [ "//build/toolchain/pw_fuzzer:fuzztest_asan_options" ]
+
+      # Optional UBSan alongside ASan (the `ubsan` modifier on a -pw-fuzztest target).
+      if (chip_pw_fuzz_ubsan) {
+        default_configs += [ "//build/toolchain/pw_fuzzer:fuzztest_ubsan" ]
+      }
     }
 
     # the third_party abseil-cpp triggers warnings related to [-Wformat-nonliteral]

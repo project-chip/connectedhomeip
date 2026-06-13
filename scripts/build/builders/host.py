@@ -579,6 +579,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
             if pw_fuzz_libfuzzer_compat:
                 self.extra_gn_options.append('chip_pw_fuzz_libfuzzer_compat=true')
+            if use_ubsan:
+                self.extra_gn_options.append('chip_pw_fuzz_ubsan=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
