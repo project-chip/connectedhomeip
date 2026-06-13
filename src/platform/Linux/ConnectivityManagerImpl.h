@@ -226,6 +226,8 @@ private:
     unsigned int mAssociationRetriesLeft = 0;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+public:
     // Network Commissioning Action Delegation Methods
 
     void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
@@ -234,6 +236,7 @@ private:
     void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
                         Optional<int32_t> inConnectStatus) noexcept;
 
+private:
     // ==================== ConnectivityManager Private Methods ====================
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
