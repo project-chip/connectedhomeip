@@ -1377,6 +1377,31 @@ jobs:
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
 
+          - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: "3.11"
+
+          - name: Build test history dashboard
+            run: |
+                set -euxo pipefail
+
+                INPUT_JSON="allure-history/allure-report/ci_tests/last-history/history.json"
+                DASHBOARD_DIR="ci-dashboard"
+
+                test -f "${INPUT_JSON}"
+
+                rm -rf "${DASHBOARD_DIR}"
+                mkdir -p "${DASHBOARD_DIR}/data"
+
+                cp scripts/tools/test_history_dashboard/site/index.html "${DASHBOARD_DIR}/index.html"
+                cp scripts/tools/test_history_dashboard/site/app.js "${DASHBOARD_DIR}/app.js"
+                cp scripts/tools/test_history_dashboard/site/styles.css "${DASHBOARD_DIR}/styles.css"
+
+                python3 scripts/tools/test_history_dashboard/build_dashboard.py \
+                  --input "${INPUT_JSON}" \
+                  --output "${DASHBOARD_DIR}/data/summary.json"
+
           - name: Upload Allure Report
             uses: actions/upload-artifact@v7
             with:
@@ -1384,6 +1409,14 @@ jobs:
                 path: allure-report
                 retention-days: 30
                 if-no-files-found: warn
+          
+          - name: Upload dashboard artifact
+            uses: actions/upload-artifact@v7
+            with:
+                name: ci-test-history-dashboard
+                path: ci-dashboard
+                retention-days: 30
+                if-no-files-found: error
 
           - name: Deploy to GitHub Pages
             if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
