@@ -2383,11 +2383,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    auto * setupPayload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload];
+    // Use the fine-grained -initWithPayload:error: (NOT the deprecated
+    // +setupPayloadWithOnboardingPayload:error:, which flattens to
+    // MTRErrorCodeInvalidArgument) so a mistyped manual pairing code surfaces
+    // as MTRErrorCodeIntegrityCheckFailed to the commissioning UI.
+    auto * setupPayload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload error:error];
     if (!setupPayload) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return NO;
     }
 
