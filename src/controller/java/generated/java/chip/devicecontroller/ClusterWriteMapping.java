@@ -3020,6 +3020,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
+    Map<String, InteractionInfo> writeMediaFileManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("mediaFileManagement", writeMediaFileManagementInteractionInfo);
     Map<String, InteractionInfo> writeZoneManagementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeZoneManagementSensitivityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo zoneManagementsensitivityCommandParameterInfo =

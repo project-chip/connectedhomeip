@@ -89,6 +89,7 @@
         "localization-configuration-cluster.xml",
         "low-power-cluster.xml",
         "measurement-and-sensing.xml",
+        "media-file-management-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
         "messages-cluster.xml",
