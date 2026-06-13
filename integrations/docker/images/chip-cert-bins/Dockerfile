@@ -2,8 +2,6 @@
 FROM ubuntu:24.04 AS chip-build-cert
 LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
 ARG TARGETPLATFORM
-# COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -34,6 +32,7 @@ RUN set -x \
     bison \
     bluez \
     bridge-utils \
+    ccache \
     clang \
     clang-format \
     clang-tidy \
@@ -111,18 +110,6 @@ RUN set -x \
     attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
     && : # last line
 
-# Install bloat comparison tools
-RUN set -x \
-    && git clone https://github.com/google/bloaty.git \
-    && mkdir -p bloaty/build \
-    && cd bloaty/build \
-    && cmake -G Ninja ../ \
-    && ninja \
-    && ninja install \
-    && cd ../.. \
-    && rm -rf bloaty \
-    && : # last line
-
 # Build and install OpenSSL 3.5 LTS (post-quantum ML-DSA / ML-KEM support)
 ARG OPENSSL_VERSION=3.5.0
 ARG OPENSSL_SHA256=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
@@ -140,14 +127,23 @@ RUN set -x \
     && : # last line
 
 # Stage 1.5: Bootstrap Matter.
+# COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
+ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
+# This does a shallower checkout of the repo
 RUN echo "Cloning at commit: ${COMMITHASH}" \
-    && git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip \
+    && mkdir /root/connectedhomeip \
+    && git init /root/connectedhomeip \
     && cd /root/connectedhomeip \
-    && git checkout ${COMMITHASH}
+    && git remote add origin https://github.com/project-chip/connectedhomeip.git \
+    && git fetch --depth 1 origin ${COMMITHASH} \
+    && git checkout FETCH_HEAD
 
 WORKDIR /root/connectedhomeip/
-RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+# If building locally, uncomment this line if you encounter failed builds due to warnings
+# RUN sed -i 's/treat_warnings_as_errors = true/treat_warnings_as_errors = false/' build/config/compiler/BUILD.gn
+RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux --jobs $(nproc)
 RUN bash scripts/bootstrap.sh
+RUN ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
 
 # Stage 2: Build.
 FROM chip-build-cert AS chip-build-cert-bins
@@ -157,68 +153,201 @@ SHELL ["/bin/bash", "-c"]
 # Records Matter SDK commit hash to include in the image.
 RUN git rev-parse HEAD > /root/.sdk-sha-version
 
+#setup ccache
+ARG CCACHE_NOHASHDIR=1
+ARG CCACHE_BASEDIR=/root/connectedhomeip/
+ARG CCACHE_NODIRECT=1
+ARG CCACHE_PREFIX_CPP=/root/connectedhomeip/scripts/helpers/ccache-prefix-cpp.sh
+ARG CCACHE_SLOPPINESS=time_macros
+ARG CCACHE_DIR=/root/connectedhomeip/.ccache
+ARG CCACHE_COMPILERCHECK=content
+ARG CCACHE_MAXSIZE=5G
+ARG CCACHE_COMPRESS=1
+ARG CCACHE_COMPRESSLEVEL=6
+ARG CHIP_PW_COMMAND_LAUNCHER=ccache
+
 # Target suffixes shared across all supported architectures.
 # The arch prefix (linux-x64 / linux-arm64) is prepended at build time.
-RUN printf '%s\n' \
-    chip-tool-ipv6only-platform-mdns-nfc-commission \
-    shell-ipv6only-platform-mdns \
-    chip-cert-ipv6only-platform-mdns \
-    air-purifier-ipv6only \
-    all-clusters-ipv6only \
-    all-clusters-ipv6only-nlfaultinject \
-    all-clusters-minimal-ipv6only \
-    bridge-ipv6only \
-    tv-app-ipv6only \
-    tv-casting-app-ipv6only \
-    light-ipv6only \
-    thermostat-ipv6only \
-    ota-provider-ipv6only \
-    ota-requestor-ipv6only \
-    lock-ipv6only \
-    simulated-app1-ipv6only \
-    lit-icd-ipv6only \
-    energy-gateway-ipv6only \
-    evse-ipv6only \
-    microwave-oven-ipv6only \
-    rvc-ipv6only \
-    fabric-bridge-rpc-ipv6only \
-    fabric-admin-rpc-ipv6only \
-    light-data-model-no-unique-id-ipv6only \
-    network-manager-ipv6only \
-    terms-and-conditions-ipv6only \
-    water-leak-detector-ipv6only \
-    camera-clang-ipv6only \
-    camera-controller-ipv6only \
-    closure-ipv6only \
-    jf-control-app-ipv6only \
-    jf-admin-app-ipv6only \
-    water-heater-ipv6only \
-    > /tmp/targets.txt
-
 RUN case ${TARGETPLATFORM} in \
-    "linux/amd64") ARCH=linux-x64 ;; \
-    "linux/arm64") ARCH=linux-arm64 ;; \
-    *) ;; \
+        "linux/amd64") ARCH=linux-x64 ;; \
+        "linux/arm64") ARCH=linux-arm64 ;; \
+        *) \
+            echo "ERROR: Unsupported platform ${TARGETPLATFORM}" \
+            && exit 1 \
+        ;; \
     esac \
+    && echo "ARCH=${ARCH}" > /tmp/arch.env
+
+ARG BUILD_EXAMPLES_ARGS="--pw-command-launcher=ccache --build-profile=release-size --pregen-dir ./zzz_pregenerated"
+
+RUN printf '%s\n' \
+    chip-tool-ipv6only \
+    chip-cert-ipv6only-platform-mdns-nfc-commission \
+    shell-ipv6only-platform-mdns \
+    fabric-admin-rpc-ipv6only \
+    fabric-bridge-rpc-ipv6only \
+    network-manager-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
     && set -x \
     && source scripts/activate.sh \
-    && TARGET_ARGS=() \
     && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
-    && scripts/build/build_examples.py \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
     "${TARGET_ARGS[@]}" \
     build \
     && while IFS= read -r suffix; do \
-        find out/${ARCH}-${suffix} -maxdepth 1 -type f -executable -exec mv {} out/ \; \
-        && rm -rf out/${ARCH}-${suffix}; \
-    done < /tmp/targets.txt \
-    && find out -maxdepth 1 -type f -executable -exec strip --strip-unneeded {} \; \
-    && : # last line
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
 
-RUN source scripts/activate.sh \
+RUN printf '%s\n' \
+    all-clusters-ipv6only \
+    all-clusters-ipv6only-nlfaultinject \
+    all-clusters-minimal-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
+    && set -x \
+    && source scripts/activate.sh \
+    && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
+    "${TARGET_ARGS[@]}" \
+    build \
+    && while IFS= read -r suffix; do \
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
+
+RUN printf '%s\n' \
+    light-ipv6only \
+    light-data-model-no-unique-id-ipv6only \
+    thermostat-ipv6only \
+    lock-ipv6only \
+    air-purifier-ipv6only \
+    bridge-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
+    && set -x \
+    && source scripts/activate.sh \
+    && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS}\
+    "${TARGET_ARGS[@]}" \
+    build \
+    && while IFS= read -r suffix; do \
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
+
+RUN printf '%s\n' \
+    tv-app-ipv6only \
+    tv-casting-app-ipv6only \
+    camera-clang-ipv6only \
+    camera-controller-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
+    && set -x \
+    && source scripts/activate.sh \
+    && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
+    "${TARGET_ARGS[@]}" \
+    build \
+    && while IFS= read -r suffix; do \
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
+
+RUN printf '%s\n' \
+    microwave-oven-ipv6only \
+    evse-ipv6only \
+    water-heater-ipv6only \
+    water-leak-detector-ipv6only \
+    rvc-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
+    && set -x \
+    && source scripts/activate.sh \
+    && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
+    "${TARGET_ARGS[@]}" \
+    build \
+    && while IFS= read -r suffix; do \
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
+
+RUN printf '%s\n' \
+    simulated-app1-ipv6only \
+    lit-icd-ipv6only \
+    energy-gateway-ipv6only \
+    closure-ipv6only \
+    terms-and-conditions-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
+    && set -x \
+    && source scripts/activate.sh \
+    && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS}\
+    "${TARGET_ARGS[@]}" \
+    build \
+    && while IFS= read -r suffix; do \
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
+
+RUN printf '%s\n' \
+    jf-control-app-ipv6only \
+    jf-admin-app-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
+    && set -x \
+    && source scripts/activate.sh \
+    && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS}\
+    "${TARGET_ARGS[@]}" \
+    build \
+    && while IFS= read -r suffix; do \
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
+
+RUN printf '%s\n' \
+    ota-provider-ipv6only \
+    ota-requestor-ipv6only \
+    > /tmp/targets.txt
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    TARGET_ARGS=() \
+    && source /tmp/arch.env \
+    && set -x \
+    && source scripts/activate.sh \
+    && while IFS= read -r suffix; do TARGET_ARGS+=("--target" "${ARCH}-${suffix}"); done < /tmp/targets.txt \
+    && scripts/build/build_examples.py ${BUILD_EXAMPLES_ARGS} \
+    "${TARGET_ARGS[@]}" \
+    build \
+    && while IFS= read -r suffix; do \
+        find out/${ARCH}-${suffix}-release-size -maxdepth 1 -type f -executable -exec mv {} out/ \; \
+        && rm -rf out/${ARCH}-${suffix}-release-size; \
+    done < /tmp/targets.txt
+
+RUN --mount=type=cache,target=/root/connectedhomeip/.ccache \
+    source scripts/activate.sh \
     && scripts/build_python.sh \
         -m platform \
         -d true \
-        --enable_nfc true
+        --enable_nfc true \
+        --enable-ccache
 
 # Generate OTA image from the built OTA requestor app
 # This creates ota-requestor-app.ota for OTA testing
@@ -238,36 +367,38 @@ RUN case ${TARGETPLATFORM} in \
     *) ;; \
     esac
 
+RUN find out -maxdepth 1 -type f -executable -exec strip --strip-all {} \;
+
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
-FROM ubuntu:24.04
+FROM ubuntu:24.04 AS builder
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    avahi-utils \
-    ffmpeg \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-ugly \
-    iproute2 \
-    libavahi-client-dev \
-    libcairo2-dev \
-    libcurl4 \
-    libdbus-1-dev \
-    libevent-dev \
-    libgirepository1.0-dev \
-    libglib2.0-dev \
-    libgstreamer1.0-0 \
-    libgstreamer-plugins-base1.0-0 \
-    libpcsclite1 \
-    libpcsclite-dev \
-    libssl-dev \
-    meson \
-    pcscd \
-    python3-dev \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/* \
-    && : # last line
+        avahi-utils \
+        ffmpeg \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-ugly \
+        iproute2 \
+        libavahi-client-dev \
+        libcairo2-dev \
+        libcurl4 \
+        libdbus-1-dev \
+        libevent-dev \
+        libgirepository1.0-dev \
+        libglib2.0-dev \
+        libgstreamer1.0-0 \
+        libgstreamer-plugins-base1.0-0 \
+        libpcsclite1 \
+        libpcsclite-dev \
+        libssl-dev \
+        meson \
+        pcscd \
+        python3-dev \
+        python3-pip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
@@ -300,12 +431,50 @@ RUN pip install --break-system-packages --no-cache-dir \
     python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
     python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
-    python_lib/obj/src/controller/python/matter-controller-wheels/*.whl \
-    && rm ../python_lib \
-    && rm -rf python_lib
+    python_lib/obj/src/controller/python/matter-controller-wheels/*.whl
 
-# Copy device attestation revocation set and device attestation test vectors
-WORKDIR /root
-RUN mkdir -p credentials/test/revoked-attestation-certificates
+FROM ubuntu:24.04
+
+ENV TZ=Etc/UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update -y \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        avahi-utils \
+        ffmpeg \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-ugly \
+        iproute2 \
+        libavahi-client3 \
+        libcairo2 \
+        libcurl4 \
+        libdbus-1-3 \
+        # commands still fail without the dev packages from libevent
+        libevent-dev \
+        libglib2.0-0t64 \
+        libgstreamer1.0-0 \
+        libgstreamer-plugins-base1.0-0 \
+        libpcsclite1 \
+        libssl3t64 \
+        pcscd \
+        python3 \
+        python3-pip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /root/
+
+COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets
+COPY --from=builder /root/apps ./apps
+COPY --from=builder /root/python_testing ./python_testing
+COPY --from=builder /root/mock_server ./mock_server
+
+# Copy the installed Python packages from builder's site-packages
+COPY --from=builder /usr/local/lib/python3.12/dist-packages /usr/local/lib/python3.12/dist-packages
+# Copy any symlinks or scripts from /usr/local/bin
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Recreate symlinks in runtime stage
+RUN cd /root && ln -s apps/* .
