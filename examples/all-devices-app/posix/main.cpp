@@ -35,7 +35,6 @@
 
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-factory/DeviceFactory.h>
 #if defined(CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS) && CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
 #include <accessors/common/AccessorRegistry.h>
 #include <accessors/common/OOBAccessor.h>
