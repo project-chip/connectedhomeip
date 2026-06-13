@@ -39,10 +39,12 @@ from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
+import matter.clusters as Clusters
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
 
@@ -364,6 +366,23 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
+def read_global_wildcard(event_loop, default_controller, node_id):
+    return event_loop.run_until_complete(
+        asyncio.wait_for(
+            default_controller.Read(
+                node_id,
+                [
+                    (Clusters.Descriptor),
+                    Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                    Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                    Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                ],
+            ),
+            timeout=60,
+        )
+    )
+
+
 def run_tests_no_exit(
         test_class,
         matter_test_config,
@@ -458,6 +477,62 @@ def run_tests_no_exit(
         with runner.mobly_logger():
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
+
+            if getattr(test_class, 'NEEDS_COMMISSIONING', True):
+
+                setup_code: Optional[str] = None
+                if matter_test_config.manual_code:
+                    setup_code = matter_test_config.manual_code[0]
+                elif matter_test_config.qr_code_content:
+                    setup_code = matter_test_config.qr_code_content[0]
+                elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
+                    setup_code = default_controller.CreateManualCode(
+                        matter_test_config.discriminators[0],
+                        matter_test_config.setup_passcodes[0],
+                    )
+
+                node_id = matter_test_config.dut_node_ids[0]
+
+                if matter_test_config.commissioning_method is not None and setup_code is not None:
+                    # Path 1: PASE + commissioning — prefetch PASE + wildcard read, then keep the commissionee
+                    # session so CommissionDeviceTest's FindOrEstablishPASESession reuses it (same nodeId).
+                    try:
+                        commissionee = event_loop.run_until_complete(
+                            default_controller.FindOrEstablishPASESession(
+                                setupCode=setup_code, nodeId=node_id
+                            )
+                        )
+                        if commissionee is not None:
+                            stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
+                            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                            # Do not ExpireSessions here: commissioning reuses this commissionee via
+                            # FindOrEstablishPASESession; tearing down forced flaky second discovery.
+                        else:
+                            LOGGER.error("FindOrEstablishPASESession returned None")
+                    except Exception:
+                        LOGGER.warning("Could not pre-populate global wildcard before commissioning")
+
+                elif setup_code is not None:
+                    # Path 2: PASE without commissioning (e.g., manual-code only)
+                    try:
+                        commissionee = event_loop.run_until_complete(
+                            default_controller.FindOrEstablishPASESession(
+                                setupCode=setup_code, nodeId=node_id
+                            )
+                        )
+                        if commissionee is not None:
+                            stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
+                            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                    except Exception:
+                        LOGGER.warning("Could not pre-populate global wildcard via PASE", exc_info=True)
+
+                else:
+                    # Path 3: CASE (already commissioned, no setup code)
+                    try:
+                        stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
+                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                    except Exception:
+                        LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:

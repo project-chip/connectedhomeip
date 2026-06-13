@@ -272,10 +272,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.current_step_index = 0
         self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
-        # self.stored_global_wildcard stores value of self.global_wildcard after first async call.
-        # Because setup_class can be called before commissioning, this variable is lazy-initialized
-        # where the read is deferred until the first guard function call that requires global attributes.
-        self.stored_global_wildcard = None
 
     def teardown_class(self):
         """Final teardown after all tests: run framework cleanup, log problems, dump attributes.
@@ -328,8 +324,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         controller-side cleanup. Each step is gated by TestCleanupConfig so individual
         steps can be disabled by test authors when needed.
 
-        Wildcard attributes are pre-fetched once so all cluster-presence checks within
-        a single cleanup pass share the same read.
+        Cluster-presence checks use ``stored_global_wildcard`` (or
+        ``_optional_stored_global_wildcard`` when the framework must tolerate a missing read), which the
+        test runner populates in ``user_params`` at session start (see ``read_global_wildcard`` in
+        ``runner.run_tests_no_exit``). If that read failed, cleanup steps that need it log and skip.
         """
 
         # If a teardown_test override already called this (per-test cleanup
@@ -354,7 +352,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                 dut_reachable = False
 
         if dut_reachable:
-            await self._populate_wildcard()
             # DUT cleanup (run first as controller must still be alive to send commands)
             # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
             #   group to still exist on the DUT, so group memberships cannot be cleared first.
@@ -564,15 +561,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         Must run before _purge_group_memberships since RemoveAllScenes needs the group to
         still exist on the DUT.
         """
-        if self.stored_global_wildcard is None:
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
             return
 
-        for endpoint_id in self.stored_global_wildcard.attributes:
-            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+        for endpoint_id in wildcard.attributes:
+            if not _has_cluster(wildcard=wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
                 continue
-            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+            if not _has_cluster(wildcard=wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
             try:
@@ -601,13 +599,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Must run after _purge_scenes since scenes need their groups to still exist for RemoveAllScenes.
         """
-        if self.stored_global_wildcard is None:
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping group membership cleanup")
             return
 
         found_any = False
-        for endpoint_id in self.stored_global_wildcard.attributes:
-            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+        for endpoint_id in wildcard.attributes:
+            if not _has_cluster(wildcard=wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
             found_any = True
@@ -625,13 +624,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def _purge_doorlock(self) -> None:
         """Clears all DoorLock users and credentials on every endpoint with the DoorLock cluster."""
-        if self.stored_global_wildcard is None:
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping DoorLock cleanup")
             return
 
         found_any = False
-        for endpoint_id in self.stored_global_wildcard.attributes:
-            if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
+        for endpoint_id in wildcard.attributes:
+            if not _has_cluster(wildcard=wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.DoorLock):  # type: ignore[arg-type]
                 continue
             found_any = True
@@ -656,12 +656,17 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _purge_tls_endpoints(self) -> None:
         """Removes all provisioned TLS endpoints on every endpoint with TlsClientManagement.
 
-        Uses stored_global_wildcard (pre-populated by _run_framework_cleanup) to locate
+        Uses stored_global_wildcard (pre-populated by the test runner) to locate
         TlsClientManagement via ServerList, no extra network read needed.
         """
         tls_cluster_id = Clusters.TlsClientManagement.id
         found_any = False
-        for endpoint_id, clusters in self.stored_global_wildcard.attributes.items():
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None:
+            LOGGER.info("[CLN] wildcard not available, skipping TLS endpoint cleanup")
+            return
+
+        for endpoint_id, clusters in wildcard.attributes.items():
             server_list = clusters.get(Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.ServerList)
             if server_list is None or tls_cluster_id not in server_list:
                 continue
@@ -710,16 +715,17 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def _unregister_icd_clients(self) -> None:
         """Unregisters all ICD clients registered on the DUT via the default controller"""
         # Check if the ICD Management cluster is present on the DUT.
-        # Wildcard is pre-populated by _run_framework_cleanup; guard for standalone calls.
-        if self.stored_global_wildcard is None:
+        # Wildcard is pre-populated by the test runner; guard when unavailable.
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None:
             LOGGER.info("[CLN] wildcard not available, skipping ICD client cleanup")
             return
-        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0,
+        if not _has_attribute(wildcard=wildcard, endpoint=0,
                               attribute=Clusters.IcdManagement.Attributes.RegisteredClients):  # type: ignore[arg-type]
             LOGGER.info("[CLN] ICD Management cluster not present, skipping ICD client cleanup")
             return
 
-        registered_clients = self.stored_global_wildcard.attributes.get(0, {}).get(
+        registered_clients = wildcard.attributes.get(0, {}).get(
             Clusters.IcdManagement, {}).get(Clusters.IcdManagement.Attributes.RegisteredClients)
 
         if not registered_clients:
@@ -1070,6 +1076,25 @@ class MatterBaseTest(base_test.BaseTestClass):
     def runner_hook(self) -> TestRunnerHooks:
         """Accesses the Test Runner Hooks for external reporting."""
         return global_stash.unstash_globally(self.user_params.get("hooks"))
+
+    def _optional_stored_global_wildcard(self) -> Optional[Attribute.AsyncReadTransaction.ReadResponse]:
+        """Returns the runner's cached global wildcard read, or None if it was never stashed.
+
+        Framework cleanup uses this to skip steps when the wildcard was unavailable. Test bodies and
+        guards should use :py:attr:`stored_global_wildcard` instead, which raises if the stash is missing.
+        """
+        return global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
+
+    @property
+    def stored_global_wildcard(self) -> Attribute.AsyncReadTransaction.ReadResponse:
+        """Accesses the cached global wildcard read populated by the test runner."""
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None:
+            raise RuntimeError(
+                "stored_global_wildcard was not populated by the runner; set NEEDS_COMMISSIONING = False only if "
+                "your test does not use guards or read stored_global_wildcard."
+            )
+        return wildcard
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
@@ -1463,14 +1488,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
-    async def _populate_wildcard(self):
-        """ Populates self.stored_global_wildcard if not already filled. """
-        if not hasattr(self, 'stored_global_wildcard') or self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
-            self.stored_global_wildcard = await global_wildcard
-
-    async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
+    def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
            For example can be used to check if a test step should be run:
@@ -1483,13 +1501,12 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        await self._populate_wildcard()
         attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
         return attr_condition
 
-    async def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
+    def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
         """Similar to attribute_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using command id against AcceptedCmdsList, otherwise returns True.
            For example can be used to check if a test step should be run:
@@ -1502,13 +1519,12 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.command_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        await self._populate_wildcard()
         cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
             self.mark_current_step_skipped()
         return cmd_condition
 
-    async def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
+    def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
         """Similar to command_guard and attribute_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using feature id against feature_map, otherwise returns True.
            For example can be used to check if a test step should be run:
@@ -1521,7 +1537,6 @@ class MatterBaseTest(base_test.BaseTestClass):
               if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
-        await self._populate_wildcard()
         feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
             self.mark_current_step_skipped()
