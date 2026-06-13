@@ -667,7 +667,5 @@ class TC_ACE_1_6(MatterBaseTest):
             targets=NullValue)
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin_full]))])
 
-
-
 if __name__ == "__main__":
     default_matter_test_main()
