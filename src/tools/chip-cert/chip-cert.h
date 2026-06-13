@@ -68,6 +68,38 @@
 
 using chip::ASN1::OID;
 
+// ML-DSA (FIPS 204) requires the OpenSSL 3.5+ EVP interface; it is not available
+// in BoringSSL or earlier OpenSSL versions.
+#if !defined(OPENSSL_IS_BORINGSSL) && OPENSSL_VERSION_NUMBER >= 0x30500000L
+#define CHIP_CERT_ML_DSA_AVAILABLE 1
+#else
+#define CHIP_CERT_ML_DSA_AVAILABLE 0
+#endif
+
+inline bool IsMLDSAKey(const EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    return EVP_PKEY_is_a(key, "ML-DSA-44") || EVP_PKEY_is_a(key, "ML-DSA-65");
+#else
+    (void) key;
+    return false;
+#endif
+}
+
+inline bool IsMLDSA44Key(const EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    return EVP_PKEY_is_a(key, "ML-DSA-44");
+#else
+    (void) key;
+    return false;
+#endif
+}
+
+// ML-DSA signed attestation certificates exceed the 600-byte limit that applies
+// to ECDSA-only chains. ML-DSA-65 certificates are ~5.5 KB DER encoded.
+inline constexpr uint32_t kMaxPQCDERCertLength = 6144;
+
 #ifndef CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
 #define CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES CHIP_CONFIG_TEST
 #endif
@@ -456,6 +488,7 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
                         X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, X509_EXTENSION * cdpExt);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
+extern bool GenerateKeyPair_MLDSA(std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, const char * algorithm);
 extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
                     bool ignorErrorIfUnsupportedCurve = false);
 extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);

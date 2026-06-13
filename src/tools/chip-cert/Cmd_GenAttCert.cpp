@@ -57,6 +57,7 @@ OptionDef gCmdOptionDefs[] =
     { "lifetime",           kArgumentRequired, 'l' },
     { "cdp-uri",            kArgumentRequired, 'x' },
     { "crl-issuer-cert",    kArgumentRequired, 'L' },
+    { "key-type",           kArgumentRequired, 'A' },
  #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     { "ignore-error",       kNoArgument,       'I' },
     { "error-type",         kArgumentRequired, 'E' },
@@ -135,6 +136,13 @@ const char * const gCmdOptionHelp =
     "       File or string containing the CRL Issuer certificate (in an X.509 PEM format).\n"
     "       The Subject name will be extracted from this certificate to be included in the\n"
     "       cRLIssuer field of the CRL Distribution Point (CDP) extension.\n"
+    "\n"
+    "   -A, --key-type <algorithm>\n"
+    "\n"
+    "       Key algorithm to use for generating the new key pair. Supported values are:\n"
+    "           p256       - EC prime256v1 / secp256r1 (default)\n"
+    "           ml-dsa-44  - ML-DSA-44 (FIPS 204, post-quantum)\n"
+    "           ml-dsa-65  - ML-DSA-65 (FIPS 204, post-quantum)\n"
     "\n"
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     "   -I, --ignore-error\n"
@@ -229,6 +237,7 @@ const char * gOutKeyFileName        = nullptr;
 uint32_t gValidDays                 = kCertValidDays_Undefined;
 const char * gCDPURI                = nullptr;
 const char * gCRLIssuerCertFileName = nullptr;
+const char * gKeyTypeName           = nullptr;
 struct tm gValidFrom;
 CertStructConfig gCertConfig;
 
@@ -313,6 +322,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
     case 'L':
         gCRLIssuerCertFileName = arg;
+        break;
+    case 'A':
+        gKeyTypeName = arg;
+        if (strcmp(arg, "p256") != 0 && strcmp(arg, "ml-dsa-44") != 0 && strcmp(arg, "ml-dsa-65") != 0)
+        {
+            PrintArgError("%s: Invalid value specified for key type: %s\n", progName, arg);
+            return false;
+        }
         break;
 #if CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
     case 'I':
@@ -593,6 +610,17 @@ bool Cmd_GenAttCert(int argc, char * argv[])
         if (gCertConfig.IsSigCurveWrong())
         {
             res = GenerateKeyPair_Secp256k1(newKey.get());
+            VerifyTrueOrExit(res);
+        }
+        else if (gKeyTypeName != nullptr && strncmp(gKeyTypeName, "ml-dsa-", 7) == 0)
+        {
+            const char * opensslAlgo = nullptr;
+            if (strcmp(gKeyTypeName, "ml-dsa-44") == 0)
+                opensslAlgo = "ML-DSA-44";
+            else if (strcmp(gKeyTypeName, "ml-dsa-65") == 0)
+                opensslAlgo = "ML-DSA-65";
+
+            res = GenerateKeyPair_MLDSA(newKey, opensslAlgo);
             VerifyTrueOrExit(res);
         }
         else
