@@ -77,14 +77,19 @@ void WiFiPAFTPDoesNotCrash(bool expectFirstAck, const std::vector<uint8_t> & fra
     {
         auto buf = PacketBufferHandle::NewWithData(frag->data(), frag->size());
         if (buf.IsNull())
+        {
             continue;
+        }
 
         SequenceNumber_t receivedAck = 0;
         bool didReceiveAck           = false;
+        // Fuzzer asserts only the no-crash property; the parse status is irrelevant here.
         RETURN_SAFELY_IGNORED engine.HandleCharacteristicReceived(std::move(buf), receivedAck, didReceiveAck);
 
         if (engine.RxState() == WiFiPAFTP::kState_Error)
+        {
             break;
+        }
     }
 }
 

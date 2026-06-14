@@ -21,6 +21,7 @@
 // data-phase reassembly. Fragments are seeded with real PAFTP shapes.
 
 #include <cstdint>
+#include <cstdlib>
 #include <utility>
 #include <vector>
 
@@ -58,15 +59,6 @@ public:
     {
         Shutdown();
         mWiFiPAFTransport = nullptr;
-    }
-
-    // Free() does not clear mWiFiPafLayer; null it so the pool slot is reusable next iteration.
-    static void ForceReleaseEndpoint(WiFiPAFEndPoint * ep)
-    {
-        if (ep != nullptr)
-        {
-            ep->mWiFiPafLayer = nullptr;
-        }
     }
 
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession &, System::PacketBufferHandle &&) override { return NextError(mRecvErrMask); }
@@ -158,10 +150,11 @@ void EndpointReceiveDoesNotCrash(WiFiPafRole role, uint8_t startState, uint32_t 
 
     WiFiPAFSession session = {};
     session.role           = role;
-    session.id             = sessionId == 0 ? 1 : sessionId;
-    session.peer_id        = 1;
-    session.nodeId         = 1;
-    session.discriminator  = discriminator;
+    // 0 and kUndefinedWiFiPafSessionId are sentinels Shutdown() skips, which would leak the endpoint across iterations.
+    session.id            = (sessionId == 0 || sessionId == chip::WiFiPAF::kUndefinedWiFiPafSessionId) ? 1 : sessionId;
+    session.peer_id       = 1;
+    session.nodeId        = 1;
+    session.discriminator = discriminator;
 
     WiFiPAFEndPoint * ep = nullptr;
     if (harness.NewEndPoint(&ep, session, role) != CHIP_NO_ERROR || ep == nullptr)
@@ -169,6 +162,7 @@ void EndpointReceiveDoesNotCrash(WiFiPafRole role, uint8_t startState, uint32_t 
         harness.FuzzTeardown();
         return;
     }
+    // Best-effort registration so Shutdown() can find the endpoint; a duplicate/full table is fine here.
     RETURN_SAFELY_IGNORED harness.AddPafSession(PafInfoAccess::kAccSessionId, session);
     ep->mState = static_cast<decltype(ep->mState)>(startState);
     harness.SetWiFiPAFState(startState == WiFiPAFEndPoint::kState_Connected ? State::kConnected : State::kInitialized);
@@ -180,6 +174,7 @@ void EndpointReceiveDoesNotCrash(WiFiPafRole role, uint8_t startState, uint32_t 
         {
             continue;
         }
+        // Fuzzer asserts only the no-crash property; Receive's status is irrelevant here.
         RETURN_SAFELY_IGNORED ep->Receive(std::move(buf));
         if (ep->mState == WiFiPAFEndPoint::kState_Closed || ep->mState == WiFiPAFEndPoint::kState_Aborting)
         {
@@ -187,8 +182,10 @@ void EndpointReceiveDoesNotCrash(WiFiPafRole role, uint8_t startState, uint32_t 
         }
     }
 
+    // FuzzTeardown()->Shutdown() closes the registered endpoint through the production DoClose path
+    // (cancels timers, frees buffers, returns the static pool slot via ClearAll), so the slot is reusable
+    // next iteration without poking mWiFiPafLayer directly. The session-id clamp above keeps it findable.
     harness.FuzzTeardown();
-    TestWiFiPAFLayer::ForceReleaseEndpoint(ep);
 }
 
 FUZZ_TEST(FuzzWiFiPAFEndPointPW, EndpointReceiveDoesNotCrash)
