@@ -920,8 +920,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
             auto setupDiscriminator                             = params.GetSetupDiscriminator();
-            VerifyOrExit(setupDiscriminator.has_value(),
-                         ChipLogError(Controller, "WiFi-PAF: Missing setup discriminator");
+            VerifyOrExit(setupDiscriminator.has_value(), ChipLogError(Controller, "WiFi-PAF: Missing setup discriminator");
                          err = CHIP_ERROR_INVALID_ARGUMENT);
             const SetupDiscriminator connDiscriminator(setupDiscriminator.value());
             VerifyOrExit(!connDiscriminator.IsShortDiscriminator(),
