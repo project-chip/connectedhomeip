@@ -101,8 +101,12 @@ private:
 TEST_F(TestWiFiPAFLayer, FinalizeCloseIsIdempotentAcrossDoubleClose)
 {
     WiFiPAFSession sessionInfo = {
-        .role = kWiFiPafRole_Subscriber, .id = 1, .peer_id = 1,
-        .peer_addr = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c }, .nodeId = 1, .discriminator = 0xF00,
+        .role          = kWiFiPafRole_Subscriber,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
     };
     WiFiPAFEndPoint * ep = nullptr;
     ASSERT_EQ(NewEndPoint(&ep, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);

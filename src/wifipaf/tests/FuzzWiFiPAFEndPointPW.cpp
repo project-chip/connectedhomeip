@@ -139,15 +139,17 @@ std::vector<std::vector<uint8_t>> CapabilitySeeds()
 std::vector<std::vector<uint8_t>> PaftpSeeds()
 {
     return {
-        { 0x05, 0x01, 0x01, 0x00, 0x00 }, { 0x05, 0x01, 0x03, 0x00, 0x00 },
-        { 0x01, 0x00, 0x01, 0x00, 0x00 }, { 0x04, 0x01, 0x02, 0x00 },
+        { 0x05, 0x01, 0x01, 0x00, 0x00 },
+        { 0x05, 0x01, 0x03, 0x00, 0x00 },
+        { 0x01, 0x00, 0x01, 0x00, 0x00 },
+        { 0x04, 0x01, 0x02, 0x00 },
     };
 }
 
 void EndpointReceiveDoesNotCrash(WiFiPafRole role, uint8_t startState, uint32_t sessionId, uint16_t discriminator,
-                                 uint32_t sendErrMask, uint32_t recvErrMask, bool resourceAvail,
-                                 const std::vector<uint8_t> & frag0, const std::vector<uint8_t> & frag1,
-                                 const std::vector<uint8_t> & frag2, const std::vector<uint8_t> & frag3)
+                                 uint32_t sendErrMask, uint32_t recvErrMask, bool resourceAvail, const std::vector<uint8_t> & frag0,
+                                 const std::vector<uint8_t> & frag1, const std::vector<uint8_t> & frag2,
+                                 const std::vector<uint8_t> & frag3)
 {
     EnsureInitialized();
 

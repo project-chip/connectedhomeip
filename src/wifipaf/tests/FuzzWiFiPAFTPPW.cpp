@@ -62,9 +62,8 @@ std::vector<std::vector<uint8_t>> PaftpFragmentSeeds()
     };
 }
 
-void WiFiPAFTPDoesNotCrash(bool expectFirstAck, const std::vector<uint8_t> & frag0,
-                           const std::vector<uint8_t> & frag1, const std::vector<uint8_t> & frag2,
-                           const std::vector<uint8_t> & frag3)
+void WiFiPAFTPDoesNotCrash(bool expectFirstAck, const std::vector<uint8_t> & frag0, const std::vector<uint8_t> & frag1,
+                           const std::vector<uint8_t> & frag2, const std::vector<uint8_t> & frag3)
 {
     EnsureInitialized();
 
@@ -90,11 +89,9 @@ void WiFiPAFTPDoesNotCrash(bool expectFirstAck, const std::vector<uint8_t> & fra
 }
 
 FUZZ_TEST(FuzzWiFiPAFTPPW, WiFiPAFTPDoesNotCrash)
-    .WithDomains(
-        Arbitrary<bool>(),
-        Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()),
-        Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()),
-        Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()),
-        Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()));
+    .WithDomains(Arbitrary<bool>(), Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()),
+                 Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()),
+                 Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()),
+                 Arbitrary<std::vector<uint8_t>>().WithSeeds(PaftpFragmentSeeds()));
 
 } // namespace
