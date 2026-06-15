@@ -438,4 +438,3 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardBridgedSequential)
     EXPECT_EQ(configs[4].type, "speaker");
     EXPECT_EQ(configs[4].endpoint, 13);
 }
-
