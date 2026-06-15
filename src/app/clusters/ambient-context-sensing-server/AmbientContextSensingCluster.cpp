@@ -344,8 +344,9 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetec
 {
     VerifyOrReturnError((simultaneousDetectionLimit <= kMaxSimultaneousDetectionLimit),
                         Protocols::InteractionModel::Status::ConstraintError);
-    VerifyOrReturnValue(SetAttributeValue(mSimultaneousDetectionLimit, simultaneousDetectionLimit, Attributes::SimultaneousDetectionLimit::Id),
-                        DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+    VerifyOrReturnValue(
+        SetAttributeValue(mSimultaneousDetectionLimit, simultaneousDetectionLimit, Attributes::SimultaneousDetectionLimit::Id),
+        DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     if (mAmbientContextTypeListSize <= mSimultaneousDetectionLimit)
     {
@@ -375,7 +376,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetHoldTime(uint16_t
 {
     VerifyOrReturnError((mHoldTimeLimits.holdTimeMin <= holdTime) && (holdTime <= mHoldTimeLimits.holdTimeMax),
                         Protocols::InteractionModel::Status::ConstraintError);
-    VerifyOrReturnValue(SetAttributeValue(mHoldTime, holdTime, Attributes::HoldTime::Id), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+    VerifyOrReturnValue(SetAttributeValue(mHoldTime, holdTime, Attributes::HoldTime::Id),
+                        DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     // Save the value to persistence
     if (mContext != nullptr)
@@ -574,7 +576,8 @@ void AmbientContextSensingCluster::UpdateDetectionAttributes()
     SetAttributeValue(mHumanActivityDetected, bDetect.Has(Feature::kHumanActivity), Attributes::HumanActivityDetected::Id);
     SetAttributeValue(mObjectIdentified, bDetect.Has(Feature::kObjectIdentification), Attributes::ObjectIdentified::Id);
     SetAttributeValue(mAudioContextDetected, bDetect.Has(Feature::kSoundIdentification), Attributes::AudioContextDetected::Id);
-    SetAttributeValue(mObjectCountThresholdReached, bDetect.Has(Feature::kObjectCounting), Attributes::ObjectCountThresholdReached::Id);
+    SetAttributeValue(mObjectCountThresholdReached, bDetect.Has(Feature::kObjectCounting),
+                      Attributes::ObjectCountThresholdReached::Id);
 }
 
 // Find the next-timeout to remove the item in mAmbientContextTypeList
