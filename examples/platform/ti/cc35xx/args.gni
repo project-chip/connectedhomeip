@@ -26,6 +26,4 @@ chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 
-chip_project_config_include_dirs = [
-  "//include",
-]
+chip_project_config_include_dirs = [ "//include" ]

@@ -22,8 +22,9 @@ arm_platform_config =
 chip_device_platform = "cc35xx"
 chip_external_mbedtls = true
 chip_crypto = "psa"
+
 # Use single part AEAD since CC35xx supports multi-step streaming AEAD with below limiation:
-# SL CCM and GCM drivers only support adding full blocks of data 
+# SL CCM and GCM drivers only support adding full blocks of data
 chip_crypto_psa_aead_single_part = true
 
 lwip_platform = "cc35xx"

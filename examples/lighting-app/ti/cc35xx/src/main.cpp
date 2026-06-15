@@ -39,13 +39,15 @@ extern "C" void initialize_mbedtls_threading(void);
 // Note: vQueueAddToRegistryWrapper and vQueueUnregisterQueueWrapper are
 // provided by the SysConfig-generated ti_freertos_config.c
 
-extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
+extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) 
+{
     PLAT_LOG("Stack overflow detected in task: %s\n", pcTaskName);
     taskDISABLE_INTERRUPTS();
     for(;;);
 }
 
-extern "C" void vApplicationMallocFailedHook(void) {
+extern "C" void vApplicationMallocFailedHook(void) 
+{
     PLAT_LOG("Malloc failed!\n");
     taskDISABLE_INTERRUPTS();
     for(;;);
