@@ -225,7 +225,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
         is_speed_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
         is_access_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kAccess
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
 
         self.step("2b")
         if is_access_supported:
@@ -240,7 +240,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
         if is_latching_supported:
             self.step("2d")
             latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-            log.info(f"LatchControlModes: {latch_control_modes}")
+            log.info("LatchControlModes: %s", latch_control_modes)
         else:
             log.info("LatchControlModes attribute is not supported, skipping read")
             self.skip_step("2d")
@@ -251,7 +251,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             log.error("GroupedMoveTo command with no fields should have failed but succeeded")
             asserts.assert_true(False, "GroupedMoveTo command with no fields should have failed but succeeded")
         except InteractionModelError as e:
-            log.info(f"GroupedMoveTo command with no fields failed: {e}")
+            log.info("GroupedMoveTo command with no fields failed: %s", e)
             asserts.assert_equal(e.status, Status.InvalidCommand,
                                  f"Expected INVALID_COMMAND status for GroupedMoveTo with no fields, but got: {e}")
 
@@ -268,7 +268,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 current_position = NullValue
             else:
                 current_position = overall_current_state.position
-            log.info(f"CurrentPosition: {current_position}")
+            log.info("CurrentPosition: %s", current_position)
 
             self.step("4c")
             if current_position == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
@@ -309,7 +309,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 current_latch = NullValue
             else:
                 current_latch = overall_current_state.latch
-            log.info(f"CurrentLatch: {current_latch}")
+            log.info("CurrentLatch: %s", current_latch)
 
             self.step("5c")
             if not current_latch and current_latch is not NullValue:
@@ -406,7 +406,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                     asserts.assert_true(
                         False, "GroupedMoveTo command with Position = MoveToFullyOpen and Latch = True should have failed but succeeded")
                 except InteractionModelError as e:
-                    log.info(f"Exception caught for GroupedMoveTo with Position = MoveToFullyOpen and Latch = True: {e}")
+                    log.info("Exception caught for GroupedMoveTo with Position = MoveToFullyOpen and Latch = True: %s", e)
                     asserts.assert_equal(e.status, Status.InvalidInState,
                                          f"Expected INVALID_IN_STATE for GroupedMoveTo with Position = MoveToFullyOpen and Latch = True but got: {e}")
             sub_handler.reset()
@@ -423,7 +423,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 current_speed = NullValue
             else:
                 current_speed = overall_current_state.speed
-            log.info(f"CurrentSpeed: {current_speed}")
+            log.info("CurrentSpeed: %s", current_speed)
 
             self.step("6c")
             if current_speed == Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh:
@@ -459,7 +459,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 log.error("GroupedMoveTo command with Position = 6 should have failed but succeeded")
                 asserts.assert_true(False, "GroupedMoveTo command with Position = 6 should have failed but succeeded")
             except InteractionModelError as e:
-                log.info(f"Exception caught for GroupedMoveTo with Position = 6: {e}")
+                log.info("Exception caught for GroupedMoveTo with Position = 6: %s", e)
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for GroupedMoveTo with Position = 6 but got: {e}")
         else:
@@ -473,7 +473,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 log.error("GroupedMoveTo command with Speed = 4 should have failed but succeeded")
                 asserts.assert_true(False, "GroupedMoveTo command with Speed = 4 should have failed but succeeded")
             except InteractionModelError as e:
-                log.info(f"Exception caught for GroupedMoveTo with Speed = 4: {e}")
+                log.info("Exception caught for GroupedMoveTo with Speed = 4: %s", e)
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for GroupedMoveTo with Speed = 4 but got: {e}")
             self.step("7c")
@@ -483,7 +483,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 asserts.assert_true(
                     False, "GroupedMoveTo command with Position = 6 and Speed = High should have failed but succeeded")
             except InteractionModelError as e:
-                log.info(f"Exception caught for GroupedMoveTo with Position = 6 and Speed = High: {e}")
+                log.info("Exception caught for GroupedMoveTo with Position = 6 and Speed = High: %s", e)
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for GroupedMoveTo with Position = 6 and Speed = High but got: {e}")
             self.step("7d")
@@ -493,7 +493,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                 asserts.assert_true(
                     False, "GroupedMoveTo command with Position = MoveToFullyClosed and Speed = 4 should have failed but succeeded")
             except InteractionModelError as e:
-                log.info(f"Exception caught for GroupedMoveTo with Position = MoveToFullyClosed and Speed = 4: {e}")
+                log.info("Exception caught for GroupedMoveTo with Position = MoveToFullyClosed and Speed = 4: %s", e)
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for GroupedMoveTo with Position = MoveToFullyClosed and Speed = 4 but got: {e}")
         else:
@@ -505,7 +505,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             self.step("8b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_latch: typing.Union[Nullable, bool] = overall_current_state.latch
-            log.info(f"CurrentLatch: {current_latch}")
+            log.info("CurrentLatch: %s", current_latch)
 
             if current_latch is True and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
                 self.step("8c")
@@ -524,7 +524,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                     log.error("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                     asserts.fail("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
-                    log.info(f"Exception caught for GroupedMoveTo with Latch = CurrentLatch: {e}")
+                    log.info("Exception caught for GroupedMoveTo with Latch = CurrentLatch: %s", e)
                     asserts.assert_equal(e.status, Status.InvalidInState,
                                          f"Expected INVALID_IN_STATE for GroupedMoveTo with Latch = CurrentLatch but got: {e}")
             else:
@@ -548,7 +548,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
                     log.error("GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                     asserts.assert_true(False, "GroupedMoveTo command with Latch = CurrentLatch should have failed but succeeded")
                 except InteractionModelError as e:
-                    log.info(f"Exception caught for GroupedMoveTo with Latch = CurrentLatch: {e}")
+                    log.info("Exception caught for GroupedMoveTo with Latch = CurrentLatch: %s", e)
                     asserts.assert_equal(e.status, Status.InvalidInState,
                                          f"Expected INVALID_IN_STATE for GroupedMoveTo with Latch = CurrentLatch but got: {e}")
             else:
@@ -566,7 +566,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = overall_current_state.position
             current_latch: typing.Union[Nullable,
                                         bool] = overall_current_state.latch if overall_current_state is not NullValue else NullValue
-            log.info(f"current_position: {current_position}, current_latch: {current_latch}")
+            log.info("current_position: %s, current_latch: %s", current_position, current_latch)
 
             self.step("9c")
             if is_latching_supported and current_latch is True:
@@ -612,7 +612,7 @@ class TC_CLCTRL_7_3(MatterBaseTest):
             current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = overall_current_state.speed
             current_latch: typing.Union[Nullable,
                                         bool] = overall_current_state.latch if overall_current_state is not NullValue else NullValue
-            log.info(f"current_speed: {current_speed}, current_latch: {current_latch}")
+            log.info("current_speed: %s, current_latch: %s", current_speed, current_latch)
 
             self.step("10c")
             if is_latching_supported and current_latch is True:
