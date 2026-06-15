@@ -128,7 +128,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         # pipe out arguments
         self.provider_pipe_arguments = ['--app-pipe-out', self.provider_app_pipe_out, '--app-pipe', self.provider_app_pipe]
-        logger.info(f"PROVIDER PIPE OUT {self.provider_app_pipe_out} ,  PROVIDER PIPE {self.provider_app_pipe}")
+        logger.info("PROVIDER PIPE OUT %s ,  PROVIDER PIPE %s", self.provider_app_pipe_out, self.provider_app_pipe)
         # Extra Arguments required for the step 3
         delayed_apply_action_time = 60
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction',
@@ -222,7 +222,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Provider pipe after KDownloading State {pipe_data}")
+        logger.info("Provider pipe after KDownloading State %s", pipe_data)
 
         # Wait for Download to Complete and confirm the Device is kDelayedOnApply because Provider is AwaitNextAction
         update_state_match = AttributeMatcher.from_callable(
@@ -232,7 +232,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Provider pipe info kDelayedOnApply {pipe_data}")
+        logger.info("Provider pipe info kDelayedOnApply %s", pipe_data)
         # Assert the values from the Provider named pipes
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
@@ -247,7 +247,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         logger.info("Requestor is on Applying State")
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Provider pipe kApplying {pipe_data}")
+        logger.info("Provider pipe kApplying %s", pipe_data)
 
         # The provider needs to be terminated just before try to send the second ApplyUpdateRequest
         self.terminate_provider()
@@ -310,7 +310,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Status from provider pipe kDownloading {pipe_data}")
+        logger.info("Status from provider pipe kDownloading %s", pipe_data)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kDelayedOnApply",
@@ -321,7 +321,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"Status for provider pipe kDelayedOnApply {pipe_data}")
+        logger.info("Status for provider pipe kDelayedOnApply %s", pipe_data)
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
@@ -430,7 +430,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Use named pipes to confirm the ApplyUpdateAction
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info(f"PIPE INFO kApplying {pipe_data}")
+        logger.info("PIPE INFO kApplying %s", pipe_data)
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kDiscontinue, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
