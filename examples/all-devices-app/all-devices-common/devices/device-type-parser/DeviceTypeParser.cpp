@@ -285,14 +285,15 @@ CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
             visited.push_back(current);
 
             const auto * parent = FindEntryByEndpoint(entries, current);
-            current = (parent != nullptr) ? parent->parentId : chip::kInvalidEndpointId;
+            current             = (parent != nullptr) ? parent->parentId : chip::kInvalidEndpointId;
         }
     }
 
     return CHIP_NO_ERROR;
 }
 
-const DeviceTypeParser::Entry * DeviceTypeParser::FindEntryByEndpoint(const std::vector<Entry> & entries, chip::EndpointId endpointId)
+const DeviceTypeParser::Entry * DeviceTypeParser::FindEntryByEndpoint(const std::vector<Entry> & entries,
+                                                                      chip::EndpointId endpointId)
 {
     for (const auto & entry : entries)
     {
