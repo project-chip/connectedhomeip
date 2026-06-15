@@ -23,6 +23,7 @@
 #include <controller/python/matter/native/ChipMainLoopWork.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
@@ -79,6 +80,7 @@ public:
         if (opcode == MsgType::StatusReport)
         {
             mStatusReport             = MakeHeaders(packetHeader, payloadHeader);
+            mStatusReportParsed       = 0;
             mStatusReportGeneralCode  = 0;
             mStatusReportProtocolId   = 0;
             mStatusReportProtocolCode = 0;
@@ -92,6 +94,7 @@ public:
                     mStatusReportGeneralCode  = chip::to_underlying(report.GetGeneralCode());
                     mStatusReportProtocolId   = report.GetProtocolId().ToFullyQualifiedSpecForm();
                     mStatusReportProtocolCode = report.GetProtocolCode();
+                    mStatusReportParsed       = 1;
                 }
             }
         }
@@ -102,6 +105,7 @@ public:
         mSigma2                   = PychipCaseCapturedHeaders{};
         mSigma2Resume             = PychipCaseCapturedHeaders{};
         mStatusReport             = PychipCaseCapturedHeaders{};
+        mStatusReportParsed       = 0;
         mStatusReportGeneralCode  = 0;
         mStatusReportProtocolId   = 0;
         mStatusReportProtocolCode = 0;
@@ -112,6 +116,7 @@ public:
         out.sigma2                   = mSigma2;
         out.sigma2Resume             = mSigma2Resume;
         out.statusReport             = mStatusReport;
+        out.statusReportParsed       = mStatusReportParsed;
         out.statusReportGeneralCode  = mStatusReportGeneralCode;
         out.statusReportProtocolId   = mStatusReportProtocolId;
         out.statusReportProtocolCode = mStatusReportProtocolCode;
@@ -121,6 +126,7 @@ private:
     PychipCaseCapturedHeaders mSigma2{};
     PychipCaseCapturedHeaders mSigma2Resume{};
     PychipCaseCapturedHeaders mStatusReport{};
+    uint8_t mStatusReportParsed        = 0;
     uint16_t mStatusReportGeneralCode  = 0;
     uint32_t mStatusReportProtocolId   = 0;
     uint16_t mStatusReportProtocolCode = 0;

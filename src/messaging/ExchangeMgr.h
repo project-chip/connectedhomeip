@@ -281,6 +281,12 @@ private:
  * Test-only observer invoked for every inbound message on the ExchangeManager, just before dispatch.
  * Subclass and register an instance via ExchangeManager::SetTestOnlyReceivedMessageObserver to inspect inbound headers and message
  * bytes (e.g. to assert on Message/Exchange flags in Python integration tests).
+ *
+ * Lifetime: the ExchangeManager only holds a raw pointer to the observer and does not own it. The observer must outlive its
+ * registration. The pointer is cleared on Init() and Shutdown(), so it does not survive a Shutdown()/re-Init() cycle; for any
+ * other teardown the caller is responsible for unregistering (passing nullptr) before the observer is destroyed.
+ *
+ * OnMessageReceived must not consume or retain msgBuf beyond the call; call msgBuf.Retain() if a handle needs to outlive it.
  */
 class TestOnlyReceivedMessageObserver
 {

@@ -135,6 +135,9 @@ class TC_SC_3_1(MatterBaseTest):
         asserts.assert_equal(snapshot.statusReport.opcode, OPCODE_STATUS_REPORT,
                              f"Final status message opcode mismatch: got 0x{snapshot.statusReport.opcode:02x}, "
                              f"expected 0x{OPCODE_STATUS_REPORT:02x}.")
+        asserts.assert_true(snapshot.statusReportParsed,
+                            "Final StatusReport body could not be decoded; the GeneralCode/ProtocolId/ProtocolCode fields "
+                            "below are not meaningful.")
         asserts.assert_equal(snapshot.statusReportGeneralCode, GENERAL_CODE_SUCCESS,
                              "Final StatusReport GeneralCode must be SUCCESS (0).")
         asserts.assert_equal(snapshot.statusReportProtocolId, PROTOCOL_ID_SECURE_CHANNEL,

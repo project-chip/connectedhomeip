@@ -43,6 +43,7 @@ class PyCaseCaptureSnapshot(ctypes.Structure):
         ("sigma2", PyCaseCapturedHeaders),
         ("sigma2Resume", PyCaseCapturedHeaders),
         ("statusReport", PyCaseCapturedHeaders),
+        ("statusReportParsed", ctypes.c_uint8),
         ("statusReportGeneralCode", ctypes.c_uint16),
         ("statusReportProtocolId", ctypes.c_uint32),
         ("statusReportProtocolCode", ctypes.c_uint16),

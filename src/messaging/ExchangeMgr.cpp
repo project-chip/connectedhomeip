@@ -75,6 +75,11 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
         handler.Reset();
     }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Start from a clean slate: a stale observer must not survive a Shutdown()/re-Init() cycle.
+    mTestOnlyReceivedObserver = nullptr;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
     sessionManager->SetMessageDelegate(this);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -98,6 +103,11 @@ void ExchangeManager::Shutdown()
         mSessionManager->SetMessageDelegate(nullptr);
         mSessionManager = nullptr;
     }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Drop the test-only observer so inbound traffic after a re-Init() cannot dispatch to a now-stale observer.
+    mTestOnlyReceivedObserver = nullptr;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     mState = State::kState_NotInitialized;
 }

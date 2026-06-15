@@ -228,7 +228,6 @@ matter_python_wheel_action("matter-core") {
         "matter/ble/library_handle.py",
         "matter/ble/scan_devices.py",
         "matter/ble/types.py",
-        "matter/case_capture/__init__.py",
         "matter/clusters/Attribute.py",
         "matter/clusters/Command.py",
         "matter/clusters/__init__.py",
@@ -285,7 +284,12 @@ matter_python_wheel_action("matter-core") {
       }
 
       if (chip_support_commissioning_in_controller) {
-        sources += [ "matter/ChipDeviceCtrl.py" ]
+        # case_capture's native bindings (CASECapture.cpp) are only compiled when
+        # chip_support_commissioning_in_controller is set, so only ship the Python module then.
+        sources += [
+          "matter/ChipDeviceCtrl.py",
+          "matter/case_capture/__init__.py",
+        ]
       } else {
         sources += [ "matter/server/__init__.py" ]
       }
@@ -329,10 +333,13 @@ matter_python_wheel_action("matter-core") {
     "matter.storage",
     "matter.tracing",
     "matter.fault_injection",
-    "matter.case_capture",
   ]
   if (chip_support_webrtc_python_bindings) {
     py_packages += [ "matter.webrtc" ]
+  }
+
+  if (chip_support_commissioning_in_controller) {
+    py_packages += [ "matter.case_capture" ]
   }
 
   if (!chip_support_commissioning_in_controller) {

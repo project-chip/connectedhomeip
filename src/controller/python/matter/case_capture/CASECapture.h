@@ -42,6 +42,7 @@ struct PychipCaseCaptureSnapshot
     PychipCaseCapturedHeaders sigma2;
     PychipCaseCapturedHeaders sigma2Resume;
     PychipCaseCapturedHeaders statusReport;
+    uint8_t statusReportParsed; // 1 if the StatusReport body decoded; if 0, the *Code fields below are not meaningful.
     uint16_t statusReportGeneralCode;
     uint32_t statusReportProtocolId;
     uint16_t statusReportProtocolCode;
