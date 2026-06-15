@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <system_error>
 
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
@@ -30,9 +31,12 @@ auto seedProvider = [](auto filterFunction) -> std::vector<std::string> {
     // deliberately, to reject $OUT-relative dependencies). Skip file-based seeding instead of
     // aborting when the directory is missing; on OSS-Fuzz the seeds are supplied via the
     // libFuzzer seed corpus (<target>_seed_corpus.zip) instead.
-    if (!std::filesystem::is_directory(OpCertsDir))
+    // Non-throwing overload: a permission/I/O error must not abort the harness (the build
+    // disables exceptions), which would defeat the purpose of tolerating a missing directory.
+    std::error_code ec;
+    if (!std::filesystem::is_directory(OpCertsDir, ec))
     {
-        std::cout << "Seed directory '" << OpCertsDir << "' not found; continuing without file seeds" << std::endl;
+        std::cout << "Seed directory '" << OpCertsDir << "' not found or inaccessible; continuing without file seeds" << std::endl;
         return seeds;
     }
 

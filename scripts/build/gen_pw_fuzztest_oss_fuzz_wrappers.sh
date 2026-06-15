@@ -18,11 +18,11 @@
 # A single FuzzTest binary hosts many FUZZ_TEST() cases and is run as a libFuzzer
 # target one case at a time (--fuzz=<Suite.Case>), whereas OSS-Fuzz expects one fuzz
 # target per executable. This bridges the two: for each binary it
-#   * copies the binary into $OUT and makes it non-executable, so OSS-Fuzz does not
-#     treat the shared binary itself as a (broken, multi-case) fuzz target;
+#   * copies the binary into $OUT/bin/ -- OSS-Fuzz scans only the root of $OUT for fuzz
+#     targets, so the shared binary there is not treated as a (broken, multi-case) target;
 #   * enumerates the cases via `--list_fuzz_tests`; and
-#   * writes one wrapper per case, named "{binary}@{Suite.Case}", that re-enables and
-#     execs the shared binary with `--fuzz=<Suite.Case>`.
+#   * writes one wrapper per case, named "{binary}@{Suite.Case}", that execs the shared
+#     binary with `--fuzz=<Suite.Case>`.
 #
 # The wrapper embeds the literal token LLVMFuzzerTestOneInput so OSS-Fuzz's grep-based
 # fuzz-target detector (infra/base-images/base-runner/targets_list) recognizes it. This
@@ -56,9 +56,11 @@ for fuzz_main_file in "$@"; do
         exit 1
     fi
 
-    cp "$fuzz_main_file" "$OUT/"
-    # Shared binary must not be a fuzz target itself; the wrappers re-enable it.
-    chmod -x "$OUT/$fuzz_basename"
+    # Keep the shared binary out of OSS-Fuzz target discovery (which scans only the root of
+    # $OUT) by placing it in a subdirectory. It stays executable, so the wrappers exec it
+    # directly -- no runtime chmod, which would fail on read-only fuzzing mounts.
+    mkdir -p "$OUT/bin"
+    cp "$fuzz_main_file" "$OUT/bin/"
 
     for fuzz_entrypoint in "${fuzz_tests[@]}"; do
         target_fuzzer="$fuzz_basename@$fuzz_entrypoint"
@@ -66,8 +68,7 @@ for fuzz_main_file in "$@"; do
 #!/bin/sh
 # LLVMFuzzerTestOneInput for fuzzer detection.
 this_dir=\$(dirname "\$0")
-chmod +x "\$this_dir/$fuzz_basename"
-exec "\$this_dir/$fuzz_basename" --fuzz=$fuzz_entrypoint -- "\$@"
+exec "\$this_dir/bin/$fuzz_basename" --fuzz=$fuzz_entrypoint -- "\$@"
 EOF
         chmod +x "$OUT/$target_fuzzer"
         echo "  wrapper: $target_fuzzer"
