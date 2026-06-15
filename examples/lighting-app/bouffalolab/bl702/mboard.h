@@ -55,12 +55,16 @@
 #define LED_PIN_PORT 3
 #define LED_PIN 18
 
+#define BOOT_PIN_RESET 31
+
 #define MAX_PWM_CHANNEL 1
 
 #else
 
 #define LED_PIN_PORT 2
 #define LED_PIN 22
+
+#define BOOT_PIN_RESET 31
 
 #define MAX_PWM_CHANNEL 1
 

@@ -37,6 +37,8 @@
 #define CHIP_UART_PORT 0
 #define CHIP_UART_RX_BUFFSIZE 256
 
+#define BOOT_PIN_RESET 16
+
 #ifdef BL706_NIGHT_LIGHT
 
 #define LED_B_PIN_PORT 2
