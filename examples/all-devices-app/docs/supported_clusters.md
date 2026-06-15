@@ -1,28 +1,44 @@
 # Matter Clusters Implementation Status (160 total)
 
-**Updated as of**: 2026-06-12 (Matter Specification SHA: `5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)
+**Updated as of**: 2026-06-12 (Matter Specification SHA:
+`5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)
 
 ## Discovery & Updating Methodology
 
 To update or validate this list manually, follow these steps:
 
 1. **Verify Specification Catalog**:
-   - Refer to the master spec cluster sheet: `docs/ids_and_codes/spec_clusters.md` (updated automatically).
-   - This provides the cluster names, decimal IDs, and hex IDs.
+
+    - Refer to the master spec cluster sheet:
+      `docs/ids_and_codes/spec_clusters.md` (updated automatically).
+    - This provides the cluster names, decimal IDs, and hex IDs.
 
 2. **Verify Code-Driven in SDK Status**:
-   - Search/grep to locate all cluster classes implementing the code-driven model. For example, if using ripgrep (rg):
-     `rg -n "public\s+(chip::app::)?DefaultServerCluster" src/app/`
-     and
-     `rg -n "public\s+(chip::app::)?ServerClusterInterface" src/app/`
-   - Every C++ class found represents a code-driven cluster. Map its cluster ID to this table.
-   - Note: Generic/templated implementations (e.g. `ConcentrationMeasurementCluster` in `src/app/clusters/concentration-measurement-server/` or `ResourceMonitoringCluster` in `src/app/clusters/resource-monitoring-server/`) implement multiple distinct spec-defined clusters (e.g. Carbon Dioxide, HEPA Filter Monitoring). All mapped clusters should be marked as "Yes".
+
+    - Search/grep to locate all cluster classes implementing the code-driven
+      model. For example, if using ripgrep (rg):
+      `rg -n "public\s+(chip::app::)?DefaultServerCluster" src/app/` and
+      `rg -n "public\s+(chip::app::)?ServerClusterInterface" src/app/`
+    - Every C++ class found represents a code-driven cluster. Map its cluster ID
+      to this table.
+    - Note: Generic/templated implementations (e.g.
+      `ConcentrationMeasurementCluster` in
+      `src/app/clusters/concentration-measurement-server/` or
+      `ResourceMonitoringCluster` in
+      `src/app/clusters/resource-monitoring-server/`) implement multiple
+      distinct spec-defined clusters (e.g. Carbon Dioxide, HEPA Filter
+      Monitoring). All mapped clusters should be marked as "Yes".
 
 3. **Verify Used in All-Devices**:
-   - Search/grep to find which clusters are dynamically registered in the all-devices-app. For example, if using ripgrep (rg):
-     `rg "LazyRegisteredServerCluster<|RegisteredServerCluster<" examples/all-devices-app/`
-   - Check where these are registered. They are typically added to the endpoint in the device implementation files under `examples/all-devices-app/all-devices-common/devices/` (e.g. `provider.AddCluster(...)`).
-   - Mark as "Yes" only if they are actively instantiated and added to an endpoint.
+    - Search/grep to find which clusters are dynamically registered in the
+      all-devices-app. For example, if using ripgrep (rg):
+      `rg "LazyRegisteredServerCluster<|RegisteredServerCluster<" examples/all-devices-app/`
+    - Check where these are registered. They are typically added to the endpoint
+      in the device implementation files under
+      `examples/all-devices-app/all-devices-common/devices/` (e.g.
+      `provider.AddCluster(...)`).
+    - Mark as "Yes" only if they are actively instantiated and added to an
+      endpoint.
 
 ## Cluster Implementation Details
 
