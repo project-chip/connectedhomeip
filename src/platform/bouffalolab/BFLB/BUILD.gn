@@ -85,6 +85,10 @@ static_library("BFLB") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
+  if (chip_enable_ota_requestor) {
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  }
+
   if (chip_enable_wifi) {
     sources += [
       "ConfigurationManagerImpl.cpp",
