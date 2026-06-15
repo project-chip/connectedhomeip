@@ -23,10 +23,9 @@
  *
  */
 /* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
