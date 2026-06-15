@@ -110,12 +110,6 @@ template("chip_pw_fuzz_target") {
                                "remove_configs",
                              ])
 
-      # NOTE: FUZZTEST_COMPATIBILITY_MODE (libfuzzer-compat mode, the mode OSS-Fuzz uses)
-      # is applied toolchain-wide in //build/toolchain/pw_fuzzer:chip_pw_fuzztest, NOT here.
-      # The define must also reach the FuzzTest library (compatibility_mode.cc); a per-target
-      # define here reaches only the harness TU and leaves FuzzTestExternalEngineAdaptor
-      # undefined at link. TODO(b/295961502): finish pw_fuzzer's OSS-Fuzz integration.
-
       if (!defined(configs)) {
         configs = []
       }

@@ -579,18 +579,15 @@ config("oss_fuzz") {
   cflags_cc = string_split(getenv("CXXFLAGS"))
   ldflags = string_split(getenv("CXXFLAGS"))
 
-  # pw_fuzzer / Google FuzzTest binaries (built in the chip_pw_fuzztest toolchain) provide
-  # their own main (fuzztest_gtest_main) and link the no-main libFuzzer runtime, so they
-  # must NOT also link $LIB_FUZZING_ENGINE, which carries its own main (a duplicate-main
-  # link error). Every other target (the legacy chip_fuzz_target libFuzzer targets) still
-  # links it. See //build/toolchain/pw_fuzzer:fuzztest_libfuzzer_engine.
+  # FuzzTest binaries (chip_pw_fuzztest toolchain) provide their own main and link the no-main
+  # libFuzzer runtime, so they must NOT also link $LIB_FUZZING_ENGINE (its main would collide).
+  # Every other (legacy chip_fuzz_target) libFuzzer target still links it.
   if (current_toolchain != "//build/toolchain/pw_fuzzer:chip_pw_fuzztest") {
     ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
   } else {
-    # The pw_fuzzer / FuzzTest toolchain pulls in pigweed modules that compile with
-    # -fno-rtti, which is incompatible with UBSan's -fsanitize=vptr (included in $CFLAGS when
-    # SANITIZER=undefined). Disable just the vptr check for these targets; no-op for other
-    # sanitizers. Appended after $CFLAGS/$CXXFLAGS so it wins (sanitizer flags are last-set).
+    # Pigweed modules compile -fno-rtti, incompatible with UBSan's -fsanitize=vptr (in $CFLAGS
+    # when SANITIZER=undefined). Disable just vptr here; appended after $CFLAGS so it wins, and
+    # a no-op for non-UBSan builds.
     cflags += [ "-fno-sanitize=vptr" ]
     cflags_cc += [ "-fno-sanitize=vptr" ]
   }
