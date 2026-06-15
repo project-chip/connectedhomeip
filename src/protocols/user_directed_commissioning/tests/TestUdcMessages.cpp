@@ -498,6 +498,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
     writer.Init(idBuffer + offset, sizeof(idBuffer) - offset);
 
     TLV::TLVType outerContainerType = TLV::kTLVType_Structure;
+<<<<<<< HEAD
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
 
     uint8_t oversizedId[60] = {};
@@ -506,6 +507,16 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
 
     EXPECT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+=======
+    EXPECT_SUCCESS(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+
+    uint8_t oversizedId[60] = {};
+    memset(oversizedId, 0xAB, sizeof(oversizedId));
+    EXPECT_SUCCESS(writer.PutBytes(TLV::ContextTag(7), oversizedId, sizeof(oversizedId)));
+
+    EXPECT_SUCCESS(writer.EndContainer(outerContainerType));
+    EXPECT_SUCCESS(writer.Finalize());
+>>>>>>> ad4be12a19 (fix(udc): Prevent uninitialized stack read on oversized UDC rotating IDs (#72482))
 
     size_t totalLen = offset + writer.GetLengthWritten();
 
@@ -532,6 +543,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
     EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
 }
 
+<<<<<<< HEAD
 TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
 {
     IdentificationDeclaration idOut;
@@ -582,6 +594,8 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppInfoOverflow)
     }
 }
 
+=======
+>>>>>>> ad4be12a19 (fix(udc): Prevent uninitialized stack read on oversized UDC rotating IDs (#72482))
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;

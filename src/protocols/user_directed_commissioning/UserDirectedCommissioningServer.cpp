@@ -243,11 +243,24 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
     {
         ChipLogError(AppServer, "UDC payload too short for instance name");
         return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+<<<<<<< HEAD
+=======
     }
 
+    size_t i = 0;
+    while (i < sizeof(mInstanceName) && udcPayload[i] != '\0')
+    {
+        mInstanceName[i] = static_cast<char>(udcPayload[i]);
+        i++;
+>>>>>>> ad4be12a19 (fix(udc): Prevent uninitialized stack read on oversized UDC rotating IDs (#72482))
+    }
+
+<<<<<<< HEAD
     size_t instanceNameLen = strnlen(reinterpret_cast<const char *>(udcPayload), sizeof(mInstanceName) - 1);
     Platform::CopyString(mInstanceName, ByteSpan(udcPayload, instanceNameLen));
 
+=======
+>>>>>>> ad4be12a19 (fix(udc): Prevent uninitialized stack read on oversized UDC rotating IDs (#72482))
     if (payloadBufferSize == sizeof(mInstanceName))
     {
         ChipLogProgress(AppServer, "UDC - No TLV information in Identification Declaration");
