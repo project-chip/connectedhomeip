@@ -442,10 +442,7 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardBridgedSequential)
 TEST_F(TestDeviceTypeParser, ValidateConfig_CycleDetected)
 {
     // Verifies that cyclic parent-child dependencies are detected and rejected.
-    std::vector<DeviceTypeParser::Entry> entries = {
-        { .type = "chime", .endpoint = 2, .parentId = 3 },
-        { .type = "speaker", .endpoint = 3, .parentId = 2 }
-    };
+    std::vector<DeviceTypeParser::Entry> entries = { { .type = "chime", .endpoint = 2, .parentId = 3 },
+                                                     { .type = "speaker", .endpoint = 3, .parentId = 2 } };
     EXPECT_NE(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
 }
-

@@ -282,7 +282,7 @@ CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
     // 4. Verify there are no cycles in parent-child relationships
     for (const auto & entry : entries)
     {
-        chip::EndpointId current = entry.parentId;
+        chip::EndpointId current              = entry.parentId;
         std::vector<chip::EndpointId> visited = { entry.endpoint };
 
         while (current != chip::kInvalidEndpointId)
