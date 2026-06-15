@@ -406,8 +406,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: VideoStreams count %u "
                                          "exceeds max %u",
-                                         mEndpointId, static_cast<unsigned>(vsCount),
-                                         static_cast<unsigned>(kMaxVideoStreams)));
+                                         mEndpointId, static_cast<unsigned>(vsCount), static_cast<unsigned>(kMaxVideoStreams)));
 
         for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
         {
@@ -435,8 +434,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: AudioStreams count %u "
                                          "exceeds max %u",
-                                         mEndpointId, static_cast<unsigned>(asCount),
-                                         static_cast<unsigned>(kMaxAudioStreams)));
+                                         mEndpointId, static_cast<unsigned>(asCount), static_cast<unsigned>(kMaxAudioStreams)));
 
         for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
         {
