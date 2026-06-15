@@ -45,7 +45,7 @@ public:
     PeerMessageCounter(PeerMessageCounter && other) noexcept
     {
         mStatus = Status::NotSynced; // uninit object so we can copy
-        *this = std::move(other);
+        *this   = std::move(other);
     }
     ~PeerMessageCounter() { Reset(); }
 
@@ -210,7 +210,6 @@ public:
     uint32_t GetCounter() const { return mSynced.mMaxCounter; }
 
 private:
-
     // Counter position indicator with respect to our current
     // mSynced.mMaxCounter.
     enum class Position

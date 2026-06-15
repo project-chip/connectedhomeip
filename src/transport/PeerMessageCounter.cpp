@@ -48,7 +48,7 @@ PeerMessageCounter & PeerMessageCounter::operator=(PeerMessageCounter && other) 
 {
     if (this != &other)
     {
-        *this = static_cast<const PeerMessageCounter &>(other);
+        *this         = static_cast<const PeerMessageCounter &>(other);
         other.mStatus = Status::NotSynced;
     }
     return *this;
