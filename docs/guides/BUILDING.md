@@ -430,6 +430,12 @@ They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
 
 You likely want `libfuzzer` + `asan` builds instead for local testing.
 
+> [!NOTE]
+>
+> The `pw_fuzzer` `FuzzTests` (see below) are also built under OSS-Fuzz, in
+> libFuzzer-compatibility mode. Use the `-compat` modifier described below to
+> reproduce that build locally.
+
 ### `pw_fuzzer` `FuzzTests`
 
 An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
@@ -452,6 +458,13 @@ executed manually.
 >     `linux-x64-tests-clang-pw-fuzztest-coverage`
 > -   Details:
 >     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
+> -   Append `-compat` to build in libFuzzer-compatibility mode (the mode
+>     OSS-Fuzz drives) instead of FuzzTest's native engine, e.g.
+>     `linux-x64-tests-clang-pw-fuzztest-compat`. Useful to reproduce the
+>     OSS-Fuzz build locally, or to use libFuzzer corpus/merge/minimize features.
+> -   Append `-ubsan` to add UndefinedBehaviorSanitizer on top of the default
+>     `asan`, e.g. `linux-x64-tests-clang-pw-fuzztest-ubsan` (can be combined
+>     with `-compat`).
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
