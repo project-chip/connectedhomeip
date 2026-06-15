@@ -1,4 +1,4 @@
-# Matter Clusters Implementation Status (160 total)
+# Matter Clusters Implementation Status (159 total)
 
 **Updated as of**: 2026-06-12 (Matter Specification SHA:
 `5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)

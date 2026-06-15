@@ -21,8 +21,8 @@ To update or validate this list manually, follow these steps:
 2. **Verify Server Clusters per Device Type**:
 
     - Locate the device type definition in the Matter Specification (e.g. under
-      `device_library/` in the spec repository, or using generated markdown
-      files under `out/spec/build/markdown/master/device_library/`).
+      `device_library/` in the spec repository, or locally generated markdown
+      files).
     - Find the sub-section `### Cluster Requirements` for the device type.
     - Identify all server-side clusters (Client/Server = Server).
     - Clusters with conformance `M` (Mandatory) are tracked normally. Clusters
