@@ -20,9 +20,10 @@ set -e
 CRASH_REMOTE_DIR="/opt/usr/share/crash/dump"
 LOCAL_TMP_DIR="out/tizen-crashes-tmp"
 SEARCH_HOURS=24
-CLEANUP=true
+CLEANUP=false
 VERBOSE=false
 LOCAL_MODE=false
+SYSROOT_PATH=""
 
 # ============================================================================
 # Utility Functions
@@ -33,13 +34,14 @@ function help() {
 Usage: $0 [options]
 
 Options:
-    --hours NUM     - Filter crashes from the last NUM hours (default: 24)
-    --target SDB_ID - SDB identifier (e.g. 192.168.0.1:26101)
-    --out-dir DIR   - Build output directory (e.g. out/tizen-arm)
-    --local         - Local mode: analyze dumps from out/tizen-*/dump/ (used in CI)
-    --verbose       - Print more information during execution
-    --no-clean      - Keep temporary files after analysis
-    --help          - Print help
+    --hours NUM       - Filter crashes from the last NUM hours (default: 24)
+    --target SDB_ID   - SDB identifier (e.g. 192.168.0.1:26101)
+    --out-dir DIR     - Build output directory (e.g. out/tizen-arm)
+    --local           - Local mode: analyze dumps from out/tizen-*/dump/ (used in CI)
+    --sysroot PATH    - Path to system libraries sysroot (default: \$TIZEN_SDK_ROOT/platforms/...)
+    --verbose         - Print more information during execution
+    --clean           - Remove temporary files after analysis (default: keep files)
+    --help            - Print help
 EOF
 }
 
@@ -50,8 +52,9 @@ function parse_arguments() {
             --target) TARGET_DEVICE="$2"; shift 2 ;;
             --out-dir) OUT_DIR="$2"; shift 2 ;;
             --verbose) VERBOSE=true; shift ;;
-            --no-clean) CLEANUP=false; shift ;;
+            --clean) CLEANUP=true; shift ;;
             --local) LOCAL_MODE=true; shift ;;
+            --sysroot) SYSROOT_PATH="$2"; shift 2 ;;
             --help) help; exit 0 ;;
             *) echo "ERROR: Unknown option $1"; exit 1 ;;
         esac
@@ -137,27 +140,29 @@ function run_gdb_analysis() {
     echo "ANALYZING CRASH: $crash_name"
     echo "BINARY:          $binary_path"
     echo "COREDUMP:        $coredump ($coredump_size)"
-    echo "--------------------------------------------------------------------------------"
-
+    
     local gdb_bin="gdb-multiarch"
     local sysroot=""
-    if [ -d "$target_dir/system_libs" ]; then
+    
+    # Use provided sysroot path if available
+    if [ -n "$SYSROOT_PATH" ]; then
+        sysroot="$SYSROOT_PATH"
+    elif [ -d "$target_dir/system_libs" ]; then
         sysroot="$target_dir/system_libs"
-    fi
-
-    if [ -n "$TIZEN_SDK_ROOT" ]; then
+    elif [ -n "$TIZEN_SDK_ROOT" ]; then
         if [[ "$target_dir" == *"arm64"* || "$target_dir" == *"aarch64"* ]]; then
             gdb_bin="$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-14.2/bin/aarch64-linux-gnu-gdb"
-            if [ -z "$sysroot" ]; then
-                sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core"
-            fi
+            sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core"
         else
             gdb_bin="$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-14.2/bin/arm-linux-gnueabi-gdb"
-            if [ -z "$sysroot" ]; then
-                sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
-            fi
+            sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
         fi
     fi
+    
+    if [ -n "$sysroot" ]; then
+        echo "SYSROOT:         $sysroot"
+    fi
+    echo "--------------------------------------------------------------------------------"
 
     local gdb_args=("--batch" "-ex" "set auto-load safe-path /")
     if [ -d "$sysroot" ]; then
@@ -206,7 +211,15 @@ function run_gdb_analysis() {
         "-ex" "thread apply all bt full"
     )
 
-    if [ "$VERBOSE" = true ]; then echo "Running: $gdb_bin ${gdb_args[*]}"; fi
+    if [ "$VERBOSE" = true ]; then
+        echo ""
+        echo "To run GDB manually, execute:"
+        echo "$gdb_bin \\"
+        for arg in "${gdb_args[@]}"; do
+            echo "    '$arg' \\"
+        done
+        echo ""
+    fi
     "$gdb_bin" "${gdb_args[@]}"
 }
 
@@ -226,6 +239,8 @@ fi
 
 if [ "$LOCAL_MODE" = true ]; then
     found_any=false
+    declare -a EXTRACT_DIRS=()
+    
     for target in out/tizen-*; do
         [ -d "$target/dump" ] || continue
         # Find primary zips and raw coredumps (limit search depth to avoid nested files)
@@ -244,6 +259,7 @@ if [ "$LOCAL_MODE" = true ]; then
                 extract_dir="${f%.zip}"
                 mkdir -p "$extract_dir"
                 unzip -qo "$f" -d "$extract_dir"
+                EXTRACT_DIRS+=("$extract_dir")
 
                 # Extract the nested .tar file inside that same directory
                 tar_file=$(find "$extract_dir" -name "*.coredump.tar" 2>/dev/null | head -n 1)
@@ -263,6 +279,20 @@ if [ "$LOCAL_MODE" = true ]; then
         done
     done
     [ "$found_any" = false ] && echo "No crash dumps found in out/tizen-*/dump/"
+    
+    # Cleanup extracted files if requested
+    if [ "$CLEANUP" = true ]; then
+        echo ""
+        echo "Cleaning up temporary files..."
+        for dir in "${EXTRACT_DIRS[@]}"; do
+            if [ -d "$dir" ]; then
+                rm -rf "$dir"
+                [ "$VERBOSE" = true ] && echo "  Removed: $dir"
+            fi
+        done
+        echo "Done."
+    fi
+    
     exit 0
 fi
 
