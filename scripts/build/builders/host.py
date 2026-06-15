@@ -100,7 +100,6 @@ class HostFuzzingType(Enum):
     """Defines fuzz target options available for host targets."""
     NONE = auto()
     LIB_FUZZER = auto()
-    OSS_FUZZ = auto()
     PW_FUZZTEST = auto()
 
 
@@ -573,8 +572,6 @@ class HostBuilder(GnBuilder):
 
         if fuzzing_type == HostFuzzingType.LIB_FUZZER:
             self.extra_gn_options.append('is_libfuzzer=true')
-        elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
-            self.extra_gn_options.append('oss_fuzz=true')
         elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
             if pw_fuzz_libfuzzer_compat:
