@@ -59,10 +59,23 @@ public:
 
     CHIP_ERROR HandleMovement(WindowCoveringType type) override
     {
-        return mWrapped ? mWrapped->HandleMovement(type) : CHIP_NO_ERROR;
+        if (mWrapped)
+        {
+            return mWrapped->HandleMovement(type);
+        }
+        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", mEndpoint);
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR HandleStopMotion() override { return mWrapped ? mWrapped->HandleStopMotion() : CHIP_NO_ERROR; }
+    CHIP_ERROR HandleStopMotion() override
+    {
+        if (mWrapped)
+        {
+            return mWrapped->HandleStopMotion();
+        }
+        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", mEndpoint);
+        return CHIP_NO_ERROR;
+    }
 
 private:
     WindowCoveringDelegate * mWrapped = nullptr;
