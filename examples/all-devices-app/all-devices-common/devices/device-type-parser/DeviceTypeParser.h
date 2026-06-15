@@ -29,8 +29,9 @@ public:
     struct Entry
     {
         std::string type;
-        chip::EndpointId endpoint;
+        chip::EndpointId endpoint = chip::kInvalidEndpointId;
         chip::EndpointId parentId = chip::kInvalidEndpointId;
+        bool bridged              = false;
     };
 
     DeviceTypeParser()  = default;
@@ -63,6 +64,12 @@ public:
     const std::vector<Entry> & GetDeviceTypeEntries();
 
     /**
+     * Validates that the list of device entries contains no duplicate endpoints,
+     * and that parentage rules are followed for bridged nodes.
+     */
+    static CHIP_ERROR ValidateConfig(const std::vector<Entry> & entries);
+
+    /**
      * Clears the list of parsed device configurations.
      */
     void Clear() { mDeviceTypeEntries.clear(); }
@@ -70,6 +77,7 @@ public:
 private:
     bool ParseDeviceTypeEntry(const char * value, Entry & entry);
     static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
+    static const Entry * FindEntryByEndpoint(const std::vector<Entry> & entries, chip::EndpointId endpointId);
 
     std::vector<Entry> mDeviceTypeEntries;
 };
