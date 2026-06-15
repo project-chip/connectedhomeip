@@ -54,7 +54,7 @@ constexpr DeviceTypeId kContactSensorDeviceTypeId  = 0x00000015;
 constexpr uint8_t kContactSensorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kRootNodeDeviceTypeId  = 0x00000016;
-constexpr uint8_t kRootNodeDeviceTypeRevision = 5;
+constexpr uint8_t kRootNodeDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kSolarPowerDeviceTypeId  = 0x00000017;
 constexpr uint8_t kSolarPowerDeviceTypeRevision = 1;
@@ -149,6 +149,9 @@ constexpr uint8_t kOvenDeviceTypeRevision = 2;
 constexpr DeviceTypeId kLaundryDryerDeviceTypeId  = 0x0000007C;
 constexpr uint8_t kLaundryDryerDeviceTypeRevision = 2;
 
+constexpr DeviceTypeId kHumidifierDehumidifierDeviceTypeId  = 0x0000007D;
+constexpr uint8_t kHumidifierDehumidifierDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kNetworkInfrastructureManagerDeviceTypeId  = 0x00000090;
 constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 2;
 
@@ -156,7 +159,7 @@ constexpr DeviceTypeId kThreadBorderRouterDeviceTypeId  = 0x00000091;
 constexpr uint8_t kThreadBorderRouterDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kOnOffLightDeviceTypeId  = 0x00000100;
-constexpr uint8_t kOnOffLightDeviceTypeRevision = 4;
+constexpr uint8_t kOnOffLightDeviceTypeRevision = 3;
 
 constexpr DeviceTypeId kDimmableLightDeviceTypeId  = 0x00000101;
 constexpr uint8_t kDimmableLightDeviceTypeRevision = 3;
@@ -295,6 +298,12 @@ constexpr uint8_t kElectricalEnergyTariffDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kElectricalMeterDeviceTypeId  = 0x00000514;
 constexpr uint8_t kElectricalMeterDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kElectricalCircuitBreakerDeviceTypeId  = 0x00000516;
+constexpr uint8_t kElectricalCircuitBreakerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kElectricalDistributionEnclosureDeviceTypeId  = 0x00000517;
+constexpr uint8_t kElectricalDistributionEnclosureDeviceTypeRevision = 1;
 
 constexpr DeviceTypeId kControlBridgeDeviceTypeId  = 0x00000840;
 constexpr uint8_t kControlBridgeDeviceTypeRevision = 3;

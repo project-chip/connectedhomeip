@@ -395,43 +395,6 @@ struct MessageTestEntry theMessageTestVector[] = {
 
         .expectedMessageCount = 0,
     },
-#if CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-    // =======================================
-    // Test early-SVE2 workaround
-    // =======================================
-    {
-        .name     = "secure group message (no privacy, but invalid P=1 flag)",
-        .peerAddr = "::1",
-
-        .payload = "",
-
-        // messageCounter = 0x12345691
-        .plain     = "\06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x91\xe0\x22\x85\xe0\x59\x07\xe0"
-                     "\xd8\x68\x0c\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26", // Includes MIC
-        .privacy   = "\x06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x91\xe0\x22\x85\xe0\x59\x07\xe0"
-                     "\xd8\x68\x0c\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26", // Includes MIC
-
-        .payloadLength   = 0,
-        .plainLength     = 24,
-        .encryptedLength = 40,
-        .privacyLength   = 40,
-
-        .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
-        .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
-        .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
-
-        .nonce        = "\x01\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\xdb\x7d\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26",
-
-        .sessionId    = 0xdb7d, // 56189
-        .peerNodeId   = 0x0000000000000000ULL,
-        .groupId      = 2,
-        .sourceNodeId = 0x0000000000000002ULL,
-
-        .expectedMessageCount = 1,
-    },
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 
 #endif // !CHIP_CONFIG_SECURITY_TEST_MODE
 };

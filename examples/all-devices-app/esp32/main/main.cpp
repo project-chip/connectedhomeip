@@ -25,7 +25,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -81,6 +81,9 @@ static const char TAG[] = "all-devices-app";
 static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespace_ChipConfig, "dev-type" };
 static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
+
+#include "DeviceFactoryPlatformOverride.h"
+#include "Esp32BleRssiRangingAdapter.h"
 
 namespace {
 
@@ -282,10 +285,19 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
 void InitServer(intptr_t context)
 {
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "InitializeStaticResourcesBeforeServerInit() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
+        .storageDelegate   = *initParams.persistentStorageDelegate,  //
     });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
@@ -299,13 +311,7 @@ void InitServer(intptr_t context)
     });
 #endif
 
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "InitializeStaticResourcesBeforeServerInit() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
+    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
 
     initParams.groupDataProvider = &gGroupDataProvider;
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

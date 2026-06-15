@@ -74,31 +74,6 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </feature>
   </features>
-  <dataTypes>
-    <struct name="SFrameStruct">
-      <field id="0" name="CipherSuite" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <min value="1"/>
-        </constraint>
-      </field>
-      <field id="1" name="BaseKey" type="octstr">
-        <mandatoryConform/>
-        <constraint>
-          <maxLength value="128"/>
-        </constraint>
-      </field>
-      <field id="2" name="KID" type="octstr">
-        <mandatoryConform/>
-        <constraint>
-          <lengthBetween>
-            <from value="2"/>
-            <to value="8"/>
-          </lengthBetween>
-        </constraint>
-      </field>
-    </struct>
-  </dataTypes>
   <attributes>
     <attribute id="0x0000" name="CurrentSessions" type="list">
       <entry type="WebRTCSessionStruct"/>
@@ -148,12 +123,6 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="METADATA"/>
         </mandatoryConform>
-      </field>
-      <field id="7" name="SFrameConfig" type="SFrameStruct">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
       </field>
       <field id="8" name="VideoStreams" type="list">
         <entry type="VideoStreamID"/>
@@ -294,12 +263,6 @@ Davis, CA 95616, USA
             </equalTerm>
           </andTerm>
         </mandatoryConform>
-      </field>
-      <field id="9" name="SFrameConfig" type="SFrameStruct">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
       </field>
       <field id="10" name="VideoStreams" type="list">
         <entry type="VideoStreamID"/>

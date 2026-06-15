@@ -41,3 +41,11 @@ private:
  * that are specific to the selected application.
  */
 chip::Zephyr::App::AppTaskBase & GetAppTask();
+
+/**
+ * Set the state of LED1 to reflect the on/off state.
+ * This is a no-op if LED1 is not available on the board.
+ *
+ * @param state true to turn the LED on, false to turn it off.
+ */
+void SetLightState(bool state);

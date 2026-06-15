@@ -72,34 +72,32 @@ class NFCReader:
 
         log.info("Available readers:")
         for idx, reader in enumerate(reader_list):
-            log.info(f"{idx}: {reader}")
+            log.info("%s: %s", idx, reader)
 
         if nfc_reader_index < 0 or nfc_reader_index >= len(reader_list):
             raise IndexError(f"Reader index {nfc_reader_index} is out of range.")
 
         self.reader = reader_list[nfc_reader_index]
         self._monitor_manager = None
-        log.info(f"Using NFC reader: {self.reader}")
+        log.info("Using NFC reader: %s", self.reader)
 
     def read_nfc_tag_data(self) -> str:
         """
-        Read NDEF data from a tag.
+        Read the first URI record from the NDEF message stored on a tag.
 
-        This function reads NDEF data from any tag present in the reader's field.
-        It expects the first NDEF record to be a URI record.
-
-        Args:
-            This function takes no arguments.
+        The tag is expected to contain a valid NDEF message. This method navigates
+        the NDEF file structure, reads the message, decodes it, and returns the URI
+        contained in the first URI record found.
 
         Returns:
-            str: The decoded NDEF record data.
+            str: The decoded URI string from the first URI record.
 
         Raises:
-            AssertionError: If any message transmission fails.
-
-        Example:
-            >>> tag_data = reader.read_nfc_tag_data()
-            >>> print(f"NFC tag contains: {tag_data}")
+            AssertionError: If APDU/message transmission fails.
+            ValueError: If the NDEF message is empty, contains no records, or does
+                not contain a URI record.
+            UnicodeDecodeError: If the URI payload cannot be decoded.
+            ndef.DecodeError: If the NDEF message is malformed.
         """
         with NFCConnection(self) as connection:
             # Perform NDEF file system navigation sequence
@@ -110,29 +108,27 @@ class NFCReader:
 
             # Read NDEF message length and data
             ndef_length = _read_ndef_length(connection)
+            if ndef_length == 0:
+                raise ValueError("NDEF message is empty")
             ndef_data = _read_ndef_data(connection, ndef_length)
 
-            # Parse NDEF message into records and find record with data
             ndef_records = list(ndef.message_decoder(ndef_data))
             if not ndef_records:
                 raise ValueError("No NDEF records found in message - tag may be corrupted or empty")
 
             # Loop through records to find a URI record
             for record in ndef_records:
-                # Check for URI record type (well-known type 'U')
-                if record.type == NFC_WKT:
+                if isinstance(record, ndef.UriRecord):
                     # The payload is described in NFC Forum's "URI Record Type Definition Technical Specification"
                     # available here https://berlin.ccc.de/~starbug/felica/NFCForum-TS-RTD_URI_1.0.pdf
                     # As indicated in paragraph 3, the payload format is:
                     #     [identifier code (1 byte)] + [URI string]
                     # There is currently no prefix officially registered for Matter so the on-boarding data string
                     # is fully in the URI string.
-                    #
-                    # Ignore the identifier code and read the URI string
-                    if hasattr(record, 'data') and record.data and len(record.data) > 1:
-                        return record.data[1:].decode("utf-8")
-                    raise ValueError("NDEF URI record payload is missing or too short")
-            # If we get here, no URI record was found
+                    # Warning: NDEF URI parser is converting the URI to lower case
+                    log.info("NFC Onboarding data: %s", record.uri.upper())
+                    return record.uri.upper()
+
             raise ValueError("No NDEF URI record found in message")
 
     def write_ndef_uri(self, uri: str) -> None:
@@ -157,7 +153,7 @@ class NFCReader:
 
             _write_ndef_record(connection, record)
 
-        log.info(f"Successfully wrote URI '{uri}' to NFC tag.")
+        log.info("Successfully wrote URI '%s' to NFC tag.", uri)
 
     def is_onboarding_data(self, ndef_uri: str) -> bool:
         """
@@ -344,8 +340,8 @@ def _read_cc_file_content(connection) -> int:
     tag = cc_data[target_idx]
 
     if tag != 0x04:
-        log.error(f"Expected TLV Tag 0x04 at index {target_idx}, but got 0x{tag:02X}")
-        log.error(f"Full Data: {cc_data}")
+        log.error("Expected TLV Tag 0x04 at index %s, but got 0x%02X", target_idx, tag)
+        log.error("Full Data: %s", cc_data)
         raise ValueError(f"NDEF File Control TLV (0x04) not found at expected index {target_idx}")
 
     return (cc_data[target_idx + 2] << 8) | cc_data[target_idx + 3]
@@ -520,7 +516,7 @@ class TagEventObserver(smartcard.CardMonitoring.CardObserver):
                 self.last_ndef = nfc_tag_data
                 log.debug(nfc_tag_data)
             except Exception as e:
-                log.info(f"Error reading NFC tag: {e}")
+                log.info("Error reading NFC tag: %s", e)
         for tag in removed_tags:
             log.debug("Tag removed.")
 
@@ -590,5 +586,5 @@ class NFCConnection:
             if self.connection:
                 self.connection.disconnect()
         except Exception as e:
-            log.warning(f"Failed to disconnect NFC connection: {e}")
+            log.warning("Failed to disconnect NFC connection: %s", e)
         return False

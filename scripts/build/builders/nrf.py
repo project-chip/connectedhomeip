@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
 
 log = logging.getLogger(__name__)
 
@@ -133,13 +135,14 @@ class NrfBoard(Enum):
 class NrfConnectBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
                  ):
-        super(NrfConnectBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
@@ -173,6 +176,7 @@ class NrfConnectBuilder(Builder):
 
         return " -- " + " ".join(flags) if len(flags) > 0 else ""
 
+    @lock_output_dir
     def generate(self):
         if not os.path.exists(self.output_dir):
             if not self._runner.dry_run:
@@ -199,6 +203,7 @@ class NrfConnectBuilder(Builder):
             self._Execute(['bash', '-c', cmd.strip()],
                           title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         log.info('Compiling NrfConnect at %s', self.output_dir)
 
@@ -217,12 +222,14 @@ class NrfConnectBuilder(Builder):
             self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', os.path.join(self.output_dir, 'nrfconnect'), '--no-tests=error'],
                           title='Run Tests ' + self.identifier)
 
+    @lock_output_dir
     def _bundle(self):
-        log.info(f'Generating flashbundle at {self.output_dir}')
+        log.info('Generating flashbundle at %s', self.output_dir)
 
         self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
             os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.elf'),
@@ -232,6 +239,7 @@ class NrfConnectBuilder(Builder):
                 os.path.join(self.output_dir, 'nrfconnect', 'zephyr', 'zephyr.map'),
                 '%s.map' % self.app.AppNamePrefix())
 
+    @lock_output_dir
     def bundle_outputs(self):
         if self.app == NrfApp.UNIT_TESTS:
             return

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2025 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,11 +44,16 @@ from .target import BuildTarget, TargetPart
 # in all-devices: examples/all-devices-app/all-devices-common/devices
 _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
+    'aggregator',
+    'bridged-node',
     'chime',
     'contact-sensor',
     'dimmable-light',
+    'fan',
     'occupancy-sensor',
     'on-off-light',
+    'power-source',
+    'proximity-ranger',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
@@ -85,9 +90,11 @@ def BuildHostFakeTarget():
     ])
 
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
@@ -118,6 +125,8 @@ def BuildHostTarget():
     if cross_compile:
         board_parts.append(TargetPart(
             'arm64', board=HostBoard.ARM64).OnlyIfRe('-(clang|nodeps)'))
+        board_parts.append(TargetPart(
+            'arm', board=HostBoard.ARM).OnlyIfRe('-(clang|nodeps)'))
 
     target.AppendFixedTargets(board_parts)
 
@@ -209,12 +218,16 @@ def BuildHostTarget():
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
-        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+        "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-(boringssl|psa)')
     target.AppendModifier(
-        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
+        "boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-(mbedtls|psa)')
+    target.AppendModifier(
+        "psa", crypto_library=HostCryptoLibrary.PSA).ExceptIfRe('-(boringssl|mbedtls)')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier("msan", use_msan=True).OnlyIfRe("-clang").OnlyIfRe("-x64").ExceptIfRe(
+        "-(asan|tsan|ubsan|libfuzzer|ossfuzz|pw-fuzztest)")
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
     target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
@@ -326,8 +339,9 @@ def BuildEfr32Target():
     ])
 
     # apps
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('water-heater', app=Efr32App.WATER_HEATER),
@@ -339,7 +353,14 @@ def BuildEfr32Target():
         TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
-    ])
+    ]
+
+    # Single-device subset builds for all-devices-app.
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[
+                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
@@ -363,8 +384,8 @@ def BuildEfr32Target():
         '-(wifi|use-ot-coap-lib)')
     target.AppendModifier('use-ot-coap-lib', enable_ot_coap_lib=True).ExceptIfRe(
         '-(wifi|use-ot-lib)')
-    target.AppendModifier('no-version', no_version=True)
     target.AppendModifier('skip-rps-generation', use_rps_extension=False)
+    target.AppendModifier('uart-log', uart_log=True)
 
     return target
 
@@ -498,7 +519,6 @@ def BuildAmebaTarget():
         TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=AmebaApp.LIGHT),
         TargetPart('light-switch', app=AmebaApp.LIGHT_SWITCH),
-        TargetPart('pigweed', app=AmebaApp.PIGWEED),
     ])
 
     return target
@@ -814,10 +834,11 @@ def BuildTelinkTarget():
         TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 
-    target.AppendFixedTargets([
+    app_parts = [
         TargetPart('air-quality-sensor', app=TelinkApp.AIR_QUALITY_SENSOR),
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('all-devices', app=TelinkApp.ALL_DEVICES),
         TargetPart('bridge', app=TelinkApp.BRIDGE),
         TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
@@ -832,7 +853,17 @@ def BuildTelinkTarget():
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
-    ])
+    ]
+
+    # Single-device subset builds for all-devices-app.
+    # Each modifier selects exactly one device; the binary is named example-device-app.
+    # Multi-device subsets should be built by passing
+    # -DALL_DEVICES_ENABLED_DEVICES=<device1;device2;...> through the
+    # Zephyr/west+CMake build system (for example via build_examples).
+    for _device in _ALL_DEVICES_APP_DEVICES:
+        app_parts.append(TargetPart(f'all-devices-{_device}', app=TelinkApp.ALL_DEVICES, all_devices_enabled_devices=[_device]))
+
+    target.AppendFixedTargets(app_parts)
 
     target.AppendModifier('ota', enable_ota=True)
     target.AppendModifier('dfu-smp', enable_dfu_smp=True)

@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import enum
 import functools
 import logging
@@ -21,12 +22,13 @@ import multiprocessing
 import os
 import random
 import shlex
+import subprocess
 import sys
 import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 import chiptest
 import click
@@ -34,7 +36,7 @@ from chiptest.accessories import AppsRegister
 from chiptest.concurrency.work_queue import CancellableQueue
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
-from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
+from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.status import PeriodicStatusThread
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
@@ -49,8 +51,7 @@ if sys.platform == "linux":
 if sys.platform == 'darwin':
     import chiptest.darwin
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 
 class ManualHandling(enum.Enum):
@@ -292,16 +293,6 @@ def cmd_list(context: click.Context) -> None:
         print("%s%s" % (test.name, tags))
 
 
-class Terminable(Protocol):
-    """Protocol for resources that can be explicitly terminated or cleaned up.
-
-    Implement this protocol for any class that manages external resources (such as subprocesses, network connections, or files) that
-    require explicit cleanup. The `terminate` method should perform any necessary actions to release or clean up the resource.
-    """
-
-    def terminate(self) -> None: ...
-
-
 class CommissioningMethod(enum.StrEnum):
     ON_NETWORK = "on-network"
     BLE_WIFI = "ble-wifi"
@@ -363,6 +354,11 @@ class CommissioningMethod(enum.StrEnum):
     default=None,
     type=int,
     help='If provided, fail if a test runs for longer than this time')
+@click.option(
+    '--value-wait-extra-duration-ms',
+    default=None,
+    type=int,
+    help='Extra duration in milliseconds to wait for attribute value changes')
 @click.option(
     '--expected-failures',
     type=click.IntRange(min=0),
@@ -444,7 +440,8 @@ class CommissioningMethod(enum.StrEnum):
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
-            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
+            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
+            value_wait_extra_duration_ms: int | None, expected_failures: int,
             commissioning_method: CommissioningMethod, summary_file: Path | None, periodic_status: int,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
@@ -535,25 +532,20 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     ble_controller_tool = None
     thread_ba_host = None
     thread_ba_port = None
-    to_terminate: list[Terminable] = []
     task_queue: TaskQueueT = CancellableQueue()
-    errors: list[BaseException] = []
 
-    with (multiprocessing.Manager() as mp_manager,
-          LogMessageCounter(mp_manager) as log_msg_counter):
-        prev_counter = context.obj.log_config.filter.msg_counter
-        try:
-            context.obj.log_config.filter.msg_counter = log_msg_counter
-
-            # Initialize result thread first so that it's closed last.
-            to_terminate.append(result_thread := ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file))
-
+    try:
+        with (multiprocessing.Manager() as mp_manager,
+                LogMessageCounter(mp_manager) as log_msg_counter,
+                context.obj.log_config.filter.msg_counter_ctx(log_msg_counter),
+                ResultProcessingThread(run_summary, expected_failures, keep_going, summary_file) as result_thread,
+                contextlib.ExitStack() as stack):
             mgmt_ns_wrapper: str | None = None
             if sys.platform == 'linux':
                 app_name = 'wlx-app' if wifi_required else 'eth-app'
                 tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
 
-                to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
+                ns: chiptest.linux.IsolatedNetworkNamespace = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
                     index=0,
                     # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                     app_link_up=not wifi_required,
@@ -565,43 +557,42 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
                 match commissioning_method:
                     case CommissioningMethod.BLE_WIFI:
-                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                        to_terminate.append(chiptest.linux.BluetoothMock())
-                        to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.BluetoothMock())
+                        stack.enter_context(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
                         ble_controller_app = 0   # Bind app to the first BLE controller
                         ble_controller_tool = 1  # Bind tool to the second BLE controller
                     case CommissioningMethod.BLE_THREAD:
-                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                        to_terminate.append(chiptest.linux.BluetoothMock())
-                        to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.BluetoothMock())
+                        stack.enter_context(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                         ble_controller_app = 0   # Bind app to the first BLE controller
                         ble_controller_tool = 1  # Bind tool to the second BLE controller
                     case CommissioningMethod.THREAD_MESHCOP:
-                        to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                        stack.enter_context(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                         thread_ba_host = tbr.get_border_agent_host()
                         thread_ba_port = tbr.get_border_agent_port()
                     case CommissioningMethod.WIFIPAF_WIFI:
-                        to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                        to_terminate.append(chiptest.linux.WpaSupplicantMock(
+                        stack.enter_context(chiptest.linux.DBusTestSystemBus())
+                        stack.enter_context(chiptest.linux.WpaSupplicantMock(
                             [app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
 
-                to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
+                executor: chiptest.linux.LinuxNamespacedExecutor = stack.enter_context(chiptest.linux.LinuxNamespacedExecutor(ns))
             elif sys.platform == 'darwin':
-                to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
+                executor: chiptest.darwin.DarwinExecutor = stack.enter_context(chiptest.darwin.DarwinExecutor())
             else:
                 log.warning("No platform-specific executor for '%s'", sys.platform)
-                to_terminate.append(executor := Executor())
+                executor: Executor = stack.enter_context(Executor())
 
             runner = chiptest.runner.Runner(executor=executor)
 
-            to_terminate.append(apps_register := AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
-            apps_register.init()
+            apps_register: AppsRegister = stack.enter_context(AppsRegister(mgmt_ns_wrapper, context.obj.log_config))
 
             status_thread = PeriodicStatusThread(run_summary, log_msg_counter, periodicity=periodic_status)
             status_thread.start()
 
-            # Initialize the worker thread last, to ensure it's terminated first.
-            to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
+            # Initialize and start the worker thread last, to ensure it's terminated first.
+            worker_thread: WorkerThread = stack.enter_context(WorkerThread(task_queue, result_thread.result_queue))
 
             # Schedule all tests.
             log.info("Each test will be executed %d times", iterations)
@@ -613,6 +604,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                         TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
                             test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
                             test_runtime=context.obj.runtime,
+                            value_wait_extra_duration_ms=value_wait_extra_duration_ms,
                             ble_controller_app=ble_controller_app,
                             ble_controller_tool=ble_controller_tool,
                             op_network='Thread' if thread_required else 'WiFi',
@@ -625,10 +617,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                     task_queue.close()
 
             log.info("All jobs scheduled")
-
-            # Start worker and result threads.
-            result_thread.start()
-            worker_thread.start()
 
             # Wait for exception or completion.
             while True:
@@ -645,37 +633,13 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                     break
 
                 time.sleep(0.5)
-        except BaseException as e:
-            errors.append(e)
-        finally:
-            for item in reversed(to_terminate):
-                item_name = item.__class__.__name__
-                try:
-                    log.info("Cleaning up %s", item_name)
-                    item.terminate()
-                except Exception as e:
-                    log.warning("Encountered exception during cleanup of %s: %r", item_name, e)
-                    errors.append(e)
-
-            context.obj.log_config.filter.msg_counter = prev_counter
-
-    # If there is only one error, we handle some special cases. Otherwise, we raise an exception group with all the errors
-    # encountered during execution and cleanup.
-    if len(errors) == 1:
-        match error := errors[0]:
-            case KeyboardInterrupt():
-                log.info("Interrupting execution on user request")
-                raise error
-            case ResultError():
-                # We just print the message, as the actual test failure with stack trace has already been logged.
-                log.error("%s", error)
-                raise SystemExit(2)
-            case _:
-                # Reraise the single exception with its original traceback preserved.
-                raise error.with_traceback(error.__traceback__)
-
-    if errors:
-        raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
+    except KeyboardInterrupt:
+        log.info("Interrupting execution on user request")
+        raise
+    except ResultError as error:
+        # We just print the message, as the actual test failure with stack trace has already been logged.
+        log.error("%s", error)
+        raise SystemExit(2) from None
 
 
 @main.command(
@@ -696,8 +660,28 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     '--show-all',
     is_flag=True,
     help='Show statistics of all tests for all iterations.')
-def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool) -> None:
-    RunSummary.from_json(summary_file).print_summary(top_slowest=top_slowest, show_all=show_all)
+@click.option(
+    '--compact-failures-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='Path to output a compact, comma-separated list of failed test names.',
+)
+def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool, compact_failures_file: Path | None) -> None:
+    summary = RunSummary.from_json(summary_file)
+    summary.print_summary(top_slowest=top_slowest, show_all=show_all)
+
+    if compact_failures_file:
+        failed_results = tuple(r for r in summary.results if r.status == TestStatus.FAILED)
+        if failed_results:
+            existing = set()
+            if compact_failures_file.exists():
+                content = compact_failures_file.read_text().strip()
+                if content:
+                    existing = {n.strip() for n in content.split(",") if n.strip()}
+            new_names = [r.name for r in failed_results]
+            all_names = sorted(existing.union(new_names))
+            compact_failures_file.parent.mkdir(parents=True, exist_ok=True)
+            compact_failures_file.write_text(", ".join(all_names) + "\n")
 
 
 # On Linux, allow an execution shell to be prepared
@@ -712,10 +696,8 @@ if sys.platform == 'linux':
         help='Index of Linux network namespace'
     )
     def cmd_shell(ns_index: int) -> None:
-        chiptest.linux.IsolatedNetworkNamespace(ns_index)
-
-        shell = os.environ.get("SHELL", "bash")
-        os.execvpe(shell, [shell], os.environ.copy())
+        with chiptest.linux.IsolatedNetworkNamespace(ns_index):
+            subprocess.run(os.environ.get("SHELL", "bash"))
 
 
 if __name__ == '__main__':

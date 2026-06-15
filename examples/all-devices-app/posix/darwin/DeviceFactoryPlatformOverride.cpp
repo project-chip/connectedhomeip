@@ -14,15 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "DarwinBleRssiRangingAdapter.h"
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixChimeDevice.h>
 #include <app_config/enabled_devices.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
+#include <devices/proximity-ranger/ProximityRangerDevice.h>
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
 {
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
@@ -32,6 +34,17 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate)
                 { 1, "Ring Ring"_span },
             };
             return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+        });
+    }
+
+    if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
+    {
+        static DarwinBleRssiRangingAdapter sBleAdapter;
+        LogErrorOnFailure(sBleAdapter.Init(storageDelegate));
+        DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
+            static Clusters::ProximityRanging::RangingAdapter * adapters[] = { &sBleAdapter };
+            return std::make_unique<ProximityRangerDevice>(timerDelegate,
+                                                           Span<Clusters::ProximityRanging::RangingAdapter * const>(adapters));
         });
     }
 }

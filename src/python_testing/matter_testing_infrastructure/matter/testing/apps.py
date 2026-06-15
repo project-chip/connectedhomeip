@@ -88,7 +88,9 @@ class IcdAppServerSubprocess(AppServerSubprocess):
 
     def pause(self, check_state: bool = True):
         if check_state and self.paused:
-            raise ValueError("ICD TH Server unexpectedly is already paused")
+            raise RuntimeError("ICD TH Server unexpectedly is already paused")
+        if self.p is None:
+            raise RuntimeError("ICD TH Server process is not started")
         if not self.paused:
             # Stop (halt) the ICD server process by sending a SIGTOP signal.
             self.p.send_signal(signal.SIGSTOP)
@@ -96,7 +98,9 @@ class IcdAppServerSubprocess(AppServerSubprocess):
 
     def resume(self, check_state: bool = True):
         if check_state and not self.paused:
-            raise ValueError("ICD TH Server unexpectedly is already running")
+            raise RuntimeError("ICD TH Server unexpectedly is already running")
+        if self.p is None:
+            raise RuntimeError("ICD TH Server process is not started")
         if self.paused:
             # Resume (continue) the ICD server process by sending a SIGCONT signal.
             self.p.send_signal(signal.SIGCONT)
@@ -209,14 +213,22 @@ class OTAProviderSubprocess(AppServerSubprocess):
                          extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=log_file, f_stderr=err_log_file)
 
     def terminate(self):
-        if self._log_file is not None:
-            self._log_file.close()
-        if self._err_log_file is not None:
-            self._err_log_file.close()
-        return super().terminate()
+        try:
+            super().terminate()
+        finally:
+            if self._log_file is not None:
+                self._log_file.close()
+                self._log_file = None
+            if self._err_log_file is not None:
+                self._err_log_file.close()
+                self._err_log_file = None
 
     def kill(self):
-        self.p.send_signal(signal.SIGKILL)
+        if self.p is None:
+            raise RuntimeError("OTAProviderSubprocess is not started")
+        self.p.kill()
 
     def get_pid(self) -> int:
+        if self.p is None:
+            raise RuntimeError("OTAProviderSubprocess is not started")
         return self.p.pid

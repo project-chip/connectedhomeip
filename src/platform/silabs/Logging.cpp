@@ -21,6 +21,7 @@
 #include <openthread/platform/logging.h>
 #endif
 
+#include <cinttypes>
 #include <stdio.h>
 #include <string.h>
 
@@ -126,13 +127,13 @@ size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
 
     // Derive the hours, minutes, seconds and milliseconds since boot time millisecond counter
     uint16_t milliseconds = timestampMillis % 1000;
-    uint32_t totalSeconds = timestampMillis / 1000;
+    uint32_t totalSeconds = static_cast<uint32_t>(timestampMillis / 1000);
     uint8_t seconds       = totalSeconds % 60;
     totalSeconds /= 60;
     uint8_t minutes = totalSeconds % 60;
     uint32_t hours  = totalSeconds / 60;
 
-    int chWritten = snprintf(buffer, maxSize, "[%04lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    int chWritten = snprintf(buffer, maxSize, "[%04" PRIu32 ":%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
     return (chWritten > 0) ? static_cast<size_t>(chWritten) : 0;
 }
 
@@ -165,7 +166,14 @@ void HandleLog(const char * module, LogCategory category, const char * aFormat, 
         prefixLen = sizeof formattedMsg - 1; // prevent overflow
     }
 
+#if !defined(__clang__)
     size_t len = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
+#else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+    size_t len = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
+#pragma clang diagnostic pop
+#endif
 
     if (len >= sizeof formattedMsg - prefixLen)
     {
@@ -306,6 +314,63 @@ extern "C" void LwIPLog(const char * aFormat, ...)
     va_end(v);
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if defined(SL_COMPONENT_CATALOG_PRESENT) &&                                                                                       \
+    (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) || defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
+#include "zcl-debug-print.h"
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+#include "uart.h"
+#endif // defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+extern "C" void sli_zigbee_af_print_internal_var_arg(uint16_t area, uint32_t log_level, bool newLine, const char * formatString,
+                                                     va_list ap)
+{
+#if SILABS_LOG_ENABLED
+    if (area == SL_ZIGBEE_AF_PRINT_CORE || area == 0x00)
+    {
+        LogCategory category = kLog_Silabs;
+        switch (log_level)
+        {
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_CRASH:
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_ERROR:
+            category = kLog_Error;
+            break;
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_WARN:
+            category = kLog_Warning;
+            break;
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_INFO:
+            category = kLog_Progress;
+            break;
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_DEBUG:
+        case SLI_ZIGBEE_AF_PRINT_LOG_LEVEL_NONE:
+        default:
+            category = kLog_Detail;
+            break;
+        }
+        // For core logs, we want to route them through the CHIP logging system so that they are timestamped and categorized
+        // appropriately.
+        chip::Logging::Platform::HandleLog(reinterpret_cast<const char *>(kLogZigbeeModule), category, formatString, ap);
+    }
+#endif
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
+    if (area == SL_ZIGBEE_AF_PRINT_CLI)
+    {
+
+        char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        int chWritten = vsnprintf(buffer, sizeof(buffer), formatString, ap);
+        if (chWritten < 0)
+        {
+            uartConsoleWrite("ZB CLI response too large", sizeof("ZB CLI response too large"));
+        }
+        else
+        {
+            uartConsoleWrite(const_cast<char *>(buffer), chWritten);
+        }
+    }
+#endif
+}
+#endif // defined(SL_COMPONENT_CATALOG_PRESENT) && (defined(SL_CATALOG_ZIGBEE_ZCL_CLI_PRESENT) ||
+       // defined(SL_CATALOG_ZIGBEE_DEBUG_PRINT_PRESENT))
+
 /**
  * Platform logging function for OpenThread
  */

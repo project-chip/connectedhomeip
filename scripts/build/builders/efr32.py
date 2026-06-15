@@ -16,10 +16,11 @@ import glob
 import logging
 import os
 import shlex
-import subprocess
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 log = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ class Efr32App(Enum):
     AIR_QUALITY_SENSOR = auto()
     CLOSURE = auto()
     SMOKE_CO_ALARM = auto()
+    ALL_DEVICES = auto()
 
     def ExampleName(self):
         if self == Efr32App.EVSE:
@@ -62,6 +64,8 @@ class Efr32App(Enum):
             return 'closure-app'
         if self == Efr32App.SMOKE_CO_ALARM:
             return 'smoke-co-alarm-app'
+        if self == Efr32App.ALL_DEVICES:
+            return 'all-devices-app'
         raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
@@ -89,6 +93,8 @@ class Efr32App(Enum):
             return 'matter-silabs-closure-example'
         if self == Efr32App.SMOKE_CO_ALARM:
             return 'matter-silabs-smoke-co-alarm-example'
+        if self == Efr32App.ALL_DEVICES:
+            return 'matter-silabs-all-devices-example'
         raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
@@ -116,6 +122,8 @@ class Efr32App(Enum):
             return 'closure_app.flashbundle.txt'
         if self == Efr32App.SMOKE_CO_ALARM:
             return 'smoke_co_alarm_app.flashbundle.txt'
+        if self == Efr32App.ALL_DEVICES:
+            return 'all_devices_app.flashbundle.txt'
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
@@ -184,8 +192,9 @@ class Efr32Board(Enum):
 class Efr32Builder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: Efr32App = Efr32App.LIGHT,
                  board: Efr32Board = Efr32Board.BRD4187C,
                  chip_build_libshell: bool = False,
@@ -205,15 +214,18 @@ class Efr32Builder(GnBuilder):
                  enable_additional_data_advertising: bool = False,
                  enable_ot_lib: bool = False,
                  enable_ot_coap_lib: bool = False,
-                 no_version: bool = False,
                  enable_917_soc: bool = False,
-                 use_rps_extension: bool = True
+                 use_rps_extension: bool = True,
+                 uart_log: bool = False,
+                 all_devices_enabled_devices=None
                  ):
-        super(Efr32Builder, self).__init__(
-            root=app.BuildRoot(root),
-            runner=runner)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.app = app
         self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
+        if self.all_devices_enabled_devices:
+            devices_str = '[' + ','.join(f'\"{d}\"' for d in self.all_devices_enabled_devices) + ']'
+            self.extra_gn_options.append(f'all_devices_enabled_devices={devices_str}')
         self.dotfile = ''
 
         if enable_rpcs:
@@ -275,15 +287,11 @@ class Efr32Builder(GnBuilder):
                 'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" '
                 'use_thread_coap_lib=true openthread_external_platform=""')
 
-        if not no_version:
-            shortCommitSha = subprocess.check_output(
-                ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
-            branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
-            self.extra_gn_options.append(
-                'sl_matter_version_str="v1.3-%s-%s"' % (branchName, shortCommitSha))
-
         if use_rps_extension is False:
             self.extra_gn_options.append('use_rps_extension=false')
+
+        if uart_log is True:
+            self.extra_gn_options.append('sl_uart_log_output=true')
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
@@ -303,11 +311,12 @@ class Efr32Builder(GnBuilder):
         args.extend(self.extra_gn_options)
         return args
 
+    @lock_output_dir
     def _bundle(self):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
         if self.app == Efr32App.UNIT_TEST:
             flash_bundle_path = os.path.join(self.output_dir, self.app.FlashBundleName())
-            log.info(f'Generating flashbundle {flash_bundle_path}')
+            log.info('Generating flashbundle %s', flash_bundle_path)
 
             patterns = [
                 os.path.join(self.output_dir, "tests", "*.flash.py"),
@@ -325,6 +334,7 @@ class Efr32Builder(GnBuilder):
             with open(flash_bundle_path, 'w') as bundle_file:
                 bundle_file.write("\n".join(files))
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out", "hex"]
         if self.options.enable_link_map_file:
@@ -350,6 +360,7 @@ class Efr32Builder(GnBuilder):
                         os.path.join(root, file),
                         os.path.join("chip_pw_test_runner_wheels", file))
 
+    @lock_output_dir
     def bundle_outputs(self):
         # If flashbundle creation is enabled, the outputs will include the s37 and flash.py files, plus the two firmware utils scripts that support flash.py.
         # For the unit-test example, there will be a s37 and flash.py file for each unit test source.
@@ -363,6 +374,7 @@ class Efr32Builder(GnBuilder):
                     sourcepath,
                     os.path.join("flashbundle", name))
 
+    @lock_output_dir
     def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
