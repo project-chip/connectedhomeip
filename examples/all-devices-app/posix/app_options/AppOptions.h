@@ -42,9 +42,6 @@ public:
         std::optional<uint16_t> port;
         std::optional<uint32_t> interfaceId;
         bool enableGroupcast = false;
-        // Caches whether wildcard expansion and default-device fallbacks have been resolved
-        // to prevent redundant operations on subsequent GetConfig() calls.
-        bool isExpanded = false;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
@@ -59,4 +56,5 @@ private:
 
     static DeviceTypeParser sParser;
     static AppConfig mConfig;
+    static bool sIsConfigExpanded;
 };
