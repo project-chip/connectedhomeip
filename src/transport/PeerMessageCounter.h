@@ -38,6 +38,27 @@ public:
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() { Reset(); }
 
+    PeerMessageCounter& operator=(const PeerMessageCounter& other)
+    {
+        if (this != &other)
+        {
+            Reset();
+            mStatus = other.mStatus;
+            switch (mStatus)
+            {
+            case Status::SyncInProcess:
+                new (&mSyncInProcess) SyncInProcess(other.mSyncInProcess);
+                break;
+            case Status::Synced:
+                new (&mSynced) Synced(other.mSynced);
+                break;
+            case Status::NotSynced:
+                break;
+            }
+        }
+        return *this;
+    }
+
     void Reset()
     {
         switch (mStatus)

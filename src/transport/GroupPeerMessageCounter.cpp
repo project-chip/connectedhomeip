@@ -31,33 +31,17 @@ namespace Transport {
 
 namespace {
 
-/// Shift elements right and insert newEntry at front (MRU position), destroying element at oldIndex.
+/// Shift elements right and insert newEntry at front (MRU position).
 ///
-/// `oldIndex` specifies which element to destroy; all elements [0..oldIndex) are then shifted right.
-/// `newEntry` is moved into list[0], becoming the most-recently-used entry.
+/// All elements [0..oldIndex) are shifted one slot to the right; newEntry
+/// becomes list[0] as the most-recently-used entry.
 void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender && newEntry)
 {
-    // The element at oldIndex is being overwritten, so we must destroy it first.
-    // Only valid (non-default-constructed) entries need destruction.
-    //
-    // This happens when `FindOrAddPeerFabricFound` inserts at the end of the list
-    // on a non-full list (i.e. element is not yet initialized)
-    if (list[oldIndex].mNodeId != kUndefinedNodeId)
-    {
-        list[oldIndex].~GroupSender();
-    }
-
-    // Iterate through and shift all elements before oldIndex 1 to the right.
-    // This will free up an empty space at index 0 to add the newEntry.
     for (uint32_t j = oldIndex; j > 0; j--)
     {
-        new (&list[j]) GroupSender(std::move(list[j - 1]));
-        list[j - 1].~GroupSender();
+        list[j] = list[j - 1];
     }
-
-    // The new entry being added is now the most recently used GroupSender entry.
-    // Most recently used elements will always be at the front of the list.
-    new (&list[0]) GroupSender(std::move(newEntry));
+    list[0] = std::move(newEntry);
 }
 
 /// Find peer by nodeId (move to MRU) or add it; return counter.
