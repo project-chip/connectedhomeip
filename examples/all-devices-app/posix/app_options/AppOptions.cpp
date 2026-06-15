@@ -66,7 +66,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     return mConfig;
 }
 
-void AppOptions::ExpandConfig()
+CHIP_ERROR AppOptions::ValidateConfig()
 {
     // Default device fallback if no devices are configured
     if (mConfig.deviceTypeEntries.empty())
@@ -76,34 +76,26 @@ void AppOptions::ExpandConfig()
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
-        return;
     }
-
-    // Expand wildcards using the supported device types from DeviceFactory
-    std::vector<std::string> supportedTypes;
-    for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+    else
     {
-        if (!IsExcludedFromWildcard(deviceType))
+        // Expand wildcards using the supported device types from DeviceFactory
+        std::vector<std::string> supportedTypes;
+        for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
         {
-            supportedTypes.push_back(deviceType);
+            if (!IsExcludedFromWildcard(deviceType))
+            {
+                supportedTypes.push_back(deviceType);
+            }
         }
+
+        sParser.ExpandWildcards(supportedTypes);
+        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
     }
 
-    sParser.ExpandWildcards(supportedTypes);
-    mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
-}
-
-CHIP_ERROR AppOptions::ValidateConfig()
-{
-    ExpandConfig();
-    ReturnErrorOnFailure(ValidateConfig(mConfig.deviceTypeEntries));
+    ReturnErrorOnFailure(DeviceTypeParser::ValidateConfig(mConfig.deviceTypeEntries));
     sIsConfigValidated = true;
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AppOptions::ValidateConfig(const std::vector<DeviceTypeParser::Entry> & entries)
-{
-    return DeviceTypeParser::ValidateConfig(entries);
 }
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
