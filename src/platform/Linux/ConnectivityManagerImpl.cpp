@@ -231,7 +231,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 }
 
-ConnectivityManagerImpl & ConnectivityMgrImpl(void)
+ConnectivityManagerImpl & ConnectivityMgrImpl()
 {
     return ConnectivityManagerImpl::GetDefaultInstance();
 }

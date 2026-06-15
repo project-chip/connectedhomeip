@@ -41,6 +41,7 @@ pw_python_package("matter-testing-module") {
   }
 
   inputs = [ "env_test.yaml" ]
+  python_deps = [ "${chip_root}/src/controller/python:matter-clusters-module" ]
 
   sources = [
     "matter/testing/CommissioningPreTest.py",
@@ -55,6 +56,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/conformance.py",
     "matter/testing/conversions.py",
     "matter/testing/credentials.py",
+    "matter/testing/data_model_errata.py",
     "matter/testing/decorators.py",
     "matter/testing/default_checker.py",
     "matter/testing/defaults.py",
@@ -88,6 +90,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/test_metadata.py",
     "matter/testing/test_tasks.py",
     "matter/testing/test_matter_asserts.py",
+    "matter/testing/test_data_model_errata.py",
   ]
 }
 

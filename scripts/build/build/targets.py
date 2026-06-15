@@ -44,17 +44,20 @@ from .target import BuildTarget, TargetPart
 # in all-devices: examples/all-devices-app/all-devices-common/devices
 _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
+    'aggregator',
+    'bridged-node',
     'chime',
     'contact-sensor',
     'dimmable-light',
     'fan',
     'occupancy-sensor',
     'on-off-light',
+    'power-source',
+    'proximity-ranger',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
     'water-leak-detector',
-    'proximity-ranger',
     # keep-sorted: end
 ]
 

@@ -53,6 +53,7 @@ Generally regenerate using one of:
 |         72 |       0x48 | OvenCavityOperationalState                              |
 |         73 |       0x49 | OvenMode                                                |
 |         74 |       0x4A | LaundryDryerControls                                    |
+|         75 |       0x4B | TemperatureControlledCabinetTopology                    |
 |         80 |       0x50 | ModeSelect                                              |
 |         81 |       0x51 | LaundryWasherMode                                       |
 |         82 |       0x52 | RefrigeratorAndTemperatureControlledCabinetMode         |

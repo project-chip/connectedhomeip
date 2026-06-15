@@ -56,7 +56,7 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::Init(AttributeChangeCallback * at
 
 void OpenThreadUbusBorderRouterDelegate::GetBorderRouterName(MutableCharSpan & borderRouterName)
 {
-    CopyCharSpanToMutableCharSpan("OpenThread BorderRouter"_span, borderRouterName);
+    CopyCharSpanToMutableCharSpanWithTruncation("OpenThread BorderRouter"_span, borderRouterName);
 }
 
 CHIP_ERROR OpenThreadUbusBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentId)
