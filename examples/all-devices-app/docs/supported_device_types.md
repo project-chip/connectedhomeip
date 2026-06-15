@@ -3,8 +3,23 @@
 **Updated as of**: 2026-06-12 (Matter Specification SHA: `5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)
 
 ## Discovery & Updating Methodology
-* **Specification Catalog**: Read device definitions from the automatically updated master specifications sheet (`docs/ids_and_codes/spec_device_types.md`), supplemented with provisional/draft specs under `device_library/`.
-* **All-Devices Support**: Check for registration inside the Device Factory registry mapping (`examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`).
+
+To update or validate this list manually, follow these steps:
+
+1. **Verify Implemented Device Types**:
+   - Inspect `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
+   - Look at the `DeviceFactory` constructor. Every `RegisterCreator("name", ...)` call corresponds to an implemented device type.
+   - Note: `Root Node` (0x0016) is a special device type that is always implemented on Endpoint 0, and is represented by `RootNodeDevice.h/cpp` under `examples/all-devices-app/all-devices-common/devices/root-node/`.
+
+2. **Verify Mandatory Server Clusters per Device Type**:
+   - Locate the device type definition in the Matter Specification (e.g. under `device_library/` in the spec repository, or using generated markdown files under `out/spec/build/markdown/master/device_library/`).
+   - Find the sub-section `### Cluster Requirements` for the device type.
+   - Identify all server-side clusters (Client/Server = Server) with conformance `M` (Mandatory). These must be listed in the "Mandatory Server Clusters" column.
+
+3. **Identify Missing Mandatory Clusters**:
+   - Compare the "Mandatory Server Clusters" list with the implementation status in `supported_clusters.md`.
+   - If a mandatory server cluster is marked as `Code-Driven in SDK = No` in `supported_clusters.md`, it is a "Missing Mandatory Cluster".
+   - If all mandatory server clusters are `Code-Driven in SDK = Yes`, the device type is "None (Ready)".
 
 ## Implemented Device Types
 
@@ -38,7 +53,6 @@
 | Ambient Context Sensor            | 336 (0x0150)  | None                                                                               | None (Ready)                                          |       |
 | Arc Fault Circuit Interrupter     | 1301 (0x0515) | User Label, Power Topology                                                         | None (Ready)                                          |       |
 | Audio Doorbell                    | 321 (0x0141)  | Identify, Switch, Camera AV Stream Management, WebRTC Transport Provider           | None (Ready)                                          |       |
-| Auxiliary Load Switch             | 69 (0x0045)   | Boolean State                                                                      | None (Ready)                                          |       |
 | Basic Video Player                | 40 (0x0028)   | On/Off, Media Playback, Keypad Input                                               | Media Playback, Keypad Input                          |       |
 | Battery Storage                   | 24 (0x0018)   | None                                                                               | None (Ready)                                          |       |
 | Camera                            | 322 (0x0142)  | Camera AV Stream Management, WebRTC Transport Provider                             | None (Ready)                                          |       |
@@ -63,7 +77,6 @@
 | Door Lock                         | 10 (0x000A)   | Identify, Door Lock                                                                | Door Lock                                             |       |
 | Door Lock Controller              | 11 (0x000B)   | None                                                                               | None (Ready)                                          |       |
 | Doorbell                          | 328 (0x0148)  | None                                                                               | None (Ready)                                          |       |
-| EVSE                              | 1292 (0x050C) | Energy EVSE, Energy EVSE Mode                                                      | Energy EVSE Mode                                      |       |
 | Electrical Circuit Breaker        | 1302 (0x0516) | User Label, Power Topology                                                         | None (Ready)                                          |       |
 | Electrical Distribution Enclosure | 1303 (0x0517) | Power Topology                                                                     | None (Ready)                                          |       |
 | Electrical Energy Tariff          | 1299 (0x0513) | None                                                                               | None (Ready)                                          |       |
@@ -95,7 +108,6 @@
 | OTA Provider                      | 20 (0x0014)   | OTA Software Update Provider                                                       | None (Ready)                                          |       |
 | OTA Requestor                     | 18 (0x0012)   | OTA Software Update Requestor                                                      | None (Ready)                                          |       |
 | On/Off Light Switch               | 259 (0x0103)  | None                                                                               | None (Ready)                                          |       |
-| On/Off Light Switch Device type   | 98 (0x0062)   | Identify                                                                           | None (Ready)                                          |       |
 | On/Off Plug-in Unit               | 266 (0x010A)  | Identify, Groups, On/Off, Scenes Management                                        | None (Ready)                                          |       |
 | On/Off Sensor                     | 2128 (0x0850) | Identify                                                                           | None (Ready)                                          |       |
 | Oven                              | 123 (0x007B)  | None                                                                               | None (Ready)                                          |       |
@@ -116,7 +128,6 @@
 | Thermostat Controller             | 778 (0x030A)  | None                                                                               | None (Ready)                                          |       |
 | Thread Border Router              | 145 (0x0091)  | Thread Network Diagnostics, Thread Border Router Management                        | None (Ready)                                          |       |
 | Video Doorbell                    | 323 (0x0143)  | None                                                                               | None (Ready)                                          |       |
-| Video Player Architecture         | 36 (0x0024)   | None                                                                               | None (Ready)                                          |       |
 | Video Remote Control              | 42 (0x002A)   | None                                                                               | None (Ready)                                          |       |
 | Water Freeze Detector             | 65 (0x0041)   | Identify, Boolean State                                                            | None (Ready)                                          |       |
 | Water Heater                      | 1295 (0x050F) | Water Heater Management, Water Heater Mode, Thermostat                             | Water Heater Mode, Thermostat                         |       |
