@@ -269,8 +269,8 @@ CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            // 3. If this is a bridged-node, its parent must be an aggregator (or power-source for testing)
-            if (entry.type == "bridged-node" && parentType != "aggregator" && parentType != "power-source")
+            // 3. If this is a bridged-node, its parent must be an aggregator
+            if (entry.type == "bridged-node" && parentType != "aggregator")
             {
                 ChipLogError(Support, "Error: Parent of bridged-node (endpoint %u) must be aggregator, but found %s (endpoint %u)",
                              entry.endpoint, parentType.c_str(), entry.parentId);
