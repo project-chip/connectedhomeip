@@ -33,8 +33,7 @@ AmbientContextSensingCluster::AmbientContextSensingCluster(const Config & config
     mHoldTimeDelegate(config.mHoldTimeDelegate)
 {
     assert(mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
-           mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting) ||
-           mFeatureMap.Has(Feature::kSensorFusion));
+           mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting));
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
@@ -178,7 +177,6 @@ CHIP_ERROR AmbientContextSensingCluster::SetAmbientContextTypeSupported(const Sp
     VerifyOrReturnError(ambientContextTypeSupportedBuf != nullptr, CHIP_ERROR_INCORRECT_STATE);
     std::copy(ACTypeList.begin(), ACTypeList.end(), ambientContextTypeSupportedBuf);
     mAmbientContextTypeSupportedList = Span<SemanticTagType>(ambientContextTypeSupportedBuf, ACTypeList.size());
-
     NotifyAttributeChanged(Attributes::AmbientContextTypeSupported::Id);
     return CHIP_NO_ERROR;
 }
@@ -331,13 +329,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetObjectCount(uint16_t objectCount)
     VerifyOrReturnError((mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification)),
                         CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(objectCount >= 1, CHIP_ERROR_INVALID_ARGUMENT);
-    if (objectCount == mObjectCount)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    mObjectCount = objectCount;
-    NotifyAttributeChanged(Attributes::ObjectCount::Id);
+    VerifyOrReturnValue(SetAttributeValue(mObjectCount, objectCount, Attributes::ObjectCount::Id), CHIP_NO_ERROR);
     mObjectCountStartTime  = mHoldTimeDelegate.GetCurrentMonotonicTimestamp();
     mObjectCountEndTime    = mObjectCountStartTime + System::Clock::Seconds16(mHoldTime);
     mObjectCountStartEpoch = mACSDelegate.GetEpochNow();
@@ -352,11 +344,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetec
 {
     VerifyOrReturnError((simultaneousDetectionLimit <= kMaxSimultaneousDetectionLimit),
                         Protocols::InteractionModel::Status::ConstraintError);
-    VerifyOrReturnError((simultaneousDetectionLimit != mSimultaneousDetectionLimit),
+    VerifyOrReturnValue(SetAttributeValue(mSimultaneousDetectionLimit, simultaneousDetectionLimit, Attributes::SimultaneousDetectionLimit::Id),
                         DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
-    mSimultaneousDetectionLimit = simultaneousDetectionLimit;
-    NotifyAttributeChanged(Attributes::SimultaneousDetectionLimit::Id);
 
     if (mAmbientContextTypeListSize <= mSimultaneousDetectionLimit)
     {
@@ -386,10 +375,7 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetHoldTime(uint16_t
 {
     VerifyOrReturnError((mHoldTimeLimits.holdTimeMin <= holdTime) && (holdTime <= mHoldTimeLimits.holdTimeMax),
                         Protocols::InteractionModel::Status::ConstraintError);
-    VerifyOrReturnError(holdTime != mHoldTime, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
-    mHoldTime = holdTime;
-    NotifyAttributeChanged(Attributes::HoldTime::Id);
+    VerifyOrReturnValue(SetAttributeValue(mHoldTime, holdTime, Attributes::HoldTime::Id), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     // Save the value to persistence
     if (mContext != nullptr)
@@ -585,26 +571,10 @@ void AmbientContextSensingCluster::UpdateDetectionAttributes()
         bDetect.Set(Feature::kObjectCounting);
     }
     // If the status is different, set the attribute & notify
-    if (bDetect.Has(Feature::kHumanActivity) != mHumanActivityDetected)
-    {
-        mHumanActivityDetected = bDetect.Has(Feature::kHumanActivity);
-        NotifyAttributeChanged(Attributes::HumanActivityDetected::Id);
-    }
-    if (bDetect.Has(Feature::kObjectIdentification) != mObjectIdentified)
-    {
-        mObjectIdentified = bDetect.Has(Feature::kObjectIdentification);
-        NotifyAttributeChanged(Attributes::ObjectIdentified::Id);
-    }
-    if (bDetect.Has(Feature::kSoundIdentification) != mAudioContextDetected)
-    {
-        mAudioContextDetected = bDetect.Has(Feature::kSoundIdentification);
-        NotifyAttributeChanged(Attributes::AudioContextDetected::Id);
-    }
-    if (bDetect.Has(Feature::kObjectCounting) != mObjectCountThresholdReached)
-    {
-        mObjectCountThresholdReached = bDetect.Has(Feature::kObjectCounting);
-        NotifyAttributeChanged(Attributes::ObjectCountThresholdReached::Id);
-    }
+    SetAttributeValue(mHumanActivityDetected, bDetect.Has(Feature::kHumanActivity), Attributes::HumanActivityDetected::Id);
+    SetAttributeValue(mObjectIdentified, bDetect.Has(Feature::kObjectIdentification), Attributes::ObjectIdentified::Id);
+    SetAttributeValue(mAudioContextDetected, bDetect.Has(Feature::kSoundIdentification), Attributes::AudioContextDetected::Id);
+    SetAttributeValue(mObjectCountThresholdReached, bDetect.Has(Feature::kObjectCounting), Attributes::ObjectCountThresholdReached::Id);
 }
 
 // Find the next-timeout to remove the item in mAmbientContextTypeList
@@ -773,8 +743,7 @@ void AmbientContextSensingCluster::RemoveExpiredItems(IntrusiveList<AmbientConte
     if ((mObjectCount > 0) && (mObjectCountEndTime <= now))
     {
         mObjectCountEndTime = System::Clock::Timestamp(0);
-        mObjectCount        = 0;
-        NotifyAttributeChanged(Attributes::ObjectCount::Id);
+        SetAttributeValue(mObjectCount, 0, Attributes::ObjectCount::Id);
         // Send the DetectEndEvent
         SendDetectEndEvent(mObjectCountStartEpoch, mObjectCountStartTime.count());
         mObjectCountStartTime = System::Clock::Timestamp(0);

@@ -8823,24 +8823,23 @@ endpoint 1 {
   server cluster AmbientContextSensing {
     emits event AmbientContextDetectStarted;
     emits event AmbientContextDetectEnded;
-    ram      attribute humanActivityDetected;
-    ram      attribute objectIdentified;
-    ram      attribute audioContextDetected;
+    callback attribute humanActivityDetected;
+    callback attribute objectIdentified;
+    callback attribute audioContextDetected;
     callback attribute ambientContextType;
     callback attribute ambientContextTypeSupported;
-    ram      attribute objectCountThresholdReached;
+    callback attribute objectCountThresholdReached;
     callback attribute objectCountConfig;
-    ram      attribute objectCount;
-    ram      attribute simultaneousDetectionLimit;
-    ram      attribute holdTime;
+    callback attribute objectCount;
+    callback attribute simultaneousDetectionLimit;
+    callback attribute holdTime;
     callback attribute holdTimeLimits;
     callback attribute predictedActivity;
-    callback attribute sensorFusionSupported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute featureMap default = 31;
+    callback attribute clusterRevision default = 2;
   }
 
   server cluster WakeOnLan {
