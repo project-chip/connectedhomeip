@@ -37,7 +37,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
 
-    if(value == NULL)
+    if (value == NULL)
     {
         return;
     }

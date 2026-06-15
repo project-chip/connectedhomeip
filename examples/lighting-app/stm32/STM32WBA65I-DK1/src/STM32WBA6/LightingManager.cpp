@@ -53,12 +53,12 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
 {
     bool action_initiated = false;
     State_t new_state     = kState_Off;
-    
+
     if (aAction == LEVEL_ACTION && value == NULL)
     {
         return false;
     }
-    
+
     switch (aAction)
     {
     case ON_ACTION:
