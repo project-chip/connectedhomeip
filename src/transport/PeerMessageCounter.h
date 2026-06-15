@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -42,65 +42,15 @@ public:
         // Delegate to operator= to avoid code duplication
         *this = other;
     }
-    PeerMessageCounter(PeerMessageCounter && other) noexcept : mStatus(other.mStatus)
+    PeerMessageCounter(PeerMessageCounter && other) noexcept
     {
-        switch (mStatus)
-        {
-        case Status::SyncInProcess:
-            new (&mSyncInProcess) SyncInProcess(std::move(other.mSyncInProcess));
-            break;
-        case Status::Synced:
-            new (&mSynced) Synced(std::move(other.mSynced));
-            break;
-        case Status::NotSynced:
-            break;
-        }
-        other.mStatus = Status::NotSynced;
+        mStatus = Status::NotSynced; // uninit object so we can copy
+        *this = std::move(other);
     }
     ~PeerMessageCounter() { Reset(); }
 
-    PeerMessageCounter & operator=(const PeerMessageCounter & other)
-    {
-        if (this != &other)
-        {
-            Reset();
-            mStatus = other.mStatus;
-            switch (mStatus)
-            {
-            case Status::SyncInProcess:
-                new (&mSyncInProcess) SyncInProcess(other.mSyncInProcess);
-                break;
-            case Status::Synced:
-                new (&mSynced) Synced(other.mSynced);
-                break;
-            case Status::NotSynced:
-                break;
-            }
-        }
-        return *this;
-    }
-
-    PeerMessageCounter & operator=(PeerMessageCounter && other) noexcept
-    {
-        if (this != &other)
-        {
-            Reset();
-            mStatus = other.mStatus;
-            switch (mStatus)
-            {
-            case Status::SyncInProcess:
-                new (&mSyncInProcess) SyncInProcess(std::move(other.mSyncInProcess));
-                break;
-            case Status::Synced:
-                new (&mSynced) Synced(std::move(other.mSynced));
-                break;
-            case Status::NotSynced:
-                break;
-            }
-            other.mStatus = Status::NotSynced;
-        }
-        return *this;
-    }
+    PeerMessageCounter & operator=(const PeerMessageCounter & other);
+    PeerMessageCounter & operator=(PeerMessageCounter && other) noexcept;
 
     void Reset()
     {
@@ -118,8 +68,8 @@ public:
         mStatus = Status::NotSynced;
     }
 
-    bool IsSynchronizing() { return mStatus == Status::SyncInProcess; }
-    bool IsSynchronized() { return mStatus == Status::Synced; }
+    bool IsSynchronizing() const { return mStatus == Status::SyncInProcess; }
+    bool IsSynchronized() const { return mStatus == Status::Synced; }
 
     void SyncStarting(FixedByteSpan<kChallengeSize> challenge)
     {
@@ -260,6 +210,7 @@ public:
     uint32_t GetCounter() const { return mSynced.mMaxCounter; }
 
 private:
+
     // Counter position indicator with respect to our current
     // mSynced.mMaxCounter.
     enum class Position

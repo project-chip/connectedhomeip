@@ -29,6 +29,7 @@ static_library("transport") {
     "MessageCounter.h",
     "MessageCounterManagerInterface.h",
     "MessageStats.h",
+    "PeerMessageCounter.cpp",
     "PeerMessageCounter.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
