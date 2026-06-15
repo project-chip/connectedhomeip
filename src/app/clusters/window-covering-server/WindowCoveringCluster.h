@@ -83,7 +83,7 @@ public:
     class Config
     {
     public:
-        Config() = default;
+        Config(WindowCoveringDelegate & delegate) : mDelegate(delegate) {}
 
         Config & WithFeatures(BitFlags<Feature> features)
         {
@@ -97,8 +97,7 @@ public:
             return *this;
         }
 
-    private:
-        friend class WindowCoveringCluster;
+        WindowCoveringDelegate & mDelegate;
         BitFlags<Feature> mFeatures;
         OptionalAttributeSet mOptionalAttributes;
     };
@@ -163,9 +162,6 @@ public:
     void SetSafetyStatus(chip::BitMask<SafetyStatus> status);
     chip::BitMask<SafetyStatus> GetSafetyStatus() const { return mSafetyStatus; }
 
-    void SetDelegate(WindowCoveringDelegate * delegate) { mDelegate = delegate; }
-    WindowCoveringDelegate * GetDelegate() const { return mDelegate; }
-
 protected:
     void SetType(Type type) { SetAttributeValue(mType, type, Attributes::Type::Id); }
     void SetEndProductType(EndProductType type);
@@ -193,7 +189,7 @@ private:
 
     EndpointId GetEndpointId() { return mPath.mEndpointId; }
 
-    WindowCoveringDelegate * mDelegate = nullptr;
+    WindowCoveringDelegate & mDelegate;
     const BitFlags<WindowCovering::Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributes;
 
