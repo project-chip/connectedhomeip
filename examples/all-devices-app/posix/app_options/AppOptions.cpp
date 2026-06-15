@@ -61,7 +61,7 @@ AppOptions::AppConfig AppOptions::mConfig;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
-    if (mConfig.expanded)
+    if (mConfig.isExpanded)
     {
         return mConfig;
     }
@@ -74,7 +74,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
-        mConfig.expanded = true;
+        mConfig.isExpanded = true;
         return mConfig;
     }
 
@@ -91,7 +91,7 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
     sParser.ExpandWildcards(supportedTypes);
     mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
 
-    mConfig.expanded = true;
+    mConfig.isExpanded = true;
     return mConfig;
 }
 
@@ -111,7 +111,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     switch (identifier)
     {
     case kOptionDeviceType: {
-        mConfig.expanded = false;
+        mConfig.isExpanded = false;
         if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;
