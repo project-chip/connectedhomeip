@@ -901,14 +901,14 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
     // After av_write_trailer, the MPD is already static with type="static",
     // mediaPresentationDuration, and no minimumUpdatePeriod/suggestedPresentationDelay.
     // The only missing piece is the SegmentTimeline inside each SegmentTemplate.
-    bool modified                       = false;
+    bool modified = false;
     std::vector<std::string> outputLines;
-    size_t streamIdx                    = 0;
+    size_t streamIdx = 0;
 
-    bool inSegmentTemplate              = false;
+    bool inSegmentTemplate = false;
     std::string templateIndent;
-    int64_t timescale                   = 90000;
-    int64_t segDurationTs               = 0;
+    int64_t timescale     = 90000;
+    int64_t segDurationTs = 0;
 
     for (size_t i = 0; i < lines.size(); i++)
     {
