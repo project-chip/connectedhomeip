@@ -461,7 +461,8 @@ executed manually.
 > -   Append `-compat` to build in libFuzzer-compatibility mode (the mode
 >     OSS-Fuzz drives) instead of FuzzTest's native engine, e.g.
 >     `linux-x64-tests-clang-pw-fuzztest-compat`. Useful to reproduce the
->     OSS-Fuzz build locally, or to use libFuzzer corpus/merge/minimize features.
+>     OSS-Fuzz build locally, or to use libFuzzer corpus/merge/minimize
+>     features.
 > -   Append `-ubsan` to add UndefinedBehaviorSanitizer on top of the default
 >     `asan`, e.g. `linux-x64-tests-clang-pw-fuzztest-ubsan` (can be combined
 >     with `-compat`).
