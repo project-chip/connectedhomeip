@@ -132,8 +132,6 @@ class TC_ACS_3_2(MatterBaseTest):
                 # '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
                 f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":3}},{{"TypeId":74, "TagId":4}},{{"TypeId":75,"TagId":3}}]}}')
             await asyncio.sleep(1)
-        ambientContextTypeSupported = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
 
         # subscription setup for the following trigger testing
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
