@@ -128,15 +128,19 @@ rm -rf /tmp/chip_*
 
 ## Bridging Support: Bridged Modifier (`,bridged`)
 
-You can use the `,bridged` option modifier on a device definition to automatically wrap it in a parent `bridged-node` endpoint.
+You can use the `,bridged` option modifier on a device definition to
+automatically wrap it in a parent `bridged-node` endpoint.
 
-Without the `,bridged` modifier, setting up a bridged device requires manually typing out both the intermediate `bridged-node` parent and the leaf device child, which gets extremely verbose:
+Without the `,bridged` modifier, setting up a bridged device requires manually
+typing out both the intermediate `bridged-node` parent and the leaf device
+child, which gets extremely verbose:
 
 ```bash
 ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device bridged-node:2,parent=1 --device chime:3,parent=2
 ```
 
-Using the `,bridged` modifier automatically handles the intermediate `bridged-node` injection:
+Using the `,bridged` modifier automatically handles the intermediate
+`bridged-node` injection:
 
 -   **Explicit Bridged Device:**
 
