@@ -23,10 +23,10 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/stm32/stm32wba/DiagnosticDataProviderImpl.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

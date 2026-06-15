@@ -23,12 +23,12 @@
  */
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-#include <lib/support/CodeUtils.h>
 #include <platform/stm32/stm32wba/DiagnosticDataProviderImpl.h>
 
 namespace chip {
