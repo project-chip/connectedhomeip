@@ -46,22 +46,11 @@ PeerMessageCounter & PeerMessageCounter::operator=(const PeerMessageCounter & ot
 
 PeerMessageCounter & PeerMessageCounter::operator=(PeerMessageCounter && other) noexcept
 {
-    VerifyOrReturnValue(this != &other, *this);
-    Reset();
-    mStatus = other.mStatus;
-    switch (other.mStatus)
+    if (this != &other)
     {
-    case Status::SyncInProcess:
-        new (&mSyncInProcess) SyncInProcess(std::move(other.mSyncInProcess));
-        break;
-    case Status::Synced:
-        new (&mSynced) Synced(std::move(other.mSynced));
-        break;
-    case Status::NotSynced:
-        break;
+        *this = static_cast<const PeerMessageCounter &>(other);
+        other.mStatus = Status::NotSynced;
     }
-    // mark as cleared
-    other.mStatus = Status::NotSynced;
     return *this;
 }
 
