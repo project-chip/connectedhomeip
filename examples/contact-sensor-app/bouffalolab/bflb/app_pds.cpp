@@ -67,9 +67,10 @@ static bl_lp_io_cfg_t s_io_wakeup_cfg;
 
 static void (* s_pin_handler)(int, bool) = NULL;
 #if CHIP_DETAIL_LOGGING
-static struct bflb_device_s * s_rtc_dev;
+static struct bflb_device_s * s_rtc_dev = NULL;
 static uint64_t s_sleep_enter_rtc = 0;
 #endif
+static struct bflb_device_s * s_sha_dev = NULL;
 
 static void app_lp_config_gpio(void);
 static void app_lp_config_wakup_gpio(void);
@@ -149,7 +150,9 @@ static int lp_enter(void * arg)
 {
     (void) arg;
 #if CHIP_DETAIL_LOGGING
-    s_sleep_enter_rtc = bflb_rtc_get_time(s_rtc_dev);
+    if (s_rtc_dev) {
+        s_sleep_enter_rtc = bflb_rtc_get_time(s_rtc_dev);
+    }
 #endif
     app_lp_config_wakup_gpio();
     return 0;
@@ -158,15 +161,16 @@ static int lp_enter(void * arg)
 static int lp_exit(void * arg)
 {
     (void) arg;
-    static struct bflb_device_s * sha = bflb_device_get_by_name(BFLB_NAME_SEC_SHA); 
     extern TaskHandle_t rxl_process_task_hd;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     set_cpu_bclk_80M_and_gate_clk();
     board_recovery();
 
-    bflb_group0_request_sha_access(sha);
-    bflb_sha_link_init(sha);
+    if (s_sha_dev) {
+        bflb_group0_request_sha_access(s_sha_dev);
+        bflb_sha_link_init(s_sha_dev);
+    }
     vPortSetupTimerInterrupt();
 
     int reason = bl_lp_get_wake_reason();
@@ -182,7 +186,7 @@ static int lp_exit(void * arg)
     app_lp_config_gpio();
     
 #if CHIP_DETAIL_LOGGING
-    {
+    if (s_rtc_dev) {
         uint64_t sleep_ticks = bflb_rtc_get_time(s_rtc_dev) - s_sleep_enter_rtc;
         uint32_t rtc_hz      = bflb_clk_get_peripheral_clock(BFLB_DEVICE_TYPE_RTC, 0);
         uint64_t sleep_ms    = (rtc_hz != 0) ? (sleep_ticks * 1000ULL / rtc_hz) : 0;
@@ -226,6 +230,8 @@ extern "C" void app_pre_matter_init(void)
 #if CHIP_DETAIL_LOGGING
     s_rtc_dev = bflb_device_get_by_name("rtc");
 #endif
+    s_gpio_dev = bflb_device_get_by_name("gpio");
+    s_sha_dev = bflb_device_get_by_name(BFLB_NAME_SEC_SHA);
 
     extern int enable_multicast_broadcast;
     enable_multicast_broadcast = true;
@@ -237,9 +243,10 @@ extern "C" void app_pre_matter_init(void)
 
 static void app_lp_config_gpio(void)
 {
-    s_gpio_dev = bflb_device_get_by_name("gpio");
+    if (NULL == s_gpio_dev) {
+        return;
+    }
 
-    /* Configure pins as inputs with pull-down */
     bflb_gpio_init(s_gpio_dev, CHIP_RESET_PIN,   GPIO_INPUT | GPIO_PULLDOWN);
     bflb_gpio_init(s_gpio_dev, CHIP_CONTACT_PIN, GPIO_INPUT | GPIO_PULLDOWN);
 

@@ -252,7 +252,6 @@ class Flasher(firmware_utils.Flasher):
             line = line.rstrip()
             if line:
                 log.info(line)
-
         ret = process.wait()
         if ret != 0:
             raise subprocess.CalledProcessError(ret, command)

@@ -74,9 +74,7 @@ static inline uint32_t app_pds_get_lmac154_symbol_counter(void)
 
 static inline uint32_t app_pds_zb_timer_ticks_to_ms(uint32_t ticks)
 {
-    constexpr uint32_t kZbTimerTicksPerTwoMs = 125; // 125 * 16us = 2ms.
-
-    return ((ticks / kZbTimerTicksPerTwoMs) * 2) + ((((ticks % kZbTimerTicksPerTwoMs) * 2) + kZbTimerTicksPerTwoMs - 1) / kZbTimerTicksPerTwoMs);
+    return (ticks * 16 + 999) / 1000;
 }
 
 static inline TickType_t app_pds_get_sleep_time(TickType_t xExpectedIdleTime)
@@ -180,6 +178,10 @@ static inline bool app_pds_is_thread_stack_idle(void)
 {
     bool is_trx_frames_empty = false;
     otRadioState radioState  = OT_RADIO_STATE_DISABLED;
+
+    if (ot_radio_ctx.instance == nullptr) {
+        return true;
+    }
 
     uint32_t tag = otrEnterCrit();
     is_trx_frames_empty = (utils_dlist_empty(&ot_radio_ctx.rx_frame_list)) && (ot_radio_ctx.tx_frame == NULL);

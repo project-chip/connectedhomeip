@@ -89,14 +89,17 @@ void vAssertCalled(void);
 #endif
 
 #define configASSERT(x)                                  \
-    if ((x) == 0)                                        \
+    do                                                   \
     {                                                    \
-        printf("file [%s]\r\n", __FILE__);               \
-        printf("func [%s]\r\n", __FUNCTION__);           \
-        printf("line [%d]\r\n", __LINE__);               \
-        printf("%s\r\n", (const char *)(#x));            \
-        vAssertCalled();                                 \
-    }
+        if ((x) == 0)                                    \
+        {                                                \
+            printf("file [%s]\r\n", __FILE__);               \
+            printf("func [%s]\r\n", __FUNCTION__);           \
+            printf("line [%d]\r\n", __LINE__);               \
+            printf("%s\r\n", (const char *)(#x));            \
+            vAssertCalled();                                 \
+        }                                                \
+    } while (0)
 
 #if (configUSE_TICKLESS_IDLE != 0)
 #ifdef __cplusplus

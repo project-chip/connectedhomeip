@@ -52,8 +52,7 @@ log = logging.getLogger(__name__)
 
 
 def _any_base_int(value):
-    return int(str(value), 0)
-
+    return int(str(value).strip("() "), 0)
 
 def _strip_c_string(value):
     value = value.strip()
