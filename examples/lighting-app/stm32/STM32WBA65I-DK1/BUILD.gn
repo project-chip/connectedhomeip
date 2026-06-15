@@ -55,11 +55,11 @@ stm32_sdk("sdk") {
   sources = [
     "${examples_plat_dir}/config_files/STM32WBA6/FreeRTOSConfig.h",
     "${examples_plat_dir}/config_files/STM32WBA6/matter_config.h",
-    "${stm32_project_dir}/include/STM32WBA6/CHIPProjectConfig.h",
+    "${stm32_project_dir}/include/CHIPProjectConfig.h",
   ]
 
   include_dirs += [
-    "${stm32_project_dir}/include/STM32WBA6",
+    "${stm32_project_dir}/include",
     "${chip_root}/src/include",
   ]
 
@@ -79,6 +79,7 @@ stm32_executable("lighting_app") {
     "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Inc",
     "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/Target",
     "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/App",
+    "include/",
     "${chip_root}/src/include/",
   ]
   defines = []
@@ -98,11 +99,11 @@ stm32_executable("lighting_app") {
     "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
     "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
     "${stm32_board_src}/STM32WBA65I-DK1/Src/main.c",
-    "src/STM32WBA6/AppTask.cpp",
-    "src/STM32WBA6/IdentifierEffect.cpp",
-    "src/STM32WBA6/LightingManager.cpp",
-    "src/STM32WBA6/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
-    "src/STM32WBA6/ZclCallbacks.cpp",
+    "src/AppTask.cpp",
+    "src/IdentifierEffect.cpp",
+    "src/LightingManager.cpp",
+    "src/SoftwareDiagnosticsTestEventTriggerHandler.cpp",
+    "src/ZclCallbacks.cpp",
   ]
 
   deps = [
