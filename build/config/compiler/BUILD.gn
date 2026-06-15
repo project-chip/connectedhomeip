@@ -524,6 +524,11 @@ config("sanitize_undefined_behavior") {
       "-fsanitize=unsigned-integer-overflow",
       "-fsanitize=implicit-conversion",
       "-fsanitize=nullability",
+
+      # Exclude vendored / stdlib code we don't own (abseil, fuzztest, libc++)
+      # from UBSan; first-party src/ stays instrumented. See ubsan_ignorelist.txt.
+      "-fsanitize-ignorelist=" +
+          rebase_path("ubsan_ignorelist.txt", root_build_dir),
     ]
   }
 
