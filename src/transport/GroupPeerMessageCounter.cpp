@@ -21,6 +21,7 @@
  */
 
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <limits>
 #include <transport/GroupPeerMessageCounter.h>
 
 #include <crypto/RandUtils.h>
@@ -57,39 +58,41 @@ void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender && newEnt
 CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8_t & peerCount, NodeId nodeId,
                                     chip::Transport::PeerMessageCounter *& counter, const char * peerType)
 {
+    static uint32_t kInvalidIndex = std::numeric_limits<uint32_t>::max();
+
+    GroupSender temp;
+    temp.mNodeId = nodeId;
+
+    uint32_t insertPos = kInvalidIndex;
+
     // Search for peer
     for (uint32_t i = 0; i < peerCount; i++)
     {
         if (list[i].mNodeId == nodeId)
         {
-            // If the node id is found and it is not already at the start of the list (i.e.
-            // it isn't already the most recently used element), then we need to move it to
-            // the front and shift the other elements.
-            if (i > 0)
-            {
-                GroupSender temp(list[i]);
-                ShiftAndInsert(list, i, std::move(temp));
-            }
-            counter = &(list[0].msgCounter);
-            return CHIP_NO_ERROR;
+            insertPos = i;
+            temp      = std::move(list[i]);
+            break;
         }
     }
 
-    // GroupSender was not found, must add a new one for this node id.
-    GroupSender temp;
-    temp.mNodeId = nodeId;
-    if (peerCount < maxLimit)
+    if (insertPos == kInvalidIndex)
     {
-        ShiftAndInsert(list, peerCount, std::move(temp));
-        peerCount++;
+        // GroupSender was not found, must add a new one for this node id.
+        if (peerCount < maxLimit)
+        {
+            peerCount++;
+        }
+        else
+        {
+            // Evict LRU
+            ChipLogProgress(SecureChannel, "GroupPeerTable: Evicting %s peer " ChipLogFormatX64 " due to table being full",
+                            peerType, ChipLogValueX64(list[maxLimit - 1].mNodeId));
+        }
+        insertPos = peerCount - 1;
     }
-    else
-    {
-        // Evict LRU
-        ChipLogProgress(SecureChannel, "GroupPeerTable: Evicting %s peer " ChipLogFormatX64 " due to table being full", peerType,
-                        ChipLogValueX64(list[maxLimit - 1].mNodeId));
-        ShiftAndInsert(list, maxLimit - 1, std::move(temp));
-    }
+
+    ShiftAndInsert(list, insertPos, std::move(temp));
     counter = &(list[0].msgCounter);
     return CHIP_NO_ERROR;
 }
