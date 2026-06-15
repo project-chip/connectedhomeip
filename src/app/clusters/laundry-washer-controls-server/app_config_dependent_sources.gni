@@ -13,6 +13,6 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "laundry-washer-controls-delegate.h",
-  "laundry-washer-controls-server.cpp",
-  "laundry-washer-controls-server.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
 ]
