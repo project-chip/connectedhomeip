@@ -404,3 +404,38 @@ TEST_F(TestDeviceTypeParser, ValidateConfig_BridgedNodeParentNotAggregator)
                                                      { .type = "bridged-node", .endpoint = 2, .parentId = 1 } };
     EXPECT_NE(DeviceTypeParser::ValidateConfig(entries), CHIP_NO_ERROR);
 }
+
+TEST_F(TestDeviceTypeParser, Parse_MultipleCommas)
+{
+    // Verifies that empty option segments (e.g., from multiple commas) are gracefully ignored.
+    EXPECT_EQ(mParser.ParseSingleDeviceString("chime:1,,bridged"), CHIP_NO_ERROR);
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 1U);
+    EXPECT_TRUE(configs[0].bridged);
+}
+
+TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardBridgedSequential)
+{
+    // Verifies that bridged wildcards correctly increment endpoints in pairs (node + device).
+    EXPECT_EQ(mParser.ParseSingleDeviceString("aggregator:1"), CHIP_NO_ERROR);
+    EXPECT_EQ(mParser.ParseSingleDeviceString("*:10,parent=1,bridged"), CHIP_NO_ERROR);
+
+    std::vector<std::string> deviceTypes = { "chime", "speaker" };
+    mParser.ExpandWildcards(deviceTypes);
+
+    const auto & configs = mParser.GetDeviceTypeEntries();
+    EXPECT_EQ(configs.size(), 5U); // 1 (aggregator) + 2 * (bridged-node + device)
+
+    // First pair starting at 10
+    EXPECT_EQ(configs[1].type, "bridged-node");
+    EXPECT_EQ(configs[1].endpoint, 10);
+    EXPECT_EQ(configs[2].type, "chime");
+    EXPECT_EQ(configs[2].endpoint, 11);
+
+    // Second pair starting at 12
+    EXPECT_EQ(configs[3].type, "bridged-node");
+    EXPECT_EQ(configs[3].endpoint, 12);
+    EXPECT_EQ(configs[4].type, "speaker");
+    EXPECT_EQ(configs[4].endpoint, 13);
+}
+
