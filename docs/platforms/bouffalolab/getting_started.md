@@ -215,7 +215,7 @@ source scripts/activate.sh -p bouffalolab
 | `CONFIG_MFD=y/n` | `y` | Enable factory/manufacturing data |
 | `CONFIG_CHIP_ROTATING_DEVICE_ID=y/n` | `n` | Enable rotating device ID |
 | `CONFIG_CHIP_HEAP_MONITOR=y/n` | `n` | Enable heap monitoring |
-| `CONFIG_COREDUMP=y/n` | `n` | Enable SDK coredump capture |
+| `CONFIG_COREDUMP=y/n` | `n` | Enable SDK `coredump` capture |
 | `CONFIG_SHELL=y/n` | `n` | Enable Matter interactive shell |
 
 **Thread-specific flags (lighting-app only):**
@@ -254,7 +254,7 @@ make -C examples/<app>/bouffalolab CONFIG_WIFI=y flash MFD_FILE=/path/to/mfd.bin
 
 ### Using build_examples.py
 
-`build_examples.py` remains supported for Bouffalo Lab platforms. For BL61X
+`build_examples.py` remains supported for `Bouffalo Lab` platforms. For BL61X
 `bouffalo_sdk` + Matter targets, it invokes the same CMake/Makefile build and
 then places generated artifacts and flashing scripts under the standard Matter
 output directory, `out/<target>`. For `BL_IOT_SDK` + Matter targets,

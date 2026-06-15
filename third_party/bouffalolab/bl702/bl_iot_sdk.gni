@@ -722,7 +722,9 @@ template("bl_iot_sdk") {
       sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_littlefs.c" ]
     }
 
-    libs = [ "${bl_iot_sdk_root}/components/network/lmac154/lmac154/lib/liblmac154.a" ]
+    libs = [
+      "${bl_iot_sdk_root}/components/network/lmac154/lmac154/lib/liblmac154.a",
+    ]
 
     configs += [
       ":${sdk_target_name}_config",

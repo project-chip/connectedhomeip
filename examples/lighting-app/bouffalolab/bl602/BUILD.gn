@@ -87,7 +87,8 @@ bl_iot_sdk("sdk") {
 }
 
 chip_data_model("bouffalolab-lighting") {
-  zap_file = "${chip_root}/examples/lighting-app/lighting-common/lighting-app.zap"
+  zap_file =
+      "${chip_root}/examples/lighting-app/lighting-common/lighting-app.zap"
   is_server = true
 }
 

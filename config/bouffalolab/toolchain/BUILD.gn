@@ -20,4 +20,3 @@ riscv_toolchain("riscv_gcc") {
   toolchain_args = {
   }
 }
-

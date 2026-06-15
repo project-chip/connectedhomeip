@@ -13,8 +13,8 @@ Identify cluster control.
 | `bl602dk` | BL602 | Wi-Fi | IoT SDK | Matter GN (`build_examples.py`) |
 | `bl706dk` | BL702 | Wi-Fi / Thread / Ethernet | IoT SDK | Matter GN (`build_examples.py`) |
 | `bl704ldk` | BL702L | Thread | IoT SDK | Matter GN (`build_examples.py`) |
-| `bl616dk` | BL616 | Wi-Fi / Thread / Ethernet | Bouffalo SDK | CMake (`make`) |
-| `bl616cldk` | BL616CL | Wi-Fi | Bouffalo SDK | CMake (`make`) |
+| `bl616dk` | BL616 | Wi-Fi / Thread / Ethernet | `Bouffalo SDK` | CMake (`make`) |
+| `bl616cldk` | BL616CL | Wi-Fi | `Bouffalo SDK` | CMake (`make`) |
 
 ---
 
@@ -92,7 +92,7 @@ BL616 / BL616CL
   be enabled for each build.
 - **Commissioning**: BLE for Wi-Fi and Thread; on-network commissioning for
   Ethernet.
-- **SDK**: Bouffalo SDK
+- **SDK**: `Bouffalo SDK`
 
 ---
 
@@ -183,9 +183,9 @@ Flash BL702L Thread:
 
 ---
 
-## Build and Flash with Bouffalo SDK
+## Build and Flash with `Bouffalo SDK`
 
-The BL616 and BL616CL targets use a Bouffalo SDK + Matter CMake hybrid build.
+The BL616 and BL616CL targets use a `Bouffalo SDK` + Matter CMake hybrid build.
 
 Activate the build environment first:
 
@@ -234,7 +234,7 @@ make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y CONFIG_MFD=n
 | `CONFIG_SHELL=y/n` | `n` | Enable Matter interactive shell |
 | `CONFIG_CHIP_ROTATING_DEVICE_ID=y/n` | `n` | Enable rotating device ID |
 | `CONFIG_CHIP_HEAP_MONITOR=y/n` | `n` | Enable heap monitoring |
-| `CONFIG_COREDUMP=y/n` | `n` | Enable SDK coredump capture |
+| `CONFIG_COREDUMP=y/n` | `n` | Enable SDK `coredump` capture |
 | `CONFIG_OT_FTD=1/0` | `1` | Enable or disable Thread FTD mode |
 | `CONFIG_OT_MTD=1/0` | `0` | Enable or disable Thread MTD mode |
 

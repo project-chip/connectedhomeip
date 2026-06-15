@@ -78,7 +78,7 @@ BL616 (RISC-V, Wi-Fi 6 + BLE)
 - **Transport**: Wi-Fi with IPv4/IPv6 networking
 - **Commissioning**: BLE → Wi-Fi credential provisioning
 - **Sleep**: PDS (Power-Down Sleep) via `bflb/app_pds.cpp`
-- **Build**: Bouffalo SDK + Matter CMake hybrid build
+- **Build**: `Bouffalo SDK` + Matter CMake hybrid build
 
 ### Build
 

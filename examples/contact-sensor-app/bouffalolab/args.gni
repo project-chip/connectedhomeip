@@ -19,10 +19,10 @@ import("${chip_root}/src/platform/bouffalolab/BFLB/args.gni")
 
 custom_toolchain = "${chip_root}/config/bouffalolab/toolchain:riscv_gcc"
 
-is_debug            = false
+is_debug = false
 
 chip_detail_logging = false
-chip_progress_logging = false 
+chip_progress_logging = false
 chip_error_logging = false
 
 lwip_platform = "external"

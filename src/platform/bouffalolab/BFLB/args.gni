@@ -18,17 +18,17 @@
 
 import("//build_overrides/chip.gni")
 
-chip_device_platform             = "bflb"
-chip_enable_ota_requestor        = true
-chip_build_tests                 = false
+chip_device_platform = "bflb"
+chip_enable_ota_requestor = true
+chip_build_tests = false
 chip_inet_config_enable_tcp_endpoint = false
-chip_mdns                        = "minimal"
+chip_mdns = "minimal"
 
 # Use a single project config header for all Matter subsystems.
-chip_project_config_include        = "<CHIPProjectConfig.h>"
-chip_ble_project_config_include    = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
-chip_inet_project_config_include   = "<CHIPProjectConfig.h>"
+chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 
 # ── lwIP: compiled by bouffalo_sdk cmake, not GN ─────────────────────────────
@@ -36,7 +36,8 @@ chip_system_project_config_include = "<CHIPProjectConfig.h>"
 # compiling lwIP sources.  Headers are provided via MATTER_CFLAGS.
 lwip_platform = "external"
 
-default_configs_extra = [ "${chip_root}/src/platform/bouffalolab/BFLB:bflb_warnings" ]
+default_configs_extra =
+    [ "${chip_root}/src/platform/bouffalolab/BFLB:bflb_warnings" ]
 
 # ── mbedtls: compiled by bouffalo_sdk cmake, not GN ──────────────────────────
 mbedtls_target = "${chip_root}/src/platform/bouffalolab/common:mbedtls_stub"
@@ -45,4 +46,5 @@ mbedtls_target = "${chip_root}/src/platform/bouffalolab/common:mbedtls_stub"
 # Use the official chip_openthread_target escape hatch so GN does not
 # compile any OT code.  The actual OT headers and library come from
 # the SDK build (via MATTER_CFLAGS include paths and cmake link).
-chip_openthread_target = "${chip_root}/src/platform/bouffalolab/common:openthread_stub"
+chip_openthread_target =
+    "${chip_root}/src/platform/bouffalolab/common:openthread_stub"
