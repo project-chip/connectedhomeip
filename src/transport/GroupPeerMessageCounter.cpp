@@ -31,10 +31,21 @@ namespace Transport {
 
 namespace {
 
-void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender & newEntry)
+/// Shift elements right and insert newEntry at front (MRU position), destroying element at oldIndex.
+///
+/// `oldIndex` specifies which element to destroy; all elements [0..oldIndex) are then shifted right.
+/// `newEntry` is moved into list[0], becoming the most-recently-used entry.
+void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender && newEntry)
 {
     // The element at oldIndex is being overwritten, so we must destroy it first.
-    list[oldIndex].~GroupSender();
+    // Only valid (non-default-constructed) entries need destruction.
+    //
+    // This happens when `FindOrAddPeerFabricFound` inserts at the end of the list
+    // on a non-full list (i.e. element is not yet initialized)
+    if (list[oldIndex].mNodeId != kUndefinedNodeId)
+    {
+        list[oldIndex].~GroupSender();
+    }
 
     // Iterate through and shift all elements before oldIndex 1 to the right.
     // This will free up an empty space at index 0 to add the newEntry.
@@ -49,6 +60,16 @@ void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender & newEntr
     new (&list[0]) GroupSender(std::move(newEntry));
 }
 
+/// Find peer by nodeId (move to MRU) or add it; return counter.
+///
+/// `list` is a list of `maxLimit` items, out of which the first `peerCount` elements are valid.
+/// `nodeId` is searched for and added if not found:
+///   - if found, it gets moved to `list[0]` as the most recently used element
+///   - if not found, it will be inserted at index 0, shifting everything else to the right.
+///     peerCount may increase if space exists, otherwise the LRU entry (at maxLimit - 1) will be evicted
+/// `peerType` is a label used only in eviction log messages.
+///
+/// `counter` is an OUTPUT value, pointing to the PeerMessageCounter of the GroupSender found or inserted.
 CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8_t & peerCount, NodeId nodeId,
                                     chip::Transport::PeerMessageCounter *& counter, const char * peerType)
 {
@@ -63,7 +84,7 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
             if (i > 0)
             {
                 GroupSender temp(list[i]);
-                ShiftAndInsert(list, i, temp);
+                ShiftAndInsert(list, i, std::move(temp));
             }
             counter = &(list[0].msgCounter);
             return CHIP_NO_ERROR;
@@ -75,7 +96,7 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
     temp.mNodeId = nodeId;
     if (peerCount < maxLimit)
     {
-        ShiftAndInsert(list, peerCount, temp);
+        ShiftAndInsert(list, peerCount, std::move(temp));
         peerCount++;
     }
     else
@@ -83,7 +104,7 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
         // Evict LRU
         ChipLogProgress(SecureChannel, "GroupPeerTable: Evicting %s peer " ChipLogFormatX64 " due to table being full", peerType,
                         ChipLogValueX64(list[maxLimit - 1].mNodeId));
-        ShiftAndInsert(list, maxLimit - 1, temp);
+        ShiftAndInsert(list, maxLimit - 1, std::move(temp));
     }
     counter = &(list[0].msgCounter);
     return CHIP_NO_ERROR;
