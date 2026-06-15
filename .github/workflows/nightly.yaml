@@ -59,7 +59,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -231,7 +231,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -267,9 +267,14 @@ jobs:
               with:
                 name: repl-build-data
 
-            - name: Unpack artifacts
-              run: |
-                tar xfJ repl-build-data.tar.xz
+            # OverlayFS (Docker container storage) layer copy-up occasionally causes
+            # "Directory renamed before its status could be extracted" during rapid unpack.
+            - uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
+              name: Unpack artifacts
+              with:
+                  command: tar xfJ repl-build-data.tar.xz
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Generate an argument environment file
               run: |
@@ -398,7 +403,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:

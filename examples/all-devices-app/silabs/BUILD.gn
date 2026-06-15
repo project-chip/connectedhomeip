@@ -23,7 +23,7 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
 
 assert(current_os == "freertos")
 
@@ -112,9 +112,10 @@ silabs_executable("all_devices_app") {
     "${chip_root}/src/data-model-providers/codedriven",
 
     # All devices common targets
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",

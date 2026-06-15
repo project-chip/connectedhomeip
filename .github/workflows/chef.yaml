@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -65,7 +65,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -108,7 +108,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:194
+            image: ghcr.io/project-chip/chip-build-esp32:200
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -137,7 +137,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:194
+            image: ghcr.io/project-chip/chip-build-nrf-platform:200
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -165,7 +165,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:194
+            image: ghcr.io/project-chip/chip-build-telink:200
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
