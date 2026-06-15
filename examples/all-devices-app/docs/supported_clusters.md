@@ -16,7 +16,7 @@ To update or validate this list manually, follow these steps:
 2. **Verify Code-Driven in SDK Status**:
 
     - Search/grep to locate all cluster classes implementing the code-driven
-      model. For example, if using ripgrep (rg):
+      model. For example, if using ripgrep (`rg`):
       `rg -n "public\s+(chip::app::)?DefaultServerCluster" src/app/` and
       `rg -n "public\s+(chip::app::)?ServerClusterInterface" src/app/`
     - Every C++ class found represents a code-driven cluster. Map its cluster ID
@@ -31,7 +31,7 @@ To update or validate this list manually, follow these steps:
 
 3. **Verify Used in All-Devices**:
     - Search/grep to find which clusters are dynamically registered in the
-      all-devices-app. For example, if using ripgrep (rg):
+      all-devices-app. For example, if using ripgrep (`rg`):
       `rg "LazyRegisteredServerCluster<|RegisteredServerCluster<" examples/all-devices-app/`
     - Check where these are registered. They are typically added to the endpoint
       in the device implementation files under
