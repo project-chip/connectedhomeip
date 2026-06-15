@@ -69,7 +69,6 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # Scritp call
 # ./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters/chip-all-clusters-app  --factory-reset --app-args "--KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_3" --script src/python_testing/TC_ACS_3_3.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --string-arg PIXIT.ACS.Event1_NSID:0x4A --string-arg PIXIT.ACS.Event1_TAGID:0x04 --float-arg PIXIT.ACS.Holdtime:30"
 
-
 class TC_ACS_3_3(MatterBaseTest):
     def desc_TC_ACS_3_3(self) -> str:
         return "[TC-ACS-3.3] Attribute Subscription and Event Functionality with DUT as a server"
@@ -158,20 +157,48 @@ class TC_ACS_3_3(MatterBaseTest):
         attr = Clusters.AmbientContextSensing.Attributes
         dev_ctrl = self.default_controller
 
-        # PIXIT input => This is meant for Human Activity Ambient Sensing Event Testing
-        pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", "0x4B")
-        pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", "0x03")
-        log.info("pixit1_nsid: %s", pixit1_nsid)
-        log.info("pixit1_nsid: %s", pixit1_tagid)
-        list_dec = ast.literal_eval(pixit1_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-        namespaceID1 = list_dec
-        list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
-        tag1 = list_dec
-        log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
+        # PIXIT1 input => This is meant for Human Activity Ambient Sensing Event Testing
+        pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
+        if pixit1_nsid is None:
+            namespaceID1 = None
+            tag1 = None
+        else:
+            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+            asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("nsid %s tagid %s", {pixit1_nsid}, {pixit1_tagid})
+            namespaceID1 = ast.literal_eval(pixit1_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            tag1 = ast.literal_eval(pixit1_tagid)  # same as the above
+            log.info("PIXIT input1: %s %s", {namespaceID1}, {tag1})
+
+        # PIXIT2 input => This is meant for Object Identification Ambient Sensing Event Testing
+        pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", None)
+        if pixit2_nsid is None:
+            namespaceID2 = None
+            tag2 = None
+        else:    
+            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
+            asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("nsid %s tagid %s", {pixit2_nsid}, {pixit2_tagid})
+            namespaceID2 = ast.literal_eval(pixit2_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            tag2 = ast.literal_eval(pixit2_tagid)  # same as the above
+            log.info("PIXIT input2: %s %s", {namespaceID2}, {tag2})
+
+        # PIXIT3 input => This is meant for Object Identification Ambient Sensing Event Testing
+        pixit3_nsid = self.user_params.get("PIXIT.ACS.Event3_NSID", None)
+        if pixit3_nsid is None:
+            namespaceID3 = None
+            tag3 = None
+        else:    
+            pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", None)
+            asserts.assert_not_equal(pixit3_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("nsid %s tagid %s", {pixit3_nsid}, {pixit3_tagid})
+            namespaceID3 = ast.literal_eval(pixit3_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            tag3 = ast.literal_eval(pixit3_tagid)  # same as the above
+            log.info("PIXIT input3: %s %s", {namespaceID3}, {tag3})
 
         # PIXIT HoldTime input
         holdTime_input = self.user_params.get("PIXIT.ACS.Holdtime", 30)
-        # holdTime_input = 30  # 30 seconds
+        #holdTime_input = 30  # 30 seconds
         holdTimeLimits = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits)
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime_input, "Expected to be between HoldTimeMin and HoldTimeMax.")
         asserts.assert_less_equal(holdTime_input, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
@@ -200,12 +227,15 @@ class TC_ACS_3_3(MatterBaseTest):
         log.info("Rx'd PredictedActivitySupported: %s", {self.PredictedActivitySupported})
 
         # Add AmbientContextSupported elements based on DUT capability for ci
-        # Human activity walking, Object identification person, Audio identification barking <= HARD CODED NEED TO BE CHANGED BASED ON DUT CAPABILITY
+        # Human activity walking, Object identification person, Audio identification barking <= HARD CODE ADDED FOR CI CALL
         if self.is_ci:
             self.write_to_app_pipe(
-                '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
-            # f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":3}},{{"TypeId":74, "TagId":4}},{{"TypeId":75, "TagId":3}}]}}')
+                #'{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":75, "TagId":3},{"TypeId":74, "TagId":3},{"TypeId":73,"TagId":4}]}')
+                f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}},{{"TypeId":75, "TagId":3}}]}}')
+                #f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}},{{"TypeId":{namespaceID2}, "TagId":{tag2}}},{{"TypeId":{namespaceID3}, "TagId":{tag3}}}]}}')
             await asyncio.sleep(1)
+        ambientContextTypeSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
 
         self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds.")
         attribute_list = await self.read_single_attribute_check_success(
@@ -237,7 +267,7 @@ class TC_ACS_3_3(MatterBaseTest):
             # Human activity walking for ci
             if self.is_ci:
                 self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
+                    #'{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
                     f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
                 # Add 1 second delay to make sure it's done
                 await asyncio.sleep(1)
@@ -267,7 +297,7 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("3d", "TH receives AmbientContextDetectStarted event and reads AmbientContextDetected field. Verify that the AmbientContextSensed struct data of AmbientContextDetected field contains the namespace ID and tag ID of the step 3b triggering event. Store the event time generated by this AmbientContextDetectStarted event.")
             # Check if AmbientContextDetectStarted event is detected
             event = event_listener.get_last_event()
-            # log.info(f"eventheader: {event}")
+            #log.info(f"eventheader: {event}")
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             # check event field is sent correctly.
@@ -281,11 +311,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("3e", "Wait until HoldTime seconds expires from the step 3b.")
             # timer ends
             end_time = time.perf_counter()
-            elapsed_time = start_time - end_time
+            elapsed_time = end_time - start_time
             if elapsed_time > holdTime_input:
                 log.info("The event testing wasn't completed within HoldTime input.")
             else:
-                log.info("Waiting for the HoldTime input to expire.")
+                log.info("Waiting for the HoldTime input to expire for %s seconds.", holdTime_input-elapsed_time+1)
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
 
             self.step("3f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 3d.")
@@ -315,7 +345,7 @@ class TC_ACS_3_3(MatterBaseTest):
         log.info("Cleared accumulated reports. Restarting accumulation.")
 
         # Object Identification Feature Supported =======================================================================
-        if (namespaceID1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
+        if (namespaceID2 == OBJECT_IDENTIFICATION_NAMESPACE_ID) & self.ObjectIdentificationSupported:
             self.step("4a", "If DUT supports Object Identification feature, check if DUT is under the undetected ObjectIdentified attribute state.")
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
@@ -326,12 +356,12 @@ class TC_ACS_3_3(MatterBaseTest):
             # Object Identification person for ci
             if self.is_ci:
                 self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
+                    #'{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
+                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
                 await asyncio.sleep(1)
             else:
                 self.wait_for_user_input(
-                    prompt_msg="Type any letter and press ENTER after a human activity ambient sensing event is triggered.")
+                    prompt_msg="Type any letter and press ENTER after an object identification ambient sensing event is triggered.")
             # event timer start
             start_time = time.perf_counter()
 
@@ -344,35 +374,35 @@ class TC_ACS_3_3(MatterBaseTest):
 
             # check the subscription of AmbientContextType attribute
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][0].value
-            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].namespaceID == namespaceID1,
+            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].namespaceID == namespaceID2,
                                 f"Unexpected namespaceID, {subscription_expected[0].ambientContextSensed[0].namespaceID}, exp {namespaceID1}")
-            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag1,
-                                f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag1}")
+            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag2,
+                                f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag2}")
             log.info("Received attribute report for AmbientContextType.")
 
             self.step("4d", "TH receives AmbientContextDetectStarted event and reads AmbientContextDetected field. Verify that the AmbientContextSensed struct data of AmbientContextDetected field contains the namespace ID and tag ID of the step 3b triggering event. Store the event time generated by this AmbientContextDetectStarted event.")
             # Check if AmbientContextDetectStarted event is detected
             event = event_listener.get_last_event()
-            # log.info(f"eventheader: {event}")
+            #log.info(f"eventheader: {event}")
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             # check event field is sent correctly.
             asserts.assert_equal(
-                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID1, "Wrong NamespaceID")
-            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag1, "Wrong Tag")
+                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID2, "Wrong NamespaceID")
+            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag2, "Wrong Tag")
             # save the event start time.
             event_start_time = event.Header.Timestamp
             log.info("event time from AmbientContextDetectStarted : %s", {event_start_time})
-            # log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
+            #log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
 
             self.step("4e", "Wait until HoldTime seconds expires from the step 4b.")
             # timer ends
             end_time = time.perf_counter()
-            elapsed_time = start_time - end_time
+            elapsed_time = end_time - start_time
             if elapsed_time > holdTime_input:
                 log.info("The event testing wasn't completed within HoldTime input.")
             else:
-                log.info("Waiting for the HoldTime input to expire.")
+                log.info("Waiting for the HoldTime input to expire for %s seconds.", holdTime_input-elapsed_time+1)
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
 
             self.step("4f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 4d.")
@@ -401,7 +431,7 @@ class TC_ACS_3_3(MatterBaseTest):
         log.info("Cleared accumulated reports. Restarting accumulation.")
 
         # Sound Identification Feature Supported =======================================================================
-        if (namespaceID1 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
+        if (namespaceID3 == SOUND_IDENTIFICATION_NAMESPACE_ID) & self.SoundIdentificationSupported:
             self.step("5a", "If DUT supports Sound Identification feature, check if DUT is under the undetected AudioContextDetected attribute state.")
             # initial
             audioContextDetected = await self.read_single_attribute_check_success(
@@ -413,13 +443,13 @@ class TC_ACS_3_3(MatterBaseTest):
             # Sound Identification barking for ci
             if self.is_ci:
                 self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":74, "TagId":4}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
+                    #'{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":74, "TagId":4}]}')
+                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID3}, "TagId":{tag3}}}]}}')
                 # Add 1 second delay to make sure it's done
                 await asyncio.sleep(1)
             else:
                 self.wait_for_user_input(
-                    prompt_msg="Type any letter and press ENTER after a human activity ambient sensing event is triggered.")
+                    prompt_msg="Type any letter and press ENTER after an audio ambient sensing event is triggered.")
             # event timer start
             start_time = time.perf_counter()
 
@@ -432,35 +462,35 @@ class TC_ACS_3_3(MatterBaseTest):
 
             # check the subscription of AmbientContextType attribute
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][0].value
-            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].namespaceID == namespaceID1,
-                                f"Unexpected namespaceID, {subscription_expected[0].ambientContextSensed[0].namespaceID}, exp {namespaceID1}")
-            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag1,
-                                f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag1}")
+            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].namespaceID == namespaceID3,
+                                f"Unexpected namespaceID, {subscription_expected[0].ambientContextSensed[0].namespaceID}, exp {namespaceID3}")
+            asserts.assert_true(subscription_expected[0].ambientContextSensed[0].tag == tag3,
+                                f"Unexpected tag, {subscription_expected[0].ambientContextSensed[0].tag}, exp {tag3}")
             log.info("Received attribute report for AmbientContextType.")
 
             self.step("5d", "TH receives AmbientContextDetectStarted event and reads AmbientContextDetected field. Verify that the AmbientContextSensed struct data of AmbientContextDetected field contains the namespace ID and tag ID of the step 5b triggering event. Store the event time generated by this AmbientContextDetectStarted event.")
             # Check if AmbientContextDetectStarted event is detected
             event = event_listener.get_last_event()
-            # log.info(f"eventheader: {event}")
+            #log.info(f"eventheader: {event}")
             asserts.assert_equal(event.Header.EventId, cluster.Events.AmbientContextDetectStarted.event_id,
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             # check event field is sent correctly.
             asserts.assert_equal(
-                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID1, "Wrong NamespaceID")
-            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag1, "Wrong Tag")
+                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID3, "Wrong NamespaceID")
+            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag3, "Wrong Tag")
             # save the event start time.
             event_start_time = event.Header.Timestamp
             log.info("event time from AmbientContextDetectStarted : %s", {event_start_time})
-            # log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
+            #log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
 
             self.step("5e", "Wait until HoldTime seconds expires from the step 5b.")
             # timer ends
             end_time = time.perf_counter()
-            elapsed_time = start_time - end_time
+            elapsed_time = end_time - start_time
             if elapsed_time > holdTime_input:
                 log.info("The event testing wasn't completed within HoldTime input.")
             else:
-                log.info("Waiting for the HoldTime input to expire.")
+                log.info("Waiting for the HoldTime input to expire for %s seconds.", holdTime_input-elapsed_time+1)
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
 
             self.step("5f", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys event field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event start time stored from the step 5d.")
@@ -488,7 +518,7 @@ class TC_ACS_3_3(MatterBaseTest):
         log.info("Cleared accumulated reports. Restarting accumulation.")
 
         # Object Counting Feature Supported =======================================================================
-        if (namespaceID1 == OBJECT_IDENTIFICATION_NAMESPACE_ID) and self.ObjectCountingSupported and self.ObjectIdentificationSupported:
+        if (namespaceID2 == OBJECT_IDENTIFICATION_NAMESPACE_ID) and self.ObjectCountingSupported and self.ObjectIdentificationSupported:
             objectcount_input = 2
             self.step("6a", "If DUT supports ObjectCounting and Object Identification feature, prepare DUT with an undetected ObjectCountThresholdReached attribute state.")
 
@@ -498,12 +528,12 @@ class TC_ACS_3_3(MatterBaseTest):
             )
             asserts.assert_true(objectCountThresholdReached is False, "Expected False Boolean value.")
 
-            self.step("6b", "Change DUT ObjectCountThreshold with 2 and the DUT supporting counting object type represented by PIXIT.ACS.Event1.")
+            self.step("6b", "Change DUT ObjectCountThreshold with 2 and the DUT supporting counting object type represented by PIXIT.ACS.Event2.")
             # setting up object counting configuration parameters
             objectcountthreshold_input = 2
-            semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID1, tag=tag1, label=None)
+            semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=None)
             objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
-                countingObject=semantic_tag, objectCountThreshold=objectcountthreshold_input)
+                countingObject=semantic_tag, objectCountThreshold=objectcountthreshold_input)            
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
 
             await asyncio.sleep(1)
@@ -511,10 +541,10 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("6c", "TH awaits a ReportDataMessage containing an attribute report for ObjectCountConfig attribute. Verify that the CountingObject field of ObjectCountConfig attribute contains the namespace ID ant tag ID entered in the step 6b and the ObjectCountThreshold field contains 2")
             # subscription check for ObjectCountConfig
             subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.ObjectCountConfig][0].value
-            asserts.assert_true(subscription_expected.countingObject.namespaceID == namespaceID1,
-                                f"Unexpected namespaceID, {subscription_expected.countingObject.namespaceID}, exp {namespaceID1}")
-            asserts.assert_true(subscription_expected.countingObject.tag == tag1,
-                                f"Unexpected tag, {subscription_expected.countingObject.tag}, exp {tag1}")
+            asserts.assert_true(subscription_expected.countingObject.namespaceID == namespaceID2,
+                                f"Unexpected namespaceID, {subscription_expected.countingObject.namespaceID}, exp {namespaceID2}")
+            asserts.assert_true(subscription_expected.countingObject.tag == tag2,
+                                f"Unexpected tag, {subscription_expected.countingObject.tag}, exp {tag2}")
             asserts.assert_true(subscription_expected.objectCountThreshold == objectcountthreshold_input,
                                 f"Unexpected tag, {subscription_expected.objectCountThreshold}, exp {objectcountthreshold_input}")
             log.info("Received attribute report for ObjectCountConfig.")
@@ -523,16 +553,16 @@ class TC_ACS_3_3(MatterBaseTest):
             # trigger the counting sensing event
             if self.is_ci:
                 self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
+                    #'{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":3}]}')
+                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
                 await asyncio.sleep(1)
                 self.write_to_app_pipe(
                     '{"Name":"SetObjCount","EndpointId":1,"ObjectCount":2}')
-                await asyncio.sleep(1)
+                await asyncio.sleep(1)      
             else:
                 self.wait_for_user_input(
-                    prompt_msg="Type any letter and press ENTER after a human activity ambient sensing event is triggered.")
-
+                    prompt_msg="Type any letter and press ENTER after an object counting ambient sensing event is triggered.")
+                
             # event timer start
             start_time = time.perf_counter()
 
@@ -556,8 +586,8 @@ class TC_ACS_3_3(MatterBaseTest):
                                  f"Wrong event, {event.Header.EventId}, {cluster.Events.AmbientContextDetectStarted.event_id}")
             asserts.assert_equal(event.Data.objectCountThresholdReached, True, "Wrong objectCountReached")
             asserts.assert_equal(
-                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID1, "Wrong NamespaceID")
-            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag1, "Wrong Tag")
+                event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID2, "Wrong NamespaceID")
+            asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag2, "Wrong Tag")
             if event.Data.objectCount != NullValue:
                 asserts.assert_equal(event.Data.objectCount, objectcount_input, "Wrong ObjectCount")
             # event start time
@@ -566,11 +596,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.step("6g", "Wait until HoldTime seconds are passed since step 6d.")
             # timer ends
             end_time = time.perf_counter()
-            elapsed_time = start_time - end_time
+            elapsed_time = end_time - start_time
             if elapsed_time > holdTime_input:
                 log.info("The event testing wasn't completed within HoldTime input.")
             else:
-                log.info("Waiting for the HoldTime input to expire.")
+                log.info("Waiting for the HoldTime input to expire for %s seconds.", holdTime_input-elapsed_time+1)
                 await asyncio.sleep(holdTime_input - elapsed_time + 1)
 
             self.step("6h", "TH receives AmbientContextDetectEnded event and reads EventStartTimePos or EventStartTimeSys field. Verify that the EventStartTimePos or EventStartTimeSys field contains the event time stored from the step 6f.")
