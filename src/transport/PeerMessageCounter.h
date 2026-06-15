@@ -38,7 +38,7 @@ public:
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() { Reset(); }
 
-    PeerMessageCounter& operator=(const PeerMessageCounter& other)
+    PeerMessageCounter & operator=(const PeerMessageCounter & other)
     {
         if (this != &other)
         {
