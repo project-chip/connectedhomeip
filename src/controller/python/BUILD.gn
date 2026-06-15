@@ -244,6 +244,7 @@ pw_python_package("matter-core-module") {
     "matter/ble/library_handle.py",
     "matter/ble/scan_devices.py",
     "matter/ble/types.py",
+    "matter/case_capture/__init__.py",
     "matter/commissioning/__init__.py",
     "matter/commissioning/commissioning_flow_blocks.py",
     "matter/commissioning/pase.py",
@@ -297,12 +298,7 @@ pw_python_package("matter-core-module") {
   }
 
   if (chip_support_commissioning_in_controller) {
-    # case_capture's native bindings (CASECapture.cpp) are only compiled when
-    # chip_support_commissioning_in_controller is set, so only ship the Python module then.
-    sources += [
-      "matter/ChipDeviceCtrl.py",
-      "matter/case_capture/__init__.py",
-    ]
+    sources += [ "matter/ChipDeviceCtrl.py" ]
   } else {
     sources += [ "matter/server/__init__.py" ]
   }
