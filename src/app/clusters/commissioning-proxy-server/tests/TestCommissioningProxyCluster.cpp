@@ -1023,7 +1023,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_A
     // CancelPendingConnect inherits InvalidInState from Delegate base (no pending connect).
     Commands::ProxyDisconnectRequest::Type cmd;
     cmd.sessionID.SetNull();
-    auto result   = tester.Invoke(cmd);
+    auto result = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
 
@@ -1599,8 +1599,8 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_WiFiPAFAndBandWithoutWIFea
     ClusterTester tester(cluster);
     SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
 
-    auto cmd = MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF, 30,
-                                      chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4)));
+    auto cmd    = MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF, 30,
+                                         chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4)));
     auto result = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
@@ -1799,8 +1799,8 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_WiFiBandWithoutWIFeature)
     ClusterTester tester(cluster);
     // A band-only stop (transport=0 + wiFiBands) without the WI feature SHALL be
     // rejected with InvalidCommand by the wiFiBands-requires-WI guard.
-    auto cmd = MakeBgScanStopRequest(static_cast<CapabilitiesBitmap>(0),
-                                     chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4)));
+    auto cmd    = MakeBgScanStopRequest(static_cast<CapabilitiesBitmap>(0),
+                                        chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4)));
     auto result = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));

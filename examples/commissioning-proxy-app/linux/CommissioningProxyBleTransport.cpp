@@ -645,8 +645,8 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     if (hasTimeout)
     {
-        CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout),
-                                                                          OnBleConnect_Timeout, nullptr);
+        CHIP_ERROR timerErr =
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout), OnBleConnect_Timeout, nullptr);
         if (timerErr != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
