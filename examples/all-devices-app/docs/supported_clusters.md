@@ -25,7 +25,7 @@
 | Audio Output                                               | 1291 (0x050B) | No                 | No                  |       |
 | Ballast Configuration                                      | 769 (0x0301)  | No                 | No                  |       |
 | Basic Information                                          | 40 (0x0028)   | Yes                | Yes                 |       |
-| Binding                                                    | 30 (0x001E)   | No                 | No                  |       |
+| Binding                                                    | 30 (0x001E)   | Yes                | No                  |       |
 | Boolean State                                              | 69 (0x0045)   | Yes                | Yes                 |       |
 | Boolean State Configuration                                | 128 (0x0080)  | Yes                | No                  |       |
 | Bridged Device Basic Information                           | 57 (0x0039)   | Yes                | Yes                 |       |
@@ -130,8 +130,8 @@
 | Refrigerator Alarm                                         | 87 (0x0057)   | No                 | No                  |       |
 | Refrigerator And Temperature Controlled Cabinet Mode       | 82 (0x0052)   | No                 | No                  |       |
 | Relative Humidity Measurement                              | 1029 (0x0405) | Yes                | No                  |       |
-| Scenes                                                     | 5 (0x0005)    | Yes                | Yes                 |       |
-| Scenes Management                                          | 98 (0x0062)   | No                 | No                  |       |
+| Scenes                                                     | 5 (0x0005)    | No                 | No                  |       |
+| Scenes Management                                          | 98 (0x0062)   | Yes                | Yes                 |       |
 | Service Area                                               | 336 (0x0150)  | No                 | No                  |       |
 | Smoke CO Alarm                                             | 92 (0x005C)   | Yes                | Yes                 |       |
 | Software Diagnostics                                       | 52 (0x0034)   | Yes                | Yes                 |       |

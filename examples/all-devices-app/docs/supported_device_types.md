@@ -50,14 +50,14 @@
 | Closure Controller                | 574 (0x023E)  | None                                                                               | None (Ready)                                          |       |
 | Closure Panel                     | 561 (0x0231)  | Closure Dimension                                                                  | None (Ready)                                          |       |
 | Color Dimmer Switch               | 261 (0x0105)  | Identify                                                                           | None (Ready)                                          |       |
-| Color Temperature Light           | 268 (0x010C)  | Identify, Groups, On/Off, Level Control, Scenes Management, Color Control          | Scenes Management, Color Control                      |       |
+| Color Temperature Light           | 268 (0x010C)  | Identify, Groups, On/Off, Level Control, Scenes Management, Color Control          | Color Control                                         |       |
 | Commissioning By Proxy            | 146 (0x0092)  | None                                                                               | None (Ready)                                          |       |
 | Content App                       | 36 (0x0024)   | Keypad Input, Application Launcher, Application Basic                              | Keypad Input, Application Launcher, Application Basic |       |
 | Control Bridge                    | 2112 (0x0840) | Identify                                                                           | None (Ready)                                          |       |
 | Cook Surface                      | 119 (0x0077)  | None                                                                               | None (Ready)                                          |       |
 | Cooktop                           | 120 (0x0078)  | On/Off                                                                             | None (Ready)                                          |       |
 | Device Energy Management          | 1293 (0x050D) | Device Energy Management                                                           | None (Ready)                                          |       |
-| Dimmable Plug-In Unit             | 267 (0x010B)  | Identify, Groups, On/Off, Level Control, Scenes Management                         | Scenes Management                                     |       |
+| Dimmable Plug-In Unit             | 267 (0x010B)  | Identify, Groups, On/Off, Level Control, Scenes Management                         | None (Ready)                                          |       |
 | Dimmer Switch                     | 260 (0x0104)  | Identify                                                                           | None (Ready)                                          |       |
 | Dishwasher                        | 117 (0x0075)  | Operational State                                                                  | Operational State                                     |       |
 | Door Lock                         | 10 (0x000A)   | Identify, Door Lock                                                                | Door Lock                                             |       |
@@ -72,7 +72,7 @@
 | Electrical Surge Protector        | 1304 (0x0518) | User Label, Power Topology                                                         | None (Ready)                                          |       |
 | Electrical Utility Meter          | 1297 (0x0511) | Meter Identification                                                               | Meter Identification                                  |       |
 | Energy EVSE                       | 1292 (0x050C) | None                                                                               | None (Ready)                                          |       |
-| Extended Color Light              | 269 (0x010D)  | Identify, Groups, On/Off, Level Control, Scenes Management, Color Control          | Scenes Management, Color Control                      |       |
+| Extended Color Light              | 269 (0x010D)  | Identify, Groups, On/Off, Level Control, Scenes Management, Color Control          | Color Control                                         |       |
 | Extractor Hood                    | 122 (0x007A)  | Fan Control                                                                        | None (Ready)                                          |       |
 | Floodlight Camera                 | 324 (0x0144)  | None                                                                               | None (Ready)                                          |       |
 | Flow Sensor                       | 774 (0x0306)  | Identify, Flow Measurement                                                         | None (Ready)                                          |       |
@@ -90,13 +90,13 @@
 | Meter Reference Point             | 1298 (0x0512) | Identify                                                                           | None (Ready)                                          |       |
 | Microwave Oven                    | 121 (0x0079)  | Operational State, Microwave Oven Mode, Microwave Oven Control                     | Operational State, Microwave Oven Mode                |       |
 | Mode Select                       | 39 (0x0027)   | Mode Select                                                                        | Mode Select                                           |       |
-| Mounted Dimmable Load Control     | 272 (0x0110)  | Identify, Groups, On/Off, Level Control, Scenes Management                         | Scenes Management                                     |       |
-| Mounted On/Off Control            | 271 (0x010F)  | Identify, Groups, On/Off, Scenes Management                                        | Scenes Management                                     |       |
+| Mounted Dimmable Load Control     | 272 (0x0110)  | Identify, Groups, On/Off, Level Control, Scenes Management                         | None (Ready)                                          |       |
+| Mounted On/Off Control            | 271 (0x010F)  | Identify, Groups, On/Off, Scenes Management                                        | None (Ready)                                          |       |
 | OTA Provider                      | 20 (0x0014)   | OTA Software Update Provider                                                       | None (Ready)                                          |       |
 | OTA Requestor                     | 18 (0x0012)   | OTA Software Update Requestor                                                      | None (Ready)                                          |       |
 | On/Off Light Switch               | 259 (0x0103)  | None                                                                               | None (Ready)                                          |       |
 | On/Off Light Switch Device type   | 98 (0x0062)   | Identify                                                                           | None (Ready)                                          |       |
-| On/Off Plug-in Unit               | 266 (0x010A)  | Identify, Groups, On/Off, Scenes Management                                        | Scenes Management                                     |       |
+| On/Off Plug-in Unit               | 266 (0x010A)  | Identify, Groups, On/Off, Scenes Management                                        | None (Ready)                                          |       |
 | On/Off Sensor                     | 2128 (0x0850) | Identify                                                                           | None (Ready)                                          |       |
 | Oven                              | 123 (0x007B)  | None                                                                               | None (Ready)                                          |       |
 | Pressure Sensor                   | 773 (0x0305)  | Identify, Pressure Measurement                                                     | None (Ready)                                          |       |
