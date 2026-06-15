@@ -99,7 +99,7 @@ To update or validate this list manually, follow these steps:
 | Electrical Sensor                 | 1296 (0x0510) | Power Topology                                                                     | None (Ready)                                          |       |
 | Electrical Surge Protector        | 1304 (0x0518) | User Label, Power Topology                                                         | None (Ready)                                          |       |
 | Electrical Utility Meter          | 1297 (0x0511) | Meter Identification                                                               | Meter Identification                                  |       |
-| Energy EVSE                       | 1292 (0x050C) | None                                                                               | None (Ready)                                          |       |
+| Energy EVSE                       | 1292 (0x050C) | Energy EVSE, Energy EVSE Mode                                                      | Energy EVSE Mode                                      |       |
 | Extended Color Light              | 269 (0x010D)  | Identify, Groups, On/Off, Level Control, Scenes Management, Color Control          | Color Control                                         |       |
 | Extractor Hood                    | 122 (0x007A)  | Fan Control                                                                        | None (Ready)                                          |       |
 | Floodlight Camera                 | 324 (0x0144)  | None                                                                               | None (Ready)                                          |       |
@@ -122,7 +122,7 @@ To update or validate this list manually, follow these steps:
 | Mounted On/Off Control            | 271 (0x010F)  | Identify, Groups, On/Off, Scenes Management                                        | None (Ready)                                          |       |
 | OTA Provider                      | 20 (0x0014)   | OTA Software Update Provider                                                       | None (Ready)                                          |       |
 | OTA Requestor                     | 18 (0x0012)   | OTA Software Update Requestor                                                      | None (Ready)                                          |       |
-| On/Off Light Switch               | 259 (0x0103)  | None                                                                               | None (Ready)                                          |       |
+| On/Off Light Switch               | 259 (0x0103)  | Identify                                                                           | None (Ready)                                          |       |
 | On/Off Plug-in Unit               | 266 (0x010A)  | Identify, Groups, On/Off, Scenes Management                                        | None (Ready)                                          |       |
 | On/Off Sensor                     | 2128 (0x0850) | Identify                                                                           | None (Ready)                                          |       |
 | Oven                              | 123 (0x007B)  | None                                                                               | None (Ready)                                          |       |
