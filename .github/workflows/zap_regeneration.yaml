@@ -30,7 +30,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
         defaults:
             run:
                 shell: sh
@@ -38,7 +38,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
               with:
                 submodules: true
             - name: Checkout submodules & Bootstrap
@@ -52,3 +52,8 @@ jobs:
               with:
                 default_author: github_actions
                 message: Regenerating ZAP
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

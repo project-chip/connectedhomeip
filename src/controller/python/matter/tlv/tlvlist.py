@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding=utf-8
 
 #
 #   Copyright (c) 2023 Project CHIP Authors
@@ -20,7 +19,7 @@
 
 import dataclasses
 import enum
-from typing import Any, Iterator, List, Tuple, Union
+from typing import Any, Iterator, Union
 
 
 class TLVList:
@@ -112,12 +111,12 @@ class TLVList:
             res = next(self._iterator)
             return res.tag, res.value
 
-    def __init__(self, items: List[Tuple[Union[int, None], Any]] = []):
+    def __init__(self, items: list[tuple[Union[int, None], Any]] = []):
         """Constructs a TLVList.
 
         items: A list of tuples for the tag and value for the items in the TLVList.
         """
-        self._data: List[TLVList.TLVListItem] = []
+        self._data: list[TLVList.TLVListItem] = []
 
         for tag, val in items:
             self.append(tag, val)

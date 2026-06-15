@@ -123,6 +123,22 @@ RUN set -x \
     && rm -rf bloaty \
     && : # last line
 
+# Build and install OpenSSL 3.5 LTS (post-quantum ML-DSA / ML-KEM support)
+ARG OPENSSL_VERSION=3.5.0
+ARG OPENSSL_SHA256=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
+RUN set -x \
+    && cd /tmp \
+    && wget -q https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz \
+    && echo "${OPENSSL_SHA256}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c - \
+    && tar xzf openssl-${OPENSSL_VERSION}.tar.gz \
+    && cd openssl-${OPENSSL_VERSION} \
+    && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
+    && make -j$(nproc) \
+    && make install_sw \
+    && ldconfig \
+    && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
+    && : # last line
+
 # Stage 1.5: Bootstrap Matter.
 RUN echo "Cloning at commit: ${COMMITHASH}" \
     && git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip \
@@ -284,7 +300,7 @@ RUN pip install --break-system-packages --no-cache-dir \
     python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
     python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
-    python_lib/controller/python/matter*.whl \
+    python_lib/obj/src/controller/python/matter-controller-wheels/*.whl \
     && rm ../python_lib \
     && rm -rf python_lib
 

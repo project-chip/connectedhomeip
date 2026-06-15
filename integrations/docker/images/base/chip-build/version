@@ -1,1 +1,1 @@
-197 : [crosscompile] Bump {armhf,aarch64} sysroot tag to `version:build-2026.05.14`
+202 : [Silabs] Update Silabs Zephyr Docker image (86c6d6a)

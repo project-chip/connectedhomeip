@@ -570,3 +570,493 @@ TEST(TestASN1, FromTLVReader)
 exit:
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
+
+// ---------------------------------------------------------------------------
+// Regression coverage for the behavior change in this PR.
+//
+// The only externally observable contract change is in ASN1Reader::Next() and
+// ASN1Reader::ExitContainer(): an inner element whose declared length overruns
+// its parent container previously caused the reader to advance past
+// mContainerEnd and report ASN1_END (which the ASN1_EXIT_* macros and
+// DumpASN1-style loops treat as a clean end-of-stream, silently swallowing the
+// malformed encoding). It now returns ASN1_ERROR_INVALID_ENCODING.
+//
+// The remaining production changes (the uint32 addition-overflow guards in
+// Next()/ExitContainer()/GetConstructedType()/Get*(), the mContainerEnd >=
+// mElemStart consistency guards, and the EnterContainer/ExitContainer
+// peek-then-commit reordering) are defense-in-depth: DecodeHead already caps
+// ValueLen at the remaining buffer, so mHeadLen + ValueLen cannot wrap a
+// uint32 from any input that reaches these methods through the public API.
+// Those branches are intentionally NOT exercised by fabricated private-state
+// tests -- doing so would only prove the guard fires on states the parser
+// cannot produce. They are exercised indirectly: every positive test below
+// passes through the new guards on its way to a correct result.
+//
+// The GetBitString() signed-shift fix is a separate, real correctness fix and
+// is proven by dedicated tests below (catchable under -fsanitize=shift).
+// ---------------------------------------------------------------------------
+
+// Positive round-trip: build a nested SEQUENCE-in-SEQUENCE, then assert that
+// GetConstructedType reports valLen = HeadLen + ValueLen exactly equal to the
+// byte span of the encoded element in the source buffer. This drives a valid
+// element through the new GetConstructedType() overflow/consistency guards and
+// confirms they do not reject well-formed input.
+TEST(TestASN1, GetConstructedType_RoundTripValidNested)
+{
+    // Hand-rolled DER: SEQUENCE { SEQUENCE { INTEGER 0x42, INTEGER 0x7FFFFFFF } }.
+    //   30 0B                          -- outer SEQUENCE, length 11 (entire inner SEQUENCE)
+    //     30 09                        -- inner SEQUENCE, length 9 (two INTEGERs follow)
+    //       02 01 42                   -- INTEGER 0x42
+    //       02 04 7F FF FF FF          -- INTEGER 0x7FFFFFFF
+    static const uint8_t kEncoded[] = { 0x30, 0x0B, 0x30, 0x09, 0x02, 0x01, 0x42, 0x02, 0x04, 0x7F, 0xFF, 0xFF, 0xFF };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded, sizeof(kEncoded));
+
+    // Position at outer SEQUENCE.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+
+    // Capture pointer + length of the OUTER element via GetConstructedType.
+    const uint8_t * outerVal = nullptr;
+    uint32_t outerLen        = 0;
+    EXPECT_EQ(reader.GetConstructedType(outerVal, outerLen), CHIP_NO_ERROR);
+    EXPECT_EQ(outerVal, &kEncoded[0]);
+    EXPECT_EQ(outerLen, static_cast<uint32_t>(sizeof(kEncoded)));
+
+    // Descend, position on inner SEQUENCE, capture its span.
+    EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+
+    const uint8_t * innerVal = nullptr;
+    uint32_t innerLen        = 0;
+    EXPECT_EQ(reader.GetConstructedType(innerVal, innerLen), CHIP_NO_ERROR);
+    ASSERT_NE(innerVal, nullptr);
+
+    // Inner element must be wholly contained inside the outer element's reported
+    // span, and its first byte must be the SEQUENCE tag (0x30).
+    EXPECT_GE(innerVal, outerVal);
+    EXPECT_LE(innerVal + innerLen, outerVal + outerLen);
+    EXPECT_EQ(innerVal[0], 0x30u);
+
+    // GetConstructedType on a primitive element must fail with INVALID_STATE.
+    EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR); // INTEGER 0x42
+    EXPECT_FALSE(reader.IsConstructed());
+    const uint8_t * v = nullptr;
+    uint32_t vLen     = 0;
+    EXPECT_EQ(reader.GetConstructedType(v, vLen), ASN1_ERROR_INVALID_STATE);
+}
+
+// Edge case: a tag with a 0-byte length (ASN.1 NULL { 0x05, 0x00 }) should be
+// readable, and Next() / EnterContainer / ExitContainer must all advance past it
+// correctly without confusing the reader's position.
+TEST(TestASN1, ASN1Reader_ZeroLengthElements)
+{
+    // SEQUENCE { NULL, NULL, INTEGER 0x2A }
+    //   30 07     -- SEQUENCE, length 7
+    //     05 00   -- NULL
+    //     05 00   -- NULL
+    //     02 01 2A -- INTEGER 42
+    static const uint8_t kEncoded[] = { 0x30, 0x07, 0x05, 0x00, 0x05, 0x00, 0x02, 0x01, 0x2A };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Sequence);
+
+    EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+
+    // First NULL: tag = 0x05, value length = 0.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_FALSE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Null);
+    EXPECT_EQ(reader.GetValueLen(), 0u);
+
+    // Second NULL: same tag, same zero length -- reader must not stall on a 0-length value.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Null);
+    EXPECT_EQ(reader.GetValueLen(), 0u);
+
+    // INTEGER 42 follows immediately after the two zero-length NULLs.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Integer);
+    int64_t intVal = 0;
+    EXPECT_EQ(reader.GetInteger(intVal), CHIP_NO_ERROR);
+    EXPECT_EQ(intVal, 42);
+
+    EXPECT_EQ(reader.Next(), ASN1_END);
+    EXPECT_EQ(reader.ExitConstructedType(), CHIP_NO_ERROR);
+}
+
+// Build a deeply nested SEQUENCE-of-SEQUENCE structure (>5 levels), enter all
+// the way down, then exit all the way back up, asserting CHIP_NO_ERROR at each
+// step. Each ExitContainer passes through the new peek-then-commit unwind.
+TEST(TestASN1, ASN1Reader_DeeplyNestedContainer)
+{
+    // Hand-rolled DER: 6 nested SEQUENCEs wrapping INTEGER 0x55.
+    static const uint8_t kEncoded[] = {
+        0x30, 0x0D, 0x30, 0x0B, 0x30, 0x09, 0x30, 0x07, 0x30, 0x05, 0x30, 0x03, 0x02, 0x01, 0x55,
+    };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded, sizeof(kEncoded));
+
+    constexpr int kDepth = 6; // matches the 6 nested SEQUENCE wrappers above.
+    for (int i = 0; i < kDepth; ++i)
+    {
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR) << "Next() failed at depth " << i;
+        EXPECT_TRUE(reader.IsConstructed()) << "Element at depth " << i << " should be constructed";
+        EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR) << "EnterConstructedType failed at depth " << i;
+    }
+
+    // Innermost element is the INTEGER.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_FALSE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Integer);
+    int64_t intVal = 0;
+    EXPECT_EQ(reader.GetInteger(intVal), CHIP_NO_ERROR);
+    EXPECT_EQ(intVal, 0x55);
+
+    // Climb back out -- every ExitConstructedType must succeed.
+    for (int i = 0; i < kDepth; ++i)
+    {
+        EXPECT_EQ(reader.Next(), ASN1_END) << "Next() at end of depth " << (kDepth - i);
+        EXPECT_EQ(reader.ExitConstructedType(), CHIP_NO_ERROR) << "ExitConstructedType failed at depth " << (kDepth - i);
+    }
+}
+
+// When two elements abut and the second begins exactly at container_end, calling
+// Next() after consuming the last in-range element must report ASN1_END rather
+// than reading past the boundary (exercises the `mElemStart == mContainerEnd`
+// early return; confirms the new bounds guard does NOT misclassify a clean end
+// of container as INVALID_ENCODING).
+TEST(TestASN1, ASN1Reader_AdjacentElementsAtBoundary)
+{
+    //   30 06          SEQUENCE, length 6
+    //     02 01 01     INTEGER 1
+    //     02 01 02     INTEGER 2
+    //   02 01 03       INTEGER 3   <-- starts exactly at the byte after the SEQUENCE
+    static const uint8_t kEncoded[] = { 0x30, 0x06, 0x02, 0x01, 0x01, 0x02, 0x01, 0x02, 0x02, 0x01, 0x03 };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Sequence);
+    EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+
+    int64_t intVal = 0;
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetInteger(intVal), CHIP_NO_ERROR);
+    EXPECT_EQ(intVal, 1);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetInteger(intVal), CHIP_NO_ERROR);
+    EXPECT_EQ(intVal, 2);
+
+    // Next element would start exactly at mContainerEnd -- must be reported as
+    // ASN1_END (clean end of container), NOT INVALID_ENCODING, and must NOT
+    // surface the trailing INTEGER 3.
+    EXPECT_EQ(reader.Next(), ASN1_END);
+
+    // After ExitConstructedType we should see the trailing INTEGER 3.
+    EXPECT_EQ(reader.ExitConstructedType(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Integer);
+    EXPECT_EQ(reader.GetInteger(intVal), CHIP_NO_ERROR);
+    EXPECT_EQ(intVal, 3);
+
+    EXPECT_EQ(reader.Next(), ASN1_END);
+}
+
+// Zero-length elements positioned at container boundaries: a NULL at the very
+// FIRST slot of a SEQUENCE, a NULL at the very LAST slot, and an entirely-empty
+// SEQUENCE {}. Exercises the boundary positions (mElemStart at the start of the
+// container's value bytes; header ending exactly at mContainerEnd; empty
+// container) against the bounds guard.
+TEST(TestASN1, ASN1Reader_ZeroLengthElementsAtContainerBoundaries)
+{
+    // SEQUENCE { NULL, INTEGER 7, NULL }
+    static const uint8_t kEncoded[] = {
+        0x30, 0x07, 0x05, 0x00, 0x02, 0x01, 0x07, 0x05, 0x00,
+    };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Sequence);
+    EXPECT_EQ(reader.GetValueLen(), 7u);
+    EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+
+    // FIRST slot: zero-length NULL at the very start of the container.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_FALSE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Null);
+    EXPECT_EQ(reader.GetValueLen(), 0u);
+
+    // Middle: INTEGER 7.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_FALSE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Integer);
+    int64_t intVal = 0;
+    EXPECT_EQ(reader.GetInteger(intVal), CHIP_NO_ERROR);
+    EXPECT_EQ(intVal, 7);
+
+    // LAST slot: zero-length NULL whose 2-byte header ends exactly at the
+    // SEQUENCE's mContainerEnd.
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Null);
+    EXPECT_EQ(reader.GetValueLen(), 0u);
+
+    EXPECT_EQ(reader.Next(), ASN1_END);
+    EXPECT_EQ(reader.ExitConstructedType(), CHIP_NO_ERROR);
+
+    // Boundary case: SEQUENCE {} with no elements at all.
+    static const uint8_t kEmptySeq[] = { 0x30, 0x00 };
+    ASN1Reader emptyReader;
+    emptyReader.Init(kEmptySeq);
+
+    EXPECT_EQ(emptyReader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(emptyReader.IsConstructed());
+    EXPECT_EQ(emptyReader.GetValueLen(), 0u);
+    EXPECT_EQ(emptyReader.EnterConstructedType(), CHIP_NO_ERROR);
+    EXPECT_EQ(emptyReader.Next(), ASN1_END);
+    EXPECT_EQ(emptyReader.ExitConstructedType(), CHIP_NO_ERROR);
+}
+
+// Boundary regression for ExitContainer's "sum > ContainerEnd" check: when the
+// saved context's ElemStart + HeadLen + ValueLen equals ContainerEnd EXACTLY,
+// ExitContainer must succeed (not return an error). This pins the off-by-one the
+// `<=` comparator must not regress to `<`.
+TEST(TestASN1, ExitContainer_BoundarySumEqualsContainerEnd_Succeeds)
+{
+    // SEQUENCE { OCTET STRING (3 bytes "abc") }
+    //   30 05            -- SEQUENCE, length 5
+    //     04 03 61 62 63 -- OCTET STRING "abc"
+    static const uint8_t kEncoded[] = { 0x30, 0x05, 0x04, 0x03, 0x61, 0x62, 0x63 };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+    EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_OctetString);
+    EXPECT_EQ(reader.GetValueLen(), 3u);
+
+    EXPECT_EQ(reader.Next(), ASN1_END);
+
+    // The regression assertion: ExitContainer must NOT error on the exact-boundary path.
+    EXPECT_EQ(reader.ExitConstructedType(), CHIP_NO_ERROR);
+}
+
+// A SEQUENCE whose declared length overshoots the buffer must be rejected.
+// DecodeHead's `static_cast<uint32_t>(mBufEnd - p) >= ValueLen` bounds check
+// surfaces this through Next() as ASN1_ERROR_VALUE_OVERFLOW before the parser
+// ever enters the container. This is the existing master behavior; the test
+// documents that the new EnterContainer reordering does not regress it.
+TEST(TestASN1, EnterConstructedType_DeclaredLengthExceedsBuffer)
+{
+    //   30 05 02 01 2A  -- SEQUENCE length=5, but body is only 3 bytes.
+    static const uint8_t kEncoded[] = { 0x30, 0x05, 0x02, 0x01, 0x2A };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), ASN1_ERROR_VALUE_OVERFLOW);
+}
+
+// Indefinite-length elements are not supported by ASN1Reader::Next() (DER only).
+// The second Next() must return ASN1_ERROR_UNSUPPORTED_ENCODING and must NOT
+// advance based on the indefinite-length state.
+TEST(TestASN1, Next_IndefiniteLengthRejectedOnSecondCall)
+{
+    //   30 80 ... 00 00  -- SEQUENCE, indefinite length (BER, not DER)
+    static const uint8_t kEncoded[] = { 0x30, 0x80, 0x02, 0x01, 0x2A, 0x00, 0x00 };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+    EXPECT_TRUE(reader.IsIndefiniteLen());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_Sequence);
+
+    // The IndefiniteLen guard at the top of Next() must fire before the
+    // overflow/bounds checks, returning UNSUPPORTED_ENCODING.
+    EXPECT_EQ(reader.Next(), ASN1_ERROR_UNSUPPORTED_ENCODING);
+}
+
+// ---------------------------------------------------------------------------
+// Proving tests for the ASN1_END -> ASN1_ERROR_INVALID_ENCODING contract change.
+//
+// These build REAL DER blobs and FAIL on pre-fix master (where the reader bleeds
+// past mContainerEnd and returns ASN1_END, which callers map to CHIP_NO_ERROR)
+// and PASS post-fix (where Next() returns ASN1_ERROR_INVALID_ENCODING).
+// ---------------------------------------------------------------------------
+
+// DER blob where an inner element declares ValueLen larger than the parent
+// SEQUENCE's remaining bytes WITHOUT wrapping uint32. Pre-fix Next() returned
+// ASN1_END (silently swallowed as clean EOF); post-fix it returns
+// ASN1_ERROR_INVALID_ENCODING.
+TEST(TestASN1, Next_BoundsExceededReturnsErrorNotEnd)
+{
+    //   30 04                     -- outer SEQUENCE, ValueLen = 4
+    //   04 0A 00 ... (10 bytes)   -- inner OCTET STRING, ValueLen = 10 > 2 spare
+    // DecodeHead accepts the inner head because mBufEnd is far enough out; the
+    // bounds check `2 + 10 <= 4 - 2` then fails inside Next().
+    static const uint8_t kEncoded[] = {
+        0x30, 0x04,                                     // outer SEQUENCE, ValueLen = 4
+        0x04, 0x0A,                                     // inner OCTET STRING, ValueLen = 10
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 8 fill bytes so DecodeHead's mBufEnd guard succeeds
+        0x00, 0x00,                                     // 2 more fill bytes
+    };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_TRUE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetValueLen(), 4u);
+    EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+
+    // First Next() decodes the inner OCTET STRING head (HeadLen=2, ValueLen=10).
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_FALSE(reader.IsConstructed());
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_OctetString);
+    EXPECT_EQ(reader.GetValueLen(), 10u);
+
+    // Second Next() now sees mHeadLen=2, ValueLen=10 and must reject the advance:
+    //   2 + 10 = 12  >  (mContainerEnd - mElemStart) = 4 - 2 = 2
+    // Pre-fix this bled past mContainerEnd and returned ASN1_END (which the
+    // ASN1_EXIT_* macros map to CHIP_NO_ERROR, silently swallowing corruption);
+    // post-fix it surfaces as the malformed-encoding error code.
+    CHIP_ERROR err = reader.Next();
+    EXPECT_EQ(err, ASN1_ERROR_INVALID_ENCODING) << "Next() must surface inner-overruns-parent as INVALID_ENCODING, not ASN1_END "
+                                                << "(got " << err.Format() << ")";
+    EXPECT_NE(err, ASN1_END);
+    EXPECT_NE(err, ASN1_ERROR_LENGTH_OVERFLOW);
+}
+
+// DumpASN1-style top-level loop must surface a length-overrun child as a hard
+// parse error (INVALID_ENCODING), not silently terminate via the
+// ASN1_END -> CHIP_NO_ERROR mapping the ASN1_EXIT_* macros perform.
+TEST(TestASN1, DumpLikeLoop_RejectsBoundsOverrun)
+{
+    // Same DER layout as Next_BoundsExceededReturnsErrorNotEnd.
+    static const uint8_t kEncoded[] = {
+        0x30, 0x04,                                     // outer SEQUENCE, ValueLen = 4
+        0x04, 0x0A,                                     // inner OCTET STRING, ValueLen = 10
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 8 fill bytes for DecodeHead's mBufEnd guard
+        0x00, 0x00,                                     // 2 more fill bytes
+    };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    int nestLevel    = 0;
+    bool sawOverflow = false;
+    while (true)
+    {
+        err = reader.Next();
+        if (err != CHIP_NO_ERROR)
+        {
+            // Pre-fix: err == ASN1_END here, the loop would break and the
+            // caller would treat it as clean EOF (corruption swallowed).
+            // Post-fix: err == ASN1_ERROR_INVALID_ENCODING, a hard error.
+            sawOverflow = (err == ASN1_ERROR_INVALID_ENCODING);
+            break;
+        }
+        if (reader.IsConstructed())
+        {
+            EXPECT_EQ(reader.EnterConstructedType(), CHIP_NO_ERROR);
+            nestLevel++;
+        }
+    }
+
+    EXPECT_TRUE(sawOverflow) << "DumpASN1-style loop must surface inner-overruns-parent as INVALID_ENCODING, "
+                             << "not silently terminate via ASN1_END (got " << err.Format() << ")";
+    EXPECT_NE(err, ASN1_END);
+    EXPECT_NE(err, CHIP_NO_ERROR);
+    EXPECT_EQ(nestLevel, 1) << "Should have descended into the outer SEQUENCE before the inner element tripped the guard";
+}
+
+// ---------------------------------------------------------------------------
+// Proving tests for the GetBitString() signed-shift undefined-behavior fix.
+//
+// Pre-fix the inner expression was
+//     static_cast<uint32_t>(ReverseBits(Value[i]) << shift)
+// where the uint8_t result of ReverseBits is integer-promoted to (signed) int
+// BEFORE the shift; a value with bit 7 set, shifted left by 24, sets the sign
+// bit of an int -- undefined behavior, caught by -fsanitize=shift / UBSan.
+//
+// The fix moves the cast inside:
+//     (static_cast<uint32_t>(ReverseBits(Value[i])) << shift)
+// so the shift operates on a uint32_t. These tests use real DER BIT STRINGs and
+// pin the exact bit pattern across every shift offset (8, 16, 24).
+// ---------------------------------------------------------------------------
+
+TEST(TestASN1, GetBitString_HighBitAtMaxShift_NoUndefinedBehavior)
+{
+    //   03 05 00 80 00 00 01  -- BIT STRING, 0 unused bits, 4 data bytes.
+    //   ReverseBits(0x80)=0x01 at shift 0; ReverseBits(0x01)=0x80 at shift 24.
+    //   Expected: 0x80 << 24 | 0x01 == 0x80000001 (the shift-24 high-bit UB case).
+    static const uint8_t kBitStringHighBit[] = { 0x03, 0x05, 0x00, 0x80, 0x00, 0x00, 0x01 };
+
+    ASN1Reader reader;
+    reader.Init(kBitStringHighBit);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_BitString);
+
+    uint32_t bits = 0;
+    EXPECT_EQ(reader.GetBitString(bits), CHIP_NO_ERROR);
+    EXPECT_EQ(bits, 0x80000001u);
+}
+
+TEST(TestASN1, GetBitString_AllBytesHighBit_ExactPattern)
+{
+    //   03 05 00 01 01 01 01  -- ReverseBits(0x01)=0x80, so each of the 4 data
+    //   bytes contributes 0x80 at shifts 0, 8, 16, 24 => outVal = 0x80808080.
+    static const uint8_t kEncoded[] = { 0x03, 0x05, 0x00, 0x01, 0x01, 0x01, 0x01 };
+
+    ASN1Reader reader;
+    reader.Init(kEncoded);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_BitString);
+
+    uint32_t bits = 0;
+    EXPECT_EQ(reader.GetBitString(bits), CHIP_NO_ERROR);
+    EXPECT_EQ(bits, 0x80808080u);
+}
+
+// Edge case: ValueLen == 1 means only the "unused bits" byte is present and
+// there are zero data bytes. The short-circuit branch must return 0 without
+// reading past Value[0].
+TEST(TestASN1, GetBitString_ZeroDataBytes_ReturnsZero)
+{
+    //   03 01 00  -- BIT STRING, length 1, 0 unused bits, no data.
+    static const uint8_t kEmptyBitString[] = { 0x03, 0x01, 0x00 };
+
+    ASN1Reader reader;
+    reader.Init(kEmptyBitString);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetTag(), kASN1UniversalTag_BitString);
+    EXPECT_EQ(reader.GetValueLen(), 1u);
+
+    uint32_t bits = 0xDEADBEEF; // pre-populate to catch "never assigned"
+    EXPECT_EQ(reader.GetBitString(bits), CHIP_NO_ERROR);
+    EXPECT_EQ(bits, 0u);
+}

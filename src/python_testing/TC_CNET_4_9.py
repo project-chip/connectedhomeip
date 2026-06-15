@@ -133,12 +133,12 @@ class TC_CNET_4_9(MatterBaseTest):
         connected_network_count = {}
         networks_dict = await self.read_single_attribute_all_endpoints(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
 
-        log.info(f"Networks by endpoint: {networks_dict}")
+        log.info("Networks by endpoint: %s", networks_dict)
 
         # Verify that there is a single connected network across ALL network commissioning clusters
         for ep in networks_dict:
-            connected_network_count[ep] = sum((x.connected for x in networks_dict[ep]))
-            log.info(f"Connected networks count by endpoint: {connected_network_count}")
+            connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
+            log.info("Connected networks count by endpoint: %s", connected_network_count)
             asserts.assert_equal(sum(connected_network_count.values()), 1,
                                  "Verify that only one entry has connected status as TRUE across ALL endpoints")
 
@@ -201,7 +201,7 @@ class TC_CNET_4_9(MatterBaseTest):
         # Verify that the Networks attribute list has 'NumNetworks' - 1 entries
         expected_num_networks = num_networks - 1
 
-        log.info(f"Network: {networks_after_removal}")
+        log.info("Network: %s", networks_after_removal)
 
         asserts.assert_equal(len(networks_after_removal), expected_num_networks,
                              f"Networks attribute list has {len(networks_after_removal)} entries instead of NumNetworks -1: {expected_num_networks} entries")
@@ -273,7 +273,7 @@ class TC_CNET_4_9(MatterBaseTest):
         # NetworkID is the hex representation of the ASCII values for the value provided in the `--wifi-ssid` parameter
         # Connected is of type bool and has the value true
 
-        log.info(f"Networks: {networks}")
+        log.info("Networks: %s", networks)
 
         for network in networks:
             asserts.assert_equal(network.networkID, ssid.encode(
@@ -325,7 +325,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         networks = await self.read_single_attribute_check_success(cluster=Clusters.NetworkCommissioning, attribute=Clusters.NetworkCommissioning.Attributes.Networks)
 
-        log.info(f"Networks: {networks}")
+        log.info("Networks: %s", networks)
 
         # Verify that the Networks attribute list has 'NumNetworks' - 1 entries and does NOT contain an entry with the NetworkID value provided in the `--wifi-ssid` parameter
         asserts.assert_equal(len(networks), num_networks - 1,

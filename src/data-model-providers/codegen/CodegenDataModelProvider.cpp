@@ -38,6 +38,7 @@
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
@@ -126,6 +127,13 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
+#if CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
+    // Shutdown ember cluster implementations (symmetric to InitDataModelForTesting()
+    // in Startup which creates them). This calls the per-cluster shutdown callbacks
+    // and unregisters AAI/CHI so clusters can be re-created on the next Startup().
+    emAfCallShutdowns(MatterClusterShutdownType::kClusterShutdown);
+    ChipLogProgress(DataManagement, "CodegenDataModelProvider::Shutdown() complete");
+#endif // CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
     Reset();
     mContext.reset();
     mRegistry.ClearContext();

@@ -122,7 +122,11 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         case IP_EVENT_GOT_IP6:
             memcpy(&event.Platform.ESPSystemEvent.Data.IpGotIp6, eventData, sizeof(event.Platform.ESPSystemEvent.Data.IpGotIp6));
             break;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+        case IP_EVENT_ASSIGNED_IP_TO_CLIENT:
+#else
         case IP_EVENT_AP_STAIPASSIGNED:
+#endif
             memcpy(&event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned, eventData,
                    sizeof(event.Platform.ESPSystemEvent.Data.IpApStaIpAssigned));
             break;

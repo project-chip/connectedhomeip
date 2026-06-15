@@ -310,9 +310,20 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
+    mGroupsProvider = initParams.groupDataProvider;
+    SetGroupDataProvider(mGroupsProvider);
+    mGroupsProvider->SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
+
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
     {
+        // If the application handed us an uninitialized delegate (e.g. the default owned by
+        // CommonCaseDeviceServerInitParams), Initialize it now with the Server's FabricTable
+        // so auxiliary-entry iteration walks only provisioned fabric indices.
+        if (!initParams.groupAuxiliaryAccessControlDelegate->IsInitialized())
+        {
+            SuccessOrExit(err = initParams.groupAuxiliaryAccessControlDelegate->Initialize(mGroupsProvider, &mFabrics));
+        }
         SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
     }
     Access::SetAccessControl(mAccessControl);
@@ -326,9 +337,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
-
-    mGroupsProvider = initParams.groupDataProvider;
-    SetGroupDataProvider(mGroupsProvider);
 
     mReportScheduler = initParams.reportScheduler;
 
@@ -908,6 +916,12 @@ void Server::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // EventManagement::Init() guards against double-init with a state check.
+    // Reset it here (after IME shutdown, which may trigger cluster shutdowns
+    // that access EventManagement) so a subsequent Server::Init() can re-initialize it.
+    app::EventManagement::DestroyEventManagement();
+
     // Shut down any remaining sessions (and hence exchanges) before we do any
     // futher teardown.  CASE handshakes have been shut down already via
     // shutting down mCASESessionManager and mCASEServer above; shutting

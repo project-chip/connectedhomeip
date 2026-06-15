@@ -100,12 +100,12 @@ class TC_JFDS_2_2(MatterBaseTest):
             self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
             self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
             self.dut_rpc_server_ip = "127.0.0.1"
-            self.dut_rpc_server_port = "33033"
+            self.dut_rpc_server_port = str(self.get_random_port())
             # Start Fabric A JF-Administrator App
             self.fabric_a_admin = AppServerSubprocess(
                 jfa_server_app,
                 storage_dir=self.storage_fabric_a,
-                port=random.randint(5001, 5999),
+                port=self.get_random_port(),
                 discriminator=self.jfadmin_fabric_a_discriminator,
                 passcode=self.jfadmin_fabric_a_passcode,
                 extra_args=["--capabilities", "0x04", "--rpc-server-port", self.dut_rpc_server_port])
@@ -251,7 +251,7 @@ class TC_JFDS_2_2(MatterBaseTest):
         for endpoint_id, endpoint_data in descriptor_response.items():
             if Clusters.JointFabricDatastore.id in endpoint_data[Clusters.Descriptor].serverList:
                 jfds_endpoint = endpoint_id
-                log.info(f"Found JointFabricDatastore cluster on endpoint {jfds_endpoint}")
+                log.info("Found JointFabricDatastore cluster on endpoint %s", jfds_endpoint)
                 break
 
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
