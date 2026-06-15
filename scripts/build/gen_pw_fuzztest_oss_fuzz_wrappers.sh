@@ -61,7 +61,7 @@ for fuzz_main_file in "$@"; do
     chmod -x "$OUT/$fuzz_basename"
 
     for fuzz_entrypoint in "${fuzz_tests[@]}"; do
-        target_fuzzer="${fuzz_basename}@${fuzz_entrypoint}"
+        target_fuzzer="$fuzz_basename@$fuzz_entrypoint"
         cat >"$OUT/$target_fuzzer" <<EOF
 #!/bin/sh
 # LLVMFuzzerTestOneInput for fuzzer detection.
