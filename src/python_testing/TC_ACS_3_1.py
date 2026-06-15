@@ -176,18 +176,14 @@ class TC_ACS_3_1(MatterBaseTest):
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime_input, "Expected to be between HoldTimeMin and HoldTimeMax.")
         asserts.assert_less_equal(holdTime_input, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
         await self.write_single_attribute(attr.HoldTime(holdTime_input))
-        holdTime = holdTime_input
 
         # Add AmbientContextSupported elements based on DUT capability
-        # Human activity walking, Object identification person, Audio identification barking are default
+        # Human activity walking, Object identification person, Audio identification barking are default <= Hard coded for CI application
         if self.is_ci:
             self.write_to_app_pipe(
                 # '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
                 f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":3}},{{"TypeId":74, "TagId":4}},{{"TypeId":75,"TagId":3}}]}}')
             await asyncio.sleep(1)
-        else:
-            ambientContextTypeSupported = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
 
         # check the SimultaneousDetectLimit
         simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
