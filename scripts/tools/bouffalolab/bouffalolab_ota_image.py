@@ -26,12 +26,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 MATTER_ROOT = Path(__file__).resolve().parents[3]
 
 sys.path.insert(0, str(MATTER_ROOT / "src" / "app"))
 import ota_image_tool  # noqa: E402
-
 
 AUTO_OTA_ENV = "BOUFFALOLAB_AUTO_OTA"
 ENV_NAMES = {
@@ -54,6 +52,7 @@ log = logging.getLogger(__name__)
 def _any_base_int(value):
     return int(str(value).strip("() "), 0)
 
+
 def _strip_c_string(value):
     value = value.strip()
     if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
@@ -67,7 +66,7 @@ def _read_project_config(path):
         return values
 
     define_re = re.compile(r"^\s*#\s*define\s+(\w+)\s+(.+?)\s*(?://.*)?$")
-    with open(path, "r", encoding="utf-8") as config:
+    with open(path, encoding="utf-8") as config:
         for line in config:
             match = define_re.match(line)
             if not match:

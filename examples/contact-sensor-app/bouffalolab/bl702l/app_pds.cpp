@@ -37,23 +37,24 @@ btble_app_conf_t app_pds_conf = {
 };
 
 static uint32_t low_power_pds_lmac154_backup[72];
-static hosal_gpio_dev_t gpio_key                    = { .port = CHIP_RESET_PIN, .config = INPUT_PULL_DOWN, .priv = NULL };
-static hosal_gpio_dev_t gpio_contact                = { .port = CHIP_CONTACT_PIN, .config = INPUT_PULL_DOWN, .priv = NULL };
-static void (* app_pds_irq_handler)(int, bool)      = NULL;
-static int app_pds_wakeup_source                    = -1;
-static uint32_t app_pds_wakeup_pin                  = -1;
+static hosal_gpio_dev_t gpio_key              = { .port = CHIP_RESET_PIN, .config = INPUT_PULL_DOWN, .priv = NULL };
+static hosal_gpio_dev_t gpio_contact          = { .port = CHIP_CONTACT_PIN, .config = INPUT_PULL_DOWN, .priv = NULL };
+static void (*app_pds_irq_handler)(int, bool) = NULL;
+static int app_pds_wakeup_source              = -1;
+static uint32_t app_pds_wakeup_pin            = -1;
 
 extern "C" void btble_pds_fastboot_done_callback(void);
 #if CHIP_DETAIL_LOGGING
 static bool app_pds_is_wakup_from_sleep = false;
 #endif
 
-static void gpio_isr(void *arg) 
+static void gpio_isr(void * arg)
 {
-    uint8_t value = 0;
-    hosal_gpio_dev_t *gpio = (hosal_gpio_dev_t *) arg;
+    uint8_t value           = 0;
+    hosal_gpio_dev_t * gpio = (hosal_gpio_dev_t *) arg;
 
-    if (app_pds_irq_handler) {
+    if (app_pds_irq_handler)
+    {
         hosal_gpio_input_get(gpio, &value);
         app_pds_irq_handler(gpio->port, value);
     }
@@ -69,7 +70,8 @@ static inline uint32_t app_pds_get_lmac154_symbol_counter(void)
     uint32_t seconds    = static_cast<uint32_t>(rtcCounter >> kRtcFrequencyBits);
     uint32_t remainder  = static_cast<uint32_t>(rtcCounter & kRtcCounterMask);
 
-    return (seconds * kSymbolsPerSecond) + (((remainder * kSymbolsPerSecond) + (1UL << (kRtcFrequencyBits - 1))) >> kRtcFrequencyBits);
+    return (seconds * kSymbolsPerSecond) +
+        (((remainder * kSymbolsPerSecond) + (1UL << (kRtcFrequencyBits - 1))) >> kRtcFrequencyBits);
 }
 
 static inline uint32_t app_pds_zb_timer_ticks_to_ms(uint32_t ticks)
@@ -109,7 +111,7 @@ static inline TickType_t app_pds_get_sleep_time(TickType_t xExpectedIdleTime)
 extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
 {
 #if CHIP_DETAIL_LOGGING
-    uint64_t sleep_before = bl_rtc_get_timestamp_ms();
+    uint64_t sleep_before       = bl_rtc_get_timestamp_ms();
     app_pds_is_wakup_from_sleep = false;
 #endif
 
@@ -173,17 +175,17 @@ void app_pds_fastboot_done_callback(void)
     app_pds_wakeup_pin    = bl_pds_get_wakeup_gpio();
 }
 
-
 static inline bool app_pds_is_thread_stack_idle(void)
 {
     bool is_trx_frames_empty = false;
     otRadioState radioState  = OT_RADIO_STATE_DISABLED;
 
-    if (ot_radio_ctx.instance == nullptr) {
+    if (ot_radio_ctx.instance == nullptr)
+    {
         return true;
     }
 
-    uint32_t tag = otrEnterCrit();
+    uint32_t tag        = otrEnterCrit();
     is_trx_frames_empty = (utils_dlist_empty(&ot_radio_ctx.rx_frame_list)) && (ot_radio_ctx.tx_frame == NULL);
     if (otThreadGetDeviceRole(ot_radio_ctx.instance) != OT_DEVICE_ROLE_DISABLED)
     {
@@ -235,7 +237,7 @@ void app_pds_after_sleep_callback(void)
 #endif
 }
 
-void app_pds_init(void (* pinHandler)(int, bool))
+void app_pds_init(void (*pinHandler)(int, bool))
 {
     btble_pds_init(&app_pds_conf);
 

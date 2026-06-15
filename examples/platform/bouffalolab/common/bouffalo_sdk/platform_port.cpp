@@ -24,8 +24,8 @@
 #endif
 
 extern "C" {
-#include <bl_sys.h>
 #include <bflb_mtd.h>
+#include <bl_sys.h>
 #include <board.h>
 }
 #include <plat.h>

@@ -13,9 +13,9 @@
 
 #include <vfs.h>
 #ifdef CFG_USB_CDC_ENABLE
-#include <stdint.h>
 #include <device/vfs_uart.h>
 #include <hal_board.h>
+#include <stdint.h>
 #endif
 
 #include <aos/kernel.h>

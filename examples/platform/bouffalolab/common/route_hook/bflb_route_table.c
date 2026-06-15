@@ -16,7 +16,7 @@ typedef struct route_node
 } route_node_t;
 
 static route_node_t * s_route_list = NULL;
-static size_t s_route_count = 0;
+static size_t s_route_count        = 0;
 
 static route_node_t * find_route_node(const bflb_route_entry_t * route_entry)
 {
@@ -155,8 +155,7 @@ const ip6_addr_t * lwip_hook_nd6_get_gw(struct netif * netif, const ip6_addr_t *
 
     for (route_node_t * node = s_route_list; node != NULL; node = node->next)
     {
-        if (node->entry.netif == netif && route_match(&node->entry, dest) &&
-            is_better_route(&node->entry, route))
+        if (node->entry.netif == netif && route_match(&node->entry, dest) && is_better_route(&node->entry, route))
         {
             route = &node->entry;
         }

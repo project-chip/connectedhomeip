@@ -121,4 +121,4 @@ inline AppTask & GetAppTask(void)
 
 void StartAppTask();
 
-void app_pds_init(void (* pinHandler)(int, bool));
+void app_pds_init(void (*pinHandler)(int, bool));

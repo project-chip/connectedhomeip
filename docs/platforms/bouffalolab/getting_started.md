@@ -83,10 +83,10 @@ Please refer to section `Prerequisites` in
 `Bouffalo Lab` Matter platforms currently use different build systems based on
 the SDK family:
 
-| SDK integration | Platforms | Build system | Recommended build entry |
-|-----------------|-----------|--------------|-------------------------|
+| SDK integration         | Platforms                  | Build system                                                                                    | Recommended build entry                 |
+| ----------------------- | -------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------- |
 | `bouffalo_sdk` + Matter | BL61X, such as BL616/BL618 | CMake build system from `bouffalo_sdk`, with Matter integrated into the SDK application project | CMake/Makefile in the example directory |
-| `BL_IOT_SDK` + Matter | BL602, BL702/BL702L | Matter ninja build system | `scripts/build/build_examples.py` |
+| `BL_IOT_SDK` + Matter   | BL602, BL702/BL702L        | Matter ninja build system                                                                       | `scripts/build/build_examples.py`       |
 
 For `bouffalo_sdk` + Matter, the application is built as a `bouffalo_sdk` CMake
 project. The example Makefile wraps the SDK CMake flow and is the recommended
@@ -194,42 +194,42 @@ source scripts/activate.sh -p bouffalolab
 
 **Lighting app:**
 
-| Command | Description |
-|---------|-------------|
-| `make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y` | Wi-Fi (default) |
-| `make -C examples/lighting-app/bouffalolab CONFIG_THREAD=y` | Thread / OpenThread |
-| `make -C examples/lighting-app/bouffalolab CONFIG_THREAD=y CONFIG_OT_FTD=0 CONFIG_OT_MTD=1` | Thread MTD |
-| `make -C examples/lighting-app/bouffalolab CONFIG_ETHERNET=y` | Ethernet |
-| `make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y CONFIG_SHELL=y` | Wi-Fi + shell |
+| Command                                                                                     | Description         |
+| ------------------------------------------------------------------------------------------- | ------------------- |
+| `make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y`                                   | Wi-Fi (default)     |
+| `make -C examples/lighting-app/bouffalolab CONFIG_THREAD=y`                                 | Thread / OpenThread |
+| `make -C examples/lighting-app/bouffalolab CONFIG_THREAD=y CONFIG_OT_FTD=0 CONFIG_OT_MTD=1` | Thread MTD          |
+| `make -C examples/lighting-app/bouffalolab CONFIG_ETHERNET=y`                               | Ethernet            |
+| `make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y CONFIG_SHELL=y`                    | Wi-Fi + shell       |
 
 **Contact sensor app (Wi-Fi only):**
 
-| Command | Description |
-|---------|-------------|
+| Command                                           | Description         |
+| ------------------------------------------------- | ------------------- |
 | `make -C examples/contact-sensor-app/bouffalolab` | Default Wi-Fi build |
 
 **Optional feature flags (both apps):**
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `CONFIG_MFD=y/n` | `y` | Enable factory/manufacturing data |
-| `CONFIG_CHIP_ROTATING_DEVICE_ID=y/n` | `n` | Enable rotating device ID |
-| `CONFIG_CHIP_HEAP_MONITOR=y/n` | `n` | Enable heap monitoring |
-| `CONFIG_COREDUMP=y/n` | `n` | Enable SDK `coredump` capture |
-| `CONFIG_SHELL=y/n` | `n` | Enable Matter interactive shell |
+| Flag                                 | Default | Description                       |
+| ------------------------------------ | ------- | --------------------------------- |
+| `CONFIG_MFD=y/n`                     | `y`     | Enable factory/manufacturing data |
+| `CONFIG_CHIP_ROTATING_DEVICE_ID=y/n` | `n`     | Enable rotating device ID         |
+| `CONFIG_CHIP_HEAP_MONITOR=y/n`       | `n`     | Enable heap monitoring            |
+| `CONFIG_COREDUMP=y/n`                | `n`     | Enable SDK `coredump` capture     |
+| `CONFIG_SHELL=y/n`                   | `n`     | Enable Matter interactive shell   |
 
 **Thread-specific flags (lighting-app only):**
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `CONFIG_OT_FTD=1/0` | `1` | Enable or disable Thread FTD mode |
-| `CONFIG_OT_MTD=1/0` | `0` | Enable or disable Thread MTD mode |
+| Flag                | Default | Description                       |
+| ------------------- | ------- | --------------------------------- |
+| `CONFIG_OT_FTD=1/0` | `1`     | Enable or disable Thread FTD mode |
+| `CONFIG_OT_MTD=1/0` | `0`     | Enable or disable Thread MTD mode |
 
 **Board selection:**
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `CHIP=<chip>` | `bl616` | BL61X chip name, for example `bl616` or `bl616cl` |
+| Flag            | Default     | Description                                          |
+| --------------- | ----------- | ---------------------------------------------------- |
+| `CHIP=<chip>`   | `bl616`     | BL61X chip name, for example `bl616` or `bl616cl`    |
 | `BOARD=<board>` | `${CHIP}dk` | SDK board name, for example `bl616dk` or `bl616cldk` |
 
 **Clean and rebuild:**
@@ -247,10 +247,9 @@ make -C examples/<app>/bouffalolab CONFIG_WIFI=y flash MFD_FILE=/path/to/mfd.bin
 
 > The CMake build for BL61X is the primary and recommended build method for
 > product application development. `build_examples.py` is compatible with BL61X
-> and dispatches to the same CMake/Makefile build internally.
-> For the full list of available build options, please refer to the `Makefile` in
-> the example directory
-> (`examples/<app>/bouffalolab/Makefile`).
+> and dispatches to the same CMake/Makefile build internally. For the full list
+> of available build options, please refer to the `Makefile` in the example
+> directory (`examples/<app>/bouffalolab/Makefile`).
 
 ### Using build_examples.py
 

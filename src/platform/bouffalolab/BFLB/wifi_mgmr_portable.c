@@ -8,7 +8,8 @@
 #include <bl618dg.h>
 #include <bl618dg_glb.h>
 #else
-#error "bouffalo_sdk chip macro (BL616/BL616CL/BL618DG) not defined; check that bouffalo_sdk cmake propagates the chip macro into MATTER_CFLAGS"
+#error                                                                                                                             \
+    "bouffalo_sdk chip macro (BL616/BL616CL/BL618DG) not defined; check that bouffalo_sdk cmake propagates the chip macro into MATTER_CFLAGS"
 #endif
 
 #include <FreeRTOS.h>

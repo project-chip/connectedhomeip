@@ -21,8 +21,8 @@ address0 = 0x3FE000
 size0 = 0x1000
 ```
 
-To enable matter factory data feature for BL61X `bouffalo_sdk` CMake builds,
-use `CONFIG_MFD=y`. This is enabled by default in the BL61X example Makefiles.
+To enable matter factory data feature for BL61X `bouffalo_sdk` CMake builds, use
+`CONFIG_MFD=y`. This is enabled by default in the BL61X example Makefiles.
 
 ```shell
 make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y CONFIG_MFD=y

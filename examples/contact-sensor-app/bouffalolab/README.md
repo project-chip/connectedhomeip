@@ -7,10 +7,10 @@ Product ID: **0x8005**), supporting BooleanState cluster reporting via GPIO.
 
 ## Supported Targets
 
-| Board | Chip | Transport | Build system |
-|-------|------|-----------|--------------|
-| `bl704ldk` | BL704L | Thread | Matter GN (`build_examples.py`) |
-| `bl616dk` | BL616 | Wi-Fi | CMake (`make`) |
+| Board      | Chip   | Transport | Build system                    |
+| ---------- | ------ | --------- | ------------------------------- |
+| `bl704ldk` | BL704L | Thread    | Matter GN (`build_examples.py`) |
+| `bl616dk`  | BL616  | Wi-Fi     | CMake (`make`)                  |
 
 ---
 
@@ -28,12 +28,13 @@ BL704L
     └── CHIP_CONTACT_PIN (GPIO 20) — rising edge = true, falling = false
 ```
 
-> `CHIP_CONTACT_PIN` should be pulled down to a low level; otherwise, the device may wake up unexpectedly.
+> `CHIP_CONTACT_PIN` should be pulled down to a low level; otherwise, the device
+> may wake up unexpectedly.
 
-- **Transport**: Thread with IPv6 networking
-- **Commissioning**: BLE → Thread credential provisioning
-- **Sleep**: PDS (Power-Down Sleep) via `app_pds.cpp`
-- **Build**: Matter GN build system, managed by `build_examples.py`
+-   **Transport**: Thread with IPv6 networking
+-   **Commissioning**: BLE → Thread credential provisioning
+-   **Sleep**: PDS (Power-Down Sleep) via `app_pds.cpp`
+-   **Build**: Matter GN build system, managed by `build_examples.py`
 
 ### Build
 
@@ -51,7 +52,8 @@ Build with Thread MTD (Minimal Thread Device, lower power):
     build
 ```
 
-The output binary is placed under `out/bouffalolab-bl704ldk-contact-sensor-thread-mtd-littlefs/`.
+The output binary is placed under
+`out/bouffalolab-bl704ldk-contact-sensor-thread-mtd-littlefs/`.
 
 ### Flash
 
@@ -75,10 +77,10 @@ BL616 (RISC-V, Wi-Fi 6 + BLE)
     └── CHIP_CONTACT_PIN (GPIO 20) — rising edge = true, falling = false
 ```
 
-- **Transport**: Wi-Fi with IPv4/IPv6 networking
-- **Commissioning**: BLE → Wi-Fi credential provisioning
-- **Sleep**: PDS (Power-Down Sleep) via `bflb/app_pds.cpp`
-- **Build**: `Bouffalo SDK` + Matter CMake hybrid build
+-   **Transport**: Wi-Fi with IPv4/IPv6 networking
+-   **Commissioning**: BLE → Wi-Fi credential provisioning
+-   **Sleep**: PDS (Power-Down Sleep) via `bflb/app_pds.cpp`
+-   **Build**: `Bouffalo SDK` + Matter CMake hybrid build
 
 ### Build
 
@@ -130,9 +132,8 @@ Commission over BLE with chip-tool, providing Wi-Fi credentials:
     <device_node_id> <wifi_ssid> <wifi_passwd> 20202021 3840
 ```
 
-> `<device_node_id>` — node ID assigned to the device;<br>
-> `<wifi_ssid>` — Wi-Fi network SSID;<br>
-> `<wifi_passwd>` — Wi-Fi network password.
+> `<device_node_id>` — node ID assigned to the device;<br> > `<wifi_ssid>` —
+> Wi-Fi network SSID;<br> > `<wifi_passwd>` — Wi-Fi network password.
 
 ---
 
@@ -150,9 +151,9 @@ Subscribe to the BooleanState attribute:
 booleanstate subscribe state-value <min-interval> <max-interval> <device_node_id> 1
 ```
 
-- `<min-interval>` — minimum reporting interval (seconds)
-- `<max-interval>` — maximum reporting interval (seconds)
-- `<device_node_id>` — node ID of the contact sensor
+-   `<min-interval>` — minimum reporting interval (seconds)
+-   `<max-interval>` — maximum reporting interval (seconds)
+-   `<device_node_id>` — node ID of the contact sensor
 
 Trigger state changes by pressing the contact GPIO button.
 
@@ -160,7 +161,7 @@ Trigger state changes by pressing the contact GPIO button.
 
 ## References
 
-- [Bouffalo Lab — Platform overview](../../../docs/platforms/bouffalolab/platform_overview.md)
-- [Bouffalo Lab — Getting Started](../../../docs/platforms/bouffalolab/getting_started.md)
-- [Bouffalo Lab — OTA upgrade](../../../docs/platforms/bouffalolab/ota_upgrade.md)
-- [Bouffalo Lab — Matter factory data](../../../docs/platforms/bouffalolab/matter_factory_data.md)
+-   [Bouffalo Lab — Platform overview](../../../docs/platforms/bouffalolab/platform_overview.md)
+-   [Bouffalo Lab — Getting Started](../../../docs/platforms/bouffalolab/getting_started.md)
+-   [Bouffalo Lab — OTA upgrade](../../../docs/platforms/bouffalolab/ota_upgrade.md)
+-   [Bouffalo Lab — Matter factory data](../../../docs/platforms/bouffalolab/matter_factory_data.md)

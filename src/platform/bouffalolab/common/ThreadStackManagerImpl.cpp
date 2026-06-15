@@ -72,7 +72,7 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 namespace Internal {
 
-#if !CHIP_DEVICE_LAYER_TARGET_BFLB && defined (CFG_PDS_ENABLE)
+#if !CHIP_DEVICE_LAYER_TARGET_BFLB && defined(CFG_PDS_ENABLE)
 static inline uint32_t GetRtcSymbolCounter()
 {
     constexpr uint32_t kRtcFrequencyBits = 15;
@@ -83,8 +83,8 @@ static inline uint32_t GetRtcSymbolCounter()
     uint32_t seconds    = static_cast<uint32_t>(rtcCounter >> kRtcFrequencyBits);
     uint32_t remainder  = static_cast<uint32_t>(rtcCounter & kRtcCounterMask);
 
-    return (seconds * kSymbolsPerSecond) + (((remainder * kSymbolsPerSecond) + (1UL << (kRtcFrequencyBits - 1))) >>
-                                            kRtcFrequencyBits);
+    return (seconds * kSymbolsPerSecond) +
+        (((remainder * kSymbolsPerSecond) + (1UL << (kRtcFrequencyBits - 1))) >> kRtcFrequencyBits);
 }
 #endif
 
@@ -179,7 +179,8 @@ void otSysProcessDrivers(otInstance * aInstance)
 {
     ot_system_event_t sevent = otrGetNotifyEvent();
 
-    if (sevent) {
+    if (sevent)
+    {
         ot_alarmTask(sevent);
         ot_radioTask(sevent);
     }

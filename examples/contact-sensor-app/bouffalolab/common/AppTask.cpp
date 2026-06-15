@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -25,7 +26,6 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 #if HEAP_MONITORING
 #include "MemMonitoring.h"

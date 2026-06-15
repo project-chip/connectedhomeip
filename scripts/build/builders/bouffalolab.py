@@ -471,7 +471,7 @@ class BouffalolabBflbBuilder(Builder):
                  ):
         if app == BouffalolabApp.CONTACT and not enable_wifi:
             raise Exception('contact-sensor-app bflb build only supports WiFi.')
-        elif [enable_wifi, enable_thread, enable_ethernet].count(True) != 1:
+        if [enable_wifi, enable_thread, enable_ethernet].count(True) != 1:
             raise Exception(
                 'Exactly one of wifi/thread/ethernet must be enabled for the bflb build.')
 

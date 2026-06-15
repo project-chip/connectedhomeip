@@ -6,11 +6,11 @@
 
 -   BL616/BL618
 
-    BL616/BL618 is combo chip-set for Wi-Fi 6, Classic Bluetooth, Bluetooth low energy
-    5.3 and IEEE 802.15.4/ZigBee/Thread.
+    BL616/BL618 is combo chip-set for Wi-Fi 6, Classic Bluetooth, Bluetooth low
+    energy 5.3 and IEEE 802.15.4/ZigBee/Thread.
 
-    BL616/BL618 has fully certified with all Thread 1.3 features, included Thread
-    `SSED` and Thread Border Router.
+    BL616/BL618 has fully certified with all Thread 1.3 features, included
+    Thread `SSED` and Thread Border Router.
 
 -   BL616CL
 

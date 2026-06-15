@@ -480,7 +480,8 @@ def main():
     parser.add_argument("--product_part_no", type=str, default="", help="Product Part number, optional.")
     parser.add_argument("--product_url", type=str, default="", help="Product Web URL, optional.")
     parser.add_argument("--product_label", type=str, default="", help="Product Label, optional.")
-    parser.add_argument("--manufacturing_date", type=str, default=datetime.now().strftime("%Y-%m-%d"), help="Manufacturing Date in YYYY-MM-DD format, optional.")
+    parser.add_argument("--manufacturing_date", type=str, default=datetime.now().strftime("%Y-%m-%d"),
+                        help="Manufacturing Date in YYYY-MM-DD format, optional.")
     parser.add_argument("--hardware_version", type=int, default=1, help="Hardware Version, optional.")
     parser.add_argument("--hardware_version_string", type=str, default="prerelease", help="Hardware Version String, optional.")
     parser.add_argument("--rendezvous", type=int, default=6, help="Rendezvous Mode for QR code generation")

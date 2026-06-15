@@ -8,13 +8,13 @@ Identify cluster control.
 
 ## Supported Targets
 
-| Board | Chip | Transport | SDK | Build system |
-|-------|------|-----------|-----|--------------|
-| `bl602dk` | BL602 | Wi-Fi | IoT SDK | Matter GN (`build_examples.py`) |
-| `bl706dk` | BL702 | Wi-Fi / Thread / Ethernet | IoT SDK | Matter GN (`build_examples.py`) |
-| `bl704ldk` | BL702L | Thread | IoT SDK | Matter GN (`build_examples.py`) |
-| `bl616dk` | BL616 | Wi-Fi / Thread / Ethernet | `Bouffalo SDK` | CMake (`make`) |
-| `bl616cldk` | BL616CL | Wi-Fi | `Bouffalo SDK` | CMake (`make`) |
+| Board       | Chip    | Transport                 | SDK            | Build system                    |
+| ----------- | ------- | ------------------------- | -------------- | ------------------------------- |
+| `bl602dk`   | BL602   | Wi-Fi                     | IoT SDK        | Matter GN (`build_examples.py`) |
+| `bl706dk`   | BL702   | Wi-Fi / Thread / Ethernet | IoT SDK        | Matter GN (`build_examples.py`) |
+| `bl704ldk`  | BL702L  | Thread                    | IoT SDK        | Matter GN (`build_examples.py`) |
+| `bl616dk`   | BL616   | Wi-Fi / Thread / Ethernet | `Bouffalo SDK` | CMake (`make`)                  |
+| `bl616cldk` | BL616CL | Wi-Fi                     | `Bouffalo SDK` | CMake (`make`)                  |
 
 ---
 
@@ -31,9 +31,9 @@ BL602
     └── LED_PIN          (GPIO 0) - on/off lighting output
 ```
 
-- **Transport**: Wi-Fi with IPv4/IPv6 networking
-- **Commissioning**: BLE -> Wi-Fi credential provisioning
-- **SDK**: IoT SDK
+-   **Transport**: Wi-Fi with IPv4/IPv6 networking
+-   **Commissioning**: BLE -> Wi-Fi credential provisioning
+-   **SDK**: IoT SDK
 
 ### BL702 + Wi-Fi / Thread / Ethernet
 
@@ -50,12 +50,12 @@ BL702
     └── LED_PIN          (GPIO 22) - on/off lighting output
 ```
 
-- **Transport**: Wi-Fi, Thread, or Ethernet; exactly one network interface must
-  be enabled for each build. Wi-Fi uses a BL602 network processor connected over
-  SPI.
-- **Commissioning**: BLE for Wi-Fi and Thread; on-network commissioning for
-  Ethernet
-- **SDK**: IoT SDK
+-   **Transport**: Wi-Fi, Thread, or Ethernet; exactly one network interface
+    must be enabled for each build. Wi-Fi uses a BL602 network processor
+    connected over SPI.
+-   **Commissioning**: BLE for Wi-Fi and Thread; on-network commissioning for
+    Ethernet
+-   **SDK**: IoT SDK
 
 ### BL702L + Thread
 
@@ -68,9 +68,9 @@ BL702L
     └── LED_PIN          (GPIO 18) - on/off lighting output
 ```
 
-- **Transport**: Thread with IPv6 networking
-- **Commissioning**: BLE -> Thread credential provisioning
-- **SDK**: IoT SDK
+-   **Transport**: Thread with IPv6 networking
+-   **Commissioning**: BLE -> Thread credential provisioning
+-   **SDK**: IoT SDK
 
 ### BL616 / BL616CL + Wi-Fi / Thread / Ethernet
 
@@ -88,11 +88,11 @@ BL616 / BL616CL
     └── LED_G_PIN        (GPIO 30) - green PWM channel
 ```
 
-- **Transport**: Wi-Fi, Thread, or Ethernet; exactly one network interface must
-  be enabled for each build.
-- **Commissioning**: BLE for Wi-Fi and Thread; on-network commissioning for
-  Ethernet.
-- **SDK**: `Bouffalo SDK`
+-   **Transport**: Wi-Fi, Thread, or Ethernet; exactly one network interface
+    must be enabled for each build.
+-   **Commissioning**: BLE for Wi-Fi and Thread; on-network commissioning for
+    Ethernet.
+-   **SDK**: `Bouffalo SDK`
 
 ---
 
@@ -228,15 +228,15 @@ make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y CONFIG_MFD=n
 
 #### Optional Features
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `CONFIG_MFD=y/n` | `y` | Enable factory/manufacturing data |
-| `CONFIG_SHELL=y/n` | `n` | Enable Matter interactive shell |
-| `CONFIG_CHIP_ROTATING_DEVICE_ID=y/n` | `n` | Enable rotating device ID |
-| `CONFIG_CHIP_HEAP_MONITOR=y/n` | `n` | Enable heap monitoring |
-| `CONFIG_COREDUMP=y/n` | `n` | Enable SDK `coredump` capture |
-| `CONFIG_OT_FTD=1/0` | `1` | Enable or disable Thread FTD mode |
-| `CONFIG_OT_MTD=1/0` | `0` | Enable or disable Thread MTD mode |
+| Flag                                 | Default | Description                       |
+| ------------------------------------ | ------- | --------------------------------- |
+| `CONFIG_MFD=y/n`                     | `y`     | Enable factory/manufacturing data |
+| `CONFIG_SHELL=y/n`                   | `n`     | Enable Matter interactive shell   |
+| `CONFIG_CHIP_ROTATING_DEVICE_ID=y/n` | `n`     | Enable rotating device ID         |
+| `CONFIG_CHIP_HEAP_MONITOR=y/n`       | `n`     | Enable heap monitoring            |
+| `CONFIG_COREDUMP=y/n`                | `n`     | Enable SDK `coredump` capture     |
+| `CONFIG_OT_FTD=1/0`                  | `1`     | Enable or disable Thread FTD mode |
+| `CONFIG_OT_MTD=1/0`                  | `0`     | Enable or disable Thread MTD mode |
 
 #### Clean
 
@@ -266,36 +266,36 @@ make -C examples/lighting-app/bouffalolab CONFIG_WIFI=y flash MFD_FILE=/path/to/
 Reset or factory reset the board first, then enter the chip-tool output
 directory and run the commissioning command for the selected transport.
 
-- Wi-Fi
+-   Wi-Fi
 
     ```shell
     ./chip-tool pairing ble-wifi <device_node_id> <wifi_ssid> <wifi_passwd> 20202021 3840
     ```
 
-- Thread
+-   Thread
 
     ```shell
     ./chip-tool pairing ble-thread <device_node_id> hex:<thread_operational_dataset> 20202021 3840
     ```
 
-- Ethernet
+-   Ethernet
 
     ```shell
     ./chip-tool pairing onnetwork <device_node_id> 20202021
     ```
 
-> `<device_node_id>` - node ID assigned to the device with chip-tool;<br>
-> `<wifi_ssid>` - Wi-Fi network SSID;<br>
-> `<wifi_passwd>` - Wi-Fi network password;<br>
-> `<thread_operational_dataset>` - Thread network credentials, which can be
-> obtained by running `sudo ot-ctl dataset active -x` on the border router.
+> `<device_node_id>` - node ID assigned to the device with chip-tool;<br> >
+> `<wifi_ssid>` - Wi-Fi network SSID;<br> > `<wifi_passwd>` - Wi-Fi network
+> password;<br> > `<thread_operational_dataset>` - Thread network credentials,
+> which can be obtained by running `sudo ot-ctl dataset active -x` on the border
+> router.
 
 ### Cluster Control
 
 After successful commissioning, use the cluster commands below to control the
 board.
 
-- OnOff cluster
+-   OnOff cluster
 
     The following command toggles the LED on the board:
 
@@ -303,7 +303,7 @@ board.
     ./chip-tool onoff toggle <device_node_id> 1
     ```
 
-- LevelControl cluster
+-   LevelControl cluster
 
     The following command moves the level to 128:
 
@@ -311,7 +311,7 @@ board.
     ./chip-tool levelcontrol move-to-level 128 10 0 0 <device_node_id> 1
     ```
 
-- ColorControl cluster
+-   ColorControl cluster
 
     The following command changes hue and saturation to 240 and 100:
 
@@ -319,7 +319,7 @@ board.
     ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 <device_node_id> 1
     ```
 
-- Identify cluster
+-   Identify cluster
 
     The following command identifies the board for 10 seconds:
 
@@ -331,8 +331,8 @@ board.
 
 ## References
 
-- [Bouffalo Lab - Platform overview](../../../docs/platforms/bouffalolab/platform_overview.md)
-- [Bouffalo Lab - Getting Started](../../../docs/platforms/bouffalolab/getting_started.md)
-- [Bouffalo Lab - OTA upgrade](../../../docs/platforms/bouffalolab/ota_upgrade.md)
-- [Bouffalo Lab - Matter factory data](../../../docs/platforms/bouffalolab/matter_factory_data.md)
-- [Bouffalo Lab - RPC console](../../../docs/platforms/bouffalolab/rpc_console.md)
+-   [Bouffalo Lab - Platform overview](../../../docs/platforms/bouffalolab/platform_overview.md)
+-   [Bouffalo Lab - Getting Started](../../../docs/platforms/bouffalolab/getting_started.md)
+-   [Bouffalo Lab - OTA upgrade](../../../docs/platforms/bouffalolab/ota_upgrade.md)
+-   [Bouffalo Lab - Matter factory data](../../../docs/platforms/bouffalolab/matter_factory_data.md)
+-   [Bouffalo Lab - RPC console](../../../docs/platforms/bouffalolab/rpc_console.md)

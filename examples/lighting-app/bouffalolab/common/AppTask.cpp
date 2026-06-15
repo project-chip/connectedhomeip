@@ -163,7 +163,8 @@ void AppTask::AppTaskMain(void * pvParameter)
     resetCnt++;
     Internal::BflbConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
     GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
-    ChipLogProgress(NotSpecified, "AppTaskMain %llu, resetCnt %u", (unsigned long long) GetAppTask().mButtonPressedTime, (unsigned int) resetCnt);
+    ChipLogProgress(NotSpecified, "AppTaskMain %llu, resetCnt %u", (unsigned long long) GetAppTask().mButtonPressedTime,
+                    (unsigned int) resetCnt);
 #endif
 
     GetAppTask().sTimer =

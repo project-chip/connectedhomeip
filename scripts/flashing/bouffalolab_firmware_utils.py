@@ -20,7 +20,6 @@ import os
 import pathlib
 import platform
 import re
-import shlex
 import shutil
 import subprocess
 import sys

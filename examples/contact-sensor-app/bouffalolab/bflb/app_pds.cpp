@@ -47,17 +47,17 @@ extern "C" {
 #include <bl616_hbn.h>
 #include <bl616_pm.h>
 #endif
+#include <bflb_clock.h>
 #include <bflb_gpio.h>
 #include <bflb_irq.h>
-#include <bflb_uart.h>
-#include <bflb_clock.h>
 #include <bflb_rtc.h>
 #include <bflb_sec_sha.h>
+#include <bflb_uart.h>
 #include <bl_lp.h>
-#include <clock_manager.h>
-#include <pm_manager.h>
-#include <easyflash.h>
 #include <board.h>
+#include <clock_manager.h>
+#include <easyflash.h>
+#include <pm_manager.h>
 }
 
 #include "mboard.h"
@@ -65,10 +65,10 @@ extern "C" {
 static struct bflb_device_s * s_gpio_dev;
 static bl_lp_io_cfg_t s_io_wakeup_cfg;
 
-static void (* s_pin_handler)(int, bool) = NULL;
+static void (*s_pin_handler)(int, bool) = NULL;
 #if CHIP_DETAIL_LOGGING
 static struct bflb_device_s * s_rtc_dev = NULL;
-static uint64_t s_sleep_enter_rtc = 0;
+static uint64_t s_sleep_enter_rtc       = 0;
 #endif
 static struct bflb_device_s * s_sha_dev = NULL;
 
@@ -91,7 +91,8 @@ static void gpio_isr(uint8_t pin)
 /* -------------------------------------------------------------------------- */
 static void wakeup_io_callback(uint64_t wake_io_bits)
 {
-    if (s_pin_handler) {
+    if (s_pin_handler)
+    {
         if (wake_io_bits & (1 << CHIP_RESET_PIN))
         {
             s_pin_handler(CHIP_RESET_PIN, bl_lp_wakeup_io_get_mode(CHIP_RESET_PIN) == BL_LP_IO_WAKEUP_MODE_RISING);
@@ -113,8 +114,7 @@ static void set_cpu_bclk_80M_and_gate_clk(void)
     uint32_t tmpVal = 0;
 
     GLB_Set_MCU_System_CLK_Div(0, 3);
-    CPU_Set_MTimer_CLK(ENABLE, BL_MTIMER_SOURCE_CLOCK_MCU_CLK,
-                       Clock_System_Clock_Get(BL_SYSTEM_CLOCK_MCU_CLK) / 1000000 - 1);
+    CPU_Set_MTimer_CLK(ENABLE, BL_MTIMER_SOURCE_CLOCK_MCU_CLK, Clock_System_Clock_Get(BL_SYSTEM_CLOCK_MCU_CLK) / 1000000 - 1);
 
     /* Keep clocks for: CPU, DMA, SEC, SDU */
     tmpVal = 0;
@@ -150,7 +150,8 @@ static int lp_enter(void * arg)
 {
     (void) arg;
 #if CHIP_DETAIL_LOGGING
-    if (s_rtc_dev) {
+    if (s_rtc_dev)
+    {
         s_sleep_enter_rtc = bflb_rtc_get_time(s_rtc_dev);
     }
 #endif
@@ -167,7 +168,8 @@ static int lp_exit(void * arg)
     set_cpu_bclk_80M_and_gate_clk();
     board_recovery();
 
-    if (s_sha_dev) {
+    if (s_sha_dev)
+    {
         bflb_group0_request_sha_access(s_sha_dev);
         bflb_sha_link_init(s_sha_dev);
     }
@@ -184,9 +186,10 @@ static int lp_exit(void * arg)
         pm_alloc_mem_reset();
     }
     app_lp_config_gpio();
-    
+
 #if CHIP_DETAIL_LOGGING
-    if (s_rtc_dev) {
+    if (s_rtc_dev)
+    {
         uint64_t sleep_ticks = bflb_rtc_get_time(s_rtc_dev) - s_sleep_enter_rtc;
         uint32_t rtc_hz      = bflb_clk_get_peripheral_clock(BFLB_DEVICE_TYPE_RTC, 0);
         uint64_t sleep_ms    = (rtc_hz != 0) ? (sleep_ticks * 1000ULL / rtc_hz) : 0;
@@ -212,9 +215,7 @@ extern "C" void app_pre_matter_init(void)
     uint8_t rt_v;
     uint8_t aon_v;
 
-    hal_pm_ldo11_cfg(PM_PDS_LDO_LEVEL_SOC_DEFAULT,
-                     PM_PDS_LDO_LEVEL_RT_DEFAULT,
-                     PM_PDS_LDO_LEVEL_AON_DEFAULT);
+    hal_pm_ldo11_cfg(PM_PDS_LDO_LEVEL_SOC_DEFAULT, PM_PDS_LDO_LEVEL_RT_DEFAULT, PM_PDS_LDO_LEVEL_AON_DEFAULT);
     hal_pm_ldo11_cfg_get(&soc_v, &rt_v, &aon_v);
     ChipLogProgress(NotSpecified, "[LP] LDO SOC:%d RT:%d AON:%d", soc_v, rt_v, aon_v);
 
@@ -231,7 +232,7 @@ extern "C" void app_pre_matter_init(void)
     s_rtc_dev = bflb_device_get_by_name("rtc");
 #endif
     s_gpio_dev = bflb_device_get_by_name("gpio");
-    s_sha_dev = bflb_device_get_by_name(BFLB_NAME_SEC_SHA);
+    s_sha_dev  = bflb_device_get_by_name(BFLB_NAME_SEC_SHA);
 
     extern int enable_multicast_broadcast;
     enable_multicast_broadcast = true;
@@ -243,20 +244,21 @@ extern "C" void app_pre_matter_init(void)
 
 static void app_lp_config_gpio(void)
 {
-    if (NULL == s_gpio_dev) {
+    if (NULL == s_gpio_dev)
+    {
         return;
     }
 
-    bflb_gpio_init(s_gpio_dev, CHIP_RESET_PIN,   GPIO_INPUT | GPIO_PULLDOWN);
+    bflb_gpio_init(s_gpio_dev, CHIP_RESET_PIN, GPIO_INPUT | GPIO_PULLDOWN);
     bflb_gpio_init(s_gpio_dev, CHIP_CONTACT_PIN, GPIO_INPUT | GPIO_PULLDOWN);
 
-    bflb_gpio_int_init(s_gpio_dev, CHIP_RESET_PIN,   GPIO_INT_TRIG_MODE_SYNC_FALLING_RISING_EDGE);
+    bflb_gpio_int_init(s_gpio_dev, CHIP_RESET_PIN, GPIO_INT_TRIG_MODE_SYNC_FALLING_RISING_EDGE);
     bflb_gpio_int_init(s_gpio_dev, CHIP_CONTACT_PIN, GPIO_INT_TRIG_MODE_SYNC_FALLING_RISING_EDGE);
 
-    bflb_gpio_irq_attach(CHIP_RESET_PIN,   gpio_isr);
+    bflb_gpio_irq_attach(CHIP_RESET_PIN, gpio_isr);
     bflb_gpio_irq_attach(CHIP_CONTACT_PIN, gpio_isr);
 
-    bflb_gpio_int_mask(s_gpio_dev, CHIP_RESET_PIN,   false);
+    bflb_gpio_int_mask(s_gpio_dev, CHIP_RESET_PIN, false);
     bflb_gpio_int_mask(s_gpio_dev, CHIP_CONTACT_PIN, false);
 
     bflb_irq_enable(s_gpio_dev->irq_num);
@@ -265,23 +267,27 @@ static void app_lp_config_gpio(void)
 static void app_lp_config_wakup_gpio(void)
 {
     memset(&s_io_wakeup_cfg, 0, sizeof(s_io_wakeup_cfg));
-    s_io_wakeup_cfg.io_wakeup_unmask            = (1ULL << CHIP_RESET_PIN) | (1ULL << CHIP_CONTACT_PIN);
-    s_io_wakeup_cfg.io_0_15_ie                  = BL_LP_IO_INPUT_ENABLE;
-    s_io_wakeup_cfg.io_20_34_ie                 = BL_LP_IO_INPUT_ENABLE;
-    if (bflb_gpio_read(s_gpio_dev, CHIP_RESET_PIN)) {
-        s_io_wakeup_cfg.io_0_7_pds_trig_mode    = BL_LP_PDS_IO_TRIG_SYNC_FALLING_EDGE;
+    s_io_wakeup_cfg.io_wakeup_unmask = (1ULL << CHIP_RESET_PIN) | (1ULL << CHIP_CONTACT_PIN);
+    s_io_wakeup_cfg.io_0_15_ie       = BL_LP_IO_INPUT_ENABLE;
+    s_io_wakeup_cfg.io_20_34_ie      = BL_LP_IO_INPUT_ENABLE;
+    if (bflb_gpio_read(s_gpio_dev, CHIP_RESET_PIN))
+    {
+        s_io_wakeup_cfg.io_0_7_pds_trig_mode = BL_LP_PDS_IO_TRIG_SYNC_FALLING_EDGE;
     }
-    else {
-        s_io_wakeup_cfg.io_0_7_pds_trig_mode    = BL_LP_PDS_IO_TRIG_SYNC_RISING_EDGE;
+    else
+    {
+        s_io_wakeup_cfg.io_0_7_pds_trig_mode = BL_LP_PDS_IO_TRIG_SYNC_RISING_EDGE;
     }
-    if (bflb_gpio_read(s_gpio_dev, CHIP_CONTACT_PIN)) {
-        s_io_wakeup_cfg.io_20_27_pds_trig_mode  = BL_LP_PDS_IO_TRIG_SYNC_FALLING_EDGE;
+    if (bflb_gpio_read(s_gpio_dev, CHIP_CONTACT_PIN))
+    {
+        s_io_wakeup_cfg.io_20_27_pds_trig_mode = BL_LP_PDS_IO_TRIG_SYNC_FALLING_EDGE;
     }
-    else {
-        s_io_wakeup_cfg.io_20_27_pds_trig_mode  = BL_LP_PDS_IO_TRIG_SYNC_RISING_EDGE;
+    else
+    {
+        s_io_wakeup_cfg.io_20_27_pds_trig_mode = BL_LP_PDS_IO_TRIG_SYNC_RISING_EDGE;
     }
-    s_io_wakeup_cfg.io_0_15_res                 = BL_LP_IO_RES_PULL_DOWN;
-    s_io_wakeup_cfg.io_20_34_res                = BL_LP_IO_RES_PULL_DOWN;
+    s_io_wakeup_cfg.io_0_15_res  = BL_LP_IO_RES_PULL_DOWN;
+    s_io_wakeup_cfg.io_20_34_res = BL_LP_IO_RES_PULL_DOWN;
 
     bl_lp_io_wakeup_cfg(&s_io_wakeup_cfg);
 }
@@ -290,7 +296,7 @@ static void app_lp_config_wakup_gpio(void)
 /* Public entry point – same interface as bl702l/app_pds.cpp                  */
 /* -------------------------------------------------------------------------- */
 
-void app_pds_init(void (* pinHandler)(int, bool))
+void app_pds_init(void (*pinHandler)(int, bool))
 {
     s_pin_handler = pinHandler;
 
