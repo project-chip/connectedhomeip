@@ -37,6 +37,17 @@ export CHIP_TEST_EVENT_LOOP_HANDLER_MAX_DURATION_MS=1000
 export GCOV_PREFIX=/mnt/chip
 export GCOV_PREFIX_STRIP=5
 
+# Parse command line arguments
+COPY_SYS_LIBS=false
+for arg in "$@"; do
+    case $arg in
+        --copy-sys-libs)
+            COPY_SYS_LIBS=true
+            shift
+            ;;
+    esac
+done
+
 FAILED=()
 STATUS=0
 CRASH_DUMP_DIR="/opt/usr/share/crash/dump"
@@ -126,15 +137,20 @@ while IFS= read -r TEST; do
 
                     SO_INFO_FILE=$(find "$EXTRACT_DIR" -name "*.so_info" 2>/dev/null | head -n 1)
                     if [ -f "$SO_INFO_FILE" ]; then
-                        echo "Copying runtime shared libraries from guest to host..."
-                        while IFS= read -r line; do
-                            LIB_PATH=$(echo "$line" | cut -d' ' -f1)
-                            if [ -f "$LIB_PATH" ]; then
-                                LIB_DIR=$(dirname "$LIB_PATH")
-                                mkdir -p "/mnt/chip/system_libs$LIB_DIR"
-                                cp -P "$LIB_PATH"* "/mnt/chip/system_libs$LIB_PATH" 2>/dev/null || true
-                            fi
-                        done < "$SO_INFO_FILE"
+                        if [ "$COPY_SYS_LIBS" = true ]; then
+                            echo "Copying runtime shared libraries from guest to host..."
+                            while IFS= read -r line; do
+                                LIB_PATH=$(echo "$line" | cut -d' ' -f1)
+                                if [ -f "$LIB_PATH" ]; then
+                                    LIB_DIR=$(dirname "$LIB_PATH")
+                                    mkdir -p "/mnt/chip/system_libs$LIB_DIR"
+                                    cp -P "$LIB_PATH"* "/mnt/chip/system_libs$LIB_PATH" 2>/dev/null || true
+                                fi
+                            done < "$SO_INFO_FILE"
+                            echo "SYSROOT_PATH=/mnt/chip/system_libs"
+                        else
+                            echo "Skipping library copy (use --copy-sys-libs to enable). Libraries will be resolved from TIZEN_SDK_ROOT."
+                        fi
                     fi
                 fi
             else
