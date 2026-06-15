@@ -23,8 +23,8 @@
 
 #include <array>
 #include <bitset>
-#include <variant>
 #include <utility>
+#include <variant>
 
 #include <lib/support/Span.h>
 
@@ -65,13 +65,13 @@ public:
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
-        SyncInProcess &sip = std::get<SyncInProcess>(mSyncState);
+        SyncInProcess & sip = std::get<SyncInProcess>(mSyncState);
         if (::memcmp(sip.mChallenge.data(), challenge.data(), kChallengeSize) != 0)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        mSyncState = Synced{};
+        mSyncState                               = Synced{};
         std::get<Synced>(mSyncState).mMaxCounter = counter;
         std::get<Synced>(mSyncState).mWindow.reset();
         return CHIP_NO_ERROR;
@@ -170,7 +170,7 @@ public:
 
     void SetCounter(uint32_t value)
     {
-        mSyncState = Synced{};
+        mSyncState                               = Synced{};
         std::get<Synced>(mSyncState).mMaxCounter = value;
         std::get<Synced>(mSyncState).mWindow.reset();
     }
@@ -178,7 +178,6 @@ public:
     uint32_t GetCounter() const { return std::get<Synced>(mSyncState).mMaxCounter; }
 
 private:
-
     // Counter position indicator with respect to our current max counter.
     enum class Position
     {
@@ -192,7 +191,7 @@ private:
     // the peer is synchronized.
     Position ClassifyWithoutRollover(uint32_t counter) const
     {
-        auto &synced = std::get<Synced>(mSyncState);
+        auto & synced = std::get<Synced>(mSyncState);
         if (counter > synced.mMaxCounter)
         {
             return Position::FutureCounter;
@@ -218,7 +217,7 @@ private:
      */
     Position ClassifyWithRollover(uint32_t counter) const
     {
-        auto &synced = std::get<Synced>(mSyncState);
+        auto & synced                          = std::get<Synced>(mSyncState);
         uint32_t counterIncrease               = counter - synced.mMaxCounter;
         constexpr uint32_t futureCounterWindow = (static_cast<uint32_t>(1 << 31)) - 1;
 
@@ -236,7 +235,7 @@ private:
      */
     Position ClassifyNonFutureCounter(uint32_t counter) const
     {
-        auto &synced = std::get<Synced>(mSyncState);
+        auto & synced = std::get<Synced>(mSyncState);
         if (counter == synced.mMaxCounter)
         {
             return Position::MaxCounter;
@@ -257,7 +256,7 @@ private:
      */
     CHIP_ERROR VerifyPositionEncrypted(Position position, uint32_t counter) const
     {
-        auto &synced = std::get<Synced>(mSyncState);
+        auto & synced = std::get<Synced>(mSyncState);
         switch (position)
         {
         case Position::FutureCounter:
@@ -283,7 +282,7 @@ private:
      */
     CHIP_ERROR VerifyPositionUnencrypted(Position position, uint32_t counter) const
     {
-        auto &synced = std::get<Synced>(mSyncState);
+        auto & synced = std::get<Synced>(mSyncState);
         switch (position)
         {
         case Position::MaxCounter:
@@ -323,7 +322,7 @@ private:
      */
     void CommitWithPosition(Position position, uint32_t counter)
     {
-        auto &synced = std::get<Synced>(mSyncState);
+        auto & synced = std::get<Synced>(mSyncState);
         switch (position)
         {
         case Position::InWindow: {
@@ -337,7 +336,7 @@ private:
         }
         default: {
             // Since we are committing, this becomes a new max-counter value.
-            uint32_t shift      = counter - synced.mMaxCounter;
+            uint32_t shift     = counter - synced.mMaxCounter;
             synced.mMaxCounter = counter;
             if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
