@@ -279,5 +279,34 @@ CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
         }
     }
 
+    // 4. Verify there are no cycles in parent-child relationships
+    for (const auto & entry : entries)
+    {
+        chip::EndpointId current = entry.parentId;
+        std::vector<chip::EndpointId> visited = { entry.endpoint };
+
+        while (current != chip::kInvalidEndpointId)
+        {
+            if (std::find(visited.begin(), visited.end(), current) != visited.end())
+            {
+                ChipLogError(Support, "Error: Cycle detected in parent-child relationships involving endpoint %u", current);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            visited.push_back(current);
+
+            // Find the parent entry
+            chip::EndpointId nextParent = chip::kInvalidEndpointId;
+            for (const auto & other : entries)
+            {
+                if (other.endpoint == current)
+                {
+                    nextParent = other.parentId;
+                    break;
+                }
+            }
+            current = nextParent;
+        }
+    }
+
     return CHIP_NO_ERROR;
 }
