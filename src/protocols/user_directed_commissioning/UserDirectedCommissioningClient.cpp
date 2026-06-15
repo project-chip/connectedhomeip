@@ -269,12 +269,21 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
                     "UserDirectedCommissioningClient::OnMessageReceived() CommissionerDeclaration DataLength() = %" PRIu32,
                     static_cast<uint32_t>(msg->DataLength()));
 
+<<<<<<< HEAD
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
     size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
     msg->Read(udcPayload, udcPayloadLength);
 
     CommissionerDeclaration cd;
     cd.ReadPayload(udcPayload, sizeof(udcPayload));
+=======
+    uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes] = {};
+    size_t udcPayloadLength                                            = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
+    ReturnOnFailure(msg->Read(udcPayload, udcPayloadLength));
+
+    CommissionerDeclaration cd;
+    ReturnOnFailure(cd.ReadPayload(udcPayload, udcPayloadLength));
+>>>>>>> ad4be12a19 (fix(udc): Prevent uninitialized stack read on oversized UDC rotating IDs (#72482))
     cd.DebugLog();
 
     // Call the registered mCommissionerDeclarationHandler, if any.
