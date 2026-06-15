@@ -696,10 +696,17 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     }
 
     Report("Wait for IP address assignment...\n\r");
-    while (isIp == 0)
+    const int kMaxIpWaitSeconds = 30;
+    for (int i = 0; i < kMaxIpWaitSeconds && isIp == 0; i++)
     {
         Report(".");
         os_sleep(1, 0);
+    }
+
+    if (isIp == 0)
+    {
+        Report("\n\r[ERROR]_Init: Timeout waiting for IP address\n\r");
+        return CHIP_ERROR_TIMEOUT;
     }
 
     Report("\n\rReceived IP address successfully!\n\r");

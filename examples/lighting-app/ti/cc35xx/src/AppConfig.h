@@ -25,7 +25,7 @@ extern "C" {
 
 int cc35xxLogInit(void);
 void cc35xxLog(const char * aFormat, ...);
-#define PLAT_LOG(...)  cc35xxLog(__VA_ARGS__);
+#define PLAT_LOG(...) cc35xxLog(__VA_ARGS__);
 
 #define ACTUATOR_MOVEMENT_PERIOD_MS 1000
 

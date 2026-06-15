@@ -38,7 +38,8 @@
 /* Use lwip provided errors as ti compiler is too granular*/
 #define LWIP_PROVIDE_ERRNO 1
 
-#define LWIP_RAND() ((u32_t) rand())
+uint32_t cc35xx_lwip_rand(void);
+#define LWIP_RAND() ((u32_t) cc35xx_lwip_rand())
 
 /* Setup Packing Macros */
 #define PACK_STRUCT_BEGIN

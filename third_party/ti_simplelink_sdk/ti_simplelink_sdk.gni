@@ -455,7 +455,6 @@ template("ti_simplelink_sdk") {
       ]
     } else if (ti_simplelink_device_family == "cc32xx") {
       sources += [
-        "${freertos_root}/repo/portable/MemMang/heap_4.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockP_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/HwiPCC32XX_freertos.c",
         "${ti_simplelink_sdk_root}/kernel/freertos/dpl/PowerCC32XX_freertos.c",
@@ -519,7 +518,8 @@ template("ti_simplelink_sdk") {
       sources = []
     }
 
-    if (ti_simplelink_device_family == "cc13x4_26x4") {
+    if (ti_simplelink_device_family == "cc13x4_26x4" ||
+       ti_simplelink_device_family == "cc32xx") {
       sources += [ "${chip_root}/src/platform/ti/cc13xx_26xx/memory.c" ]
     }
 

@@ -33,6 +33,16 @@
 #include "semphr.h"
 #include "task.h"
 
+/* PSA crypto for hardware-backed random number generation */
+#include <psa/crypto.h>
+
+uint32_t cc35xx_lwip_rand(void)
+{
+    uint32_t val;
+    psa_generate_random((uint8_t *) &val, sizeof(val));
+    return val;
+}
+
 /** Set this to 1 if you want the stack size passed to sys_thread_new() to be
  * interpreted as number of stack words (FreeRTOS-like).
  * Default is that they are interpreted as byte count (lwIP-like).

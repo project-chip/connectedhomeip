@@ -201,25 +201,18 @@ int update_arp(void * ip_addr)
         UNLOCK_TCPIP_CORE();
         if (result == ERR_OK)
         {
-            result = ERR_CONN;
-            // wait here some time for reply to be received
-            while (1) // TODO this should be changed to timeout instead of endless while
+            result                   = ERR_CONN;
+            const int kMaxArpRetries = 50;
+            for (int retry = 0; retry < kMaxArpRetries; retry++)
             {
-                osi_uSleep(100); // set time to other thread to get the reply
+                osi_uSleep(100);
                 eth_ret  = NULL;
                 ip4_ret  = NULL;
                 arp_find = etharp_find_addr(pNetIf, (ip4_addr_t *) ip4_addr, &eth_ret, (const ip4_addr_t **) &ip4_ret);
-                if (arp_find < 0)
+                if (arp_find >= 0 && ip4_ret && eth_ret && ip4_addr_cmp(ip4_ret, ip4_addr))
                 {
-                    result = ERR_CONN;
-                }
-                else
-                {
-                    if (ip4_ret && eth_ret && ip4_addr_cmp(ip4_ret, ip4_addr))
-                    {
-                        result = ERR_OK;
-                        break; // found
-                    }
+                    result = ERR_OK;
+                    break;
                 }
             }
         }
