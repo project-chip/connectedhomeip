@@ -437,6 +437,50 @@ TEST(TestGroupMessageCounter, ReorderFabricRemovalTest)
     EXPECT_NE(err, CHIP_NO_ERROR);
 }
 
+TEST(TestGroupMessageCounter, MultipleEvictionsTest)
+{
+    chip::Transport::PeerMessageCounter * counter = nullptr;
+    TestGroupPeerTable table;
+    FabricIndex fabric = 1;
+
+    // --- Data peer path: fill table then cycle 100 more unique NodeIDs ---
+    // Fill the table to capacity
+    for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_DATA_PEERS; i++)
+    {
+        NodeId nodeId = 0x1000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric, nodeId, false, counter), CHIP_NO_ERROR);
+    }
+
+    // Cycle 100 more unique NodeIDs through the table; each should become MRU
+    for (uint32_t i = 0; i < 100; i++)
+    {
+        NodeId nodeId = 0x2000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric, nodeId, false, counter), CHIP_NO_ERROR);
+
+        // Verify the most recently added peer is always at index 0
+        EXPECT_EQ(table.GetNodeIdAt(0, 0, false), nodeId) << "iteration " << i;
+    }
+
+    // --- Control peer path: fill table then cycle a few more unique NodeIDs ---
+    // The control peer path is currently not tested for eviction.
+    FabricIndex fabric2 = 2;
+    for (uint32_t i = 0; i < CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS; i++)
+    {
+        NodeId nodeId = 0x3000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric2, nodeId, true, counter), CHIP_NO_ERROR);
+    }
+
+    // Cycle more unique NodeIDs through the control peer table
+    for (uint32_t i = 0; i < 10; i++)
+    {
+        NodeId nodeId = 0x4000 + i;
+        EXPECT_EQ(table.FindOrAddPeer(fabric2, nodeId, true, counter), CHIP_NO_ERROR);
+
+        // Verify the most recently added peer is always at index 0
+        EXPECT_EQ(table.GetNodeIdAt(1, 0, true), nodeId) << "control iteration " << i;
+    }
+}
+
 TEST(TestGroupMessageCounter, GroupMessageCounterTest)
 {
 
