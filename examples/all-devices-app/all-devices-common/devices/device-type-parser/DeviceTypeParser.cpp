@@ -251,18 +251,8 @@ CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
         // 2. If it has a parent, verify the parent exists in the config
         if (entry.parentId != chip::kInvalidEndpointId)
         {
-            bool parentExists = false;
-            std::string parentType;
-            for (const auto & other : entries)
-            {
-                if (other.endpoint == entry.parentId)
-                {
-                    parentExists = true;
-                    parentType   = other.type;
-                    break;
-                }
-            }
-            if (!parentExists)
+            const auto * parent = FindEntryByEndpoint(entries, entry.parentId);
+            if (parent == nullptr)
             {
                 ChipLogError(Support, "Error: Parent endpoint %u for device %s (endpoint %u) does not exist in configuration",
                              entry.parentId, entry.type.c_str(), entry.endpoint);
@@ -270,10 +260,10 @@ CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
             }
 
             // 3. If this is a bridged-node, its parent must be an aggregator
-            if (entry.type == "bridged-node" && parentType != "aggregator")
+            if (entry.type == "bridged-node" && parent->type != "aggregator")
             {
                 ChipLogError(Support, "Error: Parent of bridged-node (endpoint %u) must be aggregator, but found %s (endpoint %u)",
-                             entry.endpoint, parentType.c_str(), entry.parentId);
+                             entry.endpoint, parent->type.c_str(), entry.parentId);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
         }
@@ -294,19 +284,22 @@ CHIP_ERROR DeviceTypeParser::ValidateConfig(const std::vector<Entry> & entries)
             }
             visited.push_back(current);
 
-            // Find the parent entry
-            chip::EndpointId nextParent = chip::kInvalidEndpointId;
-            for (const auto & other : entries)
-            {
-                if (other.endpoint == current)
-                {
-                    nextParent = other.parentId;
-                    break;
-                }
-            }
-            current = nextParent;
+            const auto * parent = FindEntryByEndpoint(entries, current);
+            current = (parent != nullptr) ? parent->parentId : chip::kInvalidEndpointId;
         }
     }
 
     return CHIP_NO_ERROR;
+}
+
+const DeviceTypeParser::Entry * DeviceTypeParser::FindEntryByEndpoint(const std::vector<Entry> & entries, chip::EndpointId endpointId)
+{
+    for (const auto & entry : entries)
+    {
+        if (entry.endpoint == endpointId)
+        {
+            return &entry;
+        }
+    }
+    return nullptr;
 }

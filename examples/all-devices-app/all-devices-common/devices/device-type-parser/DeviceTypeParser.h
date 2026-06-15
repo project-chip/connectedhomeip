@@ -77,6 +77,7 @@ public:
 private:
     bool ParseDeviceTypeEntry(const char * value, Entry & entry);
     static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
+    static const Entry * FindEntryByEndpoint(const std::vector<Entry> & entries, chip::EndpointId endpointId);
 
     std::vector<Entry> mDeviceTypeEntries;
 };
