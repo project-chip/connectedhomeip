@@ -178,8 +178,8 @@ public:
     uint32_t GetCounter() const { return std::get<Synced>(mSyncState).mMaxCounter; }
 
 private:
-    // Counter position indicator with respect to our current
-    // mSynced.mMaxCounter.
+
+    // Counter position indicator with respect to our current max counter.
     enum class Position
     {
         BeforeWindow,
@@ -189,7 +189,7 @@ private:
     };
 
     // Classify an incoming counter value's position.  Must be used only if
-    // mStatus is Status::Synced.
+    // the peer is synchronized.
     Position ClassifyWithoutRollover(uint32_t counter) const
     {
         auto &synced = std::get<Synced>(mSyncState);
@@ -203,8 +203,8 @@ private:
 
     /**
      * Classify an incoming counter value's position for the cases when counters
-     * are allowed to roll over.  Must be used only if mStatus is
-     * Status::Synced.
+     * are allowed to roll over.  Must be used only if the peer is
+     * synchronized.
      *
      * This can be used as the basis for implementing section 4.5.4.2 in the
      * spec:
@@ -355,22 +355,6 @@ private:
 
     // Synthetic type for "not synced" state (std::monostate)
     using NotSynced = std::monostate;
-
-    enum class Status
-    {
-        NotSynced,     // No state associated
-        SyncInProcess, // mSyncInProcess will be active
-        Synced,        // mSynced will be active
-    };
-
-    Status GetStatus() const
-    {
-        if (std::holds_alternative<NotSynced>(mSyncState))
-            return Status::NotSynced;
-        if (std::holds_alternative<SyncInProcess>(mSyncState))
-            return Status::SyncInProcess;
-        return Status::Synced;
-    }
 
     struct SyncInProcess
     {
