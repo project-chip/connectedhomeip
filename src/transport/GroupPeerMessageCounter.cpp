@@ -256,8 +256,7 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
         {
             if (readIndex != writeIndex)
             {
-                list[writeIndex].~GroupSender();
-                new (&list[writeIndex]) GroupSender(std::move(list[readIndex]));
+                list[writeIndex] = std::move(list[readIndex]);
             }
             writeIndex++;
         }
@@ -265,11 +264,10 @@ void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
 
     // Cleanup old entries at the end of the list. These were entries that were
     // moved further up in the list, and the entries from the writeIndex onwards
-    // are in an unspecifed state.
+    // are in an unspecified state.
     for (uint32_t i = writeIndex; i < size; i++)
     {
-        list[i].~GroupSender();
-        new (&list[i]) GroupSender();
+        list[i] = GroupSender();
     }
 }
 

@@ -23,6 +23,7 @@
 
 #include <array>
 #include <bitset>
+#include <utility>
 
 #include <lib/support/Span.h>
 
@@ -36,6 +37,26 @@ public:
     static constexpr uint32_t kInitialSyncValue = 0;
 
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
+    PeerMessageCounter(const PeerMessageCounter & other) : mStatus(Status::NotSynced)
+    {
+        // Delegate to operator= to avoid code duplication
+        *this = other;
+    }
+    PeerMessageCounter(PeerMessageCounter && other) noexcept : mStatus(other.mStatus)
+    {
+        switch (mStatus)
+        {
+        case Status::SyncInProcess:
+            new (&mSyncInProcess) SyncInProcess(std::move(other.mSyncInProcess));
+            break;
+        case Status::Synced:
+            new (&mSynced) Synced(std::move(other.mSynced));
+            break;
+        case Status::NotSynced:
+            break;
+        }
+        other.mStatus = Status::NotSynced;
+    }
     ~PeerMessageCounter() { Reset(); }
 
     PeerMessageCounter & operator=(const PeerMessageCounter & other)
@@ -55,6 +76,28 @@ public:
             case Status::NotSynced:
                 break;
             }
+        }
+        return *this;
+    }
+
+    PeerMessageCounter & operator=(PeerMessageCounter && other) noexcept
+    {
+        if (this != &other)
+        {
+            Reset();
+            mStatus = other.mStatus;
+            switch (mStatus)
+            {
+            case Status::SyncInProcess:
+                new (&mSyncInProcess) SyncInProcess(std::move(other.mSyncInProcess));
+                break;
+            case Status::Synced:
+                new (&mSynced) Synced(std::move(other.mSynced));
+                break;
+            case Status::NotSynced:
+                break;
+            }
+            other.mStatus = Status::NotSynced;
         }
         return *this;
     }
