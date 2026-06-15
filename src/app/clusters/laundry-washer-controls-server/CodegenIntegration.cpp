@@ -19,8 +19,8 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 
-#include "laundry-washer-controls-delegate.h"
 #include "CodegenIntegration.h"
+#include "laundry-washer-controls-delegate.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
