@@ -1002,7 +1002,7 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
         ProxyConnectResponse::DecodableType response;
         if (data && chip::app::DataModel::Decode(*data, response) == CHIP_NO_ERROR)
         {
-            OnProxyConnected(response.sessionId);
+            OnProxyConnected(response.sessionID);
         }
         else
         {
@@ -1021,7 +1021,7 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::a
             {
                 auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
                 auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
-                proxyTransport->OnProxyMessageReceived(response.sessionId, response.message.Value().data(),
+                proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
                                                        response.message.Value().size());
             }
         }
@@ -1086,7 +1086,7 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
     }
 
     Commands::ProxyDisconnectRequest::Type request;
-    request.sessionId = mProxySessionId;
+    request.sessionID.SetNonNull(mProxySessionId);
 
     chip::app::CommandPathParams pathParams(
         /* endpoint */ 1, chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyDisconnectRequest::Id,
@@ -1125,7 +1125,7 @@ CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan m
     VerifyOrReturnError(cmdSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     Commands::ProxyMessageRequest::Type request;
-    request.sessionId = sessionId;
+    request.sessionID = sessionId;
     // ConnectNetwork on Linux can take 20-30s (wpa_supplicant scan + join).
     // The proxy exchange must stay open at least this long.
     request.responseTimeout = 60;

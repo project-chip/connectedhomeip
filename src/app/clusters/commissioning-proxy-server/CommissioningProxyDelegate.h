@@ -130,7 +130,6 @@ public:
     /**
      * @brief Cancel any in-progress ProxyConnectRequest.
      *
-     * Called when ProxyDisconnectRequest with SessionId=0xFFFF is received.
      * The delegate SHALL terminate any ongoing WiFiPAF subscribe/handshake,
      * clean up associated state, and respond to the pending ProxyConnectRequest
      * with an error status.

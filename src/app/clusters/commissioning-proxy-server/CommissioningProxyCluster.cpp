@@ -52,9 +52,6 @@ constexpr uint8_t kValidTransportBits =
     static_cast<uint8_t>(CapabilitiesBitmap::kBle) | static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF);
 constexpr uint16_t kValidWiFiBandBits = static_cast<uint16_t>(WiFiBandBitmap::k2g4) | static_cast<uint16_t>(WiFiBandBitmap::k5g);
 
-// Reserved SessionId sentinel for ProxyDisconnectRequest: cancel any ongoing ProxyConnectRequest.
-inline constexpr uint16_t kCancelPendingConnectSessionId = 0xFFFF;
-
 CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 {
     if (mDelegate.GetEndpointId() != mPath.mEndpointId)
@@ -278,15 +275,16 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
     Commands::ProxyDisconnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
-    ChipLogProgress(Zcl, "HandleProxyDisconnectRequest: sessionId=0x%04x", commandData.sessionId);
-
-    // SessionId=0xFFFF means cancel any ongoing ProxyConnectRequest, not disconnect a session.
-    if (commandData.sessionId == kCancelPendingConnectSessionId)
+    // A null SessionID SHALL cancel any ongoing ProxyConnectRequest for the invoking fabric, not disconnect a session.
+    if (commandData.sessionID.IsNull())
     {
+        ChipLogProgress(Zcl, "HandleProxyDisconnectRequest: sessionID=null (cancel pending connect)");
         return mDelegate.CancelPendingConnect(request.subjectDescriptor.fabricIndex);
     }
 
-    auto delegateStatus = mDelegate.ProxyDisconnectRequest(commandData.sessionId, request.subjectDescriptor.fabricIndex);
+    ChipLogProgress(Zcl, "HandleProxyDisconnectRequest: sessionID=0x%04x", commandData.sessionID.Value());
+
+    auto delegateStatus = mDelegate.ProxyDisconnectRequest(commandData.sessionID.Value(), request.subjectDescriptor.fabricIndex);
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
 
     // Transition cluster state back to disconnected now that the session is gone.
@@ -464,7 +462,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageReque
     }
 
     auto delegateStatus =
-        mDelegate.ProxyMessageRequest(commandData.sessionId, message, commandData.responseTimeout, handler, request);
+        mDelegate.ProxyMessageRequest(commandData.sessionID, message, commandData.responseTimeout, handler, request);
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
     return Status::Success;

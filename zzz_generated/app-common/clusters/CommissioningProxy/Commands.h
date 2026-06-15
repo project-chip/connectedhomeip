@@ -150,7 +150,7 @@ public:
 namespace ProxyConnectResponse {
 enum class Fields : uint8_t
 {
-    kSessionId = 0,
+    kSessionID = 0,
 };
 
 struct Type
@@ -160,7 +160,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyConnectResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
 
-    uint16_t sessionId = static_cast<uint16_t>(0);
+    uint16_t sessionID = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -175,7 +175,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyConnectResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
 
-    uint16_t sessionId = static_cast<uint16_t>(0);
+    uint16_t sessionID = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -183,7 +183,7 @@ public:
 namespace ProxyDisconnectRequest {
 enum class Fields : uint8_t
 {
-    kSessionId = 0,
+    kSessionID = 0,
 };
 
 struct Type
@@ -193,7 +193,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyDisconnectRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
 
-    uint16_t sessionId = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> sessionID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -209,7 +209,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    uint16_t sessionId = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> sessionID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
@@ -367,7 +367,7 @@ public:
 namespace ProxyMessageRequest {
 enum class Fields : uint8_t
 {
-    kSessionId       = 0,
+    kSessionID       = 0,
     kResponseTimeout = 1,
     kMessage         = 2,
 };
@@ -379,7 +379,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyMessageRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
 
-    uint16_t sessionId      = static_cast<uint16_t>(0);
+    uint16_t sessionID      = static_cast<uint16_t>(0);
     uint8_t responseTimeout = static_cast<uint8_t>(0);
     DataModel::Nullable<chip::ByteSpan> message;
 
@@ -397,7 +397,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    uint16_t sessionId      = static_cast<uint16_t>(0);
+    uint16_t sessionID      = static_cast<uint16_t>(0);
     uint8_t responseTimeout = static_cast<uint8_t>(0);
     DataModel::Nullable<chip::ByteSpan> message;
 
@@ -407,7 +407,7 @@ public:
 namespace ProxyMessageResponse {
 enum class Fields : uint8_t
 {
-    kSessionId = 0,
+    kSessionID = 0,
     kMessage   = 1,
 };
 
@@ -418,7 +418,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
 
-    uint16_t sessionId = static_cast<uint16_t>(0);
+    uint16_t sessionID = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::ByteSpan> message;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
@@ -434,7 +434,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProxyMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissioningProxy::Id; }
 
-    uint16_t sessionId = static_cast<uint16_t>(0);
+    uint16_t sessionID = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::ByteSpan> message;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

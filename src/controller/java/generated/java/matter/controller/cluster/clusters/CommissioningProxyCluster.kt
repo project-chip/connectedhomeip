@@ -47,14 +47,14 @@ class CommissioningProxyCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
-  class ProxyConnectResponse(val sessionId: UShort)
+  class ProxyConnectResponse(val sessionID: UShort)
 
   class ProxyScanResponse(
     val numberOfResults: UByte,
     val proxyScanResult: List<CommissioningProxyClusterScanResultStruct>,
   )
 
-  class ProxyMessageResponse(val sessionId: UShort, val message: ByteArray?)
+  class ProxyMessageResponse(val sessionID: UShort, val message: ByteArray?)
 
   class CachedResultsAttribute(val value: List<CommissioningProxyClusterScanResultStruct>?)
 
@@ -147,35 +147,35 @@ class CommissioningProxyCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_SESSION_ID: Int = 0
-    var sessionId_decoded: UShort? = null
+    var sessionID_decoded: UShort? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
       if (tag == ContextSpecificTag(TAG_SESSION_ID)) {
-        sessionId_decoded = tlvReader.getUShort(tag)
+        sessionID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()
       }
     }
 
-    if (sessionId_decoded == null) {
-      throw IllegalStateException("sessionId not found in TLV")
+    if (sessionID_decoded == null) {
+      throw IllegalStateException("sessionID not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return ProxyConnectResponse(sessionId_decoded)
+    return ProxyConnectResponse(sessionID_decoded)
   }
 
-  suspend fun proxyDisconnectRequest(sessionId: UShort, timedInvokeTimeout: Duration? = null) {
+  suspend fun proxyDisconnectRequest(sessionID: UShort?, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_SESSION_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_SESSION_ID_REQ), sessionId)
+    sessionID?.let { tlvWriter.put(ContextSpecificTag(TAG_SESSION_ID_REQ), sessionID) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -317,7 +317,7 @@ class CommissioningProxyCluster(
   }
 
   suspend fun proxyMessageRequest(
-    sessionId: UShort,
+    sessionID: UShort,
     responseTimeout: UByte,
     message: ByteArray?,
     timedInvokeTimeout: Duration? = null,
@@ -328,7 +328,7 @@ class CommissioningProxyCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_SESSION_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_SESSION_ID_REQ), sessionId)
+    tlvWriter.put(ContextSpecificTag(TAG_SESSION_ID_REQ), sessionID)
 
     val TAG_RESPONSE_TIMEOUT_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_RESPONSE_TIMEOUT_REQ), responseTimeout)
@@ -350,7 +350,7 @@ class CommissioningProxyCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_SESSION_ID: Int = 0
-    var sessionId_decoded: UShort? = null
+    var sessionID_decoded: UShort? = null
 
     val TAG_MESSAGE: Int = 1
     var message_decoded: ByteArray? = null
@@ -359,7 +359,7 @@ class CommissioningProxyCluster(
       val tag = tlvReader.peekElement().tag
 
       if (tag == ContextSpecificTag(TAG_SESSION_ID)) {
-        sessionId_decoded = tlvReader.getUShort(tag)
+        sessionID_decoded = tlvReader.getUShort(tag)
       } else if (tag == ContextSpecificTag(TAG_MESSAGE)) {
         message_decoded =
           if (tlvReader.isNull()) {
@@ -378,13 +378,13 @@ class CommissioningProxyCluster(
       }
     }
 
-    if (sessionId_decoded == null) {
-      throw IllegalStateException("sessionId not found in TLV")
+    if (sessionID_decoded == null) {
+      throw IllegalStateException("sessionID not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return ProxyMessageResponse(sessionId_decoded, message_decoded)
+    return ProxyMessageResponse(sessionID_decoded, message_decoded)
   }
 
   suspend fun readTransportAttribute(): UByte {

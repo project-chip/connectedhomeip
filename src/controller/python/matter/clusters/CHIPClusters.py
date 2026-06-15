@@ -12662,7 +12662,7 @@ class ChipClusters:
                 "commandId": 0x00000002,
                 "commandName": "ProxyDisconnectRequest",
                 "args": {
-                    "sessionId": "int",
+                    "sessionID": "int",
                 },
             },
             0x00000003: {
@@ -12694,7 +12694,7 @@ class ChipClusters:
                 "commandId": 0x00000007,
                 "commandName": "ProxyMessageRequest",
                 "args": {
-                    "sessionId": "int",
+                    "sessionID": "int",
                     "responseTimeout": "int",
                     "message": "bytes",
                 },

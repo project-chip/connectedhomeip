@@ -115,7 +115,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             TestStep(5, "TH1 (Fabric A) reads ScanMaxTime attribute",
                      "Store as scan_max_time"),
             TestStep(6, "TH1 (Fabric A) sends ProxyConnectRequest",
-                     "DUT returns ProxyConnectResponse with SUCCESS; save sessionId as fabric_a_session"),
+                     "DUT returns ProxyConnectResponse with SUCCESS; save sessionID as fabric_a_session"),
             TestStep(7, "TH2 (Fabric B) sends ProxyMessageRequest(fabric_a_session)",
                      "DUT returns NOT_FOUND (session belongs to Fabric A)"),
             TestStep(8, "TH2 (Fabric B) sends ProxyDisconnectRequest(fabric_a_session)",
@@ -240,7 +240,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
             ),
             interactionTimeoutMs=None,
         )
-        fabric_a_session = connect_response.sessionId
+        fabric_a_session = connect_response.sessionID
         asserts.assert_true(
             0x0001 <= fabric_a_session <= 0xFFFE,
             f"fabric_a_session {fabric_a_session:#06x} must be in range 0x0001–0xFFFE")
@@ -250,13 +250,13 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # Step 7 — TH2 ProxyMessageRequest(fabric_a_session) → NOT_FOUND
         # ----------------------------------------------------------------
         self.step(7)
-        logger.info("Step 7: TH2 ProxyMessageRequest(sessionId=%d) (expect NOT_FOUND)", fabric_a_session)
+        logger.info("Step 7: TH2 ProxyMessageRequest(sessionID=%d) (expect NOT_FOUND)", fabric_a_session)
         try:
             await th2.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
                 payload=cp.Commands.ProxyMessageRequest(
-                    sessionId=fabric_a_session,
+                    sessionID=fabric_a_session,
                     responseTimeout=10,
                     message=bytes(8),
                 ),
@@ -272,12 +272,12 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # Step 8 — TH2 ProxyDisconnectRequest(fabric_a_session) → NOT_FOUND
         # ----------------------------------------------------------------
         self.step(8)
-        logger.info("Step 8: TH2 ProxyDisconnectRequest(sessionId=%d) (expect NOT_FOUND)", fabric_a_session)
+        logger.info("Step 8: TH2 ProxyDisconnectRequest(sessionID=%d) (expect NOT_FOUND)", fabric_a_session)
         try:
             await th2.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionId=fabric_a_session),
+                payload=cp.Commands.ProxyDisconnectRequest(sessionID=fabric_a_session),
             )
             asserts.fail("Expected NOT_FOUND but TH2 ProxyDisconnectRequest succeeded")
         except InteractionModelError as e:
@@ -290,11 +290,11 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # Step 9 — TH1 ProxyDisconnectRequest(fabric_a_session) → SUCCESS
         # ----------------------------------------------------------------
         self.step(9)
-        logger.info("Step 9: TH1 ProxyDisconnectRequest(sessionId=%d)", fabric_a_session)
+        logger.info("Step 9: TH1 ProxyDisconnectRequest(sessionID=%d)", fabric_a_session)
         await self.default_controller.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyDisconnectRequest(sessionId=fabric_a_session),
+            payload=cp.Commands.ProxyDisconnectRequest(sessionID=fabric_a_session),
         )
         logger.info("Step 9: ProxyDisconnectRequest succeeded")
 

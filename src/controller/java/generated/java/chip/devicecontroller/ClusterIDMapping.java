@@ -16901,7 +16901,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProxyDisconnectRequestCommandField {SessionId(0),;
+                }public enum ProxyDisconnectRequestCommandField {SessionID(0),;
                     private final int id;
                     ProxyDisconnectRequestCommandField(int id) {
                         this.id = id;
@@ -16969,7 +16969,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProxyMessageRequestCommandField {SessionId(0),ResponseTimeout(1),Message(2),;
+                }public enum ProxyMessageRequestCommandField {SessionID(0),ResponseTimeout(1),Message(2),;
                     private final int id;
                     ProxyMessageRequestCommandField(int id) {
                         this.id = id;

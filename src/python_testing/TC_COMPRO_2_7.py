@@ -40,7 +40,7 @@ commissioning sessions up to the MaxSessions limit.
   Steps 2–4:  Read MaxSessions, Transport, and WiFiBand attributes.
   Step 5:     Ensure max_sessions EDs are commissionable simultaneously.
   Step 6:     Loop: for each ED N from 1 to max_sessions, send
-              ProxyConnectRequest and verify a unique SessionId in 0x0001–0xFFFE.
+              ProxyConnectRequest and verify a unique SessionID in 0x0001–0xFFFE.
   Step 7:     One additional ProxyConnectRequest (all slots occupied) must be
               rejected with RESOURCE_EXHAUSTED.
   Step 8:     If max_sessions > 1, verify all session IDs from step 6 are distinct.
@@ -111,7 +111,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                      "Store as valid_bands"),
             TestStep(5, "Ensure at least max_sessions EDs are commissionable simultaneously"),
             TestStep(6, "For each ED N from 1 to max_sessions, TH sends ProxyConnectRequest",
-                     "Each response has SUCCESS and a unique SessionId in 0x0001–0xFFFE; "
+                     "Each response has SUCCESS and a unique SessionID in 0x0001–0xFFFE; "
                      "store as session_N"),
             TestStep(7, "TH sends ProxyConnectRequest with any valid parameters "
                      "(all max_sessions slots are now occupied)",
@@ -227,7 +227,7 @@ class TC_COMPRO_2_7(COMPROBaseTest):
                 ),
                 interactionTimeoutMs=None,
             )
-            sess_n = resp.sessionId
+            sess_n = resp.sessionID
             asserts.assert_true(
                 0x0001 <= sess_n <= 0xFFFE,
                 f"session_{n} {sess_n:#06x} must be in range 0x0001–0xFFFE")
@@ -281,11 +281,11 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         # ------------------------------------------------------------------
         self.step(9)
         for sess_id in active_sessions:
-            logger.info("Step 9: ProxyDisconnectRequest(sessionId=%d)", sess_id)
+            logger.info("Step 9: ProxyDisconnectRequest(sessionID=%d)", sess_id)
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionId=sess_id),
+                payload=cp.Commands.ProxyDisconnectRequest(sessionID=sess_id),
             )
             logger.info("Step 9: disconnected session %d", sess_id)
 

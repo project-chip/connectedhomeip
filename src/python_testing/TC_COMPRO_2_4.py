@@ -49,9 +49,9 @@ by the DUT.  Steps 4–9 iterate once per transport bit in valid_transports
   Step 10:    ProxyConnectRequest with Timeout=1 (ED not commissionable) — DUT
               MUST return TIMEOUT after the timeout fires.
   Steps 11–12: ProxyConnectRequest negative transport/band validation.
-  Step 13:    ProxyMessageRequest with a non-existent SessionId — DUT MUST return
+  Step 13:    ProxyMessageRequest with a non-existent SessionID — DUT MUST return
               NOT_FOUND.
-  Step 14:    ProxyDisconnectRequest(SessionId=0xFFFF) to cancel an in-flight
+  Step 14:    ProxyDisconnectRequest(SessionID=null) to cancel an in-flight
               ProxyConnectRequest — DUT MUST return SUCCESS (or INVALID_IN_STATE
               on a race).
 
@@ -174,22 +174,22 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                      "ED is advertising via the transport under test"),
             TestStep(5, "For each transport bit in valid_transports: TH sends "
                      "ProxyConnectRequest with that transport bit set",
-                     "DUT returns ProxyConnectResponse with SUCCESS and a valid SessionId "
+                     "DUT returns ProxyConnectResponse with SUCCESS and a valid SessionID "
                      "(0x0001–0xFFFE); save as current_session_id"),
             TestStep(6, "For each transport bit in valid_transports: TH acts as Commissioner "
                      "and performs full commissioning flow by tunneling PASE and commissioning "
                      "traffic through the DUT",
                      "Commissioning procedure completes; ED is commissioned onto the fabric"),
             TestStep(7, "For each transport bit in valid_transports: TH sends "
-                     "ProxyMessageRequest(SessionId=current_session_id, ResponseTimeout=0, "
+                     "ProxyMessageRequest(SessionID=current_session_id, ResponseTimeout=0, "
                      "Message=<valid frame>)",
                      "DUT returns ProxyMessageResponse immediately with "
-                     "SessionId=current_session_id; Message may be null"),
+                     "SessionID=current_session_id; Message may be null"),
             TestStep(8, "For each transport bit in valid_transports: TH sends "
-                     "ProxyDisconnectRequest(SessionId=<non-existent>)",
+                     "ProxyDisconnectRequest(SessionID=<non-existent>)",
                      "DUT returns NOT_FOUND"),
             TestStep(9, "For each transport bit in valid_transports: TH sends "
-                     "ProxyDisconnectRequest(SessionId=current_session_id)",
+                     "ProxyDisconnectRequest(SessionID=current_session_id)",
                      "DUT returns SUCCESS"),
             TestStep(10, "TH sends ProxyConnectRequest with Timeout=1 (ED not commissionable)",
                      "DUT returns TIMEOUT after approximately 1 second"),
@@ -198,10 +198,10 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             TestStep(12, "TH sends ProxyConnectRequest with WiFiPAF transport and a "
                      "WiFiBand not in valid_bands (if WI supported)",
                      "DUT returns INVALID_TRANSPORT_TYPE"),
-            TestStep(13, "TH sends ProxyMessageRequest with a non-existent SessionId",
+            TestStep(13, "TH sends ProxyMessageRequest with a non-existent SessionID",
                      "DUT returns NOT_FOUND"),
             TestStep(14, "TH sends ProxyConnectRequest(Timeout=30), then immediately sends "
-                     "ProxyDisconnectRequest(SessionId=0xFFFF) to cancel the pending connect",
+                     "ProxyDisconnectRequest(SessionID=null) to cancel the pending connect",
                      "ProxyDisconnectRequest returns SUCCESS (or INVALID_IN_STATE on race); "
                      "ProxyConnectRequest resolves with an error"),
         ]
@@ -341,18 +341,18 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                 ),
                 interactionTimeoutMs=None,
             )
-            current_session_id = connect_response.sessionId
+            current_session_id = connect_response.sessionID
             asserts.assert_true(
                 0x0001 <= current_session_id <= 0xFFFE,
-                f"[{transport_label}] SessionId {current_session_id:#06x} must be in "
+                f"[{transport_label}] SessionID {current_session_id:#06x} must be in "
                 "range 0x0001–0xFFFE")
-            logger.info("[%s] ProxyConnectResponse: sessionId=%d", transport_label, current_session_id)
+            logger.info("[%s] ProxyConnectResponse: sessionID=%d", transport_label, current_session_id)
 
             # -- Step 6 work: CommissionViaProxy --
             if wifi_ssid:
                 self.default_controller.SetWiFiCredentials(wifi_ssid, wifi_password)
 
-            logger.info("[%s] Commissioning ED via proxy (sessionId=%d nodeId=0x%04x "
+            logger.info("[%s] Commissioning ED via proxy (sessionID=%d nodeId=0x%04x "
                         "discriminator=%d)",
                         transport_label, current_session_id, ed_node_id, ed_discriminator)
             await self.default_controller.CommissionViaProxy(
@@ -371,51 +371,51 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
                 payload=cp.Commands.ProxyMessageRequest(
-                    sessionId=current_session_id,
+                    sessionID=current_session_id,
                     responseTimeout=0,
                     message=_MINIMAL_MATTER_MSG,
                 ),
                 interactionTimeoutMs=5000,
             )
             asserts.assert_equal(
-                msg_response.sessionId, current_session_id,
-                f"[{transport_label}] ProxyMessageResponse sessionId must match request sessionId")
+                msg_response.sessionID, current_session_id,
+                f"[{transport_label}] ProxyMessageResponse sessionID must match request sessionID")
             logger.info("[%s] ProxyMessageResponse received immediately (ResponseTimeout=0): "
-                        "sessionId=%d message=%s",
-                        transport_label, msg_response.sessionId,
+                        "sessionID=%d message=%s",
+                        transport_label, msg_response.sessionID,
                         "null" if msg_response.message is NullValue
                         else f"{len(msg_response.message)} bytes")
 
-            # -- Step 8 work: ProxyDisconnect invalid SessionId → NOT_FOUND --
+            # -- Step 8 work: ProxyDisconnect invalid SessionID → NOT_FOUND --
             non_existent_session_id = 0xFFFE
-            logger.info("[%s] Sending ProxyDisconnectRequest with non-existent sessionId=%d",
+            logger.info("[%s] Sending ProxyDisconnectRequest with non-existent sessionID=%d",
                         transport_label, non_existent_session_id)
             try:
                 await self.default_controller.SendCommand(
                     nodeId=self.dut_node_id,
                     endpoint=self.cp_endpoint,
                     payload=cp.Commands.ProxyDisconnectRequest(
-                        sessionId=non_existent_session_id),
+                        sessionID=non_existent_session_id),
                 )
                 asserts.fail(f"[{transport_label}] Expected NOT_FOUND for non-existent "
-                             "sessionId but command succeeded")
+                             "sessionID but command succeeded")
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.NotFound,
-                    f"[{transport_label}] Expected NOT_FOUND for non-existent sessionId, "
+                    f"[{transport_label}] Expected NOT_FOUND for non-existent sessionID, "
                     f"got {e.status}")
-                logger.info("[%s] ProxyDisconnectRequest with invalid sessionId correctly "
+                logger.info("[%s] ProxyDisconnectRequest with invalid sessionID correctly "
                             "returned NOT_FOUND", transport_label)
 
             # -- Step 9 work: ProxyDisconnect valid current_session_id → SUCCESS --
-            logger.info("[%s] Sending ProxyDisconnectRequest with valid sessionId=%d",
+            logger.info("[%s] Sending ProxyDisconnectRequest with valid sessionID=%d",
                         transport_label, current_session_id)
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionId=current_session_id),
+                payload=cp.Commands.ProxyDisconnectRequest(sessionID=current_session_id),
             )
-            logger.info("[%s] ProxyDisconnectRequest succeeded for sessionId=%d",
+            logger.info("[%s] ProxyDisconnectRequest succeeded for sessionID=%d",
                         transport_label, current_session_id)
 
             # Remove the commissioned ED from the controller fabric while it is
@@ -536,29 +536,29 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                     logger.info("Got expected INVALID_TRANSPORT_TYPE for invalid WiFiBand")
 
         # ----------------------------------------------------------------
-        # Step 13: ProxyMessageRequest referencing a non-existent SessionId.
+        # Step 13: ProxyMessageRequest referencing a non-existent SessionID.
         # ----------------------------------------------------------------
         self.step(13)
-        logger.info("Sending ProxyMessageRequest with non-existent sessionId=0xFFFE")
+        logger.info("Sending ProxyMessageRequest with non-existent sessionID=0xFFFE")
         try:
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
                 payload=cp.Commands.ProxyMessageRequest(
-                    sessionId=0xFFFE,
+                    sessionID=0xFFFE,
                     responseTimeout=10,
                     message=_MINIMAL_MATTER_MSG,
                 ),
                 interactionTimeoutMs=15000,
             )
-            asserts.fail("Expected NOT_FOUND for non-existent sessionId but command succeeded")
+            asserts.fail("Expected NOT_FOUND for non-existent sessionID but command succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Expected NOT_FOUND for non-existent sessionId, got {e.status}")
-            logger.info("ProxyMessageRequest with non-existent sessionId correctly returned NOT_FOUND")
+                                 f"Expected NOT_FOUND for non-existent sessionID, got {e.status}")
+            logger.info("ProxyMessageRequest with non-existent sessionID correctly returned NOT_FOUND")
 
         # ----------------------------------------------------------------
-        # Step 14: ProxyDisconnectRequest(SessionId=0xFFFF) to cancel an
+        # Step 14: ProxyDisconnectRequest(SessionID=null) to cancel an
         # in-flight ProxyConnectRequest.
         # ----------------------------------------------------------------
         self.step(14)
@@ -588,7 +588,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                 await self.default_controller.SendCommand(
                     nodeId=self.dut_node_id,
                     endpoint=self.cp_endpoint,
-                    payload=cp.Commands.ProxyDisconnectRequest(sessionId=0xFFFF),
+                    payload=cp.Commands.ProxyDisconnectRequest(sessionID=NullValue),
                     interactionTimeoutMs=5000,
                 )
                 return "SUCCESS"
@@ -599,21 +599,21 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             _pending_connect(), _cancel_pending())
 
         if isinstance(cancel_result, str):
-            logger.info("Step 14: ProxyDisconnect(0xFFFF) returned SUCCESS "
+            logger.info("Step 14: ProxyDisconnect(null) returned SUCCESS "
                         "(pending connect cancelled)")
         elif isinstance(cancel_result, InteractionModelError):
             asserts.assert_equal(
                 cancel_result.status, Status.InvalidInState,
-                f"ProxyDisconnect(0xFFFF) returned unexpected status {cancel_result.status}; "
+                f"ProxyDisconnect(null) returned unexpected status {cancel_result.status}; "
                 "expected SUCCESS or INVALID_IN_STATE")
-            logger.info("Step 14: ProxyDisconnect(0xFFFF) returned INVALID_IN_STATE "
+            logger.info("Step 14: ProxyDisconnect(null) returned INVALID_IN_STATE "
                         "(race: connect already responded)")
         else:
             asserts.fail(f"Step 14: unexpected cancel_result type {type(cancel_result)}")
 
         asserts.assert_true(
             isinstance(connect_result, InteractionModelError),
-            f"ProxyConnectRequest must not succeed when cancelled via 0xFFFF; "
+            f"ProxyConnectRequest must not succeed when cancelled via null SessionID; "
             f"got {connect_result}")
         logger.info("Step 14: ProxyConnectRequest resolved with %s (expected)",
                     connect_result.status)

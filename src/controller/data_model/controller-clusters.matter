@@ -9814,11 +9814,11 @@ provisional cluster CommissioningProxy = 1109 {
   }
 
   response struct ProxyConnectResponse = 1 {
-    int16u sessionId = 0;
+    int16u sessionID = 0;
   }
 
   request struct ProxyDisconnectRequestRequest {
-    int16u sessionId = 0;
+    nullable int16u sessionID = 0;
   }
 
   request struct ProxyScanRequestRequest {
@@ -9843,13 +9843,13 @@ provisional cluster CommissioningProxy = 1109 {
   }
 
   request struct ProxyMessageRequestRequest {
-    int16u sessionId = 0;
+    int16u sessionID = 0;
     int8u responseTimeout = 1;
     nullable long_octet_string<1280> message = 2;
   }
 
   response struct ProxyMessageResponse = 8 {
-    int16u sessionId = 0;
+    int16u sessionID = 0;
     nullable long_octet_string<1280> message = 1;
   }
 

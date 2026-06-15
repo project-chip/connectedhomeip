@@ -18126,11 +18126,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer sessionId) {
+    public void onSuccess(Integer sessionID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo sessionIdResponseValue = new CommandResponseInfo("sessionId", "Integer");
-      responseValues.put(sessionIdResponseValue, sessionId);
+      CommandResponseInfo sessionIDResponseValue = new CommandResponseInfo("sessionID", "Integer");
+      responseValues.put(sessionIDResponseValue, sessionID);
       callback.onSuccess(responseValues);
     }
 
@@ -18173,11 +18173,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer sessionId, @Nullable byte[] message) {
+    public void onSuccess(Integer sessionID, @Nullable byte[] message) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo sessionIdResponseValue = new CommandResponseInfo("sessionId", "Integer");
-      responseValues.put(sessionIdResponseValue, sessionId);
+      CommandResponseInfo sessionIDResponseValue = new CommandResponseInfo("sessionID", "Integer");
+      responseValues.put(sessionIDResponseValue, sessionID);
       CommandResponseInfo messageResponseValue = new CommandResponseInfo("message", "byte[]");
       responseValues.put(messageResponseValue, message);
       callback.onSuccess(responseValues);
@@ -31319,14 +31319,14 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> commissioningProxyproxyDisconnectRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo commissioningProxyproxyDisconnectRequestsessionIdCommandParameterInfo = new CommandParameterInfo("sessionId", Integer.class, Integer.class);
-    commissioningProxyproxyDisconnectRequestCommandParams.put("sessionId",commissioningProxyproxyDisconnectRequestsessionIdCommandParameterInfo);
+    CommandParameterInfo commissioningProxyproxyDisconnectRequestsessionIDCommandParameterInfo = new CommandParameterInfo("sessionID", Integer.class, Integer.class);
+    commissioningProxyproxyDisconnectRequestCommandParams.put("sessionID",commissioningProxyproxyDisconnectRequestsessionIDCommandParameterInfo);
     InteractionInfo commissioningProxyproxyDisconnectRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.CommissioningProxyCluster) cluster)
         .proxyDisconnectRequest((DefaultClusterCallback) callback
         , (Integer)
-        commandArguments.get("sessionId")
+        commandArguments.get("sessionID")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -31409,8 +31409,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> commissioningProxyproxyMessageRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo commissioningProxyproxyMessageRequestsessionIdCommandParameterInfo = new CommandParameterInfo("sessionId", Integer.class, Integer.class);
-    commissioningProxyproxyMessageRequestCommandParams.put("sessionId",commissioningProxyproxyMessageRequestsessionIdCommandParameterInfo);
+    CommandParameterInfo commissioningProxyproxyMessageRequestsessionIDCommandParameterInfo = new CommandParameterInfo("sessionID", Integer.class, Integer.class);
+    commissioningProxyproxyMessageRequestCommandParams.put("sessionID",commissioningProxyproxyMessageRequestsessionIDCommandParameterInfo);
 
     CommandParameterInfo commissioningProxyproxyMessageRequestresponseTimeoutCommandParameterInfo = new CommandParameterInfo("responseTimeout", Integer.class, Integer.class);
     commissioningProxyproxyMessageRequestCommandParams.put("responseTimeout",commissioningProxyproxyMessageRequestresponseTimeoutCommandParameterInfo);
@@ -31422,7 +31422,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.CommissioningProxyCluster) cluster)
           .proxyMessageRequest((ChipClusters.CommissioningProxyCluster.ProxyMessageResponseCallback) callback
            , (Integer)
-             commandArguments.get("sessionId")
+             commandArguments.get("sessionID")
 
            , (Integer)
              commandArguments.get("responseTimeout")

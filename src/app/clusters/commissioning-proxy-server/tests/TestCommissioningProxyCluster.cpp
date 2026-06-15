@@ -649,7 +649,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BleCapability)
     ASSERT_TRUE(result.response.has_value());
     if (result.response.has_value())
     {
-        EXPECT_EQ(result.response->sessionId, 1u);
+        EXPECT_EQ(result.response->sessionID, 1u);
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -698,7 +698,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithWIFeatu
     ASSERT_TRUE(result.response.has_value());
     if (result.response.has_value())
     {
-        EXPECT_EQ(result.response->sessionId, 1u);
+        EXPECT_EQ(result.response->sessionID, 1u);
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -898,7 +898,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_AfterConnect)
     Commands::ProxyDisconnectRequest::Type cmd;
     if (connectResult.response.has_value())
     {
-        cmd.sessionId = connectResult.response->sessionId;
+        cmd.sessionID.SetNonNull(connectResult.response->sessionID);
         EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     }
 
@@ -920,7 +920,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionId = 1;
+    cmd.sessionID.SetNonNull(1);
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
 
     // State SHALL be Disconnected after a successful disconnect.
@@ -953,7 +953,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateFailure
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionId = 1;
+    cmd.sessionID.SetNonNull(1);
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
 
     // State SHALL remain Connected since the delegate rejected the disconnect.
@@ -962,7 +962,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateFailure
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// SessionId=0xFFFF with a pending connect SHALL return Success and cancel the connect.
+// A null SessionID with a pending connect SHALL return Success and cancel the connect.
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_Success)
 {
     struct PendingConnectDelegate : public CommissioningProxyMockDelegate
@@ -986,7 +986,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_S
 
     tester.SetFabricIndex(2);
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionId = 0xFFFF;
+    cmd.sessionID.SetNull();
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_TRUE(mockDelegate.cancelCalled);
     EXPECT_EQ(mockDelegate.lastFabricIndex, 2);
@@ -994,7 +994,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_S
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// SessionId=0xFFFF when already connected SHALL return InvalidInState.
+// A null SessionID when already connected SHALL return InvalidInState.
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_AlreadyConnected)
 {
     TestServerClusterContext context;
@@ -1007,7 +1007,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_A
 
     // CancelPendingConnect inherits InvalidInState from Delegate base (no pending connect).
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionId = 0xFFFF;
+    cmd.sessionID.SetNull();
     auto result   = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
@@ -1015,7 +1015,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_A
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// SessionId=0xFFFF from the wrong fabric SHALL return NotFound (fabric isolation).
+// A null SessionID from the wrong fabric SHALL return NotFound (fabric isolation).
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_WrongFabric)
 {
     struct FabricCheckDelegate : public CommissioningProxyMockDelegate
@@ -1037,7 +1037,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_W
     ClusterTester tester(cluster);
 
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionId = 0xFFFF;
+    cmd.sessionID.SetNull();
 
     // Fabric 2 tries to cancel fabric 1's pending connect — SHALL be rejected.
     tester.SetFabricIndex(2);
@@ -1291,7 +1291,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WithMessage)
 
     static const uint8_t kMsg[] = { 0x01, 0x02, 0x03, 0x04 };
     Commands::ProxyMessageRequest::Type cmd;
-    cmd.sessionId       = 1;
+    cmd.sessionID       = 1;
     cmd.responseTimeout = 5;
     cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
 
@@ -1300,7 +1300,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WithMessage)
     ASSERT_TRUE(result.response.has_value());
     if (result.response.has_value())
     {
-        EXPECT_EQ(result.response->sessionId, 1u);
+        EXPECT_EQ(result.response->sessionID, 1u);
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1318,7 +1318,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_NullMessage_Poll)
     ClusterTester tester(cluster);
 
     Commands::ProxyMessageRequest::Type cmd;
-    cmd.sessionId       = 1;
+    cmd.sessionID       = 1;
     cmd.responseTimeout = 5;
     cmd.message.SetNull();
 
@@ -1327,7 +1327,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_NullMessage_Poll)
     ASSERT_TRUE(result.response.has_value());
     if (result.response.has_value())
     {
-        EXPECT_EQ(result.response->sessionId, 1u);
+        EXPECT_EQ(result.response->sessionID, 1u);
         // Null response message signals no pending data from commissionee.
         EXPECT_TRUE(result.response->message.IsNull());
     }
@@ -1347,7 +1347,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_SessionIdEchoed)
 
     static const uint8_t kMsg[] = { 0xAA, 0xBB };
     Commands::ProxyMessageRequest::Type cmd;
-    cmd.sessionId       = 42;
+    cmd.sessionID       = 42;
     cmd.responseTimeout = 5;
     cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
 
@@ -1356,7 +1356,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_SessionIdEchoed)
     ASSERT_TRUE(result.response.has_value());
     if (result.response.has_value())
     {
-        EXPECT_EQ(result.response->sessionId, 42u);
+        EXPECT_EQ(result.response->sessionID, 42u);
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1386,7 +1386,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateNotFound_P
 
     static const uint8_t kMsg[] = { 0xFF };
     Commands::ProxyMessageRequest::Type cmd;
-    cmd.sessionId       = 9999;
+    cmd.sessionID       = 9999;
     cmd.responseTimeout = 5;
     cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
 
@@ -1419,7 +1419,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateBusy_Propa
 
     static const uint8_t kMsg[] = { 0xFF };
     Commands::ProxyMessageRequest::Type cmd;
-    cmd.sessionId       = 1;
+    cmd.sessionID       = 1;
     cmd.responseTimeout = 5;
     cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
 
@@ -1449,7 +1449,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateNotFoun
 
     ClusterTester tester(cluster);
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionId = 1234; // unknown to the delegate
+    cmd.sessionID.SetNonNull(1234); // unknown to the delegate
 
     auto result = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());

@@ -41,7 +41,7 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyConnect
 {
     // Send the ProxyConnectResponse synchronously (mock simulates immediate success).
     CP::Commands::ProxyConnectResponse::Type response;
-    response.sessionId = 1;
+    response.sessionID = 1;
     commandObj->AddResponse(request.path, response);
 
     // Transition cluster state to connected, as OnPafConnectSuccess would do in production.
@@ -103,7 +103,7 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyMessage
 {
     // Mock: echo back with a null message response.
     CP::Commands::ProxyMessageResponse::Type response;
-    response.sessionId = sessionId;
+    response.sessionID = sessionId;
     response.message.SetNull();
     commandObj->AddResponse(request.path, response);
 

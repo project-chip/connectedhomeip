@@ -43,7 +43,7 @@ command scenarios:
                   rejected with UNSUPPORTED_ACCESS.
   Step 6:         ProxyConnectRequest with more than one transport bit set
                   must be rejected with INVALID_COMMAND.
-  Step 8:         ProxyMessageRequest for a non-existent SessionId must be
+  Step 8:         ProxyMessageRequest for a non-existent SessionID must be
                   rejected with NOT_FOUND.
   Step 10:        ProxyConnectRequest to establish a valid session (session_a).
   Step 11:        A second concurrent ProxyMessageRequest for session_a, sent
@@ -118,7 +118,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
                      "DUT returns INVALID_COMMAND"),
             TestStep(7, "TH sends ProxyMessageRequest over a non-CASE (PASE) session",
                      "DUT returns UNSUPPORTED_ACCESS"),
-            TestStep(8, "TH sends ProxyMessageRequest with SessionId=0xFFFE (no active session)",
+            TestStep(8, "TH sends ProxyMessageRequest with SessionID=0xFFFE (no active session)",
                      "DUT returns NOT_FOUND"),
             TestStep(9, "TH sends ProxyDisconnectRequest over a non-CASE (PASE) session",
                      "DUT returns UNSUPPORTED_ACCESS"),
@@ -128,7 +128,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
             TestStep(11, "TH sends two concurrent ProxyMessageRequests for session_a; "
                      "the second is sent while the first is still in-flight",
                      "The second ProxyMessageRequest is rejected with BUSY"),
-            TestStep(12, "TH sends ProxyDisconnectRequest(SessionId=session_a)",
+            TestStep(12, "TH sends ProxyDisconnectRequest(SessionID=session_a)",
                      "DUT returns SUCCESS"),
         ]
 
@@ -264,7 +264,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
                 nodeId=pase_node_id,
                 endpoint=self.cp_endpoint,
                 payload=cp.Commands.ProxyMessageRequest(
-                    sessionId=0x0001,
+                    sessionID=0x0001,
                     responseTimeout=10,
                     message=_MINIMAL_MATTER_MSG,
                 ),
@@ -276,25 +276,25 @@ class TC_COMPRO_2_6(COMPROBaseTest):
             logger.info("Step 7: correctly got UNSUPPORTED_ACCESS")
 
         # ----------------------------------------------------------------
-        # Step 8: ProxyMessageRequest with non-existent SessionId — NOT_FOUND
+        # Step 8: ProxyMessageRequest with non-existent SessionID — NOT_FOUND
         # ----------------------------------------------------------------
         self.step(8)
-        logger.info("Step 8: ProxyMessageRequest sessionId=0xFFFE (expect NOT_FOUND)")
+        logger.info("Step 8: ProxyMessageRequest sessionID=0xFFFE (expect NOT_FOUND)")
         try:
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=self.cp_endpoint,
                 payload=cp.Commands.ProxyMessageRequest(
-                    sessionId=0xFFFE,
+                    sessionID=0xFFFE,
                     responseTimeout=10,
                     message=_MINIMAL_MATTER_MSG,
                 ),
                 interactionTimeoutMs=15000,
             )
-            asserts.fail("Expected NOT_FOUND but ProxyMessageRequest with invalid sessionId succeeded")
+            asserts.fail("Expected NOT_FOUND but ProxyMessageRequest with invalid sessionID succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Expected NOT_FOUND for non-existent sessionId, got {e.status}")
+                                 f"Expected NOT_FOUND for non-existent sessionID, got {e.status}")
             logger.info("Step 8: correctly got NOT_FOUND")
 
         # ----------------------------------------------------------------
@@ -306,7 +306,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
             await self.default_controller.SendCommand(
                 nodeId=pase_node_id,
                 endpoint=self.cp_endpoint,
-                payload=cp.Commands.ProxyDisconnectRequest(sessionId=0x0001),
+                payload=cp.Commands.ProxyDisconnectRequest(sessionID=0x0001),
             )
             asserts.fail("Expected UNSUPPORTED_ACCESS but ProxyDisconnectRequest over PASE succeeded")
         except InteractionModelError as e:
@@ -342,7 +342,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
             ),
             interactionTimeoutMs=None,
         )
-        session_a = connect_response.sessionId
+        session_a = connect_response.sessionID
         asserts.assert_true(
             0x0001 <= session_a <= 0xFFFE,
             f"session_a {session_a:#06x} must be in range 0x0001–0xFFFE")
@@ -364,7 +364,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
                     nodeId=self.dut_node_id,
                     endpoint=self.cp_endpoint,
                     payload=cp.Commands.ProxyMessageRequest(
-                        sessionId=session_a,
+                        sessionID=session_a,
                         responseTimeout=30,
                         message=_MINIMAL_MATTER_MSG,
                     ),
@@ -380,7 +380,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
                     nodeId=self.dut_node_id,
                     endpoint=self.cp_endpoint,
                     payload=cp.Commands.ProxyMessageRequest(
-                        sessionId=session_a,
+                        sessionID=session_a,
                         responseTimeout=30,
                         message=_MINIMAL_MATTER_MSG,
                     ),
@@ -402,11 +402,11 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         # Step 12: ProxyDisconnectRequest(session_a) — SUCCESS
         # ----------------------------------------------------------------
         self.step(12)
-        logger.info("Step 12: ProxyDisconnectRequest(sessionId=%d)", session_a)
+        logger.info("Step 12: ProxyDisconnectRequest(sessionID=%d)", session_a)
         await self.default_controller.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=self.cp_endpoint,
-            payload=cp.Commands.ProxyDisconnectRequest(sessionId=session_a),
+            payload=cp.Commands.ProxyDisconnectRequest(sessionID=session_a),
         )
         logger.info("Step 12: ProxyDisconnectRequest succeeded for session_a=%d", session_a)
 

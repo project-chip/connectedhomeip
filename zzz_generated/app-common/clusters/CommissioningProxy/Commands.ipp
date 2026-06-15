@@ -92,7 +92,7 @@ namespace ProxyConnectResponse {
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kSessionId), sessionId);
+    encoder.Encode(to_underlying(Fields::kSessionID), sessionID);
     return encoder.Finalize();
 }
 
@@ -106,9 +106,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kSessionId))
+        if (__context_tag == to_underlying(Fields::kSessionID))
         {
-            err = DataModel::Decode(reader, sessionId);
+            err = DataModel::Decode(reader, sessionID);
         }
 
         ReturnErrorOnFailure(err);
@@ -120,7 +120,7 @@ namespace ProxyDisconnectRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kSessionId), sessionId);
+    encoder.Encode(to_underlying(Fields::kSessionID), sessionID);
     return encoder.Finalize();
 }
 
@@ -134,9 +134,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kSessionId))
+        if (__context_tag == to_underlying(Fields::kSessionID))
         {
-            err = DataModel::Decode(reader, sessionId);
+            err = DataModel::Decode(reader, sessionID);
         }
 
         ReturnErrorOnFailure(err);
@@ -285,7 +285,7 @@ namespace ProxyMessageRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kSessionId), sessionId);
+    encoder.Encode(to_underlying(Fields::kSessionID), sessionID);
     encoder.Encode(to_underlying(Fields::kResponseTimeout), responseTimeout);
     encoder.Encode(to_underlying(Fields::kMessage), message);
     return encoder.Finalize();
@@ -301,9 +301,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kSessionId))
+        if (__context_tag == to_underlying(Fields::kSessionID))
         {
-            err = DataModel::Decode(reader, sessionId);
+            err = DataModel::Decode(reader, sessionID);
         }
         else if (__context_tag == to_underlying(Fields::kResponseTimeout))
         {
@@ -323,7 +323,7 @@ namespace ProxyMessageResponse {
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kSessionId), sessionId);
+    encoder.Encode(to_underlying(Fields::kSessionID), sessionID);
     encoder.Encode(to_underlying(Fields::kMessage), message);
     return encoder.Finalize();
 }
@@ -338,9 +338,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kSessionId))
+        if (__context_tag == to_underlying(Fields::kSessionID))
         {
-            err = DataModel::Decode(reader, sessionId);
+            err = DataModel::Decode(reader, sessionID);
         }
         else if (__context_tag == to_underlying(Fields::kMessage))
         {

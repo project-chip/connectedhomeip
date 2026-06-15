@@ -338,7 +338,7 @@ static void OnPafConnectSuccess(void * /*context*/)
     }
 
     chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectResponse::Type response;
-    response.sessionId = sessionId;
+    response.sessionID = sessionId;
     cmd->AddResponse(ctx->path, response);
     delete ctx;
 }

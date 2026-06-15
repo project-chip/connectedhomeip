@@ -236,7 +236,7 @@ void DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t le
     }
 
     chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Type response;
-    response.sessionId = sessionId;
+    response.sessionID = sessionId;
     response.message.SetNonNull(chip::ByteSpan(data, length));
     cmd->AddResponse(ctx->path, response);
     delete ctx;
@@ -461,7 +461,7 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
         // Per spec §10.161: null/empty message means the Commissioner is polling
         // for a queued response from the Commissionee.  Respond immediately.
         chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Type pollResponse;
-        pollResponse.sessionId = sessionId;
+        pollResponse.sessionID = sessionId;
         pollResponse.message.SetNull();
         commandObj->AddResponse(request.path, pollResponse);
         return chip::Protocols::InteractionModel::Status::Success;
@@ -502,7 +502,7 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
                           sendErr.Format());
         }
         chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Type immediateResp;
-        immediateResp.sessionId = sessionId;
+        immediateResp.sessionID = sessionId;
         immediateResp.message.SetNull();
         commandObj->AddResponse(request.path, immediateResp);
         return chip::Protocols::InteractionModel::Status::Success;

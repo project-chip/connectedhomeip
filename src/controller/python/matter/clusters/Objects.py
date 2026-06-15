@@ -46757,10 +46757,10 @@ class CommissioningProxy(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="sessionId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
                     ])
 
-            sessionId: uint = 0
+            sessionID: uint = 0
 
         @dataclass
         class ProxyDisconnectRequest(ClusterCommand):
@@ -46773,10 +46773,10 @@ class CommissioningProxy(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="sessionId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=typing.Union[Nullable, uint]),
                     ])
 
-            sessionId: uint = 0
+            sessionID: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class ProxyScanRequest(ClusterCommand):
@@ -46863,12 +46863,12 @@ class CommissioningProxy(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="sessionId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="responseTimeout", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="message", Tag=2, Type=typing.Union[Nullable, bytes]),
                     ])
 
-            sessionId: uint = 0
+            sessionID: uint = 0
             responseTimeout: uint = 0
             message: typing.Union[Nullable, bytes] = NullValue
 
@@ -46883,11 +46883,11 @@ class CommissioningProxy(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="sessionId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="message", Tag=1, Type=typing.Union[Nullable, bytes]),
                     ])
 
-            sessionId: uint = 0
+            sessionID: uint = 0
             message: typing.Union[Nullable, bytes] = NullValue
 
     class Attributes:

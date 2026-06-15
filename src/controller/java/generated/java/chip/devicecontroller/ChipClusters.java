@@ -57362,31 +57362,31 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long sessionIdFieldID = 0L;
-          Integer sessionId = null;
+          final long sessionIDFieldID = 0L;
+          Integer sessionID = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == sessionIdFieldID) {
+            if (element.contextTagNum() == sessionIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                sessionId = castingValue.value(Integer.class);
+                sessionID = castingValue.value(Integer.class);
               }
             }
           }
-          callback.onSuccess(sessionId);
+          callback.onSuccess(sessionID);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void proxyDisconnectRequest(DefaultClusterCallback callback, Integer sessionId) {
-      proxyDisconnectRequest(callback, sessionId, 0);
+    public void proxyDisconnectRequest(DefaultClusterCallback callback, @Nullable Integer sessionID) {
+      proxyDisconnectRequest(callback, sessionID, 0);
     }
 
-    public void proxyDisconnectRequest(DefaultClusterCallback callback, Integer sessionId, int timedInvokeTimeoutMs) {
+    public void proxyDisconnectRequest(DefaultClusterCallback callback, @Nullable Integer sessionID, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long sessionIdFieldID = 0L;
-      BaseTLVType sessionIdtlvValue = new UIntType(sessionId);
-      elements.add(new StructElement(sessionIdFieldID, sessionIdtlvValue));
+      final long sessionIDFieldID = 0L;
+      BaseTLVType sessionIDtlvValue = sessionID != null ? new UIntType(sessionID) : new NullType();
+      elements.add(new StructElement(sessionIDFieldID, sessionIDtlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -57489,17 +57489,17 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void proxyMessageRequest(ProxyMessageResponseCallback callback, Integer sessionId, Integer responseTimeout, @Nullable byte[] message) {
-      proxyMessageRequest(callback, sessionId, responseTimeout, message, 0);
+    public void proxyMessageRequest(ProxyMessageResponseCallback callback, Integer sessionID, Integer responseTimeout, @Nullable byte[] message) {
+      proxyMessageRequest(callback, sessionID, responseTimeout, message, 0);
     }
 
-    public void proxyMessageRequest(ProxyMessageResponseCallback callback, Integer sessionId, Integer responseTimeout, @Nullable byte[] message, int timedInvokeTimeoutMs) {
+    public void proxyMessageRequest(ProxyMessageResponseCallback callback, Integer sessionID, Integer responseTimeout, @Nullable byte[] message, int timedInvokeTimeoutMs) {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long sessionIdFieldID = 0L;
-      BaseTLVType sessionIdtlvValue = new UIntType(sessionId);
-      elements.add(new StructElement(sessionIdFieldID, sessionIdtlvValue));
+      final long sessionIDFieldID = 0L;
+      BaseTLVType sessionIDtlvValue = new UIntType(sessionID);
+      elements.add(new StructElement(sessionIDFieldID, sessionIDtlvValue));
 
       final long responseTimeoutFieldID = 1L;
       BaseTLVType responseTimeouttlvValue = new UIntType(responseTimeout);
@@ -57513,15 +57513,15 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long sessionIdFieldID = 0L;
-          Integer sessionId = null;
+          final long sessionIDFieldID = 0L;
+          Integer sessionID = null;
           final long messageFieldID = 1L;
           @Nullable byte[] message = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == sessionIdFieldID) {
+            if (element.contextTagNum() == sessionIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                sessionId = castingValue.value(Integer.class);
+                sessionID = castingValue.value(Integer.class);
               }
             } else if (element.contextTagNum() == messageFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -57530,12 +57530,12 @@ public class ChipClusters {
               }
             }
           }
-          callback.onSuccess(sessionId, message);
+          callback.onSuccess(sessionID, message);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ProxyConnectResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer sessionId);
+      void onSuccess(Integer sessionID);
     }
 
     public interface ProxyScanResponseCallback extends BaseClusterCallback {
@@ -57543,7 +57543,7 @@ public class ChipClusters {
     }
 
     public interface ProxyMessageResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer sessionId, @Nullable byte[] message);
+      void onSuccess(Integer sessionID, @Nullable byte[] message);
     }
 
     public interface CachedResultsAttributeCallback extends BaseAttributeCallback {

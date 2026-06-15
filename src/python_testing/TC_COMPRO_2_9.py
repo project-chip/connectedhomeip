@@ -156,7 +156,7 @@ class TC_COMPRO_2_9(COMPROBaseTest):
         # rejects them with UNSUPPORTED_ACCESS.  ProxyScanRequest and the BGS commands
         # are O-only (no F flag), so they are accessible over PASE and are not tested
         # here.
-        # Note: sessionId values below are irrelevant — UNSUPPORTED_ACCESS fires before
+        # Note: sessionID values below are irrelevant — UNSUPPORTED_ACCESS fires before
         # any session lookup.
         pase_commands = [
             ("ProxyConnectRequest", cp.Commands.ProxyConnectRequest(
@@ -168,10 +168,10 @@ class TC_COMPRO_2_9(COMPROBaseTest):
                 timeout=30,
             )),
             ("ProxyDisconnectRequest", cp.Commands.ProxyDisconnectRequest(
-                sessionId=0xFFFE,
+                sessionID=0xFFFE,
             )),
             ("ProxyMessageRequest", cp.Commands.ProxyMessageRequest(
-                sessionId=0xFFFE,
+                sessionID=0xFFFE,
                 responseTimeout=10,
                 message=NullValue,
             )),

@@ -29735,7 +29735,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _sessionId = @(0);
+        _sessionID = @(0);
     }
     return self;
 }
@@ -29744,14 +29744,14 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRCommissioningProxyClusterProxyConnectResponseParams alloc] init];
 
-    other.sessionId = self.sessionId;
+    other.sessionID = self.sessionID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionId:%@; >", NSStringFromClass([self class]), _sessionId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; >", NSStringFromClass([self class]), _sessionID];
     return descriptionString;
 }
 
@@ -29812,7 +29812,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectResponse::DecodableType &)decodableStruct
 {
     {
-        self.sessionId = [NSNumber numberWithUnsignedShort:decodableStruct.sessionId];
+        self.sessionID = [NSNumber numberWithUnsignedShort:decodableStruct.sessionID];
     }
     return CHIP_NO_ERROR;
 }
@@ -29824,7 +29824,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _sessionId = @(0);
+        _sessionID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -29835,7 +29835,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRCommissioningProxyClusterProxyDisconnectRequestParams alloc] init];
 
-    other.sessionId = self.sessionId;
+    other.sessionID = self.sessionID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -29844,7 +29844,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionId:%@; >", NSStringFromClass([self class]), _sessionId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; >", NSStringFromClass([self class]), _sessionID];
     return descriptionString;
 }
 
@@ -29857,7 +29857,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.sessionId = self.sessionId.unsignedShortValue;
+        if (self.sessionID == nil) {
+            encodableStruct.sessionID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.sessionID.SetNonNull();
+            nonNullValue_0 = self.sessionID.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -30301,7 +30306,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _sessionId = @(0);
+        _sessionID = @(0);
 
         _responseTimeout = @(0);
 
@@ -30316,7 +30321,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRCommissioningProxyClusterProxyMessageRequestParams alloc] init];
 
-    other.sessionId = self.sessionId;
+    other.sessionID = self.sessionID;
     other.responseTimeout = self.responseTimeout;
     other.message = self.message;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -30327,7 +30332,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionId:%@; responseTimeout:%@; message:%@; >", NSStringFromClass([self class]), _sessionId, _responseTimeout, [_message base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; responseTimeout:%@; message:%@; >", NSStringFromClass([self class]), _sessionID, _responseTimeout, [_message base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -30340,7 +30345,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.sessionId = self.sessionId.unsignedShortValue;
+        encodableStruct.sessionID = self.sessionID.unsignedShortValue;
     }
     {
         encodableStruct.responseTimeout = self.responseTimeout.unsignedCharValue;
@@ -30397,7 +30402,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _sessionId = @(0);
+        _sessionID = @(0);
 
         _message = nil;
     }
@@ -30408,7 +30413,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRCommissioningProxyClusterProxyMessageResponseParams alloc] init];
 
-    other.sessionId = self.sessionId;
+    other.sessionID = self.sessionID;
     other.message = self.message;
 
     return other;
@@ -30416,7 +30421,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionId:%@; message:%@; >", NSStringFromClass([self class]), _sessionId, [_message base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; message:%@; >", NSStringFromClass([self class]), _sessionID, [_message base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -30477,7 +30482,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::DecodableType &)decodableStruct
 {
     {
-        self.sessionId = [NSNumber numberWithUnsignedShort:decodableStruct.sessionId];
+        self.sessionID = [NSNumber numberWithUnsignedShort:decodableStruct.sessionID];
     }
     {
         if (decodableStruct.message.IsNull()) {
