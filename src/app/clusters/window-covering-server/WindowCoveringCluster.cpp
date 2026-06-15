@@ -81,8 +81,8 @@ namespace Clusters {
 namespace WindowCovering {
 
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mFeatureMap(config.mFeatures),
-    mOptionalAttributes(config.mOptionalAttributes)
+    DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mDelegate(config.mDelegate),
+    mFeatureMap(config.mFeatures), mOptionalAttributes(config.mOptionalAttributes)
 {
     // Lift or Tilt must be enabled.
     VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift) || mFeatureMap.Has(Feature::kTilt), AppServer,
@@ -473,13 +473,6 @@ void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus)
                     opStatus.GetField(OperationalStatus::kTilt));
 }
 
-void ModePrint(const chip::BitMask<Mode> & mode)
-{
-    ChipLogProgress(Zcl, "Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
-                    mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback), mode.Has(Mode::kMaintenanceMode),
-                    mode.Has(Mode::kCalibrationMode));
-}
-
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
 {
 
@@ -595,22 +588,15 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOp
         SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
 
-    WindowCoveringDelegate * delegate = GetDelegate();
-    if (delegate != nullptr)
+    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
-        if (GetFeatureMap().Has(Feature::kPositionAwareLift))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-        }
-        if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-        }
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
     }
-    else
+    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
     }
+
     return Status::Success;
 }
 
@@ -630,21 +616,13 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleDownOr
         SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMaxClosed));
     }
 
-    WindowCoveringDelegate * delegate = GetDelegate();
-    if (delegate != nullptr)
+    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
-        if (GetFeatureMap().Has(Feature::kPositionAwareLift))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-        }
-        if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-        }
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
     }
-    else
+    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
     }
 
     return Status::Success;
@@ -660,23 +638,14 @@ WindowCoveringCluster::HandleStopMotion(const Commands::StopMotion::DecodableTyp
 
     bool changeTarget = true;
 
-    WindowCoveringDelegate * delegate = GetDelegate();
-    if (delegate != nullptr)
+    CHIP_ERROR err = mDelegate.HandleStopMotion();
+    if (err == CHIP_ERROR_IN_PROGRESS)
     {
-        CHIP_ERROR err = delegate->HandleStopMotion();
-        if (err == CHIP_ERROR_IN_PROGRESS)
-        {
-            // Delegate reports motion is still in progress, do not latch the current position as target yet.
-            changeTarget = false;
-        }
-        else
-        {
-            LogErrorOnFailure(err);
-        }
+        changeTarget = false;
     }
     else
     {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
+        LogErrorOnFailure(err);
     }
 
     if (changeTarget)
@@ -709,15 +678,7 @@ WindowCoveringCluster::HandleGoToLiftValue(const Commands::GoToLiftValue::Decoda
 
     SetTargetPositionLiftPercent100ths(NPercent100ths(LiftToPercent100ths(GetEndpointId(), liftValue)));
 
-    WindowCoveringDelegate * delegate = GetDelegate();
-    if (delegate != nullptr)
-    {
-        LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
-    }
+    LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
 
     return Status::Success;
 }
@@ -738,15 +699,7 @@ WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftPercenta
 
     SetTargetPositionLiftPercent100ths(NPercent100ths(percent100ths));
 
-    WindowCoveringDelegate * delegate = GetDelegate();
-    if (delegate != nullptr)
-    {
-        LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
-    }
+    LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
 
     return Status::Success;
 }
@@ -766,15 +719,7 @@ WindowCoveringCluster::HandleGoToTiltValue(const Commands::GoToTiltValue::Decoda
 
     SetTargetPositionTiltPercent100ths(NPercent100ths(TiltToPercent100ths(GetEndpointId(), tiltValue)));
 
-    WindowCoveringDelegate * delegate = GetDelegate();
-    if (delegate != nullptr)
-    {
-        LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
-    }
+    LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
 
     return Status::Success;
 }
@@ -795,15 +740,7 @@ WindowCoveringCluster::HandleGoToTiltPercentage(const Commands::GoToTiltPercenta
 
     SetTargetPositionTiltPercent100ths(NPercent100ths(percent100ths));
 
-    WindowCoveringDelegate * delegate = GetDelegate();
-    if (delegate != nullptr)
-    {
-        LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", GetEndpointId());
-    }
+    LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
 
     return Status::Success;
 }

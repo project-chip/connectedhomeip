@@ -20,6 +20,7 @@
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
 #include <app/clusters/window-covering-server/WindowCoveringDelegate.h>
 #include <app/static-cluster-config/WindowCovering.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -35,6 +36,8 @@ namespace {
 constexpr size_t kWindowCoveringFixedClusterCount = WindowCovering::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kWindowCoveringMaxClusterCount   = kWindowCoveringFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+// Helper subclass where Setters for fixed attributes Type and EndProductType are enabled
+// This is done only for keeping the backwards compatibility with example apps
 class CodegenWindowCoveringCluster : public WindowCoveringCluster
 {
 public:
@@ -44,6 +47,28 @@ public:
 };
 
 LazyRegisteredServerCluster<CodegenWindowCoveringCluster> gServers[kWindowCoveringMaxClusterCount];
+
+class WindowCoveringIntegrationDelegateWrapper final : public WindowCoveringDelegate
+{
+public:
+    void Init(EndpointId ep, WindowCoveringDelegate * wrapped)
+    {
+        mEndpoint = ep;
+        mWrapped  = wrapped;
+    }
+
+    CHIP_ERROR HandleMovement(WindowCoveringType type) override
+    {
+        return mWrapped ? mWrapped->HandleMovement(type) : CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR HandleStopMotion() override { return mWrapped ? mWrapped->HandleStopMotion() : CHIP_NO_ERROR; }
+
+private:
+    WindowCoveringDelegate * mWrapped = nullptr;
+};
+
+WindowCoveringIntegrationDelegateWrapper gDelegateWrappers[kWindowCoveringMaxClusterCount];
 
 // Helper for the derived class
 CodegenWindowCoveringCluster * FindCodegenCluster(chip::EndpointId endpoint)
@@ -89,7 +114,8 @@ public:
             optionalAttributes.Set<Attributes::SafetyStatus::Id>();
         }
 
-        WindowCoveringCluster::Config config;
+        gDelegateWrappers[clusterInstanceIndex].SetEndpoint(endpointId);
+        WindowCoveringCluster::Config config(gDelegateWrappers[clusterInstanceIndex]);
         config.WithFeatures(features).WithOptionalAttributes(optionalAttributes);
         gServers[clusterInstanceIndex].Create(endpointId, config);
 
@@ -229,9 +255,16 @@ WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId)
 
 void SetDefaultDelegate(EndpointId endpointId, WindowCoveringDelegate * delegate)
 {
-    WindowCoveringCluster * cluster = FindClusterOnEndpoint(endpointId);
-    VerifyOrReturn(cluster != nullptr, ChipLogError(Zcl, "Failed to set WindowCovering delegate for endpoint:%u", endpointId));
-    cluster->SetDelegate(delegate);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpointId, WindowCovering::Id,
+                                                       MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kWindowCoveringMaxClusterCount)
+    {
+        gDelegateWrappers[ep].Init(endpointId, delegate);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Failed to set WindowCovering delegate for endpoint:%u", endpointId);
+    }
 }
 
 void TypeSet(chip::EndpointId endpoint, Type type)
@@ -357,6 +390,13 @@ chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)
     auto cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrDie(cluster != nullptr);
     return cluster->GetMode();
+}
+
+void ModePrint(const chip::BitMask<Mode> & mode)
+{
+    ChipLogProgress(Zcl, "Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
+                    mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback), mode.Has(Mode::kMaintenanceMode),
+                    mode.Has(Mode::kCalibrationMode));
 }
 
 void SafetyStatusSet(chip::EndpointId endpoint, chip::BitMask<SafetyStatus> & newSafetyStatus)
