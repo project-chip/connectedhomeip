@@ -63,7 +63,7 @@ static void aosUartRxCallback(int fd, void * param)
     {
         if (chipUart_var.head < MAX_BUFFER_SIZE)
         {
-            readlen = len = aos_read(fd, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
+            readlen = len     = aos_read(fd, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
             if (len < 0)
             {
                 return;
