@@ -110,6 +110,19 @@ void operator delete(void * p)
     p = NULL;
 }
 
+void operator delete(void * p, std::size_t)
+{
+#ifdef USE_FREERTOS
+    if (uxTaskGetNumberOfTasks())
+        vPortFree(p);
+    else
+        free(p);
+#else
+    free(p);
+#endif
+    p = NULL;
+}
+
 void * operator new[](size_t size)
 {
     void * p;
@@ -135,6 +148,19 @@ void * operator new[](size_t size)
 // functions. THIS IS NOT OPTIONAL!
 //
 void operator delete[](void * p)
+{
+#ifdef USE_FREERTOS
+    if (uxTaskGetNumberOfTasks())
+        vPortFree(p);
+    else
+        free(p);
+#else
+    free(p);
+#endif
+    p = NULL;
+}
+
+void operator delete[](void * p, std::size_t)
 {
 #ifdef USE_FREERTOS
     if (uxTaskGetNumberOfTasks())

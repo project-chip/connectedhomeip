@@ -149,11 +149,11 @@ CHIP_ERROR AppTask::Init()
     /* Setup button handler */
     APPE_PushButtonSetReceiveCb(ButtonEventHandler);
 
-    ThreadStackMgr().InitThreadStack();
-    ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_FullEndDevice);
-    sThreadNetworkDriver.Init();
+    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
+    ReturnErrorOnFailure(sThreadNetworkDriver.Init());
 
-    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+    ReturnErrorOnFailure(PlatformMgr().AddEventHandler(MatterEventHandler, 0));
 
     err = IdentifierEffect_Init();
     if (err != CHIP_NO_ERROR)
@@ -202,15 +202,15 @@ CHIP_ERROR AppTask::Init()
     }
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     static SoftwareDiagnosticsTestEventTriggerHandler sSoftwareDiagnosticsTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler);
+    ReturnErrorOnFailure(sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler));
 #if (OTA_SUPPORT == 1)
     static OTATestEventTriggerHandler sOTATestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sOTATestEventTriggerHandler);
+    ReturnErrorOnFailure(sTestEventTriggerDelegate.AddHandler(&sOTATestEventTriggerHandler));
 #endif /* (OTA_SUPPORT == 1) */
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-    chip::Server::GetInstance().Init(initParams);
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
 
@@ -221,7 +221,7 @@ CHIP_ERROR AppTask::Init()
     {
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
         // Enable BLE advertisements
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        ReturnErrorOnFailure(chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow());
         LOG_INFO_APP("BLE advertising started. Waiting for Pairing.\n");
     }
     else

@@ -28,6 +28,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <lib/support/CodeUtils.h>
 #include <platform/stm32/stm32wba/DiagnosticDataProviderImpl.h>
 
 namespace chip {
@@ -39,7 +40,7 @@ extern "C" int mbedtls_hardware_poll(void * data, unsigned char * output, size_t
 
 void PlatformManagerImpl::ScheduleSoftwareReset(void)
 {
-    ScheduleWork([](intptr_t) {
+    TEMPORARY_RETURN_IGNORED ScheduleWork([](intptr_t) {
         PlatformMgr().HandleServerShuttingDown();
         SoftwareReset();
     });
@@ -54,8 +55,8 @@ void PlatformManagerImpl::SoftwareReset(void)
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    System::Clock::InitClock_RealTime();
-    chip::Crypto::add_entropy_source(mbedtls_hardware_poll, NULL, 16);
+    TEMPORARY_RETURN_IGNORED System::Clock::InitClock_RealTime();
+    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(mbedtls_hardware_poll, NULL, 16));
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
     // Start timer to increment TotalOperationalHours every hour
     SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
@@ -73,7 +74,7 @@ void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, vo
 
     if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
     {
-        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + 1);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + 1);
     }
     else
     {

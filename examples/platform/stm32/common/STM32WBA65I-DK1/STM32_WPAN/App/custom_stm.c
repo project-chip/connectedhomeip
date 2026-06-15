@@ -205,6 +205,7 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void * Event)
             Notification.Evt_Opcode       = MATTER_STM_ACK_INDICATE_EVT;
             Notification.ConnectionHandle = p_attribute_modified->Connection_Handle;
             APP_MATTER_Notification(&Notification);
+            break;
         }
         case ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE: {
             p_attribute_modified = (aci_gatt_attribute_modified_event_rp0 *) p_blecore_evt->data;

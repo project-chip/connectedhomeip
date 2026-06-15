@@ -418,7 +418,11 @@ uint32_t MX_APPE_Init(void * p_param)
         LOG_ERROR_APP("Matter init failed\n");
     }
 
-    GetAppTask().StartAppTask();
+    err = GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERROR_APP("Matter thread failed\n");
+    }
     /* MATTER END */
 
     /* USER CODE BEGIN APPE_Init_2 */
