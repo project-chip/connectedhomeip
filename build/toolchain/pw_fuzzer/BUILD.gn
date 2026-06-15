@@ -16,12 +16,12 @@ import("//build_overrides/build.gni")
 import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
+import("$dir_pigweed/pw_toolchain/clang_tools.gni")
 import("$dir_pigweed/targets/host/target_toolchains.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
 # Provides the `oss_fuzz` build arg (set true by OSS-Fuzz's build.sh).
 import("${build_root}/config/compiler/compiler.gni")
-
 declare_args() {
   # Build the pw_fuzzer / Google FuzzTest targets in libFuzzer-compatibility mode (the mode
   # OSS-Fuzz drives) instead of FuzzTest's native engine. Always enabled under `oss_fuzz`;
@@ -42,15 +42,13 @@ declare_args() {
 # toolchain-wide so they reach the FuzzTest library as well as the test harness.
 _use_libfuzzer_compat = oss_fuzz || chip_pw_fuzz_libfuzzer_compat
 
-# Compiler used to resolve clang runtime libraries: the OSS-Fuzz-provided $CXX when building
-# under OSS-Fuzz, otherwise the local CIPD clang the toolchain itself uses. Keeping these in
-# sync ensures the libFuzzer runtime matches the coverage/sanitizer instrumentation.
+# Compiler used to resolve the libFuzzer runtime archive: $CXX under OSS-Fuzz, otherwise
+# pw_toolchain_clang_tools.cxx -- the same clang++ the toolchain compiles with, so we track
+# pigweed (CIPD location / pw_toolchain_CLANG_PREFIX) instead of hardcoding the path.
 if (oss_fuzz) {
   _fuzztest_compiler = getenv("CXX")
 } else {
-  _fuzztest_compiler =
-      rebase_path("//.environment/cipd/packages/pigweed/bin/clang++",
-                  root_build_dir)
+  _fuzztest_compiler = pw_toolchain_clang_tools.cxx
 }
 
 # 1) Compatibility-mode define. compatibility_mode.cc defines FuzzTestExternalEngineAdaptor
