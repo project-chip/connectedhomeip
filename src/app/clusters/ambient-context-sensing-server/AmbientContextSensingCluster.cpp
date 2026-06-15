@@ -746,7 +746,7 @@ void AmbientContextSensingCluster::RemoveExpiredItems(IntrusiveList<AmbientConte
     if ((mObjectCount > 0) && (mObjectCountEndTime <= now))
     {
         mObjectCountEndTime = System::Clock::Timestamp(0);
-        SetAttributeValue(mObjectCount, 0u, Attributes::ObjectCount::Id);
+        SetAttributeValue(mObjectCount, uint16_t{0}, Attributes::ObjectCount::Id);
         // Send the DetectEndEvent
         SendDetectEndEvent(mObjectCountStartEpoch, mObjectCountStartTime.count());
         mObjectCountStartTime = System::Clock::Timestamp(0);
