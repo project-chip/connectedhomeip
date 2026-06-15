@@ -39,7 +39,7 @@ void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender && newEnt
 {
     for (uint32_t j = oldIndex; j > 0; j--)
     {
-        list[j] = list[j - 1];
+        list[j] = std::move(list[j - 1]);
     }
     list[0] = std::move(newEntry);
 }
