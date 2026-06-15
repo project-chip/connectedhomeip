@@ -54,9 +54,9 @@ void ShiftAndInsert(GroupSender * list, uint32_t oldIndex, GroupSender && newEnt
 ///     peerCount may increase if space exists, otherwise the LRU entry (at maxLimit - 1) will be evicted
 /// `peerType` is a label used only in eviction log messages.
 ///
-/// `counter` is an OUTPUT value, pointing to the PeerMessageCounter of the GroupSender found or inserted.
+/// `outCounter` is an OUTPUT value, pointing to the PeerMessageCounter of the GroupSender found or inserted.
 CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8_t & peerCount, NodeId nodeId,
-                                    chip::Transport::PeerMessageCounter *& counter, const char * peerType)
+                                    chip::Transport::PeerMessageCounter *& outCounter, const char * peerType)
 {
     static uint32_t kInvalidIndex = std::numeric_limits<uint32_t>::max();
 
@@ -93,7 +93,7 @@ CHIP_ERROR FindOrAddPeerFabricFound(GroupSender * list, uint32_t maxLimit, uint8
     }
 
     ShiftAndInsert(list, insertPos, std::move(temp));
-    counter = &(list[0].msgCounter);
+    outCounter = &(list[0].msgCounter);
     return CHIP_NO_ERROR;
 }
 
