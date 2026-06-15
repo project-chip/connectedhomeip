@@ -47,9 +47,6 @@ using chip::Ble::BLEEndPoint;
 using chip::Ble::BleLayer;
 using chip::Ble::BleLayerDelegate;
 
-// Default ProxyConnectRequest timeout
-constexpr uint16_t kProxyConnectDefaultTimeoutSecs = 30;
-
 // Active proxy sessions: sessionId → BLEEndPoint owned by the proxy.
 static std::map<uint16_t, BLEEndPoint *> sBleEndpoints;
 
@@ -611,7 +608,9 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     // fails below.
     PauseBleBgScan();
 
-    uint16_t effectiveTimeout = timeout > 0 ? timeout : kProxyConnectDefaultTimeoutSecs;
+    // Per spec a Timeout of 0 indicates no timeout: the connect runs until it
+    // succeeds, fails, or is cancelled via ProxyDisconnectRequest(null).
+    const bool hasTimeout = (timeout > 0);
 
     auto * ctx         = new BleConnectCtx{};
     ctx->handle        = chip::app::CommandHandler::Handle(commandObj);
@@ -624,7 +623,11 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     if (auto * exchange = commandObj->GetExchangeContext())
     {
-        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(effectiveTimeout + 5));
+        // Keep the exchange open until just past the connect timeout, or disable
+        // the response timer entirely (kZero) when there is no timeout. Clamp the
+        // +5 s margin so a near-max timeout cannot wrap the uint16 seconds field.
+        const uint16_t responseSecs = (timeout > static_cast<uint16_t>(0xFFFF - 5)) ? 0xFFFF : static_cast<uint16_t>(timeout + 5);
+        exchange->SetResponseTimeout(hasTimeout ? chip::System::Clock::Seconds16(responseSecs) : chip::System::Clock::kZero);
     }
 
     chip::SetupDiscriminator setupDisc;
@@ -640,17 +643,20 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
-    CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(effectiveTimeout),
-                                                                      OnBleConnect_Timeout, nullptr);
-    if (timerErr != CHIP_NO_ERROR)
+    if (hasTimeout)
     {
-        ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
-        // Cancel the BLE scan we just started so we don't leak it.
-        (void) layer->CancelBleIncompleteConnection();
-        sBlePendingConnect = nullptr;
-        delete ctx;
-        ResumeBleBgScanIfNeeded();
-        return chip::Protocols::InteractionModel::Status::Failure;
+        CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout),
+                                                                          OnBleConnect_Timeout, nullptr);
+        if (timerErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
+            // Cancel the BLE scan we just started so we don't leak it.
+            (void) layer->CancelBleIncompleteConnection();
+            sBlePendingConnect = nullptr;
+            delete ctx;
+            ResumeBleBgScanIfNeeded();
+            return chip::Protocols::InteractionModel::Status::Failure;
+        }
     }
 
     ChipLogProgress(AppServer, "ProxyConnectRequest: BLE scan/connect started for discriminator %u", discriminator);

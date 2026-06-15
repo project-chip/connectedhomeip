@@ -135,10 +135,11 @@ chip::BitMask<CapabilitiesBitmap> CommissioningProxyCluster::GetSupportedTranspo
 {
     chip::BitMask<CapabilitiesBitmap> supported;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    // WiFiPAF is advertised when the WiFi-PAF stack is compiled in AND the WI
-    // feature is enabled on this cluster instance (spec [WI].a+ conformance).
-    if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
-        supported.Set(CapabilitiesBitmap::kWiFiPAF);
+    // WiFiPAF is advertised whenever the WiFi-PAF stack is compiled into the
+    // build. The spec CapabilitiesBitmap conformance for WiFiPAF is O.a+
+    // (plain optional), independent of the WI feature — WI only gates the
+    // WiFiBand attribute and the WiFiBands command fields.
+    supported.Set(CapabilitiesBitmap::kWiFiPAF);
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
     // BLE advertised whenever the BLE stack is compiled into the build

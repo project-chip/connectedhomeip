@@ -92,7 +92,7 @@ class TC_COMPRO_2_1(COMPROBaseTest):
                      "DUT returns a uint16 value >= 1"),
             TestStep(9, "TH reads CachedResults attribute (if BGS supported)",
                      "DUT returns null (no cached results when background scan is not running)"),
-            TestStep(10, "TH reads WiFiBand attribute (if WI supported)",
+            TestStep(10, "TH reads WiFiBand attribute (if present in AttributeList)",
                      "DUT returns a WiFiBandBitmap with only valid bits set"),
             TestStep(11, "TH writes Transport attribute with a value different from step 3",
                      "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
@@ -108,9 +108,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
             TestStep(16, "TH reads MaxCachedResults attribute (if BGS supported)",
                      "DUT returns the same value as step 6 (value unchanged)"),
             TestStep(17, "TH writes WiFiBand attribute with a value different from step 10 "
-                     "(if WI supported)",
+                     "(if present in AttributeList)",
                      "DUT returns UNSUPPORTED_WRITE (read-only Fixed attribute)"),
-            TestStep(18, "TH reads WiFiBand attribute (if WI supported)",
+            TestStep(18, "TH reads WiFiBand attribute (if present in AttributeList)",
                      "DUT returns the same value as step 10 (value unchanged)"),
         ]
 
@@ -125,7 +125,6 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         self.step(2)
         feature_map = await self.read_feature_map()
         logger.info("FeatureMap = 0x%04x", feature_map)
-        has_wi = self.has_feature_wi(feature_map)
         has_bgs = self.has_feature_bgs(feature_map)
 
         # Step 3 — Transport (mandatory).  Defined transport bits per spec are
@@ -190,14 +189,18 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         else:
             self.mark_step_range_skipped(6, 9)
 
-        # Step 10 — WiFiBand (WI feature, WiFiBandBitmap).  The spec constraint is
-        # "desc": WiFiBand indicates the bands supported for PAFTP.  WI does not
-        # require the WiFiPAF transport bit, so a value of 0 is valid when WI is
-        # advertised without WiFiPAF.  Only require at least one band when the
-        # WiFiPAF transport is advertised; always reject undefined bits.
+        # Step 10 — WiFiBand (WiFiBandBitmap).  Conformance is [WI]: optional even
+        # when WI is supported, so a WI proxy MAY omit the attribute.  Gate on its
+        # actual presence in the AttributeList rather than on the WI feature.  The
+        # spec constraint is "desc": WiFiBand indicates the bands supported for
+        # PAFTP.  WI does not require the WiFiPAF transport bit, so a value of 0 is
+        # valid when WI is advertised without WiFiPAF.  Only require at least one
+        # band when the WiFiPAF transport is advertised; always reject undefined
+        # bits.
         wifi_band = None
-        if has_wi:
-            self.step(10)
+        self.step(10)
+        has_wifiband = await self.attribute_guard(endpoint=self.cp_endpoint, attribute=cp.Attributes.WiFiBand)
+        if has_wifiband:
             wifi_band = await self.read_wifi_band()
             logger.info("WiFiBand = 0x%04x", wifi_band)
             valid_band_mask = (cp.Bitmaps.WiFiBandBitmap.k2g4 |
@@ -208,8 +211,6 @@ class TC_COMPRO_2_1(COMPROBaseTest):
                 asserts.assert_not_equal(
                     wifi_band, 0,
                     "WiFiBand must have at least one band bit set when WiFiPAF transport is supported")
-        else:
-            self.skip_step(10)
 
         # ------------------------------------------------------------------
         # Steps 11-18 — Transport, MaxSessions, MaxCachedResults and WiFiBand
@@ -261,8 +262,9 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         else:
             self.mark_step_range_skipped(15, 16)
 
-        # Steps 17-18 — WiFiBand (WI feature only)
-        if has_wi:
+        # Steps 17-18 — WiFiBand ([WI]: present only if advertised in the
+        # AttributeList, as determined in step 10)
+        if has_wifiband:
             # Step 17 — write a different value → UNSUPPORTED_WRITE
             self.step(17)
             await self.expect_write_rejected(

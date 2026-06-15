@@ -615,17 +615,37 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyDisconnectRequest(uint16_t sess
 
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::CancelPendingConnect(chip::FabricIndex fabricIndex)
 {
+    // A null-SessionID ProxyDisconnectRequest cancels the invoking fabric's own
+    // pending connect(s). Each transport returns:
+    //   Success       — a connect owned by this fabric was cancelled
+    //   NotFound      — a connect is pending but owned by a different fabric
+    //   InvalidInState — no connect pending on that transport
+    // Every transport is checked (no early return): the spec says null cancels
+    // *any* ongoing ProxyConnectRequest for the fabric, so a connect pending on
+    // a second transport must also be cancelled, and a foreign connect on one
+    // transport must not mask this fabric's connect on another. Cancellation
+    // stays strictly same-fabric — a foreign connect is never touched; it only
+    // affects the returned status.
+    bool cancelledOwn      = false;
+    bool sawForeignPending = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     auto pafStatus = Paf::CancelPendingConnect(fabricIndex);
-    if (pafStatus != chip::Protocols::InteractionModel::Status::InvalidInState)
-        return pafStatus;
+    if (pafStatus == chip::Protocols::InteractionModel::Status::Success)
+        cancelledOwn = true;
+    else if (pafStatus == chip::Protocols::InteractionModel::Status::NotFound)
+        sawForeignPending = true;
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
     auto bleStatus = Ble::CancelPendingConnect(fabricIndex);
-    if (bleStatus != chip::Protocols::InteractionModel::Status::InvalidInState)
-        return bleStatus;
+    if (bleStatus == chip::Protocols::InteractionModel::Status::Success)
+        cancelledOwn = true;
+    else if (bleStatus == chip::Protocols::InteractionModel::Status::NotFound)
+        sawForeignPending = true;
 #endif
-    return chip::Protocols::InteractionModel::Status::InvalidInState;
+    if (cancelledOwn)
+        return chip::Protocols::InteractionModel::Status::Success;
+    return sawForeignPending ? chip::Protocols::InteractionModel::Status::NotFound
+                             : chip::Protocols::InteractionModel::Status::InvalidInState;
 }
 
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStartRequest(

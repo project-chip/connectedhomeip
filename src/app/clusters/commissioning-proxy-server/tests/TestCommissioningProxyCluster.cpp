@@ -149,7 +149,8 @@ TEST_F(TestCommissioningProxyCluster, TestFeatures)
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
-    // WiFi Feature - Wi-Fi and mandatory attributes
+    // WiFi Feature - mandatory attributes plus WiFiBand. WiFiBand is [WI]
+    // (optional under WI); this implementation always exposes it when WI is set.
     {
         BitMask<Feature> features(Feature::kWiFiNetworkInterface);
         CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, features, mockDelegate));
@@ -307,21 +308,27 @@ TEST_F(TestCommissioningProxyCluster, TestTransportAttribute_BleGatedByBuildFlag
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// The Transport attribute SHALL advertise kWiFiPAF only when WiFi-PAF is
-// compiled into this build (CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF) AND the WI
-// feature bit is set on this cluster instance.
-TEST_F(TestCommissioningProxyCluster, TestTransportAttribute_WiFiPAFGatedByWIFeatureAndBuildFlag)
+// The Transport attribute SHALL advertise kWiFiPAF whenever WiFi-PAF is
+// compiled into this build (CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF), independent of
+// the WI feature.  The CapabilitiesBitmap WiFiPAF conformance is O.a+ (plain
+// optional); WI only gates the WiFiBand attribute and the WiFiBands command
+// fields.
+TEST_F(TestCommissioningProxyCluster, TestTransportAttribute_WiFiPAFGatedByBuildFlag)
 {
     TestServerClusterContext context;
     CommissioningProxyMockDelegate mockDelegate;
 
-    // Without WI: kWiFiPAF must not be advertised.
+    // Without WI: kWiFiPAF is still advertised when the build flag is on.
     {
         CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
         auto supported = ReadSupportedTransports(tester);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        EXPECT_TRUE(supported.Has(CapabilitiesBitmap::kWiFiPAF));
+#else
         EXPECT_FALSE(supported.Has(CapabilitiesBitmap::kWiFiPAF));
+#endif
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
@@ -615,7 +622,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ReservedTransportB
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// WiFiPAF transport without the WI feature SHALL return InvalidTransportType.
+// WiFiPAF transport without the WI feature SHALL be accepted: the WiFiPAF
+// CapabilitiesBitmap conformance is O.a+, independent of the WI feature. WI
+// only gates the WiFiBand field (absent here).
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithoutWIFeature)
 {
     TestServerClusterContext context;
@@ -624,9 +633,11 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiPAFWithoutWIFe
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
     Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF);
 
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -796,8 +807,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_StateUnchangedOnFa
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    // WiFiPAF without WI feature → failure
-    EXPECT_FALSE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
+    // A reserved transport bit (0x01) is never supported → InvalidTransportType,
+    // a build-independent connect failure that must not transition state.
+    EXPECT_FALSE(tester.Invoke(MakeConnectRequest(static_cast<CapabilitiesBitmap>(0x01))).IsSuccess());
 
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
 
@@ -994,7 +1006,10 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_S
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// A null SessionID when already connected SHALL return InvalidInState.
+// A null SessionID with no ProxyConnectRequest in flight (e.g. already
+// connected, or never started) has no pending connect to cancel. The spec no
+// longer specifies a status for this case; this implementation surfaces
+// InvalidInState as the "nothing to cancel" signal.
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_AlreadyConnected)
 {
     TestServerClusterContext context;
@@ -1142,7 +1157,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_BleAndWiFiPAFTogether
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// kWiFiPAF transport without the WI feature SHALL return InvalidTransportType.
+// kWiFiPAF transport without the WI feature SHALL be accepted: the WiFiPAF
+// transport bit is O.a+, independent of WI. WI only gates the wiFiBands field
+// (absent here).
 TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiPAFWithoutWIFeature)
 {
     TestServerClusterContext context;
@@ -1152,17 +1169,19 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiPAFWithoutWIFeatu
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
     Commands::ProxyScanRequest::Type command;
     command.transport = CapabilitiesBitmap::kWiFiPAF;
 
-    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+    EXPECT_TRUE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// WiFiBands field present without the WI feature SHALL be rejected.
-// The kWiFiPAF transport check fires first (InvalidTransportType) since
-// kWiFiPAF itself requires WI; the wiFiBands guard is defence-in-depth.
+// WiFiBands field present without the WI feature SHALL be rejected with
+// InvalidCommand. The kWiFiPAF transport itself is supported without WI; the
+// rejection is driven solely by the wiFiBands-requires-WI guard.
 TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiBandWithoutWIFeature)
 {
     TestServerClusterContext context;
@@ -1172,11 +1191,15 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiBandWithoutWIFeat
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
     Commands::ProxyScanRequest::Type command;
     command.transport = CapabilitiesBitmap::kWiFiPAF;
     command.wiFiBands.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
 
-    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+    auto result = tester.Invoke(Commands::ProxyScanRequest::Id, command);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1526,7 +1549,8 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_BleNoExtraFeaturesSucceeds
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// kWiFiPAF without WI feature SHALL return InvalidTransportType.
+// kWiFiPAF without WI feature SHALL be accepted: the WiFiPAF transport bit is
+// O.a+, independent of WI. WI only gates the wiFiBands field (absent here).
 TEST_F(TestCommissioningProxyCluster, TestBgScanStart_WiFiPAFWithoutWIFeature)
 {
     TestServerClusterContext context;
@@ -1536,7 +1560,9 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_WiFiPAFWithoutWIFeature)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    EXPECT_FALSE(tester.Invoke(MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
+    EXPECT_TRUE(tester.Invoke(MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1559,12 +1585,9 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ReservedWiFiBandBits)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// kWiFiPAF with wiFiBands but no WI feature SHALL return InvalidTransportType.
-// Note: the kWiFiPAF transport check fires before the wiFiBands check because
-// kWiFiPAF itself requires the WI feature.  There is no transport that is both
-// valid without WI and also permits a wiFiBands field, so the "wiFiBands requires
-// WI feature" guard in the cluster code is defence-in-depth rather than a
-// reachable path for BackgroundScanStart.
+// kWiFiPAF with a wiFiBands field but no WI feature SHALL return InvalidCommand.
+// The kWiFiPAF transport itself is supported without WI; the rejection is
+// driven solely by the wiFiBands-requires-WI guard.
 TEST_F(TestCommissioningProxyCluster, TestBgScanStart_WiFiPAFAndBandWithoutWIFeature)
 {
     TestServerClusterContext context;
@@ -1574,9 +1597,13 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_WiFiPAFAndBandWithoutWIFea
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
     auto cmd = MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF, 30,
                                       chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4)));
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1724,7 +1751,8 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_BleValid)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// kWiFiPAF without WI feature SHALL return InvalidTransportType.
+// kWiFiPAF without WI feature SHALL be accepted: the WiFiPAF transport bit is
+// O.a+, independent of WI. WI only gates the wiFiBands field (absent here).
 TEST_F(TestCommissioningProxyCluster, TestBgScanStop_WiFiPAFWithoutWIFeature)
 {
     TestServerClusterContext context;
@@ -1734,7 +1762,9 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_WiFiPAFWithoutWIFeature)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    EXPECT_FALSE(tester.Invoke(MakeBgScanStopRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kWiFiPAF);
+
+    EXPECT_TRUE(tester.Invoke(MakeBgScanStopRequest(CapabilitiesBitmap::kWiFiPAF)).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1767,12 +1797,13 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_WiFiBandWithoutWIFeature)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    // transport=0 alone is invalid, so provide kWiFiPAF (which also fails,
-    // but for InvalidTransportType). Separately test wiFiBands-only path
-    // with transport=0 and a wiFiBands value without WI feature.
+    // A band-only stop (transport=0 + wiFiBands) without the WI feature SHALL be
+    // rejected with InvalidCommand by the wiFiBands-requires-WI guard.
     auto cmd = MakeBgScanStopRequest(static_cast<CapabilitiesBitmap>(0),
                                      chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4)));
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

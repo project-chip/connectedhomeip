@@ -44,9 +44,6 @@ namespace {
 
 using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type;
 
-// Default ProxyConnectRequest timeout when the commissioner sends 0 (spec §10.5.7.1).
-constexpr uint16_t kProxyConnectDefaultTimeoutSecs = 30;
-
 // ------------------------------------------------------------------
 // Per-sessionId PAF state.  Owned by this module; the dispatcher's
 // sProxySessions only tracks (transport, fabric).
@@ -471,7 +468,9 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         return chip::Protocols::InteractionModel::Status::Busy;
     }
 
-    uint16_t effectiveTimeout = timeout > 0 ? timeout : kProxyConnectDefaultTimeoutSecs;
+    // Per spec a Timeout of 0 indicates no timeout: the connect runs until it
+    // succeeds, fails, or is cancelled via ProxyDisconnectRequest(null).
+    const bool hasTimeout = (timeout > 0);
 
     auto * ctx         = new PafConnectCtx{};
     ctx->handle        = chip::app::CommandHandler::Handle(commandObj);
@@ -485,7 +484,11 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     if (auto * exchange = commandObj->GetExchangeContext())
     {
-        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(effectiveTimeout + 5));
+        // Keep the exchange open until just past the connect timeout, or disable
+        // the response timer entirely (kZero) when there is no timeout. Clamp the
+        // +5 s margin so a near-max timeout cannot wrap the uint16 seconds field.
+        const uint16_t responseSecs = (timeout > static_cast<uint16_t>(0xFFFF - 5)) ? 0xFFFF : static_cast<uint16_t>(timeout + 5);
+        exchange->SetResponseTimeout(hasTimeout ? chip::System::Clock::Seconds16(responseSecs) : chip::System::Clock::kZero);
     }
 
     CHIP_ERROR err =
@@ -506,20 +509,23 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 
     ctx->subscribeId = chip::DeviceLayer::ConnectivityMgrImpl().GetPendingConnectSubscribeId();
 
-    CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(effectiveTimeout),
-                                                                      OnProxyConnectTimeout, nullptr);
-    if (timerErr != CHIP_NO_ERROR)
+    if (hasTimeout)
     {
-        ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
-        CHIP_ERROR rmErr2 =
-            chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
-        if (rmErr2 != CHIP_NO_ERROR)
+        CHIP_ERROR timerErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout),
+                                                                          OnProxyConnectTimeout, nullptr);
+        if (timerErr != CHIP_NO_ERROR)
         {
-            ChipLogDetail(AppServer, "ProxyConnectRequest cleanup: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr2.Format());
+            ChipLogError(AppServer, "ProxyConnectRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
+            CHIP_ERROR rmErr2 = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(
+                chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
+            if (rmErr2 != CHIP_NO_ERROR)
+            {
+                ChipLogDetail(AppServer, "ProxyConnectRequest cleanup: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr2.Format());
+            }
+            sPafPendingConnect = nullptr;
+            delete ctx;
+            return chip::Protocols::InteractionModel::Status::Failure;
         }
-        sPafPendingConnect = nullptr;
-        delete ctx;
-        return chip::Protocols::InteractionModel::Status::Failure;
     }
 
     ChipLogProgress(AppServer, "ProxyConnectRequest: WiFiPAFSubscribe started for discriminator %u (subscribe_id %u)",
