@@ -424,9 +424,8 @@ After which tests should be located in
 
 The `oss_fuzz=true` GN build is not stand-alone fuzzing; it is the integration
 point for the external OSS-Fuzz automation, which drives it from its own
-`build.sh` and supplies environment variables such as `$CFLAGS`, `$CXXFLAGS`
-and `$LIB_FUZZING_ENGINE`. It is not exposed as a local `build_examples.py`
-target.
+`build.sh` and supplies environment variables such as `$CFLAGS`, `$CXXFLAGS` and
+`$LIB_FUZZING_ENGINE`. It is not exposed as a local `build_examples.py` target.
 
 For local testing you likely want `libfuzzer` + `asan` builds, or -- for the
 `pw_fuzzer` `FuzzTests` below -- the `-ossfuzz` modifier, which reproduces the
