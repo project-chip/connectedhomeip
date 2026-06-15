@@ -529,6 +529,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
     EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
 }
 
+<<<<<<< HEAD
 TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
 {
     IdentificationDeclaration idOut;
@@ -579,6 +580,8 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppInfoOverflow)
     }
 }
 
+=======
+>>>>>>> ad4be12a19 (fix(udc): Prevent uninitialized stack read on oversized UDC rotating IDs (#72482))
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
