@@ -88,7 +88,7 @@ WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config
     VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift) || mFeatureMap.Has(Feature::kTilt), AppServer,
                        "Validation failed: Neither Lift nor Tilt is enabled.");
 
-    if (mFeatureMap.Has(Feature::kLift) && mFeatureMap.Has(Feature::kPositionAwareLift))
+    if (mFeatureMap.Has(Feature::kPositionAwareLift))
     {
         VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift), AppServer,
                            "Validation failed: PositionAwareLift requires Lift feature.");
@@ -98,12 +98,6 @@ WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config
     {
         VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kTilt), AppServer,
                            "Validation failed: PositionAwareTilt requires Tilt feature.");
-    }
-
-    if (mFeatureMap.Has(Feature::kAbsolutePosition))
-    {
-        VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kPositionAwareLift) || mFeatureMap.Has(Feature::kPositionAwareTilt), AppServer,
-                           "Validation failed: AbsolutePosition requires PositionAwareLift or PositionAwareTilt.");
     }
 }
 
@@ -329,6 +323,7 @@ DataModel::ActionReturnStatus WindowCoveringCluster::WriteAttribute(const DataMo
         chip::BitMask<Mode> mode;
         ReturnErrorOnFailure(decoder.Decode(mode));
         VerifyOrReturnValue(mode.Raw() <= 0x0F, Status::ConstraintError);
+        VerifyOrReturnValue(!mMode.Has(Mode::kCalibrationMode) || mode.Has(Mode::kCalibrationMode), Status::Failure);
         SetMode(mode);
         return Status::Success;
     }
@@ -375,15 +370,16 @@ CHIP_ERROR WindowCoveringCluster::AcceptedCommands(const ConcreteClusterPath & p
         Commands::GoToTiltPercentage::kMetadataEntry,
     };
 
-    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
+    if (GetFeatureMap().Has(Feature::kLift))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kGoToLiftPercentageCommand));
     }
 
-    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    if (GetFeatureMap().Has(Feature::kTilt))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kGoToTiltPercentageCommand));
     }
+
     ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
 
     return CHIP_NO_ERROR;
@@ -588,11 +584,11 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOp
         SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
 
-    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
+    if (GetFeatureMap().Has(Feature::kLift))
     {
         LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
     }
-    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    if (GetFeatureMap().Has(Feature::kTilt))
     {
         LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
     }
@@ -616,11 +612,11 @@ std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleDownOr
         SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMaxClosed));
     }
 
-    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
+    if (GetFeatureMap().Has(Feature::kLift))
     {
         LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
     }
-    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    if (GetFeatureMap().Has(Feature::kTilt))
     {
         LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
     }
@@ -693,8 +689,14 @@ WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftPercenta
     std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kPositionAwareLift), Status::Failure,
-                        ChipLogProgress(Zcl, "Err Device is not PA LF"));
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kLift), Status::UnsupportedCommand,
+                        ChipLogProgress(Zcl, "Err Device is tilt-only"));
+
+    if (!GetFeatureMap().Has(Feature::kPositionAwareLift))
+    {
+        return (percent100ths == 0) ? HandleUpOrOpen() : HandleDownOrClose();
+    }
+
     VerifyOrReturnValue(IsPercent100thsValid(percent100ths), Status::ConstraintError);
 
     SetTargetPositionLiftPercent100ths(NPercent100ths(percent100ths));
@@ -734,8 +736,14 @@ WindowCoveringCluster::HandleGoToTiltPercentage(const Commands::GoToTiltPercenta
     std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
     VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kPositionAwareTilt), Status::Failure,
-                        ChipLogProgress(Zcl, "Err Device is not PA TL"));
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kTilt), Status::UnsupportedCommand,
+                        ChipLogProgress(Zcl, "Err Device is lift-only"));
+
+    if (!GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    {
+        return (percent100ths == 0) ? HandleUpOrOpen() : HandleDownOrClose();
+    }
+
     VerifyOrReturnValue(IsPercent100thsValid(percent100ths), Status::ConstraintError);
 
     SetTargetPositionTiltPercent100ths(NPercent100ths(percent100ths));
