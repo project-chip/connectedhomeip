@@ -427,7 +427,12 @@ For manual interactive validation, execute `chip-tool` (refer to the
 
 ## Step 6: Update Implementation Status Documentation
 
-After implementing and registering your device, manually update the tracking documentation:
+After implementing and registering your device, manually update the tracking
+documentation:
 
-1. **`supported_device_types.md`**: Move your device type entry from the **Unimplemented** table to the **Implemented** table, and increment the total count.
-2. **`supported_clusters.md`**: If your device introduced support for a new cluster, update its **Used in All-Devices** status to `Yes` and list your device type in the **Notes/Devices** column.
+1. **`supported_device_types.md`**: Move your device type entry from the
+   **Unimplemented** table to the **Implemented** table, and increment the total
+   count.
+2. **`supported_clusters.md`**: If your device introduced support for a new
+   cluster, update its **Used in All-Devices** status to `Yes` and list your
+   device type in the **Notes/Devices** column.
