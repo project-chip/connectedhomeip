@@ -141,7 +141,7 @@ public:
         mSetupPinCode     = setupPinCode;
         mProxyExchangeMgr = nullptr;
         mProxySession.Release();
-        mError            = CHIP_NO_ERROR;
+        mError = CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Start(chip::Controller::CommissioningParameters & commParams)
