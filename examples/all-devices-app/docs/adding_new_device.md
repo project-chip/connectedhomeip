@@ -9,19 +9,23 @@ build targets, and executing certification tests.
 
 ---
 
-## Step 0: Plan & Research (Matter Specification)
+## Step 0: Research Specification Requirements
 
-Before writing any code, consult the latest Matter Specification (specifically
-the Matter Device Library Specification) to determine:
+1. **Matter Device Library Specification (Primary)**: Reference the latest CSA Matter spec for authoritative next-version requirements.
+2. **Local XML Reference (Secondary)**: Cross-reference `data_model/{version}/device_types/{DeviceType}.xml` for quick lookup. Note: XMLs are static snapshots of a certifiable spec version; they may need augmentation for next-version features.
+3. **Endpoint Support Constraint**: Endpoints must contain at least one functional, domain-specific server cluster. 0-cluster endpoints are disallowed.
+4. **Identify Key Requirements**:
+   - **Device Type ID**: Hex identifier (e.g., `0x0302` for Temperature Sensor).
+   - **Mandatory & Optional Clusters**: Server clusters required to comply.
+   - **Endpoint Constraints / Composition Rules**: Tree composition rules.
 
--   **Device Type ID**: The official hex identifier for your device (e.g.,
-    `0x0302` for Temperature Sensor, `0x000E` for Aggregator).
--   **Mandatory & Optional Clusters**: The exact server clusters that must be
-    instantiated to comply with the device type definition (e.g., `Identify`,
-    `Descriptor`, `Temperature Measurement`).
--   **Endpoint Constraints & Composition Rules**: Rules governing tree
-    composition, such as whether the device type acts as a root endpoint or
-    requires specific child sub-endpoints.
+---
+
+## Step 0.5: Test Plan & Test Discovery
+
+1. **Locate Test Plans**: Reference the private `chip-test-plans` repository (e.g., cloned locally under `out/test_plans/src/cluster/`) to understand cluster verification steps.
+2. **Locate Integration Tests**: Search `src/python_testing/` for `TC_{CLUSTER}_*.py` or `src/app/tests/suites/` for YAML tests corresponding to the implemented clusters.
+3. **Plan CI Runs**: Plan to enable a subset of cluster tests in CI. This is done by adding run configurations to the `=== BEGIN CI TEST ARGUMENTS ===` block of the python script or to the YAML test suites, passing `--device {your-device}`.
 
 ---
 
@@ -405,3 +409,16 @@ For manual interactive validation, execute `chip-tool` (refer to the
     implemented by your device.
 -   Execute those dedicated test scripts via `run_python_test.py` to guarantee
     full compliance with the Matter Specification.
+
+---
+
+## Step 6: Update Implementation Status Documentation
+
+After implementing and registering your device, update the tracking documentation:
+
+1. Run the documentation generator script:
+   ```bash
+   python3 out/extract_and_generate.py
+   ```
+2. Verify your device type is moved from **Unimplemented** to **Implemented** in `examples/all-devices-app/docs/supported_device_types.md`.
+

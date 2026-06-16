@@ -1,47 +1,29 @@
 # Matter Device Types Implementation Status
 
-**Updated as of**: 2026-06-12 (Matter Specification SHA:
-`5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)
+**Updated as of**: 2026-06-12 (Matter Specification SHA: `5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)
 
 ## Discovery & Updating Methodology
 
 To update or validate this list manually, follow these steps:
 
 1. **Verify Implemented Device Types**:
-
-    - Inspect
-      `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
-    - Look at the `DeviceFactory` constructor. Every
-      `RegisterCreator("name", ...)` call corresponds to an implemented device
-      type.
-    - Note: `Root Node` (0x0016) is a special device type that is always
-      implemented on Endpoint 0, and is represented by `RootNodeDevice.h/cpp`
-      under `examples/all-devices-app/all-devices-common/devices/root-node/`.
+   - Inspect `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
+   - Look at the `DeviceFactory` constructor. Every `RegisterCreator("name", ...)` call corresponds to an implemented device type.
+   - Note: `Root Node` (0x0016) is a special device type that is always implemented on Endpoint 0, and is represented by `RootNodeDevice.h/cpp` under `examples/all-devices-app/all-devices-common/devices/root-node/`.
 
 2. **Verify Server Clusters per Device Type**:
-
-    - Locate the device type definition in the Matter Specification (e.g. under
-      `device_library/` in the spec repository, or locally generated markdown
-      files).
-    - Find the sub-section `### Cluster Requirements` for the device type.
-    - Identify all server-side clusters (Client/Server = Server).
-    - Clusters with conformance `M` (Mandatory) are tracked normally. Clusters
-      with other conformance codes (e.g. `O`, conditional, etc.) are
-      **Optional** and are tracked with an `[O]` suffix.
+   - Locate the device type definition in the Matter Specification (e.g. under `device_library/` in the spec repository, or locally generated markdown files).
+   - Find the sub-section `### Cluster Requirements` for the device type.
+   - Identify all server-side clusters (Client/Server = Server).
+   - Clusters with conformance `M` (Mandatory) are tracked normally. Clusters with other conformance codes (e.g. `O`, conditional, etc.) are **Optional** and are tracked with an `[O]` suffix.
 
 3. **Identify Ready vs Missing Clusters & Determine Status**:
-    - Compare each required server cluster against `supported_clusters.md`.
-    - If the cluster is code-driven in the SDK, list it in the **Ready
-      Clusters** column. Otherwise, list it in the **Missing Clusters** column.
-      There is no duplication between the two columns.
-    - Determine the status notes for the device type:
-        - **Ready**: `Missing Clusters` column is `None` (neither mandatory nor
-          optional clusters are missing).
-        - **Minimally Ready**: All mandatory clusters are supported, but some
-          optional clusters are missing (listed in the `Missing Clusters` column
-          with an `[O]` suffix).
-        - **Blocked**: One or more mandatory clusters are missing (listed in the
-          `Missing Clusters` column without an `[O]` suffix).
+   - Compare each required server cluster against `supported_clusters.md`.
+   - If the cluster is code-driven in the SDK, list it in the **Ready Clusters** column. Otherwise, list it in the **Missing Clusters** column. There is no duplication between the two columns.
+   - Determine the status notes for the device type:
+     - **Ready**: `Missing Clusters` column is `None` (neither mandatory nor optional clusters are missing).
+     - **Minimally Ready**: All mandatory clusters are supported, but some optional clusters are missing (listed in the `Missing Clusters` column with an `[O]` suffix).
+     - **Blocked**: One or more mandatory clusters are missing (listed in the `Missing Clusters` column without an `[O]` suffix).
 
 ## Implemented Device Types (18 total)
 
