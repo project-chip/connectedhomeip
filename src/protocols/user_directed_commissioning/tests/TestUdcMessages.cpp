@@ -549,6 +549,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
     EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
 }
 
+<<<<<<< HEAD
 TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppInfoOverflow)
 {
     IdentificationDeclaration id;
@@ -579,6 +580,8 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppInfoOverflow)
     }
 }
 
+=======
+>>>>>>> 01db7c7be7 ([UDC] Fix off-by-one string copy in ReadPayload (#72604))
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
