@@ -36,6 +36,7 @@ import matter.testing.conformance as conformance_support
 from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
                                         ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                         parse_callable_from_xml)
+from matter.testing.data_model_errata import apply_errata, load_authoritative_errata
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
@@ -47,7 +48,7 @@ LOGGER = logging.getLogger(__name__)
 # Type alias maintained for constants access; actual values are ints at runtime
 ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
-_PRIVILEGE_STR = {
+_PRIVILEGE_STR: dict[Optional[int], str] = {
     None: "N/A",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kView: "V",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate: "O",
@@ -1238,7 +1239,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return zip_root / data_model_level.dirname
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], errata_path: Union[str, Traversable, None] = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -1364,6 +1365,21 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
             id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
         clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
+
+    if errata_path is not None:
+        errata_data = load_authoritative_errata(errata_path)
+        if errata_data:
+            active_rev = None
+            if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+                active_rev = data_model_directory.dirname
+            elif hasattr(data_model_directory, 'parent'):
+                active_rev = data_model_directory.parent.name
+
+            errata_problems = apply_errata(clusters, errata_data, active_spec_revision=active_rev)
+            problems.extend(errata_problems)
+        else:
+            problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
+                                          severity=ProblemSeverity.ERROR, problem=f"Failed to load required errata overlay: '{errata_path}'"))
 
     check_clusters_for_unknown_commands(clusters, problems)
 
@@ -1648,7 +1664,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 # Workaround for 1.3 device types with zigbee clusters and old scenes
                 # This is OK because there are other tests that ensure that unknown clusters do not appear on the device
                 if cid not in cluster_definition_xml:
-                    LOGGER.info(f"Skipping unknown cluster {cid:04X}")
+                    LOGGER.info("Skipping unknown cluster %04X", cid)
                     continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
@@ -1717,7 +1733,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
                                 if is_disallowed(conformance_override):
                                     LOGGER.info(
-                                        f"Ignoring unknown {override_element_type} {element_name} in cluster {cid} because the conformance is disallowed")
+                                        "Ignoring unknown %s %s in cluster %s because the conformance is disallowed", override_element_type, element_name, cid)
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                                 severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {element_name} in cluster 0x{cid:04X} - map = {map_id}"))
@@ -1869,7 +1885,8 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
                 filtered_problems = []
                 for problem in temp_problems:
                     if "ConformanceException" in problem.problem and any(field_name in problem.problem for field_name in ['PercentMax', 'PercentMin', 'FixedMax', 'FixedMin', 'MfgCode']):
-                        LOGGER.info(f"Ignoring complex conformance in global data type {name} from {f.name}: {problem.problem}")
+                        LOGGER.info("Ignoring complex conformance in global data type %s from %s: %s",
+                                    name, f.name, problem.problem)
                         continue
                     filtered_problems.append(problem)
 

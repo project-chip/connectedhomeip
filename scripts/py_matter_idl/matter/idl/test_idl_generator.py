@@ -16,6 +16,7 @@
 
 import os
 import sys
+import textwrap
 import unittest
 from difflib import unified_diff
 from pathlib import Path
@@ -171,6 +172,43 @@ class TestIdlRendering(unittest.TestCase):
         self.assertIn("/** Test command description */", rendered)
 
         # Also ensure roundtrip parses back to the exact same IDL
+        idl2 = parser.parse(rendered)
+        self.assertEqual(idl, idl2)
+
+    def test_optional_command_event_rendering(self):
+        idl_content = """
+            client cluster MyCluster = 1 {
+                info optional event OptionalEvent = 1 {}
+                critical optional event OptionalCriticalEvent = 2 {}
+
+                optional command OptionalCommand(): DefaultSuccess = 10;
+                timed optional command OptionalTimedCommand(): DefaultSuccess = 11;
+            }
+        """
+        parser = CreateParser(skip_meta=False, merge_globals=False)
+        idl = parser.parse(idl_content)
+        rendered = RenderAsIdlTxt(idl)
+
+        expected = textwrap.dedent("""\
+            // This IDL was auto-generated from a parsed data structure
+
+            cluster MyCluster = 1 {
+              revision 1;
+
+              info optional event OptionalEvent = 1 {
+              }
+
+              critical optional event OptionalCriticalEvent = 2 {
+              }
+
+
+              optional command OptionalCommand(): DefaultSuccess = 10;
+              timed optional command OptionalTimedCommand(): DefaultSuccess = 11;
+            }
+
+        """)
+        self.assertTextEqual(expected, rendered)
+
         idl2 = parser.parse(rendered)
         self.assertEqual(idl, idl2)
 

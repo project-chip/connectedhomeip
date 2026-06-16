@@ -400,8 +400,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     return Protocols::InteractionModel::Status::Success;
 }
 
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
-
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {

@@ -295,14 +295,14 @@ private:
     char mDeviceName[Dnssd::kMaxDeviceNameLen + 1]                    = {};
     uint16_t mCdPort                                                  = 0;
 
-    uint16_t mVendorId  = 0;
-    uint16_t mProductId = 0;
-    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
-    size_t mRotatingIdLen = 0;
+    uint16_t mVendorId                                  = 0;
+    uint16_t mProductId                                 = 0;
+    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen] = {};
+    size_t mRotatingIdLen                               = 0;
 
-    constexpr static size_t kMaxTargetAppInfos = 10;
-    uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
-    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
+    constexpr static size_t kMaxTargetAppInfos        = 10;
+    uint8_t mNumTargetAppInfos                        = 0; // number of vendor Ids
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos] = {};
 
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;

@@ -141,6 +141,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeLaundryDryerControlsID:
         result = @"LaundryDryerControls";
         break;
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+        result = @"TemperatureControlledCabinetTopology";
+        break;
     case MTRClusterIDTypeModeSelectID:
         result = @"ModeSelect";
         break;
@@ -2928,6 +2931,46 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+
+        switch (attributeID) {
+
+            // Cluster TemperatureControlledCabinetTopology attributes
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeDisabledCabinetsID:
+            result = @"DisabledCabinets";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeTopologyID:
+            result = @"Topology";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known TemperatureControlledCabinetTopology attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeModeSelectID:
 
         switch (attributeID) {
@@ -4467,6 +4510,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeOptOutStateID:
             result = @"OptOutState";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributePowerRangeAdjustmentID:
+            result = @"PowerRangeAdjustment";
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeGeneratedCommandListID:
@@ -11048,6 +11095,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeModeSelectID:
 
         switch (commandID) {
@@ -11542,6 +11599,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterDeviceEnergyManagementCommandCancelRequestID:
             result = @"CancelRequest";
+            break;
+
+        case MTRCommandIDTypeClusterDeviceEnergyManagementCommandPowerRangeAdjustRequestID:
+            result = @"PowerRangeAdjustRequest";
+            break;
+
+        case MTRCommandIDTypeClusterDeviceEnergyManagementCommandCancelPowerRangeAdjustRequestID:
+            result = @"CancelPowerRangeAdjustRequest";
             break;
 
         default:
@@ -13938,6 +14003,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeModeSelectID:
 
         switch (commandID) {
@@ -15992,6 +16067,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeModeSelectID:
 
         switch (eventID) {
@@ -16428,6 +16513,14 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterDeviceEnergyManagementEventResumedID:
             result = @"Resumed";
+            break;
+
+        case MTREventIDTypeClusterDeviceEnergyManagementEventPowerRangeAdjustStartID:
+            result = @"PowerRangeAdjustStart";
+            break;
+
+        case MTREventIDTypeClusterDeviceEnergyManagementEventPowerRangeAdjustEndID:
+            result = @"PowerRangeAdjustEnd";
             break;
 
         default:

@@ -66,7 +66,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: Setup Environment
         # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
         run: |
@@ -147,6 +147,7 @@ jobs:
              --target-skip-glob '{TestAccessControlConstraints}' \
              --test-order random \
              run \
+             --value-wait-extra-duration-ms 5000 \
              --iterations 1 \
              --test-timeout-seconds 120 \
              --tool-path darwin-framework-tool:./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \

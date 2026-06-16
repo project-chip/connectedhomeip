@@ -97,12 +97,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # NOTE: Don't add "$dir_pw_env_setup:core_pigweed_python_packages"  here since it
     # pulls in a large number of dependencies that we are not using;  instead add dependencies
     # on the relevant pigweed modules via python_deps where they are needed.
-    source_packages = [
-      "//examples/chef",
-      "//examples/common/pigweed/rpc_console/py:chip_rpc",
-      "//integrations/mobly:chip_mobly",
-      "//src/python_testing/matter_testing_infrastructure:matter-testing",
-    ]
+    source_packages = [ "//integrations/mobly:chip_mobly" ]
   }
 
   pw_python_pip_install("pip_install_matter_packages") {
