@@ -145,6 +145,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
         # STEP 2a: Read feature map and determine supported features
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        log.info("FeatureMap: %s", feature_map)
 
         is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
@@ -163,6 +164,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
         self.step("2c")
         if is_limitation_supported:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
+            log.info("LimitRange: %s", limit_range)
             min_position = limit_range.min
             max_position = limit_range.max
 
@@ -171,6 +173,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
         resolution = 1  # Default resolution
         if is_positioning_supported:
             resolution = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Resolution)
+            log.info("Resolution: %s", resolution)
 
         # STEP 2e: Establish wildcard subscription to all attributes"
         self.step("2e")
@@ -180,6 +183,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
         # STEP 2f: Read CurrentState attribute
         self.step("2f")
         current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        log.info("CurrentState: %s", current_state)
 
         # STEP 2g: If Latching feature is not supported or state is unlatched, skip steps 2h to 2m
         self.step("2g")
@@ -190,6 +194,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 2h: Read LatchControlModes attribute
             self.step("2h")
             latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+            log.info("LatchControlModes: %s", latch_control_modes)
 
             # STEP 2i: If LatchControlModes is manual unlatching, skip step 2j
             self.step("2i")
@@ -293,6 +298,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
             asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
 
             # STEP 5d: Wait for CurrentState.Position to be updated to MinPosition
@@ -316,6 +322,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 5f: Verify TargetState attribute is updated
             self.step("5f")
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
             asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
 
             # STEP 5g: Wait for CurrentState.Position to be updated to 100%
@@ -352,6 +359,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 7b: Read CurrentState attribute
             self.step("7b")
             current_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+            log.info("CurrentState: %s", current_state)
 
             # STEP 7c: Send GroupedSetTarget command with Position not a multiple of Resolution
             self.step("7c")
@@ -364,6 +372,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 7d: Verify TargetState attribute is updated
             self.step("7d")
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
 
             if resolution == 1:
                 asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match expected value")
@@ -400,6 +409,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             # STEP 7h: Verify TargetState attribute is updated
             self.step("7h")
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
 
             if resolution <= 2:
                 asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match expected value")
