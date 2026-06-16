@@ -161,6 +161,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 2a: Read FeatureMap attribute
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        log.info("FeatureMap: %s", feature_map)
 
         is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
@@ -179,11 +180,13 @@ class TC_CLDIM_6_1(MatterBaseTest):
         self.step("2c")
         step_value = 1  # Default step value
         step_value = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.StepValue)
+        log.info("StepValue: %s", step_value)
 
         # STEP 2d: Read LimitRange attribute
         self.step("2d")
         if is_limitation_supported:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
+            log.info("LimitRange: %s", limit_range)
             min_position = limit_range.min
             max_position = limit_range.max
 
@@ -195,6 +198,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 2f: Read CurrentState attribute
         self.step("2f")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        log.info("CurrentState: %s", initial_state)
 
         # STEP 2g: If Latching feature is not supported or state is unlatched, skip steps 2h to 2m
         self.step("2g")
@@ -205,6 +209,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
             # STEP 2h: Read LatchControlModes attribute
             self.step("2h")
             latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+            log.info("LatchControlModes: %s", latch_control_modes)
 
             # STEP 2i: If LatchControlModes is manual unlatching, skip step 2j
             self.step("2i")
@@ -300,6 +305,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 4b: Verify TargetState attribute is updated
         self.step("4b")
         target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        log.info("TargetState: %s", target_state)
         expected_position = max(max_position - 2 * step_value, min_position)
         asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
@@ -326,6 +332,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 4e: Verify TargetState attribute is updated
         self.step("4e")
         target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        log.info("TargetState: %s", target_state)
         asserts.assert_equal(target_state.position, max_position, "TargetState Position is not updated correctly")
 
         # STEP 4f: Wait for CurrentState.Position to be updated
@@ -361,6 +368,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
             # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
             expected_position = max_position - step_value
             asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
@@ -400,6 +408,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
             # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
             expected_position = max_position
             asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
@@ -414,6 +423,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 7a: Read CurrentState attribute
         self.step("7a")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        log.info("InitialState: %s", initial_state)
 
         # STEP 7b: Send GroupedStep command to decrease position beyond MinPosition
         self.step("7b")
@@ -435,6 +445,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 7c: Verify TargetState attribute is at MinPosition
         self.step("7c")
         target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        log.info("TargetState: %s", target_state)
         asserts.assert_equal(target_state.position, min_position, "TargetState Position is not at MinPosition")
 
         # STEP 7d: Wait for CurrentState to be updated
@@ -466,6 +477,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
         # STEP 7f: Verify TargetState attribute is at MaxPosition
         self.step("7f")
         target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        log.info("TargetState: %s", target_state)
         asserts.assert_equal(target_state.position, max_position, "TargetState Position is not at MaxPosition")
 
         # STEP 7g: Wait for CurrentState to be updated

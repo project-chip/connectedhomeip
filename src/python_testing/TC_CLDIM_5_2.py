@@ -134,6 +134,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
         # STEP 2a: Read feature map and determine supported features
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        log.info("FeatureMap: %s", feature_map)
 
         is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
@@ -151,11 +152,13 @@ class TC_CLDIM_5_2(MatterBaseTest):
         self.step("2c")
         if is_limitation_supported:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
+            log.info("LimitRange: %s", limit_range)
             max_position = limit_range.max
 
         # STEP 2d: Read LatchControlModes attribute
         self.step("2d")
         latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+        log.info("LatchControlModes: %s", latch_control_modes)
 
         # STEP 2e: Establish wildcard subscription to all attributes"
         self.step("2e")
@@ -165,6 +168,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
         # STEP 2f: Read CurrentState attribute
         self.step("2f")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        log.info("InitialState: %s", initial_state)
 
         # STEP 2g: If state is unlatched, skip steps 2h to 2l
         self.step("2g")
@@ -267,6 +271,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
             # STEP 3f: Verify TargetState attribute is updated
             self.step("3f")
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
             asserts.assert_equal(target_state.latch, True, "TargetState Latch is not True")
 
         # STEP 3g: Wait for CurrentState.Latch to be updated to True
@@ -328,6 +333,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
         # STEP 5d: Verify TargetState attribute is updated
         self.step("5d")
         target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        log.info("TargetState: %s", target_state)
         asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
 
         # STEP 5e: Wait for CurrentState.Latch to be updated to False
