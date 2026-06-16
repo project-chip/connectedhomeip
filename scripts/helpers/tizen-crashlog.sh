@@ -24,6 +24,7 @@ CLEANUP=false
 VERBOSE=false
 LOCAL_MODE=false
 SYSROOT_PATH=""
+LAST_ONLY=false
 
 # ============================================================================
 # Utility Functions
@@ -41,6 +42,7 @@ Options:
     --sysroot PATH    - Path to system libraries sysroot (default: \$TIZEN_SDK_ROOT/platforms/...)
     --verbose         - Print more information during execution
     --clean           - Remove temporary files after analysis (default: keep files)
+    --last            - Analyze only the most recent coredump (default: all)
     --help            - Print help
 EOF
 }
@@ -55,6 +57,7 @@ function parse_arguments() {
             --clean) CLEANUP=true; shift ;;
             --local) LOCAL_MODE=true; shift ;;
             --sysroot) SYSROOT_PATH="$2"; shift 2 ;;
+            --last) LAST_ONLY=true; shift ;;
             --help) help; exit 0 ;;
             *) echo "ERROR: Unknown option $1"; exit 1 ;;
         esac
@@ -240,43 +243,56 @@ fi
 if [ "$LOCAL_MODE" = true ]; then
     found_any=false
     declare -a EXTRACT_DIRS=()
+    declare -a ALL_FILES=()
     
+    # Collect all coredump files from all targets
     for target in out/tizen-*; do
         [ -d "$target/dump" ] || continue
-        # Find primary zips and raw coredumps (limit search depth to avoid nested files)
-        mapfile -t files < <(find "$target/dump" -mindepth 1 -maxdepth 2 -type f \( -name "*.zip" -o -name "*.coredump" \) 2>/dev/null)
-        for f in "${files[@]}"; do
-            found_any=true
-            base_dir=$(dirname "$f")
-            fname=$(basename "$f")
-            # Extract application ID (part before the first underscore)
-            app_id="${fname%%_*}"
-            binary=$(resolve_binary_name "$app_id")
+        while IFS= read -r -d '' f; do
+            ALL_FILES+=("$f:$target")
+        done < <(find "$target/dump" -mindepth 1 -maxdepth 2 -type f \( -name "*.zip" -o -name "*.coredump" \) -print0 2>/dev/null)
+    done
+    
+    # If --last is specified, sort by modification time and take only the most recent
+    if [ "$LAST_ONLY" = true ] && [ ${#ALL_FILES[@]} -gt 0 ]; then
+        LATEST_ENTRY=$(printf '%s\n' "${ALL_FILES[@]}" | xargs -I{} sh -c 'echo "$(stat -c %Y "{}" 2>/dev/null || echo 0) {}"' | sort -rn | head -n 1 | cut -d' ' -f2-)
+        ALL_FILES=("$LATEST_ENTRY")
+        LATEST_FILE="${LATEST_ENTRY%%:*}"
+        echo "Analyzing most recent coredump: $LATEST_FILE"
+    fi
+    
+    for entry in "${ALL_FILES[@]}"; do
+        found_any=true
+        f="${entry%%:*}"
+        target_dir="${entry##*:}"
+        fname=$(basename "$f")
+        # Extract application ID (part before the first underscore)
+        app_id="${fname%%_*}"
+        binary=$(resolve_binary_name "$app_id")
 
-            coredump=""
-            if [[ "$fname" == *.zip ]]; then
-                # Extract zip to its own isolated subdirectory
-                extract_dir="${f%.zip}"
-                mkdir -p "$extract_dir"
-                unzip -qo "$f" -d "$extract_dir"
-                EXTRACT_DIRS+=("$extract_dir")
+        coredump=""
+        if [[ "$fname" == *.zip ]]; then
+            # Extract zip to its own isolated subdirectory
+            extract_dir="${f%.zip}"
+            mkdir -p "$extract_dir"
+            unzip -qo "$f" -d "$extract_dir"
+            EXTRACT_DIRS+=("$extract_dir")
 
-                # Extract the nested .tar file inside that same directory
-                tar_file=$(find "$extract_dir" -name "*.coredump.tar" 2>/dev/null | head -n 1)
-                if [ -n "$tar_file" ]; then
-                    tar --ignore-zeros -xf "$tar_file" -C "$extract_dir" 2>/dev/null || true
-                fi
-
-                # Find the non-empty coredump file inside that directory
-                coredump=$(find_coredump_file "$extract_dir")
-            else
-                coredump="$f"
+            # Extract the nested .tar file inside that same directory
+            tar_file=$(find "$extract_dir" -name "*.coredump.tar" 2>/dev/null | head -n 1)
+            if [ -n "$tar_file" ]; then
+                tar --ignore-zeros -xf "$tar_file" -C "$extract_dir" 2>/dev/null || true
             fi
 
-            if [ -n "$coredump" ] && [ -s "$coredump" ]; then
-                run_gdb_analysis "$target" "$binary" "$coredump" "$fname"
-            fi
-        done
+            # Find the non-empty coredump file inside that directory
+            coredump=$(find_coredump_file "$extract_dir")
+        else
+            coredump="$f"
+        fi
+
+        if [ -n "$coredump" ] && [ -s "$coredump" ]; then
+            run_gdb_analysis "$target_dir" "$binary" "$coredump" "$fname"
+        fi
     done
     [ "$found_any" = false ] && echo "No crash dumps found in out/tizen-*/dump/"
     
