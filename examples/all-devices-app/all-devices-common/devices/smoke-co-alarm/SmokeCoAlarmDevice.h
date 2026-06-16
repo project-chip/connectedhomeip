@@ -27,12 +27,55 @@
 namespace chip {
 namespace app {
 
+class AppSmokeCoAlarmDelegate : public Clusters::SmokeCoAlarmDelegate, public TimerContext
+{
+public:
+    static constexpr uint16_t kSelfTestTimeoutSec = 10;
+
+    void Init(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmCluster & cluster)
+    {
+        mTimerDelegate = &timerDelegate;
+        mCluster       = &cluster;
+    }
+
+    void OnSelfTestRequested() override
+    {
+        ChipLogDetail(NotSpecified, "SmokeCoAlarm: self-test started");
+        mTimerDelegate->StartTimer(this, System::Clock::Seconds32(kSelfTestTimeoutSec));
+    }
+
+    void TimerFired() override
+    {
+        mCluster->SetTestInProgress(false);
+        mCluster->SetExpressedStateByPriority(sPriorityOrder);
+        ChipLogDetail(NotSpecified, "SmokeCoAlarm: self-test complete");
+    }
+
+    void OnSmokeSensitivityLevelChanged(Clusters::SmokeCoAlarm::SensitivityEnum newLevel) override
+    {
+        ChipLogDetail(NotSpecified, "SmokeCoAlarm: smoke sensitivity level changed to %u", to_underlying(newLevel));
+    }
+
+    void OnExpressedStateChanged(Clusters::SmokeCoAlarm::ExpressedStateEnum newState) override
+    {
+        ChipLogDetail(NotSpecified, "SmokeCoAlarm: expressed state changed to %u", to_underlying(newState));
+    }
+
+private:
+    static const std::array<Clusters::SmokeCoAlarm::ExpressedStateEnum, Clusters::SmokeCoAlarmCluster::kPriorityOrderLength>
+        sPriorityOrder;
+
+    TimerDelegate * mTimerDelegate           = nullptr;
+    Clusters::SmokeCoAlarmCluster * mCluster = nullptr;
+};
+
 class SmokeCoAlarmDevice : public SingleEndpointDevice
 {
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 
-    SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig);
+    SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig,
+                       const Clusters::SmokeCoAlarmCluster::Config & smokeConfig = {});
     ~SmokeCoAlarmDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -46,6 +89,8 @@ public:
 protected:
     TimerDelegate & mTimerDelegate;
     ConcentrationCluster::Config mCoConfig;
+    Clusters::SmokeCoAlarmCluster::Config mSmokeConfig;
+    AppSmokeCoAlarmDelegate mSmokeCoAlarmDelegate;
 
     LazyRegisteredServerCluster<ConcentrationCluster> mCoMeasurementCluster;
     LazyRegisteredServerCluster<Clusters::SmokeCoAlarmCluster> mSmokeCoAlarmCluster;

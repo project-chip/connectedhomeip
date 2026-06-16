@@ -43,7 +43,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Service Area
-    - Smoke CO Alarm
     - Soil Measurement
     - Thread Border Router Management
     - Thread Network Directory
@@ -151,6 +150,7 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Relative Humidity Measurement
     - Scenes Management
+    - Smoke CO Alarm
     - Software Diagnostics
     - Switch
     - TLS Certificate Management

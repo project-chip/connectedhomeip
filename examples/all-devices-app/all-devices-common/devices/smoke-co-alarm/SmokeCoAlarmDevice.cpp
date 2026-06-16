@@ -20,13 +20,22 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::SmokeCoAlarm;
+
+const std::array<ExpressedStateEnum, chip::app::Clusters::SmokeCoAlarmCluster::kPriorityOrderLength>
+    chip::app::AppSmokeCoAlarmDelegate::sPriorityOrder = {
+        ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,
+        ExpressedStateEnum::kCOAlarm,     ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
+        ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
+    };
 
 namespace chip {
 namespace app {
 
-SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig) :
+SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig,
+                                       const Clusters::SmokeCoAlarmCluster::Config & smokeConfig) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mCoConfig(coConfig)
+    mCoConfig(coConfig), mSmokeConfig(smokeConfig)
 {}
 
 CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -36,7 +45,9 @@ CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mSmokeCoAlarmCluster.Create(endpoint);
+    mSmokeCoAlarmCluster.Create(endpoint, mSmokeConfig);
+    mSmokeCoAlarmDelegate.Init(mTimerDelegate, mSmokeCoAlarmCluster.Cluster());
+    mSmokeCoAlarmCluster.Cluster().SetDelegate(&mSmokeCoAlarmDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mSmokeCoAlarmCluster.Registration()));
 
     mCoMeasurementCluster.Create(endpoint, mCoConfig);
