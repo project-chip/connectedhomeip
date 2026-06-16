@@ -113,8 +113,6 @@ def websocket_runner_options(f):
                         help='Optional arguments to pass to the websocket server at launch.')(f)
 
 
-
-
 @dataclass
 class ParserGroup:
     builder_config: TestParserBuilderConfig
@@ -315,8 +313,6 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
 
     runner = WebSocketRunner(websocket_runner_config)
     return asyncio.run(runner.run(parser_group.builder_config, runner_config))
-
-
 
 
 @runner_base.command()

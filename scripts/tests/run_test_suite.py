@@ -226,8 +226,6 @@ def main(context: click.Context, log_level: str, log_level_tests: str | None, lo
             TestTag.PURPOSEFUL_FAILURE,
         }
 
-
-
     if 'all' not in target:
         tests = []
         for name in target:
@@ -429,7 +427,6 @@ class CommissioningMethod(enum.StrEnum):
 @click.option(
     '--closure-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path closure:<path>',
     help='what closure app to use')
-
 @click.option(
     '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
@@ -479,7 +476,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     handle_deprecated_pathopt('water-heater', water_heater_app, SubprocessKind.APP)
     handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
-
 
     handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.TOOL)
     handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.TOOL)

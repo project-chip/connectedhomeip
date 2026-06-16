@@ -233,8 +233,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> set[str]:
     }
 
 
-
-
 def _GetPurposefulFailureTests() -> set[str]:
     """Tests that fail in YAML on purpose."""
     return {
@@ -313,8 +311,6 @@ def _AllFoundYamlTests(treat_dft_unsupported_as_in_development: bool, treat_chip
 
         if path.name in purposeful_failure_tests:
             tags.add(TestTag.PURPOSEFUL_FAILURE)
-
-
 
         if use_short_run_name:
             run_name = path.stem  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
