@@ -43,8 +43,16 @@ _all_devices_all_enabled = all_devices_enabled_devices == []
 #   - Update scripts/build/build/targets.py to include the new device
 _available_devices = [
   [
+    "aggregator",
+    "AGGREGATOR",
+  ],
+  [
     "air-quality-sensor",
     "AIR_QUALITY_SENSOR",
+  ],
+  [
+    "bridged-node",
+    "BRIDGED_NODE",
   ],
   [
     "chime",
@@ -81,6 +89,10 @@ _available_devices = [
   [
     "proximity-ranger",
     "PROXIMITY_RANGER",
+  ],
+  [
+    "smoke-co-alarm",
+    "SMOKE_CO_ALARM",
   ],
   [
     "soil-sensor",

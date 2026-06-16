@@ -18,6 +18,7 @@ import pathlib
 import typing
 from dataclasses import dataclass, field
 from datetime import timedelta
+from importlib.resources.abc import Traversable
 from typing import Optional
 
 from matter.testing.defaults import TestingDefaults
@@ -30,6 +31,7 @@ class MatterTestConfig:
     paa_trust_store_path: Optional[pathlib.Path] = None
     ble_controller: Optional[int] = None
     commission_only: bool = False
+    spec_errata_path: typing.Union[None, str, Traversable] = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID
     case_admin_subject: Optional[int] = None
