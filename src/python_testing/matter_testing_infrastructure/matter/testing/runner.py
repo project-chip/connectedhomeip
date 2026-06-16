@@ -790,6 +790,10 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
     config.debug = args.debug
+    if getattr(args, 'enable_spec_errata_ci_only_disallowed_for_certification', False):
+        config.spec_errata_path = "data_model/errata_future.yaml"
+    else:
+        config.spec_errata_path = None
 
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
@@ -947,6 +951,8 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
                              help='A list of tests in the test class to execute.')
     basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
                              help="Fail the test if any test cases are skipped")
+    basic_group.add_argument('--enable-spec-errata-ci-only-disallowed-for-certification', action='store_true', default=False,
+                             help="Enable declarative data model errata overlays to bridge Spec IDM testing with in-progress Matter SDK PRs")
     basic_group.add_argument('--trace-to', nargs="*", default=[],
                              help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,

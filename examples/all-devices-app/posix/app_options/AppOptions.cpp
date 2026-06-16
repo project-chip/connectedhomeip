@@ -21,11 +21,28 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 
 using namespace chip;
 using namespace chip::ArgParser;
+
+namespace {
+
+bool IsExcludedFromWildcard(const std::string & type)
+{
+    // These device types are excluded from the wildcard (*) expansion to prevent redundant,
+    // invalid, or non-leaf endpoint structures.
+    static const std::vector<std::string> kExcludedDevices = {
+        "aggregator",   // Top-level container representing a bridge; not a standalone leaf device.
+        "bridged-node", // Base class representing a bridged endpoint wrapper; not a standalone leaf device.
+    };
+    return std::any_of(kExcludedDevices.begin(), kExcludedDevices.end(),
+                       [&type](const auto & excluded) { return excluded == type; });
+}
+
+} // namespace
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType    = 0xffd0;
@@ -41,9 +58,17 @@ constexpr uint16_t kOptionGroupcast     = 0xffda;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
+bool AppOptions::sIsConfigValidated = false;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
+    VerifyOrDie(sIsConfigValidated);
+    return mConfig;
+}
+
+CHIP_ERROR AppOptions::ValidateConfig()
+{
+    // Default device fallback if no devices are configured
     if (mConfig.deviceTypeEntries.empty())
     {
         mConfig.deviceTypeEntries.push_back({
@@ -52,7 +77,25 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
             .parentId = chip::kInvalidEndpointId,
         });
     }
-    return mConfig;
+    else
+    {
+        // Expand wildcards using the supported device types from DeviceFactory
+        std::vector<std::string> supportedTypes;
+        for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+        {
+            if (!IsExcludedFromWildcard(deviceType))
+            {
+                supportedTypes.push_back(deviceType);
+            }
+        }
+
+        sParser.ExpandWildcards(supportedTypes);
+        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
+    }
+
+    ReturnErrorOnFailure(DeviceTypeParser::ValidateConfig(mConfig.deviceTypeEntries));
+    sIsConfigValidated = true;
+    return CHIP_NO_ERROR;
 }
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
@@ -61,6 +104,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     switch (identifier)
     {
     case kOptionDeviceType: {
+        sIsConfigValidated = false;
         if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;
@@ -154,11 +198,15 @@ OptionSet * AppOptions::GetOptions()
             result.append(name);
             result.append("|");
         }
-        result.replace(result.length() - 1, 1, ">");
+        result.append("*");
+        result.append(">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or "
+                  "'type:endpoint,parent=parentId[,bridged]'.\n";
+        result += "       Use '*' to select all supported leaf devices (e.g. --device \"*:1\").\n";
+        result += "       Use 'bridged' to automatically create a parent bridged-node endpoint for the device.\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
-        result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
+        result += "       Example: --device aggregator:1 --device \"chime:2,parent=1,bridged\"\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         result += "  --ble-controller <number>\n";

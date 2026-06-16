@@ -6,27 +6,45 @@ generated code (ZAP tool) and global instances. This is the recommended approach
 for developing Matter applications, as it allows testing various device types
 and clusters without requiring recompilation for each configuration.
 
-## What’s The “All Devices App”?
+## Code-Driven Paradigm Advantages
 
 The Code-Driven paradigm offers several advantages:
 
 -   **Unit Testable**: Allows clusters to be unit tested easily.
 -   **Dynamic Data Model**: Allows applications to change their data model
     dynamically at runtime without requiring recompilation.
--   **Complex Products**: Makes it easier to develop complex products such as
-    bridges.
--   **Software Evolution**: Makes it easier to iterate and evolve product
-    software.
+-   **Composite Devices**: Supports multi-endpoint devices and bridges.
+-   **Maintainability**: Decouples cluster implementations from application
+    configuration.
 
-The application simulates various device types and is highly extensible.
+The application simulates various device types.
+
+## Documentation Suite
+
+The [`docs/`](docs/) directory contains documentation for this application:
+
+-   **[Architecture & Design Patterns](docs/architecture.md)**: Describes the
+    Code-Driven Data Model, component hierarchies (`DeviceFactory`,
+    `SingleEndpointDevice`), and platform separation.
+-   **[Starting Up & CLI Reference](docs/starting_up.md)**: Describes
+    application initialization, endpoint composition flags (`--device`), and
+    network settings.
+-   **[Testing & Simulation Guide](docs/testing.md)**: Instructions for
+    `chip-tool` commissioning and executing automated Python regression suites
+    (`src/python_testing/`).
+-   **[How to Add a New Simulated Device](docs/adding_new_device.md)**:
+    Instructions for implementing Matter devices, binding code-driven clusters,
+    and updating build configurations.
+-   **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide
+    on transitioning from this simulator baseline to a custom product
+    application.
 
 ## Architecture and File Structure
 
-The `all-devices-app` is organized to be **platform-agnostic** at its core, with
-platform-specific specializations kept separate:
+The `all-devices-app` separates platform-agnostic code from platform-specific
+implementations:
 
--   **`all-devices-common/`**: Contains the platform-agnostic core of the
-    application. This includes:
+-   **`all-devices-common/`**: Contains platform-agnostic code, including:
     -   Core cluster logic and device interfaces.
     -   Base device implementations.
     -   The **`DeviceFactory`** (in
@@ -38,15 +56,13 @@ platform-specific specializations kept separate:
     -   For example, `posix/linux/DeviceFactoryPlatformOverride.cpp` registers
         platform-specific overrides for devices at build-time.
 
-This separation ensures that the core logic remains clean and reusable across
-different operating systems and hardware platforms, while still allowing for
-deep platform integration when needed.
+This separation ensures core logic remains reusable across operating systems and
+hardware platforms while allowing platform-specific driver integration.
 
 ## Supported Devices
 
 The application supports the following device types (specified via the
-`--device` flag). Note that this list represents what is supported currently,
-but the application is constantly evolving and new device types are added often:
+`--device` flag). Currently supported device types include:
 
 -   `contact-sensor`
 -   `water-leak-detector`
@@ -56,6 +72,7 @@ but the application is constantly evolving and new device types are added often:
 -   `fan`
 -   `fan-no-onoff`
 -   `on-off-light`
+-   `power-source`
 -   `speaker`
 -   `soil-sensor`
 
@@ -68,7 +85,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|occupancy-sensor|on-off-light|soil-sensor|speaker|water-leak-detector>
+  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|occupancy-sensor|on-off-light|power-source|soil-sensor|speaker|water-leak-detector>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -108,6 +125,78 @@ rm -rf /tmp/chip_*
 # Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
 ```
+
+## Bridging Support: Bridged Modifier (`,bridged`)
+
+You can use the `,bridged` option modifier on a device definition to
+automatically wrap it in a parent `bridged-node` endpoint.
+
+Without the `,bridged` modifier, setting up a bridged device requires manually
+typing out both the intermediate `bridged-node` parent and the leaf device
+child, which gets extremely verbose:
+
+```bash
+./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device bridged-node:2,parent=1 --device chime:3,parent=2
+```
+
+Using the `,bridged` modifier automatically handles the intermediate
+`bridged-node` injection:
+
+-   **Explicit Bridged Device:**
+
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "chime:2,parent=1,bridged"
+    ```
+
+    This command explicitly maps a chime on Endpoint 2 to be bridged under the
+    aggregator on Endpoint 1. The application automatically expands this to the
+    following layout:
+
+    ```text
+    Endpoint 0 (Root Node)
+       └── Endpoint 1 (aggregator)
+              └── Endpoint 2 (bridged-node)
+                     └── Endpoint 3 (chime)
+    ```
+
+## Advanced Topology: Wildcard Expansion (`*`)
+
+You can use the wildcard `*` to automatically instantiate all supported leaf
+device types. When an endpoint is specified, it represents the starting number.
+
+-   **Standard Wildcard:** Start all devices from endpoint 1 sequentially.
+
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device "*:1"
+    ```
+
+-   **Parented Wildcard:** Start all devices from endpoint 2 sequentially and
+    make them all children of parent endpoint 1 (e.g., an aggregator).
+
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1"
+    ```
+
+-   **Compound Bridged Wildcard:** Automatically wraps every leaf device
+    generated by the wildcard in a dedicated `bridged-node` parent endpoint.
+
+    ```bash
+    ./out/linux-x64-all-devices-boringssl/all-devices-app --device aggregator:1 --device "*:2,parent=1,bridged"
+    ```
+
+    This automatically generates the following compound bridged device tree:
+
+    ```text
+    Endpoint 0 (Root Node)
+       └── Endpoint 1 (aggregator)
+              ├── Endpoint 2 (bridged-node)
+              │      └── Endpoint 3 (air-quality-sensor)
+              ├── Endpoint 4 (bridged-node)
+              │      └── Endpoint 5 (chime)
+              ├── Endpoint 6 (bridged-node)
+              │      └── Endpoint 7 (contact-sensor)
+              └── ...
+    ```
 
 ## Testing with chip-tool
 

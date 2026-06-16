@@ -32,6 +32,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
