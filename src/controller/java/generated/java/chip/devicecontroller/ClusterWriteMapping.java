@@ -2992,6 +2992,52 @@ public class ClusterWriteMapping {
     );
     writeThreadNetworkDirectoryInteractionInfo.put("writePreferredExtendedPanIDAttribute", writeThreadNetworkDirectoryPreferredExtendedPanIDAttributeInteractionInfo);
     writeAttributeMap.put("threadNetworkDirectory", writeThreadNetworkDirectoryInteractionInfo);
+    Map<String, InteractionInfo> writeCommissioningProxyInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeCommissioningProxyScanMaxTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo commissioningProxyscanMaxTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCommissioningProxyScanMaxTimeCommandParams.put(
+        "value",
+        commissioningProxyscanMaxTimeCommandParameterInfo
+    );
+    InteractionInfo writeCommissioningProxyScanMaxTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster).writeScanMaxTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCommissioningProxyScanMaxTimeCommandParams
+    );
+    writeCommissioningProxyInteractionInfo.put("writeScanMaxTimeAttribute", writeCommissioningProxyScanMaxTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCommissioningProxyCacheTimeoutCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo commissioningProxycacheTimeoutCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCommissioningProxyCacheTimeoutCommandParams.put(
+        "value",
+        commissioningProxycacheTimeoutCommandParameterInfo
+    );
+    InteractionInfo writeCommissioningProxyCacheTimeoutAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster).writeCacheTimeoutAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCommissioningProxyCacheTimeoutCommandParams
+    );
+    writeCommissioningProxyInteractionInfo.put("writeCacheTimeoutAttribute", writeCommissioningProxyCacheTimeoutAttributeInteractionInfo);
+    writeAttributeMap.put("commissioningProxy", writeCommissioningProxyInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wakeOnLan", writeWakeOnLanInteractionInfo);
     Map<String, InteractionInfo> writeChannelInteractionInfo = new LinkedHashMap<>();

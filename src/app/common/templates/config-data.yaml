@@ -24,6 +24,9 @@ CommandHandlerInterfaceOnlyClusters:
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
     - Camera AV Settings User Level Management
+    - Closure Dimension
+    - Commissioner Control
+    - Commissioning Proxy
     - Commodity Price
     - Commodity Tariff
     - Device Energy Management Mode
@@ -119,6 +122,7 @@ CodeDrivenClusters:
     - Closure Control
     - Closure Dimension
     - Commissioner Control
+    - Commissioning Proxy
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs

@@ -38,6 +38,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ColorControl" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/CommissionerControl" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/CommissioningProxy" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/CommodityMetering" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/CommodityPrice" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff" + invoker.target,

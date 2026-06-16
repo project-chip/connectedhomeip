@@ -214,6 +214,19 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-commissioning-by-proxy</name>
+        <domain>CHIP</domain>
+        <typeName>Commissioning By Proxy</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0092</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Commissioning Proxy" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-humidifierdehumidifier</name>
         <domain>CHIP</domain>
         <typeName>Humidifier/Dehumidifier</typeName>
