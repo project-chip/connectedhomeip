@@ -34,7 +34,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
-            - uses: rojopolis/spellcheck-github-actions@e3cd8e9aec4587ec73bc0e60745aafd45c37aa2e # 0.60.0
+            - uses: rojopolis/spellcheck-github-actions@ca94733232ec8328061aea8018dfcb4959857eea # 0.61.0
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure
