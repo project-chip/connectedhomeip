@@ -23,6 +23,8 @@
  *
  */
 /* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
