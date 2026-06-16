@@ -32,7 +32,7 @@ build targets, and executing certification tests.
 ## Step 0.5: Test Plan & Test Discovery
 
 1. **Locate Test Plans**: Reference the private `chip-test-plans` repository
-   (accessible to CSA members) to understand cluster verification steps. External/non-member contributors can refer to the published Matter Test Specifications instead.
+   (accessible to CSA members) to understand cluster verification steps.
 2. **Locate Integration Tests**: Search `src/python_testing/` for
    `TC_{CLUSTER}_*.py` or `src/app/tests/suites/` for YAML tests corresponding
    to the implemented clusters.
