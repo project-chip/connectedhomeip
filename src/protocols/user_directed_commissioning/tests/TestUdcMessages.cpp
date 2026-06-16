@@ -529,6 +529,26 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
     EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
 }
 
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(idBuffer, 'A', sizeof(idBuffer));
+
+    const char * deviceName = "test-device";
+    idOut.SetDeviceName(deviceName);
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    char expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(expectedInstanceName, 'A', Dnssd::Commission::kInstanceNameMaxLength);
+    expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength] = '\0';
+    EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
+}
+
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
