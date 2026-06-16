@@ -1,0 +1,298 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "AppCommandDelegate.h"
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
+#include <platform/PlatformManager.h>
+
+using namespace chip;
+using namespace chip::app;
+
+namespace {
+
+struct CommandContext
+{
+    Json::Value value;
+    EndpointId endpointId;
+    AllDevicesAppCommandDelegate * delegate;
+    NamedPipeCommandHandler * handler;
+};
+
+class IncreaseConfigurationVersionCommandHandler : public NamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "IncreaseConfigurationVersion"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetBasicInformationClusterByEndpoint(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "BasicInformationCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        CHIP_ERROR err = cluster->IncreaseConfigurationVersion();
+        ChipLogProgress(AppServer, "IncreaseConfigurationVersion on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+    }
+};
+
+class SetOccupancyCommandHandler : public NamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetOccupancy"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetOccupancySensingClusterByEndpoint(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "OccupancySensingCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("Occupancy") || !json["Occupancy"].isUInt())
+        {
+            ChipLogError(AppServer, "Invalid SetOccupancy command: missing 'Occupancy' field");
+            return;
+        }
+
+        uint8_t occupancy = static_cast<uint8_t>(json["Occupancy"].asUInt());
+        if (occupancy != 0 && occupancy != 1)
+        {
+            ChipLogError(AppServer, "Invalid occupancy value: %d", occupancy);
+            return;
+        }
+
+        cluster->SetOccupancy(occupancy == 1);
+        ChipLogProgress(AppServer, "SetOccupancy to %d on endpoint %d", occupancy, endpointId);
+    }
+};
+
+class SetHoldTimeCommandHandler : public NamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetHoldTime"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetOccupancySensingClusterByEndpoint(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "OccupancySensingCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("HoldTime") || !json["HoldTime"].isUInt())
+        {
+            ChipLogError(AppServer, "Invalid SetHoldTime command: missing 'HoldTime' field");
+            return;
+        }
+
+        uint16_t holdTime = static_cast<uint16_t>(json["HoldTime"].asUInt());
+        cluster->SetHoldTime(holdTime);
+        ChipLogProgress(AppServer, "SetHoldTime to %d on endpoint %d", holdTime, endpointId);
+    }
+};
+
+class SetBooleanStateCommandHandler : public NamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetBooleanState"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetBooleanStateClusterByEndpoint(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "BooleanStateCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("NewState") || !json["NewState"].isBool())
+        {
+            ChipLogError(AppServer, "Invalid SetBooleanState command: missing 'NewState' field");
+            return;
+        }
+
+        bool newState = json["NewState"].asBool();
+        cluster->SetStateValue(newState);
+        ChipLogProgress(AppServer, "SetBooleanState to %d on endpoint %d", newState, endpointId);
+    }
+};
+
+class SetOnOffCommandHandler : public NamedPipeCommandHandler
+{
+public:
+    const char * GetName() const override { return "SetOnOff"; }
+    void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
+    {
+        auto * cluster = delegate->GetOnOffClusterByEndpoint(endpointId);
+        if (!cluster)
+        {
+            ChipLogError(AppServer, "OnOffCluster not found on endpoint %d", endpointId);
+            return;
+        }
+
+        if (!json.isMember("OnOff") || !json["OnOff"].isBool())
+        {
+            ChipLogError(AppServer, "Invalid SetOnOff command: missing 'OnOff' field");
+            return;
+        }
+
+        bool onOff = json["OnOff"].asBool();
+        CHIP_ERROR err = cluster->SetOnOff(onOff);
+        ChipLogProgress(AppServer, "SetOnOff to %d on endpoint %d: %" CHIP_ERROR_FORMAT, onOff, endpointId, err.Format());
+    }
+};
+
+} // namespace
+
+void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
+{
+    Json::Reader reader;
+    Json::Value value;
+    if (!reader.parse(json, value))
+    {
+        ChipLogError(AppServer, "Failed to parse JSON command: %s", reader.getFormattedErrorMessages().c_str());
+        return;
+    }
+
+    if (!value.isMember("Name") || !value["Name"].isString() || !value.isMember("EndpointId") || !value["EndpointId"].isUInt())
+    {
+        ChipLogError(AppServer, "Invalid command format: %s", json);
+        return;
+    }
+
+    std::string commandName     = value["Name"].asString();
+    EndpointId endpointId       = static_cast<EndpointId>(value["EndpointId"].asUInt());
+    auto handlerIt              = mCommandHandlers.find(commandName);
+
+    if (handlerIt == mCommandHandlers.end())
+    {
+        ChipLogError(AppServer, "Unknown command: %s", commandName.c_str());
+        return;
+    }
+
+    auto * context = Platform::New<CommandContext>();
+    if (context == nullptr)
+    {
+        ChipLogError(AppServer, "Failure to allocate command context! Ignoring comand.");
+        return;
+    }
+    context->value = value;
+    context->endpointId = endpointId;
+    context->delegate = this;
+    context->handler = handlerIt->second.get();
+
+    CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(DispatchCommand, reinterpret_cast<intptr_t>(context));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
+        Platform::Delete(context);
+    }
+}
+
+void AllDevicesAppCommandDelegate::DispatchCommand(intptr_t context)
+{
+    auto * cmdContext = reinterpret_cast<CommandContext *>(context);
+    cmdContext->handler->Handle(cmdContext->value, cmdContext->delegate, cmdContext->endpointId);
+    Platform::Delete(cmdContext);
+}
+
+void AllDevicesAppCommandDelegate::RegisterOnOffCluster(chip::EndpointId endpoint, chip::app::Clusters::OnOffCluster * cluster)
+{
+    mOnOffClusters.push_back({ endpoint, cluster });
+}
+
+void AllDevicesAppCommandDelegate::RegisterOccupancySensingCluster(chip::EndpointId endpoint, chip::app::Clusters::OccupancySensingCluster * cluster)
+{
+    mOccupancySensingClusters.push_back({ endpoint, cluster });
+}
+
+void AllDevicesAppCommandDelegate::RegisterBooleanStateCluster(chip::EndpointId endpoint, chip::app::Clusters::BooleanStateCluster * cluster)
+{
+    mBooleanStateClusters.push_back({ endpoint, cluster });
+}
+
+void AllDevicesAppCommandDelegate::RegisterBasicInformationCluster(chip::EndpointId endpoint, chip::app::Clusters::BasicInformationCluster * cluster)
+{
+    mBasicInformationClusters.push_back({ endpoint, cluster });
+}
+
+chip::app::Clusters::OnOffCluster * AllDevicesAppCommandDelegate::GetOnOffClusterByEndpoint(chip::EndpointId endpoint)
+{
+    for (auto & entry : mOnOffClusters)
+    {
+        if (entry.endpoint == endpoint)
+        {
+            return entry.cluster;
+        }
+    }
+    return nullptr;
+}
+
+chip::app::Clusters::OccupancySensingCluster * AllDevicesAppCommandDelegate::GetOccupancySensingClusterByEndpoint(chip::EndpointId endpoint)
+{
+    for (auto & entry : mOccupancySensingClusters)
+    {
+        if (entry.endpoint == endpoint)
+        {
+            return entry.cluster;
+        }
+    }
+    return nullptr;
+}
+
+chip::app::Clusters::BooleanStateCluster * AllDevicesAppCommandDelegate::GetBooleanStateClusterByEndpoint(chip::EndpointId endpoint)
+{
+    for (auto & entry : mBooleanStateClusters)
+    {
+        if (entry.endpoint == endpoint)
+        {
+            return entry.cluster;
+        }
+    }
+    return nullptr;
+}
+
+chip::app::Clusters::BasicInformationCluster * AllDevicesAppCommandDelegate::GetBasicInformationClusterByEndpoint(chip::EndpointId endpoint)
+{
+    for (auto & entry : mBasicInformationClusters)
+    {
+        if (entry.endpoint == endpoint)
+        {
+            return entry.cluster;
+        }
+    }
+    return nullptr;
+}
+
+void AllDevicesAppCommandDelegate::RegisterCommandHandler(std::unique_ptr<NamedPipeCommandHandler> handler)
+{
+    mCommandHandlers[handler->GetName()] = std::move(handler);
+}
+
+void AllDevicesAppCommandDelegate::RegisterCommandHandlers()
+{
+    RegisterCommandHandler(std::make_unique<IncreaseConfigurationVersionCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetOccupancyCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetHoldTimeCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetBooleanStateCommandHandler>());
+    RegisterCommandHandler(std::make_unique<SetOnOffCommandHandler>());
+}

@@ -27,6 +27,8 @@ source_set("linux") {
     "../include/AppRootNode.h",
     "../include/BleInit.h",
     "../include/TermHandling.h",
+    "AppCommandDelegate.cpp",
+    "AppCommandDelegate.h",
     "BleInit.cpp",
     "DeviceFactoryPlatformOverride.cpp",
     "TermHandling.cpp",
@@ -37,6 +39,7 @@ source_set("linux") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
+    "${chip_root}/examples/platform/linux:named-pipes",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/data-model-providers/codedriven/endpoint",
@@ -44,6 +47,8 @@ source_set("linux") {
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
+
+  deps += [ "${chip_root}/third_party/jsoncpp" ]
 
   public_configs = [ ":includes" ]
 }

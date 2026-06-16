@@ -29,18 +29,13 @@ using namespace chip::ArgParser;
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType    = 0xffd0;
-constexpr uint16_t kOptionWiFi          = 0xffd2;
-constexpr uint16_t kOptionKVS           = 0xffd3;
-constexpr uint16_t kOptionDiscriminator = 0xffd4;
-constexpr uint16_t kOptionVendorId      = 0xffd5;
-constexpr uint16_t kOptionProductId     = 0xffd6;
 constexpr uint16_t kOptionPort          = 0xffd7;
-constexpr uint16_t kOptionInterfaceId   = 0xffd8;
-constexpr uint16_t kOptionBLE           = 0xffd9;
 constexpr uint16_t kOptionGroupcast     = 0xffda;
+constexpr uint16_t kOptionNamedPipe     = 0xffdb;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
+std::string AppOptions::mNamedPipePath;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
@@ -68,37 +63,6 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
         return true;
     }
-    case kOptionBLE:
-        if (!ParseInt(value, mConfig.bleController))
-        {
-            ChipLogError(Support, "Invalid BLE controller specified: %s", value);
-            return false;
-        }
-        return true;
-    case kOptionWiFi:
-        mConfig.enableWiFi = true;
-        ChipLogProgress(AppServer, "WiFi usage enabled");
-        return true;
-    case kOptionKVS:
-        mConfig.kvsPath = value;
-        return true;
-    case kOptionDiscriminator: {
-        char * endptr;
-        unsigned long val = strtoul(value, &endptr, 0);
-        if (*endptr != '\0' || val > 0xFFF)
-        {
-            ChipLogError(Support, "Invalid discriminator: %s", value);
-            return false;
-        }
-        mConfig.discriminator = static_cast<uint16_t>(val);
-        return true;
-    }
-    case kOptionVendorId:
-        mConfig.vendorId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
-        return true;
-    case kOptionProductId:
-        mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
-        return true;
     case kOptionPort: {
         char * endptr;
         unsigned long val = strtoul(value, &endptr, 0);
@@ -108,15 +72,17 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             return false;
         }
         mConfig.port = static_cast<uint16_t>(val);
+        LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(val);
         ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
         return true;
     }
-    case kOptionInterfaceId:
-        mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
-        return true;
     case kOptionGroupcast:
         mConfig.enableGroupcast = true;
         ChipLogProgress(AppServer, "Groupcast usage enabled");
+        return true;
+    case kOptionNamedPipe:
+        mNamedPipePath = value;
+        ChipLogProgress(AppServer, "Named pipe path set to %s", value);
         return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
@@ -130,19 +96,9 @@ OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        { "ble-controller", kArgumentRequired, kOptionBLE },
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        { "wifi", kNoArgument, kOptionWiFi },
-#endif
-        { "KVS", kArgumentRequired, kOptionKVS },
-        { "discriminator", kArgumentRequired, kOptionDiscriminator },
-        { "vendor-id", kArgumentRequired, kOptionVendorId },
-        { "product-id", kArgumentRequired, kOptionProductId },
         { "port", kArgumentRequired, kOptionPort },
-        { "interface-id", kArgumentRequired, kOptionInterfaceId },
         { "groupcast", kNoArgument, kOptionGroupcast },
+        { "named-pipe", kArgumentRequired, kOptionNamedPipe },
         {}, // need empty terminator
     };
 
@@ -160,15 +116,11 @@ OptionSet * AppOptions::GetOptions()
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
         result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        result += "  --ble-controller <number>\n";
-        result += "       Select the BLE controller to use (default: 0)\n\n";
-#endif
+        result += "  --port <number>\n";
+        result += "       Listen port for secure device messages (default: 5540)\n\n";
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        result += "  --wifi\n";
-        result += "       Enable wifi support for commissioning\n\n";
-#endif
+        result += "  --named-pipe <path>\n";
+        result += "       Path to a named pipe to receive test JSON commands.\n\n";
 
         return result;
     }();

@@ -33,18 +33,13 @@ public:
     struct AppConfig
     {
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
-        uint32_t bleController = 0;
-        bool enableWiFi        = false;
-        std::string kvsPath;
-        std::optional<uint16_t> discriminator;
-        std::optional<uint16_t> vendorId;
-        std::optional<uint16_t> productId;
         std::optional<uint16_t> port;
-        std::optional<uint32_t> interfaceId;
         bool enableGroupcast = false;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
+
+    static const char * GetNamedPipePath() { return mNamedPipePath.c_str(); }
     static const AppConfig & GetConfig();
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
 
@@ -53,5 +48,6 @@ private:
                                            const char * name, const char * value);
 
     static DeviceTypeParser sParser;
+    static std::string mNamedPipePath;
     static AppConfig mConfig;
 };

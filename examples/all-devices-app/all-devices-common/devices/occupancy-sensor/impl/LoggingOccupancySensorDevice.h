@@ -19,7 +19,7 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/occupancy-sensor/OccupancySensorDevice.h>
-#include <platform/DefaultTimerDelegate.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -31,11 +31,11 @@ namespace app {
  * occupancy state changes by toggling between "Occupied" and "Unoccupied"
  * states every 30 seconds using a timer.
  */
-class TogglingOccupancySensorDevice : public OccupancySensorDevice, public Clusters::OccupancySensingDelegate, public TimerContext
+class LoggingOccupancySensorDevice : public OccupancySensorDevice, public Clusters::OccupancySensingDelegate
 {
 public:
-    TogglingOccupancySensorDevice();
-    ~TogglingOccupancySensorDevice() override;
+    LoggingOccupancySensorDevice(TimerDelegate & timerDelegate);
+    ~LoggingOccupancySensorDevice() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
@@ -44,12 +44,6 @@ public:
     // OccupancySensingDelegate
     void OnOccupancyChanged(bool occupied) override;
     void OnHoldTimeChanged(uint16_t holdTime) override;
-
-    // TimerContext
-    void TimerFired() override;
-
-private:
-    DefaultTimerDelegate mTimerDelegate;
 };
 
 } // namespace app

@@ -24,7 +24,7 @@
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
-#include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
+#include <devices/occupancy-sensor/impl/LoggingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
@@ -153,7 +153,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
         {
-            RegisterCreator("occupancy-sensor", []() { return std::make_unique<TogglingOccupancySensorDevice>(); });
+            RegisterCreator("occupancy-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingOccupancySensorDevice>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {
