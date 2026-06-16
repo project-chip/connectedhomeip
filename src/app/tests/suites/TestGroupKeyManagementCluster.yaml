@@ -110,7 +110,7 @@ tests:
           saveAs: ClusterRevisionValue
           constraints:
               minValue: 1
-              maxValue: 3
+              maxValue: 4
               type: int16u
 
     - label: "Creates a new variable to hold if the cluster revision is == 2"
