@@ -25,13 +25,14 @@ build targets, and executing certification tests.
       Sensor).
     - **Mandatory & Optional Clusters**: Server clusters required to comply.
     - **Endpoint Constraints / Composition Rules**: Tree composition rules.
+5. **AI Agent Assistant**: If using an AI coding agent, it can use the [spec access skill](../../../.agents/skills/matter-specification-access/SKILL.md) to retrieve relevant sections of the specification.
 
 ---
 
 ## Step 0.5: Test Plan & Test Discovery
 
 1. **Locate Test Plans**: Reference the private `chip-test-plans` repository
-   (accessible to CSA members) to understand cluster verification steps.
+   (accessible to CSA members) to understand cluster verification steps. External/non-member contributors can refer to the published Matter Test Specifications instead.
 2. **Locate Integration Tests**: Search `src/python_testing/` for
    `TC_{CLUSTER}_*.py` or `src/app/tests/suites/` for YAML tests corresponding
    to the implemented clusters.
