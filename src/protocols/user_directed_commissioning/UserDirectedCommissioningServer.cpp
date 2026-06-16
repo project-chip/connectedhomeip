@@ -25,6 +25,7 @@
 
 #include "UserDirectedCommissioning.h"
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMemString.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/raw/Base.h>
 
@@ -238,6 +239,7 @@ CHIP_ERROR UserDirectedCommissioningServer::EncodeUDCMessage(const System::Packe
 
 CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t payloadBufferSize)
 {
+<<<<<<< HEAD
     size_t i = 0;
     while (i < std::min<size_t>(sizeof(mInstanceName), payloadBufferSize) && udcPayload[i] != '\0')
     {
@@ -245,6 +247,16 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         i++;
     }
     mInstanceName[i] = '\0';
+=======
+    if (payloadBufferSize < sizeof(mInstanceName))
+    {
+        ChipLogError(AppServer, "UDC payload too short for instance name");
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    }
+
+    size_t instanceNameLen = strnlen(reinterpret_cast<const char *>(udcPayload), sizeof(mInstanceName) - 1);
+    Platform::CopyString(mInstanceName, ByteSpan(udcPayload, instanceNameLen));
+>>>>>>> 01db7c7be7 ([UDC] Fix off-by-one string copy in ReadPayload (#72604))
 
     if (payloadBufferSize <= sizeof(mInstanceName))
     {
@@ -252,7 +264,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         return CHIP_NO_ERROR;
     }
     // advance i to the end of the fixed length block containing instance name
-    i = sizeof(mInstanceName);
+    size_t i = sizeof(mInstanceName);
 
     CHIP_ERROR err;
 
