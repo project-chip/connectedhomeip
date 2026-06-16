@@ -59,14 +59,14 @@ applies the specified overrides in memory.
 
 ### Supported Overrides
 
-- **Cluster**: `revision` (integer). A reserved cluster-level key that overrides
-  the cluster's reference revision (see "The `revision` key" below).
-- **Attributes**: `read_access`, `write_access` (Supports standard access
-  privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
-  `manage`, `administer`).
-- **Commands**: `invoke_access` / `privilege` (Supports standard access
-  privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
-  `manage`, `administer`).
+-   **Cluster**: `revision` (integer). A reserved cluster-level key that
+    overrides the cluster's reference revision (see "The `revision` key" below).
+-   **Attributes**: `read_access`, `write_access` (Supports standard access
+    privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
+    `manage`, `administer`).
+-   **Commands**: `invoke_access` / `privilege` (Supports standard access
+    privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
+    `manage`, `administer`).
 
 ### The `revision` key
 
