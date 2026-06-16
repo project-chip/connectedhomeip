@@ -21,12 +21,6 @@ set -e
 # Allow unlimited core dump size
 ulimit -c unlimited
 
-# Disable Tizen memory resources daemon (resourced) to avoid tight memory limits on background processes/dumpers
-systemctl stop resourced 2>/dev/null || true
-
-# Ensure Tizen crash-manager is active and running cleanly
-systemctl restart crash-manager 2>/dev/null || true
-
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
@@ -34,18 +28,15 @@ dlogutil CHIP &
 export GCOV_PREFIX=/mnt/chip
 export GCOV_PREFIX_STRIP=5
 
-# Parse command line arguments
-COPY_SYS_LIBS=false
-for arg in "$@"; do
-    case $arg in
-        --copy-sys-libs)
-            COPY_SYS_LIBS=true
-            shift
-            ;;
-    esac
-done
+# Save original core_pattern and set to raw core dumps (no crash-manager)
+ORIGINAL_CORE_PATTERN=$(cat /proc/sys/kernel/core_pattern 2>/dev/null || echo "")
+if [ -n "$ORIGINAL_CORE_PATTERN" ]; then
+    echo "/mnt/chip/core.%e.%p.%t" > /proc/sys/kernel/core_pattern
+    echo "Core pattern set to: /mnt/chip/core.%e.%p.%t (raw dumps, no crash-manager)"
+fi
 
-CRASH_DUMP_DIR="/opt/usr/share/crash/dump"
+# Restore original core_pattern on exit
+trap 'if [ -n "$ORIGINAL_CORE_PATTERN" ]; then echo "$ORIGINAL_CORE_PATTERN" > /proc/sys/kernel/core_pattern 2>/dev/null; fi' EXIT
 
 FILTER=""
 if [ -f "/mnt/chip/test_filter" ]; then
@@ -76,84 +67,10 @@ run_test_with_crash_handling() {
     if [ "$RV" -ne 0 ]; then
         echo "DONE: FAIL (exit code: $RV)"
         
-        # Only collect crash dumps if the process actually crashed (exit code > 128 due to a signal)
+        # Raw core dumps are created instantly in /mnt/chip/
+        # No need to wait - they're already on shared filesystem
         if [ "$RV" -gt 128 ]; then
-            # When a test crashes, wait for the Tizen crash-manager to finish
-            # writing the coredump, then copy it to a unique location.
-            echo -n "Process crashed (exit code: $RV). Waiting for crash files to appear"
-            PREV_SIZE=-1
-            STABLE_COUNT=0
-            REQUIRED_STABILITY=5  # Must remain the same size for 5 consecutive seconds
-            for i in $(seq 1 60); do
-                echo -n "."
-                if [ -n "$(ls /mnt/chip/dump/*.zip 2>/dev/null)" ]; then
-                    if [ "$PREV_SIZE" -eq -1 ]; then
-                        echo ""
-                        echo -n "Crash files found! Waiting for size to stabilize"
-                    fi
-                    CURR_SIZE=$(du -c /mnt/chip/dump/*.zip 2>/dev/null | tail -n 1 | cut -f1 || echo 0)
-                    if [ "$CURR_SIZE" -eq "$PREV_SIZE" ]; then
-                        STABLE_COUNT=$((STABLE_COUNT + 1))
-                        if [ "$STABLE_COUNT" -ge "$REQUIRED_STABILITY" ]; then
-                            echo ""
-                            echo "Crash dump stabilized (size: $CURR_SIZE KB)."
-                            break
-                        fi
-                    else
-                        STABLE_COUNT=0
-                    fi
-                    PREV_SIZE=$CURR_SIZE
-                else
-                    STABLE_COUNT=0
-                    PREV_SIZE=-1
-                fi
-                sleep 1
-            done
-            if [ "$STABLE_COUNT" -lt "$REQUIRED_STABILITY" ]; then
-                echo ""
-                echo "Timeout waiting for crash dump stabilization."
-            fi
-
-            # Copy crash dumps to unique location to prevent overwriting
-            CRASH_DIR="/mnt/chip/dump/$(date +%Y%m%d%H%M%S)_${TEST_NAME}"
-            mkdir -p "$CRASH_DIR"
-
-            if [ -n "$(ls /mnt/chip/dump/*.zip 2>/dev/null)" ]; then
-                echo "Moving crash files to $CRASH_DIR"
-                mv /mnt/chip/dump/*.zip "$CRASH_DIR/" 2>/dev/null || true
-
-                # Unzip on the guest to read .so_info and copy libraries
-                ZIP_FILE=$(find "$CRASH_DIR" -name "*.zip" 2>/dev/null | head -n 1)
-                if [ -n "$ZIP_FILE" ]; then
-                    EXTRACT_DIR="${ZIP_FILE%.zip}"
-                    mkdir -p "$EXTRACT_DIR"
-                    unzip -qo "$ZIP_FILE" -d "$EXTRACT_DIR"
-
-                    SO_INFO_FILE=$(find "$EXTRACT_DIR" -name "*.so_info" 2>/dev/null | head -n 1)
-                    if [ -f "$SO_INFO_FILE" ]; then
-                        if [ "$COPY_SYS_LIBS" = true ]; then
-                            echo "Copying runtime shared libraries from guest to host..."
-                            while IFS= read -r line; do
-                                LIB_PATH=$(echo "$line" | cut -d' ' -f1)
-                                if [ -f "$LIB_PATH" ]; then
-                                    LIB_DIR=$(dirname "$LIB_PATH")
-                                    mkdir -p "/mnt/chip/system_libs$LIB_DIR"
-                                    cp -P "$LIB_PATH"* "/mnt/chip/system_libs$LIB_PATH" 2>/dev/null || true
-                                fi
-                            done < "$SO_INFO_FILE"
-                            echo "SYSROOT_PATH=/mnt/chip/system_libs"
-                        else
-                            echo "Skipping library copy (use --copy-sys-libs to enable). Libraries will be resolved from TIZEN_SDK_ROOT."
-                        fi
-                    fi
-                fi
-            else
-                echo "No crash files found in /mnt/chip/dump/"
-            fi
-
-            ls -la "$CRASH_DIR" 2>&1
-        else
-            echo "Process failed without crashing (exit code: $RV). Skipping crash dump collection."
+            echo "Raw core dump created: /mnt/chip/core.${TEST_NAME}.*"
         fi
     else
         echo "DONE: SUCCESS"
