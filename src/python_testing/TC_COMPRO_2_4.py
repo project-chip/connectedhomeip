@@ -174,8 +174,8 @@ class TC_COMPRO_2_4(COMPROBaseTest):
                      "ED is advertising via the transport under test"),
             TestStep(5, "For each transport bit in valid_transports: TH sends "
                      "ProxyConnectRequest with that transport bit set",
-                     "DUT returns ProxyConnectResponse with SUCCESS and a valid SessionID "
-                     "(0x0001–0xFFFE); save as current_session_id"),
+                     "DUT returns ProxyConnectResponse with SUCCESS and a SessionID "
+                     "≤ 0xFFFE (max 65534); save as current_session_id"),
             TestStep(6, "For each transport bit in valid_transports: TH acts as Commissioner "
                      "and performs full commissioning flow by tunneling PASE and commissioning "
                      "traffic through the DUT",
@@ -343,9 +343,9 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             )
             current_session_id = connect_response.sessionID
             asserts.assert_true(
-                0x0001 <= current_session_id <= 0xFFFE,
-                f"[{transport_label}] SessionID {current_session_id:#06x} must be in "
-                "range 0x0001–0xFFFE")
+                current_session_id <= 0xFFFE,
+                f"[{transport_label}] SessionID {current_session_id:#06x} must be "
+                "≤ 0xFFFE (ProxyConnectResponse SessionID constraint is max 65534)")
             logger.info("[%s] ProxyConnectResponse: sessionID=%d", transport_label, current_session_id)
 
             # -- Step 6 work: CommissionViaProxy --
