@@ -22,8 +22,11 @@ etc.) to assist with development and code review in the Matter repository.
 ### Podman VSCode Build
 
 -   **Location**: `.agents/skills/podman-vscode-build/`
--   **Purpose**: Guidelines for building and testing Matter examples using Podman with the official vscode build image in a non-interactive environment.
--   **Triggers**: Use when running builds or tests inside a Podman container, especially when targeting embedded or cross-compiled platforms.
+-   **Purpose**: Guidelines for building and testing Matter examples using
+    Podman with the official vscode build image in a non-interactive
+    environment.
+-   **Triggers**: Use when running builds or tests inside a Podman container,
+    especially when targeting embedded or cross-compiled platforms.
 
 ## Using Skills
 
