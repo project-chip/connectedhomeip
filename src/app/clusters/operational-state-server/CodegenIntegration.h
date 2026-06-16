@@ -66,26 +66,22 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    CHIP_ERROR SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase) { return Cluster().SetCurrentPhase(aPhase); }
-    CHIP_ERROR SetOperationalState(uint8_t aOpState) { return Cluster().SetOperationalState(aOpState); }
-    DataModel::Nullable<uint8_t> GetCurrentPhase() const { return Cluster().GetCurrentPhase(); }
-    uint8_t GetCurrentOperationalState() const { return Cluster().GetCurrentOperationalState(); }
-    void GetCurrentOperationalError(GenericOperationalError & error) const { Cluster().GetCurrentOperationalError(error); }
-    void UpdateCountdownTimeFromDelegate() { Cluster().UpdateCountdownTimeFromDelegate(); }
-    void OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
-    {
-        Cluster().OnOperationalErrorDetected(aError);
-    }
+    // Forwarders to the underlying cluster. Defined out-of-line in CodegenIntegration.cpp so the
+    // cluster methods are not inlined (and duplicated) into each shim — keeps the back-compat layer small.
+    CHIP_ERROR SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase);
+    CHIP_ERROR SetOperationalState(uint8_t aOpState);
+    DataModel::Nullable<uint8_t> GetCurrentPhase() const;
+    uint8_t GetCurrentOperationalState() const;
+    void GetCurrentOperationalError(GenericOperationalError & error) const;
+    void UpdateCountdownTimeFromDelegate();
+    void OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError);
     void OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
                                        const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime = NullOptional,
-                                       const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional)
-    {
-        Cluster().OnOperationCompletionDetected(aCompletionErrorCode, aTotalOperationalTime, aPausedTime);
-    }
-    void ReportOperationalStateListChange() { Cluster().ReportOperationalStateListChange(); }
-    void ReportPhaseListChange() { Cluster().ReportPhaseListChange(); }
-    bool IsSupportedPhase(uint8_t aPhase) { return Cluster().IsSupportedPhase(aPhase); }
-    bool IsSupportedOperationalState(uint8_t aState) { return Cluster().IsSupportedOperationalState(aState); }
+                                       const Optional<DataModel::Nullable<uint32_t>> & aPausedTime           = NullOptional);
+    void ReportOperationalStateListChange();
+    void ReportPhaseListChange();
+    bool IsSupportedPhase(uint8_t aPhase);
+    bool IsSupportedOperationalState(uint8_t aState);
 
 protected:
     /**

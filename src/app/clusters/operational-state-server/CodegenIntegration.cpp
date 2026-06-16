@@ -78,6 +78,75 @@ void Instance::Shutdown()
 }
 
 // ---------------------------------------------------------------------------
+// Application-facing API — out-of-line forwarders to the underlying cluster.
+//
+// Kept out-of-line (rather than inline in the header) so the cluster methods are
+// emitted once and not inlined/duplicated into every shim call site.
+// ---------------------------------------------------------------------------
+
+CHIP_ERROR Instance::SetCurrentPhase(const DataModel::Nullable<uint8_t> & aPhase)
+{
+    return Cluster().SetCurrentPhase(aPhase);
+}
+
+CHIP_ERROR Instance::SetOperationalState(uint8_t aOpState)
+{
+    return Cluster().SetOperationalState(aOpState);
+}
+
+DataModel::Nullable<uint8_t> Instance::GetCurrentPhase() const
+{
+    return Cluster().GetCurrentPhase();
+}
+
+uint8_t Instance::GetCurrentOperationalState() const
+{
+    return Cluster().GetCurrentOperationalState();
+}
+
+void Instance::GetCurrentOperationalError(GenericOperationalError & error) const
+{
+    Cluster().GetCurrentOperationalError(error);
+}
+
+void Instance::UpdateCountdownTimeFromDelegate()
+{
+    Cluster().UpdateCountdownTimeFromDelegate();
+}
+
+void Instance::OnOperationalErrorDetected(const Structs::ErrorStateStruct::Type & aError)
+{
+    Cluster().OnOperationalErrorDetected(aError);
+}
+
+void Instance::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
+                                             const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
+                                             const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
+{
+    Cluster().OnOperationCompletionDetected(aCompletionErrorCode, aTotalOperationalTime, aPausedTime);
+}
+
+void Instance::ReportOperationalStateListChange()
+{
+    Cluster().ReportOperationalStateListChange();
+}
+
+void Instance::ReportPhaseListChange()
+{
+    Cluster().ReportPhaseListChange();
+}
+
+bool Instance::IsSupportedPhase(uint8_t aPhase)
+{
+    return Cluster().IsSupportedPhase(aPhase);
+}
+
+bool Instance::IsSupportedOperationalState(uint8_t aState)
+{
+    return Cluster().IsSupportedOperationalState(aState);
+}
+
+// ---------------------------------------------------------------------------
 // ZAP-generated plugin callbacks — stubs only.
 //
 // Applications instantiate Instance (or OperationalStateCluster) directly and
