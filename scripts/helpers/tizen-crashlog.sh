@@ -14,15 +14,27 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# ============================================================================
+# Tizen QEMU Crashlog Analyzer
+# ============================================================================
+#
+# This script is designed to work with Tizen QEMU test runners
+# (src/test_driver/tizen/chip_tests/runner.sh and
+#  src/test_driver/tizen/integration_tests/lighting-app/runner.sh).
+#
+# The runners set core_pattern to "/mnt/chip/core.%e.%p.%t" which creates
+# raw core dumps instantly on the shared filesystem. This script analyzes
+# those raw core dumps from out/tizen-*/ directories.
+#
+# For analyzing crash-manager dumps from physical Tizen devices (zip format),
+# use scripts/helpers/tizen-sdb-crashlog.sh instead.
+#
+# ============================================================================
+
 set -e
 
 # Configuration
-CRASH_REMOTE_DIR="/opt/usr/share/crash/dump"
-LOCAL_TMP_DIR="out/tizen-crashes-tmp"
-SEARCH_HOURS=24
-CLEANUP=false
 VERBOSE=false
-LOCAL_MODE=false
 SYSROOT_PATH=""
 LAST_ONLY=false
 
@@ -34,28 +46,26 @@ function help() {
     cat <<EOF
 Usage: $0 [options]
 
+Analyze raw core dumps from Tizen QEMU tests.
+
 Options:
-    --hours NUM       - Filter crashes from the last NUM hours (default: 24)
-    --target SDB_ID   - SDB identifier (e.g. 192.168.0.1:26101)
-    --out-dir DIR     - Build output directory (e.g. out/tizen-arm)
-    --local           - Local mode: analyze dumps from out/tizen-*/dump/ (used in CI)
     --sysroot PATH    - Path to system libraries sysroot (default: \$TIZEN_SDK_ROOT/platforms/...)
-    --verbose         - Print more information during execution
-    --clean           - Remove temporary files after analysis (default: keep files)
+    --verbose         - Print GDB command for manual execution
     --last            - Analyze only the most recent coredump (default: all)
     --help            - Print help
+
+Examples:
+    $0                                              # Analyze all coredumps
+    $0 --last                                       # Analyze most recent coredump
+    $0 --sysroot /path/to/sysroot                   # Use custom sysroot
+    $0 --verbose                                    # Show GDB command
 EOF
 }
 
 function parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --hours) SEARCH_HOURS="$2"; shift 2 ;;
-            --target) TARGET_DEVICE="$2"; shift 2 ;;
-            --out-dir) OUT_DIR="$2"; shift 2 ;;
             --verbose) VERBOSE=true; shift ;;
-            --clean) CLEANUP=true; shift ;;
-            --local) LOCAL_MODE=true; shift ;;
             --sysroot) SYSROOT_PATH="$2"; shift 2 ;;
             --last) LAST_ONLY=true; shift ;;
             --help) help; exit 0 ;;
@@ -89,37 +99,8 @@ function resolve_binary_path() {
 }
 
 # ============================================================================
-# Extraction & Analysis
+# GDB Analysis
 # ============================================================================
-
-function extract_coredump() {
-    local archive_path="$1"
-    local dest_dir="$2"
-    if [[ "$archive_path" == *.zip ]]; then
-        unzip -qo "$archive_path" -d "$dest_dir"
-    fi
-    # Tizen crash-manager tars are often truncated in QEMU. --ignore-zeros is vital.
-    local tar_file
-    tar_file=$(find "$dest_dir" -name "*.coredump.tar" 2>/dev/null | head -n 1)
-    if [ -n "$tar_file" ]; then
-        if [ "$VERBOSE" = true ]; then echo "Extracting $tar_file with --ignore-zeros"; fi
-        tar --ignore-zeros -xf "$tar_file" -C "$dest_dir" 2>/dev/null || true
-    fi
-}
-
-function find_coredump_file() {
-    local dir="$1"
-    local f
-    # 1. Prefer non-empty files explicitly named .coredump (raw or extracted)
-    f=$(find "$dir" -type f -name "*.coredump" -size +0 2>/dev/null | head -1)
-    [ -n "$f" ] && echo "$f" && return
-    # 2. Check file type as fallback, also ensuring size > 0
-    mapfile -t all < <(find "$dir" -type f -size +0 2>/dev/null)
-    for f in "${all[@]}"; do
-        if file "$f" | grep -q 'core file'; then echo "$f"; return; fi
-    done
-    echo ""
-}
 
 function run_gdb_analysis() {
     local target_dir="$1"
@@ -170,11 +151,6 @@ function run_gdb_analysis() {
     local gdb_args=("--batch" "-ex" "set auto-load safe-path /")
     if [ -d "$sysroot" ]; then
         gdb_args+=("-ex" "set sysroot $sysroot" "-ex" "set solib-absolute-prefix $sysroot")
-        # Create a native host symlink to map /mnt/chip inside the sysroot if using system_libs
-        if [ "$sysroot" = "$target_dir/system_libs" ]; then
-            mkdir -p "$sysroot/mnt"
-            ln -sf "../../" "$sysroot/mnt/chip" 2>/dev/null || true
-        fi
     fi
 
     # Map Tizen device paths to host paths for GDB file-backed mappings
@@ -227,96 +203,59 @@ function run_gdb_analysis() {
 }
 
 # ============================================================================
-# Main Logic
+# Main Logic - Local mode only (raw coredumps from QEMU)
 # ============================================================================
 
 parse_arguments "$@"
 
-# Auto-detect local mode if no SDB device is reachable
-if [ "$LOCAL_MODE" = false ]; then
-    if ! command -v sdb >/dev/null 2>&1 || [ "$(sdb devices 2>/dev/null | grep -cv 'List')" -eq 0 ]; then
-        echo "No SDB device found, switching to local mode."
-        LOCAL_MODE=true
-    fi
+echo "Analyzing raw core dumps from out/tizen-*/"
+echo ""
+
+found_any=false
+declare -a ALL_FILES=()
+
+# Collect all raw coredump files from all targets
+for target in out/tizen-*; do
+    [ -d "$target" ] || continue
+    while IFS= read -r -d '' f; do
+        ALL_FILES+=("$f:$target")
+    done < <(find "$target" -maxdepth 1 -type f -name "core.*" -size +0 -print0 2>/dev/null)
+done
+
+# If --last is specified, sort by modification time and take only the most recent
+if [ "$LAST_ONLY" = true ] && [ ${#ALL_FILES[@]} -gt 0 ]; then
+    LATEST_ENTRY=$(printf '%s\n' "${ALL_FILES[@]}" | while read -r entry; do
+        file_path="${entry%%:*}"
+        mtime=$(stat -c %Y "$file_path" 2>/dev/null || echo 0)
+        printf '%s\t%s\n' "$mtime" "$entry"
+    done | sort -rn | head -n 1 | cut -f2-)
+    ALL_FILES=("$LATEST_ENTRY")
+    LATEST_FILE="${LATEST_ENTRY%%:*}"
+    echo "Analyzing most recent coredump: $LATEST_FILE"
+    echo ""
 fi
 
-if [ "$LOCAL_MODE" = true ]; then
-    found_any=false
-    declare -a EXTRACT_DIRS=()
-    declare -a ALL_FILES=()
+for entry in "${ALL_FILES[@]}"; do
+    found_any=true
+    f="${entry%%:*}"
+    target_dir="${entry##*:}"
+    fname=$(basename "$f")
     
-    # Collect all coredump files from all targets
-    for target in out/tizen-*; do
-        [ -d "$target/dump" ] || continue
-        while IFS= read -r -d '' f; do
-            ALL_FILES+=("$f:$target")
-        done < <(find "$target/dump" -mindepth 1 -maxdepth 2 -type f \( -name "*.zip" -o -name "*.coredump" \) -print0 2>/dev/null)
-    done
-    
-    # If --last is specified, sort by modification time and take only the most recent
-    if [ "$LAST_ONLY" = true ] && [ ${#ALL_FILES[@]} -gt 0 ]; then
-        # Use tab as delimiter to handle paths with spaces correctly
-        LATEST_ENTRY=$(printf '%s\n' "${ALL_FILES[@]}" | while read -r entry; do
-            file_path="${entry%%:*}"
-            mtime=$(stat -c %Y "$file_path" 2>/dev/null || echo 0)
-            printf '%s\t%s\n' "$mtime" "$entry"
-        done | sort -rn | head -n 1 | cut -f2-)
-        ALL_FILES=("$LATEST_ENTRY")
-        LATEST_FILE="${LATEST_ENTRY%%:*}"
-        echo "Analyzing most recent coredump: $LATEST_FILE"
+    # Extract binary name from core filename (core.NAME.PID.TIMESTAMP)
+    # Format: core.TestServer.12345.1781607184
+    binary=$(echo "$fname" | cut -d'.' -f2)
+    if [ -z "$binary" ]; then
+        binary="unknown"
     fi
-    
-    for entry in "${ALL_FILES[@]}"; do
-        found_any=true
-        f="${entry%%:*}"
-        target_dir="${entry##*:}"
-        fname=$(basename "$f")
-        # Extract application ID (part before the first underscore)
-        app_id="${fname%%_*}"
-        binary=$(resolve_binary_name "$app_id")
 
-        coredump=""
-        if [[ "$fname" == *.zip ]]; then
-            # Extract zip to its own isolated subdirectory
-            extract_dir="${f%.zip}"
-            mkdir -p "$extract_dir"
-            unzip -qo "$f" -d "$extract_dir"
-            EXTRACT_DIRS+=("$extract_dir")
-
-            # Extract the nested .tar file inside that same directory
-            tar_file=$(find "$extract_dir" -name "*.coredump.tar" 2>/dev/null | head -n 1)
-            if [ -n "$tar_file" ]; then
-                tar --ignore-zeros -xf "$tar_file" -C "$extract_dir" 2>/dev/null || true
-            fi
-
-            # Find the non-empty coredump file inside that directory
-            coredump=$(find_coredump_file "$extract_dir")
-        else
-            coredump="$f"
-        fi
-
-        if [ -n "$coredump" ] && [ -s "$coredump" ]; then
-            run_gdb_analysis "$target_dir" "$binary" "$coredump" "$fname"
-        fi
-    done
-    [ "$found_any" = false ] && echo "No crash dumps found in out/tizen-*/dump/"
-    
-    # Cleanup extracted files if requested
-    if [ "$CLEANUP" = true ]; then
-        echo ""
-        echo "Cleaning up temporary files..."
-        for dir in "${EXTRACT_DIRS[@]}"; do
-            if [ -d "$dir" ]; then
-                rm -rf "$dir"
-                [ "$VERBOSE" = true ] && echo "  Removed: $dir"
-            fi
-        done
-        echo "Done."
+    if [ -f "$f" ] && [ -s "$f" ]; then
+        run_gdb_analysis "$target_dir" "$binary" "$f" "$fname"
     fi
-    
-    exit 0
+done
+
+if [ "$found_any" = false ]; then
+    echo "No raw core dumps found in out/tizen-*/"
+    echo ""
+    echo "Raw core dumps should be created with pattern: /mnt/chip/core.%e.%p.%t"
+    echo "Make sure the test runner set the core_pattern before running tests."
 fi
-
-# SDB remote mode implementation (simplified placeholder)
-echo "SDB remote mode is currently limited. Please use --local for CI analysis."
-exit 1
