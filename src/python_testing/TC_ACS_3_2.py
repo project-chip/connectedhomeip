@@ -59,6 +59,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # Script call reference
 # ./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters/chip-all-clusters-app  --factory-reset --app-args "--KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_2" --script src/python_testing/TC_ACS_3_2.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
+
 class TC_ACS_3_2(MatterBaseTest):
     def desc_TC_ACS_3_2(self) -> str:
         return "[TC-ACS-3.2] Same Continuous Detection and HoldTimeMax Functionality with DUT as a server"
@@ -128,7 +129,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # Human activity walking, Object identification person, Audio identification barking
         if self.is_ci:
             self.write_to_app_pipe(
-                #'{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
+                # '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
                 f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":3}},{{"TypeId":74, "TagId":4}},{{"TypeId":75,"TagId":3}}]}}')
             await asyncio.sleep(1)
 
@@ -141,7 +142,7 @@ class TC_ACS_3_2(MatterBaseTest):
 
         # PIXIT input
         holdTime_input = self.user_params.get("PIXIT.ACS.Holdtime", 30)
-        #holdTime_input = 30  # 30 seconds
+        # holdTime_input = 30  # 30 seconds
         holdTimeLimits = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits)
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime_input, "Expected to be between HoldTimeMin and HoldTimeMax.")
         asserts.assert_less_equal(holdTime_input, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
@@ -165,7 +166,7 @@ class TC_ACS_3_2(MatterBaseTest):
         if self.is_ci:
             # Human activity walking for ci
             self.write_to_app_pipe(
-                #'{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
+                # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
                 f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
             # Add 1 second delay to make sure the name piped functional latency
             await asyncio.sleep(1)
@@ -196,7 +197,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # Read AmbientContextType attribute
         ambientContextType = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-        #log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
+        # log.info(f"Rx'd AmbientContextType_read: {ambientContextType_read}")
 
         # check attribute read
         # nsID_1_read = ambientContextType_read[0].ambientContextSensed[0].namespaceID
@@ -219,7 +220,7 @@ class TC_ACS_3_2(MatterBaseTest):
         # CI call to trigger on
         if self.is_ci:
             self.write_to_app_pipe(
-                #'{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
+                # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
                 f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
             # Add 1 second delay to make sure it's done
             await asyncio.sleep(1)
@@ -230,7 +231,7 @@ class TC_ACS_3_2(MatterBaseTest):
         self.step("7", "TH reads the AmbientContextType attribute. Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID from the step 6. Verify that DUT response contains the size of AmbientContextType list is 1.")
         ambientContextType = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-        #log.info(f"Rx'd AmbientContextType_read: {ambientContextType}")
+        # log.info(f"Rx'd AmbientContextType_read: {ambientContextType}")
 
         # Same trigger shouldn't add to the list, so check to be 1.
         asserts.assert_equal(len(ambientContextType), 1, "AmbientContextType needs to be the size of 1.")
