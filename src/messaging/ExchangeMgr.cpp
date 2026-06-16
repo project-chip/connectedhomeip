@@ -398,6 +398,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                          CHIP_ERROR_INVALID_MESSAGE_TYPE.Format());
             if (delegate != nullptr)
             {
+                // Prevent use-after-free in ec->Close() if the handler deallocates the delegate.
                 ec->SetDelegate(nullptr);
                 handler->OnExchangeCreationFailed(delegate);
             }
