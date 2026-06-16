@@ -93,6 +93,33 @@ private:
     WiFiPAFEndPoint * mEndPoint;
 };
 
+// Regression: a closed WiFiPAFEndPoint must not be revivable. ClearAll() (called at the end of
+// FinalizeClose) nulls mWiFiPafLayer; if it also left mState at a non-closed value, the DoClose()
+// guard would re-open and a second close trigger -- e.g. a retransmit/ack timer that still
+// references this endpoint and fires after it closed -- would re-enter and dereference the null
+// mWiFiPafLayer. Two DoClose() calls reproduce it through the production path.
+TEST_F(TestWiFiPAFLayer, FinalizeCloseIsIdempotentAcrossDoubleClose)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Subscriber,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+    WiFiPAFEndPoint * ep = nullptr;
+    ASSERT_EQ(NewEndPoint(&ep, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(ep, nullptr);
+    SetEndPoint(ep);
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    ep->mState = WiFiPAFEndPoint::kState_Connected;
+
+    EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, CHIP_ERROR_INTERNAL);
+    EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, CHIP_ERROR_INTERNAL);
+    SUCCEED();
+}
+
 TEST_F(TestWiFiPAFLayer, CheckWiFiPAFTransportCapabilitiesRequestMessage)
 {
     auto buf = System::PacketBufferHandle::New(100);
