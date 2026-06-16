@@ -2227,7 +2227,6 @@ class ChipDeviceControllerBase:
                 raise
         raise RuntimeError("Unreachable")
 
-
     async def Read(
         self,
         nodeId: int,
