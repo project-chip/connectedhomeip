@@ -398,6 +398,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                          CHIP_ERROR_INVALID_MESSAGE_TYPE.Format());
             if (delegate != nullptr)
             {
+                ec->SetDelegate(nullptr);
                 handler->OnExchangeCreationFailed(delegate);
             }
             ec->Close();

@@ -282,7 +282,8 @@ class MockUHTempUnregister : public UnsolicitedMessageHandler, public ExchangeDe
 public:
     MockUHTempUnregister(ExchangeManager & em) : mEm(em) {}
 
-    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, const SessionHandle & session,
+                                            ExchangeDelegate *& newDelegate) override
     {
         ReturnErrorOnFailure(mEm.UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1));
         mUnregistered = true;
