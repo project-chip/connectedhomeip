@@ -59,6 +59,8 @@ uint32_t AdapterIterator::GetIndex() const
     const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(mCurrentAdapter.get()));
     unsigned index    = 0;
 
+    // sscanf return value is checked
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
     if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
     {
         ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", StringOrNullMarker(path));
