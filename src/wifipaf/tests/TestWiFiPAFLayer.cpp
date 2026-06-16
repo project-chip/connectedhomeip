@@ -541,4 +541,3 @@ TEST_F(TestWiFiPAFLayer, SubscriberNonFatalCloseReleasesPendingAck)
 
 }; // namespace WiFiPAF
 }; // namespace chip
-
