@@ -408,8 +408,8 @@ def run_tests_no_exit(
         bool: True if all tests passed, False otherwise
     """
 
-    from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.commissioning import is_commissioned
+    from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.matter_stack_state import MatterStackState
 
     # Mobly deep-copies user_params, so the asyncio event loop cannot be passed
@@ -523,7 +523,8 @@ def run_tests_no_exit(
                             )
                             if commissionee is not None:
                                 stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
-                                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+                                    stored_global_wildcard)
                                 # Do not ExpireSessions here: commissioning reuses this commissionee via
                                 # FindOrEstablishPASESession; tearing down forced flaky second discovery.
                             else:
