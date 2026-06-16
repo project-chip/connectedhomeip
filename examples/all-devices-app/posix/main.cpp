@@ -35,7 +35,7 @@
 
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -376,11 +376,14 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ChipLogProgress(AppServer, "Initializing...");
     ReturnErrorOnFailure(Platform::MemoryInit());
 
-    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), nullptr };
+    static HelpOptions sHelpOptions(argv[0], "Usage: all-devices-app [options]", "1.0");
+    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), &sHelpOptions, nullptr };
     if (!ArgParser::ParseArgs(argv[0], argc, argv, sAppOptionSets))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
     const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));

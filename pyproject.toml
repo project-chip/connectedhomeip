@@ -32,6 +32,7 @@ exclude = [
 
 [tool.pyright]
 reportMissingTypeStubs = "warning"
+extraPaths = ["./src/python_testing/matter_testing_infrastructure"]
 
 [tool.ruff.lint]
 select = [
@@ -48,14 +49,15 @@ select = [
     # Check for common exception issues
     "RSE",
     # Check for common logging issues
-    "LOG",
+    "G", "LOG",
     # Check for common optimization issues
     "SLOT",
     # Check for builtin symbols aliasing
     "A",
     # pyupgrade rules to update syntax to the new preferred variant
     "UP001", "UP003", "UP004", "UP005", "UP006", "UP008", "UP009", "UP010", "UP011", "UP012", "UP013", "UP014", "UP015", "UP017",
-    "UP018", "UP023", "UP024", "UP025", "UP033", "UP034", "UP037", "UP039", "UP040", "UP041",
+    "UP018", "UP019", "UP020", "UP021", "UP022", "UP023", "UP024", "UP025", "UP026", "UP028", "UP029", "UP030", "UP033", "UP034",
+    "UP036", "UP037", "UP039", "UP040", "UP041", "UP042",
 ]
 ignore = [
     "ASYNC109", # Sometimes we use "timeout" argument in async functions

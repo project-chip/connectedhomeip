@@ -36,14 +36,28 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
             - name: Mark workspace as safe for Git
               run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - name: Check CodeQL action pins are consistent
+              if: always()
+              # All github/codeql-action pins (init, analyze, upload-sarif) must
+              # share one SHA; a mismatch breaks CodeQL with a CLI/config version skew.
+              run: |
+                  shas=$(grep -rhoE '^[[:space:]]*uses:[[:space:]]+github/codeql-action/[^@[:space:]]+@[0-9a-f]{40}' \
+                      .github/workflows .github/actions | grep -oE '[0-9a-f]{40}' | sort -u)
+                  if [ "$(printf '%s\n' "$shas" | grep -c .)" -gt 1 ]; then
+                      echo "::error::github/codeql-action pins diverge across workflows/actions:"
+                      printf '%s\n' "$shas"
+                      exit 1
+                  fi
+                  echo "codeql-action pinned consistently: ${shas:-<none>}"
 
             - name: Check for orphaned gn files
               if: always()
@@ -132,7 +146,7 @@ jobs:
                      scripts/py_matter_idl
                   scripts/tools/not_known_to_gn.py \
                      -e py -e cpp -e cc -e c -e h -e hpp -e mm \
-                     --known-failure build-matter-wheel.py \
+                     --known-failure matter-repl.py \
                      --known-failure tests/scripts/base.py \
                      --known-failure tests/scripts/cirque_restart_remote_device.py \
                      --known-failure tests/scripts/cluster_objects.py \

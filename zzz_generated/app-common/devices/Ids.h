@@ -299,6 +299,12 @@ constexpr uint8_t kElectricalEnergyTariffDeviceTypeRevision = 1;
 constexpr DeviceTypeId kElectricalMeterDeviceTypeId  = 0x00000514;
 constexpr uint8_t kElectricalMeterDeviceTypeRevision = 1;
 
+constexpr DeviceTypeId kElectricalCircuitBreakerDeviceTypeId  = 0x00000516;
+constexpr uint8_t kElectricalCircuitBreakerDeviceTypeRevision = 1;
+
+constexpr DeviceTypeId kElectricalDistributionEnclosureDeviceTypeId  = 0x00000517;
+constexpr uint8_t kElectricalDistributionEnclosureDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kControlBridgeDeviceTypeId  = 0x00000840;
 constexpr uint8_t kControlBridgeDeviceTypeRevision = 3;
 

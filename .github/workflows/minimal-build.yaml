@@ -34,11 +34,11 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-minimal:194
+            image: ghcr.io/project-chip/chip-build-minimal:200
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
 
             - name: Checkout submodules # but don't bootstrap!
               uses: ./.github/actions/checkout-submodules
@@ -61,11 +61,11 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-minimal:194
+            image: ghcr.io/project-chip/chip-build-minimal:200
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v6.0.3
 
             - name: Checkout submodules # but don't bootstrap!
               uses: ./.github/actions/checkout-submodules

@@ -130,10 +130,10 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
 void SetTestEventTrigger_PowerAdjustment()
 {
-    sPowerAdjustments[0].minPower    = 5000 * 1000;  // 5kW
-    sPowerAdjustments[0].maxPower    = 30000 * 1000; // 30kW
-    sPowerAdjustments[0].minDuration = 10;           // 30s
-    sPowerAdjustments[0].maxDuration = 60;           // 60s
+    sPowerAdjustments[0].minPower    = static_cast<int64_t>(5000) * 1000;  // 5kW
+    sPowerAdjustments[0].maxPower    = static_cast<int64_t>(30000) * 1000; // 30kW
+    sPowerAdjustments[0].minDuration = 10;                                 // 30s
+    sPowerAdjustments[0].maxDuration = 60;                                 // 60s
 
     DataModel::List<const DeviceEnergyManagement::Structs::PowerAdjustStruct::Type> powerAdjustmentList(sPowerAdjustments, 1);
 
