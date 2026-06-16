@@ -24,8 +24,8 @@
  */
 
 #include "UserDirectedCommissioning.h"
-#include <lib/support/CHIPMemString.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMemString.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/raw/Base.h>
 
