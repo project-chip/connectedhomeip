@@ -34,8 +34,8 @@ namespace app {
 
 SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig,
                                        const Clusters::SmokeCoAlarmCluster::Config & smokeConfig) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mCoConfig(coConfig), mSmokeConfig(smokeConfig)
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mCoConfig(coConfig), mSmokeConfig(smokeConfig)
 {}
 
 CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
