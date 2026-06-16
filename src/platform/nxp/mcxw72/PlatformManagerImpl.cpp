@@ -40,6 +40,7 @@
 #include "fsl_os_abstraction.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include "OTAFuseVerifier.h"
 #include "OtaSupport.h"
 #endif
 
@@ -102,6 +103,17 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     err = chip::Crypto::add_entropy_source(plat_entropy_source, NULL, 16);
     SuccessOrExit(err);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
+    ChipLogDetail(SoftwareUpdate, "Verifying OTA encryption keys");
+    err = NXP::OTAFuseVerifier::VerifyOTAFusesReady();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "OTA cannot proceed - encryption fuses not programmed!");
+    }
+    SuccessOrExit(err);
+
+#endif
 exit:
     return err;
 }
