@@ -28,7 +28,6 @@
         "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
-        "chip-ota.xml",
         "channel-cluster.xml",
         "closure-control-cluster.xml",
         "closure-dimension-cluster.xml",
@@ -97,6 +96,8 @@
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
         "network-identity-management-cluster.xml",
+        "ota-provider-cluster.xml",
+        "ota-requestor-cluster.xml",
         "proximity-ranging-cluster.xml",
         "push-av-stream-transport-cluster.xml",
         "semantic-tag-namespace-enums.xml",
@@ -131,6 +132,7 @@
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
+        "temperature-controlled-cabinet-topology-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thermostat-cluster.xml",
@@ -342,6 +344,17 @@
             "TxErrCount",
             "CollisionCount",
             "OverrunCount",
+            "ClusterRevision"
+        ],
+        "Fan Control": [
+            "FanMode",
+            "PercentSetting",
+            "PercentCurrent",
+            "SpeedSetting",
+            "SpeedCurrent",
+            "RockSetting",
+            "WindSetting",
+            "AirflowDirection",
             "ClusterRevision"
         ],
         "General Commissioning": [
@@ -839,7 +852,13 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
-        "Power Source": ["ClusterRevision"],
+        "Power Source": [
+            "ClusterRevision",
+            "ActiveWiredFaults",
+            "ActiveBatFaults",
+            "ActiveBatChargeFaults",
+            "EndpointList"
+        ],
         "Valve Configuration and Control": [
             "OpenDuration",
             "AutoCloseTime",
