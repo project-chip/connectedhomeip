@@ -245,7 +245,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
     }
 
     size_t i = 0;
-    while (i < sizeof(mInstanceName) && udcPayload[i] != '\0')
+    while (i < sizeof(mInstanceName) - 1 && udcPayload[i] != '\0')
     {
         mInstanceName[i] = static_cast<char>(udcPayload[i]);
         i++;

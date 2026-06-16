@@ -529,6 +529,23 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
     EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
 }
 
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationUnterminatedInstanceName)
+{
+    IdentificationDeclaration idOut;
+
+    // Fill the entire fixed-size instance name block with non-null bytes so there is no
+    // terminator within it. ReadPayload must keep the copy and terminator within mInstanceName.
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(idBuffer, 'A', sizeof(idBuffer));
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+
+    char expected[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(expected, 'A', Dnssd::Commission::kInstanceNameMaxLength);
+    expected[Dnssd::Commission::kInstanceNameMaxLength] = '\0';
+    EXPECT_STREQ(idOut.GetInstanceName(), expected);
+}
+
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
 {
     CommissionerDeclaration id;
