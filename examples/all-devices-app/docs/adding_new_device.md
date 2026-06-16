@@ -25,7 +25,9 @@ build targets, and executing certification tests.
       Sensor).
     - **Mandatory & Optional Clusters**: Server clusters required to comply.
     - **Endpoint Constraints / Composition Rules**: Tree composition rules.
-5. **AI Agent Assistant**: If using an AI coding agent, it can use the [spec access skill](../../../.agents/skills/matter-specification-access/SKILL.md) to retrieve relevant sections of the specification.
+5. **AI Agent Assistant**: If using an AI coding agent, it can use the
+   [spec access skill](../../../.agents/skills/matter-specification-access/SKILL.md)
+   to retrieve relevant sections of the specification.
 
 ---
 
