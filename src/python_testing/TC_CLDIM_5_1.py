@@ -148,6 +148,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
         self.kGroupId = 0x0001
         self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
         self.groupcast_enabled = await is_groupcast_on_root_node(self)
+        log.info("Groupcast on root node enabled: %s", self.groupcast_enabled)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -237,26 +238,42 @@ class TC_CLDIM_5_1(MatterBaseTest):
         self.step("2m")
         membership = None
         if self.groupcast_enabled:
+            log.info("Groupcast cluster is enabled on EP0, reading the Groupcast membership attribute on the DUT")
             membership = await self.read_single_attribute_check_success(
                 endpoint=0,
                 cluster=Clusters.Groupcast,
                 attribute=Clusters.Groupcast.Attributes.Membership
             )
+        else:
+            log.info("Groupcast cluster is not enabled on EP0, skipping step")
+            self.skmark_current_step_skipped()
 
         # STEP 2n: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
         self.step("2n")
         if self.groupcast_enabled:
+            log.info("Groupcast cluster is enabled on EP0")
             if membership:
+                log.info("Groupcast membership is not empty, sending the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT")
                 await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+            else:
+                log.info("Groupcast membership is empty, skipping step")
+                self.mark_current_step_skipped()
+        else:
+            log.info("Groupcast cluster is not enabled on EP0, skipping step")
+            self.mark_current_step_skipped()
 
         # STEP 2o: If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT
         self.step("2o")
         if self.groupcast_enabled:
+            log.info("Groupcast cluster is enabled on EP0, sending Groupcast JoinGroup command")
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=self.kGroupId,
                 endpoints=[endpoint],
                 keySetID=self.kGroupKeysetId,
                 key=self.kGroupKey), endpoint=0)
+        else:
+            log.info("Groupcast cluster is not enabled on EP0, skipping step")
+            self.mark_current_step_skipped()
 
         # STEP 3a: If Position = MaxPosition, skip steps 3b to 3d
         self.step("3a")
@@ -268,9 +285,11 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.step("3b")
             sub_handler.reset()
             if self.groupcast_enabled:
+                log.info("Sending GroupedSetTarget command by groupcast")
                 self.default_controller.SendGroupCommand(
                     self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position))
             else:
+                log.info("Sending GroupedSetTarget command by unicast")
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position),
                     endpoint=endpoint
@@ -297,9 +316,11 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.step("4b")
             sub_handler.reset()
             if self.groupcast_enabled:
+                log.info("Sending GroupedSetTarget command by groupcast")
                 self.default_controller.SendGroupCommand(
                     self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(speed=Globals.Enums.ThreeLevelAutoEnum.kMedium))
             else:
+                log.info("Sending GroupedSetTarget command by unicast")
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
                         speed=Globals.Enums.ThreeLevelAutoEnum.kMedium),
@@ -322,9 +343,11 @@ class TC_CLDIM_5_1(MatterBaseTest):
         self.step("5a")
         sub_handler.reset()
         if self.groupcast_enabled:
+            log.info("Sending GroupedSetTarget command by groupcast")
             self.default_controller.SendGroupCommand(
                 self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position))
         else:
+            log.info("Sending GroupedSetTarget command by unicast")
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=min_position),
                 endpoint=endpoint
@@ -351,9 +374,11 @@ class TC_CLDIM_5_1(MatterBaseTest):
             self.step("6b")
             sub_handler.reset()
             if self.groupcast_enabled:
+                log.info("Sending GroupedSetTarget command by groupcast")
                 self.default_controller.SendGroupCommand(
                     self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(position=max_position, speed=Globals.Enums.ThreeLevelAutoEnum.kHigh))
             else:
+                log.info("Sending GroupedSetTarget command by unicast")
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(
                         position=max_position, speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
