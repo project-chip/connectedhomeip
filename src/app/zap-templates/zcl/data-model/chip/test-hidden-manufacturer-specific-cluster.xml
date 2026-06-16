@@ -19,7 +19,7 @@ limitations under the License.
 
   Reproduces an SVE finding: a vendor's device exposed a manufacturer-
   specific cluster the Python test harness had no codegen for, which
-  crashed TC_IDM_2_2 wildcard reads. Pinning that scenario into
+  crashed TC_IDM_2_2 wildcard reads. Adding that scenario into
   all-clusters-app prevents the regression from returning.
 
   The cluster is present in controller-clusters.matter as an `internal`
