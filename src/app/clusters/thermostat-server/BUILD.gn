@@ -18,6 +18,9 @@ source_set("thermostat-server") {
   sources = []
 
   public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/support:span",
     "${chip_root}/src/system",
     "${chip_root}/zzz_generated/app-common/clusters/Thermostat",

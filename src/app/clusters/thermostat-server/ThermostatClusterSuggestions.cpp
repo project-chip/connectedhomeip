@@ -234,6 +234,21 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
+// Namespaced entry points invoked by ThermostatCluster::InvokeCommand. They mirror the global Ember
+// callbacks below (which the legacy dispatch used) so the friend-declared names resolve.
+bool emberAfThermostatClusterAddThermostatSuggestionCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::AddThermostatSuggestion::DecodableType & commandData)
+{
+    return AddThermostatSuggestion(commandObj, commandPath, commandData);
+}
+
+bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(CommandHandler * commandObj,
+                                                                const ConcreteCommandPath & commandPath,
+                                                                const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
+{
+    return RemoveThermostatSuggestion(commandObj, commandPath, commandData);
+}
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

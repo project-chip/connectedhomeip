@@ -153,6 +153,7 @@ CodeDrivenClusters:
     - Scenes Management
     - Software Diagnostics
     - Switch
+    - Thermostat
     - TLS Certificate Management
     - TLS Client Management
     - Temperature Control
