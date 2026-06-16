@@ -32,7 +32,7 @@
 #     quiet: true
 #   run2:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device soil-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device soil-sensor --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
