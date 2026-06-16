@@ -286,7 +286,7 @@ public:
     {
         ReturnErrorOnFailure(mEm.UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1));
         mUnregistered = true;
-        newDelegate = this;
+        newDelegate   = this;
         return CHIP_NO_ERROR;
     }
 
@@ -305,10 +305,7 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
-    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override
-    {
-        return mDispatch;
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return mDispatch; }
 
     class MockDispatch : public Messaging::ApplicationExchangeDispatch
     {
@@ -318,8 +315,8 @@ public:
 
     ExchangeManager & mEm;
     MockDispatch mDispatch;
-    bool mUnregistered = false;
-    bool mRegisteredAgain = false;
+    bool mUnregistered            = false;
+    bool mRegisteredAgain         = false;
     bool mOnMessageReceivedCalled = false;
 };
 

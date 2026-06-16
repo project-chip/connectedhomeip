@@ -361,7 +361,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // If we found a handler, create an exchange to handle the message.
     if (matchingUMH != nullptr)
     {
-        ExchangeDelegate * delegate = nullptr;
+        ExchangeDelegate * delegate         = nullptr;
         UnsolicitedMessageHandler * handler = matchingUMH->Handler;
 
         // Fetch delegate from the handler
