@@ -59,12 +59,40 @@ applies the specified overrides in memory.
 
 ### Supported Overrides
 
--   **Attributes**: `read_access`, `write_access` (Supports standard access
-    privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
-    `manage`, `administer`).
--   **Commands**: `invoke_access` / `privilege` (Supports standard access
-    privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
-    `manage`, `administer`).
+- **Cluster**: `revision` (integer). A reserved cluster-level key that overrides
+  the cluster's reference revision (see "The `revision` key" below).
+- **Attributes**: `read_access`, `write_access` (Supports standard access
+  privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
+  `manage`, `administer`).
+- **Commands**: `invoke_access` / `privilege` (Supports standard access
+  privilege codes: `RV`, `RO`, `RM`, `RA`, `none`, or `view`, `operate`,
+  `manage`, `administer`).
+
+### The `revision` key
+
+`revision` is a reserved key matched at the **cluster** level (a sibling of
+attribute/command element names, not an element name itself):
+
+```yaml
+GroupKeyManagement:
+    revision: 4
+```
+
+#### How it works
+
+The conformance check (`device_conformance_tests.py`) compares the device's
+reported `ClusterRevision` attribute (`0xFFFD`) against the _reference_ revision
+from the `<cluster revision="...">` XML property, parsed into
+`XmlCluster.revision`. That reference is a cluster property, not an attribute,
+so it can't be targeted by an attribute name (it isn't in `attribute_map`).
+
+The `revision` key bridges this gap: the engine parses the value as an integer
+and writes it directly to `XmlCluster.revision`, so the test compares against
+the overridden reference instead of the stale baseline.
+
+Use this when a cluster revision is bumped in a "next" spec release (or SDK PR)
+ahead of the checked-in baseline XML, so the device legitimately reports a newer
+revision than the baseline records.
 
 ## Extending Engine Capabilities (Supporting New Errata Overrides)
 
