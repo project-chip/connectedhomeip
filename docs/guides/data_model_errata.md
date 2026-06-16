@@ -83,16 +83,16 @@ GroupKeyManagement:
 The conformance check (`device_conformance_tests.py`) compares the device's
 reported `ClusterRevision` attribute (`0xFFFD`) against the _reference_ revision
 from the `<cluster revision="...">` XML property, parsed into
-`XmlCluster.revision`. That reference is a cluster property, not an attribute,
-so it can't be targeted by an attribute name (it isn't in `attribute_map`).
+`XmlCluster.revision`. This revision is parsed as cluster property, not an
+attribute, so it can't be targeted by an attribute name (it isn't in
+`attribute_map`).
 
-The `revision` key bridges this gap: the engine parses the value as an integer
+The `revision` keys allows the errata engine to parses the value as an integer
 and writes it directly to `XmlCluster.revision`, so the test compares against
 the overridden reference instead of the stale baseline.
 
 Use this when a cluster revision is bumped in a "next" spec release (or SDK PR)
-ahead of the checked-in baseline XML, so the device legitimately reports a newer
-revision than the baseline records.
+ahead of the checked-in baseline XML.
 
 ## Extending Engine Capabilities (Supporting New Errata Overrides)
 

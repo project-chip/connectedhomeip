@@ -151,8 +151,8 @@ def _apply_cluster_revision_errata(target_cluster: Any, cluster_id: int, value: 
     """Overrides the cluster's reference revision in the AST (XmlCluster.revision).
 
     The conformance test compares the device-reported ClusterRevision attribute (0xFFFD)
-    against this reference value. Bumping it here lets a device legitimately report a
-    revision newer than the checked-in baseline XML records (e.g. a 'next' spec bump).
+    against this reference value. Bumping it here lets a device report a
+    revision newer than the checked-in baseline XML records (e.g. a 'next/in-progress' spec bump).
     """
     try:
         target_cluster.revision = int(value)
