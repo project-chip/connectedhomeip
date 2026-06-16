@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <clusters/SmokeCoAlarm/Enums.h>
+#include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -34,17 +34,17 @@ using namespace chip::app::Clusters;
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
+    ClusterId clusterId     = attributePath.mClusterId;
+    AttributeId attributeId = attributePath.mAttributeId;
+    ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+
     // TODO: this will NOT be called after code driven conversion
     //       You may intercept data model provider attribute changes by DataModel::Provider::RegisterAttributeChangeListener
-
-    // ClusterId clusterId     = attributePath.mClusterId;
-    // AttributeId attributeId = attributePath.mAttributeId;
-    // ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-    // if (clusterId == SmokeCoAlarm::Id && attributeId == SmokeCoAlarm::Attributes::ExpressedState::Id)
-    // {
-    //     static_assert(sizeof(SmokeCoAlarm::ExpressedStateEnum) == 1, "Wrong size");
-    //     SmokeCoAlarm::ExpressedStateEnum expressedState = *(reinterpret_cast<SmokeCoAlarm::ExpressedStateEnum *>(value));
-    //     ChipLogProgress(Zcl, "Smoke CO Alarm cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
-    //                     to_underlying(expressedState));
-    // }
+    if (clusterId == SmokeCoAlarm::Id && attributeId == SmokeCoAlarm::Attributes::ExpressedState::Id)
+    {
+        static_assert(sizeof(SmokeCoAlarm::ExpressedStateEnum) == 1, "Wrong size");
+        SmokeCoAlarm::ExpressedStateEnum expressedState = *(reinterpret_cast<SmokeCoAlarm::ExpressedStateEnum *>(value));
+        ChipLogProgress(Zcl, "Smoke CO Alarm cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
+                        to_underlying(expressedState));
+    }
 }
