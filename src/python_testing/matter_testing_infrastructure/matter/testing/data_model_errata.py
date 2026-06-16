@@ -155,6 +155,8 @@ def _apply_cluster_revision_errata(target_cluster: Any, cluster_id: int, value: 
     revision newer than the checked-in baseline XML records (e.g. a 'next/in-progress' spec bump).
     """
     try:
+        if isinstance(value, (bool, float)):
+            raise ValueError
         target_cluster.revision = int(value)
     except (TypeError, ValueError):
         problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
