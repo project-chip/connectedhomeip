@@ -110,6 +110,7 @@ class TC_CLDIM_6_2(MatterBaseTest):
             cluster=Clusters.Objects.ClosureDimension,
             attribute=attributes.FeatureMap
         )
+        log.info("FeatureMap: %s", feature_map)
 
         is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
@@ -131,6 +132,7 @@ class TC_CLDIM_6_2(MatterBaseTest):
         # STEP 2d: Read CurrentState attribute
         self.step("2d")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        log.info("InitialState: %s", initial_state)
 
         # STEP 2e: If Latching feature is not supported or state is unlatched, skip steps 2f to 2k
         self.step("2e")
@@ -141,6 +143,7 @@ class TC_CLDIM_6_2(MatterBaseTest):
             # STEP 2f: Read LatchControlModes attribute
             self.step("2f")
             latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+            log.info("LatchControlModes: %s", latch_control_modes)
 
             # STEP 2g: If LatchControlModes is manual unlatching, skip step 2h
             self.step("2g")
