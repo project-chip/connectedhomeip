@@ -22,12 +22,6 @@ limitations under the License.
   crashed TC_IDM_2_2 wildcard reads. Adding that scenario into
   all-clusters-app prevents the regression from returning.
 
-  The cluster is present in controller-clusters.matter as an `internal`
-  cluster, but excluded from Python ClusterObjects.ALL_CLUSTERS by an
-  allowlist in
-  src/controller/python/templates/python-cluster-Objects-py.zapt, so
-  test scripts must reach it via raw AttributePath / tlvAttributes.
-
   Cluster ID: 0xFFF1FC21 (4294048801)
   - Vendor ID: 0xFFF1 (test vendor)
   - Cluster suffix: 0xFC21 (within manufacturer-specific range 0xFC00-0xFFFE per spec)

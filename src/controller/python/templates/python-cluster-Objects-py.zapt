@@ -22,6 +22,14 @@ from .Types import Nullable, NullValue
 __all__ = [
     "Globals",
 {{#zcl_clusters}}
+{{! TestHiddenManufacturerSpecific is deliberately excluded from generated }}
+{{! Python ClusterObjects (here and in the class-definition loop below). It }}
+{{! is a CI-only manufacturer-specific cluster used to reproduce an SVE }}
+{{! finding where a device exposed a cluster the Python test harness had no }}
+{{! codegen for, which crashed TC_IDM_2_2 wildcard reads. By keeping it out }}
+{{! of ClusterObjects.ALL_CLUSTERS we ensure that scenario is exercised: }}
+{{! test scripts must reach the cluster via raw AttributePath / tlvAttributes }}
+{{! rather than generated bindings. }}
 {{~#unless (is_str_equal (asUpperCamelCase name) "TestHiddenManufacturerSpecific")}}
     "{{asUpperCamelCase name}}",
 {{/unless~}}
