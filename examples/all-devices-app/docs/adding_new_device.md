@@ -23,7 +23,7 @@ build targets, and executing certification tests.
 
 ## Step 0.5: Test Plan & Test Discovery
 
-1. **Locate Test Plans**: Reference the private `chip-test-plans` repository (e.g., cloned locally under `out/test_plans/src/cluster/`) to understand cluster verification steps.
+1. **Locate Test Plans**: Reference the private `chip-test-plans` repository to understand cluster verification steps.
 2. **Locate Integration Tests**: Search `src/python_testing/` for `TC_{CLUSTER}_*.py` or `src/app/tests/suites/` for YAML tests corresponding to the implemented clusters.
 3. **Plan CI Runs**: Plan to enable a subset of cluster tests in CI. This is done by adding run configurations to the `=== BEGIN CI TEST ARGUMENTS ===` block of the python script or to the YAML test suites, passing `--device {your-device}`.
 
