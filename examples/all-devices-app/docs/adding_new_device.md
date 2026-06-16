@@ -222,7 +222,7 @@ your device creation callback in
     #include <devices/my-sensor/MySensorDevice.h>
     ```
 
-2. **Register the Creator** inside `InitCreator()`:
+2. **Register the Creator** inside the `DeviceFactory` constructor:
     ```cpp
     if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
     {
