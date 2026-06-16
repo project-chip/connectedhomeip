@@ -197,7 +197,7 @@ public:
         VerifyOrReturnError(cmdSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
         Commands::ProxyMessageRequest::Type request;
-        request.sessionId       = sessionId;
+        request.sessionID       = sessionId;
         request.responseTimeout = 60; // ConnectNetwork can take ~30 s
         request.message.SetNonNull(message);
 
@@ -228,7 +228,7 @@ public:
         if (!response.message.IsNull())
         {
             auto * proxyTransport = GetDeviceProxyTransport(mDevCtrl->GetTransportMgr());
-            proxyTransport->OnProxyMessageReceived(response.sessionId, response.message.Value().data(),
+            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
                                                    response.message.Value().size());
         }
     }
