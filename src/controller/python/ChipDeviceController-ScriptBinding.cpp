@@ -141,6 +141,7 @@ public:
         mSetupPinCode     = setupPinCode;
         mProxyExchangeMgr = nullptr;
         mProxySession.Release();
+        mError            = CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Start(chip::Controller::CommissioningParameters & commParams)
@@ -163,10 +164,12 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override
     {
         // Deactivate proxy transport regardless of success or failure, then
-        // restore the original pairing delegate before forwarding.
+        // restore the original pairing delegate before forwarding. If a proxy
+        // message transaction failed earlier (recorded in mError), propagate
+        // that specific error rather than the generic commissioning error.
         DeactivateProxyTransport();
         mDevCtrl->RegisterPairingDelegate(mPairingDelegate);
-        mPairingDelegate->OnCommissioningComplete(deviceId, error);
+        mPairingDelegate->OnCommissioningComplete(deviceId, mError != CHIP_NO_ERROR ? mError : error);
     }
     void OnCommissioningSuccess(chip::PeerId peerId) override { mPairingDelegate->OnCommissioningSuccess(peerId); }
     void OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::Controller::CommissioningStage stageFailed,
@@ -214,33 +217,52 @@ public:
     }
 
     // --- CommandSender::Callback -----------------------------------------
-    void OnResponse(chip::app::CommandSender * /*sender*/, const chip::app::ConcreteCommandPath & path,
-                    const chip::app::StatusIB & /*status*/, chip::TLV::TLVReader * data) override
+    void OnResponse(chip::app::CommandSender * sender, const chip::app::ConcreteCommandPath & path,
+                    const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
         using namespace chip::app::Clusters::CommissioningProxy::Commands;
-        if (path.mCommandId != ProxyMessageResponse::Id || data == nullptr)
+        // Any failure here must drive the flow to OnError; otherwise the
+        // commissioner waits for a relayed message that never arrives and the
+        // whole commissioning hangs until an unrelated timeout fires.
+        if (!status.IsSuccess())
+        {
+            OnError(sender, status.ToChipError());
             return;
+        }
+        if (path.mCommandId != ProxyMessageResponse::Id || data == nullptr)
+        {
+            OnError(sender, CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
 
         ProxyMessageResponse::DecodableType response;
         if (chip::app::DataModel::Decode(*data, response) != CHIP_NO_ERROR)
+        {
+            OnError(sender, CHIP_ERROR_INVALID_ARGUMENT);
             return;
+        }
 
         if (!response.message.IsNull())
         {
             auto * proxyTransport = GetDeviceProxyTransport(mDevCtrl->GetTransportMgr());
-            proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
-                                                   response.message.Value().size());
+            if (proxyTransport != nullptr)
+            {
+                proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value().data(),
+                                                       response.message.Value().size());
+            }
         }
     }
 
     void OnError(const chip::app::CommandSender * /*sender*/, CHIP_ERROR error) override
     {
         ChipLogError(Controller, "CommissionViaProxy CommandSender error: %" CHIP_ERROR_FORMAT, error.Format());
+        // Record the error and deactivate the proxy transport. Deactivation
+        // aborts the in-flight commissioning exchange, which drives the flow to
+        // OnCommissioningComplete — that is where the original pairing delegate
+        // is restored and mError is propagated. Restoring the delegate here
+        // would lose this specific error and risk double-calling the delegate.
+        mError = error;
         DeactivateProxyTransport();
-        // Restore the original pairing delegate immediately so any subsequent
-        // status callbacks (before OnCommissioningComplete fires) are not
-        // routed through sPythonProxyCommissioner.
-        mDevCtrl->RegisterPairingDelegate(mPairingDelegate);
     }
 
     void OnDone(chip::app::CommandSender * sender) override
@@ -253,7 +275,11 @@ private:
     void DeactivateProxyTransport()
     {
         if (mDevCtrl != nullptr)
-            GetDeviceProxyTransport(mDevCtrl->GetTransportMgr())->Deactivate();
+        {
+            auto * proxyTransport = GetDeviceProxyTransport(mDevCtrl->GetTransportMgr());
+            if (proxyTransport != nullptr)
+                proxyTransport->Deactivate();
+        }
     }
 
     // --- Static callbacks for GetConnectedDevice -------------------------
@@ -265,6 +291,13 @@ private:
         self->mProxySession.Grab(sessionHandle);
 
         auto * proxyTransport = GetDeviceProxyTransport(self->mDevCtrl->GetTransportMgr());
+        if (proxyTransport == nullptr)
+        {
+            ChipLogError(Controller, "CommissionViaProxy: ProxyTransport is null");
+            self->mDevCtrl->RegisterPairingDelegate(self->mPairingDelegate);
+            self->mPairingDelegate->OnCommissioningComplete(self->mRemoteNodeId, CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
         proxyTransport->Activate(self->mProxySessionId, self);
 
         auto rendezvousParams = chip::RendezvousParameters()
@@ -305,6 +338,7 @@ private:
     chip::SessionHolder mProxySession;
     chip::Platform::UniquePtr<chip::app::CommandSender> mProxyCmdSender;
     chip::Controller::CommissioningParameters mCommParams;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback{ OnDeviceConnected, this };
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailedCallback{ OnDeviceConnectionFailed, this };
