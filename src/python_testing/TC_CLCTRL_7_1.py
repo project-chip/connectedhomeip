@@ -224,6 +224,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.kGroupId = 0x0001
         self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
         self.groupcast_enabled = await is_groupcast_on_root_node(self)
+        log.info("Groupcast on root node enabled: %s", self.groupcast_enabled)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -274,26 +275,42 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.step("2f")
         membership = None
         if self.groupcast_enabled:
+            log.info("Groupcast cluster is enabled on EP0, reading the Groupcast membership attribute on the DUT")
             membership = await self.read_single_attribute_check_success(
                 endpoint=0,
                 cluster=Clusters.Groupcast,
                 attribute=Clusters.Groupcast.Attributes.Membership
             )
+        else:
+            log.info("Groupcast cluster is not enabled on EP0, skipping step")
+            self.mark_current_step_skipped()
 
         # STEP 2g: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
         self.step("2g")
         if self.groupcast_enabled:
+            log.info("Groupcast cluster is enabled on EP0")
             if membership:
+                log.info("Groupcast membership is not empty, sending the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT")
                 await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+            else:
+                log.info("Groupcast membership is empty, skipping step")
+                self.mark_current_step_skipped()
+        else:
+            log.info("Groupcast cluster is not enabled on EP0, skipping step")
+            self.smark_current_step_skipped()
 
         # STEP 2h: If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT
         self.step("2h")
         if self.groupcast_enabled:
+            log.info("Groupcast cluster is enabled on EP0, sending Groupcast JoinGroup command")
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=self.kGroupId,
                 endpoints=[endpoint],
                 keySetID=self.kGroupKeysetId,
                 key=self.kGroupKey), endpoint=0)
+        else:
+            log.info("Groupcast cluster is not enabled on EP0, skipping step")
+            self.mark_current_step_skipped()
 
         # STEP 3a: TH reads from the DUT the OverallCurrentState attribute
         self.step("3a")
