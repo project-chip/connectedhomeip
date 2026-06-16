@@ -462,6 +462,28 @@ TEST_F(TestWiFiPAFLayer, ReceiveConnectionTimerTimeout)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+TEST_F(TestWiFiPAFLayer, ShutdownClosesStalledEndpoints)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Publisher,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    EXPECT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
+
+    Shutdown();
+
+    // Verify the endpoint is closed and dissociated from the layer
+    EXPECT_EQ(EpGetWiFiPafLayer(), nullptr);
+}
+
 // kSystemLayer_NumPacketBufs only exists as a single counter when packet buffers are not the
 // custom-pool LWIP configuration (which splits the counter per pool via lwippools.h), so guard
 // these counter-based checks the same way SystemStats.h declares the entry.

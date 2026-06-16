@@ -125,10 +125,10 @@ private:
      *       --> StartConnect()                                       |
      *               |                                                |
      *               v                                                v
-     *    +----------------------+                         +----------------------+
-     *    | kConnectTimerRunning |                         |kReceiveConnectionTim-|
-     *    |       (5000ms)       |                         |  erRunning (5000ms)  |
-     *    +----------------------+                         +----------------------+
+     *    +----------------------+                         +-------------------------+
+     *    | kConnectTimerRunning |                         | kReceiveConnectionTimer-|
+     *    |      (15000ms)       |                         |    Running (15000ms)    |
+     *    +----------------------+                         +-------------------------+
 
      *         |            |                                   |            |
      *   (Handshake     (Timeout)                         (Handshake     (Timeout)
@@ -153,7 +153,7 @@ private:
      *                  v                                           v
      *      +--------------------------+                +--------------------------+
      *      | kAckReceivedTimerRunning |                |   kSendAckTimerRunning   |
-     *      |        (5000ms)          |                |         (200ms)          |
+     *      |        (15000ms)         |                |         (200ms)          |
      *      +--------------------------+                +--------------------------+
      *          |                  |                        |                  |
      *     (Ack Arrives)       (Timeout)                (Timeout)         (Piggybacked
