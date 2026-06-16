@@ -255,7 +255,12 @@ if [ "$LOCAL_MODE" = true ]; then
     
     # If --last is specified, sort by modification time and take only the most recent
     if [ "$LAST_ONLY" = true ] && [ ${#ALL_FILES[@]} -gt 0 ]; then
-        LATEST_ENTRY=$(printf '%s\n' "${ALL_FILES[@]}" | xargs -I{} sh -c 'echo "$(stat -c %Y "{}" 2>/dev/null || echo 0) {}"' | sort -rn | head -n 1 | cut -d' ' -f2-)
+        # Use tab as delimiter to handle paths with spaces correctly
+        LATEST_ENTRY=$(printf '%s\n' "${ALL_FILES[@]}" | while read -r entry; do
+            file_path="${entry%%:*}"
+            mtime=$(stat -c %Y "$file_path" 2>/dev/null || echo 0)
+            printf '%s\t%s\n' "$mtime" "$entry"
+        done | sort -rn | head -n 1 | cut -f2-)
         ALL_FILES=("$LATEST_ENTRY")
         LATEST_FILE="${LATEST_ENTRY%%:*}"
         echo "Analyzing most recent coredump: $LATEST_FILE"
