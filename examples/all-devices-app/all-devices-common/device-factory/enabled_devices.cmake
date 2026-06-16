@@ -38,6 +38,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/aggregator/AggregatorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/air-quality-sensor/AirQualitySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/bridged-node/BridgedNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
@@ -56,11 +57,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/BleRssiRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
     # keep-sorted: end
@@ -105,6 +106,7 @@ foreach(_key
         # keep-sorted: start
         aggregator
         air-quality-sensor
+        bridged-node
         chime
         contact-sensor
         dimmable-light
@@ -114,8 +116,8 @@ foreach(_key
         on-off-light
         power-source
         proximity-ranger
-        soil-sensor
         smoke-co-alarm
+        soil-sensor
         speaker
         temperature-sensor
         water-leak-detector

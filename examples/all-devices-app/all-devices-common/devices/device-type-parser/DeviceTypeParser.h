@@ -29,8 +29,9 @@ public:
     struct Entry
     {
         std::string type;
-        chip::EndpointId endpoint;
+        chip::EndpointId endpoint = chip::kInvalidEndpointId;
         chip::EndpointId parentId = chip::kInvalidEndpointId;
+        bool bridged              = false;
     };
 
     DeviceTypeParser()  = default;
@@ -50,9 +51,23 @@ public:
     CHIP_ERROR ParseSingleDeviceString(const char * value);
 
     /**
+     * Expands any wildcard "*" entries in the parsed list into the given list of device types,
+     * maintaining parentage and allocating sequential endpoints.
+     *
+     * @param wildcardExpandedTypes The list of leaf device types that wildcard should expand to.
+     */
+    void ExpandWildcards(const std::vector<std::string> & wildcardExpandedTypes);
+
+    /**
      * Gets the list of parsed device configurations.
      */
     const std::vector<Entry> & GetDeviceTypeEntries();
+
+    /**
+     * Validates that the list of device entries contains no duplicate endpoints,
+     * and that parentage rules are followed for bridged nodes.
+     */
+    static CHIP_ERROR ValidateConfig(const std::vector<Entry> & entries);
 
     /**
      * Clears the list of parsed device configurations.
@@ -62,6 +77,7 @@ public:
 private:
     bool ParseDeviceTypeEntry(const char * value, Entry & entry);
     static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
+    static const Entry * FindEntryByEndpoint(const std::vector<Entry> & entries, chip::EndpointId endpointId);
 
     std::vector<Entry> mDeviceTypeEntries;
 };
