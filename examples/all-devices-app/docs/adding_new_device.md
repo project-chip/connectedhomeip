@@ -427,12 +427,7 @@ For manual interactive validation, execute `chip-tool` (refer to the
 
 ## Step 6: Update Implementation Status Documentation
 
-After implementing and registering your device, update the tracking
-documentation:
+After implementing and registering your device, manually update the tracking documentation:
 
-1. Run the documentation generator script:
-    ```bash
-    python3 out/extract_and_generate.py
-    ```
-2. Verify your device type is moved from **Unimplemented** to **Implemented** in
-   `examples/all-devices-app/docs/supported_device_types.md`.
+1. **`supported_device_types.md`**: Move your device type entry from the **Unimplemented** table to the **Implemented** table, and increment the total count.
+2. **`supported_clusters.md`**: If your device introduced support for a new cluster, update its **Used in All-Devices** status to `Yes` and list your device type in the **Notes/Devices** column.
