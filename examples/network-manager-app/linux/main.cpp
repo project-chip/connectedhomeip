@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@
 #if MATTER_ENABLE_UBUS
 #include "ThreadBROpenThreadUbus.h"
 #include "UbusManager.h"
+#include "WiFiManagerUbus.h"
 #else
 #include "ThreadBRFake.h"
 #endif
@@ -53,10 +54,16 @@ void emberAfThreadNetworkDirectoryClusterInitCallback(EndpointId endpoint)
 }
 
 std::optional<WiFiNetworkManagementServer> gWiFiNetworkManagementServer;
+#if MATTER_ENABLE_UBUS
+std::optional<WiFiManagerUbus> gWiFiManagerUbus;
+#endif
 void emberAfWiFiNetworkManagementClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!gWiFiNetworkManagementServer);
     TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer.emplace(endpoint).Init();
+#if MATTER_ENABLE_UBUS
+    gWiFiManagerUbus.emplace(gUbusManager, *gWiFiNetworkManagementServer).Init();
+#endif
 }
 
 std::optional<ThreadBorderRouterManagement::ServerInstance> gThreadBorderRouterManagementServer;
