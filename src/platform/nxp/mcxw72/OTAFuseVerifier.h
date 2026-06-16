@@ -42,31 +42,31 @@ public:
 
     /**
      * @brief Verifies that the OTA encryption key is programmed and valid.
-     * 
+     *
      * The OTA encryption keys are a requirement for secure OTA updates. This function verifies that
      * the CUST_PROD_OEMFW_AUTH_PUK fuse (the authentication key) has been programmed with valid data.
-     * 
+     *
      * @returns CHIP_NO_ERROR if the OTA fuses are properly programmed, CHIP_ERROR_NOT_IMPLEMENTED otherwise.
-     * 
+     *
      * @warning This function should only be called after the device has completed secure subsystem initialization.
-     * 
+     *
      */
     static CHIP_ERROR VerifyOTAFusesReady();
 
 private:
     /**
      * @brief Reads OTA encryption key fuse from secure subsystem.
-     * 
+     *
      * Reading the OTA encryption key fuse requires establishing an SSCP session with the secure
      * subsystem and issuing a fuse read command. The fuse data is returned in the provided buffer.
-     * 
+     *
      * @param[in] mu Pointer to the MU (Message Unit) peripheral for SSCP communication.
      * @param[in] fuse The fuse ID to read (kFuseId_OEMFW_AUTH_PUK).
      * @param[out] fuseData Pointer to buffer where fuse data will be stored.
      * @param[in] fuseLen Length of the fuse data buffer in bytes.
-     * 
+     *
      * @returns kStatus_Success if the fuse was read successfully, kStatus_Fail otherwise.
-     * 
+     *
      */
     static status_t read_ota_encryption_key_fuse(ELEMU_Type * mu, uint32_t fuse, uint32_t * fuseData, size_t fuseLen);
 };

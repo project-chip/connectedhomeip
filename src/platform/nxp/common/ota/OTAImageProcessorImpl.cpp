@@ -298,25 +298,25 @@ CHIP_ERROR OTAImageProcessorImpl::HandleImageStatus()
     OtaImgState_t otaResult = OTA_GetImgState();
     switch (otaResult)
     {
-        case OtaImgState_None:
-        case OtaImgState_Permanent:
-            ChipLogProgress(SoftwareUpdate, "Image state: Default state, current image made permanent");
-            break;
-        case OtaImgState_Acquiring:
-            ChipLogProgress(SoftwareUpdate, "Image state: Acquisition of new firmware is ongoing");
-            break;
-        case OtaImgState_CandidateRdy:
-            ChipLogProgress(SoftwareUpdate, "Image state: Candidate ready");
-            break;
-        case OtaImgState_RunCandidate:
-            ChipLogProgress(SoftwareUpdate, "Image state: Running candidate");
-            break;
-        case OtaImgState_Fail:
-            ChipLogError(SoftwareUpdate, "Image state: FAIL");
-            return CHIP_ERROR_INTERNAL;
-        default:
-            ChipLogError(SoftwareUpdate, "Image state: UNKNOWN");
-            break;
+    case OtaImgState_None:
+    case OtaImgState_Permanent:
+        ChipLogProgress(SoftwareUpdate, "Image state: Default state, current image made permanent");
+        break;
+    case OtaImgState_Acquiring:
+        ChipLogProgress(SoftwareUpdate, "Image state: Acquisition of new firmware is ongoing");
+        break;
+    case OtaImgState_CandidateRdy:
+        ChipLogProgress(SoftwareUpdate, "Image state: Candidate ready");
+        break;
+    case OtaImgState_RunCandidate:
+        ChipLogProgress(SoftwareUpdate, "Image state: Running candidate");
+        break;
+    case OtaImgState_Fail:
+        ChipLogError(SoftwareUpdate, "Image state: FAIL");
+        return CHIP_ERROR_INTERNAL;
+    default:
+        ChipLogError(SoftwareUpdate, "Image state: UNKNOWN");
+        break;
     }
 
     return CHIP_NO_ERROR;

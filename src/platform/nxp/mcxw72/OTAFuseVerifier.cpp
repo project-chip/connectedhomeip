@@ -30,7 +30,7 @@ extern "C" {
 
 #define FUSE_LEN (32u) // 32 bytes - 256 bits for fuse data
 #define CORE_CLK_FREQ CLOCK_GetFreq(kCLOCK_CoreSysClk)
-#define NBOOT_FUSEID_CUST_PROD_OEMFW_AUTH_PUK         (0x1f)
+#define NBOOT_FUSEID_CUST_PROD_OEMFW_AUTH_PUK (0x1f)
 
 namespace chip {
 namespace DeviceLayer {
@@ -85,9 +85,8 @@ CHIP_ERROR OTAFuseVerifier::VerifyOTAFusesReady()
 {
     uint8_t fuseData[FUSE_LEN];
 
-    status_t status =
-        read_ota_encryption_key_fuse(ELEMUA, NBOOT_FUSEID_CUST_PROD_OEMFW_AUTH_PUK, (uint32_t *) fuseData, FUSE_LEN);
-    
+    status_t status = read_ota_encryption_key_fuse(ELEMUA, NBOOT_FUSEID_CUST_PROD_OEMFW_AUTH_PUK, (uint32_t *) fuseData, FUSE_LEN);
+
     if (status != kStatus_Success)
     {
         ChipLogError(DeviceLayer, "Failed to read OTA fuses, status: 0x%08X", static_cast<unsigned>(status));
@@ -114,7 +113,6 @@ CHIP_ERROR OTAFuseVerifier::VerifyOTAFusesReady()
 
     ChipLogProgress(DeviceLayer, "OTA fuse value verified successfully");
     return CHIP_NO_ERROR;
-
 }
 
 } // namespace NXP
