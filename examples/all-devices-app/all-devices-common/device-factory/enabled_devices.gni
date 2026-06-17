@@ -136,7 +136,6 @@ _available_devices = [
   ],
 ]
 
-
 # Computed output binary name — mirrors the three-way logic in enabled_devices.cmake.
 # Exported (no leading underscore) so that posix/BUILD.gn can use it as output_name.
 if (all_devices_app_name != "") {
