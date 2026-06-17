@@ -17,7 +17,6 @@
 
 """Unit tests for PromptCoordinator and the on_timeout extension in AttributeSubscriptionHandler."""
 
-import io
 import queue
 import threading
 import time
@@ -198,7 +197,7 @@ class TestAwaitAllExpectedReportMatchesOnTimeout(unittest.TestCase):
 
     def _make_handler_with_no_reports(self):
         """Return an AttributeSubscriptionHandler whose report store is always empty."""
-        from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, AttributeMatcher
+        from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler
         handler = AttributeSubscriptionHandler.__new__(AttributeSubscriptionHandler)
         handler._attribute_reports = {}
         handler._attribute_report_counts = {}

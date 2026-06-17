@@ -276,7 +276,7 @@ async def _run_with_interactive_timeout(coro, timeout_sec: float, coordinator) -
             if effective < current_timeout[0]:
                 continue
 
-            still_needed = lambda: (time.time() - wall_start - coordinator.total_prompt_seconds) >= current_timeout[0]
+            def still_needed(): return (time.time() - wall_start - coordinator.total_prompt_seconds) >= current_timeout[0]
             extended = coordinator.ask_user(
                 description=f"Overall test timeout ({current_timeout[0]:.0f}s) reached",
                 elapsed_sec=effective,
