@@ -71,6 +71,7 @@ class Status(enum.IntEnum):
     Reserved98 = 0x98
     Reserved99 = 0x99
     Reserved9a = 0x9a
+    UnsupportedNode = 0x9b
     Busy = 0x9c
     AccessRestricted = 0x9d
     Deprecatedc0 = 0xc0
@@ -86,6 +87,8 @@ class Status(enum.IntEnum):
     FailsafeRequired = 0xca
     InvalidInState = 0xcb
     NoCommandResponse = 0xcc
+    TermsAndConditionsChanged = 0xcd
+    MaintenanceRequired = 0xce
     DynamicConstraintError = 0xcf
     AlreadyExists = 0xd0
     InvalidTransportType = 0xd1
