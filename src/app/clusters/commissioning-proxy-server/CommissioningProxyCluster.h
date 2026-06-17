@@ -131,14 +131,19 @@ private:
     DataModel::ActionReturnStatus HandleProxyMessageRequest(const DataModel::InvokeRequest & request,
                                                             TLV::TLVReader & input_arguments, CommandHandler * handler);
 
-    // Returns the set of transports supported by this proxy instance.
-    // Mirrors the Transport attribute value and is the single source of truth
-    // for transport validation in command handlers.  This translation unit is
-    // only compiled when the Commissioning Proxy itself is enabled
-    // (CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY) so membership is driven
-    // purely by the per-transport compile flags:
-    //   kWiFiPAF: CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && WI Feature bit set
-    //   kBle:     CONFIG_NETWORK_LAYER_BLE
+    /**
+     * @brief Returns the set of transports supported by this proxy instance.
+     *
+     * Mirrors the Transport attribute value and is the single source of truth
+     * for transport validation in command handlers. This translation unit is
+     * only compiled when the Commissioning Proxy itself is enabled
+     * (CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY) so membership is driven
+     * purely by the per-transport compile flags:
+     *   - kWiFiPAF: CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF (independent of the WI
+     *     feature — WiFiPAF transport conformance is O.a+; WI only gates the
+     *     WiFiBand attribute and the WiFiBands command fields)
+     *   - kBle:     CONFIG_NETWORK_LAYER_BLE
+     */
     chip::BitMask<CapabilitiesBitmap> GetSupportedTransports() const;
 
     CommissioningProxy::Delegate & mDelegate;

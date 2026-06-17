@@ -28,8 +28,10 @@ chip_test_suite("tests") {
   # which requires mock_model (and its mock_ember transitive dep).  In the
   # Zephyr monolithic test binary, mock_ember conflicts with real Ember,
   # causing duplicate-symbol linker errors.  The backwards-compat suite below
-  # covers CodegenIntegration and is restricted to darwin/linux where
-  # individual binaries are linked.
+  # covers CodegenIntegration.  It is pulled into the build only as a
+  # standalone host binary (chip_link_tests); the monolithic test aggregation
+  # in src/BUILD.gn references only ":tests", so mock_model/mock_ember never
+  # enters the Zephyr binary.
   sources = [
     "../CommissioningProxyCluster.cpp",
     "../CommissioningProxyCluster.h",

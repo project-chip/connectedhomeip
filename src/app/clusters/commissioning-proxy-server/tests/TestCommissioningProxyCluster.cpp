@@ -21,6 +21,7 @@
 #include <app/clusters/commissioning-proxy-server/tests/CommissioningProxyMockDelegate.h>
 #include <ble/BleConfig.h> // for CONFIG_NETWORK_LAYER_BLE
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CommissionableDataProvider.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/data-model-provider/tests/ReadTesting.h>
@@ -466,6 +467,23 @@ TEST_F(TestCommissioningProxyCluster, TestScanMaxTimeAttribute_WritableRoundTrip
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Spec § Attributes: ScanMaxTime constraint = "min 1".  Writing 0 SHALL be
+// rejected with ConstraintError.
+TEST_F(TestCommissioningProxyCluster, TestScanMaxTimeAttribute_WriteZeroConstraintError)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    auto writeStatus = tester.WriteAttribute(CPAttributes::ScanMaxTime::Id, static_cast<uint8_t>(0));
+    EXPECT_EQ(writeStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // Spec § Attributes: CacheTimeout (BGS-only) fallback = 120, access = "RW VO".
 TEST_F(TestCommissioningProxyCluster, TestCacheTimeoutAttribute_DefaultAndWritable)
 {
@@ -487,6 +505,24 @@ TEST_F(TestCommissioningProxyCluster, TestCacheTimeoutAttribute_DefaultAndWritab
     EXPECT_TRUE(writeStatus.IsSuccess());
     ASSERT_EQ(tester.ReadAttribute(CPAttributes::CacheTimeout::Id, cacheTimeout), CHIP_NO_ERROR);
     EXPECT_EQ(cacheTimeout, 60u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Spec § Attributes: CacheTimeout constraint = "min 1".  Writing 0 SHALL be
+// rejected with ConstraintError.
+TEST_F(TestCommissioningProxyCluster, TestCacheTimeoutAttribute_WriteZeroConstraintError)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    BitMask<Feature> bgs(Feature::kBackgroundScan);
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, bgs, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    auto writeStatus = tester.WriteAttribute(CPAttributes::CacheTimeout::Id, static_cast<uint16_t>(0));
+    EXPECT_EQ(writeStatus.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -566,7 +602,7 @@ static Commands::ProxyConnectRequest::Type MakeConnectRequest(CapabilitiesBitmap
     return cmd;
 }
 
-// Zero transport bits SHALL return InvalidCommand.
+// Zero transport bits SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ZeroTransportBits)
 {
     TestServerClusterContext context;
@@ -582,7 +618,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ZeroTransportBits)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Multiple transport bits set SHALL return InvalidCommand.
+// Multiple transport bits set SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleTransportBits)
 {
     TestServerClusterContext context;
@@ -595,6 +631,28 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleTransportB
     cmd.transport.Set(CapabilitiesBitmap::kWiFiPAF); // now two bits set
 
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ProxyConnectRequest: Discriminator constraint is "0 to 4095".  A value
+// above 4095 is an invalid field and SHALL return InvalidCommand.
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DiscriminatorOutOfRange)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    // Exactly one transport bit set so the single-transport check passes; the
+    // discriminator check runs before the transport-supported check, so this is
+    // independent of which transports are compiled in.
+    Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(CapabilitiesBitmap::kWiFiPAF);
+    cmd.discriminator                       = chip::kMaxDiscriminatorValue + 1; // one past the spec max
+
+    auto result = tester.Invoke(cmd);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -616,7 +674,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ReservedTransportB
     Commands::ProxyConnectRequest::Type cmd = MakeConnectRequest(static_cast<CapabilitiesBitmap>(0x01));
     auto result                             = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
-    // Spec §10.5.7.1: invalid Transport → InvalidTransportType
+    // Per the ProxyConnectRequest Effect on Receipt: an invalid/unsupported Transport → InvalidTransportType
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidTransportType));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -736,7 +794,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandWithWIFeat
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Reserved bits in wiFiBand SHALL return InvalidCommand.
+// Reserved bits in wiFiBand SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ReservedWiFiBandBits)
 {
     TestServerClusterContext context;
@@ -774,7 +832,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_WiFiBandNotInSuppo
     // Request 5 GHz — not in supported bands.
     cmd.wiFiBand.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g));
 
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidTransportType));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -816,12 +876,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_StateUnchangedOnFa
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// =============================================================================
-// ProxyDisconnectRequest Command Tests
-// =============================================================================
-
-// Spec §10.5.7.1: "If MaxSessions are in use, a RESOURCE_EXHAUSTED status
-// SHALL be returned."  Enforced generically by the cluster from the delegate's
+// Per the ProxyConnectRequest Effect on Receipt: if the number of active sessions
+// has reached the value of the MaxSessions attribute, a RESOURCE_EXHAUSTED status
+// SHALL be returned.  Enforced generically by the cluster from the delegate's
 // GetActiveSessionCount() vs GetMaxSessions(), so every delegate inherits the
 // behaviour without having to remember the check itself.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedAtMaxSessions)
@@ -863,8 +920,8 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Spec §10.5.7.1: "If Timeout expires, the connection attempt will be terminated
-// and a TIMEOUT status SHALL be returned."  The cluster must propagate.
+// Per the ProxyConnectRequest Effect on Receipt: if Timeout expires, the connection
+// attempt is terminated and a TIMEOUT status SHALL be returned.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DelegateTimeout_Propagated)
 {
     struct TimeoutDelegate : public CommissioningProxyMockDelegate
@@ -889,6 +946,10 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DelegateTimeout_Pr
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+
+// =============================================================================
+// ProxyDisconnectRequest Command Tests
+// =============================================================================
 
 // After a successful connect, disconnect with the returned sessionId SHALL succeed.
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_AfterConnect)
@@ -1007,9 +1068,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_S
 }
 
 // A null SessionID with no ProxyConnectRequest in flight (e.g. already
-// connected, or never started) has no pending connect to cancel. The spec no
-// longer specifies a status for this case; this implementation surfaces
-// InvalidInState as the "nothing to cancel" signal.
+// connected, or never started) has no pending connect to cancel.
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_AlreadyConnected)
 {
     TestServerClusterContext context;
@@ -1067,11 +1126,40 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_W
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Per the ProxyDisconnectRequest Effect on Receipt: if no transport connection
+// with the specified SessionId exists (or the connection's fabric does not match
+// the sending fabric), the command SHALL be rejected with NOT_FOUND.  Delegate
+// returns NotFound; cluster must propagate.
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateNotFound_Propagated)
+{
+    struct NotFoundDelegate : public CommissioningProxyMockDelegate
+    {
+        Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t, chip::FabricIndex) override
+        {
+            return Protocols::InteractionModel::Status::NotFound;
+        }
+    } mockDelegate;
+
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    Commands::ProxyDisconnectRequest::Type cmd;
+    cmd.sessionID.SetNonNull(1234); // unknown to the delegate
+
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::NotFound));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // =============================================================================
 // ProxyScanRequest Command Tests
 // =============================================================================
 
-// Zero transport bits SHALL return InvalidCommand.
+// Zero transport bits SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ZeroTransport)
 {
     TestServerClusterContext context;
@@ -1089,7 +1177,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ZeroTransport)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Reserved bits in transport SHALL return InvalidCommand.
+// Reserved bits in transport SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ReservedTransportBits)
 {
     TestServerClusterContext context;
@@ -1204,7 +1292,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiBandWithoutWIFeat
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Reserved bits in wiFiBands SHALL return InvalidCommand.
+// Reserved bits in wiFiBands SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ReservedWiFiBandBits)
 {
     TestServerClusterContext context;
@@ -1245,7 +1333,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_WiFiBandNotInSupporte
     command.transport = CapabilitiesBitmap::kWiFiPAF;
     command.wiFiBands.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g));
 
-    EXPECT_FALSE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+    auto result = tester.Invoke(Commands::ProxyScanRequest::Id, command);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidTransportType));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1385,11 +1475,10 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_SessionIdEchoed)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Spec §10.5.7.7: "If no transport connection with the specified SessionId
-// exists on the proxy, or if the fabric associated with the connection does
-// not match the fabric sending the command, the command SHALL be rejected
-// with a status of NOT_FOUND."  This is delegate-side state; the cluster
-// must propagate.
+// Per the ProxyMessageRequest Effect on Receipt: if no transport connection with
+// the specified SessionID exists, or the connection's fabric does not match the
+// sending fabric, the command SHALL be rejected with NOT_FOUND.  This is
+// delegate-side state; the cluster must propagate it.
 TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateNotFound_Propagated)
 {
     struct NotFoundDelegate : public CommissioningProxyMockDelegate
@@ -1420,9 +1509,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateNotFound_P
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Spec §10.5.7.7: "If another ProxyMessageRequest referencing the same
-// SessionId is still outstanding, the command SHALL be rejected with a status
-// of BUSY."  Delegate-side bookkeeping; cluster must propagate.
+// Per the ProxyMessageRequest Effect on Receipt: if another ProxyMessageRequest
+// referencing the same SessionId is still outstanding, the command SHALL be
+// rejected with BUSY.  Delegate-side bookkeeping; cluster must propagate it.
 TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateBusy_Propagated)
 {
     struct BusyDelegate : public CommissioningProxyMockDelegate
@@ -1453,34 +1542,6 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateBusy_Propa
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Spec §10.5.7.2: "If no transport connection with the specified session id
-// exists on the proxy, ... the command SHALL be rejected with a status of
-// NOT_FOUND."  Delegate returns NotFound; cluster must propagate.
-TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateNotFound_Propagated)
-{
-    struct NotFoundDelegate : public CommissioningProxyMockDelegate
-    {
-        Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t, chip::FabricIndex) override
-        {
-            return Protocols::InteractionModel::Status::NotFound;
-        }
-    } mockDelegate;
-
-    TestServerClusterContext context;
-    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    ClusterTester tester(cluster);
-    Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionID.SetNonNull(1234); // unknown to the delegate
-
-    auto result = tester.Invoke(cmd);
-    EXPECT_FALSE(result.IsSuccess());
-    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::NotFound));
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
 // =============================================================================
 // ProxyBackgroundScanStartRequest — parameter validation tests
 // =============================================================================
@@ -1497,7 +1558,7 @@ MakeBgScanStartRequest(CapabilitiesBitmap transport, uint16_t timeout = 30,
     return cmd;
 }
 
-// transport=0 SHALL return InvalidCommand.
+// transport=0 SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ZeroTransport)
 {
     TestServerClusterContext context;
@@ -1512,7 +1573,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ZeroTransport)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Reserved bits in transport SHALL return InvalidCommand.
+// Reserved bits in transport SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ReservedTransportBits)
 {
     TestServerClusterContext context;
@@ -1567,7 +1628,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_WiFiPAFWithoutWIFeature)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// wiFiBands with reserved bits SHALL return InvalidCommand.
+// wiFiBands with reserved bits SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestBgScanStart_ReservedWiFiBandBits)
 {
     TestServerClusterContext context;
@@ -1676,9 +1737,11 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStart_UnsupportedWiFiBand)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    auto cmd = MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF, 30,
-                                      chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g)));
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
+    auto cmd    = MakeBgScanStartRequest(CapabilitiesBitmap::kWiFiPAF, 30,
+                                         chip::MakeOptional(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g)));
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::InvalidTransportType));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1697,7 +1760,7 @@ MakeBgScanStopRequest(CapabilitiesBitmap transport, chip::Optional<chip::BitMask
     return cmd;
 }
 
-// transport=0 and no wiFiBands SHALL return InvalidCommand (nothing to stop).
+// transport=0 and no wiFiBands SHALL be rejected (nothing to stop).
 TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ZeroTransportNoWiFiBands)
 {
     TestServerClusterContext context;
@@ -1712,7 +1775,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ZeroTransportNoWiFiBands)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Reserved bits in transport SHALL return InvalidCommand.
+// Reserved bits in transport SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ReservedTransportBits)
 {
     TestServerClusterContext context;
@@ -1769,7 +1832,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_WiFiPAFWithoutWIFeature)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// wiFiBands with reserved bits SHALL return InvalidCommand.
+// wiFiBands with reserved bits SHALL be rejected.
 TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ReservedWiFiBandBits)
 {
     TestServerClusterContext context;
@@ -1809,7 +1872,7 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_WiFiBandWithoutWIFeature)
 }
 
 // transport=0 with valid wiFiBands and WI feature — SHALL succeed
-// (band-only stop is valid per spec §10.5.7.7).
+// (a band-only stop is valid per the ProxyBackGroundScanStopRequest behaviour).
 TEST_F(TestCommissioningProxyCluster, TestBgScanStop_BandOnlyStop_Valid)
 {
     TestServerClusterContext context;
@@ -1860,11 +1923,11 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ValidWiFiPAF_5gBand)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Spec §10.5.7.8: "If the NodeId and FabricId of the client do not match
-// those used in a previous ProxyBackGroundScanStartRequest, the proxy SHALL
-// take no action and the command SHALL be rejected with a status of NOT_FOUND."
-// This is delegate-side state; the cluster must propagate the delegate's
-// NotFound status.
+// Per the ProxyBackGroundScanStopRequest Effect on Receipt: if the NodeId and
+// FabricId of the client do not match those used in a previous
+// ProxyBackGroundScanStartRequest, the proxy SHALL take no action and the command
+// SHALL be rejected with NOT_FOUND.  This is delegate-side state; the cluster
+// must propagate the delegate's NotFound status.
 TEST_F(TestCommissioningProxyCluster, TestBgScanStop_DelegateNotFound_Propagated)
 {
     struct NotFoundDelegate : public CommissioningProxyMockDelegate
