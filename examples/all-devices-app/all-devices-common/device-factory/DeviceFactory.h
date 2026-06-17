@@ -29,12 +29,17 @@
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
+#include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
+#include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
+#include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
+
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -283,6 +288,39 @@ private:
                         .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
                     });
             });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_RAIN_SENSOR)
+        {
+            RegisterCreator("rain-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<BooleanStateSensorDevice>(
+                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)
+        {
+            RegisterCreator("water-freeze-detector", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<BooleanStateSensorDevice>(
+                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
+        {
+            RegisterCreator("humidity-sensor", []() { return std::make_unique<IncreasingHumiditySensorDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
+        {
+            RegisterCreator("light-sensor", []() { return std::make_unique<IncreasingLightSensorDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
+        {
+            RegisterCreator("pressure-sensor", []() { return std::make_unique<IncreasingPressureSensorDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
+        {
+            RegisterCreator("flow-sensor", []() { return std::make_unique<IncreasingFlowSensorDevice>(); });
         }
 
         // at least one device type MUST be enabled
