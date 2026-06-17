@@ -31,7 +31,6 @@
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/TLV.h>

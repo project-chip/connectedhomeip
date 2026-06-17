@@ -13,8 +13,14 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
 
 executable("all-devices-app") {
   sources = [
@@ -52,6 +58,7 @@ executable("all-devices-app") {
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+  defines = []
 
   if (chip_device_platform == "darwin") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
@@ -63,6 +70,44 @@ executable("all-devices-app") {
     "include",
     "${chip_root}/examples/common",
   ]
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/platform/linux/Rpc.cpp",
+      "${chip_root}/examples/platform/linux/system_rpc_server.cc",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_log",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_rpc/system_server:socket",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_sync:mutex",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
+    ]
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [ "${chip_root}/examples/common" ]
+  }
 
   output_dir = root_out_dir
 }

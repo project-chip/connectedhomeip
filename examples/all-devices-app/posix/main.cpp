@@ -47,6 +47,9 @@
 
 #include <BleInit.h>
 #include <TermHandling.h>
+#if defined(PW_RPC_ENABLED)
+#include <Rpc.h>
+#endif // defined(PW_RPC_ENABLED)
 
 using namespace chip;
 using namespace chip::app;
@@ -281,6 +284,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");
+
+#if defined(PW_RPC_ENABLED)
+    chip::rpc::Init(33000);
+    ChipLogProgress(AppServer, "PW_RPC initialized.");
+#endif // defined(PW_RPC_ENABLED)
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
