@@ -408,8 +408,8 @@ def run_tests_no_exit(
         bool: True if all tests passed, False otherwise
     """
 
-    from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.commissioning import _is_device_commissionable_via_dnssd, is_commissioned
+    from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.matter_stack_state import MatterStackState
 
     # Mobly deep-copies user_params, so the asyncio event loop cannot be passed
@@ -599,6 +599,7 @@ def run_tests_no_exit(
     else:
         LOGGER.error("Final result: FAIL !")
     return ok
+
 
 def run_tests(
         test_class,
