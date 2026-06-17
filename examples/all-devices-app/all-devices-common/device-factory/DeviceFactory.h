@@ -165,8 +165,7 @@ private:
                 sBridgedNodeCount++;
                 std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
                 return std::make_unique<BridgedNodeDevice>(mContext->timerDelegate,
-                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount),
-                                                           label);
+                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)

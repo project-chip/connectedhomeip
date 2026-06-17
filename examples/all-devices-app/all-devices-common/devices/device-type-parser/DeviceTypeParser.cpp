@@ -28,18 +28,18 @@
 namespace {
 std::string KebabCaseToTitleCase(const std::string & input)
 {
-    std::string output = input;
+    std::string output  = input;
     bool capitalizeNext = true;
     for (char & c : output)
     {
         if (c == '-')
         {
-            c = ' ';
+            c              = ' ';
             capitalizeNext = true;
         }
         else if (capitalizeNext)
         {
-            c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+            c              = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
             capitalizeNext = false;
         }
     }
