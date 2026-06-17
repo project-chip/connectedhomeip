@@ -77,48 +77,48 @@ public:
             chip::TLV::TLVReader rootReader;
             rootReader.Init(tlvBuffer);
 
-            ReturnErrorOnFailure(rootReader.Next());
+            ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to read first TLV element");
             if (rootReader.GetType() != chip::TLV::kTLVType_Structure)
             {
                 return CHIP_ERROR_WRONG_TLV_TYPE;
             }
 
             chip::TLV::TLVType outerType;
-            ReturnErrorOnFailure(rootReader.EnterContainer(outerType));
+            ReturnErrorAndLogOnFailure(rootReader.EnterContainer(outerType), Support, "Failed to enter outer TLV structure container");
 
             // Tag 1: EndpointId
-            ReturnErrorOnFailure(rootReader.Next());
+            ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to EndpointId element");
             if (rootReader.GetTag() != chip::TLV::ContextTag(kTagEndpointId))
             {
                 return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
             }
-            ReturnErrorOnFailure(rootReader.Get(path.mEndpointId));
+            ReturnErrorAndLogOnFailure(rootReader.Get(path.mEndpointId), Support, "Failed to read EndpointId value");
 
             // Tag 2: ClusterId
-            ReturnErrorOnFailure(rootReader.Next());
+            ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to ClusterId element");
             if (rootReader.GetTag() != chip::TLV::ContextTag(kTagClusterId))
             {
                 return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
             }
-            ReturnErrorOnFailure(rootReader.Get(path.mClusterId));
+            ReturnErrorAndLogOnFailure(rootReader.Get(path.mClusterId), Support, "Failed to read ClusterId value");
 
             // Tag 3: AttributeId
-            ReturnErrorOnFailure(rootReader.Next());
+            ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to AttributeId element");
             if (rootReader.GetTag() != chip::TLV::ContextTag(kTagAttributeId))
             {
                 return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
             }
-            ReturnErrorOnFailure(rootReader.Get(path.mAttributeId));
+            ReturnErrorAndLogOnFailure(rootReader.Get(path.mAttributeId), Support, "Failed to read AttributeId value");
 
             // Tag 4: Arguments (args)
-            ReturnErrorOnFailure(rootReader.Next());
+            ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to AttributeValue element");
             if (rootReader.GetTag() != chip::TLV::ContextTag(kTagValue))
             {
                 return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
             }
             attrValueReader = rootReader;
 
-            ReturnErrorOnFailure(rootReader.ExitContainer(outerType));
+            ReturnErrorAndLogOnFailure(rootReader.ExitContainer(outerType), Support, "Failed to exit outer TLV structure container");
 
             return CHIP_NO_ERROR;
         }
