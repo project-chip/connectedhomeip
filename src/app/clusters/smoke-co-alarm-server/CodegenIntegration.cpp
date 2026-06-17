@@ -288,4 +288,3 @@ bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpoint, bool & v) const
     v = mCluster.Cluster().GetUnmountedState();
     return true;
 }
-
