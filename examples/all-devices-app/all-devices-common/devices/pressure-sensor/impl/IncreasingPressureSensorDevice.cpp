@@ -51,7 +51,7 @@ IncreasingPressureSensorDevice::~IncreasingPressureSensorDevice()
 }
 
 CHIP_ERROR IncreasingPressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                     EndpointId parentId)
+                                                    EndpointId parentId)
 {
     ReturnErrorOnFailure(PressureSensorDevice::Register(endpoint, provider, parentId));
 
@@ -71,13 +71,10 @@ void IncreasingPressureSensorDevice::Unregister(CodeDrivenDataModelProvider & pr
 
 void IncreasingPressureSensorDevice::TimerFired()
 {
-    if (mPressureMeasuredValue >= kDefaultPressureConfig.maxMeasuredValue.Value())
+    mPressureMeasuredValue = static_cast<int16_t>(mPressureMeasuredValue + kPressureStepValue);
+    if (mPressureMeasuredValue > kDefaultPressureConfig.maxMeasuredValue.Value())
     {
         mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();
-    }
-    else
-    {
-        mPressureMeasuredValue = static_cast<int16_t>(mPressureMeasuredValue + kPressureStepValue);
     }
 
     ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(mPressureMeasuredValue));

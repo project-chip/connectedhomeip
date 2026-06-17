@@ -70,13 +70,10 @@ void IncreasingFlowSensorDevice::Unregister(CodeDrivenDataModelProvider & provid
 
 void IncreasingFlowSensorDevice::TimerFired()
 {
-    if (mFlowMeasuredValue >= kDefaultFlowConfig.maxMeasuredValue.Value())
+    mFlowMeasuredValue = static_cast<uint16_t>(mFlowMeasuredValue + kFlowStepValue);
+    if (mFlowMeasuredValue > kDefaultFlowConfig.maxMeasuredValue.Value())
     {
         mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();
-    }
-    else
-    {
-        mFlowMeasuredValue = static_cast<uint16_t>(mFlowMeasuredValue + kFlowStepValue);
     }
 
     ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %u", static_cast<unsigned int>(mFlowMeasuredValue));

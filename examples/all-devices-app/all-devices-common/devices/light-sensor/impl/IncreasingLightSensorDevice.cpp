@@ -70,13 +70,10 @@ void IncreasingLightSensorDevice::Unregister(CodeDrivenDataModelProvider & provi
 
 void IncreasingLightSensorDevice::TimerFired()
 {
-    if (mLightMeasuredValue >= kDefaultLightConfig.maxMeasuredValue.Value())
+    mLightMeasuredValue = static_cast<uint16_t>(mLightMeasuredValue + kLightStepValue);
+    if (mLightMeasuredValue > kDefaultLightConfig.maxMeasuredValue.Value())
     {
         mLightMeasuredValue = kDefaultLightConfig.minMeasuredValue.Value();
-    }
-    else
-    {
-        mLightMeasuredValue = static_cast<uint16_t>(mLightMeasuredValue + kLightStepValue);
     }
 
     ChipLogProgress(AppServer, "IncreasingLightValue: Increasing to %u", static_cast<unsigned int>(mLightMeasuredValue));
