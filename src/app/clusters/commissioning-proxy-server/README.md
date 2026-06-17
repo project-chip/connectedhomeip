@@ -25,9 +25,9 @@ transport management (e.g. BLE or Wi-Fi PAF session setup and teardown).
 A Commissioner that lacks (or is out of range of) the transport a commissionable
 device advertises on uses the proxy as a tunnel. The flow is:
 
-1. **Discover** — the Commissioner sends `ProxyScanRequest` (or subscribes to the
-   background-scan cache); the proxy scans its local transports and returns the
-   commissionable devices it can see as `ScanResultStruct` entries.
+1. **Discover** — the Commissioner sends `ProxyScanRequest` (or subscribes to
+   the background-scan cache); the proxy scans its local transports and returns
+   the commissionable devices it can see as `ScanResultStruct` entries.
 2. **Connect** — the Commissioner sends `ProxyConnectRequest` naming a single
    transport plus the target device (address/discriminator/VID/PID). The proxy
    opens a transport connection to the device and replies with a unique
@@ -55,8 +55,8 @@ The cluster supports the following optional features:
     attribute and the `WiFiBand(s)` command fields. It does **not** gate the
     Wi-Fi PAF transport itself (see Transports below).
 -   **BackgroundScan (BGS)**: Allows background scanning of commissioning
-    transports, with results cached in the `CachedResults` /
-    `NumCachedResults` attributes.
+    transports, with results cached in the `CachedResults` / `NumCachedResults`
+    attributes.
 
 ## Transports
 
@@ -64,9 +64,9 @@ The transports the proxy advertises in the `Transport` attribute (and accepts in
 `ProxyConnectRequest` / `ProxyScanRequest`) are derived purely from the build's
 compile flags, independent of the `WI` feature:
 
-| Transport (`CapabilitiesBitmap`) | Advertised when             | Wire protocol |
-| -------------------------------- | --------------------------- | ------------- |
-| `kBle` (BTP)                     | `CONFIG_NETWORK_LAYER_BLE`  | BTP over BLE  |
+| Transport (`CapabilitiesBitmap`) | Advertised when                     | Wire protocol        |
+| -------------------------------- | ----------------------------------- | -------------------- |
+| `kBle` (BTP)                     | `CONFIG_NETWORK_LAYER_BLE`          | BTP over BLE         |
 | `kWiFiPAF` (PAFTP)               | `CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF` | PAFTP over Wi-Fi NAN |
 
 `ProxyConnectRequest` selects **exactly one** transport per session. A request
@@ -237,11 +237,11 @@ BTP connection through `chip::Ble::BleLayer`. The Linux example
 shows the full integration:
 
 -   `ProxyConnectRequest` — on the first BLE connect the proxy flips its own BLE
-    role from peripheral to central via
-    `BLEManagerImpl::SwitchToCentralMode()` (a one-way switch; `IsCentralMode()`
-    reports the state and central-mode advertising is then refused), then calls
-    `BleLayer::NewBleConnectionByDiscriminator()` to open an L2CAP/BTP connection
-    to the commissionee.
+    role from peripheral to central via `BLEManagerImpl::SwitchToCentralMode()`
+    (a one-way switch; `IsCentralMode()` reports the state and central-mode
+    advertising is then refused), then calls
+    `BleLayer::NewBleConnectionByDiscriminator()` to open an L2CAP/BTP
+    connection to the commissionee.
 -   `ProxyMessageRequest` — calls `BLEEndPoint::Send()` to push the tunneled
     commissioning packet over BTP.
 -   `ProxyDisconnectRequest` — calls `BLEEndPoint::Close()` to drop the
@@ -254,8 +254,8 @@ matches the connection against the active session map.
 ## Wi-Fi PAF Transport Integration
 
 When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the
-delegate interacts with `chip::WiFiPAF::WiFiPAFLayer` to open, send over, receive
-from, and close PAF (NAN) sessions:
+delegate interacts with `chip::WiFiPAF::WiFiPAFLayer` to open, send over,
+receive from, and close PAF (NAN) sessions:
 
 -   `ProxyConnectRequest` — calls `WiFiPAFLayer::WiFiPAFSubscribe()` to open a
     PAF session identified by the commissionee discriminator and peer address.
