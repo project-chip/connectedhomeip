@@ -122,10 +122,10 @@ void FakeReadings::FakeReadingsUpdate()
     // Update readings
     // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
     // first compute power as a mean + some random value in range +/- mPowerRandomness_mW
-    int64_t power = (static_cast<int64_t>(rand()) % (2 * mPowerRandomness_mW)) - mPowerRandomness_mW;
+    int64_t power = (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mPowerRandomness_mW))) - mPowerRandomness_mW;
     power += mPower_mW; // add in the base power
 
-    int64_t voltage = (static_cast<int64_t>(rand()) % (2 * mVoltageRandomness_mV)) - mVoltageRandomness_mV;
+    int64_t voltage = (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mVoltageRandomness_mV))) - mVoltageRandomness_mV;
     voltage += mVoltage_mV; // add in the base voltage
 
     /* Note: whilst we could compute a current from the power and voltage,
@@ -135,7 +135,7 @@ void FakeReadings::FakeReadingsUpdate()
      * This is meant more as an example to show how to use the APIs, not
      * to be a real representation of laws of physics.
      */
-    int64_t current = (static_cast<int64_t>(rand()) % (2 * mCurrentRandomness_mA)) - mCurrentRandomness_mA;
+    int64_t current = (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mCurrentRandomness_mA))) - mCurrentRandomness_mA;
     current += mCurrent_mA; // add in the base current
 
     ElectricalSensorManager * esManager = GetESManager();

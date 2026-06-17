@@ -21,7 +21,6 @@
 #      This file is Chip BLE Base class file
 #
 
-from __future__ import absolute_import
 
 import abc
 import optparse

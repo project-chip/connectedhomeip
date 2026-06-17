@@ -32,7 +32,7 @@ class StreamService:
             if stream_path.is_dir():
                 stream_file = stream_path / "stream.json"
                 if stream_file.exists():
-                    with open(stream_file, 'r', encoding='utf-8') as f:
+                    with open(stream_file, encoding='utf-8') as f:
                         stream_data = json.load(f)
                         streams[stream_path.name] = Stream.model_validate(stream_data)
         return streams
@@ -51,7 +51,7 @@ class StreamService:
         self.wd.mkdir("streams", str(stream_id))
         self._save_stream(stream)
 
-        log.info(f"Stream created: id={stream_id}, interface={interface}")
+        log.info("Stream created: id=%s, interface=%s", stream_id, interface)
         return stream
 
     def get_stream(self, stream_id: int) -> Optional[Stream]:

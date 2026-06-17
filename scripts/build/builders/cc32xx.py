@@ -50,7 +50,7 @@ class cc32xxBuilder(GnBuilder):
                  runner: Runner,
                  output_dir_lock: OutDirLock,
                  app: cc32xxApp = cc32xxApp.LOCK):
-        super(cc32xxBuilder, self).__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
 

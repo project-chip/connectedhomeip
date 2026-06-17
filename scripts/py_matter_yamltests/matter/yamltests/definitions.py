@@ -16,7 +16,7 @@
 import enum
 import glob
 import io
-from typing import List, Optional
+from typing import Optional
 
 from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, Enum, Event, FieldQuality, Struct, StructQuality,
                                          StructTag)
@@ -38,7 +38,7 @@ class _ItemType(enum.Enum):
 
 class SpecDefinitions:
 
-    def __init__(self, sources: List[ParseSource]):
+    def __init__(self, sources: list[ParseSource]):
         self.__clusters_by_id: dict[int, Cluster] = {}
         self.__commands_by_id: dict[int, dict[int, Command]] = {}
         self.__responses_by_id: dict[int, dict[int, Struct]] = {}
@@ -92,7 +92,7 @@ class SpecDefinitions:
         self.__global_enums: dict[str, Bitmap] = {e.name: e for e in idl.global_enums}
         self.__global_structs: dict[str, Bitmap] = {s.name: s for s in idl.global_structs}
 
-    def get_cluster_names(self) -> List[str]:
+    def get_cluster_names(self) -> list[str]:
         return [name for name, _ in self.__clusters_by_name.items()]
 
     def get_cluster_name(self, cluster_id: int) -> str:
@@ -169,17 +169,17 @@ class SpecDefinitions:
 
         return None
 
-    def get_command_names(self, cluster_name: str) -> List[str]:
+    def get_command_names(self, cluster_name: str) -> list[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Request)
         return [] if targets is None else list(targets)
 
-    def get_event_names(self, cluster_name: str) -> List[str]:
+    def get_event_names(self, cluster_name: str) -> list[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Event)
         return [] if targets is None else list(targets)
 
-    def get_attribute_names(self, cluster_name: str) -> List[str]:
+    def get_attribute_names(self, cluster_name: str) -> list[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Attribute)
         return [] if targets is None else list(targets)

@@ -33,6 +33,7 @@
 
 #include <arpa/inet.h>
 #include <dirent.h>
+#include <fstream>
 #include <ifaddrs.h>
 #include <linux/ethtool.h>
 #include <linux/if_link.h>
@@ -78,6 +79,20 @@ enum class WiFiStatsCountType
 // Static variable to store the maximum heap size
 static uint64_t maxHeapHighWatermark = 0;
 #endif
+
+CHIP_ERROR GetThreadName(pid_t tid, char * nameBuf, size_t nameBufSize)
+{
+    char path[64];
+    snprintf(path, sizeof(path), "/proc/self/task/%u/comm", tid);
+
+    std::ifstream commFile(path);
+    VerifyOrReturnError(commFile.is_open(), CHIP_ERROR_READ_FAILED);
+
+    commFile.getline(nameBuf, nameBufSize);
+    VerifyOrReturnError(commFile.gcount() > 0, CHIP_ERROR_READ_FAILED);
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
@@ -320,10 +335,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
                 continue;
 
             ThreadMetrics * thread = new ThreadMetrics();
+            pid_t tid              = atoi(entry->d_name);
+            thread->id             = tid;
 
-            Platform::CopyString(thread->NameBuf, entry->d_name);
-            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
-            thread->id = atoi(entry->d_name);
+            if (GetThreadName(tid, thread->NameBuf, sizeof(thread->NameBuf)) == CHIP_NO_ERROR)
+            {
+                thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            }
 
             // TODO: Get stack info of each thread: thread->stackFreeCurrent,
             // thread->stackFreeMinimum, thread->stackSize.

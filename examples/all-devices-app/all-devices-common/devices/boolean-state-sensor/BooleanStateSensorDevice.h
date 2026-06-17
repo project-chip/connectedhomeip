@@ -25,6 +25,9 @@
 namespace chip {
 namespace app {
 
+/// A reusable, general-purpose simulated device class for boolean state sensors (such as
+/// contact sensors, water leak detectors, and rain sensors) that share the same core
+/// functionality through the Identify and Boolean State clusters.
 class BooleanStateSensorDevice : public SingleEndpointDevice
 {
 public:

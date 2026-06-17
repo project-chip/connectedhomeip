@@ -68,12 +68,13 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, is_groupcast_on_root_node
+from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -106,8 +107,11 @@ class TC_SC_5_2(MatterBaseTest):
             TestStep("12", "If Groupcast NOT enabled or Listener disabled, skip to step 17. TH sends LeaveGroup(groupID=0)."),
             TestStep("13", "TH sends JoinGroup command with GroupID 0x0103."),
             TestStep("14", "TH reads Membership attribute from Groupcast cluster."),
-            TestStep("15", "TH sends a group command using GroupID 0x0103 to modify an attribute on DUT."),
-            TestStep("16", "TH validates group message was received by reading the modified attribute."),
+            TestStep("15a", "TH subscribes to the Groupcast cluster's GroupcastTesting event on the RootNode endpoint."),
+            TestStep("15b", "TH sends GroupcastTesting command with TestOperation=EnableListenerTesting and DurationSeconds=120."),
+            TestStep("15c", "TH sends a command requiring Operate privilege available on the endpoint provided in step 13 as a group command using GroupID 0x0103."),
+            TestStep("16a", "TH validates the group message was received by checking the GroupcastTesting event from DUT (AccessAllowed: true)."),
+            TestStep("16b", "TH sends GroupcastTesting command with DisableTesting to restore normal operation."),
             TestStep("17", "TH sends KeySetRemove with GroupKeySetID 0x01a3."),
             TestStep("18", "TH writes ACL to restore default access."),
         ]
@@ -129,9 +133,9 @@ class TC_SC_5_2(MatterBaseTest):
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
             self.mark_all_remaining_steps_skipped("1")
             return
-        logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
+        logger.info('Found the following endpoints with Groups clusters: %s', endpoints)
         for endpoint in endpoints:
-            logger.info(f"Running test against endpoint {endpoint} groups cluster")
+            logger.info("Running test against endpoint %s groups cluster", endpoint)
             self.current_step_index = 2
             await self.run_test_against_endpoint(endpoint)
 
@@ -241,7 +245,7 @@ class TC_SC_5_2(MatterBaseTest):
             is_groupcast_listener = ln_enabled
 
         if not is_groupcast_listener:
-            self.mark_step_range_skipped("12", "16")
+            self.mark_step_range_skipped("12", "16b")
         else:
             # update the controller GroupInfo for groupID 0x0103 to use IANA address policy
             dev_ctrl.SetGroupInfo(0x0103, "Group #3", 0)
@@ -265,17 +269,49 @@ class TC_SC_5_2(MatterBaseTest):
             group_ids = [entry.groupID for entry in membership]
             asserts.assert_in(0x0103, group_ids, "GroupID 0x0103 not found in Membership")
 
-            # Step 15: Send group command via GroupID 0x0103
-            self.step("15")
-            dev_ctrl.SendGroupCommand(0x0103, Clusters.OnOff.Commands.On())
-            await asyncio.sleep(3)
-            # Step 16: Validate group command received
-            self.step("16")
-            on_off = await self.read_single_attribute_check_success(endpoint=groups_endpoint,
-                                                                    cluster=Clusters.OnOff, attribute=Clusters.OnOff.Attributes.OnOff)
+            # Step 15a: Subscribe to GroupcastTesting events on the RootNode.
+            self.step("15a")
+            event_sub = EventSubscriptionHandler(
+                expected_cluster=Clusters.Groupcast,
+                expected_event_id=Clusters.Groupcast.Events.GroupcastTesting.event_id)
+            await event_sub.start(dev_ctrl, node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
 
-            asserts.assert_true(on_off, "OnOff should be TRUE after group On command")
-            await dev_ctrl.SendCommand(node_id, groups_endpoint, Clusters.OnOff.Commands.Off())
+            # Step 15b: Enable listener testing on the DUT.
+            self.step("15b")
+            await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.GroupcastTesting(
+                testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kEnableListenerTesting,
+                durationSeconds=120))
+
+            # Discover an Operate-privilege command on the tested endpoint.
+            operate_only_commands_dict = await get_operate_only_commands(
+                dev_ctrl, node_id, exclude_ep0=True, endpoint_id_to_search=groups_endpoint)
+            asserts.assert_in(groups_endpoint, operate_only_commands_dict,
+                              f"No Operate-privilege command found on endpoint {groups_endpoint}; cannot validate groupcast listener.")
+            operate_only_command = operate_only_commands_dict[groups_endpoint][0]
+            logger.info(
+                "Using %s.%s as the group command for endpoint %d",
+                operate_only_command.cluster_object.__name__, operate_only_command.command_object.__name__,
+                groups_endpoint)
+
+            # Step 15c: Send the operate-only command as a group command to GroupID 0x0103.
+            self.step("15c")
+            dev_ctrl.SendGroupCommand(0x0103, operate_only_command.command_object())
+            await asyncio.sleep(3)
+
+            # Step 16a: Validate the DUT received the group command via the GroupcastTesting event.
+            self.step("16a")
+            event_data = event_sub.wait_for_event_report(
+                Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            asserts.assert_equal(event_data.groupID, 0x0103, "Incorrect group ID in GroupcastTesting event")
+            asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
+            asserts.assert_equal(event_data.groupcastTestResult,
+                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                                 "GroupcastTesting event should report Success")
+
+            # Step 16b: Disable GroupcastTesting to restore normal operation.
+            self.step("16b")
+            await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.GroupcastTesting(
+                testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kDisableTesting))
 
             # restore the GroupInfo for groupID 0x0103 to use Per-Group address policy
             dev_ctrl.SetGroupInfo(0x0103, "Group #3")
