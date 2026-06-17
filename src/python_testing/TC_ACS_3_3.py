@@ -72,7 +72,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
 # --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
-# --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
+# --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:10"
 
 class TC_ACS_3_3(MatterBaseTest):
     def desc_TC_ACS_3_3(self) -> str:
