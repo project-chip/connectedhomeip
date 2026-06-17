@@ -211,7 +211,8 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
 
     if (deviceConfigs.size() != constructedDevices.size())
     {
-        ChipLogError(AppServer, "Mismatch between device configs count (%u) and constructed devices count (%u)", static_cast<unsigned>(deviceConfigs.size()), static_cast<unsigned>(constructedDevices.size()));
+        ChipLogError(AppServer, "Mismatch between device configs count (%u) and constructed devices count (%u)",
+                     static_cast<unsigned>(deviceConfigs.size()), static_cast<unsigned>(constructedDevices.size()));
         return;
     }
 
