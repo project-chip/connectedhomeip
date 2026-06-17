@@ -16,8 +16,6 @@ import("//build_overrides/chip.gni")
 import("//with_pw_rpc.gni")
 
 import("${chip_root}/config/standalone/args.gni")
-import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/accessors/accessors.gni")
 
 chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_project_config_include = "<CHIPProjectAppConfig.h>"

@@ -13,10 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/accessors/accessors.gni")
-import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/accessors/accessors.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -35,6 +31,7 @@ executable("all-devices-app") {
   ]
 
   deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/accessors:common",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
@@ -64,11 +61,6 @@ executable("all-devices-app") {
   ]
   defines = []
 
-  if (chip_all_devices_app_enable_oob_accessors) {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/accessors:common" ]
-    defines += [ "CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS=1" ]
-  }
-
   if (chip_device_platform == "darwin") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
   } else {
@@ -82,7 +74,7 @@ executable("all-devices-app") {
 
   if (chip_enable_pw_rpc) {
     defines += [
-      "PW_RPC_ENABLED",
+      "PW_RPC_ENABLED=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
     ]
 
@@ -106,16 +98,14 @@ executable("all-devices-app") {
       "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",
     ]
 
     deps += pw_build_LINK_DEPS
 
     include_dirs += [ "${chip_root}/examples/common" ]
+  } else {
+    defines += [ "PW_RPC_ENABLED=0" ]
   }
 
   output_dir = root_out_dir
