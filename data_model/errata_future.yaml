@@ -1,0 +1,14 @@
+#
+# Authoritative Data Model Errata Overlay
+# Bridges stable specification XMLs with Matter 'next' in-progress PR development.
+#
+
+# Guard to ensure this errata is only applied to compatible underlying data model revisions.
+compatible_specification_revisions:
+    - 1.6
+
+AmbientContextSensing:
+    # Fix spec typo where attribute is specified as RW instead of RV
+    # Reconciles against future spec / PR #43327
+    SimultaneousDetectionLimit:
+        write_access: none

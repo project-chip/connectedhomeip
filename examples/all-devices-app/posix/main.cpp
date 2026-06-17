@@ -383,6 +383,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    ReturnErrorOnFailure(AppOptions::ValidateConfig());
+
     const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());

@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
@@ -37,6 +38,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
+    // TODO: this will NOT be called after code driven conversion
+    //       You may intercept data model provider attribute changes by DataModel::Provider::RegisterAttributeChangeListener
     if (clusterId == SmokeCoAlarm::Id && attributeId == SmokeCoAlarm::Attributes::ExpressedState::Id)
     {
         static_assert(sizeof(SmokeCoAlarm::ExpressedStateEnum) == 1, "Wrong size");

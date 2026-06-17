@@ -22,6 +22,7 @@
 #include <devices/aggregator/AggregatorDevice.h>
 #include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
+#include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
@@ -30,6 +31,7 @@
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -145,6 +147,17 @@ private:
                     });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
+        {
+            RegisterCreator("bridged-node", [this]() {
+                VerifyOrDie(mContext.has_value());
+                static int sBridgedNodeCount = 0;
+                sBridgedNodeCount++;
+                return std::make_unique<BridgedNodeDevice>(mContext->timerDelegate,
+                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount),
+                                                           "Bridged Node " + std::to_string(sBridgedNodeCount));
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
             RegisterCreator("contact-sensor", [this]() {
@@ -254,6 +267,22 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
             RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
+        {
+            RegisterCreator("smoke-co-alarm", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<SmokeCoAlarmDevice>(
+                    mContext->timerDelegate,
+                    SmokeCoAlarmDevice::ConcentrationCluster::Config{
+                        .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
+                        .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                    });
+            });
         }
 
         // at least one device type MUST be enabled

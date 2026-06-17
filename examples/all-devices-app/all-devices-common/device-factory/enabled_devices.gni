@@ -51,6 +51,10 @@ _available_devices = [
     "AIR_QUALITY_SENSOR",
   ],
   [
+    "bridged-node",
+    "BRIDGED_NODE",
+  ],
+  [
     "chime",
     "CHIME",
   ],
@@ -85,6 +89,10 @@ _available_devices = [
   [
     "proximity-ranger",
     "PROXIMITY_RANGER",
+  ],
+  [
+    "smoke-co-alarm",
+    "SMOKE_CO_ALARM",
   ],
   [
     "soil-sensor",
