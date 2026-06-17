@@ -15,6 +15,28 @@ ballots are released.
 The data model files in this directory are not used with zap or for SDK codegen
 and should not be updated manually by cluster or device type implementers.
 
+## How Test Suites Select the Data Model Version
+
+During test execution, the testing infrastructure (`basic_composition.py`)
+communicates with the actual Matter device (DUT). It reads the DUT's active
+`SpecificationVersion` attribute from endpoint 0 (`BasicInformation` cluster).
+
+This revision number is mapped (via `dm_from_spec_version()` in
+`spec_parsing.py`) to an explicit `prebuilt` version directory (e.g., `1.6`) to
+ensure the test harness validates the device against its declared specification
+baseline.
+
+## Data Model Errata Engine
+
+If you are developing features for "next" or fixing specification typos that
+cause Interaction Data Model (IDM) tests to fail against our stable checked-in
+XMLs, do not edit the XMLs manually. Instead, use our declarative errata overlay
+file (`errata_future.yaml`).
+
+To learn how to add new overlay entries or **extend the engine's core
+capabilities** to support new override keys, see the formal
+[Data Model Errata Guide](../docs/guides/data_model_errata.md).
+
 ## Updating the data model files
 
 ### Updating current spec revision directories

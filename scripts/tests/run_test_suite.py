@@ -51,8 +51,7 @@ if sys.platform == "linux":
 if sys.platform == 'darwin':
     import chiptest.darwin
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 
 class ManualHandling(enum.Enum):
@@ -356,6 +355,11 @@ class CommissioningMethod(enum.StrEnum):
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.option(
+    '--value-wait-extra-duration-ms',
+    default=None,
+    type=int,
+    help='Extra duration in milliseconds to wait for attribute value changes')
+@click.option(
     '--expected-failures',
     type=click.IntRange(min=0),
     default=0,
@@ -436,7 +440,8 @@ class CommissioningMethod(enum.StrEnum):
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
-            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
+            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
+            value_wait_extra_duration_ms: int | None, expected_failures: int,
             commissioning_method: CommissioningMethod, summary_file: Path | None, periodic_status: int,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
@@ -599,6 +604,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                         TestResult.run_test, test.name, i, dry_run, context.obj.log_config, functools.partial(
                             test.Run, runner, apps_register, subproc_info_repo, pics_file, test_timeout_seconds, dry_run,
                             test_runtime=context.obj.runtime,
+                            value_wait_extra_duration_ms=value_wait_extra_duration_ms,
                             ble_controller_app=ble_controller_app,
                             ble_controller_tool=ble_controller_tool,
                             op_network='Thread' if thread_required else 'WiFi',

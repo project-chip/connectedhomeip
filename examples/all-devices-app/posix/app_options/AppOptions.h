@@ -47,6 +47,7 @@ public:
     static chip::ArgParser::OptionSet * GetOptions();
     static const AppConfig & GetConfig();
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
+    static CHIP_ERROR ValidateConfig();
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
@@ -54,4 +55,5 @@ private:
 
     static DeviceTypeParser sParser;
     static AppConfig mConfig;
+    static bool sIsConfigValidated;
 };
