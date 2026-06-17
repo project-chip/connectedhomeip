@@ -16,19 +16,98 @@ import("//build_overrides/build.gni")
 import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
+import("$dir_pigweed/pw_toolchain/clang_tools.gni")
 import("$dir_pigweed/targets/host/target_toolchains.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
-# creating a secondary toolchain to be used with pw_fuzzer FuzzTests
-# This toolchain is downstreamed from pigweed's pw_target_toolchain_host.clang_fuzz
-# it allows us to specifically use googletest for fuzzing (instead of the lighter version of googletest used for unit testing)
+# Provides the `oss_fuzz` build arg (set true by OSS-Fuzz's build.sh).
+import("${build_root}/config/compiler/compiler.gni")
+declare_args() {
+  # Build the FuzzTest targets in libFuzzer-compatibility mode (what OSS-Fuzz drives) instead
+  # of FuzzTest's native engine. Always on under `oss_fuzz`; set true locally to reproduce
+  # OSS-Fuzz or use libFuzzer corpus/merge/minimize. Default: native run mode.
+  chip_pw_fuzz_libfuzzer_compat = false
+
+  # Build the local pw_fuzzer / FuzzTest targets with UBSan in addition to the default ASan
+  # (set by the `ubsan` build_examples modifier on a -pw-fuzztest target). Local builds only;
+  # under OSS-Fuzz the engine drives sanitizers via $CFLAGS.
+  chip_pw_fuzz_ubsan = false
+}
+
+# --- libFuzzer-compatibility-mode support for FuzzTest ---
+# Applied toolchain-wide (via _use_libfuzzer_compat) so the configs below reach the FuzzTest
+# library, not just the test harness.
+_use_libfuzzer_compat = oss_fuzz || chip_pw_fuzz_libfuzzer_compat
+
+# Compiler used to resolve the libFuzzer runtime archive: $CXX under OSS-Fuzz, otherwise
+# pw_toolchain_clang_tools.cxx -- the same clang++ the toolchain compiles with, so we track
+# pigweed (CIPD location / pw_toolchain_CLANG_PREFIX) instead of hardcoding the path.
+if (oss_fuzz) {
+  _fuzztest_compiler = getenv("CXX")
+} else {
+  _fuzztest_compiler = pw_toolchain_clang_tools.cxx
+}
+
+# 1) Compatibility-mode define. compatibility_mode.cc defines FuzzTestExternalEngineAdaptor
+#    only under #ifdef FUZZTEST_COMPATIBILITY_MODE; a harness-only define leaves that library
+#    symbol undefined at link, so it MUST be toolchain-wide.
+config("fuzztest_compatibility_mode") {
+  defines = [ "FUZZTEST_COMPATIBILITY_MODE=libfuzzer" ]
+}
+
+# 2) libFuzzer driver. FuzzTest keeps its own main (fuzztest_gtest_main) and calls
+#    LLVMFuzzerRunDriver, so link the libFuzzer runtime WITHOUT its main (fuzzer_no_main) --
+#    never plain -fsanitize=fuzzer / $LIB_FUZZING_ENGINE, which carry a conflicting main.
+config("fuzztest_libfuzzer_engine") {
+  ldflags = [ exec_script("print_file_name.py",
+                          [
+                            _fuzztest_compiler,
+                            "libclang_rt.fuzzer_no_main.a",
+                          ],
+                          "trim string") ]
+}
+
+# 3) Optional UBSan for LOCAL FuzzTest builds (`ubsan` modifier -> chip_pw_fuzz_ubsan): the
+#    fuzzing-specific deltas over chip's global UBSan config, which already reaches this
+#    toolchain via is_ubsan (it supplies -fsanitize=undefined, the ignorelist, and -fno-rtti vptr).
+config("fuzztest_ubsan") {
+  cflags = [
+    # make UB abort so FuzzTest records it as a crash (UBSan recovers by default)
+    "-fno-sanitize-recover=undefined",
+
+    # defined unsigned wraps, not UB -- fuzzing noise on first-party code
+    "-fno-sanitize=unsigned-integer-overflow",
+    "-fno-sanitize=unsigned-shift-base",
+  ]
+  ldflags = [ "-fsanitize=undefined" ]
+}
+
+# Secondary toolchain for pw_fuzzer FuzzTests, derived from pigweed's
+# pw_target_toolchain_host.clang_fuzz. Uses full GoogleTest, not the light unit-test backend.
 
 gcc_toolchain("chip_pw_fuzztest") {
   forward_variables_from(pw_target_toolchain_host.clang_fuzz, "*", [ "name" ])
 
+  # Under OSS-Fuzz, use the compiler OSS-Fuzz provides ($CC/$CXX) so the instrumentation it
+  # injects via $CFLAGS/$CXXFLAGS matches the fuzzer runtime we link. We do NOT set
+  # pw_toolchain_OSS_FUZZ_ENABLED, because that also swaps the unit-test main/backend to the
+  # light / simple_printing variants, which break FuzzTest.
+  if (oss_fuzz) {
+    cc = getenv("CC")
+    cxx = getenv("CXX")
+  }
+
   toolchain_args = {
     # This is needed to have the defaults passed from pw_target_toolchain_host.clang_fuzz to the current scope
     forward_variables_from(defaults, "*")
+
+    # libFuzzer-compatibility configs (defined above); otherwise FuzzTest's native engine.
+    if (_use_libfuzzer_compat) {
+      default_configs += [
+        "//build/toolchain/pw_fuzzer:fuzztest_compatibility_mode",
+        "//build/toolchain/pw_fuzzer:fuzztest_libfuzzer_engine",
+      ]
+    }
 
     pw_unit_test_MAIN = "$dir_pw_fuzzer:fuzztest_main"
     pw_unit_test_BACKEND = "$dir_pw_fuzzer:gtest"
@@ -41,11 +120,10 @@ gcc_toolchain("chip_pw_fuzztest") {
     # the upstream pigweed host_clang toolchain defines a default sysroot, which results in build errors
     # since it does not include SSL lib and is supposed to be minimal by design.
     # by removing this default config, we will use the system's libs. Otherwise we can define our own sysroot.
-    # discussion on: https://discord.com/channels/691686718377558037/1275092695764959232
     remove_default_configs = [ "$dir_pw_toolchain/host_clang:linux_sysroot" ]
 
-    # when is_debug = true, we pass -O0 to cflags and ldflags, while upstream pw_fuzzer toolchain defines "optimize_speed" config that passes -O2.
-    # This condition was added to prevent mixing the flags
+    # is_debug passes -O0, but the upstream pw_fuzzer toolchain's "optimize_speed" config adds
+    # -O2; drop it so the two don't mix.
     if (is_debug) {
       remove_default_configs += [ "$dir_pw_build:optimize_speed" ]
     }
@@ -56,6 +134,23 @@ gcc_toolchain("chip_pw_fuzztest") {
       "$dir_pw_build:strict_warnings",
       "$dir_pw_build:extra_strict_warnings",
     ]
+
+    # Under OSS-Fuzz the env-provided $CFLAGS/$CXXFLAGS drive sanitizers + coverage (applied
+    # to every target via chip's global fuzzing_default -> oss_fuzz config). Drop pigweed's
+    # local ASan + -fsanitize=fuzzer-no-link instrumentation here so they don't conflict
+    # (pigweed's ASan requires a field-padding-instrumented libc++ that OSS-Fuzz does not use).
+    if (oss_fuzz) {
+      remove_default_configs += [
+        "$dir_pw_fuzzer:instrumentation",
+        "$dir_pw_toolchain/host_clang:sanitize_address",
+      ]
+    } else {
+      # Local builds keep pigweed's base -fsanitize=address. Optional UBSan on top via the
+      # `ubsan` modifier on a -pw-fuzztest target.
+      if (chip_pw_fuzz_ubsan) {
+        default_configs += [ "//build/toolchain/pw_fuzzer:fuzztest_ubsan" ]
+      }
+    }
 
     # the third_party abseil-cpp triggers warnings related to [-Wformat-nonliteral]
     treat_warnings_as_errors = false

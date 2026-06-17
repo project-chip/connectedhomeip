@@ -58,8 +58,15 @@ constexpr uint16_t kOptionGroupcast     = 0xffda;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
+bool AppOptions::sIsConfigValidated = false;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
+{
+    VerifyOrDie(sIsConfigValidated);
+    return mConfig;
+}
+
+CHIP_ERROR AppOptions::ValidateConfig()
 {
     // Default device fallback if no devices are configured
     if (mConfig.deviceTypeEntries.empty())
@@ -69,23 +76,26 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
-        return mConfig;
     }
-
-    // Expand wildcards using the supported device types from DeviceFactory
-    std::vector<std::string> supportedTypes;
-    for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+    else
     {
-        if (!IsExcludedFromWildcard(deviceType))
+        // Expand wildcards using the supported device types from DeviceFactory
+        std::vector<std::string> supportedTypes;
+        for (const auto & deviceType : chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes())
         {
-            supportedTypes.push_back(deviceType);
+            if (!IsExcludedFromWildcard(deviceType))
+            {
+                supportedTypes.push_back(deviceType);
+            }
         }
+
+        sParser.ExpandWildcards(supportedTypes);
+        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
     }
 
-    sParser.ExpandWildcards(supportedTypes);
-    mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
-
-    return mConfig;
+    ReturnErrorOnFailure(DeviceTypeParser::ValidateConfig(mConfig.deviceTypeEntries));
+    sIsConfigValidated = true;
+    return CHIP_NO_ERROR;
 }
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
@@ -94,6 +104,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     switch (identifier)
     {
     case kOptionDeviceType: {
+        sIsConfigValidated = false;
         if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;
@@ -190,10 +201,12 @@ OptionSet * AppOptions::GetOptions()
         result.append("*");
         result.append(">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'.\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or "
+                  "'type:endpoint,parent=parentId[,bridged]'.\n";
         result += "       Use '*' to select all supported leaf devices (e.g. --device \"*:1\").\n";
+        result += "       Use 'bridged' to automatically create a parent bridged-node endpoint for the device.\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
-        result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
+        result += "       Example: --device aggregator:1 --device \"chime:2,parent=1,bridged\"\n\n";
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         result += "  --ble-controller <number>\n";
