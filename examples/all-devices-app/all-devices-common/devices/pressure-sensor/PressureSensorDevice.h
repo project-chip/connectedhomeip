@@ -25,6 +25,8 @@
 namespace chip {
 namespace app {
 
+/// A base device type implementation for a Matter Pressure Sensor, supporting the
+/// Pressure Measurement server cluster.
 class PressureSensorDevice : public SingleEndpointDevice
 {
 public:

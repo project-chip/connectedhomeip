@@ -24,6 +24,8 @@
 namespace chip {
 namespace app {
 
+/// A base device type implementation for a Matter Light Sensor, supporting the
+/// Illuminance Measurement server cluster.
 class LightSensorDevice : public SingleEndpointDevice
 {
 public:

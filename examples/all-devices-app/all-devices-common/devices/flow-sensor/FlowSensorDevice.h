@@ -24,6 +24,8 @@
 namespace chip {
 namespace app {
 
+/// A base device type implementation for a Matter Flow Sensor, supporting the
+/// Flow Measurement server cluster.
 class FlowSensorDevice : public SingleEndpointDevice
 {
 public:

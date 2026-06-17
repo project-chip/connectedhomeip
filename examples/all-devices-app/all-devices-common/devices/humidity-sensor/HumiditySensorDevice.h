@@ -24,6 +24,8 @@
 namespace chip {
 namespace app {
 
+/// A base device type implementation for a Matter Humidity Sensor, supporting the
+/// Relative Humidity Measurement server cluster.
 class HumiditySensorDevice : public SingleEndpointDevice
 {
 public:
