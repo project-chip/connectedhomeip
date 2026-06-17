@@ -36,7 +36,7 @@ using namespace chip::DeviceLayer;
 
 namespace {
 
-constexpr uint16_t kSelfTestingTimeoutSec = 10;
+constexpr uint16_t kSelfTestingTimeoutSec  = 10;
 constexpr EndpointId kSmokeCoAlarmEndpoint = 1;
 
 const std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> kPriorityOrder = {
@@ -68,8 +68,7 @@ void ChefSmokeCoAlarmDelegate::OnSelfTestRequested()
 
 void ChefSmokeCoAlarmDelegate::OnSmokeSensitivityLevelChanged(SensitivityEnum newSmokeSensitivityLevel)
 {
-    ChipLogProgress(Zcl, "[Smoke-CO-Alarm] => SmokeSensitivityLevel changed to %u",
-                    to_underlying(newSmokeSensitivityLevel));
+    ChipLogProgress(Zcl, "[Smoke-CO-Alarm] => SmokeSensitivityLevel changed to %u", to_underlying(newSmokeSensitivityLevel));
 }
 
 void ChefSmokeCoAlarmDelegate::OnExpressedStateChanged(ExpressedStateEnum newExpressedState)
