@@ -25,8 +25,6 @@
 namespace chip {
 namespace app {
 
-class BooleanStateSensorDevice;
-
 class BooleanStateSensorDevice : public SingleEndpointDevice
 {
 public:
