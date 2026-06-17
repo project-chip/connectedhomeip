@@ -25,10 +25,10 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 0
-#       --timeout 200
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
+#     timeout: 200
 #     quiet: true
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
