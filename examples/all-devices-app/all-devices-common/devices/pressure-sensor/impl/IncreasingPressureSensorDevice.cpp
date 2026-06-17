@@ -62,18 +62,14 @@ void IncreasingPressureSensorDevice::Unregister(CodeDrivenDataModelProvider & pr
 
 void IncreasingPressureSensorDevice::TimerFired()
 {
-    // Simulate increasing pressure
-    if (mPressureMeasuredValue.IsNull())
-    {
-        mPressureMeasuredValue.SetNonNull(kDefaultPressureConfig.minMeasuredValue.Value());
-    }
-    else if (mPressureMeasuredValue.Value() >= kDefaultPressureConfig.maxMeasuredValue.Value())
+    int16_t currentValue = mPressureMeasuredValue.ValueOr(kDefaultPressureConfig.maxMeasuredValue.Value());
+    if (currentValue >= kDefaultPressureConfig.maxMeasuredValue.Value())
     {
         mPressureMeasuredValue.SetNonNull(kDefaultPressureConfig.minMeasuredValue.Value());
     }
     else
     {
-        mPressureMeasuredValue.SetNonNull(static_cast<int16_t>(mPressureMeasuredValue.Value() + 50));
+        mPressureMeasuredValue.SetNonNull(static_cast<int16_t>(currentValue + 50));
     }
 
     ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", mPressureMeasuredValue.Value());

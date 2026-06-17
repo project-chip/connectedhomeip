@@ -36,6 +36,9 @@ CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
+    // Enable optional Tolerance and LightSensorType attributes.
+    // These optional attributes are enabled to support the Illuminance Measurement
+    // YAML certification tests (Test_TC_ILL_2_1.yaml) executed against this simulated device.
     IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet;
     optionalAttributeSet.Set<IlluminanceMeasurement::Attributes::Tolerance::Id>();
     optionalAttributeSet.Set<IlluminanceMeasurement::Attributes::LightSensorType::Id>();

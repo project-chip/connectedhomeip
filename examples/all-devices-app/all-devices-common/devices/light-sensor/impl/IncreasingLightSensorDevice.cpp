@@ -61,18 +61,14 @@ void IncreasingLightSensorDevice::Unregister(CodeDrivenDataModelProvider & provi
 
 void IncreasingLightSensorDevice::TimerFired()
 {
-    // Simulate increasing light level
-    if (mLightMeasuredValue.IsNull())
-    {
-        mLightMeasuredValue.SetNonNull(kDefaultLightConfig.minMeasuredValue.Value());
-    }
-    else if (mLightMeasuredValue.Value() >= kDefaultLightConfig.maxMeasuredValue.Value())
+    uint16_t currentValue = mLightMeasuredValue.ValueOr(kDefaultLightConfig.maxMeasuredValue.Value());
+    if (currentValue >= kDefaultLightConfig.maxMeasuredValue.Value())
     {
         mLightMeasuredValue.SetNonNull(kDefaultLightConfig.minMeasuredValue.Value());
     }
     else
     {
-        mLightMeasuredValue.SetNonNull(static_cast<uint16_t>(mLightMeasuredValue.Value() + 10));
+        mLightMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + 10));
     }
 
     ChipLogProgress(AppServer, "IncreasingLightValue: Increasing to %d", mLightMeasuredValue.Value());

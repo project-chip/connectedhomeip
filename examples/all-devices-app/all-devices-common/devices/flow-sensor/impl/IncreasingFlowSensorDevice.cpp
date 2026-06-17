@@ -61,18 +61,14 @@ void IncreasingFlowSensorDevice::Unregister(CodeDrivenDataModelProvider & provid
 
 void IncreasingFlowSensorDevice::TimerFired()
 {
-    // Simulate increasing flow
-    if (mFlowMeasuredValue.IsNull())
-    {
-        mFlowMeasuredValue.SetNonNull(kDefaultFlowConfig.minMeasuredValue.Value());
-    }
-    else if (mFlowMeasuredValue.Value() >= kDefaultFlowConfig.maxMeasuredValue.Value())
+    uint16_t currentValue = mFlowMeasuredValue.ValueOr(kDefaultFlowConfig.maxMeasuredValue.Value());
+    if (currentValue >= kDefaultFlowConfig.maxMeasuredValue.Value())
     {
         mFlowMeasuredValue.SetNonNull(kDefaultFlowConfig.minMeasuredValue.Value());
     }
     else
     {
-        mFlowMeasuredValue.SetNonNull(static_cast<uint16_t>(mFlowMeasuredValue.Value() + 100));
+        mFlowMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + 100));
     }
 
     ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %d", mFlowMeasuredValue.Value());

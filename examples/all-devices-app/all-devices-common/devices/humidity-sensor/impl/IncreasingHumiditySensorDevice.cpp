@@ -62,18 +62,14 @@ void IncreasingHumiditySensorDevice::Unregister(CodeDrivenDataModelProvider & pr
 
 void IncreasingHumiditySensorDevice::TimerFired()
 {
-    // Simulate increasing humidity
-    if (mHumidityMeasuredValue.IsNull())
-    {
-        mHumidityMeasuredValue.SetNonNull(kDefaultHumidityConfig.minMeasuredValue.Value());
-    }
-    else if (mHumidityMeasuredValue.Value() >= kDefaultHumidityConfig.maxMeasuredValue.Value())
+    uint16_t currentValue = mHumidityMeasuredValue.ValueOr(kDefaultHumidityConfig.maxMeasuredValue.Value());
+    if (currentValue >= kDefaultHumidityConfig.maxMeasuredValue.Value())
     {
         mHumidityMeasuredValue.SetNonNull(kDefaultHumidityConfig.minMeasuredValue.Value());
     }
     else
     {
-        mHumidityMeasuredValue.SetNonNull(static_cast<uint16_t>(mHumidityMeasuredValue.Value() + 100)); // step by 1.00%
+        mHumidityMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + 100)); // step by 1.00%
     }
 
     ChipLogProgress(AppServer, "IncreasingHumidityValue: Increasing to %d", mHumidityMeasuredValue.Value());
