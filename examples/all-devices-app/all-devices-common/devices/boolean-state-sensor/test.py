@@ -101,11 +101,11 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
 
         # Read Endpoint 1
         initial_val_ep1 = await self.read_boolean_state_value(endpoint=1)
-        logger.info(f"Initial Boolean State Value on Endpoint 1: {initial_val_ep1}")
+        logger.info("Initial Boolean State Value on Endpoint 1: %s", initial_val_ep1)
 
         # Read Endpoint 2
         initial_val_ep2 = await self.read_boolean_state_value(endpoint=2)
-        logger.info(f"Initial Boolean State Value on Endpoint 2: {initial_val_ep2}")
+        logger.info("Initial Boolean State Value on Endpoint 2: %s", initial_val_ep2)
 
         # Step 3: Toggle and assert state values on Endpoint 1 and Endpoint 2 independently via PwRPC
         self.step(3)
@@ -127,7 +127,7 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
         with device_connection as device:
             # 1. Toggle Endpoint 1's state value and assert Endpoint 1's state changed while Endpoint 2's state remained intact.
             new_val_ep1 = not initial_val_ep1
-            logger.info(f"Toggling Endpoint 1 from {initial_val_ep1} to {new_val_ep1} via PwRPC...")
+            logger.info("Toggling Endpoint 1 from %s to %s via PwRPC...", initial_val_ep1, new_val_ep1)
             self.write_boolean_state_value_pwrpc(device, endpoint=1, value=new_val_ep1)
 
             # Assert Endpoint 1 changed
@@ -140,7 +140,7 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
 
             # 2. Toggle Endpoint 2's state value and assert Endpoint 2's state changed while Endpoint 1's state remained intact.
             new_val_ep2 = not initial_val_ep2
-            logger.info(f"Toggling Endpoint 2 from {initial_val_ep2} to {new_val_ep2} via PwRPC...")
+            logger.info("Toggling Endpoint 2 from %s to %s via PwRPC...", initial_val_ep2, new_val_ep2)
             self.write_boolean_state_value_pwrpc(device, endpoint=2, value=new_val_ep2)
 
             # Assert Endpoint 2 changed
