@@ -65,10 +65,7 @@ executable("all-devices-app") {
   defines = []
 
   if (chip_all_devices_app_enable_oob_accessors) {
-    deps += [
-      "${chip_root}/examples/all-devices-app/all-devices-common/accessors:common",
-      "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor:boolean-state-sensor-accessor",
-    ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/accessors:common" ]
     defines += [ "CHIP_ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS=1" ]
   }
 

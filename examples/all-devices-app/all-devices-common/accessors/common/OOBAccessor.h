@@ -193,7 +193,7 @@ public:
             "Failed to write AttributeId tag");
 
         // Tag 4: Attribute Value
-        readerHelper = attributeValueReader;
+        readerHelper.Init(attributeValueReader);
         ReturnErrorAndLogOnFailure(tlvWriter.CopyElement(chip::TLV::ContextTag(SetAttributeRequestParser::kTagValue), readerHelper),
                                    Support, "Failed to copy attribute value TLV element");
 
@@ -215,6 +215,10 @@ public:
      *         A non-null optional containing:
      *           - CHIP_NO_ERROR on success.
      *           - Other CHIP_ERROR codes on failure.
+     *
+     * @note **Asynchronous Safety Warning:** The `tlvBuffer` parameter is a non-owning,
+     *       temporary view whose underlying memory is only guaranteed to be valid during the
+     *       synchronous execution of this function call.
      */
     virtual std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) = 0;
 };
