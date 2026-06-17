@@ -59,7 +59,7 @@ namespace chip::app {
 class DeviceFactory
 {
 public:
-    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
+    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
 
     struct Context
     {
@@ -86,15 +86,25 @@ public:
         mRegistry[deviceTypeArg] = std::move(creator);
     }
 
+    /**
+     * Convenience overload to support making the label optional for creator registrations
+     * that do not care about the label (i.e. most cases).
+     */
+    void RegisterCreator(const std::string & deviceTypeArg, std::function<std::unique_ptr<DeviceInterface>()> && creator)
+    {
+        RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
+    }
+
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 
     bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 
-    std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg)
+    std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg, const std::string & nodeLabel = "")
     {
-        if (IsValidDevice(deviceTypeArg))
+        auto it = mRegistry.find(deviceTypeArg);
+        if (it != mRegistry.end())
         {
-            return mRegistry.find(deviceTypeArg)->second();
+            return it->second(nodeLabel);
         }
         ChipLogError(
             Support,
@@ -154,13 +164,13 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
         {
-            RegisterCreator("bridged-node", [this]() {
+            RegisterCreator("bridged-node", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 static int sBridgedNodeCount = 0;
                 sBridgedNodeCount++;
+                std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
                 return std::make_unique<BridgedNodeDevice>(mContext->timerDelegate,
-                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount),
-                                                           "Bridged Node " + std::to_string(sBridgedNodeCount));
+                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
