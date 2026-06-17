@@ -212,7 +212,8 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     gsize bufferLen;
     value = g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
     GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
@@ -305,7 +306,8 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     gsize bufferLen;
     value = g_variant_lookup_value(reply_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
 
     /*
@@ -346,7 +348,11 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     pPafInfo->id      = publish_id;
     pPafInfo->peer_id = peer_subscribe_id;
     memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
-    TEMPORARY_RETURN_IGNORED WiFiPafLayer.HandleTransportConnectionInitiated(*pPafInfo);
+    auto handleInitiated = [](intptr_t arg) {
+        WiFiPAF::WiFiPAFSession * pInfo = reinterpret_cast<WiFiPAF::WiFiPAFSession *>(arg);
+        LogErrorOnFailure(WiFiPAFLayer::GetWiFiPAFLayer().HandleTransportConnectionInitiated(*pInfo));
+    };
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(handleInitiated, reinterpret_cast<intptr_t>(pPafInfo)));
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
