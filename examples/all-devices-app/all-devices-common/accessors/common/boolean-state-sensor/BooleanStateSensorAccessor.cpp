@@ -15,7 +15,7 @@
  */
 
 #include <access/SubjectDescriptor.h>
-#include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
+#include <accessors/common/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
