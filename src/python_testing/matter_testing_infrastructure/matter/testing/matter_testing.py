@@ -1091,8 +1091,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         wildcard = self._optional_stored_global_wildcard()
         if wildcard is None:
             raise RuntimeError(
-                "stored_global_wildcard was not populated by the runner; set NEEDS_COMMISSIONING = False only if "
-                "your test does not use guards or read stored_global_wildcard."
+                "stored_global_wildcard was not populated by the runner"
             )
         return wildcard
 
