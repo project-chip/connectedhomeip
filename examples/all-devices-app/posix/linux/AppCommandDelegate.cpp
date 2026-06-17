@@ -207,7 +207,7 @@ void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
     auto * context = Platform::New<CommandContext>();
     if (context == nullptr)
     {
-        ChipLogError(AppServer, "Failure to allocate command context! Ignoring comand.");
+        ChipLogError(AppServer, "Failure to allocate command context! Ignoring command.");
         return;
     }
     context->value      = value;
