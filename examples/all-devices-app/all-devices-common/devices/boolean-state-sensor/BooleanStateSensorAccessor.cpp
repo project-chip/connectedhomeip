@@ -27,30 +27,25 @@ BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice 
     VerifyOrDie(mDevice != nullptr);
 }
 
-std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, chip::TLV::TLVReader & arguments,
-                                                                   const ConcreteDataAttributePath * path)
+std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
 {
     if (!actionName.data_equal(kActionSetAttribute))
     {
         return std::nullopt;
     }
 
-    if (path == nullptr)
-    {
-        return std::make_optional(CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    OOBAccessor::SetAttributeRequestParser parser;
+    ReturnErrorAndLogOnFailure(parser.Init(tlvBuffer), Support, "Failed to parse attribute path and value from tlvBuffer");
 
-    if (path->mEndpointId != mDevice->GetEndpointId())
+    if (parser.path.mEndpointId != mDevice->GetEndpointId())
     {
         return std::nullopt; // Not for our endpoint
     }
 
-    // arguments TLVReader is positioned at the value.
-    // Reconstruct decoder.
     Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternalDeviceAccess };
-    AttributeValueDecoder decoder(arguments, subjectDescriptor);
+    AttributeValueDecoder decoder(parser.attrValueReader, subjectDescriptor);
 
-    return SetAttribute(*path, decoder);
+    return SetAttribute(parser.path, decoder);
 }
 
 std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path,

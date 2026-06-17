@@ -44,7 +44,7 @@
 namespace chip {
 namespace rpc {
 
-std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path,
+std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader & reader,
                                                 chip::app::AttributeValueDecoder & decoder)
 {
     std::set<PigweedDebugAccessInterceptor *> accessors = PigweedDebugAccessInterceptorRegistry::Instance().GetAllAccessors();
@@ -64,6 +64,15 @@ std::optional<::pw::Status> TryWriteViaAccessor(const chip::app::ConcreteDataAtt
     }
 
     VerifyOrReturnError(!decoder.TriedDecode(), ::pw::Status::FailedPrecondition());
+
+    for (PigweedDebugAccessInterceptor * accessor : accessors)
+    {
+        std::optional<::pw::Status> result = accessor->Write(path, reader);
+        if (result.has_value()) // Write was either a success or failure.
+        {
+            return result;
+        }
+    }
 
     return std::nullopt;
 }
@@ -235,7 +244,7 @@ public:
 
         app::AttributeValueDecoder decoder(tlvReader.value(), subjectDescriptor);
 
-        std::optional<::pw::Status> interceptResult = TryWriteViaAccessor(write_request.path, decoder);
+        std::optional<::pw::Status> interceptResult = TryWriteViaAccessor(write_request.path, tlvReader.value(), decoder);
         if (interceptResult.has_value())
         {
             return *interceptResult;

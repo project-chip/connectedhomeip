@@ -17,19 +17,11 @@
 #pragma once
 
 #include <accessors/common/AccessorRegistry.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
 
 namespace chip::app {
-
-// TODO: currently added to be able to get the TLV reader from the decoder. Options to void using TestOnly:
-// A. Update chip::rpc::PigweedDebugAccessInterceptor::Write interface to take in TLV reader instead of decoder.
-// B. Add a new chip::rpc::PigweedDebugAccessInterceptor::Write interface that takes in a TLV.
-class TestOnlyAttributeValueDecoderAccessor
-{
-public:
-    static TLV::TLVReader & GetReader(AttributeValueDecoder & decoder) { return decoder.mReader; }
-};
 
 class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
 {
@@ -37,24 +29,24 @@ public:
     PigweedAttributeAccessor()           = default;
     ~PigweedAttributeAccessor() override = default;
 
-    std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
+    std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, const TLV::TLVReader & reader) override
     {
-        TLV::TLVReader & reader = TestOnlyAttributeValueDecoderAccessor::GetReader(decoder);
+        Platform::ScopedMemoryBuffer<uint8_t> tlvRequest;
+        size_t tlvLen = 0;
 
-        auto result = AccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, reader, &path);
+        CHIP_ERROR err = OOBAccessor::BuildSetAttributeRequest(path, reader, tlvLen, tlvRequest);
+        if (err != CHIP_NO_ERROR)
+        {
+            return ::pw::Status::Internal();
+        }
+
+        auto result =
+            AccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, ByteSpan(tlvRequest.Get(), tlvLen));
         if (result.has_value())
         {
-            CHIP_ERROR err = *result;
+            err = *result;
             if (err == CHIP_NO_ERROR)
             {
-                if (!decoder.TriedDecode())
-                {
-                    ChipLogError(Support,
-                                 "OOB Accessor returned success but did not decode the value. Path: (%d, " ChipLogFormatMEI
-                                 ", " ChipLogFormatMEI ")",
-                                 path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-                    return ::pw::Status::FailedPrecondition();
-                }
                 return ::pw::OkStatus();
             }
             ChipLogError(Support, "OOB Accessor failed to write attribute: %" CHIP_ERROR_FORMAT, err.Format());

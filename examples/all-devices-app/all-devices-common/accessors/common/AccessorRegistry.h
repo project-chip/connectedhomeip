@@ -69,17 +69,15 @@ public:
      * @brief Routes an action/simulation invocation to the registered accessors.
      *
      * @param actionName The name of the action to invoke.
-     * @param arguments A TLVReader positioned at the arguments for the action.
-     * @param path Optional pointer to ConcreteDataAttributePath.
-     * @return std::nullopt if no accessor handled the request.
-     *         A non-null optional containing the CHIP_ERROR result from the handling accessor.
+     * @param tlvBuffer Buffer containing TLV data for the action request.
+     * @return std::nullopt if the action is not handled by any registered accessors. Or a CHIP_ERROR result returned by an accessor
+     * that handled the request.
      */
-    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, chip::TLV::TLVReader & arguments,
-                                           const ConcreteDataAttributePath * path = nullptr)
+    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
     {
         for (auto & accessor : mAccessors)
         {
-            auto result = accessor.HandleAction(actionName, arguments, path);
+            auto result = accessor.HandleAction(actionName, tlvBuffer);
             if (result.has_value())
             {
                 return result;

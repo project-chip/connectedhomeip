@@ -34,8 +34,7 @@ public:
     BooleanStateSensorAccessor(BooleanStateSensorDevice * device);
     ~BooleanStateSensorAccessor() override = default;
 
-    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, chip::TLV::TLVReader & arguments,
-                                           const ConcreteDataAttributePath * path = nullptr) override;
+    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
 
 private:
     std::optional<CHIP_ERROR> SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
