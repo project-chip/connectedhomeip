@@ -74,6 +74,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
 # --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:10"
 
+
 class TC_ACS_3_3(MatterBaseTest):
     def desc_TC_ACS_3_3(self) -> str:
         return "[TC-ACS-3.3] Attribute Subscription and Event Functionality with DUT as a server"
