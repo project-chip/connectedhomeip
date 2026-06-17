@@ -23,10 +23,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-LightSensorDevice::LightSensorDevice(TimerDelegate & timerDelegate,
-                                     IlluminanceMeasurementCluster::StartupConfiguration lightConfig) :
+LightSensorDevice::LightSensorDevice(TimerDelegate & timerDelegate, IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
+                                     IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLightSensor, 1)),
-    mTimerDelegate(timerDelegate), mLightConfig(lightConfig)
+    mTimerDelegate(timerDelegate), mLightConfig(lightConfig), mOptionalAttributes(optionalAttributes)
 {}
 
 CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -36,13 +36,7 @@ CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Enable optional Tolerance and LightSensorType attributes.
-    // These optional attributes are enabled to support the Illuminance Measurement
-    // YAML certification tests (Test_TC_ILL_2_1.yaml) executed against this simulated device.
-    IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet;
-    optionalAttributeSet.Set<IlluminanceMeasurement::Attributes::Tolerance::Id>();
-    optionalAttributeSet.Set<IlluminanceMeasurement::Attributes::LightSensorType::Id>();
-    mIlluminanceMeasurementCluster.Create(endpoint, optionalAttributeSet, mLightConfig);
+    mIlluminanceMeasurementCluster.Create(endpoint, mOptionalAttributes, mLightConfig);
     ReturnErrorOnFailure(provider.AddCluster(mIlluminanceMeasurementCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

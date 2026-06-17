@@ -29,7 +29,8 @@ namespace app {
 class LightSensorDevice : public SingleEndpointDevice
 {
 public:
-    LightSensorDevice(TimerDelegate & timerDelegate, Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig);
+    LightSensorDevice(TimerDelegate & timerDelegate, Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
+                      Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~LightSensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -41,6 +42,7 @@ public:
 protected:
     TimerDelegate & mTimerDelegate;
     const Clusters::IlluminanceMeasurementCluster::StartupConfiguration mLightConfig;
+    const Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet mOptionalAttributes;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::IlluminanceMeasurementCluster> mIlluminanceMeasurementCluster;
 };
