@@ -16,9 +16,10 @@ import logging
 from dataclasses import dataclass
 from io import StringIO
 from typing import Optional
-from matter.testing.defaults import TestingDefaults
 
 import yaml
+
+from matter.testing.defaults import TestingDefaults
 
 LOGGER = logging.getLogger(__name__)
 
