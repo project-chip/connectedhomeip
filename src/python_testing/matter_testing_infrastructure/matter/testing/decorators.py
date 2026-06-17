@@ -249,7 +249,7 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
-async def _run_with_interactive_timeout(coro, timeout_sec: float, coordinator) -> object:
+async def _run_with_interactive_timeout(coro, timeout_sec: float, coordinator) -> object | None:
     """Run coro with an interactive overall-timeout supervisor.
 
     A background thread counts down ``timeout_sec`` of *effective* elapsed time
@@ -298,6 +298,7 @@ async def _run_with_interactive_timeout(coro, timeout_sec: float, coordinator) -
         asserts.fail(
             f"Test aborted by user after overall timeout ({timeout_sec:.0f}s)."
         )
+        return None  # unreachable; asserts.fail raises signals.TestFailure
     finally:
         sv_thread.join(timeout=2.0)
 
