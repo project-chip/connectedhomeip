@@ -33,6 +33,13 @@ LOGGER = logging.getLogger(__name__)
 
 AccessControlEntryPrivilegeEnum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
+# Reserved key under a cluster that targets the cluster's own reference revision
+# (the `revision` property on the <cluster> XML element, stored as XmlCluster.revision)
+# rather than a named attribute or command. This is distinct from the device's runtime
+# ClusterRevision global attribute (0xFFFD), which is the value the conformance test
+# compares against this reference.
+CLUSTER_REVISION_KEY = 'revision'
+
 
 def parse_errata_access(val: str) -> int:
     """Parses a human-readable access string into an AccessControlEntryPrivilegeEnum value."""
@@ -139,6 +146,23 @@ def _apply_command_errata(target_cmd: Any, overrides: dict[str, Any], cluster_id
                                           severity=ProblemSeverity.ERROR, problem=f"Invalid privilege/invoke_access on '{context}': {e}"))
 
 
+def _apply_cluster_revision_errata(target_cluster: Any, cluster_id: int, value: Any, cluster_name: str,
+                                   problems: list[ProblemNotice]) -> None:
+    """Overrides the cluster's reference revision in the AST (XmlCluster.revision).
+
+    The conformance test compares the device-reported ClusterRevision attribute (0xFFFD)
+    against this reference value. Bumping it here lets a device report a
+    revision newer than the checked-in baseline XML records (e.g. a 'next/in-progress' spec bump).
+    """
+    try:
+        if isinstance(value, (bool, float)):
+            raise ValueError
+        target_cluster.revision = int(value)
+    except (TypeError, ValueError):
+        problems.append(ProblemNotice(test_name='Data Model Errata', location=ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id),
+                                      severity=ProblemSeverity.ERROR, problem=f"Invalid revision override on '{cluster_name}': {value!r} is not an integer."))
+
+
 def _apply_element_errata(target_cluster: Any, cluster_id: int, element_name: str, overrides: Any, cluster_name: str,
                           sanitized_attr_map: Mapping[str, int], sanitized_cmd_map: Mapping[str, int],
                           problems: list[ProblemNotice]) -> None:
@@ -219,6 +243,9 @@ def apply_errata(clusters: Mapping[uint, Any], errata_data: dict[str, Any],
         sanitized_cmd_map = {_sanitize_name(k): v for k, v in target_cluster.command_map.items()}
 
         for element_name, overrides in elements.items():
+            if element_name.lower() == CLUSTER_REVISION_KEY:
+                _apply_cluster_revision_errata(target_cluster, target_cluster_id, overrides, cluster_name, problems)
+                continue
             _apply_element_errata(target_cluster, target_cluster_id, element_name, overrides, cluster_name,
                                   sanitized_attr_map, sanitized_cmd_map, problems)
 

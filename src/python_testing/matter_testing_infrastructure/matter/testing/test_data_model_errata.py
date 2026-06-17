@@ -113,6 +113,37 @@ class TestDataModelErrata(unittest.TestCase):
         self.assertEqual(len(problems), 0, f"Unexpected problems: {problems}")
         self.assertEqual(cmd.privilege, AccessControlEntryPrivilegeEnum.kManage)
 
+    def test_cluster_revision_override(self):
+        cluster = self._create_dummy_cluster("GroupKeyManagement")
+        clusters = {uint(63): cluster}
+
+        errata = {
+            "GroupKeyManagement": {
+                "revision": 4,
+            }
+        }
+
+        problems = apply_errata(clusters, errata)
+
+        self.assertEqual(len(problems), 0, f"Unexpected problems: {problems}")
+        self.assertEqual(cluster.revision, 4)
+
+    def test_cluster_revision_override_invalid(self):
+        cluster = self._create_dummy_cluster("GroupKeyManagement")
+        clusters = {uint(63): cluster}
+
+        errata = {
+            "GroupKeyManagement": {
+                "revision": "not-a-number",
+            }
+        }
+
+        problems = apply_errata(clusters, errata)
+
+        self.assertEqual(len(problems), 1)
+        self.assertIn("Invalid revision override", problems[0].problem)
+        self.assertEqual(cluster.revision, 1)
+
     def test_error_unknown_cluster(self):
         clusters: dict[uint, XmlCluster] = {}
         errata = {
