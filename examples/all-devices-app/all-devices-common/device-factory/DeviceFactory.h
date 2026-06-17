@@ -42,7 +42,7 @@
 #include <platform/DefaultTimerDelegate.h>
 
 #include <accessors/common/OOBAccessor.h>
-#include <devices/boolean-state-sensor/BooleanStateSensorAccessor.h>
+#include <accessors/common/boolean-state-sensor/BooleanStateSensorAccessor.h>
 namespace chip::app {
 
 /**
@@ -159,7 +159,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
