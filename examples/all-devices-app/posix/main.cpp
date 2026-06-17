@@ -208,6 +208,13 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
 {
     auto deviceConfigs = AppOptions::GetDeviceTypeEntries();
     const auto & constructedDevices = devices.GetConstructedDevices();
+
+    if (deviceConfigs.size() != constructedDevices.size())
+    {
+        ChipLogError(AppServer, "Mismatch between device configs count (%u) and constructed devices count (%u)", static_cast<unsigned>(deviceConfigs.size()), static_cast<unsigned>(constructedDevices.size()));
+        return;
+    }
+
     for (size_t i = 0; i < deviceConfigs.size(); i++)
     {
         const auto & config = deviceConfigs[i];
@@ -319,7 +326,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     // Set up named pipe command handlers against the registered devices.
     const char * namedPipePath = LinuxDeviceOptions::GetInstance().app_pipe;
-    if (strlen(namedPipePath) > 0)
+    if ((namedPipePath != nullptr) && (strlen(namedPipePath) > 0))
     {
          SetupNamedPipe(devices, namedPipePath);
     }

@@ -74,14 +74,15 @@ public:
             return;
         }
 
-        uint8_t occupancy = static_cast<uint8_t>(json["Occupancy"].asUInt());
-        if (occupancy != 0 && occupancy != 1)
+        unsigned int occupancyVal = json["Occupancy"].asUInt();
+        if (occupancyVal != 0 && occupancyVal != 1)
         {
-            ChipLogError(AppServer, "Invalid occupancy value: %d", occupancy);
+            ChipLogError(AppServer, "Invalid occupancy value: %u", occupancyVal);
             return;
         }
+        uint8_t occupancy = static_cast<uint8_t>(occupancyVal);
 
-        cluster->SetOccupancy(occupancy == 1);
+        cluster->SetOccupancy(occupancy != 0);
         ChipLogProgress(AppServer, "SetOccupancy to %d on endpoint %d", occupancy, endpointId);
     }
 };
@@ -105,7 +106,13 @@ public:
             return;
         }
 
-        uint16_t holdTime = static_cast<uint16_t>(json["HoldTime"].asUInt());
+        unsigned int holdTimeVal = json["HoldTime"].asUInt();
+        if (holdTimeVal > 0xFFFF)
+        {
+            ChipLogError(AppServer, "Invalid HoldTime value (out of range): %u", holdTimeVal);
+            return;
+        }
+        uint16_t holdTime = static_cast<uint16_t>(holdTimeVal);
         cluster->SetHoldTime(holdTime);
         ChipLogProgress(AppServer, "SetHoldTime to %d on endpoint %d", holdTime, endpointId);
     }
@@ -180,7 +187,15 @@ void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
     }
 
     std::string commandName     = value["Name"].asString();
-    EndpointId endpointId       = static_cast<EndpointId>(value["EndpointId"].asUInt());
+
+    unsigned int endpointIdVal = value["EndpointId"].asUInt();
+    if (endpointIdVal > 0xFFFF)
+    {
+        ChipLogError(AppServer, "Invalid EndpointId (out of range): %u", endpointIdVal);
+        return;
+    }
+
+    EndpointId endpointId       = static_cast<EndpointId>(endpointIdVal);
     auto handlerIt              = mCommandHandlers.find(commandName);
 
     if (handlerIt == mCommandHandlers.end())
