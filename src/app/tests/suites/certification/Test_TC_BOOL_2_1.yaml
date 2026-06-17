@@ -20,6 +20,11 @@ CI:
       args:
           - --device
           - rain-sensor
+    - name: "Test against all-devices/water-freeze-detector"
+      app: all-devices
+      args:
+          - --device
+          - water-freeze-detector
 
 PICS:
     - BOOL.S
