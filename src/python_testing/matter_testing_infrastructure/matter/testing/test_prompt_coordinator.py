@@ -177,14 +177,14 @@ class TestPromptCoordinatorSerialisation(unittest.TestCase):
         coordinator._lock.acquire()  # hold the lock to simulate another prompt in progress
 
         def release():
-            time.sleep(0.1)
+            time.sleep(0.3)
             coordinator._lock.release()
 
         threading.Thread(target=release, daemon=True).start()
 
         coordinator.ask_user("test", elapsed_sec=5, extension_sec=10)
 
-        # total_prompt_seconds must include the wait (~0.1 s) plus interaction time
+        # total_prompt_seconds must include the wait (~0.3 s) plus interaction time
         self.assertGreaterEqual(coordinator.total_prompt_seconds, 0.1)
 
 
