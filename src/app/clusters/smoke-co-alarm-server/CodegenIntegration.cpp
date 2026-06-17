@@ -290,5 +290,7 @@ bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpoint, bool & v) const
     return true;
 }
 
+__attribute__((weak)) void MatterSmokeCoAlarmClusterInitCallback() {}
+__attribute__((weak)) void MatterSmokeCoAlarmClusterShutdownCallback() {}
 __attribute__((weak)) void MatterSmokeCoAlarmClusterInitCallback(chip::EndpointId) {}
 __attribute__((weak)) void MatterSmokeCoAlarmClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
