@@ -201,9 +201,9 @@ public:
 
         ReturnErrorAndLogOnFailure(tlvWriter.EndContainer(outerType), Support, "Failed to end TLV structure container");
 
-        ReturnErrorAndLogOnFailure(tlvWriter.Finalize(tlvRequest), Support, "Failed to finalize TLV buffer creator");
-
+        // Get TLV length and move ownership back to tlvRequest.
         tlvLen = tlvWriter.GetLengthWritten();
+        ReturnErrorAndLogOnFailure(tlvWriter.Finalize(tlvRequest), Support, "Failed to finalize TLV buffer creator");
 
         return CHIP_NO_ERROR;
     }
