@@ -20,6 +20,8 @@ from matter.testing.defaults import TestingDefaults
 
 import yaml
 
+from matter.testing.defaults import TestingDefaults
+
 LOGGER = logging.getLogger(__name__)
 
 

@@ -24,6 +24,8 @@ from enum import StrEnum
 from typing import BinaryIO, Callable, Self
 from matter.testing.defaults import TestingDefaults
 
+from matter.testing.defaults import TestingDefaults
+
 LOGGER = logging.getLogger(__name__)
 
 

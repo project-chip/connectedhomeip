@@ -276,6 +276,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+    script_args += f" --timeout {int(script_timeout)}"
 
     if '--timeout ' not in script_args:
         script_args += f" --timeout {int(script_timeout)}"
