@@ -317,7 +317,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(devices.Startup());
 
     // Set up named pipe command handlers against the registered devices.
-    const char * namedPipePath = AppOptions::GetNamedPipePath();
+    const char * namedPipePath = LinuxDeviceOptions::GetInstance().app_pipe;
     if (strlen(namedPipePath) > 0)
     {
          SetupNamedPipe(devices, namedPipePath);

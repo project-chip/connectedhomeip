@@ -39,7 +39,6 @@ public:
 
     static chip::ArgParser::OptionSet * GetOptions();
 
-    static const char * GetNamedPipePath() { return mNamedPipePath.c_str(); }
     static const AppConfig & GetConfig();
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
     static CHIP_ERROR ValidateConfig();
@@ -49,7 +48,6 @@ private:
                                            const char * name, const char * value);
 
     static DeviceTypeParser sParser;
-    static std::string mNamedPipePath;
     static AppConfig mConfig;
     static bool sIsConfigValidated;
 };

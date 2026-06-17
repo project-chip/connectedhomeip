@@ -48,11 +48,9 @@ bool IsExcludedFromWildcard(const std::string & type)
 constexpr uint16_t kOptionDeviceType    = 0xffd0;
 constexpr uint16_t kOptionPort          = 0xffd7;
 constexpr uint16_t kOptionGroupcast     = 0xffda;
-constexpr uint16_t kOptionNamedPipe     = 0xffdb;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
-std::string AppOptions::mNamedPipePath;
 bool AppOptions::sIsConfigValidated = false;
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
@@ -124,10 +122,6 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.enableGroupcast = true;
         ChipLogProgress(AppServer, "Groupcast usage enabled");
         return true;
-    case kOptionNamedPipe:
-        mNamedPipePath = value;
-        ChipLogProgress(AppServer, "Named pipe path set to %s", value);
-        return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -142,7 +136,6 @@ OptionSet * AppOptions::GetOptions()
         { "device", kArgumentRequired, kOptionDeviceType },
         { "port", kArgumentRequired, kOptionPort },
         { "groupcast", kNoArgument, kOptionGroupcast },
-        { "named-pipe", kArgumentRequired, kOptionNamedPipe },
         {}, // need empty terminator
     };
 
@@ -166,9 +159,6 @@ OptionSet * AppOptions::GetOptions()
 
         result += "  --port <number>\n";
         result += "       Listen port for secure device messages (default: 5540)\n\n";
-
-        result += "  --named-pipe <path>\n";
-        result += "       Path to a named pipe to receive test JSON commands.\n\n";
 
         return result;
     }();
