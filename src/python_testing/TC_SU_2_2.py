@@ -239,9 +239,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         s6_query_timeout_sec = int(self.user_params.get('step6_query_timeout_sec', 720))
         timeout_extension_sec = int(self.user_params.get('timeout_extension_sec', 600))
         logger.info(
-            f"Timeout config — step5 transfer: {s5_transfer_timeout_sec}s, "
-            f"apply: {s5_apply_timeout_sec}s, reboot: {s5_reboot_timeout_sec}s, "
-            f"step6 query: {s6_query_timeout_sec}s, extension: {timeout_extension_sec}s"
+            "Timeout config — step5 transfer: %ss, apply: %ss, reboot: %ss, step6 query: %ss, extension: %ss",
+            s5_transfer_timeout_sec, s5_apply_timeout_sec, s5_reboot_timeout_sec,
+            s6_query_timeout_sec, timeout_extension_sec,
         )
 
         self.step(0)
@@ -860,7 +860,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             on_timeout=self.make_timeout_callback(f"{step_number_s5} download start"),
             extension_sec=float(timeout_extension_sec),
         )
-        logger.info(f'{step_number_s5}: Step #5.3 - UpdateState (Available sequence) matcher has completed.')
+        logger.info('%s: Step #5.3 - UpdateState (Available sequence) matcher has completed.', step_number_s5)
         subscription_attr.cancel()
 
         # ------------------------------------------------------------------------------------
@@ -904,7 +904,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             on_timeout=self.make_timeout_callback(f"{step_number_s5} kApplying"),
             extension_sec=float(timeout_extension_sec),
         )
-        logger.info(f'{step_number_s5}: Step #5.5 - kApplying observed — BDX transfer complete.')
+        logger.info('%s: Step #5.5 - kApplying observed — BDX transfer complete.', step_number_s5)
         subscription_attr_applying.cancel()
 
         logger.info('%s: Step #5.5 - Killing provider (download done, DUT applying firmware).', step_number_s5)
@@ -932,13 +932,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 await controller.GetConnectedDevice(
                     requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
                 reconnected = True
-                logger.info(f'{step_number_s5}: Step #5.6 - DUT reconnected after OTA reboot (attempt {attempt}).')
+                logger.info('%s: Step #5.6 - DUT reconnected after OTA reboot (attempt %s).', step_number_s5, attempt)
                 break
             except (TimeoutError, ChipDeviceCtrl.ChipStackError):
                 elapsed = time.time() - reboot_start
                 logger.info(
-                    f'{step_number_s5}: Step #5.6 - Waiting for DUT to come back online '
-                    f'(attempt {attempt}, elapsed {elapsed:.0f}s / {reboot_deadline_sec}s)...')
+                    '%s: Step #5.6 - Waiting for DUT to come back online (attempt %s, elapsed %.0fs / %.0fs)...',
+                    step_number_s5, attempt, elapsed, reboot_deadline_sec)
                 if elapsed >= reboot_deadline_sec:
                     extended = await asyncio.get_event_loop().run_in_executor(
                         None,
@@ -951,7 +951,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                     if extended:
                         reboot_deadline_sec += timeout_extension_sec
                         logger.info(
-                            f'{step_number_s5}: Step #5.6 - Reboot wait extended to {reboot_deadline_sec:.0f}s.')
+                            '%s: Step #5.6 - Reboot wait extended to %.0fs.', step_number_s5, reboot_deadline_sec)
                     else:
                         break
 

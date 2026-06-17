@@ -488,7 +488,7 @@ class AttributeSubscriptionHandler:
                 pending = [matchers_list[i].description for i, matched in report_matches.items() if not matched]
                 LOGGER.error("Reached time-out without finding all expected report values.")
                 for idx, matcher in enumerate(matchers_list):
-                    LOGGER.info(f"  -> {matcher.description}: {report_matches[idx]}")
+                    LOGGER.info("  -> %s: %s", matcher.description, report_matches[idx])
 
                 if on_timeout is not None and on_timeout(
                     pending_descriptions=pending,
@@ -496,7 +496,7 @@ class AttributeSubscriptionHandler:
                     extension_sec=extension_sec,
                 ):
                     timeout_sec += extension_sec
-                    LOGGER.info(f"Timeout extended by {extension_sec:.0f}s (new deadline: {timeout_sec:.0f}s).")
+                    LOGGER.info("Timeout extended by %.0fs (new deadline: %.0fs).", extension_sec, timeout_sec)
                     continue
 
                 asserts.fail("Did not find all expected reports before time-out")
@@ -658,7 +658,7 @@ class AttributeSubscriptionHandler:
                     extension_sec=extension_sec,
                 ):
                     deadline = time.time() + extension_sec
-                    LOGGER.info(f"Timeout extended by {extension_sec:.0f}s while waiting for {target_value!r}.")
+                    LOGGER.info("Timeout extended by %.0fs while waiting for %r.", extension_sec, target_value)
                     continue
 
                 asserts.fail(

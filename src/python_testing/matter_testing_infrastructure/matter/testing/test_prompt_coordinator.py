@@ -176,9 +176,6 @@ class TestPromptCoordinatorSerialisation(unittest.TestCase):
         coordinator = PromptCoordinator()
         coordinator._lock.acquire()  # hold the lock to simulate another prompt in progress
 
-        start = time.time()
-        release_at = [start + 0.1]
-
         def release():
             time.sleep(0.1)
             coordinator._lock.release()
