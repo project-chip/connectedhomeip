@@ -1,0 +1,96 @@
+# Stage 3: Copy relevant cert bins to a minimal image to reduce size.
+FROM ubuntu:24.04
+LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedhomeip
+ENV TZ=Etc/UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+ARG TARGETPLATFORM
+# COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
+ARG COMMITHASH=c1ec2d777456924dcaa59b53351b00d73caf378f
+
+# Ensure TARGETPLATFORM is set
+RUN case ${TARGETPLATFORM} in \
+    "linux/amd64") \
+    echo "Building for linux/amd64" \
+    ;; \
+    "linux/arm64") \
+    echo "Building for linux/arm64" \
+    ;; \
+    *) \
+    if [ -z "$TARGETPLATFORM" ] ;\
+    then \
+    echo "TARGETPLATFORM not defined! Please run from buildkit (buildx)." \
+    && return 1 ;\
+    else \
+    echo "Unsupported platform ${TARGETPLATFORM}." \
+    && return 1 ;\
+    fi \
+    ;; \
+    esac
+
+RUN apt-get update -y \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    avahi-utils \
+    ffmpeg \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-ugly \
+    iproute2 \
+    libavahi-client-dev \
+    libcairo2-dev \
+    libcurl4 \
+    libdbus-1-dev \
+    libevent-dev \
+    libgirepository1.0-dev \
+    libglib2.0-dev \
+    libgstreamer1.0-0 \
+    libgstreamer-plugins-base1.0-0 \
+    libpcsclite1 \
+    libpcsclite-dev \
+    libssl-dev \
+    meson \
+    pcscd \
+    python3-dev \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/* \
+    && : # last line
+
+WORKDIR /root/
+RUN echo $COMMITHASH > .sdk-sha-version
+COPY apps ./apps
+COPY examples/fabric-admin/scripts/fabric-sync-app.py ./apps/fabric-sync-app
+COPY src/tools/push_av_server ./apps/push_av_server
+
+# Create symbolic links for now since this allows users to use existing configurations
+# for running just `app-name` instead of `apps/app-name`
+RUN ln -s apps/* .
+
+# Stage 3.1: Setup the Matter Python environment
+COPY src/python_testing ./python_testing/scripts/sdk
+COPY data_model ./python_testing/data_model
+RUN pip install --break-system-packages -r python_testing/scripts/sdk/requirements.txt \
+    && rm python_testing/scripts/sdk/requirements.txt
+
+# Install PushAV dependencies
+RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt \
+    && patch -d $(python3 -c "from importlib.metadata import distribution; print(distribution('hypercorn').locate_file(''))") -p0 < apps/push_av_server/hypercorn.patch
+
+RUN pip install --break-system-packages -r python_testing/scripts/sdk/requirements.nfc.txt \
+    && rm python_testing/scripts/sdk/requirements.nfc.txt
+
+# Stage 3.2: Setup the Mock Server
+COPY integrations/mock_server ./mock_server
+
+WORKDIR /root/apps
+RUN pip install --break-system-packages --no-cache-dir \
+    python_lib/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl \
+    python_lib/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl \
+    python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
+    python_lib/obj/src/controller/python/matter-controller-wheels/*.whl \
+    && rm ../python_lib \
+    && rm -rf python_lib
+
+# Copy device attestation revocation set and device attestation test vectors
+WORKDIR /root
+RUN mkdir -p ./credentials/test/revoked-attestation-certificates
+COPY credentials/test/revoked-attestation-certificates/dac-provider-test-vectors ./credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+COPY credentials/test/revoked-attestation-certificates/revocation-sets ./credentials/test/revoked-attestation-certificates/revocation-sets
