@@ -24,6 +24,9 @@
 namespace chip {
 namespace app {
 
+/// A simulated pressure sensor device that periodically increases the measured pressure
+/// value to simulate pressure changes, wrapping around to the minimum value once it
+/// reaches the maximum configured limit.
 class IncreasingPressureSensorDevice : public PressureSensorDevice, public TimerContext
 {
 public:

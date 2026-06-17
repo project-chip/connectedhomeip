@@ -24,6 +24,9 @@
 namespace chip {
 namespace app {
 
+/// A simulated flow sensor device that periodically increases the measured flow value
+/// to simulate active water flow, wrapping around to the minimum value once it reaches
+/// the maximum configured limit.
 class IncreasingFlowSensorDevice : public FlowSensorDevice, public TimerContext
 {
 public:

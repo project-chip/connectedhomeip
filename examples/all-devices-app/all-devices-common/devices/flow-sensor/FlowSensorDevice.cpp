@@ -32,11 +32,9 @@ CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelPr
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Create the flow measurement cluster
     mFlowMeasurementCluster.Create(endpoint, mFlowConfig);
     ReturnErrorOnFailure(provider.AddCluster(mFlowMeasurementCluster.Registration()));
 

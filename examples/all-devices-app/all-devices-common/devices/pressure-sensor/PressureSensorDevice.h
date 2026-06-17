@@ -39,7 +39,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
-    Clusters::PressureMeasurementCluster::Config mPressureConfig;
+    const Clusters::PressureMeasurementCluster::Config mPressureConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::PressureMeasurementCluster> mPressureMeasurementCluster;
 };

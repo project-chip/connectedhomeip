@@ -24,6 +24,9 @@
 namespace chip {
 namespace app {
 
+/// A simulated light sensor device that periodically increases the measured illuminance
+/// value to simulate changing light conditions, wrapping around to the minimum value
+/// once it reaches the maximum configured limit.
 class IncreasingLightSensorDevice : public LightSensorDevice, public TimerContext
 {
 public:

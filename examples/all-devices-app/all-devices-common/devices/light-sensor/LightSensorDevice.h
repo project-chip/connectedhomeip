@@ -38,7 +38,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
-    Clusters::IlluminanceMeasurementCluster::StartupConfiguration mLightConfig;
+    const Clusters::IlluminanceMeasurementCluster::StartupConfiguration mLightConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::IlluminanceMeasurementCluster> mIlluminanceMeasurementCluster;
 };

@@ -32,11 +32,9 @@ CHIP_ERROR PressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataMod
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Create the pressure measurement cluster
     mPressureMeasurementCluster.Create(endpoint, mPressureConfig);
     ReturnErrorOnFailure(provider.AddCluster(mPressureMeasurementCluster.Registration()));
 

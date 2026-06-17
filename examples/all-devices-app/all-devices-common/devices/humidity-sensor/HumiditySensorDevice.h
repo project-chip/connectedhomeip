@@ -41,7 +41,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
-    Clusters::RelativeHumidityMeasurementCluster::Config mHumidityConfig;
+    const Clusters::RelativeHumidityMeasurementCluster::Config mHumidityConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::RelativeHumidityMeasurementCluster> mRelativeHumidityMeasurementCluster;
 };

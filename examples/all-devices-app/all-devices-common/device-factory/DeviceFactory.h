@@ -39,12 +39,12 @@
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
-
-#include <functional>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <map>
 #include <platform/DefaultTimerDelegate.h>
+
+#include <functional>
+#include <map>
 
 namespace chip::app {
 
@@ -145,7 +145,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },

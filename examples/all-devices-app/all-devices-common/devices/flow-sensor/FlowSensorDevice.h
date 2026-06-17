@@ -38,7 +38,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
-    Clusters::FlowMeasurementCluster::Config mFlowConfig;
+    const Clusters::FlowMeasurementCluster::Config mFlowConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::FlowMeasurementCluster> mFlowMeasurementCluster;
 };

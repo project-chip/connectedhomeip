@@ -33,11 +33,9 @@ CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Create the illuminance measurement cluster
     IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet;
     optionalAttributeSet.Set<IlluminanceMeasurement::Attributes::Tolerance::Id>();
     optionalAttributeSet.Set<IlluminanceMeasurement::Attributes::LightSensorType::Id>();

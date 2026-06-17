@@ -24,6 +24,9 @@
 namespace chip {
 namespace app {
 
+/// A simulated relative humidity sensor device that periodically increases the measured
+/// humidity value to simulate humidity changes, wrapping around to the minimum value
+/// once it reaches the maximum configured limit.
 class IncreasingHumiditySensorDevice : public HumiditySensorDevice, public TimerContext
 {
 public:
