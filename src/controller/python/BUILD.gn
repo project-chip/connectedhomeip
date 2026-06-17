@@ -272,11 +272,6 @@ pw_python_package("matter-core-module") {
     "matter/tracing/__init__.py",
     "matter/utils/CommissioningBuildingBlocks.py",
     "matter/utils/__init__.py",
-    "matter/yaml/__init__.py",
-    "matter/yaml/data_model_lookup.py",
-    "matter/yaml/errors.py",
-    "matter/yaml/format_converter.py",
-    "matter/yaml/runner.py",
   ]
   if (chip_support_webrtc_python_bindings) {
     sources += [
