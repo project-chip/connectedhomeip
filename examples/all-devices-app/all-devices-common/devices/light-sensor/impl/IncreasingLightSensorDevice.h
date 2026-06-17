@@ -41,7 +41,7 @@ public:
     void TimerFired() override;
 
 private:
-    DataModel::Nullable<uint16_t> mLightMeasuredValue;
+    uint16_t mLightMeasuredValue = 0;
 };
 
 } // namespace app

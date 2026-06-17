@@ -56,8 +56,8 @@ CHIP_ERROR IncreasingHumiditySensorDevice::Register(EndpointId endpoint, CodeDri
     ReturnErrorOnFailure(HumiditySensorDevice::Register(endpoint, provider, parentId));
 
     // Initialize with the minimum configured value
-    mHumidityMeasuredValue.SetNonNull(kDefaultHumidityConfig.minMeasuredValue.Value());
-    ReturnErrorOnFailure(mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(mHumidityMeasuredValue));
+    mHumidityMeasuredValue = kDefaultHumidityConfig.minMeasuredValue.Value();
+    ReturnErrorOnFailure(mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mHumidityMeasuredValue)));
 
     // Kick off the timer loop to increase humidity every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseHumidityIntervalSec);
@@ -71,18 +71,17 @@ void IncreasingHumiditySensorDevice::Unregister(CodeDrivenDataModelProvider & pr
 
 void IncreasingHumiditySensorDevice::TimerFired()
 {
-    uint16_t currentValue = mHumidityMeasuredValue.Value();
-    if (currentValue >= kDefaultHumidityConfig.maxMeasuredValue.Value())
+    if (mHumidityMeasuredValue >= kDefaultHumidityConfig.maxMeasuredValue.Value())
     {
-        mHumidityMeasuredValue.SetNonNull(kDefaultHumidityConfig.minMeasuredValue.Value());
+        mHumidityMeasuredValue = kDefaultHumidityConfig.minMeasuredValue.Value();
     }
     else
     {
-        mHumidityMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + kHumidityStepValue));
+        mHumidityMeasuredValue = static_cast<uint16_t>(mHumidityMeasuredValue + kHumidityStepValue);
     }
 
-    ChipLogProgress(AppServer, "IncreasingHumidityValue: Increasing to %u", static_cast<unsigned int>(mHumidityMeasuredValue.Value()));
-    LogErrorOnFailure(mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(mHumidityMeasuredValue));
+    ChipLogProgress(AppServer, "IncreasingHumidityValue: Increasing to %u", static_cast<unsigned int>(mHumidityMeasuredValue));
+    LogErrorOnFailure(mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mHumidityMeasuredValue)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseHumidityIntervalSec));
 }

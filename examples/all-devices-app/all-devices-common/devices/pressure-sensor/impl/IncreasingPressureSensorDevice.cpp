@@ -56,8 +56,8 @@ CHIP_ERROR IncreasingPressureSensorDevice::Register(EndpointId endpoint, CodeDri
     ReturnErrorOnFailure(PressureSensorDevice::Register(endpoint, provider, parentId));
 
     // Initialize with the minimum configured value
-    mPressureMeasuredValue.SetNonNull(kDefaultPressureConfig.minMeasuredValue.Value());
-    ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(mPressureMeasuredValue));
+    mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();
+    ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
 
     // Kick off the timer loop to increase pressure every few seconds
     return mTimerDelegate.StartTimer(this, kIncreasePressureIntervalSec);
@@ -71,18 +71,17 @@ void IncreasingPressureSensorDevice::Unregister(CodeDrivenDataModelProvider & pr
 
 void IncreasingPressureSensorDevice::TimerFired()
 {
-    int16_t currentValue = mPressureMeasuredValue.Value();
-    if (currentValue >= kDefaultPressureConfig.maxMeasuredValue.Value())
+    if (mPressureMeasuredValue >= kDefaultPressureConfig.maxMeasuredValue.Value())
     {
-        mPressureMeasuredValue.SetNonNull(kDefaultPressureConfig.minMeasuredValue.Value());
+        mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();
     }
     else
     {
-        mPressureMeasuredValue.SetNonNull(static_cast<int16_t>(currentValue + kPressureStepValue));
+        mPressureMeasuredValue = static_cast<int16_t>(mPressureMeasuredValue + kPressureStepValue);
     }
 
-    ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(mPressureMeasuredValue.Value()));
-    LogErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(mPressureMeasuredValue));
+    ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(mPressureMeasuredValue));
+    LogErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreasePressureIntervalSec));
 }

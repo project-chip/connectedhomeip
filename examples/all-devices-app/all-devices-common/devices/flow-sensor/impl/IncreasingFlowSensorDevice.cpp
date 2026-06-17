@@ -55,8 +55,8 @@ CHIP_ERROR IncreasingFlowSensorDevice::Register(EndpointId endpoint, CodeDrivenD
     ReturnErrorOnFailure(FlowSensorDevice::Register(endpoint, provider, parentId));
 
     // Initialize with the minimum configured value
-    mFlowMeasuredValue.SetNonNull(kDefaultFlowConfig.minMeasuredValue.Value());
-    ReturnErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(mFlowMeasuredValue));
+    mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();
+    ReturnErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mFlowMeasuredValue)));
 
     // Kick off the timer loop to increase flow every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseFlowIntervalSec);
@@ -70,18 +70,17 @@ void IncreasingFlowSensorDevice::Unregister(CodeDrivenDataModelProvider & provid
 
 void IncreasingFlowSensorDevice::TimerFired()
 {
-    uint16_t currentValue = mFlowMeasuredValue.Value();
-    if (currentValue >= kDefaultFlowConfig.maxMeasuredValue.Value())
+    if (mFlowMeasuredValue >= kDefaultFlowConfig.maxMeasuredValue.Value())
     {
-        mFlowMeasuredValue.SetNonNull(kDefaultFlowConfig.minMeasuredValue.Value());
+        mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();
     }
     else
     {
-        mFlowMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + kFlowStepValue));
+        mFlowMeasuredValue = static_cast<uint16_t>(mFlowMeasuredValue + kFlowStepValue);
     }
 
-    ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %u", static_cast<unsigned int>(mFlowMeasuredValue.Value()));
-    LogErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(mFlowMeasuredValue));
+    ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %u", static_cast<unsigned int>(mFlowMeasuredValue));
+    LogErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mFlowMeasuredValue)));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseFlowIntervalSec));
 }

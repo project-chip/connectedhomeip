@@ -41,7 +41,7 @@ public:
     void TimerFired() override;
 
 private:
-    DataModel::Nullable<uint16_t> mHumidityMeasuredValue;
+    uint16_t mHumidityMeasuredValue = 0;
 };
 
 } // namespace app

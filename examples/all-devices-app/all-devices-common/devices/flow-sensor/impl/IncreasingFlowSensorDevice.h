@@ -41,7 +41,7 @@ public:
     void TimerFired() override;
 
 private:
-    DataModel::Nullable<uint16_t> mFlowMeasuredValue;
+    uint16_t mFlowMeasuredValue = 0;
 };
 
 } // namespace app
