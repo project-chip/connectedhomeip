@@ -119,6 +119,8 @@ void InitIdentifyCluster()
 #include <app/clusters/chime-server/CodegenIntegration.h>
 #endif
 
+#include "clusters/smoke-co-alarm/chef-smoke-co-alarm.h"
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -838,6 +840,7 @@ void ApplicationInit()
     CastingvideoplayerContentappInit();
     WaterHeaterInit();
     ChimeInit();
+    SmokeCoAlarmInit();
     InitModeSelect();
     chef::InitMultiColumnSwitch();
 
