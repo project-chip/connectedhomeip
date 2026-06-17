@@ -276,7 +276,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
-    script_args += f" --timeout {int(script_timeout)}"
+
+    if '--timeout ' not in script_args:
+        script_args += f" --timeout {int(script_timeout)}"
 
     # Generate unique test run ID to avoid conflicts in concurrent test runs
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths

@@ -216,5 +216,6 @@ class Subprocess(threading.Thread):
         """Wait for the subprocess to finish."""
         self.join(timeout)
         if self.is_alive():
+            self.terminate()
             raise TimeoutError(f"Subprocess `{self.program} {shlex.join(self.args)}` did not finish within {timeout} seconds")
         return self.returncode
