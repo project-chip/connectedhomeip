@@ -162,7 +162,7 @@ public:
             return;
         }
 
-        bool onOff = json["OnOff"].asBool();
+        bool onOff     = json["OnOff"].asBool();
         CHIP_ERROR err = cluster->SetOnOff(onOff);
         ChipLogProgress(AppServer, "SetOnOff to %d on endpoint %d: %" CHIP_ERROR_FORMAT, onOff, endpointId, err.Format());
     }
@@ -210,10 +210,10 @@ void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
         ChipLogError(AppServer, "Failure to allocate command context! Ignoring comand.");
         return;
     }
-    context->value = value;
+    context->value      = value;
     context->endpointId = endpointId;
-    context->delegate = this;
-    context->handler = handlerIt->second.get();
+    context->delegate   = this;
+    context->handler    = handlerIt->second.get();
 
     CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(DispatchCommand, reinterpret_cast<intptr_t>(context));
     if (err != CHIP_NO_ERROR)
@@ -235,17 +235,20 @@ void AllDevicesAppCommandDelegate::RegisterOnOffCluster(chip::EndpointId endpoin
     mOnOffClusters.push_back({ endpoint, cluster });
 }
 
-void AllDevicesAppCommandDelegate::RegisterOccupancySensingCluster(chip::EndpointId endpoint, chip::app::Clusters::OccupancySensingCluster * cluster)
+void AllDevicesAppCommandDelegate::RegisterOccupancySensingCluster(chip::EndpointId endpoint,
+                                                                   chip::app::Clusters::OccupancySensingCluster * cluster)
 {
     mOccupancySensingClusters.push_back({ endpoint, cluster });
 }
 
-void AllDevicesAppCommandDelegate::RegisterBooleanStateCluster(chip::EndpointId endpoint, chip::app::Clusters::BooleanStateCluster * cluster)
+void AllDevicesAppCommandDelegate::RegisterBooleanStateCluster(chip::EndpointId endpoint,
+                                                               chip::app::Clusters::BooleanStateCluster * cluster)
 {
     mBooleanStateClusters.push_back({ endpoint, cluster });
 }
 
-void AllDevicesAppCommandDelegate::RegisterBasicInformationCluster(chip::EndpointId endpoint, chip::app::Clusters::BasicInformationCluster * cluster)
+void AllDevicesAppCommandDelegate::RegisterBasicInformationCluster(chip::EndpointId endpoint,
+                                                                   chip::app::Clusters::BasicInformationCluster * cluster)
 {
     mBasicInformationClusters.push_back({ endpoint, cluster });
 }
@@ -262,7 +265,8 @@ chip::app::Clusters::OnOffCluster * AllDevicesAppCommandDelegate::GetOnOffCluste
     return nullptr;
 }
 
-chip::app::Clusters::OccupancySensingCluster * AllDevicesAppCommandDelegate::GetOccupancySensingClusterByEndpoint(chip::EndpointId endpoint)
+chip::app::Clusters::OccupancySensingCluster *
+AllDevicesAppCommandDelegate::GetOccupancySensingClusterByEndpoint(chip::EndpointId endpoint)
 {
     for (auto & entry : mOccupancySensingClusters)
     {
@@ -286,7 +290,8 @@ chip::app::Clusters::BooleanStateCluster * AllDevicesAppCommandDelegate::GetBool
     return nullptr;
 }
 
-chip::app::Clusters::BasicInformationCluster * AllDevicesAppCommandDelegate::GetBasicInformationClusterByEndpoint(chip::EndpointId endpoint)
+chip::app::Clusters::BasicInformationCluster *
+AllDevicesAppCommandDelegate::GetBasicInformationClusterByEndpoint(chip::EndpointId endpoint)
 {
     for (auto & entry : mBasicInformationClusters)
     {

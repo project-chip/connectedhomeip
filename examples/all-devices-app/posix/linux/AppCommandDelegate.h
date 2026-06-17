@@ -20,10 +20,10 @@
 #include <NamedPipeCommands.h>
 #include <app/util/basic-types.h>
 #include <json/json.h>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 namespace chip {
 namespace app {
@@ -48,8 +48,8 @@ class AllDevicesAppCommandDelegate;
 class NamedPipeCommandHandler
 {
 public:
-    virtual ~NamedPipeCommandHandler()                                                      = default;
-    virtual const char * GetName() const                                                    = 0;
+    virtual ~NamedPipeCommandHandler()                                                                                  = default;
+    virtual const char * GetName() const                                                                                = 0;
     virtual void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, chip::EndpointId endpointId) = 0;
 };
 
@@ -74,10 +74,26 @@ public:
 private:
     static void DispatchCommand(intptr_t context);
 
-    struct OnOffClusterEntry { chip::EndpointId endpoint; chip::app::Clusters::OnOffCluster * cluster; };
-    struct OccupancySensingClusterEntry { chip::EndpointId endpoint; chip::app::Clusters::OccupancySensingCluster * cluster; };
-    struct BooleanStateClusterEntry { chip::EndpointId endpoint; chip::app::Clusters::BooleanStateCluster * cluster; };
-    struct BasicInformationClusterEntry { chip::EndpointId endpoint; chip::app::Clusters::BasicInformationCluster * cluster; };
+    struct OnOffClusterEntry
+    {
+        chip::EndpointId endpoint;
+        chip::app::Clusters::OnOffCluster * cluster;
+    };
+    struct OccupancySensingClusterEntry
+    {
+        chip::EndpointId endpoint;
+        chip::app::Clusters::OccupancySensingCluster * cluster;
+    };
+    struct BooleanStateClusterEntry
+    {
+        chip::EndpointId endpoint;
+        chip::app::Clusters::BooleanStateCluster * cluster;
+    };
+    struct BasicInformationClusterEntry
+    {
+        chip::EndpointId endpoint;
+        chip::app::Clusters::BasicInformationCluster * cluster;
+    };
 
     std::vector<OnOffClusterEntry> mOnOffClusters;
     std::vector<OccupancySensingClusterEntry> mOccupancySensingClusters;
