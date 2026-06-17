@@ -26,12 +26,12 @@
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
-#include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
-#include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
-#include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
 #include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
 #include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
+#include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
+#include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
+#include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>

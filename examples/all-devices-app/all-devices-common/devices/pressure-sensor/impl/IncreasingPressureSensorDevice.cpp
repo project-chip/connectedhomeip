@@ -37,9 +37,7 @@ const PressureMeasurementCluster::Config kDefaultPressureConfig = []() {
 
 } // namespace
 
-IncreasingPressureSensorDevice::IncreasingPressureSensorDevice() :
-    PressureSensorDevice(mTimerDelegate, kDefaultPressureConfig)
-{}
+IncreasingPressureSensorDevice::IncreasingPressureSensorDevice() : PressureSensorDevice(mTimerDelegate, kDefaultPressureConfig) {}
 
 IncreasingPressureSensorDevice::~IncreasingPressureSensorDevice()
 {
@@ -47,7 +45,7 @@ IncreasingPressureSensorDevice::~IncreasingPressureSensorDevice()
 }
 
 CHIP_ERROR IncreasingPressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                     EndpointId parentId)
+                                                    EndpointId parentId)
 {
     ReturnErrorOnFailure(PressureSensorDevice::Register(endpoint, provider, parentId));
     // Kick off the timer loop to increase pressure every few seconds

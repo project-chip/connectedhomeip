@@ -28,8 +28,7 @@ namespace app {
 class PressureSensorDevice : public SingleEndpointDevice
 {
 public:
-    PressureSensorDevice(TimerDelegate & timerDelegate,
-                         Clusters::PressureMeasurementCluster::Config pressureConfig);
+    PressureSensorDevice(TimerDelegate & timerDelegate, Clusters::PressureMeasurementCluster::Config pressureConfig);
     ~PressureSensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

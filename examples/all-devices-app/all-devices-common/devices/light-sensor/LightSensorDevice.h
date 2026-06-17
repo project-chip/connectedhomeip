@@ -27,8 +27,7 @@ namespace app {
 class LightSensorDevice : public SingleEndpointDevice
 {
 public:
-    LightSensorDevice(TimerDelegate & timerDelegate,
-                      Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig);
+    LightSensorDevice(TimerDelegate & timerDelegate, Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig);
     ~LightSensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

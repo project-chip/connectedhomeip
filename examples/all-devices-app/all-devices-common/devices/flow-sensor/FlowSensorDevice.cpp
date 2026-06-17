@@ -23,10 +23,9 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-FlowSensorDevice::FlowSensorDevice(TimerDelegate & timerDelegate,
-                                   FlowMeasurementCluster::Config flowConfig) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFlowSensor, 1)),
-    mTimerDelegate(timerDelegate), mFlowConfig(flowConfig)
+FlowSensorDevice::FlowSensorDevice(TimerDelegate & timerDelegate, FlowMeasurementCluster::Config flowConfig) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFlowSensor, 1)), mTimerDelegate(timerDelegate),
+    mFlowConfig(flowConfig)
 {}
 
 CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)

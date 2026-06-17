@@ -31,15 +31,13 @@ const RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
     RelativeHumidityMeasurementCluster::Config config;
     config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);
     config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000); // 100.00%
-    config.WithTolerance(100); // 1.00%
+    config.WithTolerance(100);                                          // 1.00%
     return config;
 }();
 
 } // namespace
 
-IncreasingHumiditySensorDevice::IncreasingHumiditySensorDevice() :
-    HumiditySensorDevice(mTimerDelegate, kDefaultHumidityConfig)
-{}
+IncreasingHumiditySensorDevice::IncreasingHumiditySensorDevice() : HumiditySensorDevice(mTimerDelegate, kDefaultHumidityConfig) {}
 
 IncreasingHumiditySensorDevice::~IncreasingHumiditySensorDevice()
 {
@@ -47,7 +45,7 @@ IncreasingHumiditySensorDevice::~IncreasingHumiditySensorDevice()
 }
 
 CHIP_ERROR IncreasingHumiditySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                     EndpointId parentId)
+                                                    EndpointId parentId)
 {
     ReturnErrorOnFailure(HumiditySensorDevice::Register(endpoint, provider, parentId));
     // Kick off the timer loop to increase humidity every few seconds

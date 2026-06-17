@@ -23,10 +23,9 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-PressureSensorDevice::PressureSensorDevice(TimerDelegate & timerDelegate,
-                                           PressureMeasurementCluster::Config pressureConfig) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPressureSensor, 1)),
-    mTimerDelegate(timerDelegate), mPressureConfig(pressureConfig)
+PressureSensorDevice::PressureSensorDevice(TimerDelegate & timerDelegate, PressureMeasurementCluster::Config pressureConfig) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPressureSensor, 1)), mTimerDelegate(timerDelegate),
+    mPressureConfig(pressureConfig)
 {}
 
 CHIP_ERROR PressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)

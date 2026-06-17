@@ -37,17 +37,14 @@ const FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
 
 } // namespace
 
-IncreasingFlowSensorDevice::IncreasingFlowSensorDevice() :
-    FlowSensorDevice(mTimerDelegate, kDefaultFlowConfig)
-{}
+IncreasingFlowSensorDevice::IncreasingFlowSensorDevice() : FlowSensorDevice(mTimerDelegate, kDefaultFlowConfig) {}
 
 IncreasingFlowSensorDevice::~IncreasingFlowSensorDevice()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR IncreasingFlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                 EndpointId parentId)
+CHIP_ERROR IncreasingFlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(FlowSensorDevice::Register(endpoint, provider, parentId));
     // Kick off the timer loop to increase flow every few seconds

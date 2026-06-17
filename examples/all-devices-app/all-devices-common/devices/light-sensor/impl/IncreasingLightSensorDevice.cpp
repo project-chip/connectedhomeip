@@ -37,17 +37,14 @@ const IlluminanceMeasurementCluster::StartupConfiguration kDefaultLightConfig = 
 
 } // namespace
 
-IncreasingLightSensorDevice::IncreasingLightSensorDevice() :
-    LightSensorDevice(mTimerDelegate, kDefaultLightConfig)
-{}
+IncreasingLightSensorDevice::IncreasingLightSensorDevice() : LightSensorDevice(mTimerDelegate, kDefaultLightConfig) {}
 
 IncreasingLightSensorDevice::~IncreasingLightSensorDevice()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR IncreasingLightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                 EndpointId parentId)
+CHIP_ERROR IncreasingLightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(LightSensorDevice::Register(endpoint, provider, parentId));
     // Kick off the timer loop to increase light level every few seconds

@@ -31,7 +31,7 @@ public:
     ~IncreasingLightSensorDevice() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                         EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // TimerContext

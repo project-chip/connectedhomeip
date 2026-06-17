@@ -27,15 +27,17 @@ namespace app {
 class HumiditySensorDevice : public SingleEndpointDevice
 {
 public:
-    HumiditySensorDevice(TimerDelegate & timerDelegate,
-                         Clusters::RelativeHumidityMeasurementCluster::Config humidityConfig);
+    HumiditySensorDevice(TimerDelegate & timerDelegate, Clusters::RelativeHumidityMeasurementCluster::Config humidityConfig);
     ~HumiditySensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::RelativeHumidityMeasurementCluster & RelativeHumidityMeasurementCluster() { return mRelativeHumidityMeasurementCluster.Cluster(); }
+    Clusters::RelativeHumidityMeasurementCluster & RelativeHumidityMeasurementCluster()
+    {
+        return mRelativeHumidityMeasurementCluster.Cluster();
+    }
 
 protected:
     TimerDelegate & mTimerDelegate;

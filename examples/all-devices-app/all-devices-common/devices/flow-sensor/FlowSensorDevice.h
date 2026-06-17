@@ -27,8 +27,7 @@ namespace app {
 class FlowSensorDevice : public SingleEndpointDevice
 {
 public:
-    FlowSensorDevice(TimerDelegate & timerDelegate,
-                     Clusters::FlowMeasurementCluster::Config flowConfig);
+    FlowSensorDevice(TimerDelegate & timerDelegate, Clusters::FlowMeasurementCluster::Config flowConfig);
     ~FlowSensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
