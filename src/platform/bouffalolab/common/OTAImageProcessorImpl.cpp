@@ -17,6 +17,7 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <lib/support/StringBuilder.h>
 
 extern "C" {
 #if CHIP_DEVICE_LAYER_TARGET_BFLB
@@ -43,11 +44,8 @@ namespace chip {
 
 static bool check_ota_header(ota_header_s_t * ota_header_s)
 {
-    char str[sizeof(ota_header_s->header) + 1];
-
-    memcpy(str, ota_header_s->header, sizeof(ota_header_s->header));
-    str[sizeof(ota_header_s->header)] = '\0';
-    ChipLogProgress(SoftwareUpdate, "Bouffalo Lab OTA header: %s", str);
+    StringBuilder<sizeof(ota_header_s->header) + 1> header(ota_header_s->header, sizeof(ota_header_s->header));
+    ChipLogProgress(SoftwareUpdate, "Bouffalo Lab OTA header: %s", header.c_str());
 
     if (0 == memcmp(OTA_IMAGE_TYPE_XZ, ota_header_s->type, strlen(OTA_IMAGE_TYPE_XZ)))
     {
@@ -64,13 +62,13 @@ static bool check_ota_header(ota_header_s_t * ota_header_s)
 
     ChipLogProgress(SoftwareUpdate, "Bouffalo Lab OTA image file size: %ld", ota_header_s->image_len);
 
-    memcpy(str, ota_header_s->ver_hardware, sizeof(ota_header_s->ver_hardware));
-    str[sizeof(ota_header_s->ver_hardware)] = '\0';
-    ChipLogProgress(SoftwareUpdate, "OTA image hardware version: %s", str);
+    StringBuilder<sizeof(ota_header_s->ver_hardware) + 1> hardwareVersion(ota_header_s->ver_hardware,
+                                                                          sizeof(ota_header_s->ver_hardware));
+    ChipLogProgress(SoftwareUpdate, "OTA image hardware version: %s", hardwareVersion.c_str());
 
-    memcpy(str, ota_header_s->ver_software, sizeof(ota_header_s->ver_software));
-    str[sizeof(ota_header_s->ver_software)] = '\0';
-    ChipLogProgress(SoftwareUpdate, "OTA image software version: %s", str);
+    StringBuilder<sizeof(ota_header_s->ver_software) + 1> softwareVersion(ota_header_s->ver_software,
+                                                                          sizeof(ota_header_s->ver_software));
+    ChipLogProgress(SoftwareUpdate, "OTA image software version: %s", softwareVersion.c_str());
 
     return true;
 }
