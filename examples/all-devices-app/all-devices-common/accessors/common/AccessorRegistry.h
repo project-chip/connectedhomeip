@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <accessors/common/OOBAccessor.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -84,6 +86,23 @@ public:
             }
         }
         return std::nullopt;
+    }
+
+    /**
+     * @brief Appends all supported write attribute paths from all registered accessors to the provided vector.
+     *
+     * @param[out] paths The vector to append the paths to.
+     */
+    void GetSupportedWriteAttributes(std::vector<ConcreteDataAttributePath> & paths)
+    {
+        for (auto & accessor : mAccessors)
+        {
+            auto supportedPaths = accessor.GetSupportedWriteAttributes();
+            for (const auto & path : supportedPaths)
+            {
+                paths.push_back(path);
+            }
+        }
     }
 
 private:

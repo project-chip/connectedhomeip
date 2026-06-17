@@ -36,10 +36,13 @@ public:
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
 
+    chip::Span<const ConcreteDataAttributePath> GetSupportedWriteAttributes() const override;
+
 private:
     std::optional<CHIP_ERROR> SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
 
     BooleanStateSensorDevice * mDevice;
+    ConcreteDataAttributePath mSupportedPaths[1];
 };
 
 } // namespace chip::app
