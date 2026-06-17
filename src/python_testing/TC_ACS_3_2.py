@@ -62,6 +62,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
+
 class TC_ACS_3_2(MatterBaseTest):
     def desc_TC_ACS_3_2(self) -> str:
         return "[TC-ACS-3.2] Same Continuous Detection and HoldTimeMax Functionality with DUT as a server"
