@@ -2170,7 +2170,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablelight = 257, version 3;
+  device type ma_dimmablelight = 257, version 4;
 
   binding cluster Binding;
   binding cluster OccupancySensing;

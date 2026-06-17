@@ -2470,7 +2470,7 @@
         }
       ],
       "deviceVersions": [
-        2
+        3
       ],
       "deviceIdentifiers": [
         45

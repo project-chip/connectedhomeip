@@ -2095,7 +2095,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onoffpluginunit = 266, version 4;
+  device type ma_onoffpluginunit = 266, version 5;
 
   binding cluster Binding;
 

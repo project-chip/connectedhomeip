@@ -2619,7 +2619,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_smokecoalarm = 118, version 1;
+  device type ma_smokecoalarm = 118, version 2;
 
 
   server cluster Identify {

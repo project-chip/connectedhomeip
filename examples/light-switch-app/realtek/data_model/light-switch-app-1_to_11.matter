@@ -2908,7 +2908,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -2943,7 +2943,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -2976,7 +2976,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3009,7 +3009,7 @@ endpoint 3 {
   }
 }
 endpoint 4 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3042,7 +3042,7 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3075,7 +3075,7 @@ endpoint 5 {
   }
 }
 endpoint 6 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3108,7 +3108,7 @@ endpoint 6 {
   }
 }
 endpoint 7 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3141,7 +3141,7 @@ endpoint 7 {
   }
 }
 endpoint 8 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3174,7 +3174,7 @@ endpoint 8 {
   }
 }
 endpoint 9 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3247,7 +3247,7 @@ endpoint 10 {
   }
 }
 endpoint 11 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3280,7 +3280,7 @@ endpoint 11 {
   }
 }
 endpoint 12 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3313,7 +3313,7 @@ endpoint 12 {
   }
 }
 endpoint 13 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;

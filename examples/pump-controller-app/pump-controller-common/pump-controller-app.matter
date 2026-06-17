@@ -2192,7 +2192,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_pumpcontroller = 772, version 4;
+  device type ma_pumpcontroller = 772, version 5;
 
   binding cluster OnOff;
   binding cluster PumpConfigurationAndControl;

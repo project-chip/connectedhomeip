@@ -2673,7 +2673,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_dimmablelight = 257, version 3;
+  device type ma_dimmablelight = 257, version 4;
 
 
   server cluster OnOff {

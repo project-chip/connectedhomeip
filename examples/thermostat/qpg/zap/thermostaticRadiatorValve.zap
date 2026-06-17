@@ -4570,7 +4570,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        7
       ],
       "deviceIdentifiers": [
         769

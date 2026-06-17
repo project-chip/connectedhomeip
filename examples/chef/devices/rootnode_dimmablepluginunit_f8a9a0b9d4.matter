@@ -2321,7 +2321,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablepluginunit = 267, version 5;
+  device type ma_dimmablepluginunit = 267, version 6;
 
   binding cluster Binding;
   binding cluster OccupancySensing;
