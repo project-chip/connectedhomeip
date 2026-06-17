@@ -186,7 +186,7 @@ void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    std::string commandName     = value["Name"].asString();
+    std::string commandName = value["Name"].asString();
 
     unsigned int endpointIdVal = value["EndpointId"].asUInt();
     if (endpointIdVal > 0xFFFF)
@@ -195,8 +195,8 @@ void AllDevicesAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    EndpointId endpointId       = static_cast<EndpointId>(endpointIdVal);
-    auto handlerIt              = mCommandHandlers.find(commandName);
+    EndpointId endpointId = static_cast<EndpointId>(endpointIdVal);
+    auto handlerIt        = mCommandHandlers.find(commandName);
 
     if (handlerIt == mCommandHandlers.end())
     {
