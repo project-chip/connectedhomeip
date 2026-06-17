@@ -32,7 +32,7 @@ import queue
 import threading
 import time
 from datetime import datetime, timezone
-from typing import Any, Iterable, Optional
+from typing import Any, Callable, Iterable, Optional
 
 from mobly import asserts
 
@@ -434,7 +434,13 @@ class AttributeSubscriptionHandler:
             LOGGER.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
 
-    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+    def await_all_expected_report_matches(
+        self,
+        expected_matchers: Iterable[AttributeMatcher],
+        timeout_sec: float = 1.0,
+        on_timeout: Optional[Callable] = None,
+        extension_sec: float = 600.0,
+    ):
         """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
 
         Waits for at least `timeout_sec` seconds.
@@ -443,24 +449,50 @@ class AttributeSubscriptionHandler:
 
         Note that this does not check against the "last" value of every attribute, only that each expected
         report was seen at least once.
+
+        Args:
+            expected_matchers: Iterable of AttributeMatcher predicates that must all match.
+            timeout_sec: Maximum seconds to wait before invoking on_timeout or failing.
+            on_timeout: Optional callable invoked when timeout_sec expires before all matchers
+                match. Signature: ``(pending_descriptions: list[str], elapsed_sec: float,
+                extension_sec: float) -> bool``. Return True to extend the wait by
+                extension_sec; return False (or omit) to fail immediately.
+            extension_sec: Seconds added to the deadline when on_timeout returns True.
         """
+        matchers_list = list(expected_matchers)
         start_time = time.time()
-        elapsed = 0.0
-        time_remaining = timeout_sec
+        report_matches: dict[int, bool] = {idx: False for idx in range(len(matchers_list))}
 
-        report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
-
-        for matcher in expected_matchers:
-            LOGGER.info(
-                f"--> Matcher waiting: {matcher.description}")
+        for matcher in matchers_list:
+            LOGGER.info(f"--> Matcher waiting: {matcher.description}")
         LOGGER.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
 
-        while time_remaining > 0:
+        while True:
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+
+            if time_remaining <= 0:
+                pending = [matchers_list[i].description for i, matched in report_matches.items() if not matched]
+                LOGGER.error("Reached time-out without finding all expected report values.")
+                for idx, matcher in enumerate(matchers_list):
+                    LOGGER.info(f"  -> {matcher.description}: {report_matches[idx]}")
+
+                if on_timeout is not None and on_timeout(
+                    pending_descriptions=pending,
+                    elapsed_sec=elapsed,
+                    extension_sec=extension_sec,
+                ):
+                    timeout_sec += extension_sec
+                    LOGGER.info(f"Timeout extended by {extension_sec:.0f}s (new deadline: {timeout_sec:.0f}s).")
+                    continue
+
+                asserts.fail("Did not find all expected reports before time-out")
+
             # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
             all_reports = self._attribute_reports
 
             # Recompute all last-value matches
-            for expected_idx, matcher in enumerate(expected_matchers):
+            for expected_idx, matcher in enumerate(matchers_list):
                 for attribute, reports in all_reports.items():
                     for report in reports:
                         if matcher.matches(report) and not report_matches[expected_idx]:
@@ -472,15 +504,7 @@ class AttributeSubscriptionHandler:
                 LOGGER.info("Found all expected matchers did match.")
                 return
 
-            elapsed = time.time() - start_time
-            time_remaining = timeout_sec - elapsed
             time.sleep(0.1)
-
-        # If we reach here, there was no early return and we failed to find all the values.
-        LOGGER.error("Reached time-out without finding all expected report values.")
-        for expected_idx, expected_matcher in enumerate(expected_matchers):
-            LOGGER.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
-        asserts.fail("Did not find all expected reports before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
@@ -570,6 +594,8 @@ class AttributeSubscriptionHandler:
         forbidden_values: set,
         timeout_sec: float,
         reporter=None,
+        on_timeout: Optional[Callable] = None,
+        extension_sec: float = 600.0,
     ) -> float:
         """Consume reports from the queue until ``target_value`` is first observed.
 
@@ -590,6 +616,11 @@ class AttributeSubscriptionHandler:
                 ``target_value``.
             timeout_sec: Maximum time to wait for ``target_value``.
             reporter: Optional ``StepReporter`` instance; each dequeued value is recorded.
+            on_timeout: Optional callable invoked when the deadline expires before
+                ``target_value`` is seen. Signature: ``(pending_descriptions: list[str],
+                elapsed_sec: float, extension_sec: float) -> bool``. Return True to extend
+                the deadline by ``extension_sec``; return False (or omit) to fail.
+            extension_sec: Seconds added to the deadline when on_timeout returns True.
 
         Returns:
             ``time.time()`` captured at the moment ``target_value`` was observed.
@@ -600,8 +631,18 @@ class AttributeSubscriptionHandler:
         while True:
             remaining = deadline - time.time()
             if remaining <= 0:
+                elapsed = time.time() - t_start
+                if on_timeout is not None and on_timeout(
+                    pending_descriptions=[f"target value {target_value!r}"],
+                    elapsed_sec=elapsed,
+                    extension_sec=extension_sec,
+                ):
+                    deadline = time.time() + extension_sec
+                    LOGGER.info(f"Timeout extended by {extension_sec:.0f}s while waiting for {target_value!r}.")
+                    continue
+
                 asserts.fail(
-                    f"Timeout ({timeout_sec}s) waiting for {target_value!r}: "
+                    f"Timeout ({elapsed:.0f}s) waiting for {target_value!r}: "
                     "target value not observed in time"
                 )
             try:

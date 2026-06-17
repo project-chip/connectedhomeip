@@ -65,6 +65,12 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
 
+    @property
+    def default_timeout(self) -> int:
+        # CI sets --timeout 2100 explicitly in the CI test args block.
+        # This larger value applies for cert / manual runs where no --timeout is given.
+        return 3600  # 60 min
+
     def matcher_ota_updatestate(self, step_name, start_states, allowed_states, min_interval_sec, final_state=None):
         """
         Generic matcher for OTA UpdateState across multiple steps.
@@ -224,6 +230,19 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Validate ota_image
         if not self.ota_image or not os.path.exists(self.ota_image):
             raise FileNotFoundError(f'Invalid ota_image: {self.ota_image}.')
+
+        # Per-step timeouts — override via --int-arg when testing on a slow physical device.
+        # Example: --int-arg step5_transfer_timeout_sec:1200
+        s5_transfer_timeout_sec = int(self.user_params.get('step5_transfer_timeout_sec', 800))
+        s5_apply_timeout_sec = int(self.user_params.get('step5_apply_timeout_sec', 800))
+        s5_reboot_timeout_sec = int(self.user_params.get('step5_reboot_timeout_sec', 120))
+        s6_query_timeout_sec = int(self.user_params.get('step6_query_timeout_sec', 720))
+        timeout_extension_sec = int(self.user_params.get('timeout_extension_sec', 600))
+        logger.info(
+            f"Timeout config — step5 transfer: {s5_transfer_timeout_sec}s, "
+            f"apply: {s5_apply_timeout_sec}s, reboot: {s5_reboot_timeout_sec}s, "
+            f"step6 query: {s6_query_timeout_sec}s, extension: {timeout_extension_sec}s"
+        )
 
         self.step(0)
         # Controller has already commissioned the requestor
@@ -835,7 +854,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             keepSubscriptions=True
         )
 
-        subscription_attr.await_all_expected_report_matches([matcher_combined_obj], timeout_sec=800.0)
+        subscription_attr.await_all_expected_report_matches(
+            [matcher_combined_obj],
+            timeout_sec=float(s5_transfer_timeout_sec),
+            on_timeout=self.make_timeout_callback(f"{step_number_s5} download start"),
+            extension_sec=float(timeout_extension_sec),
+        )
         logger.info(f'{step_number_s5}: Step #5.3 - UpdateState (Available sequence) matcher has completed.')
         subscription_attr.cancel()
 
@@ -874,7 +898,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             matcher=matcher_applying
         )
 
-        subscription_attr_applying.await_all_expected_report_matches([matcher_applying_obj], timeout_sec=800.0)
+        subscription_attr_applying.await_all_expected_report_matches(
+            [matcher_applying_obj],
+            timeout_sec=float(s5_apply_timeout_sec),
+            on_timeout=self.make_timeout_callback(f"{step_number_s5} kApplying"),
+            extension_sec=float(timeout_extension_sec),
+        )
         logger.info(f'{step_number_s5}: Step #5.5 - kApplying observed — BDX transfer complete.')
         subscription_attr_applying.cancel()
 
@@ -889,24 +918,47 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s5}: Step #5.6 - Expiring stale session and waiting for DUT to reboot.')
         controller.ExpireSessions(requestor_node_id)
 
-        reboot_timeout_sec = 120
         poll_interval_sec = 5
         reconnect_timeout_ms = 5000
         reconnected = False
-        for attempt in range(reboot_timeout_sec // poll_interval_sec):
+        reboot_deadline_sec = s5_reboot_timeout_sec
+        reboot_start = time.time()
+        attempt = 0
+
+        while True:
             await asyncio.sleep(poll_interval_sec)
+            attempt += 1
             try:
                 await controller.GetConnectedDevice(
                     requestor_node_id, allowPASE=False, timeoutMs=reconnect_timeout_ms)
                 reconnected = True
-                logger.info(f'{step_number_s5}: Step #5.6 - DUT reconnected after OTA reboot (attempt {attempt + 1}).')
+                logger.info(f'{step_number_s5}: Step #5.6 - DUT reconnected after OTA reboot (attempt {attempt}).')
                 break
             except (TimeoutError, ChipDeviceCtrl.ChipStackError):
+                elapsed = time.time() - reboot_start
                 logger.info(
-                    f'{step_number_s5}: Step #5.6 - Waiting for DUT to come back online (attempt {attempt + 1}/{reboot_timeout_sec // poll_interval_sec})...')
+                    f'{step_number_s5}: Step #5.6 - Waiting for DUT to come back online '
+                    f'(attempt {attempt}, elapsed {elapsed:.0f}s / {reboot_deadline_sec}s)...')
+                if elapsed >= reboot_deadline_sec:
+                    extended = await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        lambda: self.prompt_coordinator.ask_user(
+                            description=f"{step_number_s5}: DUT has not reconnected after OTA reboot",
+                            elapsed_sec=elapsed,
+                            extension_sec=float(timeout_extension_sec),
+                        ),
+                    )
+                    if extended:
+                        reboot_deadline_sec += timeout_extension_sec
+                        logger.info(
+                            f'{step_number_s5}: Step #5.6 - Reboot wait extended to {reboot_deadline_sec:.0f}s.')
+                    else:
+                        break
 
         asserts.assert_true(
-            reconnected, f'{step_number_s5}: DUT did not come back online within {reboot_timeout_sec}s after OTA reboot.')
+            reconnected,
+            f'{step_number_s5}: DUT did not come back online within {reboot_deadline_sec:.0f}s after OTA reboot.'
+        )
 
         # Allow the DUT to finish post-OTA housekeeping (attribute writes, data-version
         # bumps on the OTA Requestor cluster) before Step 6 establishes a subscription.
@@ -1024,7 +1076,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             matcher=phase1_matcher_s6
         )
 
-        subscription_s6.await_all_expected_report_matches([phase1_matcher_s6_obj], timeout_sec=720.0)
+        subscription_s6.await_all_expected_report_matches([phase1_matcher_s6_obj], timeout_sec=float(s6_query_timeout_sec))
 
         # Phase 2: reset and wait for kIdle.
         logger.info(f'{step_number_s6}: Phase 2: awaiting kIdle to confirm query cycle completed without download.')
