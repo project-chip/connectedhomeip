@@ -37,7 +37,9 @@ const IlluminanceMeasurementCluster::StartupConfiguration kDefaultLightConfig = 
 
 } // namespace
 
-IncreasingLightSensorDevice::IncreasingLightSensorDevice(TimerDelegate & timerDelegate) : LightSensorDevice(timerDelegate, kDefaultLightConfig) {}
+IncreasingLightSensorDevice::IncreasingLightSensorDevice(TimerDelegate & timerDelegate) :
+    LightSensorDevice(timerDelegate, kDefaultLightConfig)
+{}
 
 IncreasingLightSensorDevice::~IncreasingLightSensorDevice()
 {
