@@ -355,6 +355,8 @@ TEST(TestASN1, ASN1UniversalTime)
         {    "2010115142343Z",   ASN1_ERROR_UNSUPPORTED_ENCODING },
         {    "201014415142343Z", ASN1_ERROR_UNSUPPORTED_ENCODING },
         {    "201O15142343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        // High-bit byte (0xE9) in the time field: must be rejected, not fed to isdigit as a negative char.
+        {    "201" "\xe9" "15142343Z", ASN1_ERROR_INVALID_ENCODING },
         {    "200015142343Z",    ASN1_ERROR_INVALID_ENCODING     },
         {    "201315142343Z",    ASN1_ERROR_INVALID_ENCODING     },
         {    "201000142343Z",    ASN1_ERROR_INVALID_ENCODING     },
