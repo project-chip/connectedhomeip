@@ -84,7 +84,8 @@ public:
             }
 
             chip::TLV::TLVType outerType;
-            ReturnErrorAndLogOnFailure(rootReader.EnterContainer(outerType), Support, "Failed to enter outer TLV structure container");
+            ReturnErrorAndLogOnFailure(rootReader.EnterContainer(outerType), Support,
+                                       "Failed to enter outer TLV structure container");
 
             // Tag 1: EndpointId
             ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to EndpointId element");
@@ -118,7 +119,8 @@ public:
             }
             attrValueReader = rootReader;
 
-            ReturnErrorAndLogOnFailure(rootReader.ExitContainer(outerType), Support, "Failed to exit outer TLV structure container");
+            ReturnErrorAndLogOnFailure(rootReader.ExitContainer(outerType), Support,
+                                       "Failed to exit outer TLV structure container");
 
             return CHIP_NO_ERROR;
         }
