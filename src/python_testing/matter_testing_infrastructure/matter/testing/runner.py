@@ -478,7 +478,9 @@ def run_tests_no_exit(
 
             node_id = matter_test_config.dut_node_ids[0]
 
-            # Determine actual commissioning status via DNS-SD
+            # Determine actual commissioning status via DNS-SD rather than
+            # relying solely on command-line args, so the framework can be
+            # more proactive about handling commissioning automatically.
             try:
                 already_commissioned = event_loop.run_until_complete(
                     is_commissioned(default_controller, node_id)
@@ -524,31 +526,55 @@ def run_tests_no_exit(
                             stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                             test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
 
-                            # Expire the session and wait for the device to reach
-                            # a stable state — either commissioned (reachable via CASE)
-                            # or back to advertising (test can establish its own PASE).
-                            # This avoids interfering with tests that manage their own
-                            # PASE sessions (e.g. TC_SC_7_1, TC_DD).
-                            default_controller.ExpireSessions(node_id)
-
-                            async def _wait_for_device_ready(timeout: float = 60.0, interval: float = 1.0) -> None:
-                                deadline = asyncio.get_event_loop().time() + timeout
-                                while asyncio.get_event_loop().time() < deadline:
-                                    if await is_commissioned(default_controller, node_id):
-                                        LOGGER.info("Device is now commissioned — CASE will be used by the test")
-                                        return
-                                    if await _is_device_commissionable_via_dnssd(discovery_timeout_sec=interval):
-                                        LOGGER.info("Device resumed commissionable advertisement — test can establish its own PASE")
-                                        return
-                                    await asyncio.sleep(interval)
-                                LOGGER.warning(
-                                    "Device is neither commissioned nor advertising after PASE expiry within timeout"
+                            if matter_test_config.commissioning_method is None:
+                                # No commissioning will follow — the test owns its own
+                                # PASE session (e.g. TC_SC_7_1, TC_DD). Expire the session
+                                # so the device resumes advertising and the test can
+                                # establish its own PASE cleanly.
+                                default_controller.ExpireSessions(node_id)
+                                LOGGER.info(
+                                    "Expired PASE session after wildcard read — "
+                                    "waiting for device to resume advertising"
                                 )
 
-                            event_loop.run_until_complete(_wait_for_device_ready())
+                                async def _wait_for_device_ready(
+                                        timeout: float = 60.0,
+                                        interval: float = 1.0) -> None:
+                                    deadline = asyncio.get_event_loop().time() + timeout
+                                    while asyncio.get_event_loop().time() < deadline:
+                                        if await is_commissioned(default_controller, node_id):
+                                            LOGGER.info(
+                                                "Device is now commissioned — "
+                                                "CASE will be used by the test"
+                                            )
+                                            return
+                                        if await _is_device_commissionable_via_dnssd(
+                                                discovery_timeout_sec=interval):
+                                            LOGGER.info(
+                                                "Device resumed commissionable advertisement — "
+                                                "test can establish its own PASE"
+                                            )
+                                            return
+                                        await asyncio.sleep(interval)
+                                    LOGGER.warning(
+                                        "Device is neither commissioned nor advertising "
+                                        "after PASE expiry within timeout"
+                                    )
+
+                                event_loop.run_until_complete(_wait_for_device_ready())
+                            else:
+                                # CommissionDeviceTest follows immediately and reuses
+                                # this PASE session via FindOrEstablishPASESession —
+                                # do NOT expire it.
+                                LOGGER.info(
+                                    "Keeping PASE session alive for CommissionDeviceTest to reuse"
+                                )
 
                     except Exception:
-                        LOGGER.warning("Could not pre-populate global wildcard before commissioning", exc_info=True)
+                        LOGGER.warning(
+                            "Could not pre-populate global wildcard before commissioning",
+                            exc_info=True
+                        )
                 else:
                     LOGGER.warning(
                         "Device not commissioned and no setup code available — "
