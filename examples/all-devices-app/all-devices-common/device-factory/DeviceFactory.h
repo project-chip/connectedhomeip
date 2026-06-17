@@ -159,7 +159,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
@@ -184,7 +184,7 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
-            RegisterAccessorCreator("contact-sensor", [this](DeviceInterface * device) {
+            RegisterAccessorCreator("contact-sensor", [](DeviceInterface * device) {
                 return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
             });
         }
@@ -195,7 +195,7 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
-            RegisterAccessorCreator("water-leak-detector", [this](DeviceInterface * device) {
+            RegisterAccessorCreator("water-leak-detector", [](DeviceInterface * device) {
                 return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
             });
         }
