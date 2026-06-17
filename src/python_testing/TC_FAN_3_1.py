@@ -30,8 +30,8 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --timeout 600
 #     factory-reset: true
+#     timeout: 600
 #     quiet: true
 #   run2:
 #     app: ${ALL_DEVICES_APP}
@@ -45,8 +45,8 @@
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --timeout 600
 #     factory-reset: true
+#     timeout: 600
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 

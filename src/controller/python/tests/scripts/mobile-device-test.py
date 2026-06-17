@@ -29,11 +29,11 @@
 #     app-args: --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --log-level INFO
-#       --timeout 3600
 #       --disable-test ClusterObjectTests.TestTimedRequestTimeout
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
+#     timeout: 3600
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 

@@ -42,11 +42,13 @@
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
 #       --int-arg ota_image_download_timeout:300
-#       --timeout 2100
 #     factory-reset: true
+#     timeout: 10
 #     app-ready-pattern: Server initialization complete
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
+
+#     timeout: 2100
 
 import asyncio
 import logging

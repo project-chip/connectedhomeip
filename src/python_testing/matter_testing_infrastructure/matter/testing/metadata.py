@@ -16,6 +16,7 @@ import logging
 from dataclasses import dataclass
 from io import StringIO
 from typing import Optional
+from matter.testing.defaults import TestingDefaults
 
 import yaml
 
@@ -34,6 +35,7 @@ class Metadata:
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
+    timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S
     quiet: bool = False
 
 
@@ -154,6 +156,7 @@ class MetadataReader:
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
                 factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
+                timeout=float(attr.get("timeout", TestingDefaults.DEFAULT_TIMEOUT_S)),
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
             ))
 

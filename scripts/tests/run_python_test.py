@@ -266,16 +266,17 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run.quiet, run.run)
+                  ip_packet_capture_dir, run.timeout, run.quiet, run.run)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              quiet: bool, run_name: str):
+              script_timeout: float, quiet: bool, run_name: str):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+    script_args += f" --timeout {int(script_timeout)}"
 
     # Generate unique test run ID to avoid conflicts in concurrent test runs
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
@@ -350,7 +351,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_script_process.p.stdin.close()
 
     try:
-        test_script_exit_code = test_script_process.wait()
+        test_script_exit_code = test_script_process.wait(script_timeout)
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
