@@ -26,12 +26,16 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseHumidityIntervalSec = System::Clock::Seconds16(10);
+constexpr uint16_t kHumidityStepValue                           = 100; // step by 1.00%
+constexpr uint16_t kDefaultMinHumidity                          = 0;     // 0.00%
+constexpr uint16_t kDefaultMaxHumidity                          = 10000; // 100.00%
+constexpr uint16_t kDefaultHumidityTolerance                    = 100;   // 1.00%
 
 const RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
     RelativeHumidityMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);
-    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000); // 100.00%
-    config.WithTolerance(100);                                          // 1.00%
+    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinHumidity);
+    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxHumidity);
+    config.WithTolerance(kDefaultHumidityTolerance);
     return config;
 }();
 
@@ -50,6 +54,11 @@ CHIP_ERROR IncreasingHumiditySensorDevice::Register(EndpointId endpoint, CodeDri
                                                     EndpointId parentId)
 {
     ReturnErrorOnFailure(HumiditySensorDevice::Register(endpoint, provider, parentId));
+
+    // Initialize with the minimum configured value
+    mHumidityMeasuredValue.SetNonNull(kDefaultHumidityConfig.minMeasuredValue.Value());
+    ReturnErrorOnFailure(mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(mHumidityMeasuredValue));
+
     // Kick off the timer loop to increase humidity every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseHumidityIntervalSec);
 }
@@ -62,17 +71,17 @@ void IncreasingHumiditySensorDevice::Unregister(CodeDrivenDataModelProvider & pr
 
 void IncreasingHumiditySensorDevice::TimerFired()
 {
-    uint16_t currentValue = mHumidityMeasuredValue.ValueOr(kDefaultHumidityConfig.maxMeasuredValue.Value());
+    uint16_t currentValue = mHumidityMeasuredValue.Value();
     if (currentValue >= kDefaultHumidityConfig.maxMeasuredValue.Value())
     {
         mHumidityMeasuredValue.SetNonNull(kDefaultHumidityConfig.minMeasuredValue.Value());
     }
     else
     {
-        mHumidityMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + 100)); // step by 1.00%
+        mHumidityMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + kHumidityStepValue));
     }
 
-    ChipLogProgress(AppServer, "IncreasingHumidityValue: Increasing to %d", mHumidityMeasuredValue.Value());
+    ChipLogProgress(AppServer, "IncreasingHumidityValue: Increasing to %u", static_cast<unsigned int>(mHumidityMeasuredValue.Value()));
     LogErrorOnFailure(mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(mHumidityMeasuredValue));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseHumidityIntervalSec));

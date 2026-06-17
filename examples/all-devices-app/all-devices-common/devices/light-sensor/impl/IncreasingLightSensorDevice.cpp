@@ -26,11 +26,15 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseLightIntervalSec = System::Clock::Seconds16(10);
+constexpr uint16_t kLightStepValue                           = 10;
+constexpr uint16_t kDefaultMinLight                          = 1;
+constexpr uint16_t kDefaultMaxLight                          = 10000;
+constexpr uint16_t kDefaultLightTolerance                    = 100; // 1% tolerance
 
 const IlluminanceMeasurementCluster::StartupConfiguration kDefaultLightConfig = {
-    .minMeasuredValue = DataModel::MakeNullable<uint16_t>(1),
-    .maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000),
-    .tolerance        = 100, // 1% tolerance
+    .minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinLight),
+    .maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxLight),
+    .tolerance        = kDefaultLightTolerance,
     .lightSensorType  = DataModel::MakeNullable<IlluminanceMeasurement::LightSensorTypeEnum>(
         IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode),
 };
@@ -49,6 +53,11 @@ IncreasingLightSensorDevice::~IncreasingLightSensorDevice()
 CHIP_ERROR IncreasingLightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     ReturnErrorOnFailure(LightSensorDevice::Register(endpoint, provider, parentId));
+
+    // Initialize with the minimum configured value
+    mLightMeasuredValue.SetNonNull(kDefaultLightConfig.minMeasuredValue.Value());
+    ReturnErrorOnFailure(mIlluminanceMeasurementCluster.Cluster().SetMeasuredValue(mLightMeasuredValue));
+
     // Kick off the timer loop to increase light level every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseLightIntervalSec);
 }
@@ -61,17 +70,17 @@ void IncreasingLightSensorDevice::Unregister(CodeDrivenDataModelProvider & provi
 
 void IncreasingLightSensorDevice::TimerFired()
 {
-    uint16_t currentValue = mLightMeasuredValue.ValueOr(kDefaultLightConfig.maxMeasuredValue.Value());
+    uint16_t currentValue = mLightMeasuredValue.Value();
     if (currentValue >= kDefaultLightConfig.maxMeasuredValue.Value())
     {
         mLightMeasuredValue.SetNonNull(kDefaultLightConfig.minMeasuredValue.Value());
     }
     else
     {
-        mLightMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + 10));
+        mLightMeasuredValue.SetNonNull(static_cast<uint16_t>(currentValue + kLightStepValue));
     }
 
-    ChipLogProgress(AppServer, "IncreasingLightValue: Increasing to %d", mLightMeasuredValue.Value());
+    ChipLogProgress(AppServer, "IncreasingLightValue: Increasing to %u", static_cast<unsigned int>(mLightMeasuredValue.Value()));
     LogErrorOnFailure(mIlluminanceMeasurementCluster.Cluster().SetMeasuredValue(mLightMeasuredValue));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseLightIntervalSec));
