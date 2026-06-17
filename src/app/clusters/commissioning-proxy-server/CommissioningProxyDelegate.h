@@ -72,7 +72,7 @@ public:
      * @return Success if connection was established and ProxyConnectResponse has been sent
      *
      * The delegate handles all transport-specific connection logic. On success, the delegate
-     * SHALL call commandObj->AddResponse() with a ProxyConnectResponse containing the sessionId.
+     * SHALL call commandObj->AddResponse() with a ProxyConnectResponse containing the sessionID.
      * If the connection cannot be established, an appropriate error Status is returned.
      */
     virtual Protocols::InteractionModel::Status
@@ -150,7 +150,7 @@ public:
      * removes the entry on expiry.
      *
      * @param transport     Transport(s) to scan on.
-     * @param timeout       Scan lifetime in seconds; 0 = infinite (spec §10.5.7.6).
+     * @param timeout       Scan lifetime in seconds; 0 = infinite
      * @param wiFiBands     Wi-Fi bands to scan (WI feature only).
      * @param fabricIndex   Fabric index of the requesting commissioner.
      * @param nodeId        Node ID of the requesting commissioner.
@@ -167,14 +167,17 @@ public:
     /**
      * @brief Stop the background scan started by ProxyBackgroundScanStartRequest.
      *
-     * Per spec §10.5.7.7: silently ignore if the requesting NodeId+FabricIndex
-     * do not match the original requester — return Success in that case.
+     * Per the spec's ProxyBackGroundScanStopRequest behaviour: if the requesting
+     * NodeId+FabricIndex do not match the original requester, take no action and
+     * reject with NOT_FOUND.
      *
      * @param transport     Transport(s) to stop.
      * @param wiFiBands     Wi-Fi bands (WI feature only).
      * @param fabricIndex   Fabric index of the requesting commissioner.
      * @param nodeId        Node ID of the requesting commissioner.
-     * @return Success always (mismatch is silently ignored per spec).
+     * @return Success when the matching scan is stopped, or when valid transports/
+     *         bands are supplied that are not currently in use; NotFound when the
+     *         requesting NodeId+FabricIndex do not match the original requester.
      */
     virtual Protocols::InteractionModel::Status
     ProxyBackgroundScanStopRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,

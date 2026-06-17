@@ -28,6 +28,7 @@
 #include <clusters/CommissioningProxy/Structs.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CommissionableDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -72,12 +73,16 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
     case ScanMaxTime::Id: {
         uint8_t time;
         ReturnErrorOnFailure(decoder.Decode(time));
+        // Spec: ScanMaxTime has constraint "min 1"; reject 0 with ConstraintError.
+        VerifyOrReturnError(time >= 1, Status::ConstraintError);
         mDelegate.SetScanMaxTime(time);
         break;
     }
     case CacheTimeout::Id: {
         uint16_t cacheTimeout;
         ReturnErrorOnFailure(decoder.Decode(cacheTimeout));
+        // Spec: CacheTimeout has constraint "min 1"; reject 0 with ConstraintError.
+        VerifyOrReturnError(cacheTimeout >= 1, Status::ConstraintError);
         mDelegate.SetCacheTimeout(cacheTimeout);
         break;
     }
@@ -136,9 +141,7 @@ chip::BitMask<CapabilitiesBitmap> CommissioningProxyCluster::GetSupportedTranspo
     chip::BitMask<CapabilitiesBitmap> supported;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     // WiFiPAF is advertised whenever the WiFi-PAF stack is compiled into the
-    // build. The spec CapabilitiesBitmap conformance for WiFiPAF is O.a+
-    // (plain optional), independent of the WI feature — WI only gates the
-    // WiFiBand attribute and the WiFiBands command fields.
+    // build.
     supported.Set(CapabilitiesBitmap::kWiFiPAF);
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
@@ -207,6 +210,11 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
 
     // Only a single transport SHALL be selected per spec
     VerifyOrReturnError(HasExactlyOneBitSet(commandData.transport.Raw()), Status::InvalidCommand);
+
+    // Spec: Discriminator field constraint is "0 to 4095" (12-bit); any other
+    // field being invalid SHALL return InvalidCommand. Matches the validation in
+    // AdministratorCommissioning / JointFabricAdministrator.
+    VerifyOrReturnError(commandData.discriminator <= kMaxDiscriminatorValue, Status::InvalidCommand);
 
     // The selected transport must be supported by this proxy instance.
     if (!GetSupportedTransports().HasAny(commandData.transport))
