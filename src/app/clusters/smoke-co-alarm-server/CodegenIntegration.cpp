@@ -17,6 +17,7 @@
  */
 
 #include "CodegenIntegration.h"
+#include <app/util/af-types.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
@@ -288,3 +289,6 @@ bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpoint, bool & v) const
     v = mCluster.Cluster().GetUnmountedState();
     return true;
 }
+
+__attribute__((weak)) void MatterSmokeCoAlarmClusterInitCallback(chip::EndpointId) {}
+__attribute__((weak)) void MatterSmokeCoAlarmClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
