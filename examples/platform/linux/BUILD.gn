@@ -206,8 +206,8 @@ source_set("app-main") {
   public_deps = [
     ":app-main-loop",
     ":app-options",
-    ":commissionable-init",
     ":boolean-state-configuration-test-event-trigger",
+    ":commissionable-init",
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
     ":commodity-price-test-event-trigger",
