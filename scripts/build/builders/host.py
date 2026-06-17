@@ -100,7 +100,6 @@ class HostFuzzingType(Enum):
     """Defines fuzz target options available for host targets."""
     NONE = auto()
     LIB_FUZZER = auto()
-    OSS_FUZZ = auto()
     PW_FUZZTEST = auto()
 
 
@@ -463,7 +462,8 @@ class HostBuilder(GnBuilder):
     def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False, use_msan=False,
-                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
+                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE,
+                 pw_fuzz_libfuzzer_compat=False, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
@@ -572,10 +572,12 @@ class HostBuilder(GnBuilder):
 
         if fuzzing_type == HostFuzzingType.LIB_FUZZER:
             self.extra_gn_options.append('is_libfuzzer=true')
-        elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
-            self.extra_gn_options.append('oss_fuzz=true')
         elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
+            if pw_fuzz_libfuzzer_compat:
+                self.extra_gn_options.append('chip_pw_fuzz_libfuzzer_compat=true')
+            if use_ubsan:
+                self.extra_gn_options.append('chip_pw_fuzz_ubsan=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')

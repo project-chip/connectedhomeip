@@ -1337,7 +1337,7 @@ void WiFiPAFEndPoint::ClearAll()
     OnMessageReceived       = nullptr;
     OnConnectionClosed      = nullptr;
 
-    mState = kState_Ready;
+    mState = kState_Closed;
     mRole  = kWiFiPafRole_Publisher;
     mRxAck = 0;
     mConnStateFlags.ClearAll();
