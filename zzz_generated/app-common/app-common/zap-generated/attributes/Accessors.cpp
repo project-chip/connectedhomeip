@@ -6896,13 +6896,13 @@ namespace Attributes {
 
 namespace ExpressedState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -6920,8 +6920,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -6939,8 +6940,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -6958,8 +6960,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -6977,8 +6980,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -6996,8 +7000,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7015,8 +7020,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7030,13 +7036,13 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 
 namespace EndOfServiceAlert {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum * value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum * value)
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7054,8 +7060,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7073,8 +7080,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7093,8 +7101,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7112,8 +7121,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::C
 {
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7131,8 +7141,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7150,8 +7161,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value
 {
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7169,8 +7181,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * v
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -7188,8 +7201,9 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
-    uint8_t * readable                         = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
