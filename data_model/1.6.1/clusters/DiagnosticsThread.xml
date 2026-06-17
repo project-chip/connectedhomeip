@@ -70,16 +70,16 @@ Davis, CA 95616, USA
     <quality diagnostics="true"/>
   </classification>
   <features>
-    <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Server supports the counts for the number of received and transmitted packets on the Thread interface.">
+    <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Server supports the counts for the number of received and transmitted packets on the Thread interface">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Server supports the counts for the number of errors that have occurred during the reception and transmission of packets on the Thread interface.">
+    <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Server supports the counts for the number of errors that have occurred during the reception and transmission of packets on the Thread interface">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="MLECNT" name="MLECounts" summary="Server supports the counts for various MLE layer happenings.">
+    <feature bit="2" code="MLECNT" name="MLECounts" summary="Server supports the counts for various MLE layer happenings">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="MACCNT" name="MACCounts" summary="Server supports the counts for various MAC layer happenings.">
+    <feature bit="3" code="MACCNT" name="MACCounts" summary="Server supports the counts for various MAC layer happenings">
       <optionalConform/>
     </feature>
   </features>

@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene.">
+    <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene">
       <optionalConform/>
     </feature>
   </features>

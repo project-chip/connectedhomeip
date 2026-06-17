@@ -68,19 +68,19 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="GC" scope="Node"/>
   <features>
-    <feature bit="0" code="LN" name="Listener" summary="Supports joining a multicast group of nodes as a listener.">
+    <feature bit="0" code="LN" name="Listener" summary="Supports joining a multicast group of nodes as a listener">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform choice="a" more="true" min="1"/>
       </otherwiseConform>
     </feature>
-    <feature bit="1" code="SD" name="Sender" summary="Supports sending multicast message to a targeted group of nodes.">
+    <feature bit="1" code="SD" name="Sender" summary="Supports sending multicast message to a targeted group of nodes">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform choice="a" more="true" min="1"/>
       </otherwiseConform>
     </feature>
-    <feature bit="2" code="PGA" name="PerGroup" summary="Supports PerGroup multicast addresses.">
+    <feature bit="2" code="PGA" name="PerGroup" summary="Supports PerGroup multicast addresses">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
@@ -285,7 +285,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="LeaveGroupResponse" direction="responseFromServer">
-      <access fabricScoped="true"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform/>

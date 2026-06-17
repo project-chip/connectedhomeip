@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LTIME" scope="Node"/>
   <features>
-    <feature bit="0" code="CALFMT" name="CalendarFormat" summary="The Node can be configured to use different calendar formats when conveying values to a user.">
+    <feature bit="0" code="CALFMT" name="CalendarFormat" summary="The Node can be configured to use different calendar formats when conveying values to a user">
       <optionalConform/>
     </feature>
   </features>

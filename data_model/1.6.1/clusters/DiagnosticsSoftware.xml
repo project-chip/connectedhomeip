@@ -68,7 +68,7 @@ Davis, CA 95616, USA
     <quality diagnostics="true"/>
   </classification>
   <features>
-    <feature bit="0" code="WTRMRK" name="Watermarks" summary="Node makes available the metrics for high watermark related to memory consumption.">
+    <feature bit="0" code="WTRMRK" name="Watermarks" summary="Node makes available the metrics for high watermark related to memory consumption">
       <optionalConform/>
     </feature>
   </features>

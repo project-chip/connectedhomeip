@@ -70,7 +70,7 @@ Davis, CA 95616, USA
       <item value="0" name="SimpleAnnouncement" summary="An OTA Provider is announcing its presence.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="UpdateAvailable" summary="An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available.">
+      <item value="1" name="UpdateAvailable" summary="An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available">
         <mandatoryConform/>
       </item>
       <item value="2" name="UrgentUpdateAvailable" summary="An OTA Provider is announcing, either to a single Node or to a group of Nodes, that a new Software Image MAY be available, which contains an update that needs to be applied urgently.">

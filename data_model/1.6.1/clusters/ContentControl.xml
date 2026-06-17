@@ -68,61 +68,61 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONCON" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="ST" name="ScreenTime" summary="Supports managing screen time limits.">
+    <feature bit="0" code="ST" name="ScreenTime" summary="Supports managing screen time limits">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="PM" name="PINManagement" summary="Supports managing a PIN code which is used for restricting access to configuration of this feature.">
+    <feature bit="1" code="PM" name="PINManagement" summary="Supports managing a PIN code which is used for restricting access to configuration of this feature">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="BU" name="BlockUnrated" summary="Supports managing content controls for unrated content.">
+    <feature bit="2" code="BU" name="BlockUnrated" summary="Supports managing content controls for unrated content">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="OCR" name="OnDemandContentRating" summary="Supports managing content controls based upon rating threshold for on demand content.">
+    <feature bit="3" code="OCR" name="OnDemandContentRating" summary="Supports managing content controls based upon rating threshold for on demand content">
       <optionalConform/>
     </feature>
-    <feature bit="4" code="SCR" name="ScheduledContentRating" summary="Supports managing content controls based upon rating threshold for scheduled content.">
+    <feature bit="4" code="SCR" name="ScheduledContentRating" summary="Supports managing content controls based upon rating threshold for scheduled content">
       <optionalConform/>
     </feature>
-    <feature bit="5" code="BC" name="BlockChannels" summary="Supports managing a set of channels that are prohibited.">
+    <feature bit="5" code="BC" name="BlockChannels" summary="Supports managing a set of channels that are prohibited">
       <optionalConform/>
     </feature>
-    <feature bit="6" code="BA" name="BlockApplications" summary="Supports managing a set of applications that are prohibited.">
+    <feature bit="6" code="BA" name="BlockApplications" summary="Supports managing a set of applications that are prohibited">
       <optionalConform/>
     </feature>
-    <feature bit="7" code="BTW" name="BlockContentTimeWindow" summary="Supports managing content controls based upon setting time window in which all contents and applications SHALL be blocked.">
+    <feature bit="7" code="BTW" name="BlockContentTimeWindow" summary="Supports managing content controls based upon setting time window in which all contents and applications SHALL be blocked">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
     <enum name="StatusCodeEnum">
-      <item value="0x02" name="InvalidPINCode" summary="Provided PIN Code does not match the current PIN code.">
+      <item value="0x02" name="InvalidPINCode" summary="Provided PIN Code does not match the current PIN code">
         <mandatoryConform/>
       </item>
-      <item value="0x03" name="InvalidRating" summary="Provided Rating is out of scope of the corresponding Rating list.">
+      <item value="0x03" name="InvalidRating" summary="Provided Rating is out of scope of the corresponding Rating list">
         <mandatoryConform/>
       </item>
-      <item value="0x04" name="InvalidChannel" summary="Provided Channel(s) is invalid.">
+      <item value="0x04" name="InvalidChannel" summary="Provided Channel(s) is invalid">
         <mandatoryConform/>
       </item>
-      <item value="0x05" name="ChannelAlreadyExist" summary="Provided Channel(s) already exists.">
+      <item value="0x05" name="ChannelAlreadyExist" summary="Provided Channel(s) already exists">
         <mandatoryConform/>
       </item>
-      <item value="0x06" name="ChannelNotExist" summary="Provided Channel(s) doesn&apos;t exist in BlockChannelList attribute.">
+      <item value="0x06" name="ChannelNotExist" summary="Provided Channel(s) doesn&apos;t exist in BlockChannelList attribute">
         <mandatoryConform/>
       </item>
-      <item value="0x07" name="UnidentifiableApplication" summary="Provided Application(s) is not identified.">
+      <item value="0x07" name="UnidentifiableApplication" summary="Provided Application(s) is not identified">
         <mandatoryConform/>
       </item>
-      <item value="0x08" name="ApplicationAlreadyExist" summary="Provided Application(s) already exists.">
+      <item value="0x08" name="ApplicationAlreadyExist" summary="Provided Application(s) already exists">
         <mandatoryConform/>
       </item>
-      <item value="0x09" name="ApplicationNotExist" summary="Provided Application(s) doesn&apos;t exist in BlockApplicationList attribute.">
+      <item value="0x09" name="ApplicationNotExist" summary="Provided Application(s) doesn&apos;t exist in BlockApplicationList attribute">
         <mandatoryConform/>
       </item>
-      <item value="0x0A" name="TimeWindowAlreadyExist" summary="Provided time Window already exists in BlockContentTimeWindow attribute.">
+      <item value="0x0A" name="TimeWindowAlreadyExist" summary="Provided time Window already exists in BlockContentTimeWindow attribute">
         <mandatoryConform/>
       </item>
-      <item value="0x0B" name="TimeWindowNotExist" summary="Provided time window doesn&apos;t exist in BlockContentTimeWindow attribute.">
+      <item value="0x0B" name="TimeWindowNotExist" summary="Provided time window doesn&apos;t exist in BlockContentTimeWindow attribute">
         <mandatoryConform/>
       </item>
     </enum>

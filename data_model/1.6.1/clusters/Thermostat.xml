@@ -66,8 +66,8 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation, added FeatureMap, collapsed attribute sets, clarified edge cases around limits, default value of xxxSetpointLimit now respects AbsxxxSetpointLimit"/>
     <revision revision="6" summary="Introduced the LTNE feature and adapted text (spec issue #5778)"/>
     <revision revision="7" summary="Update constraints on local temperature calibration and minimum setpoint deadband and introduced Presets and MatterScheduleConfiguration features"/>
-    <revision revision="8" summary="Added comment regarding writing to ControlSequenceOfOperation."/>
-    <revision revision="9" summary="Removed AlarmMask attribute and AlarmCodeBitmap Type."/>
+    <revision revision="8" summary="Added comment regarding writing to ControlSequenceOfOperation"/>
+    <revision revision="9" summary="Removed AlarmMask attribute and AlarmCodeBitmap Type"/>
     <revision revision="10" summary="Removed Zigbee related elements and P quality, deprecated ThermostatProgrammingOperationMode and removed ProgrammingOperationModeBitmap. and deprecated Setback feature and related elements."/>
     <revision revision="11" summary="Added support for Thermostat suggestions. Added events."/>
   </revisionHistory>

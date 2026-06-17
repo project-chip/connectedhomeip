@@ -85,37 +85,37 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="CharacteristicEnum">
-      <item value="0" name="ForcedSubtitles" summary="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.">
+      <item value="0" name="ForcedSubtitles" summary="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio">
         <mandatoryConform/>
       </item>
       <item value="1" name="DescribesVideo" summary="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component">
         <mandatoryConform/>
       </item>
-      <item value="2" name="EasyToRead" summary="Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)].">
+      <item value="2" name="EasyToRead" summary="Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)]">
         <mandatoryConform/>
       </item>
-      <item value="3" name="FrameBased" summary="A media characteristic that indicates that a track selection option includes frame-based content.">
+      <item value="3" name="FrameBased" summary="A media characteristic that indicates that a track selection option includes frame-based content">
         <mandatoryConform/>
       </item>
       <item value="4" name="MainProgram" summary="Main media component(s) which is/are intended for presentation if no other information is provided">
         <mandatoryConform/>
       </item>
-      <item value="5" name="OriginalContent" summary="A media characteristic that indicates that a track or media selection option contains original content.">
+      <item value="5" name="OriginalContent" summary="A media characteristic that indicates that a track or media selection option contains original content">
         <mandatoryConform/>
       </item>
-      <item value="6" name="VoiceOverTranslation" summary="A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog.">
+      <item value="6" name="VoiceOverTranslation" summary="A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog">
         <mandatoryConform/>
       </item>
-      <item value="7" name="Caption" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.">
+      <item value="7" name="Caption" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired">
         <mandatoryConform/>
       </item>
       <item value="8" name="Subtitle" summary="Textual transcriptions of spoken dialog.">
         <mandatoryConform/>
       </item>
-      <item value="9" name="Alternate" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.">
+      <item value="9" name="Alternate" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired">
         <mandatoryConform/>
       </item>
-      <item value="10" name="Supplementary" summary="Media content component that is supplementary to a media content component of a different media component type.">
+      <item value="10" name="Supplementary" summary="Media content component that is supplementary to a media content component of a different media component type">
         <mandatoryConform/>
       </item>
       <item value="11" name="Commentary" summary="Experience that contains a commentary (e.g. director’s commentary) (typically audio)">
@@ -127,16 +127,16 @@ Davis, CA 95616, USA
       <item value="13" name="Description" summary="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component">
         <mandatoryConform/>
       </item>
-      <item value="14" name="Metadata" summary="Media component containing information intended to be processed by application specific elements.">
+      <item value="14" name="Metadata" summary="Media component containing information intended to be processed by application specific elements">
         <mandatoryConform/>
       </item>
       <item value="15" name="EnhancedAudioIntelligibility" summary="Experience containing an element for improved intelligibility of the dialogue.">
         <mandatoryConform/>
       </item>
-      <item value="16" name="Emergency" summary="Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency.">
+      <item value="16" name="Emergency" summary="Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency">
         <mandatoryConform/>
       </item>
-      <item value="17" name="Karaoke" summary="Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2].">
+      <item value="17" name="Karaoke" summary="Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2]">
         <mandatoryConform/>
       </item>
     </enum>
@@ -161,7 +161,7 @@ Davis, CA 95616, USA
       <item value="1" name="InvalidStateForCommand" summary="Requested playback command is invalid in the current playback state.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="NotAllowed" summary="Requested playback command is not allowed in the current playback state. For example, attempting to fast-forward during a commercial might return NotAllowed.">
+      <item value="2" name="NotAllowed" summary="Requested playback command is not allowed in the current playback state For example, attempting to fast-forward during a commercial might return NotAllowed.">
         <mandatoryConform/>
       </item>
       <item value="3" name="NotActive" summary="This endpoint is not active for playback.">

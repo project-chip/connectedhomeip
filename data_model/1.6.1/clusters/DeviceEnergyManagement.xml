@@ -120,7 +120,7 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="CauseEnum">
-      <item value="0" name="NormalCompletion" summary="The ESA completed the power adjustment as requested">
+      <item value="0" name="NormalCompletion" summary="The ESA completed the adjustment as requested">
         <mandatoryConform/>
       </item>
       <item value="1" name="Offline" summary="The ESA was set to offline">

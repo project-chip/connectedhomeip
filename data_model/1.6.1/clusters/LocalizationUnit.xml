@@ -67,7 +67,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LUNIT" scope="Node"/>
   <features>
-    <feature bit="0" code="TEMP" name="TemperatureUnit" summary="The Node can be configured to use different units of temperature when conveying values to a user.">
+    <feature bit="0" code="TEMP" name="TemperatureUnit" summary="The Node can be configured to use different units of temperature when conveying values to a user">
       <optionalConform/>
     </feature>
   </features>

@@ -67,16 +67,16 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TIMESYNC" scope="Node"/>
   <features>
-    <feature bit="0" code="TZ" name="TimeZone" summary="Server supports time zone.">
+    <feature bit="0" code="TZ" name="TimeZone" summary="Server supports time zone">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="NTPC" name="NTPClient" summary="Server supports an NTP or SNTP client.">
+    <feature bit="1" code="NTPC" name="NTPClient" summary="Server supports an NTP or SNTP client">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="NTPS" name="NTPServer" summary="Server supports an NTP server role.">
+    <feature bit="2" code="NTPS" name="NTPServer" summary="Server supports an NTP server role">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="TSC" name="TimeSyncClient" summary="Time synchronization client cluster is present.">
+    <feature bit="3" code="TSC" name="TimeSyncClient" summary="Time synchronization client cluster is present">
       <optionalConform/>
     </feature>
   </features>

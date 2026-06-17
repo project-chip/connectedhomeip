@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CADMIN" scope="Node"/>
   <features>
-    <feature bit="0" code="BC" name="Basic" summary="Node supports Basic Commissioning Method.">
+    <feature bit="0" code="BC" name="Basic" summary="Node supports Basic Commissioning Method">
       <optionalConform/>
     </feature>
   </features>

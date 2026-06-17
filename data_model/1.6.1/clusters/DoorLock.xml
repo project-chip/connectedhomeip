@@ -66,7 +66,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="CCB 3472 3474 3338"/>
     <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
-    <revision revision="8" summary="Removed LOG and NOT feature, fixed constraints on NumberOf*Schedules attributes. and added support for Aliro credential provisioning"/>
+    <revision revision="8" summary="Removed LOG and NOT feature, fixed constraints on NumberOf*Schedules attributes and added support for Aliro credential provisioning"/>
     <revision revision="9" summary="Removed AlarmMask attribute"/>
     <revision revision="10" summary="Removed Zigbee related elements and P quality"/>
   </revisionHistory>
@@ -530,10 +530,10 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="StatusCodeEnum">
-      <item value="0x02" name="DUPLICATE" summary="Entry would cause a duplicate credential/ID.">
+      <item value="0x02" name="Duplicate" summary="Entry would cause a duplicate credential/ID.">
         <mandatoryConform/>
       </item>
-      <item value="0x03" name="OCCUPIED" summary="Entry would replace an occupied slot.">
+      <item value="0x03" name="Occupied" summary="Entry would replace an occupied slot.">
         <mandatoryConform/>
       </item>
     </enum>

@@ -72,7 +72,12 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0097" name="Messages" side="server">
-      <optionalConform/>
+      <optionalConform>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="2"/>
+        </greaterOrEqualTerm>
+      </optionalConform>
     </cluster>
     <cluster id="0x0503" name="Wake On LAN" side="server">
       <optionalConform/>
@@ -119,7 +124,12 @@ Davis, CA 95616, USA
     <cluster id="0x050F" name="Content Control" side="server">
       <otherwiseConform>
         <provisionalConform/>
-        <optionalConform/>
+        <optionalConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
       </otherwiseConform>
     </cluster>
   </clusters>

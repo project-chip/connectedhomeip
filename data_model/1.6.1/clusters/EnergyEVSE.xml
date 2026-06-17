@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
-    <revision revision="3" summary="Added Q quality for SessionDuration, SessionEnergyCharged and SessionEnergyDischarged. Updates to V2X and associated areas. Make PREF mandatory."/>
+    <revision revision="3" summary="Added Q quality for SessionDuration, SessionEnergyCharged and SessionEnergyDischarged, updated to V2X and associated areas and made PREF mandatory"/>
     <revision revision="4" summary="Sync with SDK revision number"/>
   </revisionHistory>
   <clusterIds>
@@ -187,7 +187,7 @@ Davis, CA 95616, USA
           <feature name="V2X"/>
         </optionalConform>
       </item>
-      <item value="3" name="DisabledError" summary="The EV is not currently allowed to charge or discharge due to an error. The error must be cleared before operation can continue.">
+      <item value="3" name="DisabledError" summary="The EV is not currently allowed to charge or discharge due to an error, the error must be cleared before operation can continue">
         <mandatoryConform/>
       </item>
       <item value="4" name="DisabledDiagnostics" summary="The EV is not currently allowed to charge or discharge due to self-diagnostics mode.">

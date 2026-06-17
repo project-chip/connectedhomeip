@@ -59,31 +59,31 @@ Davis, CA 95616, USA
 -->
 <bitmaps>
   <bitmap name="WildcardPathFlagsBitmap">
-    <bitfield name="WildcardSkipRootNode" bit="0" summary="Skip the Root Node endpoint (endpoint 0) during wildcard expansion.">
+    <bitfield name="WildcardSkipRootNode" bit="0" summary="Skip the Root Node endpoint (endpoint 0) during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
-    <bitfield name="WildcardSkipGlobalAttributes" bit="1" summary="Skip several large global attributes during wildcard expansion.">
+    <bitfield name="WildcardSkipGlobalAttributes" bit="1" summary="Skip several large global attributes during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
-    <bitfield name="WildcardSkipAttributeList" bit="2" summary="Skip the AttributeList global attribute during wildcard expansion.">
+    <bitfield name="WildcardSkipAttributeList" bit="2" summary="Skip the AttributeList global attribute during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
     <bitfield name="DoNotUse" bit="3" summary="">
       <mandatoryConform/>
     </bitfield>
-    <bitfield name="WildcardSkipCommandLists" bit="4" summary="Skip the AcceptedCommandList and GeneratedCommandList global attributes during wildcard expansion.">
+    <bitfield name="WildcardSkipCommandLists" bit="4" summary="Skip the AcceptedCommandList and GeneratedCommandList global attributes during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
-    <bitfield name="WildcardSkipCustomElements" bit="5" summary="Skip any manufacturer-specific clusters or attributes during wildcard expansion.">
+    <bitfield name="WildcardSkipCustomElements" bit="5" summary="Skip any manufacturer-specific clusters or attributes during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
-    <bitfield name="WildcardSkipFixedAttributes" bit="6" summary="Skip any Fixed (F) quality attributes during wildcard expansion.">
+    <bitfield name="WildcardSkipFixedAttributes" bit="6" summary="Skip any Fixed (F) quality attributes during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
-    <bitfield name="WildcardSkipChangesOmittedAttributes" bit="7" summary="Skip any Changes Omitted ++(C)++ quality attributes during wildcard expansion.">
+    <bitfield name="WildcardSkipChangesOmittedAttributes" bit="7" summary="Skip any Changes Omitted ++(C)++ quality attributes during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
-    <bitfield name="WildcardSkipDiagnosticsClusters" bit="8" summary="Skip all clusters with the Diagnostics (K) quality during wildcard expansion.">
+    <bitfield name="WildcardSkipDiagnosticsClusters" bit="8" summary="Skip all clusters with the Diagnostics (K) quality during wildcard expansion">
       <mandatoryConform/>
     </bitfield>
   </bitmap>

@@ -92,7 +92,7 @@ Davis, CA 95616, USA
         <optionalConform choice="a" more="true" min="1"/>
       </otherwiseConform>
     </feature>
-    <feature bit="4" code="PRED" name="PredictedActivity" summary="Supports predicting various human actions and activities.">
+    <feature bit="4" code="PRED" name="PredictedActivity" summary="Supports predicting various human actions and activities">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
@@ -210,13 +210,11 @@ Davis, CA 95616, USA
         <otherwiseConform>
           <provisionalConform/>
           <mandatoryConform>
-            <feature name="HA"/>
-          </mandatoryConform>
-          <mandatoryConform>
-            <feature name="OI"/>
-          </mandatoryConform>
-          <mandatoryConform>
-            <feature name="AUD"/>
+            <orTerm>
+              <feature name="HA"/>
+              <feature name="OI"/>
+              <feature name="AUD"/>
+            </orTerm>
           </mandatoryConform>
         </otherwiseConform>
         <constraint>
@@ -287,13 +285,11 @@ Davis, CA 95616, USA
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
-          <feature name="HA"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="OI"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="AUD"/>
+          <orTerm>
+            <feature name="HA"/>
+            <feature name="OI"/>
+            <feature name="AUD"/>
+          </orTerm>
         </mandatoryConform>
       </otherwiseConform>
       <constraint>
@@ -311,20 +307,18 @@ Davis, CA 95616, USA
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
-          <feature name="HA"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="OI"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="AUD"/>
+          <orTerm>
+            <feature name="HA"/>
+            <feature name="OI"/>
+            <feature name="AUD"/>
+          </orTerm>
         </mandatoryConform>
       </otherwiseConform>
       <constraint>
         <maxCount value="50"/>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="ObjectCountReached" type="bool">
+    <attribute id="0x0005" name="ObjectCountThresholdReached" type="bool">
       <access read="true" readPrivilege="view"/>
       <otherwiseConform>
         <provisionalConform/>
@@ -349,7 +343,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute id="0x0007" name="ObjectCount" type="uint16" default="null">
+    <attribute id="0x0007" name="ObjectCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <otherwiseConform>
         <provisionalConform/>
@@ -365,13 +359,17 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0008" name="SimultaneousDetectionLimit" type="uint8">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform/>
       </otherwiseConform>
       <constraint>
-        <max value="10"/>
+        <between>
+          <from value="1"/>
+          <to value="10"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0009" name="HoldTime" type="uint16">
@@ -424,39 +422,31 @@ Davis, CA 95616, USA
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
-          <feature name="HA"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="OI"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="AUD"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="OC"/>
+          <orTerm>
+            <feature name="HA"/>
             <feature name="OI"/>
-          </andTerm>
+            <feature name="AUD"/>
+            <andTerm>
+              <feature name="OC"/>
+              <feature name="OI"/>
+            </andTerm>
+          </orTerm>
         </mandatoryConform>
       </otherwiseConform>
       <field id="0" name="AmbientContextDetected" type="AmbientContextTypeStruct">
         <otherwiseConform>
           <provisionalConform/>
           <mandatoryConform>
-            <feature name="HA"/>
-          </mandatoryConform>
-          <mandatoryConform>
-            <feature name="OI"/>
-          </mandatoryConform>
-          <mandatoryConform>
-            <feature name="OC"/>
-          </mandatoryConform>
-          <mandatoryConform>
-            <feature name="AUD"/>
+            <orTerm>
+              <feature name="HA"/>
+              <feature name="OI"/>
+              <feature name="OC"/>
+              <feature name="AUD"/>
+            </orTerm>
           </mandatoryConform>
         </otherwiseConform>
       </field>
-      <field id="1" name="ObjectCountReached" type="bool">
+      <field id="1" name="ObjectCountThresholdReached" type="bool">
         <otherwiseConform>
           <provisionalConform/>
           <mandatoryConform>
@@ -487,25 +477,27 @@ Davis, CA 95616, USA
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
-          <feature name="HA"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="OI"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <feature name="AUD"/>
-        </mandatoryConform>
-        <mandatoryConform>
-          <andTerm>
-            <feature name="OC"/>
+          <orTerm>
+            <feature name="HA"/>
             <feature name="OI"/>
-          </andTerm>
+            <feature name="AUD"/>
+            <andTerm>
+              <feature name="OC"/>
+              <feature name="OI"/>
+            </andTerm>
+          </orTerm>
         </mandatoryConform>
       </otherwiseConform>
-      <field id="0" name="EventStartTime" type="posix-ms">
+      <field id="0" name="EventStartTimePos" type="posix-ms">
         <otherwiseConform>
           <provisionalConform/>
-          <mandatoryConform/>
+          <optionalConform choice="a"/>
+        </otherwiseConform>
+      </field>
+      <field id="1" name="EventStartTimeSys" type="systime-ms">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform choice="a"/>
         </otherwiseConform>
       </field>
     </event>

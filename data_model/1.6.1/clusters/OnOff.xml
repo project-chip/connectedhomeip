@@ -71,7 +71,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OO" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications.">
+    <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications">
       <optionalConform>
         <notTerm>
           <feature name="OFFONLY"/>

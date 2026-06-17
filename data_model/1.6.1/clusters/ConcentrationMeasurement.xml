@@ -61,9 +61,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2882"/>
-    <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty."/>
+    <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty"/>
     <revision revision="4" summary="Removed P quality"/>
-    <revision revision="5" summary="Added F quality to MinMeasuredValue, MaxMeasuredValue and Uncertainty attributes."/>
+    <revision revision="5" summary="Added F quality to MinMeasuredValue, MaxMeasuredValue and Uncertainty attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement" picsCode="CMOCONC"/>
@@ -277,9 +277,6 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="MEA"/>
       </optionalConform>
-      <constraint>
-        <allowed value="MS"/>
-      </constraint>
     </attribute>
     <attribute id="0x0008" name="MeasurementUnit" type="MeasurementUnitEnum">
       <access read="true" readPrivilege="view"/>
