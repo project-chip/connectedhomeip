@@ -266,6 +266,7 @@
             "MaxCachedResults",
             "NumCachedResults",
             "CacheTimeout",
+            "CachedResults",
             "WiFiBand"
         ],
         "Commodity Price": [
