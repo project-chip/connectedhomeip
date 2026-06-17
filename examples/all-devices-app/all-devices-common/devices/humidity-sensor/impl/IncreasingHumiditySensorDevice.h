@@ -27,7 +27,7 @@ namespace app {
 class IncreasingHumiditySensorDevice : public HumiditySensorDevice, public TimerContext
 {
 public:
-    IncreasingHumiditySensorDevice();
+    IncreasingHumiditySensorDevice(TimerDelegate & timerDelegate);
     ~IncreasingHumiditySensorDevice() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -38,7 +38,6 @@ public:
     void TimerFired() override;
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
     DataModel::Nullable<uint16_t> mHumidityMeasuredValue;
 };
 

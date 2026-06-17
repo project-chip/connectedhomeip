@@ -27,7 +27,7 @@ namespace app {
 class IncreasingLightSensorDevice : public LightSensorDevice, public TimerContext
 {
 public:
-    IncreasingLightSensorDevice();
+    IncreasingLightSensorDevice(TimerDelegate & timerDelegate);
     ~IncreasingLightSensorDevice() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -38,7 +38,6 @@ public:
     void TimerFired() override;
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
     DataModel::Nullable<uint16_t> mLightMeasuredValue;
 };
 

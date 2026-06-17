@@ -308,19 +308,31 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
         {
-            RegisterCreator("humidity-sensor", []() { return std::make_unique<IncreasingHumiditySensorDevice>(); });
+            RegisterCreator("humidity-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingHumiditySensorDevice>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
-            RegisterCreator("light-sensor", []() { return std::make_unique<IncreasingLightSensorDevice>(); });
+            RegisterCreator("light-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingLightSensorDevice>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {
-            RegisterCreator("pressure-sensor", []() { return std::make_unique<IncreasingPressureSensorDevice>(); });
+            RegisterCreator("pressure-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingPressureSensorDevice>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
         {
-            RegisterCreator("flow-sensor", []() { return std::make_unique<IncreasingFlowSensorDevice>(); });
+            RegisterCreator("flow-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingFlowSensorDevice>(mContext->timerDelegate);
+            });
         }
 
         // at least one device type MUST be enabled

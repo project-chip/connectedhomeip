@@ -27,7 +27,7 @@ namespace app {
 class IncreasingPressureSensorDevice : public PressureSensorDevice, public TimerContext
 {
 public:
-    IncreasingPressureSensorDevice();
+    IncreasingPressureSensorDevice(TimerDelegate & timerDelegate);
     ~IncreasingPressureSensorDevice() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -38,7 +38,6 @@ public:
     void TimerFired() override;
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
     DataModel::Nullable<int16_t> mPressureMeasuredValue;
 };
 

@@ -27,7 +27,7 @@ namespace app {
 class IncreasingFlowSensorDevice : public FlowSensorDevice, public TimerContext
 {
 public:
-    IncreasingFlowSensorDevice();
+    IncreasingFlowSensorDevice(TimerDelegate & timerDelegate);
     ~IncreasingFlowSensorDevice() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -38,7 +38,6 @@ public:
     void TimerFired() override;
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
     DataModel::Nullable<uint16_t> mFlowMeasuredValue;
 };
 
