@@ -1333,8 +1333,8 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
 } // namespace InterconnectCOAlarm
 
 namespace ContaminationState {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
-                                               chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum * value); // ContaminationStateEnum
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum * value); // ContaminationStateEnum
 } // namespace ContaminationState
 
 namespace SmokeSensitivityLevel {
