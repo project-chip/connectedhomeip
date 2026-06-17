@@ -174,7 +174,6 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/test-hidden-manufacturer-specific-stub.cpp
 
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp

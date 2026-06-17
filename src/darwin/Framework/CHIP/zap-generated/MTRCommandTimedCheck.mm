@@ -1484,15 +1484,6 @@ static BOOL CommandNeedsTimedInvokeInSampleMEICluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInTestHiddenManufacturerSpecificCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::TestHiddenManufacturerSpecific;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 
 BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonnull aCommandID)
 {
@@ -1946,9 +1937,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::SampleMei::Id: {
         return CommandNeedsTimedInvokeInSampleMEICluster(commandID);
-    }
-    case Clusters::TestHiddenManufacturerSpecific::Id: {
-        return CommandNeedsTimedInvokeInTestHiddenManufacturerSpecificCluster(commandID);
     }
     default: {
         return NO;
