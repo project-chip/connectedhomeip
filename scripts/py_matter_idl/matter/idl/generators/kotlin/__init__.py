@@ -17,7 +17,7 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import List, Optional, Set
+from typing import Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst
@@ -288,7 +288,7 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
     }
 
 
-def NamedFilter(choices: List, name: str):
+def NamedFilter(choices: list, name: str):
     for choice in choices:
         if choice.name == name:
             return choice
@@ -338,7 +338,7 @@ class EncodableValue:
         for the underlying types.
     """
 
-    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
+    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: set[EncodableValueAttr]):
         self.context = context
         self.data_type = data_type
         self.attrs = attrs
@@ -649,7 +649,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
         self.internal_render_one_output(
             template_path="MatterFiles_gni.jinja",
             output_file_name="java/matter/controller/cluster/files.gni",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -661,7 +661,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
             self.internal_render_one_output(
                 template_path="MatterClusters.jinja",
                 output_file_name=output_name,
-                vars={
+                template_vars={
                     'idl': self.idl,
                     'cluster': cluster,
                 }
@@ -680,7 +680,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         struct_name=struct.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'struct': struct,
                         'typeLookup': TypeLookupContext(self.idl, cluster),
@@ -697,7 +697,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         event_name=event.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'event': event,
                         'typeLookup': TypeLookupContext(self.idl, cluster),

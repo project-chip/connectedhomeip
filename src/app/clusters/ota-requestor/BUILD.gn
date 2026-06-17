@@ -29,7 +29,7 @@ source_set("ota-requestor") {
   public_deps = [
     ":interface",
     "${chip_root}/src/app:user-consent",
-    "${chip_root}/src/app/clusters/basic-information",
+    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/controller:interactions",
   ]
 }

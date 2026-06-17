@@ -50,6 +50,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SetupDiscriminator.h>
@@ -993,7 +994,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
     VerifyOrReturnError(deviceName, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(strlen(deviceName.get()) >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    g_strlcpy(buf, deviceName.get(), bufSize);
+    chip::Platform::CopyString(buf, bufSize, deviceName.get());
     ChipLogProgress(DeviceLayer, "BLE device name: %s", buf);
 
     return CHIP_NO_ERROR;
@@ -1262,7 +1263,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 
     /* Send StartScan Request to Scanner Class */
     strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
-    err = mDeviceScanner.StartScan(ScanFilterType::kServiceData, data);
+    err = mDeviceScanner.StartScan(ScanFilterType::kServiceUUID, data);
     SuccessOrExitAction(err, ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimeout, this);

@@ -17,7 +17,9 @@ import re
 import shlex
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -68,15 +70,17 @@ class IMXApp(Enum):
 class IMXBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: IMXApp,
                  release: bool = False,
                  trusty: bool = False,
                  ele: bool = False):
-        super(IMXBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
-            runner=runner)
+            runner=runner,
+            output_dir_lock=output_dir_lock)
         self.release = release
         self.trusty = trusty
         self.ele = ele
@@ -108,7 +112,7 @@ class IMXBuilder(GnBuilder):
                 raise Exception('The SDK environment setup script is not found, make sure the env IMX_SDK_ROOT is correctly set.')
             else:
 
-                with open(os.path.join(self.SysRootPath('IMX_SDK_ROOT'), env_setup_script), 'r') as env_setup_script_fd:
+                with open(os.path.join(self.SysRootPath('IMX_SDK_ROOT'), env_setup_script)) as env_setup_script_fd:
                     lines = env_setup_script_fd.readlines()
                     for line in lines:
                         line = line.strip('\n')
@@ -192,6 +196,7 @@ class IMXBuilder(GnBuilder):
             raise Exception('Missing environment variable "%s"' % name)
         return os.environ[name]
 
+    @lock_output_dir
     def build_outputs(self):
         for name in self.app.OutputNames():
             if not self.options.enable_link_map_file and name.endswith(".map"):

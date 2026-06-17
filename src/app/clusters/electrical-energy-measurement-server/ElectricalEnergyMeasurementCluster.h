@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,9 @@
  */
 #pragma once
 
+#include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementDelegate.h>
+#include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
@@ -24,134 +27,176 @@
 #include <clusters/ElectricalEnergyMeasurement/Structs.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
 
-enum class OptionalAttributes : uint32_t
-{
-    kOptionalAttributeCumulativeEnergyReset = 0x1,
-};
-// Data structure to hold measurement data for backwards compatibility
-struct MeasurementData
-{
-    Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicExported;
-    Optional<Structs::CumulativeEnergyResetStruct::Type> cumulativeReset;
-};
-}; // namespace ElectricalEnergyMeasurement
-
 class ElectricalEnergyMeasurementCluster : public DefaultServerCluster
 {
 public:
-    // Type aliases for shorter struct type names
-    using MeasurementAccuracyStruct   = ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type;
-    using EnergyMeasurementStruct     = ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type;
-    using CumulativeEnergyResetStruct = ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type;
+    using MeasurementAccuracyStruct   = Structs::MeasurementAccuracyStruct::Type;
+    using EnergyMeasurementStruct     = Structs::EnergyMeasurementStruct::Type;
+    using CumulativeEnergyResetStruct = Structs::CumulativeEnergyResetStruct::Type;
+    template <typename T>
+    using Nullable = DataModel::Nullable<T>;
 
-    using OptionalAttributesSet = OptionalAttributeSet<                        //
-        ElectricalEnergyMeasurement::Attributes::CumulativeEnergyImported::Id, //
-        ElectricalEnergyMeasurement::Attributes::CumulativeEnergyExported::Id, //
-        ElectricalEnergyMeasurement::Attributes::PeriodicEnergyImported::Id,   //
-        ElectricalEnergyMeasurement::Attributes::PeriodicEnergyExported::Id,   //
-        ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id     //
+    using OptionalAttributesSet = OptionalAttributeSet< //
+        Attributes::CumulativeEnergyImported::Id,       //
+        Attributes::CumulativeEnergyExported::Id,       //
+        Attributes::PeriodicEnergyImported::Id,         //
+        Attributes::PeriodicEnergyExported::Id,         //
+        Attributes::CumulativeEnergyReset::Id           //
         >;
 
+    //
+    // Per Spec, a server cannot report more frequently than every 1 second:
+    // 6.X. [Cumulative/Periodic]Energy[Imported/Exported] Attribute:
+    // The server SHALL NOT mark this attribute ready for report if the last time this was done was more recently than 1 second ago.
+    //
+    static constexpr System::Clock::Timeout kMinReportInterval = System::Clock::Seconds32(1);
+
+    /**
+     * Quieter reporting wrapper for Nullable<EnergyMeasurementStruct>.
+     *
+     * QuieterReportingAttribute<T> only accepts arithmetic T. This wrapper provides
+     * the same semantics for the EnergyMeasurementStruct and updates the dirty state based on
+     * the struct's `energy` field via an internal QuieterReportingAttribute<int64_t>.
+     *
+     */
+    class QuieterReportingEnergyAttribute
+    {
+    public:
+        using StructType = Structs::EnergyMeasurementStruct::Type;
+        template <typename T>
+        using Nullable = DataModel::Nullable<T>;
+
+        QuieterReportingEnergyAttribute() = default;
+
+        explicit QuieterReportingEnergyAttribute(const Nullable<StructType> & initialValue) :
+            mValue(initialValue), mEnergyTracker(EnergyKey(initialValue))
+        {}
+
+        const Nullable<StructType> & value() const { return mValue; }
+
+        /**
+         * Update the held struct and compute reporting state based on the energy field.
+         *
+         * @param newValue new struct value (or null) to store
+         * @param now      monotonic timestamp at the time of the call
+         * @return AttributeDirtyState::kMustReport if a report is required, otherwise kNoReportNeeded.
+         */
+        AttributeDirtyState SetValue(const Nullable<StructType> & newValue, System::Clock::Milliseconds64 now)
+        {
+
+            auto predicate            = mEnergyTracker.GetPredicateForSufficientTimeSinceLastDirty(kMinReportInterval);
+            AttributeDirtyState state = mEnergyTracker.SetValue(EnergyKey(newValue), now, predicate);
+            mValue                    = newValue;
+            return state;
+        }
+
+    private:
+        static Nullable<int64_t> EnergyKey(const Nullable<StructType> & v)
+        {
+            return v.IsNull() ? Nullable<int64_t>() : DataModel::MakeNullable(v.Value().energy);
+        }
+
+        Nullable<StructType> mValue;
+        QuieterReportingAttribute<int64_t> mEnergyTracker;
+    };
     struct Config
     {
         EndpointId endpointId;
-        BitMask<ElectricalEnergyMeasurement::Feature> featureFlags;
-        BitMask<ElectricalEnergyMeasurement::OptionalAttributes> optionalAttributes;
-        const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type & accuracyStruct;
+        BitMask<Feature> featureFlags;
+        OptionalAttributesSet optionalAttributes;
+        const Structs::MeasurementAccuracyStruct::Type & accuracyStruct;
+        Delegate & delegate;
+        TimerDelegate & timerDelegate;
     };
 
-    /// @brief Constructor for ElectricalEnergyMeasurementCluster.
-    /// @param config The configuration for the cluster.
-    /// @note The accuracyStruct must outlive the cluster to avoid dangling pointers.
-    ElectricalEnergyMeasurementCluster(const Config & config) :
-        DefaultServerCluster({ config.endpointId, ElectricalEnergyMeasurement::Id }), mFeatureFlags(config.featureFlags),
-        mEnabledOptionalAttributes([&]() {
-            OptionalAttributesSet attrs;
-            attrs.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyImported::Id>(config.featureFlags.HasAll(
-                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kImportedEnergy));
-            attrs.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyExported::Id>((config.featureFlags.HasAll(
-                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy)));
-            attrs.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyImported::Id>(config.featureFlags.HasAll(
-                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kImportedEnergy));
-            attrs.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyExported::Id>(config.featureFlags.HasAll(
-                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy));
-            attrs.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(
-                config.optionalAttributes.Has(
-                    ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset) &&
-                config.featureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy));
-            return attrs;
-        }())
-    {
-        mMeasurementData.measurementAccuracy.measurementType  = config.accuracyStruct.measurementType;
-        mMeasurementData.measurementAccuracy.measured         = config.accuracyStruct.measured;
-        mMeasurementData.measurementAccuracy.minMeasuredValue = config.accuracyStruct.minMeasuredValue;
-        mMeasurementData.measurementAccuracy.maxMeasuredValue = config.accuracyStruct.maxMeasuredValue;
+    /** @brief Constructor for ElectricalEnergyMeasurementCluster.
+     *
+     * @param config The configuration for the cluster. The only optional attribute is Cumulative Energy Reset,
+     *  the other attributes will be enabled based on the feature flags. Cumulative Energy Reset is only enabled
+     *  if the feature flag for Cumulative Energy is enabled AND the optional attribute is set in the config.
+     *
+     * @note The accuracyStruct must outlive the cluster to avoid dangling pointers.
+     */
+    ElectricalEnergyMeasurementCluster(const Config & config);
 
-        // ReferenceExisting: caller's accuracyRanges data must outlive the cluster
-        using RangeType = ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type;
-        ReadOnlyBufferBuilder<RangeType> rangesBuilder;
-        VerifyOrDie(rangesBuilder.ReferenceExisting(config.accuracyStruct.accuracyRanges) == CHIP_NO_ERROR);
-        mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer();
-        mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
-    }
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
-    const BitFlags<ElectricalEnergyMeasurement::Feature> & Features() const { return mFeatureFlags; }
+    const BitFlags<Feature> & Features() const { return mFeatureFlags; }
 
-    // Direct access to measurement data - for backwards compatibility
-    const ElectricalEnergyMeasurement::MeasurementData * GetMeasurementData() const { return &mMeasurementData; }
-
-    // Getters - return copies with error checking
+    /** @brief Getters */
     void GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const;
-    CHIP_ERROR GetCumulativeEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const;
-    CHIP_ERROR GetCumulativeEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const;
-    CHIP_ERROR GetPeriodicEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const;
-    CHIP_ERROR GetPeriodicEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const;
-    CHIP_ERROR GetCumulativeEnergyReset(Optional<CumulativeEnergyResetStruct> & outValue) const;
+    CHIP_ERROR GetCumulativeEnergyImported(Nullable<EnergyMeasurementStruct> & outValue) const;
+    CHIP_ERROR GetCumulativeEnergyExported(Nullable<EnergyMeasurementStruct> & outValue) const;
+    CHIP_ERROR GetPeriodicEnergyImported(Nullable<EnergyMeasurementStruct> & outValue) const;
+    CHIP_ERROR GetPeriodicEnergyExported(Nullable<EnergyMeasurementStruct> & outValue) const;
+    CHIP_ERROR GetCumulativeEnergyReset(Nullable<CumulativeEnergyResetStruct> & outValue) const;
 
-    /// @brief Sets the measurement accuracy.
-    /// @param value The new measurement accuracy value.
-    /// @return CHIP_ERROR_NO_MEMORY if the deep copy of accuracyRanges fails to allocate.
-    /// @note Use the constructor with Config::accuracyStruct for zero-copy reference to long-lived (e.g. flash) data.
+    /** @brief Sets the measurement accuracy.
+     *
+     * @return CHIP_ERROR_NO_MEMORY if the deep copy of accuracyRanges fails to allocate.
+     *
+     * @note Use the constructor with Config::accuracyStruct for zero-copy reference to long-lived (e.g. flash) data.
+     */
     CHIP_ERROR SetMeasurementAccuracy(const MeasurementAccuracyStruct & value);
-    CHIP_ERROR SetCumulativeEnergyReset(const Optional<CumulativeEnergyResetStruct> & value);
+    CHIP_ERROR SetCumulativeEnergyReset(const Nullable<CumulativeEnergyResetStruct> & value);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    void CumulativeEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                  const Optional<EnergyMeasurementStruct> & energyExported);
+    /** @brief Handle to request an immediate snapshot/report:
+     *  pulls readings from the delegate, updates attributes, and generates events.
+     *
+     * @note Enforces the minimum reporting interval: if a report was generated less than kMinReportInterval ago, this will
+     *        update the cluster values without generating a report.
+     */
+    void GenerateSnapshots();
 
-    void PeriodicEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                const Optional<EnergyMeasurementStruct> & energyExported);
+    /** @brief Legacy snapshot methods -- kept for backwards compatibility with CodegenIntegration */
+    void CumulativeEnergySnapshot(const Nullable<EnergyMeasurementStruct> & energyImported,
+                                  const Nullable<EnergyMeasurementStruct> & energyExported);
+    void PeriodicEnergySnapshot(const Nullable<EnergyMeasurementStruct> & energyImported,
+                                const Nullable<EnergyMeasurementStruct> & energyExported);
 
 private:
-    // These setters are private since it is intended that the app updates those attributes through CumulativeEnergySnapshot and
-    // PeriodicEnergySnapshot.
-    CHIP_ERROR SetCumulativeEnergyImported(const Optional<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetCumulativeEnergyExported(const Optional<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetPeriodicEnergyImported(const Optional<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetPeriodicEnergyExported(const Optional<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetCumulativeEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetCumulativeEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetPeriodicEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
+    AttributeDirtyState SetPeriodicEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
 
-    const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
+    // Attributes
+    Structs::MeasurementAccuracyStruct::Type mMeasurementAccuracy;
+    QuieterReportingEnergyAttribute mCumulativeImported;
+    QuieterReportingEnergyAttribute mCumulativeExported;
+    QuieterReportingEnergyAttribute mPeriodicImported;
+    QuieterReportingEnergyAttribute mPeriodicExported;
+    Nullable<Structs::CumulativeEnergyResetStruct::Type> mCumulativeReset;
+
+    /** @brief Builds an EnergyMeasurementStruct with timestamps. For periodic (isCumulative == false), copies previous
+     *  endTimestamp/endSystime into start*. For cumulative (isCumulative == true), start fields stay unset (spec). */
+    DataModel::Nullable<EnergyMeasurementStruct>
+    BuildMeasurement(Nullable<int64_t> energy, const Nullable<EnergyMeasurementStruct> & previous, bool isCumulative);
+
+    const BitFlags<Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
-    ElectricalEnergyMeasurement::MeasurementData mMeasurementData;
 
-    // Owns the accuracyRanges backing store; either references long-lived data (ReferenceExisting) or an allocated copy.
-    ReadOnlyBuffer<ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type> mAccuracyRangesStorage;
+    /** @brief Owns the accuracyRanges backing store; either references long-lived data (ReferenceExisting) when passing in
+     * Config::accuracyStruct or an allocated copy when using the SetMeasurementAccuracy() method */
+    ReadOnlyBuffer<Structs::MeasurementAccuracyRangeStruct::Type> mAccuracyRangesStorage;
+
+    Delegate & mDelegate;
+    TimerDelegate & mTimerDelegate;
 };
 
+} // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

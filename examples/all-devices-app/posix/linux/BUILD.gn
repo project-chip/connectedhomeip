@@ -25,13 +25,15 @@ config("includes") {
 source_set("linux") {
   sources = [
     "../include/AppRootNode.h",
+    "../include/BleInit.h",
     "../include/TermHandling.h",
+    "BleInit.cpp",
     "DeviceFactoryPlatformOverride.cpp",
     "TermHandling.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",

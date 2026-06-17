@@ -252,7 +252,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_equal(expected_status, Status.Success)
         except InteractionModelError as e:
-            log.exception(f"Got exception when performing SetAliroReaderConfig {e}")
+            log.exception("Got exception when performing SetAliroReaderConfig %s", e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def get_credentials_status(self, credentialIndex: int, credentialType: cluster.Enums.CredentialTypeEnum,
@@ -395,7 +395,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                                )
         self.step("1b")
         if self.pics_guard(self.check_pics("DRLK.S.C1d.Rsp")):
-            await self.send_clear_user_cmd(user_index=int(0xFFFE))
+            await self.send_clear_user_cmd(user_index=0xFFFE)
 
         self.step("1c")
         if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
@@ -587,8 +587,8 @@ class TC_DRLK_2_13(MatterBaseTest):
                 endpoint=self.app_cluster_endpoint,
                 cluster=Clusters.Objects.DoorLock,
                 attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
-        log.info(f"After reading  attribute NumberOfCredentialsSupportedPerUser we get"
-                 f" value {self.numberofcredentialsupportedperuser} ")
+        log.info("After reading  attribute NumberOfCredentialsSupportedPerUser we get value %s ",
+                 self.numberofcredentialsupportedperuser)
         self.step("28b")
         await self.clear_all_aliro_credential()
         await self.send_clear_user_cmd(user_index=1)
@@ -631,7 +631,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                   userStatus=NullValue,
                                                   userType=NullValue)
                     start_credential_index += 1
-                    log.info(f"The updated value of start_credential_index is {start_credential_index}")
+                    log.info("The updated value of start_credential_index is %s", start_credential_index)
                 else:
                     break
             self.step("30")

@@ -38,15 +38,43 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 } // namespace
 
 OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands,
-                                         OTARequestorAttributes & attributes) :
+                                         OTARequestorAttributes & attributes, FabricTable & fabricTable) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
-    mOtaCommands(otaCommands), mAttributes(attributes)
+    mOtaCommands(otaCommands), mAttributes(attributes), mFabricTable(fabricTable)
 {}
+
+OTARequestorCluster::~OTARequestorCluster()
+{
+    // Defensive: ensure we're unregistered even if Shutdown() was never called
+    // (LazyRegisteredServerCluster::Destroy calls the destructor directly without
+    // first calling Shutdown). RemoveFabricDelegate is a no-op if not registered.
+    mFabricTable.RemoveFabricDelegate(this);
+}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    return mAttributes.SetInteractionModelContext(mPath.mEndpointId, *this, context.interactionContext.eventsGenerator);
+    ReturnErrorOnFailure(
+        mAttributes.SetInteractionModelContext(mPath.mEndpointId, *this, context.interactionContext.eventsGenerator));
+    return mFabricTable.AddFabricDelegate(this);
+}
+
+void OTARequestorCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mFabricTable.RemoveFabricDelegate(this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
+void OTARequestorCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    // Clear the fabric-scoped attribute, then notify the requestor.
+    CHIP_ERROR err = mAttributes.RemoveDefaultOtaProvider(fabricIndex);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OTA Requestor: failed to clear DefaultOTAProviders for removed fabric %u: %" CHIP_ERROR_FORMAT,
+                     static_cast<unsigned>(fabricIndex), err.Format());
+    }
+    mOtaCommands.OnFabricRemoved(fabricIndex);
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -153,12 +181,14 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
         ReturnErrorOnFailure(data.Decode(input_arguments));
 
         auto & metadataForNode = data.metadataForNode;
-        if (metadataForNode.HasValue() && metadataForNode.Value().size() > kMaxMetadataLen)
-        {
-            ChipLogError(Zcl, "Metadata size %u exceeds max %u", static_cast<unsigned>(metadataForNode.Value().size()),
-                         static_cast<unsigned>(kMaxMetadataLen));
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
+        VerifyOrReturnError(!metadataForNode.HasValue() || metadataForNode.Value().size() <= kMaxMetadataLen,
+                            Protocols::InteractionModel::Status::ConstraintError,
+                            ChipLogError(Zcl, "Metadata size %u exceeds max %u",
+                                         static_cast<unsigned>(metadataForNode.Value().size()),
+                                         static_cast<unsigned>(kMaxMetadataLen)));
+        VerifyOrReturnError(data.announcementReason != OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUnknownEnumValue,
+                            Protocols::InteractionModel::Status::ConstraintError,
+                            ChipLogError(Zcl, "Received unknown announcement reason"));
         mOtaCommands.HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }

@@ -34,6 +34,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --int-arg pixit_fan_start_time:1
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -254,7 +269,7 @@ class TC_FAN_4_1(MatterBaseTest):
                 asserts.assert_not_equal(percent_setting, 0, "Incorrect percent setting")
 
             self.step(step_num + 3)
-            log.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
+            log.info("Waiting for %s seconds to give the fan a chance to respond", wait_s)
             await asyncio.sleep(wait_s)
 
             self.step(step_num + 4)
@@ -317,7 +332,8 @@ class TC_FAN_4_1(MatterBaseTest):
         self.step(step_num)
         attr = fan.Attributes.PercentSetting(50)
         resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
-        asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Invalid response from writing PercentSetting")
+        asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState],
+                          "Invalid response from writing PercentSetting")
         step_num += 1
 
         # we want to see a change on percent setting and percent current to 1

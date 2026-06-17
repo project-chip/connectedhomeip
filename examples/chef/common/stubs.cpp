@@ -1,5 +1,6 @@
 #include "DeviceTypes.h"
 #include "FakeAttributeAccess.h"
+#include "multi_column_switch_tags.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
@@ -79,8 +80,13 @@ void InitIdentifyCluster()
         if (epIndex >= kIdentifyTableSize)
             continue;
 
-        gIdentifyInstanceTable[epIndex] =
-            std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+        chip::app::Clusters::Identify::IdentifyTypeEnum idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kNone;
+        if (endpointId == 1)
+        {
+            idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator;
+        }
+
+        gIdentifyInstanceTable[epIndex] = std::make_unique<struct Identify>(endpointId, nullptr, nullptr, idType);
     }
 }
 } // namespace
@@ -129,12 +135,22 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]  
 
 namespace PostionSemanticTag {
 
-constexpr const uint8_t kNamespace                                   = 0x08; // Common Position Namespace
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft   = { .namespaceID = kNamespace, .tag = 0x00 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight  = { .namespaceID = kNamespace, .tag = 0x01 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namespaceID = kNamespace, .tag = 0x02 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
+constexpr const uint8_t kNamespace                                 = 0x08; // Common Position Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft = {
+    .namespaceID = kNamespace, .tag = 0x00, .label = MakeOptional(Nullable<Span<const char>>("left"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight = {
+    .namespaceID = kNamespace, .tag = 0x01, .label = MakeOptional(Nullable<Span<const char>>("right"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop = {
+    .namespaceID = kNamespace, .tag = 0x02, .label = MakeOptional(Nullable<Span<const char>>("top"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = {
+    .namespaceID = kNamespace, .tag = 0x03, .label = MakeOptional(Nullable<Span<const char>>("bottom"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = {
+    .namespaceID = kNamespace, .tag = 0x04, .label = MakeOptional(Nullable<Span<const char>>("middle"_span))
+};
 
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
@@ -142,14 +158,37 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 
 namespace NumberSemanticTag {
 constexpr const uint8_t kNamespace                                = 0x07; // Common Number Namespace
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = { .namespaceID = kNamespace, .tag = 0x01 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = { .namespaceID = kNamespace, .tag = 0x02 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = {
+    .namespaceID = kNamespace, .tag = 0x01, .label = MakeOptional(Nullable<Span<const char>>("one"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = {
+    .namespaceID = kNamespace, .tag = 0x02, .label = MakeOptional(Nullable<Span<const char>>("two"_span))
+};
 } // namespace NumberSemanticTag
 
-namespace GenericSwitch { // Tag lists for rootnode_genericswitch_9866e35d0b app
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { PostionSemanticTag::kBottom,
-                                                                               NumberSemanticTag::kTwo };
+namespace GenericSwitch {
+
+// These are generic tags
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottomTagList[] = { PostionSemanticTag::kBottom,
+                                                                                  NumberSemanticTag::kTwo };
+// These are representative tags.
+// Note: this tries to emulate data as seen in a real product, hence using the namespace.
+namespace BilresaRotary {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRotaryTagList[] = {
+    { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
+    { .namespaceID = 0x43, .tag = 0x04 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("rotary"_span)) },
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kButtonTagList[] = {
+    { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
+    { .namespaceID = 0x43, .tag = 0x02 },
+    { .namespaceID = 0x43, .tag = 0x06 },
+    { .namespaceID = 0x43, .tag = 0x05 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("button"_span)) },
+};
+} // namespace BilresaRotary
+
 } // namespace GenericSwitch
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
@@ -360,8 +399,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     }
     return Protocols::InteractionModel::Status::Success;
 }
-
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -624,14 +661,26 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
  */
 void GenericSwitchInit()
 {
-    if (DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId))
+    if (!DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(3, Device::kGenericSwitchDeviceTypeId))
     {
-        LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::kEp1TagList)));
+        return;
     }
-    if (DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId))
+
+    if (chef::isMultiColumnSwitch())
     {
-        LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kEp2TagList)));
+        return;
     }
+
+    // Rotary endpoint
+    LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::BilresaRotary::kRotaryTagList)));
+
+    // This is just a momentary switch endpoint with no multi press.
+    LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kTopTagList)));
+
+    // Button endpoint
+    LogErrorOnFailure(SetTagList(3, Span(GenericSwitch::BilresaRotary::kButtonTagList)));
 }
 
 /**
@@ -790,6 +839,7 @@ void ApplicationInit()
     WaterHeaterInit();
     ChimeInit();
     InitModeSelect();
+    chef::InitMultiColumnSwitch();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER

@@ -113,9 +113,9 @@ class TC_TLSCERT_2_3(TC_TLSCERT_Base):
             my_caid[i] = response.caid
 
         self.step(5)
-        log.warning(f"maximum cert {my_max_root_certs}")
+        log.warning("maximum cert %s", my_max_root_certs)
         for i in range(2, my_max_root_certs + 2):
-            log.warning(f"Root cert {i}")
+            log.warning("Root cert %s", i)
             response = await cr2_cmd.send_provision_root_command(certificate=my_root_cert[i])
             cr2_cmd.assert_valid_caid(response.caid)
             my_caid[i] = response.caid

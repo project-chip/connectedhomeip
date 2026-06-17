@@ -262,6 +262,15 @@ else()
     chip_gn_arg_append("chip_enable_thread"                     "false")
 endif()
 
+if (CONFIG_CHIP_USE_OT_ENDPOINT)
+    chip_gn_arg_append("chip_system_config_use_openthread_inet_endpoints" "true")
+    chip_gn_arg_append("chip_openthread_target"                  "\"//:openthread\"")
+    chip_gn_arg_append("chip_with_lwip"                         "false")
+else()
+    chip_gn_arg_append("chip_system_config_use_openthread_inet_endpoints" "false")
+    chip_gn_arg_append("chip_with_lwip"                         "true")
+endif()
+
 if (CONFIG_OPENTHREAD_FTD)
     chip_gn_arg_append("chip_openthread_ftd"                    "true")
 else()
@@ -356,6 +365,10 @@ if (CONFIG_CHIP_ENABLE_GROUPCAST)
 chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
 endif()
 
+if (CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+chip_gn_arg_bool("chip_device_config_enable_thread_meshcop" CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
@@ -372,6 +385,11 @@ set(filter_out "-DHAVE_CONFIG_H" "-DIDF_VER=\\\"${idf_ver}\\\"" )
 list(APPEND filter_out "-Iconfig")
 idf_build_get_property(config_dir CONFIG_DIR)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-I${config_dir}")
+
+if (CONFIG_CHIP_USE_OT_ENDPOINT)
+    idf_component_get_property(openthread_dir openthread COMPONENT_DIR)
+    target_compile_options(${COMPONENT_LIB} PRIVATE "-I${openthread_dir}/private_include")
+endif()
 
 if(filter_out)
     set(filter_arg "--filter-out=${filter_out}")
@@ -487,8 +505,14 @@ if (CONFIG_ENABLE_ENCRYPTED_OTA)
     list(APPEND matter_requires espressif__esp_encrypted_img)
 endif()
 
-add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
-                     REQUIRES ${matter_requires})
+if (CONFIG_ENABLE_DELTA_OTA)
+    list(APPEND matter_requires espressif__esp_delta_ota)
+endif()
+
+if(NOT TARGET matterlib)
+    add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
+                         REQUIRES ${matter_requires})
+endif()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
