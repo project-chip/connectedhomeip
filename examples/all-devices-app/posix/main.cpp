@@ -18,10 +18,10 @@
 
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
+#include <CommissionableInit.h>
 #include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
-#include <CommissionableInit.h>
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include <TraceDecoder.h>
 #include <TraceHandlers.h>
@@ -206,17 +206,18 @@ private:
 
 void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipePath)
 {
-    auto deviceConfigs = AppOptions::GetDeviceTypeEntries();
+    auto deviceConfigs              = AppOptions::GetDeviceTypeEntries();
     const auto & constructedDevices = devices.GetConstructedDevices();
     for (size_t i = 0; i < deviceConfigs.size(); i++)
     {
         const auto & config = deviceConfigs[i];
-        auto * device = constructedDevices[i].get();
+        auto * device       = constructedDevices[i].get();
 
         if (config.type == "occupancy-sensor")
         {
             auto * occupancyDevice = static_cast<OccupancySensorDevice *>(device);
-            gAllDevicesAppCommandDelegate.RegisterOccupancySensingCluster(config.endpoint, &occupancyDevice->OccupancySensingCluster());
+            gAllDevicesAppCommandDelegate.RegisterOccupancySensingCluster(config.endpoint,
+                                                                          &occupancyDevice->OccupancySensingCluster());
         }
         else if (config.type == "contact-sensor" || config.type == "water-leak-detector")
         {
@@ -230,14 +231,15 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
         }
     }
 
-    gAllDevicesAppCommandDelegate.RegisterBasicInformationCluster(kRootEndpointId, &devices.RootNode().GetRootNodeDevice().BasicInformation());
+    gAllDevicesAppCommandDelegate.RegisterBasicInformationCluster(kRootEndpointId,
+                                                                  &devices.RootNode().GetRootNodeDevice().BasicInformation());
     gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
 
     CHIP_ERROR err = gNamedPipeCommands.Start(namedPipePath, &gAllDevicesAppCommandDelegate);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to start named pipe at %s: %" CHIP_ERROR_FORMAT, namedPipePath, err.Format());
-        (void)gNamedPipeCommands.Stop();
+        (void) gNamedPipeCommands.Stop();
     }
 }
 
@@ -321,7 +323,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     const char * namedPipePath = LinuxDeviceOptions::GetInstance().app_pipe;
     if (strlen(namedPipePath) > 0)
     {
-         SetupNamedPipe(devices, namedPipePath);
+        SetupNamedPipe(devices, namedPipePath);
     }
 
     initParams.dataModelProvider      = &devices.DataModelProvider();
@@ -421,7 +423,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
-    (void)gNamedPipeCommands.Stop();
+    (void) gNamedPipeCommands.Stop();
     devices.Shutdown();
     Server::GetInstance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
@@ -456,22 +458,27 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(ParseArguments(argc, argv, AppOptions::GetOptions()));
     ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
-    const char * kvsPath = LinuxDeviceOptions::GetInstance().KVS == nullptr ? CHIP_CONFIG_KVS_PATH : LinuxDeviceOptions::GetInstance().KVS;
+    const char * kvsPath =
+        LinuxDeviceOptions::GetInstance().KVS == nullptr ? CHIP_CONFIG_KVS_PATH : LinuxDeviceOptions::GetInstance().KVS;
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    ReturnErrorOnFailure(chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance()));
+    ReturnErrorOnFailure(
+        chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance()));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     static AllDevicesExampleDeviceInfoProviderImpl sExampleDeviceInfoProvider;
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    ReturnErrorOnFailure(chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()), LinuxDeviceOptions::GetInstance()));
+    ReturnErrorOnFailure(chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
+                                                                  LinuxDeviceOptions::GetInstance()));
 
-    auto vendorId = LinuxDeviceOptions::GetInstance().payload.vendorID != 0 ?
-        std::make_optional(LinuxDeviceOptions::GetInstance().payload.vendorID) : std::nullopt;
-    auto productId = LinuxDeviceOptions::GetInstance().payload.productID != 0 ?
-        std::make_optional(LinuxDeviceOptions::GetInstance().payload.productID) : std::nullopt;
+    auto vendorId  = LinuxDeviceOptions::GetInstance().payload.vendorID != 0
+         ? std::make_optional(LinuxDeviceOptions::GetInstance().payload.vendorID)
+         : std::nullopt;
+    auto productId = LinuxDeviceOptions::GetInstance().payload.productID != 0
+        ? std::make_optional(LinuxDeviceOptions::GetInstance().payload.productID)
+        : std::nullopt;
     static AllDevicesExampleDeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(
         DeviceLayer::GetDeviceInstanceInfoProvider(), vendorId, productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);

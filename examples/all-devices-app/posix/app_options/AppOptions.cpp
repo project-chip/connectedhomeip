@@ -45,9 +45,9 @@ bool IsExcludedFromWildcard(const std::string & type)
 } // namespace
 
 // App custom argument handling
-constexpr uint16_t kOptionDeviceType    = 0xffd0;
-constexpr uint16_t kOptionPort          = 0xffd7;
-constexpr uint16_t kOptionGroupcast     = 0xffda;
+constexpr uint16_t kOptionDeviceType = 0xffd0;
+constexpr uint16_t kOptionPort       = 0xffd7;
+constexpr uint16_t kOptionGroupcast  = 0xffda;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -113,7 +113,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             ChipLogError(Support, "Invalid port: %s", value);
             return false;
         }
-        mConfig.port = static_cast<uint16_t>(val);
+        mConfig.port                                        = static_cast<uint16_t>(val);
         LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(val);
         ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
         return true;
