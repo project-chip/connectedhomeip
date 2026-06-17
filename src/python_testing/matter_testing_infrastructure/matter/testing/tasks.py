@@ -22,7 +22,6 @@ import threading
 from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import BinaryIO, Callable, Self
-from matter.testing.defaults import TestingDefaults
 
 from matter.testing.defaults import TestingDefaults
 

@@ -866,7 +866,7 @@ for that run, e.g.:
 
 -   `timeout`: Sets the timeout of the test script. When this timeout expires
     the test run is considered failed. The value is in seconds.
- 
+
     -   Example: `700.6`
     -   Default: `matter.testing.TestingDefaults.DEFAULT_TIMEOUT_S`
 
