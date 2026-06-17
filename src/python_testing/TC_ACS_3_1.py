@@ -56,8 +56,13 @@ HUMAN_ACTIVITY_NAMESPACE_ID = 75  # 0x4B
 OBJECT_IDENTIFICATION_NAMESPACE_ID = 73  # 0x49
 SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
-# Script Function Call
-# ./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters/chip-all-clusters-app  --factory-reset --app-args "--KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_1" --script src/python_testing/TC_ACS_3_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x03 --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x04 --float-arg PIXIT.ACS.Holdtime:30"
+# Script Function Call Example
+# ./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters/chip-all-clusters-app --factory-reset
+# --app-args "--KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_1" --script src/python_testing/TC_ACS_3_1.py
+# --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
+# --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
+# --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
+# --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
 
 class TC_ACS_3_1(MatterBaseTest):
