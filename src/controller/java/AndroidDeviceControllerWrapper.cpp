@@ -183,15 +183,15 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #if CONFIG_NETWORK_LAYER_BLE
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
-    initParams.listenPort                      = listenPort;
-    setupParams.controllerVendorId             = static_cast<chip::VendorId>(controllerVendorId);
-    setupParams.pairingDelegate                = wrapper.get();
-    setupParams.operationalCredentialsDelegate = opCredsIssuer;
-    setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
+    initParams.listenPort                       = listenPort;
+    setupParams.controllerVendorId              = static_cast<chip::VendorId>(controllerVendorId);
+    setupParams.pairingDelegate                 = wrapper.get();
+    setupParams.operationalCredentialsDelegate  = opCredsIssuer;
+    setupParams.defaultCommissioner             = &wrapper->mAutoCommissioner;
     setupParams.deleteFromFabricTableOnShutdown = true;
-    initParams.fabricIndependentStorage        = wrapperStorage;
-    initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
-    initParams.dataModelProvider               = app::CodegenDataModelProviderInstance(wrapperStorage);
+    initParams.fabricIndependentStorage         = wrapperStorage;
+    initParams.sessionKeystore                  = &wrapper->mSessionKeystore;
+    initParams.dataModelProvider                = app::CodegenDataModelProviderInstance(wrapperStorage);
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
