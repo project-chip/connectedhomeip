@@ -44,14 +44,22 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/fan/FanDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl/LoggingFanDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/FlowSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/impl/IncreasingFlowSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/HumiditySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/LightSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/impl/IncreasingLightSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/BatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/impl/DecreasingBatteryPowerSourceDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/PressureSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/impl/IncreasingPressureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/DefaultProximityRangingDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
@@ -111,15 +119,21 @@ foreach(_key
         contact-sensor
         dimmable-light
         fan
+        flow-sensor
+        humidity-sensor
+        light-sensor
         network-infrastructure-manager
         occupancy-sensor
         on-off-light
         power-source
+        pressure-sensor
         proximity-ranger
+        rain-sensor
         smoke-co-alarm
         soil-sensor
         speaker
         temperature-sensor
+        water-freeze-detector
         water-leak-detector
         # keep-sorted: end
     )
