@@ -33,10 +33,10 @@
 #include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <providers/AllDevicesExampleDeviceInstanceInfoProviderImpl.h>
 
-#include <app_options/AppOptions.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <accessors/common/AccessorRegistry.h>
 #include <accessors/common/OOBAccessor.h>
+#include <app_options/AppOptions.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #if PW_RPC_ENABLED
 #include <accessors/pigweed/PigweedAttributeAccessor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
