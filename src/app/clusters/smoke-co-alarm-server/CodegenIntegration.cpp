@@ -289,5 +289,3 @@ bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpoint, bool & v) const
     return true;
 }
 
-__attribute__((weak)) void MatterSmokeCoAlarmPluginServerInitCallback() {}
-__attribute__((weak)) void MatterSmokeCoAlarmPluginServerShutdownCallback() {}

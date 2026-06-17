@@ -286,7 +286,8 @@ private:
                             Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
                         .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                         .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                    });
+                    },
+                    smokeConfig);
             });
         }
 

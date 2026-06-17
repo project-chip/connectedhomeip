@@ -32,6 +32,14 @@ class AppSmokeCoAlarmDelegate : public Clusters::SmokeCoAlarmDelegate, public Ti
 public:
     static constexpr uint16_t kSelfTestTimeoutSec = 10;
 
+    ~AppSmokeCoAlarmDelegate() override
+    {
+        if (mTimerDelegate != nullptr)
+        {
+            mTimerDelegate->CancelTimer(this);
+        }
+    }
+
     void Init(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmCluster & cluster)
     {
         mTimerDelegate = &timerDelegate;
