@@ -52,7 +52,7 @@
         }
       ],
       "deviceVersions": [
-        4
+        5
       ],
       "deviceIdentifiers": [
         22
