@@ -20,8 +20,9 @@
 
 namespace chip::app::OOBDataSerializer {
 
-CHIP_ERROR SetAttributeRequestParser::Init(ByteSpan tlvBuffer)
+std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuffer)
 {
+    AttributeRequest request;
     chip::TLV::TLVReader rootReader;
     rootReader.Init(tlvBuffer);
 
@@ -40,7 +41,7 @@ CHIP_ERROR SetAttributeRequestParser::Init(ByteSpan tlvBuffer)
     {
         return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
     }
-    ReturnErrorAndLogOnFailure(rootReader.Get(path.mEndpointId), Support, "Failed to read EndpointId value");
+    ReturnErrorAndLogOnFailure(rootReader.Get(request.path.mEndpointId), Support, "Failed to read EndpointId value");
 
     // Tag 2: ClusterId
     ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to ClusterId element");
@@ -48,7 +49,7 @@ CHIP_ERROR SetAttributeRequestParser::Init(ByteSpan tlvBuffer)
     {
         return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
     }
-    ReturnErrorAndLogOnFailure(rootReader.Get(path.mClusterId), Support, "Failed to read ClusterId value");
+    ReturnErrorAndLogOnFailure(rootReader.Get(request.path.mClusterId), Support, "Failed to read ClusterId value");
 
     // Tag 3: AttributeId
     ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to AttributeId element");
@@ -56,7 +57,7 @@ CHIP_ERROR SetAttributeRequestParser::Init(ByteSpan tlvBuffer)
     {
         return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
     }
-    ReturnErrorAndLogOnFailure(rootReader.Get(path.mAttributeId), Support, "Failed to read AttributeId value");
+    ReturnErrorAndLogOnFailure(rootReader.Get(request.path.mAttributeId), Support, "Failed to read AttributeId value");
 
     // Tag 4: Arguments (args)
     ReturnErrorAndLogOnFailure(rootReader.Next(), Support, "Failed to advance TLV reader to AttributeValue element");
@@ -64,11 +65,11 @@ CHIP_ERROR SetAttributeRequestParser::Init(ByteSpan tlvBuffer)
     {
         return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
     }
-    attrValueReader = rootReader;
+    request.value = rootReader;
 
     ReturnErrorAndLogOnFailure(rootReader.ExitContainer(outerType), Support, "Failed to exit outer TLV structure container");
 
-    return CHIP_NO_ERROR;
+    return request;
 }
 
 CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path, const chip::TLV::TLVReader & attributeValueReader,

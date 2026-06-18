@@ -37,18 +37,24 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan acti
         return std::nullopt;
     }
 
-    OOBDataSerializer::SetAttributeRequestParser parser;
-    ReturnErrorAndLogOnFailure(parser.Init(tlvBuffer), Support, "Failed to parse attribute path and value from tlvBuffer");
+    auto parseResult = OOBDataSerializer::ParseAttributeRequest(tlvBuffer);
+    if (std::holds_alternative<CHIP_ERROR>(parseResult))
+    {
+        CHIP_ERROR err = std::get<CHIP_ERROR>(parseResult);
+        ChipLogError(Support, "Failed to parse attribute request: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
 
-    if (parser.path.mEndpointId != mDevice->GetEndpointId())
+    auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
+    if (request.path.mEndpointId != mDevice->GetEndpointId())
     {
         return std::nullopt; // Not for our endpoint
     }
 
     Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternalDeviceAccess };
-    AttributeValueDecoder decoder(parser.attrValueReader, subjectDescriptor);
+    AttributeValueDecoder decoder(request.value, subjectDescriptor);
 
-    return SetAttribute(parser.path, decoder);
+    return SetAttribute(request.path, decoder);
 }
 
 std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path,

@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <variant>
+
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -29,11 +31,16 @@ static constexpr uint8_t kTagClusterId   = 2;
 static constexpr uint8_t kTagAttributeId = 3;
 static constexpr uint8_t kTagValue       = 4;
 
+struct AttributeRequest
+{
+    ConcreteDataAttributePath path;
+    chip::TLV::TLVReader value;
+};
+
 /**
- * @brief A utility class for parsing a unified TLV buffer containing an out-of-band "SetAttribute" request.
+ * @brief Parses a unified TLV buffer containing an out-of-band "SetAttribute" request.
  *
- * @note To minimize code size and RAM overhead in resource-constrained environments, this parser expects
- * a strict, sequential binary layout. It does not loop or support out-of-order elements.
+ * @note This parser expects a strict, sequential binary layout. It does not loop or support out-of-order elements.
  * The incoming TLV buffer MUST contain exactly four sequential elements in the following strict order:
  *
  * Structure
@@ -42,13 +49,7 @@ static constexpr uint8_t kTagValue       = 4;
  * ├── Context Tag 3: AttributeId (uint32_t)
  * └── Context Tag 4: Raw, unwrapped Attribute Value (MUST be the last element to allow direct parsing).
  */
-struct SetAttributeRequestParser
-{
-    ConcreteDataAttributePath path;
-    chip::TLV::TLVReader attrValueReader;
-
-    CHIP_ERROR Init(ByteSpan tlvBuffer);
-};
+std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuffer);
 
 /**
  * @brief Dynamically allocates and builds a unified, out-of-band "SetAttribute" request TLV buffer.
