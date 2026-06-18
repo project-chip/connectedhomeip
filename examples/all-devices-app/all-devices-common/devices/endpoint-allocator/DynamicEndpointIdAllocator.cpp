@@ -16,6 +16,8 @@
 
 #include "DynamicEndpointIdAllocator.h"
 
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <utility>
 
 namespace chip::app {
@@ -23,12 +25,13 @@ namespace chip::app {
 DynamicEndpointIdAllocator::DynamicEndpointIdAllocator(std::set<EndpointId> reservedIds) :
     mUsedIds(std::move(reservedIds)), mNext(1)
 {
+    mUsedIds.insert(kRootEndpointId);
     Advance();
 }
 
 void DynamicEndpointIdAllocator::Advance()
 {
-    while (mUsedIds.count(mNext))
+    while (mNext < kInvalidEndpointId && mUsedIds.count(mNext))
     {
         mNext++;
     }
@@ -44,6 +47,7 @@ void DynamicEndpointIdAllocator::ForceNext(EndpointId endpoint)
 
 EndpointId DynamicEndpointIdAllocator::Allocate()
 {
+    VerifyOrDie(mNext != kInvalidEndpointId);
     EndpointId allocated = mNext++;
     mUsedIds.insert(allocated);
     Advance();
