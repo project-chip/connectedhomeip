@@ -277,7 +277,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
-    if '--timeout ' not in script_args:
+    if not any(arg.startswith('--timeout') for arg in shlex.split(script_args)):
         script_args += f" --timeout {int(script_timeout)}"
 
     # Generate unique test run ID to avoid conflicts in concurrent test runs
