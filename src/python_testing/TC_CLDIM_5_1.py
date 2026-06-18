@@ -246,7 +246,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
             )
         else:
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
-            self.skmark_current_step_skipped()
+            self.mark_current_step_skipped()
 
         # STEP 2n: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
         self.step("2n")
