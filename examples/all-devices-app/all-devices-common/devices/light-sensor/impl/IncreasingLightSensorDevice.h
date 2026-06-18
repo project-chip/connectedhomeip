@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,40 +16,32 @@
  */
 #pragma once
 
-#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <app/clusters/illuminance-measurement-server/IlluminanceMeasurementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/occupancy-sensor/OccupancySensorDevice.h>
+#include <devices/light-sensor/LightSensorDevice.h>
 #include <platform/DefaultTimerDelegate.h>
 
 namespace chip {
 namespace app {
 
-/**
- * @brief An implementation of an Occupancy Sensor Device.
- *
- * This class serves as a simple example of an occupancy sensor. It emulates
- * occupancy state changes by toggling between "Occupied" and "Unoccupied"
- * states every 30 seconds using a timer.
- */
-class TogglingOccupancySensorDevice : public OccupancySensorDevice, public Clusters::OccupancySensingDelegate, public TimerContext
+/// A simulated light sensor device that periodically increases the measured illuminance
+/// value to simulate changing light conditions, wrapping around to the minimum value
+/// once it reaches the maximum configured limit.
+class IncreasingLightSensorDevice : public LightSensorDevice, public TimerContext
 {
 public:
-    TogglingOccupancySensorDevice();
-    ~TogglingOccupancySensorDevice() override;
+    IncreasingLightSensorDevice(TimerDelegate & timerDelegate);
+    ~IncreasingLightSensorDevice() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // OccupancySensingDelegate
-    void OnOccupancyChanged(bool occupied) override;
-    void OnHoldTimeChanged(uint16_t holdTime) override;
-
     // TimerContext
     void TimerFired() override;
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
+    uint16_t mLightMeasuredValue = 0;
 };
 
 } // namespace app

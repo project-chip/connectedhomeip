@@ -50,13 +50,19 @@ _ALL_DEVICES_APP_DEVICES = [
     'contact-sensor',
     'dimmable-light',
     'fan',
+    'flow-sensor',
+    'humidity-sensor',
+    'light-sensor',
     'occupancy-sensor',
     'on-off-light',
     'power-source',
+    'pressure-sensor',
     'proximity-ranger',
+    'rain-sensor',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
+    'water-freeze-detector',
     'water-leak-detector',
     # keep-sorted: end
 ]
@@ -100,10 +106,9 @@ def BuildHostFakeTarget():
     target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
-    target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
-        "-clang").ExceptIfRe('-libfuzzer')
+    target.AppendModifier("ossfuzz", pw_fuzz_libfuzzer_compat=True).OnlyIfRe("-pw-fuzztest")
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
-        "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
+        "-clang").ExceptIfRe('-(libfuzzer|asan)')
     target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
@@ -230,10 +235,9 @@ def BuildHostTarget():
         "-(asan|tsan|ubsan|libfuzzer|ossfuzz|pw-fuzztest)")
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
-    target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
-        "-clang").ExceptIfRe('-libfuzzer')
+    target.AppendModifier("ossfuzz", pw_fuzz_libfuzzer_compat=True).OnlyIfRe("-pw-fuzztest")
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
-        "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
+        "-clang").ExceptIfRe('-(libfuzzer|asan)')
     target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
