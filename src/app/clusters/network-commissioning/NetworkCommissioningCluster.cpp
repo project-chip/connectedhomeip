@@ -1217,10 +1217,12 @@ CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPa
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
     {}
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     if (Features().Has(Feature::kPerDeviceCredentials))
     {
         ReturnErrorOnFailure(builder.AppendElements({ QueryIdentity::kMetadataEntry }));
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     return CHIP_NO_ERROR;
 }
@@ -1242,10 +1244,12 @@ CHIP_ERROR NetworkCommissioningCluster::GeneratedCommands(const ConcreteClusterP
         }));
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     if (Features().Has(Feature::kPerDeviceCredentials))
     {
         ReturnErrorOnFailure(builder.Append(QueryIdentityResponse::Id));
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     return CHIP_NO_ERROR;
 }
 
