@@ -48,8 +48,8 @@ const char * GetClusterTypeName<chip::app::Clusters::BasicInformationCluster>()
     return "chip::app::Clusters::BasicInformationCluster";
 }
 
-chip::app::ServerClusterInterface * AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(
-    const char * typeName, chip::EndpointId endpoint)
+chip::app::ServerClusterInterface *
+AllDevicesAppClusterImplementationRegistry::GetClusterInterfaceByEndpointAndType(const char * typeName, chip::EndpointId endpoint)
 {
     auto it = mClusters.find(typeName);
     if (it == mClusters.end())

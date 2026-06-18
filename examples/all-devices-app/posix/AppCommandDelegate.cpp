@@ -43,7 +43,9 @@ public:
     const char * GetName() const override { return "IncreaseConfigurationVersion"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BasicInformationCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BasicInformationCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "BasicInformationCluster not found on endpoint %d", endpointId);
@@ -61,7 +63,9 @@ public:
     const char * GetName() const override { return "SetOccupancy"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OccupancySensingCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OccupancySensingCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "OccupancySensingCluster not found on endpoint %d", endpointId);
@@ -93,7 +97,9 @@ public:
     const char * GetName() const override { return "SetHoldTime"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OccupancySensingCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OccupancySensingCluster>(
+                endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "OccupancySensingCluster not found on endpoint %d", endpointId);
@@ -124,7 +130,8 @@ public:
     const char * GetName() const override { return "SetBooleanState"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BooleanStateCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BooleanStateCluster>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "BooleanStateCluster not found on endpoint %d", endpointId);
@@ -149,7 +156,8 @@ public:
     const char * GetName() const override { return "SetOnOff"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OnOffCluster>(endpointId);
+        auto * cluster =
+            delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OnOffCluster>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "OnOffCluster not found on endpoint %d", endpointId);

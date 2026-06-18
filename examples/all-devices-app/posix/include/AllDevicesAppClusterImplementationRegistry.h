@@ -79,7 +79,7 @@ public:
     ClusterType * GetClusterByEndpoint(chip::EndpointId endpoint)
     {
         const char * name = GetClusterTypeName<ClusterType>();
-        auto * cluster = GetClusterInterfaceByEndpointAndType(name, endpoint);
+        auto * cluster    = GetClusterInterfaceByEndpointAndType(name, endpoint);
         return static_cast<ClusterType *>(cluster);
     }
 
