@@ -31,9 +31,12 @@
 #include <devices/generic-switch/GenericSwitchDevice.h>
 #include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
 #include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
+#include <devices/mounted-on-off-control/MountedOnOffControlDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/on-off-light-switch/OnOffLightSwitchDevice.h>
+#include <devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
@@ -228,6 +231,17 @@ private:
                 });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
+        {
+            RegisterCreator("mounted-on-off-control", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<MountedOnOffControlDevice>(LoggingOnOffLightDevice::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
             RegisterCreator("network-infrastructure-manager", [this]() {
@@ -240,6 +254,28 @@ private:
             RegisterCreator("on-off-light", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<LoggingOnOffLightDevice>(LoggingOnOffLightDevice::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT_SWITCH)
+        {
+            RegisterCreator("on-off-light-switch", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<OnOffLightSwitchDevice>(LoggingOnOffLightDevice::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
+        {
+            RegisterCreator("on-off-plug-in-unit", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<OnOffPlugInUnitDevice>(LoggingOnOffLightDevice::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,

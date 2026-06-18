@@ -55,10 +55,13 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/LightSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/impl/IncreasingLightSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/mounted-on-off-control/MountedOnOffControlDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light-switch/OnOffLightSwitchDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/BatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/impl/DecreasingBatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/PressureSensorDevice.cpp"
@@ -127,9 +130,12 @@ foreach(_key
         generic-switch
         humidity-sensor
         light-sensor
+        mounted-on-off-control
         network-infrastructure-manager
         occupancy-sensor
         on-off-light
+        on-off-light-switch
+        on-off-plug-in-unit
         power-source
         pressure-sensor
         proximity-ranger

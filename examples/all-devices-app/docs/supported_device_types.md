@@ -43,7 +43,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (26 total)
+## Implemented Device Types (29 total)
 
 | #   | Device Type Name               | ID           | Notes |
 | --- | ------------------------------ | ------------ | ----- |
@@ -59,21 +59,24 @@ To update or validate this list manually, follow these steps:
 | 10  | Generic Switch                 | 15 (0x000F)  |       |
 | 11  | Humidity Sensor                | 775 (0x0307) |       |
 | 12  | Light Sensor                   | 262 (0x0106) |       |
-| 13  | Network Infrastructure Manager | 144 (0x0090) |       |
-| 14  | Occupancy Sensor               | 263 (0x0107) |       |
-| 15  | On/Off Light                   | 256 (0x0100) |       |
-| 16  | Power Source                   | 17 (0x0011)  |       |
-| 17  | Pressure Sensor                | 773 (0x0305) |       |
-| 18  | Proximity Ranger               | 338 (0x0152) |       |
-| 19  | Rain Sensor                    | 68 (0x0044)  |       |
-| 20  | Root Node                      | 22 (0x0016)  |       |
-| 21  | Smoke CO Alarm                 | 118 (0x0076) |       |
-| 22  | Soil Sensor                    | 69 (0x0045)  |       |
-| 23  | Speaker                        | 34 (0x0022)  |       |
-| 24  | Temperature Sensor             | 770 (0x0302) |       |
-| 25  | Water Freeze Detector          | 65 (0x0041)  |       |
-| 26  | Water Leak Detector            | 67 (0x0043)  |       |
-## Unimplemented Device Types (78 total)
+| 13  | Mounted On/Off Control         | 271 (0x010F) |       |
+| 14  | Network Infrastructure Manager | 144 (0x0090) |       |
+| 15  | Occupancy Sensor               | 263 (0x0107) |       |
+| 16  | On/Off Light                   | 256 (0x0100) |       |
+| 17  | On/Off Light Switch            | 259 (0x0103) |       |
+| 18  | On/Off Plug-In Unit            | 266 (0x010A) |       |
+| 19  | Power Source                   | 17 (0x0011)  |       |
+| 20  | Pressure Sensor                | 773 (0x0305) |       |
+| 21  | Proximity Ranger               | 338 (0x0152) |       |
+| 22  | Rain Sensor                    | 68 (0x0044)  |       |
+| 23  | Root Node                      | 22 (0x0016)  |       |
+| 24  | Smoke CO Alarm                 | 118 (0x0076) |       |
+| 25  | Soil Sensor                    | 69 (0x0045)  |       |
+| 26  | Speaker                        | 34 (0x0022)  |       |
+| 27  | Temperature Sensor             | 770 (0x0302) |       |
+| 28  | Water Freeze Detector          | 65 (0x0041)  |       |
+| 29  | Water Leak Detector            | 67 (0x0043)  |       |
+## Unimplemented Device Types (75 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                               | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
@@ -128,11 +131,8 @@ To update or validate this list manually, follow these steps:
 | 49  | Microwave Oven                    | 121 (0x0079)  | Microwave Oven Control, Identify [O], Fan Control [O]                                                                                                                                                                        | Operational State, Microwave Oven Mode                                                                                                                                                                                               | Blocked         |
 | 50  | Mode Select                       | 39 (0x0027)   | None                                                                                                                                                                                                                         | Mode Select                                                                                                                                                                                                                          | Blocked         |
 | 51  | Mounted Dimmable Load Control     | 272 (0x0110)  | Identify, Groups, On/Off, Level Control, Scenes Management                                                                                                                                                                   | None                                                                                                                                                                                                                                 | Ready           |
-| 52  | Mounted On/Off Control            | 271 (0x010F)  | Identify, Groups, On/Off, Scenes Management, Level Control [O]                                                                                                                                                               | None                                                                                                                                                                                                                                 | Ready           |
 | 53  | OTA Provider                      | 20 (0x0014)   | OTA Software Update Provider                                                                                                                                                                                                 | None                                                                                                                                                                                                                                 | Ready           |
 | 54  | OTA Requestor                     | 18 (0x0012)   | OTA Software Update Requestor                                                                                                                                                                                                | None                                                                                                                                                                                                                                 | Ready           |
-| 55  | On/Off Light Switch               | 259 (0x0103)  | Identify                                                                                                                                                                                                                     | None                                                                                                                                                                                                                                 | Ready           |
-| 56  | On/Off Plug-in Unit               | 266 (0x010A)  | Identify, Groups, On/Off, Scenes Management, Level Control [O]                                                                                                                                                               | None                                                                                                                                                                                                                                 | Ready           |
 | 57  | On/Off Sensor                     | 2128 (0x0850) | Identify                                                                                                                                                                                                                     | None                                                                                                                                                                                                                                 | Ready           |
 | 58  | Oven                              | 123 (0x007B)  | Identify [O]                                                                                                                                                                                                                 | Temperature Controlled Cabinet Topology [O]                                                                                                                                                                                          | Minimally Ready |
 | 59  | Pump                              | 771 (0x0303)  | Identify, On/Off, Groups [O], Level Control [O], Scenes Management [O], Temperature Measurement [O], Pressure Measurement [O], Flow Measurement [O]                                                                          | Pump Configuration and Control                                                                                                                                                                                                       | Blocked         |

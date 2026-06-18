@@ -91,6 +91,10 @@ _available_devices = [
     "LIGHT_SENSOR",
   ],
   [
+    "mounted-on-off-control",
+    "MOUNTED_ON_OFF_CONTROL",
+  ],
+  [
     "network-infrastructure-manager",
     "NETWORK_INFRASTRUCTURE_MANAGER",
   ],
@@ -101,6 +105,14 @@ _available_devices = [
   [
     "on-off-light",
     "ON_OFF_LIGHT",
+  ],
+  [
+    "on-off-light-switch",
+    "ON_OFF_LIGHT_SWITCH",
+  ],
+  [
+    "on-off-plug-in-unit",
+    "ON_OFF_PLUG_IN_UNIT",
   ],
   [
     "power-source",
