@@ -821,11 +821,11 @@ void SmokeCoAlarmInit()
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kSmokeCoAlarmDeviceTypeId))
     {
         static SmokeCoAlarm::ChefSmokeCoAlarmDelegate delegate;
-        SmokeCoAlarm::SmokeCoAlarmCluster::Config config;
+        SmokeCoAlarmCluster::Config config;
         config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
         config.optionalAttribs =
-            SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet::All());
-        VerifyOrDieWithMsg(SmokeCoAlarm::SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
+            SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        VerifyOrDieWithMsg(SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
                            "Error: SmokeCoAlarmServer::Init failed");
     }
 #endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
