@@ -22,13 +22,6 @@
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 
-const std::array<ExpressedStateEnum, chip::app::Clusters::SmokeCoAlarmCluster::kPriorityOrderLength>
-    chip::app::AppSmokeCoAlarmDelegate::sPriorityOrder = {
-        ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,
-        ExpressedStateEnum::kCOAlarm,     ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
-        ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
-    };
-
 namespace chip {
 namespace app {
 
@@ -60,9 +53,10 @@ SmokeCoAlarmCluster::Config DefaultSmokeConfig()
 
 } // namespace
 
-SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mCoConfig(DefaultCoConfig()), mSmokeConfig(DefaultSmokeConfig())
+SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
+    mSmokeConfig(DefaultSmokeConfig())
 {}
 
 CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -73,10 +67,7 @@ CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mSmokeCoAlarmCluster.Create(endpoint, mSmokeConfig);
-    // The delegate holds references to the timer delegate and the cluster, so it can only be built now that the
-    // cluster exists.
-    mSmokeCoAlarmDelegate = std::make_unique<AppSmokeCoAlarmDelegate>(mTimerDelegate, mSmokeCoAlarmCluster.Cluster());
-    mSmokeCoAlarmCluster.Cluster().SetDelegate(mSmokeCoAlarmDelegate.get());
+    mSmokeCoAlarmCluster.Cluster().SetDelegate(&mSmokeCoAlarmDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mSmokeCoAlarmCluster.Registration()));
 
     mCoMeasurementCluster.Create(endpoint, mCoConfig);
@@ -98,8 +89,6 @@ void SmokeCoAlarmDevice::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mSmokeCoAlarmCluster.Cluster()));
         mSmokeCoAlarmCluster.Destroy();
     }
-    // Releasing the delegate cancels any pending self-test timer (see ~AppSmokeCoAlarmDelegate).
-    mSmokeCoAlarmDelegate.reset();
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));

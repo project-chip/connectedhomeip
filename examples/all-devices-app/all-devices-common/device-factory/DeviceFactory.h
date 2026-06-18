@@ -31,7 +31,7 @@
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
-#include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
+#include <devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -272,7 +272,7 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<SmokeCoAlarmDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingOnlySmokeCoAlarmDevice>(mContext->timerDelegate);
             });
         }
 
