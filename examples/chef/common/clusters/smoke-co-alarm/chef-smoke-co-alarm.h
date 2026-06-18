@@ -37,9 +37,5 @@ public:
 
 } // namespace chip::app::Clusters::SmokeCoAlarm
 
-/**
- * @brief Registers the Smoke CO Alarm cluster on endpoint 1 when the device
- *        exposes the Smoke CO Alarm device type. Called from ApplicationInit().
- */
-void SmokeCoAlarmInit();
+/// Cancels the pending self-test timer (if any). Called from ApplicationShutdown().
 void SmokeCoAlarmShutdown();

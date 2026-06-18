@@ -119,7 +119,10 @@ void InitIdentifyCluster()
 #include <app/clusters/chime-server/CodegenIntegration.h>
 #endif
 
+#if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
 #include <smoke-co-alarm/chef-smoke-co-alarm.h>
+#endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace {
 
@@ -812,6 +815,23 @@ void ChimeInit()
 #endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
 }
 
+
+void SmokeCoAlarmInit()
+{
+#if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kSmokeCoAlarmDeviceTypeId))
+    {
+        static SmokeCoAlarm::ChefSmokeCoAlarmDelegate delegate;
+        SmokeCoAlarm::SmokeCoAlarmCluster::Config config;
+        config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
+        config.optionalAttribs = SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet(
+            SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        VerifyOrDieWithMsg(SmokeCoAlarm::SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
+                           "Error: SmokeCoAlarmServer::Init failed");
+    }
+#endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+}
+
 void InitModeSelect()
 {
 #if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
@@ -880,7 +900,9 @@ void ApplicationInit()
 void ApplicationShutdown()
 {
     ChipLogProgress(NotSpecified, "Chef Application Down !!!");
+#if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     SmokeCoAlarmShutdown();
+#endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 }
 
 // No-op function, used to force linking this file,

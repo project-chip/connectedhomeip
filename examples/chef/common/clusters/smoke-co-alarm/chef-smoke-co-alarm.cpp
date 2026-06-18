@@ -18,10 +18,7 @@
 
 #include "chef-smoke-co-alarm.h"
 
-#include "DeviceTypes.h"
 #include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
-#include <app/util/config.h>
-#include <devices/Ids.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -54,10 +51,7 @@ void EndSelfTestingEventHandler(System::Layer *, void *)
 
 } // namespace
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace SmokeCoAlarm {
+namespace chip::app::Clusters::SmokeCoAlarm {
 
 void ChefSmokeCoAlarmDelegate::OnSelfTestRequested()
 {
@@ -76,26 +70,9 @@ void ChefSmokeCoAlarmDelegate::OnExpressedStateChanged(ExpressedStateEnum newExp
     ChipLogProgress(Zcl, "[Smoke-CO-Alarm] => ExpressedState changed to %u", to_underlying(newExpressedState));
 }
 
+} // namespace chip::app::Clusters::SmokeCoAlarm
+
 void SmokeCoAlarmShutdown()
 {
     DeviceLayer::SystemLayer().CancelTimer(EndSelfTestingEventHandler, nullptr);
-}
-} // namespace SmokeCoAlarm
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-void SmokeCoAlarmInit()
-{
-#if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
-    if (chef::DeviceTypes::EndpointHasDeviceType(kSmokeCoAlarmEndpoint, Device::kSmokeCoAlarmDeviceTypeId))
-    {
-        static ChefSmokeCoAlarmDelegate delegate;
-        SmokeCoAlarmCluster::Config config;
-        config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-        VerifyOrDieWithMsg(SmokeCoAlarmServer::Instance().Init(kSmokeCoAlarmEndpoint, config, &delegate) == CHIP_NO_ERROR, Zcl,
-                           "Error: SmokeCoAlarmServer::Init failed");
-    }
-#endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 }
