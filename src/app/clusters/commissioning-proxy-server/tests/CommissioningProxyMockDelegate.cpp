@@ -34,8 +34,9 @@ CommissioningProxyMockDelegate::CommissioningProxyMockDelegate()  = default;
 CommissioningProxyMockDelegate::~CommissioningProxyMockDelegate() = default;
 
 Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyConnectRequest(
-    DataModel::Nullable<chip::ByteSpan> address, chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
-    uint16_t discriminator, chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
+    DataModel::Nullable<chip::ByteSpan> address,
+    chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport, uint16_t discriminator,
+    chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
     chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBand, app::CommandHandler * commandObj,
     const DataModel::InvokeRequest & request)
 {

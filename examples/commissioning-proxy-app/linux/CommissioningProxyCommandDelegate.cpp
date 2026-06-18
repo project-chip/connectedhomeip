@@ -337,11 +337,9 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     }
 }
 
-Protocols::InteractionModel::Status
-Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(chip::BitMask<CapabilitiesBitmap> transport,
-                                                             chip::BitMask<WiFiBandBitmap> wiFiBands,
-                                                             app::CommandHandler * commandObj,
-                                                             const DataModel::InvokeRequest & request)
+Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(
+    chip::BitMask<CapabilitiesBitmap> transport, chip::BitMask<WiFiBandBitmap> wiFiBands, app::CommandHandler * commandObj,
+    const DataModel::InvokeRequest & request)
 {
     ChipLogProgress(AppServer, "ProxyScanRequest: transport:0x%x wiFiBands:0x%x", transport.Raw(), wiFiBands.Raw());
 
@@ -711,7 +709,7 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(chip:
                     transportMask.Raw(), wiFiBandsMask.Raw(), fabricIndex, ChipLogValueX64(nodeId));
 
     const CapabilitiesBitmap transport = static_cast<CapabilitiesBitmap>(transportMask.Raw());
-    const WiFiBandBitmap wiFiBands      = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
+    const WiFiBandBitmap wiFiBands     = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
 
     // Fan the stop out to every transport; each matches the request against its
     // own per-fabric record.  NotFound is returned only if no transport had a
