@@ -288,7 +288,7 @@ TEST_F(TestUdcMessages, TestUDCClients)
     EXPECT_EQ(nullptr, mUdcClients.FindUDCClientState(instanceName4));
 
     // test re-activation
-    EXPECT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
+    ASSERT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
     System::Clock::Timestamp expirationTime = state->GetExpirationTime();
     state->SetExpirationTime(expirationTime - System::Clock::Milliseconds64(1));
     EXPECT_EQ((expirationTime - System::Clock::Milliseconds64(1)), state->GetExpirationTime());
@@ -480,6 +480,73 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
 
     // TODO: remove following "force-fail" debug line
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName = "servertest1";
+
+    uint8_t idBuffer[500] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), Dnssd::Commission::kInstanceNameMaxLength + 1, instanceName);
+
+    size_t offset = Dnssd::Commission::kInstanceNameMaxLength + 1;
+    TLV::TLVWriter writer;
+    writer.Init(idBuffer + offset, sizeof(idBuffer) - offset);
+
+    TLV::TLVType outerContainerType = TLV::kTLVType_Structure;
+    EXPECT_SUCCESS(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+
+    uint8_t oversizedId[60] = {};
+    memset(oversizedId, 0xAB, sizeof(oversizedId));
+    EXPECT_SUCCESS(writer.PutBytes(TLV::ContextTag(7), oversizedId, sizeof(oversizedId)));
+
+    EXPECT_SUCCESS(writer.EndContainer(outerContainerType));
+    EXPECT_SUCCESS(writer.Finalize());
+
+    size_t totalLen = offset + writer.GetLengthWritten();
+
+    EXPECT_NE(idOut.ReadPayload(idBuffer, totalLen), CHIP_NO_ERROR);
+    EXPECT_EQ(idOut.GetRotatingIdLength(), 0u);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTruncatedPayload)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[5] = { 't', 'e', 's', 't', '\0' };
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName                                       = "servertest1";
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), sizeof(idBuffer), instanceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+    EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(idBuffer, 'A', sizeof(idBuffer));
+
+    const char * deviceName = "test-device";
+    idOut.SetDeviceName(deviceName);
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    char expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(expectedInstanceName, 'A', Dnssd::Commission::kInstanceNameMaxLength);
+    expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength] = '\0';
+    EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
 }
 
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)

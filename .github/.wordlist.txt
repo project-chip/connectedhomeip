@@ -39,8 +39,8 @@ aef
 AES
 AFL
 AIDL
-aliased
 algs
+aliased
 alloc
 allocator
 allocators
@@ -193,9 +193,9 @@ bz
 bzip
 CACACACA
 cacerts
+CAfile
 callsite
 callsites
-CAfile
 cancelled
 capacitive
 CarbonDioxideConcentrationMeasurement
@@ -317,8 +317,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 contrib
@@ -416,6 +416,7 @@ dereferencing
 desc
 descheduled
 destructor
+destructors
 detokenization
 detokenizer
 dev
@@ -540,6 +541,7 @@ endian
 EndpointId
 eno
 entrypoint
+Entrypoints
 enum
 Enums
 env
@@ -648,6 +650,7 @@ generalised
 GenericConfigurationManagerImpl
 GenericConnectivityManagerImpl
 GenericImpl
+Genericity
 GenericPlatformManagerImpl
 GenericThreadConfigurationManagerImpl
 GenericThreadStackManagerImpl
@@ -678,6 +681,7 @@ googleapis
 googlesource
 GPG
 GPIO
+GPIOs
 GPL
 GPLv
 Gradle
@@ -695,6 +699,7 @@ gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
+Hardcode
 hardcoded
 hardcodes
 hardknott
@@ -1187,10 +1192,11 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
-Pm1ConcentrationMeasurement
-Pm10ConcentrationMeasurement
-Pm25ConcentrationMeasurement
+pluggable
 PluginServerCallback
+Pm10ConcentrationMeasurement
+Pm1ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 png
 Podman
 PollControl
@@ -1265,8 +1271,8 @@ QueryImageResponse
 queryImageStatus
 Quickstart
 qvCHIP
-RADVD
 RadonConcentrationMeasurement
+RADVD
 raspberryPi
 RasPi
 rAv
@@ -1291,10 +1297,10 @@ recurse
 refrigeratoralarm
 regen
 registerAttributeAccessOverride
-registration
 RegisterCommandHandler
-registry
+registration
 registrations
+registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1307,8 +1313,8 @@ repo
 repos
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1318,6 +1324,7 @@ reviwed
 rfid
 rfids
 RGB
+ripgrep
 riscv
 rloc
 rmw
@@ -1372,8 +1379,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1724,9 +1731,9 @@ xbef
 xc
 xcd
 Xcode
+Xcode's
 xcodebuild
 xcodeproj
-Xcode's
 xcworkspace
 xd
 xds

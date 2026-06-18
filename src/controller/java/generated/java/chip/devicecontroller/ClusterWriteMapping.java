@@ -592,6 +592,8 @@ public class ClusterWriteMapping {
     );
     writeLaundryDryerControlsInteractionInfo.put("writeSelectedDrynessLevelAttribute", writeLaundryDryerControlsSelectedDrynessLevelAttributeInteractionInfo);
     writeAttributeMap.put("laundryDryerControls", writeLaundryDryerControlsInteractionInfo);
+    Map<String, InteractionInfo> writeTemperatureControlledCabinetTopologyInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("temperatureControlledCabinetTopology", writeTemperatureControlledCabinetTopologyInteractionInfo);
     Map<String, InteractionInfo> writeModeSelectInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeModeSelectStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo modeSelectstartUpModeCommandParameterInfo =

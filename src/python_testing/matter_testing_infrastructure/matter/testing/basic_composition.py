@@ -24,6 +24,7 @@ import pathlib
 import sys
 import typing
 from dataclasses import dataclass
+from importlib.resources.abc import Traversable
 from pprint import pformat, pprint
 from typing import Any, Optional
 
@@ -38,7 +39,9 @@ from matter.testing.conformance import ConformanceException
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlCluster, XmlDeviceType, build_xml_clusters,
+                                         build_xml_device_types, dm_from_spec_version)
+from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
 
@@ -148,8 +151,8 @@ class BasicCompositionTests(MatterBaseTest):
     problems: list[ProblemNotice]
     endpoints: dict[int, Any]  # Wildcard read result
     endpoints_tlv: dict[int, Any]  # Wildcard read result (raw TLV)
-    xml_clusters: dict[int, Any]
-    xml_device_types: dict[int, Any]
+    xml_clusters: dict[uint, XmlCluster]
+    xml_device_types: dict[int, XmlDeviceType]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
         """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
@@ -259,11 +262,16 @@ class BasicCompositionTests(MatterBaseTest):
         except ConformanceException as e:
             asserts.fail(f"Unable to identify specification version: {e}")
 
-    def build_spec_xmls(self):
+    def build_spec_xmls(self, errata_path: str | Traversable | None = None):
+        if errata_path is None:
+            errata_path = self.matter_test_config.spec_errata_path
+
         dm = self._get_dm()
         LOGGER.info("----------------------------------------------------------------------------------")
         LOGGER.info("-- Running tests against Specification version %s", dm.dirname)
+        if errata_path is not None:
+            LOGGER.info("-- Enabling Data Model Errata overlay: %s", errata_path)
         LOGGER.info("----------------------------------------------------------------------------------")
-        self.xml_clusters, self.problems = build_xml_clusters(dm)
+        self.xml_clusters, self.problems = build_xml_clusters(dm, errata_path=errata_path)
         self.xml_device_types, problems = build_xml_device_types(dm)
         self.problems.extend(problems)

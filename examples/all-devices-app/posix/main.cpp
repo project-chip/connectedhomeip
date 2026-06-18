@@ -35,7 +35,7 @@
 
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -154,7 +154,8 @@ public:
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
-            auto device = DeviceFactory::GetInstance().Create(entry.type);
+            auto device = DeviceFactory::GetInstance().Create(entry.type, entry.label);
+
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
@@ -382,6 +383,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
     const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));

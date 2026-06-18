@@ -10023,7 +10023,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & nonNullValue_1 = encodableStruct.groupKeySet.epochStartTime2.SetNonNull();
             nonNullValue_1 = self.groupKeySet.epochStartTime2.unsignedLongLongValue;
         }
-        encodableStruct.groupKeySet.groupKeyMulticastPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.groupKeySet.groupKeyMulticastPolicy)>>(self.groupKeySet.groupKeyMulticastPolicy.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -10260,7 +10259,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         } else {
             self.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime2.Value()];
         }
-        self.groupKeySet.groupKeyMulticastPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.groupKeySet.groupKeyMulticastPolicy)];
     }
     return CHIP_NO_ERROR;
 }
@@ -28287,6 +28285,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _networkIdentityType = nil;
 
+        _clientIndex = nil;
+
         _identifier = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
@@ -28300,6 +28300,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.networkIdentityIndex = self.networkIdentityIndex;
     other.networkIdentityType = self.networkIdentityType;
+    other.clientIndex = self.clientIndex;
     other.identifier = self.identifier;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -28309,7 +28310,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkIdentityIndex:%@; networkIdentityType:%@; identifier:%@; >", NSStringFromClass([self class]), _networkIdentityIndex, _networkIdentityType, [_identifier base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkIdentityIndex:%@; networkIdentityType:%@; clientIndex:%@; identifier:%@; >", NSStringFromClass([self class]), _networkIdentityIndex, _networkIdentityType, _clientIndex, [_identifier base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -28331,6 +28332,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         if (self.networkIdentityType != nil) {
             auto & definedValue_0 = encodableStruct.networkIdentityType.Emplace();
             definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.networkIdentityType.unsignedCharValue);
+        }
+    }
+    {
+        if (self.clientIndex != nil) {
+            auto & definedValue_0 = encodableStruct.clientIndex.Emplace();
+            definedValue_0 = self.clientIndex.unsignedShortValue;
         }
     }
     {

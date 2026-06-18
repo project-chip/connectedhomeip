@@ -3807,7 +3807,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   public @Nullable Long epochStartTime1;
   public @Nullable byte[] epochKey2;
   public @Nullable Long epochStartTime2;
-  public Integer groupKeyMulticastPolicy;
   private static final long GROUP_KEY_SET_ID_ID = 0L;
   private static final long GROUP_KEY_SECURITY_POLICY_ID = 1L;
   private static final long EPOCH_KEY0_ID = 2L;
@@ -3816,7 +3815,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   private static final long EPOCH_START_TIME1_ID = 5L;
   private static final long EPOCH_KEY2_ID = 6L;
   private static final long EPOCH_START_TIME2_ID = 7L;
-  private static final long GROUP_KEY_MULTICAST_POLICY_ID = 8L;
 
   public GroupKeyManagementClusterGroupKeySetStruct(
     Integer groupKeySetID,
@@ -3826,8 +3824,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable byte[] epochKey1,
     @Nullable Long epochStartTime1,
     @Nullable byte[] epochKey2,
-    @Nullable Long epochStartTime2,
-    Integer groupKeyMulticastPolicy
+    @Nullable Long epochStartTime2
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -3837,7 +3834,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     this.epochStartTime1 = epochStartTime1;
     this.epochKey2 = epochKey2;
     this.epochStartTime2 = epochStartTime2;
-    this.groupKeyMulticastPolicy = groupKeyMulticastPolicy;
   }
 
   public StructType encodeTlv() {
@@ -3850,7 +3846,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     values.add(new StructElement(EPOCH_START_TIME1_ID, epochStartTime1 != null ? new UIntType(epochStartTime1) : new NullType()));
     values.add(new StructElement(EPOCH_KEY2_ID, epochKey2 != null ? new ByteArrayType(epochKey2) : new NullType()));
     values.add(new StructElement(EPOCH_START_TIME2_ID, epochStartTime2 != null ? new UIntType(epochStartTime2) : new NullType()));
-    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, new UIntType(groupKeyMulticastPolicy)));
 
     return new StructType(values);
   }
@@ -3867,7 +3862,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable Long epochStartTime1 = null;
     @Nullable byte[] epochKey2 = null;
     @Nullable Long epochStartTime2 = null;
-    Integer groupKeyMulticastPolicy = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3909,11 +3903,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
           UIntType castingValue = element.value(UIntType.class);
           epochStartTime2 = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == GROUP_KEY_MULTICAST_POLICY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          groupKeyMulticastPolicy = castingValue.value(Integer.class);
-        }
       }
     }
     return new GroupKeyManagementClusterGroupKeySetStruct(
@@ -3924,8 +3913,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
       epochKey1,
       epochStartTime1,
       epochKey2,
-      epochStartTime2,
-      groupKeyMulticastPolicy
+      epochStartTime2
     );
   }
 
@@ -3956,9 +3944,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     output.append("\n");
     output.append("\tepochStartTime2: ");
     output.append(epochStartTime2);
-    output.append("\n");
-    output.append("\tgroupKeyMulticastPolicy: ");
-    output.append(groupKeyMulticastPolicy);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -14205,18 +14190,22 @@ public static class NetworkIdentityManagementClusterActiveNetworkIdentityStruct 
 public static class NetworkIdentityManagementClusterClientStruct {
   public Integer clientIndex;
   public byte[] clientIdentifier;
+  public Integer clientIdentityType;
   public @Nullable Integer networkIdentityIndex;
   private static final long CLIENT_INDEX_ID = 0L;
   private static final long CLIENT_IDENTIFIER_ID = 1L;
-  private static final long NETWORK_IDENTITY_INDEX_ID = 2L;
+  private static final long CLIENT_IDENTITY_TYPE_ID = 2L;
+  private static final long NETWORK_IDENTITY_INDEX_ID = 3L;
 
   public NetworkIdentityManagementClusterClientStruct(
     Integer clientIndex,
     byte[] clientIdentifier,
+    Integer clientIdentityType,
     @Nullable Integer networkIdentityIndex
   ) {
     this.clientIndex = clientIndex;
     this.clientIdentifier = clientIdentifier;
+    this.clientIdentityType = clientIdentityType;
     this.networkIdentityIndex = networkIdentityIndex;
   }
 
@@ -14224,6 +14213,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CLIENT_INDEX_ID, new UIntType(clientIndex)));
     values.add(new StructElement(CLIENT_IDENTIFIER_ID, new ByteArrayType(clientIdentifier)));
+    values.add(new StructElement(CLIENT_IDENTITY_TYPE_ID, new UIntType(clientIdentityType)));
     values.add(new StructElement(NETWORK_IDENTITY_INDEX_ID, networkIdentityIndex != null ? new UIntType(networkIdentityIndex) : new NullType()));
 
     return new StructType(values);
@@ -14235,6 +14225,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     }
     Integer clientIndex = null;
     byte[] clientIdentifier = null;
+    Integer clientIdentityType = null;
     @Nullable Integer networkIdentityIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CLIENT_INDEX_ID) {
@@ -14247,6 +14238,11 @@ public static class NetworkIdentityManagementClusterClientStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           clientIdentifier = castingValue.value(byte[].class);
         }
+      } else if (element.contextTagNum() == CLIENT_IDENTITY_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clientIdentityType = castingValue.value(Integer.class);
+        }
       } else if (element.contextTagNum() == NETWORK_IDENTITY_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -14257,6 +14253,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     return new NetworkIdentityManagementClusterClientStruct(
       clientIndex,
       clientIdentifier,
+      clientIdentityType,
       networkIdentityIndex
     );
   }
@@ -14270,6 +14267,9 @@ public static class NetworkIdentityManagementClusterClientStruct {
     output.append("\n");
     output.append("\tclientIdentifier: ");
     output.append(Arrays.toString(clientIdentifier));
+    output.append("\n");
+    output.append("\tclientIdentityType: ");
+    output.append(clientIdentityType);
     output.append("\n");
     output.append("\tnetworkIdentityIndex: ");
     output.append(networkIdentityIndex);

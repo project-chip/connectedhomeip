@@ -531,6 +531,10 @@
 #include <clusters/TemperatureControl/Commands.ipp>
 #include <clusters/TemperatureControl/Events.ipp>
 #include <clusters/TemperatureControl/Structs.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Attributes.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Commands.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Events.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Structs.ipp>
 #include <clusters/TemperatureMeasurement/Attributes.ipp>
 #include <clusters/TemperatureMeasurement/Commands.ipp>
 #include <clusters/TemperatureMeasurement/Events.ipp>

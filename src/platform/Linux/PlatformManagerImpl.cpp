@@ -204,7 +204,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     auto * context      = g_main_context_new();
     mGLibMainLoop       = g_main_loop_new(context, FALSE);
-    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    mGLibMainLoopThread = g_thread_new("gmatter", GLibMainLoopThread, mGLibMainLoop);
     g_main_context_unref(context);
 
     {

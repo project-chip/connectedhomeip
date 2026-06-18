@@ -308,6 +308,11 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
+            # Ensuring fuzztests build in compat mode
+            - name: Build pw_fuzzer FuzzTests in compat mode
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-ossfuzz build"
             # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
             # deactivate until a better solution is found
             # - name: Perform CodeQL Analysis
