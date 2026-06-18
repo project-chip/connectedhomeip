@@ -67,12 +67,24 @@ _available_devices = [
     "CONTACT_SENSOR",
   ],
   [
+    "cook-surface",
+    "COOK_SURFACE",
+  ],
+  [
+    "cooktop",
+    "COOKTOP",
+  ],
+  [
     "dimmable-light",
     "DIMMABLE_LIGHT",
   ],
   [
     "dimmable-plug-in-unit",
     "DIMMABLE_PLUG_IN_UNIT",
+  ],
+  [
+    "extractor-hood",
+    "EXTRACTOR_HOOD",
   ],
   [
     "fan",

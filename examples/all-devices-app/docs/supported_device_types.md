@@ -43,7 +43,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (31 total)
+## Implemented Device Types (34 total)
 
 | #   | Device Type Name               | ID           | Notes |
 | --- | ------------------------------ | ------------ | ----- |
@@ -53,33 +53,36 @@ To update or validate this list manually, follow these steps:
 | 4   | Bridged Node                   | 19 (0x0013)  |       |
 | 5   | Chime                          | 326 (0x0146) |       |
 | 6   | Contact Sensor                 | 21 (0x0015)  |       |
-| 7   | Dimmable Light                 | 257 (0x0101) |       |
-| 8   | Dimmable Plug-In Unit          | 267 (0x010B) |       |
-| 9   | Fan                            | 43 (0x002B)  |       |
-| 10  | Flow Sensor                    | 774 (0x0306) |       |
-| 11  | Generic Switch                 | 15 (0x000F)  |       |
-| 12  | Humidity Sensor                | 775 (0x0307) |       |
-| 13  | Light Sensor                   | 262 (0x0106) |       |
-| 14  | Mounted Dimmable Load Control  | 272 (0x0110) |       |
-| 15  | Mounted On/Off Control         | 271 (0x010F) |       |
-| 16  | Network Infrastructure Manager | 144 (0x0090) |       |
-| 17  | Occupancy Sensor               | 263 (0x0107) |       |
-| 18  | On/Off Light                   | 256 (0x0100) |       |
-| 19  | On/Off Light Switch            | 259 (0x0103) |       |
-| 20  | On/Off Plug-In Unit            | 266 (0x010A) |       |
-| 21  | Power Source                   | 17 (0x0011)  |       |
-| 22  | Pressure Sensor                | 773 (0x0305) |       |
-| 23  | Proximity Ranger               | 338 (0x0152) |       |
-| 24  | Rain Sensor                    | 68 (0x0044)  |       |
-| 25  | Root Node                      | 22 (0x0016)  |       |
-| 26  | Smoke CO Alarm                 | 118 (0x0076) |       |
-| 27  | Soil Sensor                    | 69 (0x0045)  |       |
-| 28  | Speaker                        | 34 (0x0022)  |       |
-| 29  | Temperature Sensor             | 770 (0x0302) |       |
-| 30  | Water Freeze Detector          | 65 (0x0041)  |       |
-| 31  | Water Leak Detector            | 67 (0x0043)  |       |
+| 7   | Cook Surface                   | 119 (0x0077) |       |
+| 8   | Cooktop                        | 120 (0x0078) |       |
+| 9   | Dimmable Light                 | 257 (0x0101) |       |
+| 10  | Dimmable Plug-In Unit          | 267 (0x010B) |       |
+| 11  | Extractor Hood                 | 122 (0x007A) |       |
+| 12  | Fan                            | 43 (0x002B)  |       |
+| 13  | Flow Sensor                    | 774 (0x0306) |       |
+| 14  | Generic Switch                 | 15 (0x000F)  |       |
+| 15  | Humidity Sensor                | 775 (0x0307) |       |
+| 16  | Light Sensor                   | 262 (0x0106) |       |
+| 17  | Mounted Dimmable Load Control  | 272 (0x0110) |       |
+| 18  | Mounted On/Off Control         | 271 (0x010F) |       |
+| 19  | Network Infrastructure Manager | 144 (0x0090) |       |
+| 20  | Occupancy Sensor               | 263 (0x0107) |       |
+| 21  | On/Off Light                   | 256 (0x0100) |       |
+| 22  | On/Off Light Switch            | 259 (0x0103) |       |
+| 23  | On/Off Plug-In Unit            | 266 (0x010A) |       |
+| 24  | Power Source                   | 17 (0x0011)  |       |
+| 25  | Pressure Sensor                | 773 (0x0305) |       |
+| 26  | Proximity Ranger               | 338 (0x0152) |       |
+| 27  | Rain Sensor                    | 68 (0x0044)  |       |
+| 28  | Root Node                      | 22 (0x0016)  |       |
+| 29  | Smoke CO Alarm                 | 118 (0x0076) |       |
+| 30  | Soil Sensor                    | 69 (0x0045)  |       |
+| 31  | Speaker                        | 34 (0x0022)  |       |
+| 32  | Temperature Sensor             | 770 (0x0302) |       |
+| 33  | Water Freeze Detector          | 65 (0x0041)  |       |
+| 34  | Water Leak Detector            | 67 (0x0043)  |       |
 
-## Unimplemented Device Types (73 total)
+## Unimplemented Device Types (70 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                               | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
@@ -102,8 +105,6 @@ To update or validate this list manually, follow these steps:
 | 17  | Commissioning By Proxy            | 146 (0x0092)  | None                                                                                                                                                                                                                         | Commissioning Proxy                                                                                                                                                                                                                  | Blocked         |
 | 18  | Content App                       | 36 (0x0024)   | None                                                                                                                                                                                                                         | Keypad Input, Application Launcher, Application Basic, Channel [O], Target Navigator [O], Media Playback [O], Content Launcher [O], Account Login [O]                                                                                | Blocked         |
 | 19  | Control Bridge                    | 2112 (0x0840) | Identify                                                                                                                                                                                                                     | None                                                                                                                                                                                                                                 | Ready           |
-| 20  | Cook Surface                      | 119 (0x0077)  | On/Off [O], Temperature Control [O], Temperature Measurement [O]                                                                                                                                                             | None                                                                                                                                                                                                                                 | Ready           |
-| 21  | Cooktop                           | 120 (0x0078)  | On/Off, Identify [O]                                                                                                                                                                                                         | None                                                                                                                                                                                                                                 | Ready           |
 | 22  | Device Energy Management          | 1293 (0x050D) | Device Energy Management                                                                                                                                                                                                     | Device Energy Management Mode [O]                                                                                                                                                                                                    | Minimally Ready |
 | 24  | Dimmer Switch                     | 260 (0x0104)  | Identify                                                                                                                                                                                                                     | None                                                                                                                                                                                                                                 | Ready           |
 | 25  | Dishwasher                        | 117 (0x0075)  | Identify [O], On/Off [O], Temperature Control [O]                                                                                                                                                                            | Operational State, Dishwasher Mode [O], Dishwasher Alarm [O]                                                                                                                                                                         | Blocked         |
@@ -119,7 +120,6 @@ To update or validate this list manually, follow these steps:
 | 35  | Electrical Utility Meter          | 1297 (0x0511) | None                                                                                                                                                                                                                         | Meter Identification                                                                                                                                                                                                                 | Blocked         |
 | 36  | Energy EVSE                       | 1292 (0x050C) | Energy EVSE, Identify [O], Temperature Measurement [O]                                                                                                                                                                       | Energy EVSE Mode                                                                                                                                                                                                                     | Blocked         |
 | 37  | Extended Color Light              | 269 (0x010D)  | Identify, Groups, On/Off, Level Control, Scenes Management                                                                                                                                                                   | Color Control, Dynamic Lighting [O]                                                                                                                                                                                                  | Blocked         |
-| 38  | Extractor Hood                    | 122 (0x007A)  | Fan Control, Identify [O], HEPA Filter Monitoring [O], Activated Carbon Filter Monitoring [O]                                                                                                                                | None                                                                                                                                                                                                                                 | Ready           |
 | 39  | Floodlight Camera                 | 324 (0x0144)  | None                                                                                                                                                                                                                         | None                                                                                                                                                                                                                                 | Ready           |
 | 40  | Heat Pump                         | 777 (0x0309)  | Identify [O]                                                                                                                                                                                                                 | None                                                                                                                                                                                                                                 | Ready           |
 | 41  | Heating/Cooling Unit              | 768 (0x0300)  | None                                                                                                                                                                                                                         | None                                                                                                                                                                                                                                 | Ready           |
