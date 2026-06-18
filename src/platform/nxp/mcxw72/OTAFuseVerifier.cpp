@@ -30,7 +30,6 @@ extern "C" {
 
 #define FUSE_LEN (32u) // 32 bytes - 256 bits for fuse data
 #define CORE_CLK_FREQ CLOCK_GetFreq(kCLOCK_CoreSysClk)
-#define NBOOT_FUSEID_CUST_PROD_OEMFW_AUTH_PUK (0x1f)
 
 namespace chip {
 namespace DeviceLayer {
@@ -64,11 +63,8 @@ status_t OTAFuseVerifier::read_ota_encryption_key_fuse(ELEMU_Type * mu, uint32_t
         }
 
         /* READ FUSE */
-        if (sss_mgmt_fuse_read(&mgmtContext, fuse, fuseData, &fuseLen, (uintptr_t) &mgmtContext.clockFrequency, &optLen) !=
-            kStatus_SSS_Success)
-        {
-            break;
-        }
+        sss_mgmt_fuse_read(&mgmtContext, fuse, fuseData, &fuseLen, (uintptr_t) &mgmtContext.clockFrequency, &optLen);
+
         if (sss_mgmt_context_free(&mgmtContext) != kStatus_SSS_Success)
         {
             break;
@@ -83,9 +79,9 @@ status_t OTAFuseVerifier::read_ota_encryption_key_fuse(ELEMU_Type * mu, uint32_t
 
 CHIP_ERROR OTAFuseVerifier::VerifyOTAFusesReady()
 {
-    uint8_t fuseData[FUSE_LEN];
+    alignas(uint32_t) uint8_t fuseData[FUSE_LEN];
 
-    status_t status = read_ota_encryption_key_fuse(ELEMUA, NBOOT_FUSEID_CUST_PROD_OEMFW_AUTH_PUK, (uint32_t *) fuseData, FUSE_LEN);
+    status_t status = read_ota_encryption_key_fuse(ELEMUA, kFuseId_OEMFW_AUTH_PUK, (uint32_t *) fuseData, FUSE_LEN);
 
     if (status != kStatus_Success)
     {
