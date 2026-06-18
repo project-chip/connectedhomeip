@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include <devices/device-energy-management/DeviceEnergyManagementDevice.h>
 #include <devices/Types.h>
+#include <devices/device-energy-management/DeviceEnergyManagementDevice.h>
 
 namespace chip::app {
 
@@ -32,10 +32,7 @@ CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrive
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    Clusters::DeviceEnergyManagementCluster::Config config(
-        endpoint,
-        BitMask<Clusters::DeviceEnergyManagement::Feature>(),
-        *this);
+    Clusters::DeviceEnergyManagementCluster::Config config(endpoint, BitMask<Clusters::DeviceEnergyManagement::Feature>(), *this);
     mDemCluster.Create(config);
     ReturnErrorOnFailure(provider.AddCluster(mDemCluster.Registration()));
 
@@ -59,8 +56,9 @@ void DeviceEnergyManagementDevice::Unregister(CodeDrivenDataModelProvider & prov
     }
 }
 
-Protocols::InteractionModel::Status DeviceEnergyManagementDevice::PowerAdjustRequest(
-    const int64_t power, const uint32_t duration, Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status
+DeviceEnergyManagementDevice::PowerAdjustRequest(const int64_t power, const uint32_t duration,
+                                                 Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
@@ -70,14 +68,15 @@ Protocols::InteractionModel::Status DeviceEnergyManagementDevice::CancelPowerAdj
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status DeviceEnergyManagementDevice::StartTimeAdjustRequest(
-    const uint32_t requestedStartTime, Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status
+DeviceEnergyManagementDevice::StartTimeAdjustRequest(const uint32_t requestedStartTime,
+                                                     Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status DeviceEnergyManagementDevice::PauseRequest(
-    const uint32_t duration, Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status
+DeviceEnergyManagementDevice::PauseRequest(const uint32_t duration, Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }

@@ -24,8 +24,7 @@
 
 namespace chip::app {
 
-class DeviceEnergyManagementDevice : public SingleEndpointDevice,
-                                     public Clusters::DeviceEnergyManagement::Delegate
+class DeviceEnergyManagementDevice : public SingleEndpointDevice, public Clusters::DeviceEnergyManagement::Delegate
 {
 public:
     explicit DeviceEnergyManagementDevice(TimerDelegate & timerDelegate);
@@ -39,8 +38,8 @@ public:
     Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t power, const uint32_t duration,
                                                            Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
     Protocols::InteractionModel::Status CancelPowerAdjustRequest() override;
-    Protocols::InteractionModel::Status StartTimeAdjustRequest(const uint32_t requestedStartTime,
-                                                               Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
+    Protocols::InteractionModel::Status
+    StartTimeAdjustRequest(const uint32_t requestedStartTime, Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
     Protocols::InteractionModel::Status PauseRequest(const uint32_t duration,
                                                      Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause) override;
     Protocols::InteractionModel::Status ResumeRequest() override;

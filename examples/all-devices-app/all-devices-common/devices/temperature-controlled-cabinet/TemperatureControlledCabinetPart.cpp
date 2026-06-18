@@ -26,8 +26,7 @@ TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate
 
 TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureControlledCabinet, 1)),
-    mTimerDelegate(timerDelegate),
-    mConfig(config)
+    mTimerDelegate(timerDelegate), mConfig(config)
 {}
 
 CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -36,15 +35,14 @@ CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeD
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
 
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
-    mTemperatureControlCluster.Create(endpoint,
-                                      BitFlags<Clusters::TemperatureControl::Feature>(
-                                          Clusters::TemperatureControl::Feature::kTemperatureNumber),
-                                      Clusters::TemperatureControlCluster::StartupConfiguration{
-                                          .temperatureSetpoint = mConfig.temperatureSetpoint,
-                                          .minTemperature      = mConfig.minTemperature,
-                                          .maxTemperature      = mConfig.maxTemperature,
-                                          .step                = mConfig.step,
-                                      });
+    mTemperatureControlCluster.Create(
+        endpoint, BitFlags<Clusters::TemperatureControl::Feature>(Clusters::TemperatureControl::Feature::kTemperatureNumber),
+        Clusters::TemperatureControlCluster::StartupConfiguration{
+            .temperatureSetpoint = mConfig.temperatureSetpoint,
+            .minTemperature      = mConfig.minTemperature,
+            .maxTemperature      = mConfig.maxTemperature,
+            .step                = mConfig.step,
+        });
 
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureControlCluster.Registration()));

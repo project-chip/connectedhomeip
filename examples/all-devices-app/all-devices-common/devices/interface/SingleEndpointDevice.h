@@ -28,7 +28,6 @@
 
 namespace chip::app {
 
-
 /// A device is a entity that maintains some cluster functionality.
 ///
 /// This implementation assumes that a device is registered on a single

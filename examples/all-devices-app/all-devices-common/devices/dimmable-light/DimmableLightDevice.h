@@ -50,10 +50,9 @@ public:
     ~DimmableLightDevice() override = default;
 
 protected:
-    DimmableLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                        Clusters::OnOffDelegate & onOffDelegate, Clusters::LevelControlDelegate & levelControlDelegate,
-                        Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
-                        const Context & context);
+    DimmableLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
+                        Clusters::LevelControlDelegate & levelControlDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                        Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;

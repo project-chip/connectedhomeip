@@ -37,8 +37,8 @@ CHIP_ERROR OvenDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
 
-    ReturnErrorOnFailure(InitEndpointRegistration(endpoint, provider,
-                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(
+        InitEndpointRegistration(endpoint, provider, EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(mCavity.Register(endpoint + 1, provider, endpoint));

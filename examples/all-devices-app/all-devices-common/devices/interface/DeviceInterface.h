@@ -29,18 +29,17 @@ struct EndpointComposition
 {
     using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
 
-    EndpointId parentId = kInvalidEndpointId;
+    EndpointId parentId                           = kInvalidEndpointId;
     DataModel::EndpointCompositionPattern pattern = DataModel::EndpointCompositionPattern::kFullFamily;
-    Span<const SemanticTag> tagList = {};
+    Span<const SemanticTag> tagList               = {};
 
     constexpr EndpointComposition() = default;
-    constexpr EndpointComposition(EndpointId parent,
-                                  DataModel::EndpointCompositionPattern compositionPattern =
-                                      DataModel::EndpointCompositionPattern::kFullFamily,
-                                  Span<const SemanticTag> tags = {}) :
+    constexpr EndpointComposition(
+        EndpointId parent,
+        DataModel::EndpointCompositionPattern compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
+        Span<const SemanticTag> tags                             = {}) :
         parentId(parent),
-        pattern(compositionPattern),
-        tagList(tags)
+        pattern(compositionPattern), tagList(tags)
     {}
 };
 

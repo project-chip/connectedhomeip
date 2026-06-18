@@ -31,7 +31,8 @@ LoggingDimmableLightDevice::LoggingDimmableLightDevice(const Context & context) 
     LoggingDimmableLightDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), context)
 {}
 
-LoggingDimmableLightDevice::LoggingDimmableLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context) :
+LoggingDimmableLightDevice::LoggingDimmableLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
+                                                       const Context & context) :
     DimmableLightDevice(deviceTypes, *this, *this, *this, *this, context)
 {}
 

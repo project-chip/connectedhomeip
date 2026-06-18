@@ -23,8 +23,7 @@ using namespace chip::app::Clusters;
 namespace chip::app {
 
 WaterValveDevice::WaterValveDevice(TimerDelegate & timerDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
-    mTimerDelegate(timerDelegate)
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate)
 {}
 
 CHIP_ERROR WaterValveDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -34,15 +33,12 @@ CHIP_ERROR WaterValveDevice::Register(chip::EndpointId endpoint, CodeDrivenDataM
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    ValveConfigurationAndControlCluster::StartupConfiguration config{
-        DataModel::NullNullable,
-        ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-        ValveConfigurationAndControlCluster::kDefaultLevelStep
-    };
+    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
+                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
 
     ValveConfigurationAndControlCluster::ValveContext valveContext = {
-        .features             = BitFlags<ValveConfigurationAndControl::Feature>(
-            ValveConfigurationAndControl::Feature::kLevel),
+        .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
         .optionalAttributeSet = {},
         .config               = config,
         .tsTracker            = nullptr,

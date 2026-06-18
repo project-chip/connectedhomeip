@@ -36,8 +36,7 @@ const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
 } // namespace
 
 CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCooktop, 1)),
-    mSurface1(timerDelegate),
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCooktop, 1)), mSurface1(timerDelegate),
     mSurface2(timerDelegate)
 {}
 
@@ -46,16 +45,16 @@ CHIP_ERROR CooktopDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvi
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
 
-    ReturnErrorOnFailure(InitEndpointRegistration(endpoint, provider,
-                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(
+        InitEndpointRegistration(endpoint, provider, EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mSurface1.Register(endpoint + 1, provider,
-                                            EndpointComposition(endpoint, DataModel::EndpointCompositionPattern::kFullFamily,
-                                                                Span(&kSurface1Tag, 1))));
-    ReturnErrorOnFailure(mSurface2.Register(endpoint + 2, provider,
-                                            EndpointComposition(endpoint, DataModel::EndpointCompositionPattern::kFullFamily,
-                                                                Span(&kSurface2Tag, 1))));
+    ReturnErrorOnFailure(mSurface1.Register(
+        endpoint + 1, provider,
+        EndpointComposition(endpoint, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface1Tag, 1))));
+    ReturnErrorOnFailure(mSurface2.Register(
+        endpoint + 2, provider,
+        EndpointComposition(endpoint, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface2Tag, 1))));
 
     return CHIP_NO_ERROR;
 }

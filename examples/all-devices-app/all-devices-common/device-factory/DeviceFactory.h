@@ -39,8 +39,8 @@
 #include <devices/mounted-on-off-control/MountedOnOffControlDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
-#include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/on-off-light-switch/OnOffLightSwitchDevice.h>
+#include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.h>
 #include <devices/oven/OvenDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>

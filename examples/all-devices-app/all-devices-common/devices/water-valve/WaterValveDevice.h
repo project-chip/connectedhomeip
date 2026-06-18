@@ -24,8 +24,7 @@
 
 namespace chip::app {
 
-class WaterValveDevice : public SingleEndpointDevice,
-                         public Clusters::ValveConfigurationAndControl::Delegate
+class WaterValveDevice : public SingleEndpointDevice, public Clusters::ValveConfigurationAndControl::Delegate
 {
 public:
     WaterValveDevice(TimerDelegate & timerDelegate);

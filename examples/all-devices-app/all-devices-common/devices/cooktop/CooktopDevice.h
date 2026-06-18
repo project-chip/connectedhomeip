@@ -29,8 +29,7 @@ class CookSurfacePart : public SingleEndpointDevice
 {
 public:
     explicit CookSurfacePart(TimerDelegate & timerDelegate) :
-        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)),
-        mTimerDelegate(timerDelegate)
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)), mTimerDelegate(timerDelegate)
     {}
     ~CookSurfacePart() override = default;
 

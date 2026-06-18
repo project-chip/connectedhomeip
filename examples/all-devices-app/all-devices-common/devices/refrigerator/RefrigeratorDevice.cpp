@@ -36,8 +36,8 @@ CHIP_ERROR RefrigeratorDevice::Register(EndpointId endpoint, CodeDrivenDataModel
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
 
-    ReturnErrorOnFailure(InitEndpointRegistration(endpoint, provider,
-                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(
+        InitEndpointRegistration(endpoint, provider, EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(mCabinet.Register(endpoint + 1, provider, endpoint));
