@@ -815,7 +815,6 @@ void ChimeInit()
 #endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
 }
 
-
 void SmokeCoAlarmInit()
 {
 #if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
@@ -824,8 +823,8 @@ void SmokeCoAlarmInit()
         static SmokeCoAlarm::ChefSmokeCoAlarmDelegate delegate;
         SmokeCoAlarm::SmokeCoAlarmCluster::Config config;
         config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
-        config.optionalAttribs = SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet(
-            SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        config.optionalAttribs =
+            SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarm::SmokeCoAlarmCluster::OptionalAttributeSet::All());
         VerifyOrDieWithMsg(SmokeCoAlarm::SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
                            "Error: SmokeCoAlarmServer::Init failed");
     }
