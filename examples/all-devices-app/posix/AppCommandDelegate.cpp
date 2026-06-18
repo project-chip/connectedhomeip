@@ -18,6 +18,10 @@
 #include "include/AppCommandDelegate.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
+#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -39,7 +43,7 @@ public:
     const char * GetName() const override { return "IncreaseConfigurationVersion"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetBasicInformationClusterByEndpoint(endpointId);
+        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BasicInformationCluster>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "BasicInformationCluster not found on endpoint %d", endpointId);
@@ -57,7 +61,7 @@ public:
     const char * GetName() const override { return "SetOccupancy"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetOccupancySensingClusterByEndpoint(endpointId);
+        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OccupancySensingCluster>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "OccupancySensingCluster not found on endpoint %d", endpointId);
@@ -89,7 +93,7 @@ public:
     const char * GetName() const override { return "SetHoldTime"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetOccupancySensingClusterByEndpoint(endpointId);
+        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OccupancySensingCluster>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "OccupancySensingCluster not found on endpoint %d", endpointId);
@@ -120,7 +124,7 @@ public:
     const char * GetName() const override { return "SetBooleanState"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetBooleanStateClusterByEndpoint(endpointId);
+        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::BooleanStateCluster>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "BooleanStateCluster not found on endpoint %d", endpointId);
@@ -145,7 +149,7 @@ public:
     const char * GetName() const override { return "SetOnOff"; }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
-        auto * cluster = delegate->GetOnOffClusterByEndpoint(endpointId);
+        auto * cluster = delegate->GetClusterImplementationRegistry().GetClusterByEndpoint<chip::app::Clusters::OnOffCluster>(endpointId);
         if (!cluster)
         {
             ChipLogError(AppServer, "OnOffCluster not found on endpoint %d", endpointId);
@@ -224,80 +228,6 @@ void AllDevicesAppCommandDelegate::DispatchCommand(intptr_t context)
     auto * cmdContext = reinterpret_cast<CommandContext *>(context);
     cmdContext->handler->Handle(cmdContext->value, cmdContext->delegate, cmdContext->endpointId);
     Platform::Delete(cmdContext);
-}
-
-void AllDevicesAppCommandDelegate::RegisterOnOffCluster(chip::app::Clusters::OnOffCluster * cluster)
-{
-    mOnOffClusters.push_back(cluster);
-}
-
-void AllDevicesAppCommandDelegate::RegisterOccupancySensingCluster(chip::app::Clusters::OccupancySensingCluster * cluster)
-{
-    mOccupancySensingClusters.push_back(cluster);
-}
-
-void AllDevicesAppCommandDelegate::RegisterBooleanStateCluster(chip::app::Clusters::BooleanStateCluster * cluster)
-{
-    mBooleanStateClusters.push_back(cluster);
-}
-
-void AllDevicesAppCommandDelegate::RegisterBasicInformationCluster(chip::app::Clusters::BasicInformationCluster * cluster)
-{
-    mBasicInformationClusters.push_back(cluster);
-}
-
-chip::app::Clusters::OnOffCluster * AllDevicesAppCommandDelegate::GetOnOffClusterByEndpoint(chip::EndpointId endpoint)
-{
-    for (auto * cluster : mOnOffClusters)
-    {
-        auto paths = cluster->GetPaths();
-        if (!paths.empty() && (paths[0].mEndpointId == endpoint))
-        {
-            return cluster;
-        }
-    }
-    return nullptr;
-}
-
-chip::app::Clusters::OccupancySensingCluster *
-AllDevicesAppCommandDelegate::GetOccupancySensingClusterByEndpoint(chip::EndpointId endpoint)
-{
-    for (auto * cluster : mOccupancySensingClusters)
-    {
-        auto paths = cluster->GetPaths();
-        if (!paths.empty() && (paths[0].mEndpointId == endpoint))
-        {
-            return cluster;
-        }
-    }
-    return nullptr;
-}
-
-chip::app::Clusters::BooleanStateCluster * AllDevicesAppCommandDelegate::GetBooleanStateClusterByEndpoint(chip::EndpointId endpoint)
-{
-    for (auto * cluster : mBooleanStateClusters)
-    {
-        auto paths = cluster->GetPaths();
-        if (!paths.empty() && (paths[0].mEndpointId == endpoint))
-        {
-            return cluster;
-        }
-    }
-    return nullptr;
-}
-
-chip::app::Clusters::BasicInformationCluster *
-AllDevicesAppCommandDelegate::GetBasicInformationClusterByEndpoint(chip::EndpointId endpoint)
-{
-    for (auto * cluster : mBasicInformationClusters)
-    {
-        auto paths = cluster->GetPaths();
-        if (!paths.empty() && (paths[0].mEndpointId == endpoint))
-        {
-            return cluster;
-        }
-    }
-    return nullptr;
 }
 
 void AllDevicesAppCommandDelegate::RegisterCommandHandler(std::unique_ptr<AllDevicesAppNamedPipeCommandHandler> handler)

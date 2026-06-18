@@ -226,21 +226,21 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
         if (config.type == "occupancy-sensor")
         {
             auto * occupancyDevice = static_cast<OccupancySensorDevice *>(device);
-            gAllDevicesAppCommandDelegate.RegisterOccupancySensingCluster(&occupancyDevice->OccupancySensingCluster());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<chip::app::Clusters::OccupancySensingCluster>(&occupancyDevice->OccupancySensingCluster());
         }
         else if (config.type == "contact-sensor" || config.type == "water-leak-detector")
         {
             auto * booleanStateDevice = static_cast<BooleanStateSensorDevice *>(device);
-            gAllDevicesAppCommandDelegate.RegisterBooleanStateCluster(&booleanStateDevice->BooleanState());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<chip::app::Clusters::BooleanStateCluster>(&booleanStateDevice->BooleanState());
         }
         else if (config.type == "on-off-light")
         {
             auto * lightDevice = static_cast<LoggingOnOffLightDevice *>(device);
-            gAllDevicesAppCommandDelegate.RegisterOnOffCluster(&lightDevice->OnOffCluster());
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<chip::app::Clusters::OnOffCluster>(&lightDevice->OnOffCluster());
         }
     }
 
-    gAllDevicesAppCommandDelegate.RegisterBasicInformationCluster(&devices.RootNode().GetRootNodeDevice().BasicInformation());
+    gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry().RegisterClusterInstance<chip::app::Clusters::BasicInformationCluster>(&devices.RootNode().GetRootNodeDevice().BasicInformation());
     gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
 
     CHIP_ERROR err = gNamedPipeCommands.Start(namedPipePath, &gAllDevicesAppCommandDelegate);

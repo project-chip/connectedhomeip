@@ -23,6 +23,7 @@ executable("all-devices-app") {
 
   sources = [
     "AppCommandDelegate.cpp",
+    "ClusterTypeMappings.cpp",
     "PosixBleRssiRangingAdapter.cpp",
     "PosixChimeDevice.cpp",
     "include/CHIPProjectAppConfig.h",

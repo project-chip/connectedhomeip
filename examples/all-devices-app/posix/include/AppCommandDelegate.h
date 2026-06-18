@@ -18,10 +18,7 @@
 #pragma once
 
 #include <NamedPipeCommands.h>
-#include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
-#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
-#include <app/clusters/on-off-server/OnOffCluster.h>
+#include "AllDevicesAppClusterImplementationRegistry.h"
 #include <app/util/basic-types.h>
 #include <json/json.h>
 #include <map>
@@ -36,15 +33,7 @@ class AllDevicesAppCommandDelegate : public NamedPipeCommandDelegate
 public:
     void OnEventCommandReceived(const char * json) override;
 
-    void RegisterOnOffCluster(chip::app::Clusters::OnOffCluster * cluster);
-    void RegisterOccupancySensingCluster(chip::app::Clusters::OccupancySensingCluster * cluster);
-    void RegisterBooleanStateCluster(chip::app::Clusters::BooleanStateCluster * cluster);
-    void RegisterBasicInformationCluster(chip::app::Clusters::BasicInformationCluster * cluster);
-
-    chip::app::Clusters::OnOffCluster * GetOnOffClusterByEndpoint(chip::EndpointId endpoint);
-    chip::app::Clusters::OccupancySensingCluster * GetOccupancySensingClusterByEndpoint(chip::EndpointId endpoint);
-    chip::app::Clusters::BooleanStateCluster * GetBooleanStateClusterByEndpoint(chip::EndpointId endpoint);
-    chip::app::Clusters::BasicInformationCluster * GetBasicInformationClusterByEndpoint(chip::EndpointId endpoint);
+    AllDevicesAppClusterImplementationRegistry & GetClusterImplementationRegistry() { return mRegistry; }
 
     void RegisterCommandHandler(std::unique_ptr<AllDevicesAppNamedPipeCommandHandler> handler);
     void RegisterCommandHandlers();
@@ -58,12 +47,7 @@ private:
     // instance by Endpoint ID (retrieved dynamically via cluster->GetPaths()[0].mEndpointId)
     // when executing commands.
     //
-    // Separate vectors are used for each cluster type because code-driven clusters do not
-    // share a common polymorphic base class, which preserves type-safe API access.
-    std::vector<chip::app::Clusters::OnOffCluster *> mOnOffClusters;
-    std::vector<chip::app::Clusters::OccupancySensingCluster *> mOccupancySensingClusters;
-    std::vector<chip::app::Clusters::BooleanStateCluster *> mBooleanStateClusters;
-    std::vector<chip::app::Clusters::BasicInformationCluster *> mBasicInformationClusters;
+    AllDevicesAppClusterImplementationRegistry mRegistry;
 
     std::map<std::string, std::unique_ptr<AllDevicesAppNamedPipeCommandHandler>> mCommandHandlers;
 };
