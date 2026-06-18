@@ -178,6 +178,7 @@ class BarcodeFragment : Fragment() {
   }
 
   private fun handleInputCode(code: String, isLIT: Boolean) {
+    val context = context
     if (!isAdded || context == null) {
       Log.d(TAG, "Fragment is not added or context is null")
       return
@@ -208,6 +209,7 @@ class BarcodeFragment : Fragment() {
     }
     val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
     Handler(Looper.getMainLooper()).post {
+      val context = context
       if (!isAdded || context == null) {
         Log.d(TAG, "Fragment is not added or context is null")
         return@post
