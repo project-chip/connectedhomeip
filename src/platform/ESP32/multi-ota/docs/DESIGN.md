@@ -260,7 +260,7 @@ Four methods form the contract:
     (`entry.length`, `entry.sha256`). Do not start heavy I/O here — defer that
     to the first `Write()` call so resources are only allocated when `kReady` is
     confirmed.
--   `IsReadyForOTA()` → `DeviceReadinessState` — called immediately after
+-   `IsReadyForOTA()` → `DeviceState` — called immediately after
     `Init()`, with no parameters. The sub-processor uses the version stored
     during `Init()` to decide: `kReady` (proceed), `kAlreadyUpToDate` (already
     at target version, skip), `kNotReady` (skip; reported to the application
@@ -333,7 +333,7 @@ Dispatcher after a `kPending` return:
     released and the next BDX block requested.
 -   Sub-processors whose `Write()` always returns `kDone` never call it.
 
-`DeviceReadinessState` is a three-value enum — not a boolean — because the
+`DeviceState` is a three-value enum — not a boolean — because the
 outcome report (§5) distinguishes "already up to date" from "unavailable":
 
 | Value              | Dispatcher action                      | Recorded outcome      |
@@ -397,7 +397,7 @@ defines the interface; applications provide the implementations.
      |
      |  framework → sub-processor
      | Init(SubImageHeader) — always, light
-     | IsReadyForOTA() → DeviceReadinessState
+     | IsReadyForOTA() → DeviceState
      | Write(block) → kDone | kPending
      | Abort(AbortContext) — on error or cancel
      v
@@ -790,7 +790,7 @@ The full contract for each operation is defined in §4.1. The four operations ar
 | # | Operation | One-line rule |
 |---|-----------|---------------|
 | 1 | `Init(entry)` | Light-weight; store entry fields; no heavy I/O. |
-| 2 | `IsReadyForOTA()` | Returns `DeviceReadinessState` from cached state; must complete in milliseconds. |
+| 2 | `IsReadyForOTA()` | Returns `DeviceState` from cached state; must complete in milliseconds. |
 | 3 | `Write(block)` | Returns `kDone` (sync) or `kPending` (async); verifies SHA-256 on last chunk. |
 | 4 | `Abort(context)` | Discard partial state, cancel async ops, release resources, do not block. |
 
