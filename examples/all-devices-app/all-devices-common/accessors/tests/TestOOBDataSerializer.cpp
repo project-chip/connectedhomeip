@@ -17,8 +17,8 @@
  */
 
 #include <accessors/OOBDataSerializer.h>
-#include <pw_unit_test/framework.h>
 #include <lib/core/TLV.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -38,7 +38,7 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_BooleanStateValue)
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
-    
+
     // Put a simple boolean element
     EXPECT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
@@ -122,16 +122,16 @@ TEST_F(TestOOBDataSerializer, Parse_MismatchedTags)
     uint8_t buffer[128];
     TLV::TLVWriter writer;
     writer.Init(buffer);
-    
+
     TLV::TLVType outerType;
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType), CHIP_NO_ERROR);
-    
+
     // Write tag 2 (ClusterId) first instead of tag 1 (EndpointId)
     EXPECT_EQ(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagClusterId), static_cast<uint32_t>(20)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagEndpointId), static_cast<uint16_t>(10)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagAttributeId), static_cast<uint32_t>(30)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagValue), true), CHIP_NO_ERROR);
-    
+
     EXPECT_EQ(writer.EndContainer(outerType), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
