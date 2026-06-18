@@ -75,6 +75,10 @@ _available_devices = [
     "FLOW_SENSOR",
   ],
   [
+    "generic-switch",
+    "GENERIC_SWITCH",
+  ],
+  [
     "humidity-sensor",
     "HUMIDITY_SENSOR",
   ],

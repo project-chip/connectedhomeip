@@ -51,6 +51,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'dimmable-light',
     'fan',
     'flow-sensor',
+    'generic-switch',
     'humidity-sensor',
     'light-sensor',
     'occupancy-sensor',

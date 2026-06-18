@@ -171,7 +171,7 @@ To update or validate this list manually, follow these steps:
 | 125       | Software Diagnostics                                       | 52 (0x0034)   | Yes                | Yes                 |                                       |
 | 126       | Soil Measurement                                           | 1072 (0x0430) | Yes                | Yes                 |                                       |
 | 127       | Soil Moisture Measurement                                  | 1032 (0x0408) | No                 | No                  |                                       |
-| 128       | Switch                                                     | 59 (0x003B)   | Yes                | No                  |                                       |
+| 128       | Switch                                                     | 59 (0x003B)   | Yes                | Yes                 |                                       |
 | 129       | TLS Certificate Management                                 | 2049 (0x0801) | Yes                | No                  |                                       |
 | 130       | TLS Client Management                                      | 2050 (0x0802) | Yes                | No                  |                                       |
 | 131       | Target Navigator                                           | 1285 (0x0505) | No                 | No                  |                                       |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **86**             | **46**              |                                       |
+| **Total** | **159**                                                    |               | **86**             | **47**              |                                       |

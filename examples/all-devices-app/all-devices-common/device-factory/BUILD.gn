@@ -38,6 +38,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/fan/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/flow-sensor/impl:increasing",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/generic-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/humidity-sensor/impl:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/light-sensor/impl:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",

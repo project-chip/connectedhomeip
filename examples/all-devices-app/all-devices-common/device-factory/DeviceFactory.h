@@ -27,6 +27,7 @@
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
 #include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
+#include <devices/generic-switch/GenericSwitchDevice.h>
 #include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
 #include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
@@ -268,6 +269,13 @@ private:
                     .timerDelegate       = mContext->timerDelegate,
                     .includeOnOffCluster = false,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_GENERIC_SWITCH)
+        {
+            RegisterCreator("generic-switch", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<GenericSwitchDevice>(mContext->timerDelegate);
             });
         }
 

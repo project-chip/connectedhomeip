@@ -46,6 +46,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl/LoggingFanDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/FlowSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/impl/IncreasingFlowSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/generic-switch/GenericSwitchDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/HumiditySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
@@ -120,6 +121,7 @@ foreach(_key
         dimmable-light
         fan
         flow-sensor
+        generic-switch
         humidity-sensor
         light-sensor
         network-infrastructure-manager

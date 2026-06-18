@@ -117,6 +117,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/generic-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
