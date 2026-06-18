@@ -108,7 +108,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             TestStep("2d", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),
             TestStep("2e", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
             TestStep("2f", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT."),
-            TestStep("2g", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT."),
+            TestStep("2g", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupID field = 0 to the DUT."),
             TestStep("2h", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT."),
             TestStep("3a", "TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("3b", "If CurrentPosition = FullyClosed, skip steps 3c to 3d."),
@@ -285,19 +285,19 @@ class TC_CLCTRL_7_1(MatterBaseTest):
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
             self.mark_current_step_skipped()
 
-        # STEP 2g: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
+        # STEP 2g: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupID field = 0 to the DUT
         self.step("2g")
         if self.groupcast_enabled:
             log.info("Groupcast cluster is enabled on EP0")
             if membership:
-                log.info("Groupcast membership is not empty, sending the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT")
+                log.info("Groupcast membership is not empty, sending the Groupcast LeaveGroup command with GroupID field = 0 to the DUT")
                 await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
             else:
                 log.info("Groupcast membership is empty, skipping step")
                 self.mark_current_step_skipped()
         else:
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
-            self.smark_current_step_skipped()
+            self.mark_current_step_skipped()
 
         # STEP 2h: If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT
         self.step("2h")
