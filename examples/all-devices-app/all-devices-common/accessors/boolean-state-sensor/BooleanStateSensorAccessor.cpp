@@ -15,6 +15,7 @@
  */
 
 #include <access/SubjectDescriptor.h>
+#include <accessors/OOBDataSerializer.h>
 #include <accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #include <lib/support/CodeUtils.h>
 
@@ -36,7 +37,7 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan acti
         return std::nullopt;
     }
 
-    OOBAccessor::SetAttributeRequestParser parser;
+    OOBDataSerializer::SetAttributeRequestParser parser;
     ReturnErrorAndLogOnFailure(parser.Init(tlvBuffer), Support, "Failed to parse attribute path and value from tlvBuffer");
 
     if (parser.path.mEndpointId != mDevice->GetEndpointId())

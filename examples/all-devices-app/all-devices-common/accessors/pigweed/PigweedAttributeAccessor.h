@@ -17,9 +17,11 @@
 #pragma once
 
 #include <accessors/AccessorRegistry.h>
+#include <accessors/OOBDataSerializer.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
+
 
 namespace chip::app {
 
@@ -34,7 +36,7 @@ public:
         Platform::ScopedMemoryBuffer<uint8_t> tlvRequest;
         size_t tlvLen = 0;
 
-        CHIP_ERROR err = OOBAccessor::BuildSetAttributeRequest(path, reader, tlvLen, tlvRequest);
+        CHIP_ERROR err = OOBDataSerializer::BuildSetAttributeRequest(path, reader, tlvLen, tlvRequest);
         if (err != CHIP_NO_ERROR)
         {
             return ::pw::Status::Internal();
@@ -57,3 +59,4 @@ public:
 };
 
 } // namespace chip::app
+
