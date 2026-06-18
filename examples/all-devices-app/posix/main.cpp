@@ -48,7 +48,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
 
-#include "include/AppCommandDelegate.h"
+#include <AppCommandDelegate.h>
 #include <BleInit.h>
 #include <TermHandling.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
@@ -207,14 +207,10 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
     auto deviceConfigs              = AppOptions::GetDeviceTypeEntries();
     const auto & constructedDevices = devices.GetConstructedDevices();
 
-    if (deviceConfigs.size() != constructedDevices.size())
-    {
-        ChipLogError(AppServer, "Mismatch between device configs count (%u) and constructed devices count (%u)",
-                     static_cast<unsigned>(deviceConfigs.size()), static_cast<unsigned>(constructedDevices.size()));
-        return;
-    }
+    // Calling code already checked that deviceConfigs.size() == constructedDevices.size().
+    VerifyOrDie(deviceConfigs.size() == constructedDevices.size());
 
-    // TODO(#72638): The hardcoded type-casts to specific device implementations below prevent those
+    // TODO(#72638): The hardcoded type references to specific device implementations below prevent those
     // classes from being selectively compiled out or stripped by LTO when they are disabled.
     // A more generic and pluggable registration mechanism (e.g., via DeviceFactory or an interface)
     // should be developed to allow true conditional compilation of devices.
@@ -331,6 +327,12 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     });
 
     SuccessOrDie(devices.Startup());
+
+    if (AppOptions::GetDeviceTypeEntries().size() != devices.GetConstructedDevices().size())
+    {
+        ChipLogError(AppServer, "Failed to initialize some of the --device entries on command line. Cannot proceed.");
+        chipDie();
+    }
 
     // Set up named pipe command handlers against the registered devices.
     const std::string & namedPipePath = AppOptions::GetConfig().appPipePath;

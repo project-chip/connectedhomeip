@@ -38,7 +38,6 @@ public:
         std::string appPipePath;
         std::vector<std::string> traceTo;
 
-        // Restored original custom options
         std::optional<uint16_t> discriminator;
         std::optional<uint16_t> vendorId;
         std::optional<uint16_t> productId;
