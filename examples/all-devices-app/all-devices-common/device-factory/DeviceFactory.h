@@ -372,20 +372,34 @@ private:
         {
             RegisterCreator("fan", [this]() {
                 VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kTop to disambiguate from fan-no-onoff under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = kCommonPositionNamespaceId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
                 return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
                     .includeOnOffCluster = true,
+                    .tagList             = Span(&kFanTag, 1),
                 });
             });
             RegisterCreator("fan-no-onoff", [this]() {
                 VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from fan (see comments above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanNoOnOffTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = kCommonPositionNamespaceId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
                 return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
                     .includeOnOffCluster = false,
+                    .tagList             = Span(&kFanNoOnOffTag, 1),
                 });
             });
         }

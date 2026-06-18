@@ -37,6 +37,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
+#include <devices/endpoint-allocator/DynamicEndpointIdAllocator.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -152,14 +153,26 @@ public:
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
+        std::set<EndpointId> reservedIds;
+        for (const auto & entry : AppOptions::GetDeviceTypeEntries())
+        {
+            if (entry.endpoint != kInvalidEndpointId)
+            {
+                reservedIds.insert(entry.endpoint);
+            }
+        }
+
+        DynamicEndpointIdAllocator allocator(std::move(reservedIds));
+
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
             auto device = DeviceFactory::GetInstance().Create(entry.type, entry.label);
 
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
-            ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
-                            entry.endpoint, entry.parentId);
-            ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
+            allocator.ForceNext(entry.endpoint);
+
+            ChipLogProgress(AppServer, "Registering device %s with parent 0x%04X", entry.type.c_str(), entry.parentId);
+            ReturnErrorOnFailure(device->Register(allocator, mDataModelProvider, entry.parentId));
             mConstructedDevices.push_back(std::move(device));
         }
 

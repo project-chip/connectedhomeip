@@ -23,13 +23,13 @@ namespace {
 
 const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface1Tag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = 7, // Common Position
+    .namespaceID = kCommonPositionNamespaceId,
     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
 };
 
 const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = 7, // Common Position
+    .namespaceID = kCommonPositionNamespaceId,
     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
 };
 
@@ -40,21 +40,21 @@ CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate) :
     mSurface2(timerDelegate)
 {}
 
-CHIP_ERROR CooktopDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    mEndpointId = endpoint;
+    mEndpointId = allocator.Allocate();
 
-    ReturnErrorOnFailure(
-        InitEndpointRegistration(endpoint, provider, EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(InitEndpointRegistration(mEndpointId, provider,
+                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(mSurface1.Register(
-        endpoint + 1, provider,
-        EndpointComposition(endpoint, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface1Tag, 1))));
+        allocator.Allocate(), provider,
+        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface1Tag, 1))));
     ReturnErrorOnFailure(mSurface2.Register(
-        endpoint + 2, provider,
-        EndpointComposition(endpoint, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface2Tag, 1))));
+        allocator.Allocate(), provider,
+        EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface2Tag, 1))));
 
     return CHIP_NO_ERROR;
 }

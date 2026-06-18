@@ -27,7 +27,7 @@ public:
     explicit RefrigeratorDevice(TimerDelegate & timerDelegate);
     ~RefrigeratorDevice() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 

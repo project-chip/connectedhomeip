@@ -32,17 +32,17 @@ OvenDevice::OvenDevice(TimerDelegate & timerDelegate) :
     mSurface(timerDelegate)
 {}
 
-CHIP_ERROR OvenDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    mEndpointId = endpoint;
+    mEndpointId = allocator.Allocate();
 
-    ReturnErrorOnFailure(
-        InitEndpointRegistration(endpoint, provider, EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(InitEndpointRegistration(mEndpointId, provider,
+                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mCavity.Register(endpoint + 1, provider, endpoint));
-    ReturnErrorOnFailure(mSurface.Register(endpoint + 2, provider, endpoint));
+    ReturnErrorOnFailure(mCavity.Register(allocator, provider, mEndpointId));
+    ReturnErrorOnFailure(mSurface.Register(allocator, provider, mEndpointId));
 
     return CHIP_NO_ERROR;
 }

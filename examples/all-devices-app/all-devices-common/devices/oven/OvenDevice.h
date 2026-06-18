@@ -28,7 +28,7 @@ public:
     explicit OvenDevice(TimerDelegate & timerDelegate);
     ~OvenDevice() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 

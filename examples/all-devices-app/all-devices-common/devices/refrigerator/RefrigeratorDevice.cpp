@@ -31,16 +31,17 @@ RefrigeratorDevice::RefrigeratorDevice(TimerDelegate & timerDelegate) :
              })
 {}
 
-CHIP_ERROR RefrigeratorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR RefrigeratorDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                        EndpointId parentId)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    mEndpointId = endpoint;
+    mEndpointId = allocator.Allocate();
 
-    ReturnErrorOnFailure(
-        InitEndpointRegistration(endpoint, provider, EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(InitEndpointRegistration(mEndpointId, provider,
+                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mCabinet.Register(endpoint + 1, provider, endpoint));
+    ReturnErrorOnFailure(mCabinet.Register(allocator, provider, mEndpointId));
 
     return CHIP_NO_ERROR;
 }

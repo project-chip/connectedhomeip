@@ -38,7 +38,8 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
-        bool includeOnOffCluster = true;
+        bool includeOnOffCluster                                                = true;
+        Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {};
     };
 
     /// If onOffDelegate is null, the endpoint will not have an On/Off cluster. If it is not null, Register() will add

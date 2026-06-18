@@ -26,6 +26,8 @@ namespace chip::app {
 class TemperatureControlledCabinetPart : public SingleEndpointDevice
 {
 public:
+    using SingleEndpointDevice::Register;
+
     struct Config
     {
         int16_t temperatureSetpoint = 400; // 4.00 °C

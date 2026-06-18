@@ -37,6 +37,17 @@ class SingleEndpointDevice : public DeviceInterface
 public:
     virtual ~SingleEndpointDevice() = default;
 
+    /// Subclasses implement this to perform single-endpoint registration on a specific endpoint ID.
+    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                EndpointId parentId = kInvalidEndpointId) = 0;
+
+    /// Implements DeviceInterface::Register by allocating an endpoint via allocator.
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointId parentId = kInvalidEndpointId) override
+    {
+        return Register(allocator.Allocate(), provider, parentId);
+    }
+
     EndpointId GetEndpointId() const { return mEndpointId; }
 
 protected:

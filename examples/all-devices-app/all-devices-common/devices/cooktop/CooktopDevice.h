@@ -28,6 +28,8 @@ namespace chip::app {
 class CookSurfacePart : public SingleEndpointDevice
 {
 public:
+    using SingleEndpointDevice::Register;
+
     explicit CookSurfacePart(TimerDelegate & timerDelegate) :
         SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)), mTimerDelegate(timerDelegate)
     {}
@@ -76,7 +78,7 @@ public:
     explicit CooktopDevice(TimerDelegate & timerDelegate);
     ~CooktopDevice() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
