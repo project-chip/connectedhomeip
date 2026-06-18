@@ -25,12 +25,12 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --timeout 30
 #       --endpoint 1
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
-#     timeout: 30
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
