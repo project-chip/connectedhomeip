@@ -27,7 +27,11 @@ namespace chip {
 namespace app {
 
 LoggingDimmableLightDevice::LoggingDimmableLightDevice(const Context & context) :
-    DimmableLightDevice(*this, *this, *this, *this, context)
+    LoggingDimmableLightDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), context)
+{}
+
+LoggingDimmableLightDevice::LoggingDimmableLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context) :
+    DimmableLightDevice(deviceTypes, *this, *this, *this, *this, context)
 {}
 
 // OnOffDelegate

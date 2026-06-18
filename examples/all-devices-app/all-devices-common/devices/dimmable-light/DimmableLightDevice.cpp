@@ -29,7 +29,16 @@ DimmableLightDevice::DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate
                                          Clusters::LevelControlDelegate & levelControlDelegate,
                                          Clusters::OnOffEffectDelegate & effectDelegate,
                                          Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1)),
+    DimmableLightDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), onOffDelegate,
+                        levelControlDelegate, effectDelegate, identifyDelegate, context)
+{}
+
+DimmableLightDevice::DimmableLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
+                                         Clusters::OnOffDelegate & onOffDelegate,
+                                         Clusters::LevelControlDelegate & levelControlDelegate,
+                                         Clusters::OnOffEffectDelegate & effectDelegate,
+                                         Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+    SingleEndpointDevice(deviceTypes),
     mOnOffDelegate(onOffDelegate), mLevelControlDelegate(levelControlDelegate), mEffectDelegate(effectDelegate),
     mIdentifyDelegate(identifyDelegate), mContext(context)
 {}

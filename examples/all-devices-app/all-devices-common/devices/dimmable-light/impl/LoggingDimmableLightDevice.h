@@ -42,6 +42,9 @@ public:
     LoggingDimmableLightDevice(const Context & context);
     ~LoggingDimmableLightDevice() override = default;
 
+protected:
+    LoggingDimmableLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context);
+
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
