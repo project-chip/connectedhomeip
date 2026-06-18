@@ -157,7 +157,7 @@ class MetadataReader:
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
                 factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
-                timeout=float(attr.get("timeout", TestingDefaults.DEFAULT_TIMEOUT_S)),
+                timeout=float(attr.get("timeout", str(TestingDefaults.DEFAULT_TIMEOUT_S))),
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
             ))
 
