@@ -29,7 +29,9 @@ namespace chip::app {
 // TODO: Generate standard namespace ID constants from spec and place them in libCHIP.
 constexpr uint16_t kCommonPositionNamespaceId = 7;
 
-/// Defines the parent-child topology, family composition pattern, and static semantic tags for an endpoint.
+/// Structural configuration for registering an endpoint within a node hierarchy.
+///
+/// Encapsulates parent-child relationship, family composition pattern, and static semantic tags.
 struct EndpointComposition
 {
     using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
@@ -58,9 +60,9 @@ public:
     /// be called once after starting up a device for the first time. This function
     /// will create/instantiate all clusters on the device and complete endpoint registration.
     /// It should return error if there's any failure when adding the device's clusters to the provider.
-    /// A parentId of kInvalidEndpointId represents that there is no parent to this device
+    /// An empty or default EndpointComposition represents that there is no parent or static tags.
     virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                EndpointId parentId = kInvalidEndpointId) = 0;
+                                EndpointComposition composition = {}) = 0;
 
     /// Removes a device's clusters from the given provider. This
     /// must only be called when register has succeeded before. Expected
