@@ -32,7 +32,7 @@ namespace app {
  * It implements SmokeCoAlarmDelegate: a self-test request is simulated with a timer, and every
  * other callback simply logs. This is the device the factory builds for the all-devices-app.
  */
-class LoggingOnlySmokeCoAlarmDevice : public SmokeCoAlarmDevice, public Clusters::SmokeCoAlarmDelegate, public TimerContext
+class LoggingOnlySmokeCoAlarmDevice : public Clusters::SmokeCoAlarmDelegate, public SmokeCoAlarmDevice, public TimerContext
 {
 public:
     static constexpr uint16_t kSelfTestTimeoutSec = 10;
