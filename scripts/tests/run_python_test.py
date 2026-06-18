@@ -353,7 +353,11 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_script_process.p.stdin.close()
 
     try:
-        test_script_exit_code = test_script_process.wait(script_timeout)
+        try:
+            test_script_exit_code = test_script_process.wait(script_timeout)
+        except TimeoutError as e:
+            log.exception("%r", e)
+            test_script_exit_code = -1  # Trigger error codepath
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
