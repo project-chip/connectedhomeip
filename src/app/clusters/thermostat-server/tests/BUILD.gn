@@ -1,0 +1,59 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "TestThermostatCluster"
+
+  test_sources = [ "TestThermostatCluster.cpp" ]
+
+  # The thermostat-server source_set has empty `sources` (the implementation lives in
+  # app_config_dependent_sources), so the cluster sources are compiled directly here.
+  #
+  # CodegenIntegration.cpp is intentionally excluded: it depends on the app-specific
+  # `StaticApplicationConfig::Thermostat` and on `Server::GetInstance()`. The test supplies a small
+  # `Thermostat::GetDelegate()` stub instead (see TestThermostatCluster.cpp).
+  #
+  # NOTE: PR 3a's retained ThermostatAttrAccess helper still uses Ember attribute accessors
+  # (`Attributes::X::Get/Set`); `mock_model` provides that Ember backing for the link. PR 3b removes this
+  # coupling, after which these deps can be slimmed down.
+  sources = [
+    "../PresetStructWithOwnedMembers.cpp",
+    "../PresetStructWithOwnedMembers.h",
+    "../ThermostatCluster.cpp",
+    "../ThermostatCluster.h",
+    "../ThermostatClusterAtomic.cpp",
+    "../ThermostatClusterEvents.cpp",
+    "../ThermostatClusterEvents.h",
+    "../ThermostatClusterPresets.cpp",
+    "../ThermostatClusterPresets.h",
+    "../ThermostatClusterSuggestions.cpp",
+    "../ThermostatSuggestionStructWithOwnedMembers.cpp",
+    "../ThermostatSuggestionStructWithOwnedMembers.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/thermostat-server",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
+    "${chip_root}/src/lib/support",
+  ]
+}

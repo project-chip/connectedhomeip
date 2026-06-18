@@ -384,7 +384,9 @@ private:
     Attributes::ACRefrigerantType::TypeInfo::Type mACRefrigerantType{};
     Attributes::ACCompressorType::TypeInfo::Type mACCompressorType{};
     Attributes::ACErrorCode::TypeInfo::Type mACErrorCode{};
-    Attributes::ACLouverPosition::TypeInfo::Type mACLouverPosition{};
+    // ACLouverPositionEnum has no 0 value (0 == kUnknownEnumValue, which must never be transmitted), so
+    // default to the first valid value rather than {} to avoid emitting a constraint-invalid enum.
+    Attributes::ACLouverPosition::TypeInfo::Type mACLouverPosition{ ACLouverPositionEnum::kClosed };
     Attributes::ACCoilTemperature::TypeInfo::Type mACCoilTemperature{};
     Attributes::ACCapacityformat::TypeInfo::Type mACCapacityformat{};
     Attributes::NumberOfSchedules::TypeInfo::Type mNumberOfSchedules{};
