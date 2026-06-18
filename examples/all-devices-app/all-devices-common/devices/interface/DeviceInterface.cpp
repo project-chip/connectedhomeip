@@ -38,10 +38,14 @@ CHIP_ERROR DeviceInterface::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & ou
 CHIP_ERROR DeviceInterface::InitEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                      EndpointComposition composition)
 {
-    // TODO: This needs to be updated to be more customizable and allow the cluster to be created with
-    //  optional attributes or semantic tags being set.
+    // TODO: Allow mDescriptorCluster to be initialized with custom optional attribute sets.
     mDescriptorCluster.Create(endpoint, DescriptorCluster::OptionalAttributesSet(0), composition.tagList);
-    ReturnErrorOnFailure(provider.AddCluster(mDescriptorCluster.Registration()));
+    CHIP_ERROR err = provider.AddCluster(mDescriptorCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        mDescriptorCluster.Destroy();
+        return err;
+    }
 
     mEndpointRegistration.endpointEntry = DataModel::EndpointEntry{
         .id                 = endpoint,
