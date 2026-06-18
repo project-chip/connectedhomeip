@@ -52,6 +52,8 @@ protected:
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
+
 private:
     class OnOffDelegate : public Clusters::OnOffDelegate
     {

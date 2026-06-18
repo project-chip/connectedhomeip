@@ -45,5 +45,7 @@ source_set("linux") {
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 
+  deps += [ "${chip_root}/third_party/jsoncpp" ]
+
   public_configs = [ ":includes" ]
 }

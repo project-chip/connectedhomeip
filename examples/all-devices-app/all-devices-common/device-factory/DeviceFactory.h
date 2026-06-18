@@ -215,7 +215,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
         {
-            RegisterCreator("occupancy-sensor", []() { return std::make_unique<TogglingOccupancySensorDevice>(); });
+            RegisterCreator("occupancy-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingOccupancySensorDevice>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {

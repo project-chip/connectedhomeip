@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-
-source_set("logging") {
-  sources = [
-    "LoggingOccupancySensorDevice.cpp",
-    "LoggingOccupancySensorDevice.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
-    "${chip_root}/src/lib/support",
-  ]
-}
+# This is the equivalent to app_config_dependent_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
