@@ -76,7 +76,7 @@ TEST_F(TestServer, TestFactoryResetEvent)
 }
 
 // TODO: Remove this test after verifying crashlog workflow
-TEST(TestServer, CrashlogAbort)
+TEST(CrashlogTest, Abort)
 {
     // Deliberately abort to trigger coredump generation for crashlog testing.
     // This test is independent of TestServer (which requires BLE/stack init).
