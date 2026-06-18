@@ -32,6 +32,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/bridged-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/cooktop",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-energy-management",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/flow-sensor",

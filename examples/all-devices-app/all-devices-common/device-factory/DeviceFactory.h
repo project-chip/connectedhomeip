@@ -26,6 +26,7 @@
 #include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/cooktop/CooktopDevice.h>
+#include <devices/device-energy-management/DeviceEnergyManagementDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.h>
 #include <devices/extractor-hood/ExtractorHoodDevice.h>
@@ -234,6 +235,13 @@ private:
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_DEVICE_ENERGY_MANAGEMENT)
+        {
+            RegisterCreator("device-energy-management", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<DeviceEnergyManagementDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_LIGHT)

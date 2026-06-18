@@ -50,6 +50,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'chime',
     'contact-sensor',
     'cooktop',
+    'device-energy-management',
     'dimmable-light',
     'dimmable-plug-in-unit',
     'extractor-hood',

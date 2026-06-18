@@ -82,7 +82,7 @@ To update or validate this list manually, follow these steps:
 | 36        | Content Launcher                                           | 1290 (0x050A) | No                 | No                  |                                       |
 | 37        | Demand Response Load Control                               | 150 (0x0096)  | No                 | No                  |                                       |
 | 38        | Descriptor                                                 | 29 (0x001D)   | Yes                | Yes                 |                                       |
-| 39        | Device Energy Management                                   | 152 (0x0098)  | Yes                | No                  |                                       |
+| 39        | Device Energy Management                                   | 152 (0x0098)  | Yes                | Yes                 | Device Energy Management              |
 | 40        | Device Energy Management Mode                              | 159 (0x009F)  | No                 | No                  | Instance of Mode Base                 |
 | 41        | Diagnostic Logs                                            | 50 (0x0032)   | Yes                | No                  |                                       |
 | 42        | Dishwasher Alarm                                           | 93 (0x005D)   | No                 | No                  |                                       |

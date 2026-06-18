@@ -71,6 +71,10 @@ _available_devices = [
     "COOKTOP",
   ],
   [
+    "device-energy-management",
+    "DEVICE_ENERGY_MANAGEMENT",
+  ],
+  [
     "dimmable-light",
     "DIMMABLE_LIGHT",
   ],

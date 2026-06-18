@@ -42,8 +42,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/bridged-node/BridgedNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/cook-surface/CookSurfaceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/cooktop/CooktopDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/device-energy-management/DeviceEnergyManagementDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.cpp"
@@ -131,6 +131,7 @@ foreach(_key
         chime
         contact-sensor
         cooktop
+        device-energy-management
         dimmable-light
         dimmable-plug-in-unit
         extractor-hood
