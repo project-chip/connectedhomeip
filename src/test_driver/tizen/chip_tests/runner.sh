@@ -80,7 +80,7 @@ while IFS= read -r TEST; do
         # Raw core dumps are created instantly in /mnt/chip/dump/
         # No need to wait or copy - they're already on shared filesystem
         if [ "$RV" -gt 128 ]; then
-            echo "Raw core dump created: /mnt/chip/dump/core.${NAME}.*"
+            echo "Raw core dump created: /mnt/chip/dump/core.$NAME.*"
         fi
     fi
 

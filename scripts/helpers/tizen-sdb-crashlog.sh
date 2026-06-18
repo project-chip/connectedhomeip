@@ -196,7 +196,7 @@ function resolve_binary_path() {
         # Linux %e in core_pattern truncates the executable name to 15 characters.
         # If no exact match, try prefix matching to find the full binary name.
         local found
-        found=$(find "$target_dir" "$target_dir/tests" -maxdepth 1 -type f -name "${binary}*" -executable 2>/dev/null | head -1)
+        found=$(find "$target_dir" "$target_dir/tests" -maxdepth 1 -type f -name "$binary*" -executable 2>/dev/null | head -1)
         if [ -n "$found" ]; then
             echo "$found"
         fi
@@ -354,7 +354,7 @@ function filter_matter_crashes() {
             fi
         done
 
-        if $found; then
+        if "$found"; then
             filtered_crashes+=("$remote_zip")
             filtered_epochs+=("${CRASH_EPOCHS[$i]}")
         fi

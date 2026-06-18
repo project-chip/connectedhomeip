@@ -99,7 +99,7 @@ function resolve_binary_path() {
         # Linux %e in core_pattern truncates the executable name to 15 characters.
         # If no exact match, try prefix matching to find the full binary name.
         local found
-        found=$(find "$target_dir" "$target_dir/tests" -maxdepth 1 -type f -name "${binary}*" -executable 2>/dev/null | head -1)
+        found=$(find "$target_dir" "$target_dir/tests" -maxdepth 1 -type f -name "$binary*" -executable 2>/dev/null | head -1)
         if [ -n "$found" ]; then
             echo "$found"
         fi
