@@ -61,7 +61,7 @@ namespace chip::app {
 class DeviceFactory
 {
 public:
-    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
+    using DeviceCreator         = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
     using DeviceAccessorCreator = std::function<std::unique_ptr<OOBAccessor>(DeviceInterface *)>;
 
     struct Context
