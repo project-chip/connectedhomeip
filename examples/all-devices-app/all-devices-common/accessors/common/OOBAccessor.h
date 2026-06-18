@@ -223,13 +223,6 @@ public:
      *       synchronous execution of this function call.
      */
     virtual std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) = 0;
-
-    /**
-     * @brief Retrieves a list of all concrete attribute paths that this accessor supports writes to.
-     *
-     * @return A Span of ConcreteDataAttributePath elements.
-     */
-    virtual chip::Span<const ConcreteDataAttributePath> GetSupportedWriteAttributes() const = 0;
 };
 
 } // namespace chip::app

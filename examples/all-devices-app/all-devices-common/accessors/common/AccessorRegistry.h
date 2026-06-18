@@ -57,23 +57,6 @@ public:
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    /**
-     * @brief Appends all supported write attribute paths from all registered accessors to the provided vector.
-     *
-     * @param[out] paths The vector to append the paths to.
-     */
-    void GetSupportedWriteAttributes(std::vector<ConcreteDataAttributePath> & paths)
-    {
-        for (auto & accessor : mAccessors)
-        {
-            auto supportedPaths = accessor.GetSupportedWriteAttributes();
-            for (const auto & path : supportedPaths)
-            {
-                paths.push_back(path);
-            }
-        }
-    }
-
 private:
     AccessorRegistry()  = default;
     ~AccessorRegistry() = default;

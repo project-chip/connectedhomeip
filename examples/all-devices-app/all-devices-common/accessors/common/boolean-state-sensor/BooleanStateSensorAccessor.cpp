@@ -29,11 +29,6 @@ BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice 
         ConcreteDataAttributePath(mDevice->GetEndpointId(), BooleanState::Id, BooleanState::Attributes::StateValue::Id);
 }
 
-chip::Span<const ConcreteDataAttributePath> BooleanStateSensorAccessor::GetSupportedWriteAttributes() const
-{
-    return chip::Span<const ConcreteDataAttributePath>(mSupportedPaths);
-}
-
 std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
 {
     if (!actionName.data_equal(kActionSetAttribute))
