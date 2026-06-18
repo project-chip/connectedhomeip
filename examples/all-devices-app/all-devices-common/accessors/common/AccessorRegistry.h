@@ -40,12 +40,11 @@ public:
     /**
      * @brief Routes an action/simulation invocation to the registered accessors.
      *
-     * @param actionName The name of the action to invoke.
+     * @param actionName Action name. An OOBAccessor that handles this action must be registered.
      * @param tlvBuffer Buffer containing TLV data for the action request.
-     * @return std::nullopt if the action is not handled by any registered accessors. Or a CHIP_ERROR result returned by an accessor
-     * that handled the request.
+     * @return CHIP_ERROR_NOT_FOUND if no accessor handles this request. OR the status from the accssor.
      */
-    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
+    CHIP_ERROR HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
     {
         for (auto & accessor : mAccessors)
         {
@@ -55,7 +54,7 @@ public:
                 return result;
             }
         }
-        return std::nullopt;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     /**

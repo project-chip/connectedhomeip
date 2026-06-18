@@ -40,16 +40,15 @@ public:
             return ::pw::Status::Internal();
         }
 
-        auto result =
+        CHIP_ERROR result =
             AccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, ByteSpan(tlvRequest.Get(), tlvLen));
-        if (result.has_value())
+        if (result != CHIP_ERROR_NOT_FOUND)
         {
-            err = *result;
-            if (err == CHIP_NO_ERROR)
+            if (result == CHIP_NO_ERROR)
             {
                 return ::pw::OkStatus();
             }
-            ChipLogError(Support, "OOB Accessor failed to write attribute: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(Support, "OOB Accessor failed to write attribute: %" CHIP_ERROR_FORMAT, result.Format());
             return ::pw::Status::Internal();
         }
 

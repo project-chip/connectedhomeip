@@ -216,7 +216,7 @@ public:
      * @return std::nullopt if the action is not handled/supported by this accessor.
      *         A non-null optional containing:
      *           - CHIP_NO_ERROR on success.
-     *           - Other CHIP_ERROR codes on failure.
+     *           - Other CHIP_ERROR codes except CHIP_ERROR_NOT_FOUND on failure.
      *
      * @note **Asynchronous Safety Warning:** The `tlvBuffer` parameter is a non-owning,
      *       temporary view whose underlying memory is only guaranteed to be valid during the
