@@ -43,7 +43,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (29 total)
+## Implemented Device Types (31 total)
 
 | #   | Device Type Name               | ID           | Notes |
 | --- | ------------------------------ | ------------ | ----- |
@@ -54,29 +54,32 @@ To update or validate this list manually, follow these steps:
 | 5   | Chime                          | 326 (0x0146) |       |
 | 6   | Contact Sensor                 | 21 (0x0015)  |       |
 | 7   | Dimmable Light                 | 257 (0x0101) |       |
-| 8   | Fan                            | 43 (0x002B)  |       |
-| 9   | Flow Sensor                    | 774 (0x0306) |       |
-| 10  | Generic Switch                 | 15 (0x000F)  |       |
-| 11  | Humidity Sensor                | 775 (0x0307) |       |
-| 12  | Light Sensor                   | 262 (0x0106) |       |
-| 13  | Mounted On/Off Control         | 271 (0x010F) |       |
-| 14  | Network Infrastructure Manager | 144 (0x0090) |       |
-| 15  | Occupancy Sensor               | 263 (0x0107) |       |
-| 16  | On/Off Light                   | 256 (0x0100) |       |
-| 17  | On/Off Light Switch            | 259 (0x0103) |       |
-| 18  | On/Off Plug-In Unit            | 266 (0x010A) |       |
-| 19  | Power Source                   | 17 (0x0011)  |       |
-| 20  | Pressure Sensor                | 773 (0x0305) |       |
-| 21  | Proximity Ranger               | 338 (0x0152) |       |
-| 22  | Rain Sensor                    | 68 (0x0044)  |       |
-| 23  | Root Node                      | 22 (0x0016)  |       |
-| 24  | Smoke CO Alarm                 | 118 (0x0076) |       |
-| 25  | Soil Sensor                    | 69 (0x0045)  |       |
-| 26  | Speaker                        | 34 (0x0022)  |       |
-| 27  | Temperature Sensor             | 770 (0x0302) |       |
-| 28  | Water Freeze Detector          | 65 (0x0041)  |       |
-| 29  | Water Leak Detector            | 67 (0x0043)  |       |
-## Unimplemented Device Types (75 total)
+| 8   | Dimmable Plug-In Unit          | 267 (0x010B) |       |
+| 9   | Fan                            | 43 (0x002B)  |       |
+| 10  | Flow Sensor                    | 774 (0x0306) |       |
+| 11  | Generic Switch                 | 15 (0x000F)  |       |
+| 12  | Humidity Sensor                | 775 (0x0307) |       |
+| 13  | Light Sensor                   | 262 (0x0106) |       |
+| 14  | Mounted Dimmable Load Control  | 272 (0x0110) |       |
+| 15  | Mounted On/Off Control         | 271 (0x010F) |       |
+| 16  | Network Infrastructure Manager | 144 (0x0090) |       |
+| 17  | Occupancy Sensor               | 263 (0x0107) |       |
+| 18  | On/Off Light                   | 256 (0x0100) |       |
+| 19  | On/Off Light Switch            | 259 (0x0103) |       |
+| 20  | On/Off Plug-In Unit            | 266 (0x010A) |       |
+| 21  | Power Source                   | 17 (0x0011)  |       |
+| 22  | Pressure Sensor                | 773 (0x0305) |       |
+| 23  | Proximity Ranger               | 338 (0x0152) |       |
+| 24  | Rain Sensor                    | 68 (0x0044)  |       |
+| 25  | Root Node                      | 22 (0x0016)  |       |
+| 26  | Smoke CO Alarm                 | 118 (0x0076) |       |
+| 27  | Soil Sensor                    | 69 (0x0045)  |       |
+| 28  | Speaker                        | 34 (0x0022)  |       |
+| 29  | Temperature Sensor             | 770 (0x0302) |       |
+| 30  | Water Freeze Detector          | 65 (0x0041)  |       |
+| 31  | Water Leak Detector            | 67 (0x0043)  |       |
+
+## Unimplemented Device Types (73 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                               | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
@@ -102,7 +105,6 @@ To update or validate this list manually, follow these steps:
 | 20  | Cook Surface                      | 119 (0x0077)  | On/Off [O], Temperature Control [O], Temperature Measurement [O]                                                                                                                                                             | None                                                                                                                                                                                                                                 | Ready           |
 | 21  | Cooktop                           | 120 (0x0078)  | On/Off, Identify [O]                                                                                                                                                                                                         | None                                                                                                                                                                                                                                 | Ready           |
 | 22  | Device Energy Management          | 1293 (0x050D) | Device Energy Management                                                                                                                                                                                                     | Device Energy Management Mode [O]                                                                                                                                                                                                    | Minimally Ready |
-| 23  | Dimmable Plug-In Unit             | 267 (0x010B)  | Identify, Groups, On/Off, Level Control, Scenes Management                                                                                                                                                                   | None                                                                                                                                                                                                                                 | Ready           |
 | 24  | Dimmer Switch                     | 260 (0x0104)  | Identify                                                                                                                                                                                                                     | None                                                                                                                                                                                                                                 | Ready           |
 | 25  | Dishwasher                        | 117 (0x0075)  | Identify [O], On/Off [O], Temperature Control [O]                                                                                                                                                                            | Operational State, Dishwasher Mode [O], Dishwasher Alarm [O]                                                                                                                                                                         | Blocked         |
 | 26  | Door Lock                         | 10 (0x000A)   | Identify                                                                                                                                                                                                                     | Door Lock                                                                                                                                                                                                                            | Blocked         |
@@ -130,7 +132,6 @@ To update or validate this list manually, follow these steps:
 | 48  | Meter Reference Point             | 1298 (0x0512) | Identify                                                                                                                                                                                                                     | None                                                                                                                                                                                                                                 | Ready           |
 | 49  | Microwave Oven                    | 121 (0x0079)  | Microwave Oven Control, Identify [O], Fan Control [O]                                                                                                                                                                        | Operational State, Microwave Oven Mode                                                                                                                                                                                               | Blocked         |
 | 50  | Mode Select                       | 39 (0x0027)   | None                                                                                                                                                                                                                         | Mode Select                                                                                                                                                                                                                          | Blocked         |
-| 51  | Mounted Dimmable Load Control     | 272 (0x0110)  | Identify, Groups, On/Off, Level Control, Scenes Management                                                                                                                                                                   | None                                                                                                                                                                                                                                 | Ready           |
 | 53  | OTA Provider                      | 20 (0x0014)   | OTA Software Update Provider                                                                                                                                                                                                 | None                                                                                                                                                                                                                                 | Ready           |
 | 54  | OTA Requestor                     | 18 (0x0012)   | OTA Software Update Requestor                                                                                                                                                                                                | None                                                                                                                                                                                                                                 | Ready           |
 | 57  | On/Off Sensor                     | 2128 (0x0850) | Identify                                                                                                                                                                                                                     | None                                                                                                                                                                                                                                 | Ready           |

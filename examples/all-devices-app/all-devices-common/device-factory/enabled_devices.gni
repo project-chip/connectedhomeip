@@ -71,6 +71,10 @@ _available_devices = [
     "DIMMABLE_LIGHT",
   ],
   [
+    "dimmable-plug-in-unit",
+    "DIMMABLE_PLUG_IN_UNIT",
+  ],
+  [
     "fan",
     "FAN",
   ],
@@ -89,6 +93,10 @@ _available_devices = [
   [
     "light-sensor",
     "LIGHT_SENSOR",
+  ],
+  [
+    "mounted-dimmable-load-control",
+    "MOUNTED_DIMMABLE_LOAD_CONTROL",
   ],
   [
     "mounted-on-off-control",

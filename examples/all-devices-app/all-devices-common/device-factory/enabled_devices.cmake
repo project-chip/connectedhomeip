@@ -44,6 +44,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/fan/FanDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl/LoggingFanDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/FlowSensorDevice.cpp"
@@ -55,6 +56,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/LightSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/impl/IncreasingLightSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/mounted-dimmable-load-control/MountedDimmableLoadControlDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/mounted-on-off-control/MountedOnOffControlDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
@@ -125,11 +127,13 @@ foreach(_key
         chime
         contact-sensor
         dimmable-light
+        dimmable-plug-in-unit
         fan
         flow-sensor
         generic-switch
         humidity-sensor
         light-sensor
+        mounted-dimmable-load-control
         mounted-on-off-control
         network-infrastructure-manager
         occupancy-sensor

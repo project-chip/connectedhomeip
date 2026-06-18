@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <devices/Types.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>

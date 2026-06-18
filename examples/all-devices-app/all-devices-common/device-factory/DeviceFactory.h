@@ -26,11 +26,13 @@
 #include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
 #include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
 #include <devices/generic-switch/GenericSwitchDevice.h>
 #include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
 #include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
+#include <devices/mounted-dimmable-load-control/MountedDimmableLoadControlDevice.h>
 #include <devices/mounted-on-off-control/MountedOnOffControlDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
@@ -225,6 +227,28 @@ private:
             RegisterCreator("dimmable-light", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<LoggingDimmableLightDevice>(LoggingDimmableLightDevice::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_PLUG_IN_UNIT)
+        {
+            RegisterCreator("dimmable-plug-in-unit", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<DimmablePlugInUnitDevice>(LoggingDimmableLightDevice::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
+        {
+            RegisterCreator("mounted-dimmable-load-control", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<MountedDimmableLoadControlDevice>(LoggingDimmableLightDevice::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
