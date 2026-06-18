@@ -172,7 +172,7 @@ public:
             auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, device.get());
             if (accessor)
             {
-                AccessorRegistry::Instance().Register(accessor.get());
+                AccessorRegistry::Instance().Register(*accessor);
                 mConstructedAccessors.push_back(std::move(accessor));
             }
             mConstructedDevices.push_back(std::move(device));
