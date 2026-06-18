@@ -41,8 +41,8 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <device-factory/DeviceFactory.h>
-#include <devices/root-node/RootNodeDevice.h>
 #include <devices/endpoint-allocator/ConsecutiveEndpointIdAllocator.h>
+#include <devices/root-node/RootNodeDevice.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <devices/root-node/ThreadRootNodeDevice.h>
