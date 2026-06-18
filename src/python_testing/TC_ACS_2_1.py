@@ -61,6 +61,10 @@ HUMAN_ACTIVITY_MAXTAGNUMBER = 0X09
 OBJECT_IDENTIFICATION_MAXTAGNUMBER = 0X0C
 SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
+# Script Function Call Example
+# ./scripts/tests/run_python_test.py --app out/linux-x64-all-clusters/chip-all-clusters-app --factory-reset
+# --app-args "--KVS kvs1 --discriminator 1234" --script src/python_testing/TC_ACS_2_1.py
+# --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1"
 
 class TC_ACS_2_1(MatterBaseTest):
     def desc_TC_ACS_2_1(self) -> str:
