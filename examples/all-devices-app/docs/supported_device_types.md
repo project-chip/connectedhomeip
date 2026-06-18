@@ -53,7 +53,7 @@ To update or validate this list manually, follow these steps:
 | 4   | Bridged Node                   | 19 (0x0013)  |       |
 | 5   | Chime                          | 326 (0x0146) |       |
 | 6   | Contact Sensor                 | 21 (0x0015)  |       |
-| 7   | Cook Surface                   | 119 (0x0077) |       |
+| 7   | Cook Surface                   | 119 (0x0077) | Part of Cooktop |
 | 8   | Cooktop                        | 120 (0x0078) |       |
 | 9   | Dimmable Light                 | 257 (0x0101) |       |
 | 10  | Dimmable Plug-In Unit          | 267 (0x010B) |       |

@@ -25,7 +25,6 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
-#include <devices/cook-surface/CookSurfaceDevice.h>
 #include <devices/cooktop/CooktopDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.h>
@@ -224,17 +223,6 @@ private:
                     { 1, "Ring Ring"_span },
                 };
                 return std::make_unique<ChimeDevice>(mContext->timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
-            });
-        }
-        if constexpr (ALL_DEVICES_ENABLE_COOK_SURFACE)
-        {
-            RegisterCreator("cook-surface", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return std::make_unique<CookSurfaceDevice>(LoggingOnOffLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COOKTOP)

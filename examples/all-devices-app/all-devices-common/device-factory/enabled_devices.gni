@@ -67,10 +67,6 @@ _available_devices = [
     "CONTACT_SENSOR",
   ],
   [
-    "cook-surface",
-    "COOK_SURFACE",
-  ],
-  [
     "cooktop",
     "COOKTOP",
   ],

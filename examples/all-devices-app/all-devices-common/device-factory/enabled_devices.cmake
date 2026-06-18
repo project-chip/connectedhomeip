@@ -130,7 +130,6 @@ foreach(_key
         bridged-node
         chime
         contact-sensor
-        cook-surface
         cooktop
         dimmable-light
         dimmable-plug-in-unit

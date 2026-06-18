@@ -117,7 +117,6 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/air-purifier",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/cook-surface",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/cooktop",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-plug-in-unit",

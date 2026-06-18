@@ -49,7 +49,6 @@ _ALL_DEVICES_APP_DEVICES = [
     'bridged-node',
     'chime',
     'contact-sensor',
-    'cook-surface',
     'cooktop',
     'dimmable-light',
     'dimmable-plug-in-unit',
