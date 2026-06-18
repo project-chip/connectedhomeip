@@ -759,7 +759,7 @@ void BLEManagerImpl::DriveBLEState()
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled)
     {
-        //TODO: shut down realtek BT
+        // TODO: shut down realtek BT
         mFlags.ClearAll();
         ChipLogProgress(DeviceLayer, "Shut down BLE");
     }
