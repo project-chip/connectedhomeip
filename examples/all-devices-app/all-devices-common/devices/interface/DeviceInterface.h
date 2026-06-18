@@ -29,6 +29,7 @@ namespace chip::app {
 // TODO: Generate standard namespace ID constants from spec and place them in libCHIP.
 constexpr uint16_t kCommonPositionNamespaceId = 7;
 
+/// Defines the parent-child topology, family composition pattern, and static semantic tags for an endpoint.
 struct EndpointComposition
 {
     using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
