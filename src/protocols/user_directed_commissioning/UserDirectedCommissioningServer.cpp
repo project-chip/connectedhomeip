@@ -25,6 +25,7 @@
 
 #include "UserDirectedCommissioning.h"
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMemString.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/raw/Base.h>
 
@@ -244,13 +245,8 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
     }
 
-    size_t i = 0;
-    while (i < sizeof(mInstanceName) && udcPayload[i] != '\0')
-    {
-        mInstanceName[i] = static_cast<char>(udcPayload[i]);
-        i++;
-    }
-    mInstanceName[i] = '\0';
+    size_t instanceNameLen = strnlen(reinterpret_cast<const char *>(udcPayload), sizeof(mInstanceName) - 1);
+    Platform::CopyString(mInstanceName, ByteSpan(udcPayload, instanceNameLen));
 
     if (payloadBufferSize == sizeof(mInstanceName))
     {
@@ -258,7 +254,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         return CHIP_NO_ERROR;
     }
     // advance i to the end of the fixed length block containing instance name
-    i = sizeof(mInstanceName);
+    size_t i = sizeof(mInstanceName);
 
     CHIP_ERROR err;
 
