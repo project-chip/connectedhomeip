@@ -49,6 +49,7 @@
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
+#include <devices/water-valve/WaterValveDevice.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -431,6 +432,13 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)
+        {
+            RegisterCreator("water-valve", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<WaterValveDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)

@@ -192,7 +192,7 @@ To update or validate this list manually, follow these steps:
 | 146       | Unit Localization                                          | 45 (0x002D)   | Yes                | No                  |                                       |
 | 147       | User Label                                                 | 65 (0x0041)   | Yes                | No                  |                                       |
 | 148       | Valid Proxies                                              | 68 (0x0044)   | No                 | No                  |                                       |
-| 149       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | No                  |                                       |
+| 149       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | Yes                 | Water Valve                           |
 | 150       | Wake On LAN                                                | 1283 (0x0503) | No                 | No                  |                                       |
 | 151       | Water Heater Management                                    | 148 (0x0094)  | Yes                | No                  |                                       |
 | 152       | Water Heater Mode                                          | 158 (0x009E)  | No                 | No                  | Instance of Mode Base                 |

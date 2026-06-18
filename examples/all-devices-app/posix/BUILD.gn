@@ -53,6 +53,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",

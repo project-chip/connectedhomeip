@@ -83,6 +83,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/water-valve/WaterValveDevice.cpp"
     # keep-sorted: end
 )
 
@@ -156,6 +157,7 @@ foreach(_key
         temperature-sensor
         water-freeze-detector
         water-leak-detector
+        water-valve
         # keep-sorted: end
     )
     string(REPLACE "-" "_" _suffix "${_key}")

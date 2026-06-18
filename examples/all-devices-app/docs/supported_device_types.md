@@ -43,7 +43,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (34 total)
+## Implemented Device Types (35 total)
 
 | #   | Device Type Name               | ID           | Notes |
 | --- | ------------------------------ | ------------ | ----- |
@@ -81,8 +81,9 @@ To update or validate this list manually, follow these steps:
 | 32  | Temperature Sensor             | 770 (0x0302) |       |
 | 33  | Water Freeze Detector          | 65 (0x0041)  |       |
 | 34  | Water Leak Detector            | 67 (0x0043)  |       |
+| 35  | Water Valve                    | 66 (0x0042)  |       |
 
-## Unimplemented Device Types (70 total)
+## Unimplemented Device Types (69 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                               | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
@@ -153,6 +154,5 @@ To update or validate this list manually, follow these steps:
 | 73  | Video Doorbell                    | 323 (0x0143)  | None                                                                                                                                                                                                                         | None                                                                                                                                                                                                                                 | Ready           |
 | 74  | Video Remote Control              | 42 (0x002A)   | None                                                                                                                                                                                                                         | None                                                                                                                                                                                                                                 | Ready           |
 | 75  | Water Heater                      | 1295 (0x050F) | Water Heater Management, Identify [O]                                                                                                                                                                                        | Water Heater Mode, Thermostat, Thermostat Mode [O], Demand Response Load Control [O], Thermostat User Interface Configuration [O]                                                                                                    | Blocked         |
-| 76  | Water Valve                       | 66 (0x0042)   | Identify, Valve Configuration and Control, Flow Measurement [O]                                                                                                                                                              | None                                                                                                                                                                                                                                 | Ready           |
 | 77  | Window Covering                   | 514 (0x0202)  | Identify, Groups [O]                                                                                                                                                                                                         | Window Covering                                                                                                                                                                                                                      | Blocked         |
 | 78  | Window Covering Controller        | 515 (0x0203)  | Identify [O]                                                                                                                                                                                                                 | None                                                                                                                                                                                                                                 | Ready           |
