@@ -36,6 +36,9 @@ public:
     LoggingFanDevice(const Context & context);
     ~LoggingFanDevice() override;
 
+protected:
+    LoggingFanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context);
+
     // FanControlDelegate
 
     Protocols::InteractionModel::Status HandleStep(Clusters::FanControl::StepDirectionEnum aDirection, bool aWrap,

@@ -47,6 +47,10 @@ public:
 
     ~FanDevice() override = default;
 
+protected:
+    FanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
+              Clusters::OnOffDelegate * onOffDelegate, const Context & context);
+
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;

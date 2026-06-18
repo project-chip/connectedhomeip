@@ -64,6 +64,7 @@ hardware platforms while allowing platform-specific driver integration.
 The application supports the following device types (specified via the
 `--device` flag). Currently supported device types include:
 
+-   `air-purifier`
 -   `chime`
 -   `contact-sensor`
 -   `dimmable-light`
@@ -92,7 +93,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|occupancy-sensor|on-off-light|power-source|pressure-sensor|rain-sensor|soil-sensor|speaker|water-freeze-detector|water-leak-detector>
+  --device <air-purifier|chime|contact-sensor|dimmable-light|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|occupancy-sensor|on-off-light|power-source|pressure-sensor|rain-sensor|soil-sensor|speaker|water-freeze-detector|water-leak-detector>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1

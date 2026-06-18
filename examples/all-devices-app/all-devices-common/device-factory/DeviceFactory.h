@@ -20,6 +20,7 @@
 #include <app_config/enabled_devices.h>
 #include <devices/Types.h>
 #include <devices/aggregator/AggregatorDevice.h>
+#include <devices/air-purifier/impl/LoggingAirPurifierDevice.h>
 #include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/bridged-node/BridgedNodeDevice.h>
@@ -139,6 +140,17 @@ private:
             RegisterCreator("aggregator", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<AggregatorDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_AIR_PURIFIER)
+        {
+            RegisterCreator("air-purifier", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingAirPurifierDevice>(FanDevice::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)

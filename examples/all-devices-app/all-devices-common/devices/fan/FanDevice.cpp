@@ -29,7 +29,12 @@ namespace app {
 
 FanDevice::FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,
                      const Context & context) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFan, 1)),
+    FanDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFan, 1), fanDelegate, onOffDelegate, context)
+{}
+
+FanDevice::FanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
+                     Clusters::OnOffDelegate * onOffDelegate, const Context & context) :
+    SingleEndpointDevice(deviceTypes),
     mFanDelegate(fanDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(context.timerDelegate), mContext(context)
 {
     VerifyOrDie(mContext.includeOnOffCluster == (mOnOffDelegate != nullptr));

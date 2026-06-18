@@ -47,6 +47,10 @@ _available_devices = [
     "AGGREGATOR",
   ],
   [
+    "air-purifier",
+    "AIR_PURIFIER",
+  ],
+  [
     "air-quality-sensor",
     "AIR_QUALITY_SENSOR",
   ],

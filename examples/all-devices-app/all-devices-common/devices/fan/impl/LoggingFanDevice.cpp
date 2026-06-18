@@ -80,6 +80,10 @@ LoggingFanDevice::LoggingFanDevice(const Context & context) :
     FanDevice(*this, context.includeOnOffCluster ? static_cast<Clusters::OnOffDelegate *>(this) : nullptr, context)
 {}
 
+LoggingFanDevice::LoggingFanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context) :
+    FanDevice(deviceTypes, *this, context.includeOnOffCluster ? static_cast<Clusters::OnOffDelegate *>(this) : nullptr, context)
+{}
+
 LoggingFanDevice::~LoggingFanDevice() {}
 
 // FanControlDelegate
