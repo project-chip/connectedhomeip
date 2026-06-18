@@ -41,8 +41,8 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
-#include <devices/endpoint-allocator/DynamicEndpointIdAllocator.h>
 #include <devices/endpoint-allocator/ConsecutiveEndpointIdAllocator.h>
+#include <devices/endpoint-allocator/DynamicEndpointIdAllocator.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
