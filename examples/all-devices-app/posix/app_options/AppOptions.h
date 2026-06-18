@@ -44,7 +44,7 @@ public:
         std::optional<uint16_t> productId;
         std::optional<uint32_t> interfaceId;
         std::string kvsPath;
-        bool enableWiFi = false;
+        bool enableWiFi   = false;
         int bleController = 0;
     };
 

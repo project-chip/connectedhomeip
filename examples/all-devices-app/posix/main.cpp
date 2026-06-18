@@ -472,8 +472,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
-    const char * kvsPath =
-        AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
+    const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
@@ -484,8 +483,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();
-    auto vendorId  = config.vendorId.has_value() ? config.vendorId : std::nullopt;
-    auto productId = config.productId.has_value() ? config.productId : std::nullopt;
+    auto vendorId       = config.vendorId.has_value() ? config.vendorId : std::nullopt;
+    auto productId      = config.productId.has_value() ? config.productId : std::nullopt;
     static AllDevicesExampleDeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(
         DeviceLayer::GetDeviceInstanceInfoProvider(), vendorId, productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
