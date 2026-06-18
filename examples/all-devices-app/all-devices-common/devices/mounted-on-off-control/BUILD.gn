@@ -21,7 +21,5 @@ source_set("mounted-on-off-control") {
     "MountedOnOffControlDevice.h",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
-  ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light" ]
 }

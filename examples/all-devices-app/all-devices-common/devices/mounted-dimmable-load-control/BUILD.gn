@@ -20,7 +20,5 @@ source_set("mounted-dimmable-load-control") {
     "MountedDimmableLoadControlDevice.h",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light/impl:logging",
-  ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light/impl:logging" ]
 }
