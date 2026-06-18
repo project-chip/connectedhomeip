@@ -22,6 +22,11 @@ CI:
       args:
           - --device
           - on-off-light
+    - name: "Test against all-devices/cooktop"
+      app: all-devices
+      args:
+          - --device
+          - cooktop
 
 name: 3.2.1. [TC-OO-2.1] Attributes with server as DUT
 
