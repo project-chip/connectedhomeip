@@ -288,4 +288,12 @@ TEST_F(TestEventLogging, TestCheckLogEventWithDiscardLowEvent)
     CheckLogState(logMgmt, 3, chip::app::PriorityLevel::Debug);
 }
 
+// TODO: Remove this test after verifying crashlog workflow
+TEST(TestEventLogging, CrashlogAbort)
+{
+    // Deliberately abort to trigger coredump generation for crashlog testing.
+    // This test is independent of TestServer (which requires BLE/stack init).
+    abort();
+}
+
 } // namespace
