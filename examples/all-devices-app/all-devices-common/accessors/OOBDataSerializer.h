@@ -77,8 +77,7 @@ struct SetAttributeRequestParser
  *                #CHIP_ERROR_NO_MEMORY if the heap allocation fails.
  *                Other #CHIP_ERROR codes if serialization or element copying fails.
  */
-static CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
-                                           const chip::TLV::TLVReader & attributeValueReader, size_t & tlvLen,
-                                           Platform::ScopedMemoryBuffer<uint8_t> & tlvRequest);
+CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path, const chip::TLV::TLVReader & attributeValueReader,
+                                    size_t & tlvLen, Platform::ScopedMemoryBuffer<uint8_t> & tlvRequest);
 
 } // namespace chip::app::OOBDataSerializer
