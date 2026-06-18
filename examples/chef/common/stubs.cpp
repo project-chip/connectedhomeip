@@ -119,7 +119,7 @@ void InitIdentifyCluster()
 #include <app/clusters/chime-server/CodegenIntegration.h>
 #endif
 
-#include <clusters/smoke-co-alarm/chef-smoke-co-alarm.h>
+#include <smoke-co-alarm/chef-smoke-co-alarm.h>
 
 namespace {
 
