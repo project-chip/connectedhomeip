@@ -45,7 +45,7 @@ public:
         std::optional<uint32_t> interfaceId;
         std::string kvsPath;
         bool enableWiFi   = false;
-        int bleController = 0;
+        uint32_t bleController = 0;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
