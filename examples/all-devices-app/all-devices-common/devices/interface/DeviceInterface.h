@@ -22,8 +22,30 @@
 #include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <devices/endpoint-allocator/EndpointIdAllocator.h>
 
 namespace chip::app {
+
+// TODO: Generate standard namespace ID constants or place them in core DataModelTypes.h.
+constexpr uint16_t kCommonPositionNamespaceId = 7;
+
+struct EndpointComposition
+{
+    using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
+
+    EndpointId parentId                           = kInvalidEndpointId;
+    DataModel::EndpointCompositionPattern pattern = DataModel::EndpointCompositionPattern::kFullFamily;
+    Span<const SemanticTag> tagList               = {};
+
+    constexpr EndpointComposition() = default;
+    constexpr EndpointComposition(
+        EndpointId parent,
+        DataModel::EndpointCompositionPattern compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
+        Span<const SemanticTag> tags                             = {}) :
+        parentId(parent),
+        pattern(compositionPattern), tagList(tags)
+    {}
+};
 
 /// A device is an entity that maintains some cluster functionality.
 class DeviceInterface : public EndpointInterface
@@ -36,7 +58,7 @@ public:
     /// will create/instantiate all clusters on the device and complete endpoint registration.
     /// It should return error if there's any failure when adding the device's clusters to the provider.
     /// A parentId of kInvalidEndpointId represents that there is no parent to this device
-    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+    virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                 EndpointId parentId = kInvalidEndpointId) = 0;
 
     /// Removes a device's clusters from the given provider. This
@@ -55,6 +77,10 @@ protected:
     DeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) :
         mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {})
     {}
+
+    CHIP_ERROR InitEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                        EndpointComposition composition = {});
+    void ShutdownEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     EndpointInterfaceRegistration mEndpointRegistration;

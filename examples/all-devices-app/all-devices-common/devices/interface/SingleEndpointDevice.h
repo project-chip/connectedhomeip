@@ -37,6 +37,17 @@ class SingleEndpointDevice : public DeviceInterface
 public:
     virtual ~SingleEndpointDevice() = default;
 
+    /// Subclasses implement this to perform single-endpoint registration on a specific endpoint ID.
+    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                EndpointId parentId = kInvalidEndpointId) = 0;
+
+    /// Implements DeviceInterface::Register by allocating an endpoint via allocator.
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointId parentId = kInvalidEndpointId) override
+    {
+        return Register(allocator.Allocate(), provider, parentId);
+    }
+
     EndpointId GetEndpointId() const { return mEndpointId; }
 
 protected:
@@ -48,7 +59,8 @@ protected:
     /// Device subclasses are expected to, and must only call this as part of their own device specific Register()
     /// functions. This allows creation of common and device-specific clusters to be done together and
     /// also to complete endpoint registration.
-    CHIP_ERROR SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);
+    CHIP_ERROR SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition = {});
 
     /// Internal function to unregister a single endpoint device. This will destroy the clusters part of
     /// this class, and must be called in a subclass' device-specific Unregister() function. This allows
