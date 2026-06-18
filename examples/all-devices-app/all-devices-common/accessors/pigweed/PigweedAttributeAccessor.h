@@ -21,7 +21,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
 
-
 namespace chip::app {
 
 class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
