@@ -35,23 +35,7 @@ public:
         return instance;
     }
 
-    /**
-     * @brief The accessor must live longer than the registration.
-     */
     void Register(OOBAccessor & accessor) { mAccessors.PushBack(&accessor); }
-
-    /**
-     * @brief Unregisters a device accessor from the registry.
-     *
-     * @param accessor The accessor to unregister.
-     */
-    void Unregister(OOBAccessor * accessor)
-    {
-        if (accessor != nullptr)
-        {
-            mAccessors.Remove(accessor);
-        }
-    }
 
     /**
      * @brief Routes an action/simulation invocation to the registered accessors.
