@@ -51,7 +51,7 @@ public:
             auto result = accessor.HandleAction(actionName, tlvBuffer);
             if (result.has_value())
             {
-                return result;
+                return *result;
             }
         }
         return CHIP_ERROR_NOT_FOUND;
