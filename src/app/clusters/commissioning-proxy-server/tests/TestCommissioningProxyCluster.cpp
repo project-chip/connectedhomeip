@@ -926,8 +926,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DelegateTimeout_Pr
 {
     struct TimeoutDelegate : public CommissioningProxyMockDelegate
     {
-        Protocols::InteractionModel::Status ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan>, CapabilitiesBitmap, uint16_t,
-                                                                chip::VendorId, uint16_t, uint16_t, WiFiBandBitmap,
+        Protocols::InteractionModel::Status ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan>,
+                                                                chip::BitMask<CapabilitiesBitmap>, uint16_t, chip::VendorId,
+                                                                uint16_t, uint16_t, chip::BitMask<WiFiBandBitmap>,
                                                                 app::CommandHandler *, const DataModel::InvokeRequest &) override
         {
             return Protocols::InteractionModel::Status::Timeout;
@@ -997,6 +998,39 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
 
     // State SHALL be Disconnected after a successful disconnect.
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// With MaxSessions > 1, disconnecting one of several active sessions SHALL NOT
+// transition the cluster to disconnected; only the final disconnect (no sessions
+// remaining) SHALL do so.
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionStateTransition)
+{
+    TestServerClusterContext context;
+    CommissioningProxyMockDelegate mockDelegate;
+    mockDelegate.SetMaxSessions(2);
+    CommissioningProxyCluster cluster(CommissioningProxyCluster::Config(kTestEndpointId, BitMask<Feature>{}, mockDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    // Open two sessions.
+    ASSERT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
+    ASSERT_TRUE(tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle)).IsSuccess());
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
+
+    Commands::ProxyDisconnectRequest::Type cmd;
+    cmd.sessionID.SetNonNull(1);
+
+    // First disconnect: one session remains, so state SHALL stay Connected.
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
+
+    // Second disconnect: no sessions remain, so state SHALL revert to Disconnected.
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1932,7 +1966,8 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_DelegateNotFound_Propagated
 {
     struct NotFoundDelegate : public CommissioningProxyMockDelegate
     {
-        Protocols::InteractionModel::Status ProxyBackgroundScanStopRequest(CapabilitiesBitmap, WiFiBandBitmap, chip::FabricIndex,
+        Protocols::InteractionModel::Status ProxyBackgroundScanStopRequest(chip::BitMask<CapabilitiesBitmap>,
+                                                                           chip::BitMask<WiFiBandBitmap>, chip::FabricIndex,
                                                                            chip::NodeId) override
         {
             return Protocols::InteractionModel::Status::NotFound;

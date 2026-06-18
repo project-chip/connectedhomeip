@@ -31,16 +31,15 @@ public:
     CommissioningProxyMockDelegate();
     ~CommissioningProxyMockDelegate() override; // = default;
 
-    Protocols::InteractionModel::Status ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
-                                                            chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                                                            uint16_t discriminator, chip::VendorId vendorid, uint16_t productid,
-                                                            uint16_t timeout,
-                                                            chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
-                                                            app::CommandHandler * commandObj,
-                                                            const DataModel::InvokeRequest & request) override;
+    Protocols::InteractionModel::Status
+    ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
+                        chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport, uint16_t discriminator,
+                        chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
+                        chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBand,
+                        app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) override;
 
-    Protocols::InteractionModel::Status ProxyScanRequest(CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands,
-                                                         app::CommandHandler * commandObj,
+    Protocols::InteractionModel::Status ProxyScanRequest(chip::BitMask<CapabilitiesBitmap> transport,
+                                                         chip::BitMask<WiFiBandBitmap> wiFiBands, app::CommandHandler * commandObj,
                                                          const DataModel::InvokeRequest & request) override;
 
     Protocols::InteractionModel::Status ProxyMessageRequest(uint16_t sessionId, chip::Optional<chip::ByteSpan> message,
@@ -50,17 +49,19 @@ public:
     Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex) override;
 
     Protocols::InteractionModel::Status
-    ProxyBackgroundScanStartRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t timeout,
-                                    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+    ProxyBackgroundScanStartRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                                    uint16_t timeout,
+                                    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
                                     chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj,
                                     const DataModel::InvokeRequest & request) override;
 
     Protocols::InteractionModel::Status
-    ProxyBackgroundScanStopRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                                   chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands, chip::FabricIndex fabricIndex,
-                                   chip::NodeId nodeId) override;
+    ProxyBackgroundScanStopRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                                   chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
+                                   chip::FabricIndex fabricIndex, chip::NodeId nodeId) override;
 
     uint8_t GetMaxSessions() override;
+    void SetMaxSessions(uint8_t v) { mMaxSessions = v; } // test helper
     uint8_t GetActiveSessionCount() override { return mActiveSessionCount; }
     void SetActiveSessionCount(uint8_t v) { mActiveSessionCount = v; } // test helper
     uint8_t GetMaxCachedResults() override { return 10; }

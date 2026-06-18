@@ -77,10 +77,10 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
-                        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t discriminator,
+                        chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport, uint16_t discriminator,
                         chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
-                        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand, app::CommandHandler * commandObj,
-                        const DataModel::InvokeRequest & request) = 0;
+                        chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBand,
+                        app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) = 0;
 
     /**
      * @brief Handles starting a Scan Request of required Transport and Bands
@@ -94,9 +94,9 @@ public:
      * The delegate handles all the transport specific options.
      */
     virtual Protocols::InteractionModel::Status
-    ProxyScanRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands, chip::app::CommandHandler * commandObj,
-                     const DataModel::InvokeRequest & request) = 0;
+    ProxyScanRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                     chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
+                     chip::app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) = 0;
 
     /**
      * @brief Forward a raw Matter packet to the commissionee via the proxy's
@@ -159,8 +159,9 @@ public:
      * @return Success, Busy (another caller's scan is running), or InvalidCommand.
      */
     virtual Protocols::InteractionModel::Status
-    ProxyBackgroundScanStartRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t timeout,
-                                    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+    ProxyBackgroundScanStartRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                                    uint16_t timeout,
+                                    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
                                     chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj,
                                     const DataModel::InvokeRequest & request) = 0;
 
@@ -180,9 +181,9 @@ public:
      *         requesting NodeId+FabricIndex do not match the original requester.
      */
     virtual Protocols::InteractionModel::Status
-    ProxyBackgroundScanStopRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                                   chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands, chip::FabricIndex fabricIndex,
-                                   chip::NodeId nodeId) = 0;
+    ProxyBackgroundScanStopRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                                   chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
+                                   chip::FabricIndex fabricIndex, chip::NodeId nodeId) = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
