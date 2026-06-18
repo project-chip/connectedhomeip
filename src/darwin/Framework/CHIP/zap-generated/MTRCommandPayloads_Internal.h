@@ -420,19 +420,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRNetworkCommissioningClusterQueryIdentityParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRNetworkCommissioningClusterQueryIdentityResponseParams (InternalMethods)
-
-- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType &)decodableStruct;
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTRDiagnosticLogsClusterRetrieveLogsRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

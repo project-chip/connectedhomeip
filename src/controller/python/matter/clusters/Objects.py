@@ -7231,7 +7231,6 @@ class NetworkCommissioning(Cluster):
             kWiFiNetworkInterface = 0x1
             kThreadNetworkInterface = 0x2
             kEthernetNetworkInterface = 0x4
-            kPerDeviceCredentials = 0x8
 
         class ThreadCapabilitiesBitmap(IntFlag):
             kIsBorderRouterCapable = 0x1
@@ -7246,7 +7245,6 @@ class NetworkCommissioning(Cluster):
             kWpaPersonal = 0x4
             kWpa2Personal = 0x8
             kWpa3Personal = 0x10
-            kWpa3MatterPdc = 0x20
 
     class Structs:
         @dataclass
@@ -7257,14 +7255,10 @@ class NetworkCommissioning(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="connected", Tag=1, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="networkIdentifier", Tag=2, Type=typing.Union[None, Nullable, bytes]),
-                        ClusterObjectFieldDescriptor(Label="clientIdentifier", Tag=3, Type=typing.Union[None, Nullable, bytes]),
                     ])
 
             networkID: 'bytes' = b""
             connected: 'bool' = False
-            networkIdentifier: 'typing.Union[None, Nullable, bytes]' = None
-            clientIdentifier: 'typing.Union[None, Nullable, bytes]' = None
 
         @dataclass
         class ThreadInterfaceScanResultStruct(ClusterObject):
@@ -7367,17 +7361,11 @@ class NetworkCommissioning(Cluster):
                         ClusterObjectFieldDescriptor(Label="ssid", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="credentials", Tag=1, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="networkIdentity", Tag=3, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="clientIdentifier", Tag=4, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="possessionNonce", Tag=5, Type=typing.Optional[bytes]),
                     ])
 
             ssid: bytes = b""
             credentials: bytes = b""
             breadcrumb: typing.Optional[uint] = None
-            networkIdentity: typing.Optional[bytes] = None
-            clientIdentifier: typing.Optional[bytes] = None
-            possessionNonce: typing.Optional[bytes] = None
 
         @dataclass
         class AddOrUpdateThreadNetwork(ClusterCommand):
@@ -7429,15 +7417,11 @@ class NetworkCommissioning(Cluster):
                         ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatusEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="networkIndex", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="clientIdentity", Tag=3, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="possessionSignature", Tag=4, Type=typing.Optional[bytes]),
                     ])
 
             networkingStatus: NetworkCommissioning.Enums.NetworkCommissioningStatusEnum = 0
             debugText: typing.Optional[str] = None
             networkIndex: typing.Optional[uint] = None
-            clientIdentity: typing.Optional[bytes] = None
-            possessionSignature: typing.Optional[bytes] = None
 
         @dataclass
         class ConnectNetwork(ClusterCommand):
@@ -7496,42 +7480,6 @@ class NetworkCommissioning(Cluster):
             networkID: bytes = b""
             networkIndex: uint = 0
             breadcrumb: typing.Optional[uint] = None
-
-        @dataclass
-        class QueryIdentity(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000031
-            command_id: typing.ClassVar[int] = 0x00000009
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'QueryIdentityResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="keyIdentifier", Tag=0, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="possessionNonce", Tag=1, Type=typing.Optional[bytes]),
-                    ])
-
-            keyIdentifier: bytes = b""
-            possessionNonce: typing.Optional[bytes] = None
-
-        @dataclass
-        class QueryIdentityResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000031
-            command_id: typing.ClassVar[int] = 0x0000000A
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="identity", Tag=0, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="possessionSignature", Tag=1, Type=typing.Optional[bytes]),
-                    ])
-
-            identity: bytes = b""
-            possessionSignature: typing.Optional[bytes] = None
 
     class Attributes:
         @dataclass

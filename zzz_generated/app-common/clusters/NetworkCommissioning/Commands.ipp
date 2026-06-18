@@ -113,9 +113,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kSsid), ssid);
     encoder.Encode(to_underlying(Fields::kCredentials), credentials);
     encoder.Encode(to_underlying(Fields::kBreadcrumb), breadcrumb);
-    encoder.Encode(to_underlying(Fields::kNetworkIdentity), networkIdentity);
-    encoder.Encode(to_underlying(Fields::kClientIdentifier), clientIdentifier);
-    encoder.Encode(to_underlying(Fields::kPossessionNonce), possessionNonce);
     return encoder.Finalize();
 }
 
@@ -140,18 +137,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
             err = DataModel::Decode(reader, breadcrumb);
-        }
-        else if (__context_tag == to_underlying(Fields::kNetworkIdentity))
-        {
-            err = DataModel::Decode(reader, networkIdentity);
-        }
-        else if (__context_tag == to_underlying(Fields::kClientIdentifier))
-        {
-            err = DataModel::Decode(reader, clientIdentifier);
-        }
-        else if (__context_tag == to_underlying(Fields::kPossessionNonce))
-        {
-            err = DataModel::Decode(reader, possessionNonce);
         }
 
         ReturnErrorOnFailure(err);
@@ -232,8 +217,6 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
     encoder.Encode(to_underlying(Fields::kNetworkingStatus), networkingStatus);
     encoder.Encode(to_underlying(Fields::kDebugText), debugText);
     encoder.Encode(to_underlying(Fields::kNetworkIndex), networkIndex);
-    encoder.Encode(to_underlying(Fields::kClientIdentity), clientIdentity);
-    encoder.Encode(to_underlying(Fields::kPossessionSignature), possessionSignature);
     return encoder.Finalize();
 }
 
@@ -258,14 +241,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kNetworkIndex))
         {
             err = DataModel::Decode(reader, networkIndex);
-        }
-        else if (__context_tag == to_underlying(Fields::kClientIdentity))
-        {
-            err = DataModel::Decode(reader, clientIdentity);
-        }
-        else if (__context_tag == to_underlying(Fields::kPossessionSignature))
-        {
-            err = DataModel::Decode(reader, possessionSignature);
         }
 
         ReturnErrorOnFailure(err);
@@ -381,72 +356,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace ReorderNetwork
-namespace QueryIdentity {
-
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kKeyIdentifier), keyIdentifier);
-    encoder.Encode(to_underlying(Fields::kPossessionNonce), possessionNonce);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kKeyIdentifier))
-        {
-            err = DataModel::Decode(reader, keyIdentifier);
-        }
-        else if (__context_tag == to_underlying(Fields::kPossessionNonce))
-        {
-            err = DataModel::Decode(reader, possessionNonce);
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace QueryIdentity
-namespace QueryIdentityResponse {
-
-CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kIdentity), identity);
-    encoder.Encode(to_underlying(Fields::kPossessionSignature), possessionSignature);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kIdentity))
-        {
-            err = DataModel::Decode(reader, identity);
-        }
-        else if (__context_tag == to_underlying(Fields::kPossessionSignature))
-        {
-            err = DataModel::Decode(reader, possessionSignature);
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace QueryIdentityResponse
 } // namespace Commands
 } // namespace NetworkCommissioning
 } // namespace Clusters

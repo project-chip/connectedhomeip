@@ -2137,12 +2137,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * This command is used to re-order the network configuration list.
  */
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-/**
- * Command QueryIdentity
- *
- * This command is used to query the identity of a network configuration.
- */
-- (void)queryIdentityWithParams:(MTRNetworkCommissioningClusterQueryIdentityParams *)params completion:(void (^)(MTRNetworkCommissioningClusterQueryIdentityResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeMaxNetworksWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeMaxNetworksWithParams:(MTRSubscribeParams *)params
@@ -20046,7 +20040,6 @@ typedef NS_OPTIONS(uint32_t, MTRNetworkCommissioningFeature) {
     MTRNetworkCommissioningFeatureWiFiNetworkInterface MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRNetworkCommissioningFeatureThreadNetworkInterface MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
     MTRNetworkCommissioningFeatureEthernetNetworkInterface MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRNetworkCommissioningFeaturePerDeviceCredentials MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint16_t, MTRNetworkCommissioningThreadCapabilitiesBitmap) {
@@ -20063,7 +20056,6 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurityBitmap) {
     MTRNetworkCommissioningWiFiSecurityBitmapWPAPersonal MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x4,
     MTRNetworkCommissioningWiFiSecurityBitmapWPA2Personal MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x8,
     MTRNetworkCommissioningWiFiSecurityBitmapWPA3Personal MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x10,
-    MTRNetworkCommissioningWiFiSecurityBitmapWPA3MatterPDC MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {

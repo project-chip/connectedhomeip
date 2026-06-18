@@ -73,7 +73,6 @@ enum class Feature : uint32_t
     kWiFiNetworkInterface     = 0x1,
     kThreadNetworkInterface   = 0x2,
     kEthernetNetworkInterface = 0x4,
-    kPerDeviceCredentials     = 0x8,
 };
 
 // Bitmap for ThreadCapabilitiesBitmap
@@ -89,12 +88,11 @@ enum class ThreadCapabilitiesBitmap : uint16_t
 // Bitmap for WiFiSecurityBitmap
 enum class WiFiSecurityBitmap : uint8_t
 {
-    kUnencrypted   = 0x1,
-    kWep           = 0x2,
-    kWpaPersonal   = 0x4,
-    kWpa2Personal  = 0x8,
-    kWpa3Personal  = 0x10,
-    kWpa3MatterPdc = 0x20,
+    kUnencrypted  = 0x1,
+    kWep          = 0x2,
+    kWpaPersonal  = 0x4,
+    kWpa2Personal = 0x8,
+    kWpa3Personal = 0x10,
 };
 } // namespace NetworkCommissioning
 } // namespace Clusters

@@ -8397,11 +8397,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void addOrUpdateWiFiNetwork(NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Optional<Long> breadcrumb, Optional<byte[]> networkIdentity, Optional<byte[]> clientIdentifier, Optional<byte[]> possessionNonce) {
-      addOrUpdateWiFiNetwork(callback, ssid, credentials, breadcrumb, networkIdentity, clientIdentifier, possessionNonce, 0);
+    public void addOrUpdateWiFiNetwork(NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Optional<Long> breadcrumb) {
+      addOrUpdateWiFiNetwork(callback, ssid, credentials, breadcrumb, 0);
     }
 
-    public void addOrUpdateWiFiNetwork(NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Optional<Long> breadcrumb, Optional<byte[]> networkIdentity, Optional<byte[]> clientIdentifier, Optional<byte[]> possessionNonce, int timedInvokeTimeoutMs) {
+    public void addOrUpdateWiFiNetwork(NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Optional<Long> breadcrumb, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -8417,18 +8417,6 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      final long networkIdentityFieldID = 3L;
-      BaseTLVType networkIdentitytlvValue = networkIdentity.<BaseTLVType>map((nonOptionalnetworkIdentity) -> new ByteArrayType(nonOptionalnetworkIdentity)).orElse(new EmptyType());
-      elements.add(new StructElement(networkIdentityFieldID, networkIdentitytlvValue));
-
-      final long clientIdentifierFieldID = 4L;
-      BaseTLVType clientIdentifiertlvValue = clientIdentifier.<BaseTLVType>map((nonOptionalclientIdentifier) -> new ByteArrayType(nonOptionalclientIdentifier)).orElse(new EmptyType());
-      elements.add(new StructElement(clientIdentifierFieldID, clientIdentifiertlvValue));
-
-      final long possessionNonceFieldID = 5L;
-      BaseTLVType possessionNoncetlvValue = possessionNonce.<BaseTLVType>map((nonOptionalpossessionNonce) -> new ByteArrayType(nonOptionalpossessionNonce)).orElse(new EmptyType());
-      elements.add(new StructElement(possessionNonceFieldID, possessionNoncetlvValue));
-
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -8439,10 +8427,6 @@ public class ChipClusters {
           Optional<String> debugText = Optional.empty();
           final long networkIndexFieldID = 2L;
           Optional<Integer> networkIndex = Optional.empty();
-          final long clientIdentityFieldID = 3L;
-          Optional<byte[]> clientIdentity = Optional.empty();
-          final long possessionSignatureFieldID = 4L;
-          Optional<byte[]> possessionSignature = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == networkingStatusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -8459,19 +8443,9 @@ public class ChipClusters {
                 UIntType castingValue = element.value(UIntType.class);
                 networkIndex = Optional.of(castingValue.value(Integer.class));
               }
-            } else if (element.contextTagNum() == clientIdentityFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                clientIdentity = Optional.of(castingValue.value(byte[].class));
-              }
-            } else if (element.contextTagNum() == possessionSignatureFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                possessionSignature = Optional.of(castingValue.value(byte[].class));
-              }
             }
           }
-          callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
+          callback.onSuccess(networkingStatus, debugText, networkIndex);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -8501,10 +8475,6 @@ public class ChipClusters {
           Optional<String> debugText = Optional.empty();
           final long networkIndexFieldID = 2L;
           Optional<Integer> networkIndex = Optional.empty();
-          final long clientIdentityFieldID = 3L;
-          Optional<byte[]> clientIdentity = Optional.empty();
-          final long possessionSignatureFieldID = 4L;
-          Optional<byte[]> possessionSignature = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == networkingStatusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -8521,19 +8491,9 @@ public class ChipClusters {
                 UIntType castingValue = element.value(UIntType.class);
                 networkIndex = Optional.of(castingValue.value(Integer.class));
               }
-            } else if (element.contextTagNum() == clientIdentityFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                clientIdentity = Optional.of(castingValue.value(byte[].class));
-              }
-            } else if (element.contextTagNum() == possessionSignatureFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                possessionSignature = Optional.of(castingValue.value(byte[].class));
-              }
             }
           }
-          callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
+          callback.onSuccess(networkingStatus, debugText, networkIndex);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -8563,10 +8523,6 @@ public class ChipClusters {
           Optional<String> debugText = Optional.empty();
           final long networkIndexFieldID = 2L;
           Optional<Integer> networkIndex = Optional.empty();
-          final long clientIdentityFieldID = 3L;
-          Optional<byte[]> clientIdentity = Optional.empty();
-          final long possessionSignatureFieldID = 4L;
-          Optional<byte[]> possessionSignature = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == networkingStatusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -8583,19 +8539,9 @@ public class ChipClusters {
                 UIntType castingValue = element.value(UIntType.class);
                 networkIndex = Optional.of(castingValue.value(Integer.class));
               }
-            } else if (element.contextTagNum() == clientIdentityFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                clientIdentity = Optional.of(castingValue.value(byte[].class));
-              }
-            } else if (element.contextTagNum() == possessionSignatureFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                possessionSignature = Optional.of(castingValue.value(byte[].class));
-              }
             }
           }
-          callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
+          callback.onSuccess(networkingStatus, debugText, networkIndex);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -8677,10 +8623,6 @@ public class ChipClusters {
           Optional<String> debugText = Optional.empty();
           final long networkIndexFieldID = 2L;
           Optional<Integer> networkIndex = Optional.empty();
-          final long clientIdentityFieldID = 3L;
-          Optional<byte[]> clientIdentity = Optional.empty();
-          final long possessionSignatureFieldID = 4L;
-          Optional<byte[]> possessionSignature = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == networkingStatusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -8697,60 +8639,9 @@ public class ChipClusters {
                 UIntType castingValue = element.value(UIntType.class);
                 networkIndex = Optional.of(castingValue.value(Integer.class));
               }
-            } else if (element.contextTagNum() == clientIdentityFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                clientIdentity = Optional.of(castingValue.value(byte[].class));
-              }
-            } else if (element.contextTagNum() == possessionSignatureFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                possessionSignature = Optional.of(castingValue.value(byte[].class));
-              }
             }
           }
-          callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void queryIdentity(QueryIdentityResponseCallback callback, byte[] keyIdentifier, Optional<byte[]> possessionNonce) {
-      queryIdentity(callback, keyIdentifier, possessionNonce, 0);
-    }
-
-    public void queryIdentity(QueryIdentityResponseCallback callback, byte[] keyIdentifier, Optional<byte[]> possessionNonce, int timedInvokeTimeoutMs) {
-      final long commandId = 9L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long keyIdentifierFieldID = 0L;
-      BaseTLVType keyIdentifiertlvValue = new ByteArrayType(keyIdentifier);
-      elements.add(new StructElement(keyIdentifierFieldID, keyIdentifiertlvValue));
-
-      final long possessionNonceFieldID = 1L;
-      BaseTLVType possessionNoncetlvValue = possessionNonce.<BaseTLVType>map((nonOptionalpossessionNonce) -> new ByteArrayType(nonOptionalpossessionNonce)).orElse(new EmptyType());
-      elements.add(new StructElement(possessionNonceFieldID, possessionNoncetlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          final long identityFieldID = 0L;
-          byte[] identity = null;
-          final long possessionSignatureFieldID = 1L;
-          Optional<byte[]> possessionSignature = Optional.empty();
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == identityFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                identity = castingValue.value(byte[].class);
-              }
-            } else if (element.contextTagNum() == possessionSignatureFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-                ByteArrayType castingValue = element.value(ByteArrayType.class);
-                possessionSignature = Optional.of(castingValue.value(byte[].class));
-              }
-            }
-          }
-          callback.onSuccess(identity, possessionSignature);
+          callback.onSuccess(networkingStatus, debugText, networkIndex);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -8759,15 +8650,11 @@ public class ChipClusters {
     }
 
     public interface NetworkConfigResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex, Optional<byte[]> clientIdentity, Optional<byte[]> possessionSignature);
+      void onSuccess(Integer networkingStatus, Optional<String> debugText, Optional<Integer> networkIndex);
     }
 
     public interface ConnectNetworkResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer networkingStatus, Optional<String> debugText, @Nullable Long errorValue);
-    }
-
-    public interface QueryIdentityResponseCallback extends BaseClusterCallback {
-      void onSuccess(byte[] identity, Optional<byte[]> possessionSignature);
     }
 
     public interface NetworksAttributeCallback extends BaseAttributeCallback {

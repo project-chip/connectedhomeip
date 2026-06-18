@@ -71,8 +71,6 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Networ
             return ConnectNetwork::kMetadataEntry;
         case ReorderNetwork::Id:
             return ReorderNetwork::kMetadataEntry;
-        case QueryIdentity::Id:
-            return QueryIdentity::kMetadataEntry;
 
         default:
             return std::nullopt;

@@ -5693,12 +5693,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _credentials = [NSData data];
 
         _breadcrumb = nil;
-
-        _networkIdentity = nil;
-
-        _clientIdentifier = nil;
-
-        _possessionNonce = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -5712,9 +5706,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.ssid = self.ssid;
     other.credentials = self.credentials;
     other.breadcrumb = self.breadcrumb;
-    other.networkIdentity = self.networkIdentity;
-    other.clientIdentifier = self.clientIdentifier;
-    other.possessionNonce = self.possessionNonce;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -5723,7 +5714,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ssid:%@; credentials:%@; breadcrumb:%@; networkIdentity:%@; clientIdentifier:%@; possessionNonce:%@; >", NSStringFromClass([self class]), [_ssid base64EncodedStringWithOptions:0], [_credentials base64EncodedStringWithOptions:0], _breadcrumb, [_networkIdentity base64EncodedStringWithOptions:0], [_clientIdentifier base64EncodedStringWithOptions:0], [_possessionNonce base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ssid:%@; credentials:%@; breadcrumb:%@; >", NSStringFromClass([self class]), [_ssid base64EncodedStringWithOptions:0], [_credentials base64EncodedStringWithOptions:0], _breadcrumb];
     return descriptionString;
 }
 
@@ -5745,24 +5736,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         if (self.breadcrumb != nil) {
             auto & definedValue_0 = encodableStruct.breadcrumb.Emplace();
             definedValue_0 = self.breadcrumb.unsignedLongLongValue;
-        }
-    }
-    {
-        if (self.networkIdentity != nil) {
-            auto & definedValue_0 = encodableStruct.networkIdentity.Emplace();
-            definedValue_0 = AsByteSpan(self.networkIdentity);
-        }
-    }
-    {
-        if (self.clientIdentifier != nil) {
-            auto & definedValue_0 = encodableStruct.clientIdentifier.Emplace();
-            definedValue_0 = AsByteSpan(self.clientIdentifier);
-        }
-    }
-    {
-        if (self.possessionNonce != nil) {
-            auto & definedValue_0 = encodableStruct.possessionNonce.Emplace();
-            definedValue_0 = AsByteSpan(self.possessionNonce);
         }
     }
 
@@ -5990,10 +5963,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _debugText = nil;
 
         _networkIndex = nil;
-
-        _clientIdentity = nil;
-
-        _possessionSignature = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -6006,8 +5975,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.networkingStatus = self.networkingStatus;
     other.debugText = self.debugText;
     other.networkIndex = self.networkIndex;
-    other.clientIdentity = self.clientIdentity;
-    other.possessionSignature = self.possessionSignature;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -6015,7 +5982,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; networkIndex:%@; clientIdentity:%@; possessionSignature:%@; >", NSStringFromClass([self class]), _networkingStatus, _debugText, _networkIndex, [_clientIdentity base64EncodedStringWithOptions:0], [_possessionSignature base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; networkIndex:%@; >", NSStringFromClass([self class]), _networkingStatus, _debugText, _networkIndex];
     return descriptionString;
 }
 
@@ -6094,20 +6061,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             self.networkIndex = [NSNumber numberWithUnsignedChar:decodableStruct.networkIndex.Value()];
         } else {
             self.networkIndex = nil;
-        }
-    }
-    {
-        if (decodableStruct.clientIdentity.HasValue()) {
-            self.clientIdentity = AsData(decodableStruct.clientIdentity.Value());
-        } else {
-            self.clientIdentity = nil;
-        }
-    }
-    {
-        if (decodableStruct.possessionSignature.HasValue()) {
-            self.possessionSignature = AsData(decodableStruct.possessionSignature.Value());
-        } else {
-            self.possessionSignature = nil;
         }
     }
     return CHIP_NO_ERROR;
@@ -6410,193 +6363,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     return decodedObj;
 }
-@end
-
-@implementation MTRNetworkCommissioningClusterQueryIdentityParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _keyIdentifier = [NSData data];
-
-        _possessionNonce = nil;
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRNetworkCommissioningClusterQueryIdentityParams alloc] init];
-
-    other.keyIdentifier = self.keyIdentifier;
-    other.possessionNonce = self.possessionNonce;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: keyIdentifier:%@; possessionNonce:%@; >", NSStringFromClass([self class]), [_keyIdentifier base64EncodedStringWithOptions:0], [_possessionNonce base64EncodedStringWithOptions:0]];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRNetworkCommissioningClusterQueryIdentityParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentity::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.keyIdentifier = AsByteSpan(self.keyIdentifier);
-    }
-    {
-        if (self.possessionNonce != nil) {
-            auto & definedValue_0 = encodableStruct.possessionNonce.Emplace();
-            definedValue_0 = AsByteSpan(self.possessionNonce);
-        }
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRNetworkCommissioningClusterQueryIdentityResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _identity = [NSData data];
-
-        _possessionSignature = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRNetworkCommissioningClusterQueryIdentityResponseParams alloc] init];
-
-    other.identity = self.identity;
-    other.possessionSignature = self.possessionSignature;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: identity:%@; possessionSignature:%@; >", NSStringFromClass([self class]), [_identity base64EncodedStringWithOptions:0], [_possessionSignature base64EncodedStringWithOptions:0]];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    LogAndConvertDecodingError(err, error);
-    return nil;
-}
-
-@end
-
-@implementation MTRNetworkCommissioningClusterQueryIdentityResponseParams (InternalMethods)
-
-- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
-    if (err == CHIP_NO_ERROR) {
-        return self;
-    }
-
-    LogAndConvertDecodingError(err, nil);
-    return nil;
-}
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
-{
-    {
-        self.identity = AsData(decodableStruct.identity);
-    }
-    {
-        if (decodableStruct.possessionSignature.HasValue()) {
-            self.possessionSignature = AsData(decodableStruct.possessionSignature.Value());
-        } else {
-            self.possessionSignature = nil;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
 @end
 
 @implementation MTRDiagnosticLogsClusterRetrieveLogsRequestParams
