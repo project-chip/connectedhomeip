@@ -26,6 +26,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
+#include <devices/endpoint-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -251,7 +252,9 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         WifiRootNodeDevice::WifiContext{
             .wifiDriver = sWiFiDriver,
         });
-    err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+
+    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    err = gRootNodeDevice->Register(rootAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
