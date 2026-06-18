@@ -39,9 +39,14 @@ public:
     };
 
     LoggingOnOffLightDevice(const Context & context) :
-        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1)), mContext(context)
+        LoggingOnOffLightDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), context)
     {}
     ~LoggingOnOffLightDevice() override = default;
+
+protected:
+    LoggingOnOffLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context) :
+        SingleEndpointDevice(deviceTypes), mContext(context)
+    {}
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
