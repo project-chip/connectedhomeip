@@ -196,6 +196,7 @@ class CommissioningStage(enum.IntEnum):
     FailsafeBeforeThreadEnable = enum.auto()
     WiFiNetworkEnable = enum.auto()
     ThreadNetworkEnable = enum.auto()
+    InitialPhaseComplete = enum.auto()
     EvictPreviousCaseSessions = enum.auto()
     FindOperationalForStayActive = enum.auto()
     FindOperationalForCommissioningComplete = enum.auto()
@@ -210,7 +211,6 @@ class CommissioningStage(enum.IntEnum):
     RequestWiFiCredentials = enum.auto()
     RequestThreadCredentials = enum.auto()
     PDCGetNetworkIdentity = enum.auto()
-    UnpoweredPhaseComplete = enum.auto()
     Cleanup = enum.auto()
 
 
