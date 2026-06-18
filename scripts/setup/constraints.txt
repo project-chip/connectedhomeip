@@ -116,7 +116,7 @@ matplotlib-inline==0.1.6
     # via ipython
 mobly==1.13
     # via -r requirements.all.txt
-mypy==1.19.1
+mypy==2.1.0
     # via -r requirements.all.txt
 mypy-extensions==1.0.0
     # via mypy
