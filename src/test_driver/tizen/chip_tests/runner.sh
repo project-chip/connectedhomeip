@@ -31,11 +31,14 @@ export CHIP_TEST_EVENT_LOOP_HANDLER_MAX_DURATION_MS=1000
 export GCOV_PREFIX=/mnt/chip
 export GCOV_PREFIX_STRIP=5
 
+# Create dump directory (may not exist if emu hasn't created it yet)
+mkdir -p /mnt/chip/dump
+
 # Save original core_pattern and set to raw core dumps (no crash-manager)
 ORIGINAL_CORE_PATTERN=$(cat /proc/sys/kernel/core_pattern 2>/dev/null || echo "")
 if [ -n "$ORIGINAL_CORE_PATTERN" ]; then
-    echo "/mnt/chip/core.%e.%p.%t" > /proc/sys/kernel/core_pattern
-    echo "Core pattern set to: /mnt/chip/core.%e.%p.%t (raw dumps, no crash-manager)"
+    echo "/mnt/chip/dump/core.%e.%p.%t" > /proc/sys/kernel/core_pattern
+    echo "Core pattern set to: /mnt/chip/dump/core.%e.%p.%t (raw dumps, no crash-manager)"
 fi
 
 # Restore original core_pattern on exit
@@ -74,10 +77,10 @@ while IFS= read -r TEST; do
         STATUS=$((STATUS + 1))
         echo -e "DONE: \e[31mFAIL\e[0m (exit code: $RV)"
         
-        # Raw core dumps are created instantly in /mnt/chip/
+        # Raw core dumps are created instantly in /mnt/chip/dump/
         # No need to wait or copy - they're already on shared filesystem
         if [ "$RV" -gt 128 ]; then
-            echo "Raw core dump created: /mnt/chip/core.${NAME}.*"
+            echo "Raw core dump created: /mnt/chip/dump/core.${NAME}.*"
         fi
     fi
 
