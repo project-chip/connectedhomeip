@@ -21,11 +21,11 @@ config("includes") {
   include_dirs = [ ".." ]
 }
 
-source_set("common") {
+source_set("accessors") {
   sources = [
-    "common/AccessorRegistry.h",
-    "common/OOBAccessor.h",
-    "common/SingleEndpointDeviceAccessor.h",
+    "AccessorRegistry.h",
+    "OOBAccessor.h",
+    "SingleEndpointDeviceAccessor.h",
   ]
 
   public_deps = [

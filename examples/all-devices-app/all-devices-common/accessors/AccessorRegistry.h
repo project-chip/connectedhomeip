@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include <accessors/common/OOBAccessor.h>
+#include <accessors/OOBAccessor.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/IntrusiveList.h>

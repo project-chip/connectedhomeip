@@ -18,7 +18,7 @@
 
 #include <optional>
 
-#include <accessors/common/OOBAccessor.h>
+#include <accessors/OOBAccessor.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>

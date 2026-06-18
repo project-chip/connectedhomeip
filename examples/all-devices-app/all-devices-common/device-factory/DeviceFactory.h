@@ -43,8 +43,8 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
 
-#include <accessors/common/OOBAccessor.h>
-#include <accessors/common/boolean-state-sensor/BooleanStateSensorAccessor.h>
+#include <accessors/OOBAccessor.h>
+#include <accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #include <functional>
 #include <map>
 

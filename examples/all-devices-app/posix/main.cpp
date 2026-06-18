@@ -33,8 +33,8 @@
 #include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <providers/AllDevicesExampleDeviceInstanceInfoProviderImpl.h>
 
-#include <accessors/common/AccessorRegistry.h>
-#include <accessors/common/OOBAccessor.h>
+#include <accessors/AccessorRegistry.h>
+#include <accessors/OOBAccessor.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #if PW_RPC_ENABLED

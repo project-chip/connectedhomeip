@@ -16,10 +16,11 @@
 
 #pragma once
 
-#include <accessors/common/AccessorRegistry.h>
+#include <accessors/AccessorRegistry.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
+
 
 namespace chip::app {
 

@@ -74,7 +74,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
     # keep-sorted: end
     # keep-sorted: start
-    "${ALL_DEVICES_COMMON_DIR}/accessors/common/boolean-state-sensor/BooleanStateSensorAccessor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/accessors/boolean-state-sensor/BooleanStateSensorAccessor.cpp"
     # keep-sorted: end
 )
 

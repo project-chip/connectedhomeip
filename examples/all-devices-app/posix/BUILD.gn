@@ -31,7 +31,7 @@ executable("all-devices-app") {
   ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/accessors:common",
+    "${chip_root}/examples/all-devices-app/all-devices-common/accessors:accessors",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
