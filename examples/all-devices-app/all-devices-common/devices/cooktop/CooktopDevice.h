@@ -16,15 +16,75 @@
 
 #pragma once
 
-#include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
+#include <devices/Types.h>
+#include <devices/interface/DeviceInterface.h>
+#include <devices/interface/SingleEndpointDevice.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class CooktopDevice : public LoggingOnOffLightDevice
+class CookSurfacePart : public SingleEndpointDevice
 {
 public:
-    explicit CooktopDevice(const Context & context);
+    explicit CookSurfacePart(TimerDelegate & timerDelegate) :
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)),
+        mTimerDelegate(timerDelegate)
+    {}
+    ~CookSurfacePart() override = default;
+
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointId parentId = kInvalidEndpointId) override
+    {
+        return Register(endpoint, provider, EndpointComposition(parentId));
+    }
+
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+    {
+        ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+        mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
+        mOnOffCluster.Create(endpoint, Clusters::OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
+        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+        ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
+        return provider.AddEndpoint(mEndpointRegistration);
+    }
+
+    void Unregister(CodeDrivenDataModelProvider & provider) override
+    {
+        SingleEndpointUnregistration(provider);
+        if (mIdentifyCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
+            mIdentifyCluster.Destroy();
+        }
+        if (mOnOffCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
+            mOnOffCluster.Destroy();
+        }
+    }
+
+private:
+    TimerDelegate & mTimerDelegate;
+    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
+};
+
+class CooktopDevice : public DeviceInterface
+{
+public:
+    explicit CooktopDevice(TimerDelegate & timerDelegate);
     ~CooktopDevice() override = default;
+
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointId parentId = kInvalidEndpointId) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+private:
+    EndpointId mEndpointId = kInvalidEndpointId;
+    CookSurfacePart mSurface1;
+    CookSurfacePart mSurface2;
 };
 
 } // namespace chip::app

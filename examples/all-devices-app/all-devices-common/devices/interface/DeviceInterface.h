@@ -25,6 +25,25 @@
 
 namespace chip::app {
 
+struct EndpointComposition
+{
+    using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
+
+    EndpointId parentId = kInvalidEndpointId;
+    DataModel::EndpointCompositionPattern pattern = DataModel::EndpointCompositionPattern::kFullFamily;
+    Span<const SemanticTag> tagList = {};
+
+    constexpr EndpointComposition() = default;
+    constexpr EndpointComposition(EndpointId parent,
+                                  DataModel::EndpointCompositionPattern compositionPattern =
+                                      DataModel::EndpointCompositionPattern::kFullFamily,
+                                  Span<const SemanticTag> tags = {}) :
+        parentId(parent),
+        pattern(compositionPattern),
+        tagList(tags)
+    {}
+};
+
 /// A device is an entity that maintains some cluster functionality.
 class DeviceInterface : public EndpointInterface
 {
@@ -55,6 +74,10 @@ protected:
     DeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) :
         mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {})
     {}
+
+    CHIP_ERROR InitEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                        EndpointComposition composition = {});
+    void ShutdownEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     EndpointInterfaceRegistration mEndpointRegistration;

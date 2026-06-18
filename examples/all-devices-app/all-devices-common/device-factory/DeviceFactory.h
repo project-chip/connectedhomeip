@@ -230,11 +230,7 @@ private:
         {
             RegisterCreator("cooktop", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<CooktopDevice>(LoggingOnOffLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                return std::make_unique<CooktopDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DEVICE_ENERGY_MANAGEMENT)
