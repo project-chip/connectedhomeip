@@ -26,7 +26,7 @@
 
 namespace chip::app {
 
-// TODO: Generate standard namespace ID constants or place them in core DataModelTypes.h.
+// TODO: Generate standard namespace ID constants from spec and place them in libCHIP.
 constexpr uint16_t kCommonPositionNamespaceId = 7;
 
 struct EndpointComposition
