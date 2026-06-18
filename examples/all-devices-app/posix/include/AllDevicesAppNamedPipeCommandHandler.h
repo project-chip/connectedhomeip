@@ -21,13 +21,13 @@
 #include <json/json.h>
 
 // Forward declaration to avoid circular dependency. AllDevicesAppCommandDelegate
-// registers a set of NamedPipeCommandHandlers
+// registers a set of AllDevicesAppNamedPipeCommandHandler instances.
 class AllDevicesAppCommandDelegate;
 
-class NamedPipeCommandHandler
+class AllDevicesAppNamedPipeCommandHandler
 {
 public:
-    virtual ~NamedPipeCommandHandler()                                                                                  = default;
+    virtual ~AllDevicesAppNamedPipeCommandHandler()                                                                     = default;
     virtual const char * GetName() const                                                                                = 0;
     virtual void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, chip::EndpointId endpointId) = 0;
 };

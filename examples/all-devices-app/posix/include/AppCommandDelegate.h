@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "NamedPipeCommandHandler.h"
+#include "AllDevicesAppNamedPipeCommandHandler.h"
 
 class AllDevicesAppCommandDelegate : public NamedPipeCommandDelegate
 {
@@ -46,7 +46,7 @@ public:
     chip::app::Clusters::BooleanStateCluster * GetBooleanStateClusterByEndpoint(chip::EndpointId endpoint);
     chip::app::Clusters::BasicInformationCluster * GetBasicInformationClusterByEndpoint(chip::EndpointId endpoint);
 
-    void RegisterCommandHandler(std::unique_ptr<NamedPipeCommandHandler> handler);
+    void RegisterCommandHandler(std::unique_ptr<AllDevicesAppNamedPipeCommandHandler> handler);
     void RegisterCommandHandlers();
 
 private:
@@ -65,5 +65,5 @@ private:
     std::vector<chip::app::Clusters::BooleanStateCluster *> mBooleanStateClusters;
     std::vector<chip::app::Clusters::BasicInformationCluster *> mBasicInformationClusters;
 
-    std::map<std::string, std::unique_ptr<NamedPipeCommandHandler>> mCommandHandlers;
+    std::map<std::string, std::unique_ptr<AllDevicesAppNamedPipeCommandHandler>> mCommandHandlers;
 };

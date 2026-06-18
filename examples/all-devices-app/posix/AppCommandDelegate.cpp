@@ -30,10 +30,10 @@ struct CommandContext
     Json::Value value;
     EndpointId endpointId;
     AllDevicesAppCommandDelegate * delegate;
-    NamedPipeCommandHandler * handler;
+    AllDevicesAppNamedPipeCommandHandler * handler;
 };
 
-class IncreaseConfigurationVersionCommandHandler : public NamedPipeCommandHandler
+class IncreaseConfigurationVersionCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
     const char * GetName() const override { return "IncreaseConfigurationVersion"; }
@@ -51,7 +51,7 @@ public:
     }
 };
 
-class SetOccupancyCommandHandler : public NamedPipeCommandHandler
+class SetOccupancyCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
     const char * GetName() const override { return "SetOccupancy"; }
@@ -83,7 +83,7 @@ public:
     }
 };
 
-class SetHoldTimeCommandHandler : public NamedPipeCommandHandler
+class SetHoldTimeCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
     const char * GetName() const override { return "SetHoldTime"; }
@@ -114,7 +114,7 @@ public:
     }
 };
 
-class SetBooleanStateCommandHandler : public NamedPipeCommandHandler
+class SetBooleanStateCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
     const char * GetName() const override { return "SetBooleanState"; }
@@ -139,7 +139,7 @@ public:
     }
 };
 
-class SetOnOffCommandHandler : public NamedPipeCommandHandler
+class SetOnOffCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
     const char * GetName() const override { return "SetOnOff"; }
@@ -300,7 +300,7 @@ AllDevicesAppCommandDelegate::GetBasicInformationClusterByEndpoint(chip::Endpoin
     return nullptr;
 }
 
-void AllDevicesAppCommandDelegate::RegisterCommandHandler(std::unique_ptr<NamedPipeCommandHandler> handler)
+void AllDevicesAppCommandDelegate::RegisterCommandHandler(std::unique_ptr<AllDevicesAppNamedPipeCommandHandler> handler)
 {
     mCommandHandlers[handler->GetName()] = std::move(handler);
 }
