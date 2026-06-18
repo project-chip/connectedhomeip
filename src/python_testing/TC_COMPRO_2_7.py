@@ -240,7 +240,13 @@ class TC_COMPRO_2_7(COMPROBaseTest):
         # check before any transport scan, so no additional ED is needed.
         # ------------------------------------------------------------------
         self.step(7)
-        overflow_disc = int(params.get('overflow_discriminator', 9999))
+        # The overflow request must itself be valid so RESOURCE_EXHAUSTED (session
+        # table full) is the only possible rejection reason. The discriminator must
+        # stay within the spec range (0..4095); a value above it would be rejected
+        # with INVALID_COMMAND by the discriminator-range check, which runs before
+        # the session-count gate. 4095 is the max valid value and is clear of the
+        # 3840-based discriminators used to fill the sessions in step 6.
+        overflow_disc = int(params.get('overflow_discriminator', 4095))
         logger.info("Step 7: ProxyConnectRequest (discriminator=%d, expect RESOURCE_EXHAUSTED)",
                     overflow_disc)
         try:

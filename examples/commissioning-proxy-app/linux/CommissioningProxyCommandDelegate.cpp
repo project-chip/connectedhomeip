@@ -309,12 +309,15 @@ void ContributeScanResults(chip::Span<const ScanResultEntry> results)
 // ==================================================================
 
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyConnectRequest(
-    DataModel::Nullable<chip::ByteSpan> address, CapabilitiesBitmap transport, uint16_t discriminator, chip::VendorId vendorid,
-    uint16_t productid, uint16_t timeout, WiFiBandBitmap wiFiBand, app::CommandHandler * commandObj,
-    const DataModel::InvokeRequest & request)
+    DataModel::Nullable<chip::ByteSpan> address, chip::BitMask<CapabilitiesBitmap> transportBits, uint16_t discriminator,
+    chip::VendorId vendorid, uint16_t productid, uint16_t timeout, chip::BitMask<WiFiBandBitmap> wiFiBand,
+    app::CommandHandler * commandObj, const DataModel::InvokeRequest & request)
 {
-    ChipLogProgress(AppServer, "ProxyConnectRequest transport:%d wiFiBand:%d timeout:%u discriminator:%u", (int) transport,
-                    (int) wiFiBand, timeout, discriminator);
+    ChipLogProgress(AppServer, "ProxyConnectRequest transport:%d wiFiBand:%d timeout:%u discriminator:%u", transportBits.Raw(),
+                    wiFiBand.Raw(), timeout, discriminator);
+
+    // The cluster guarantees exactly one transport bit is set for a connect.
+    const CapabilitiesBitmap transport = static_cast<CapabilitiesBitmap>(transportBits.Raw());
 
     switch (transport)
     {
@@ -335,11 +338,12 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 }
 
 Protocols::InteractionModel::Status
-Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands,
+Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(chip::BitMask<CapabilitiesBitmap> transport,
+                                                             chip::BitMask<WiFiBandBitmap> wiFiBands,
                                                              app::CommandHandler * commandObj,
                                                              const DataModel::InvokeRequest & request)
 {
-    ChipLogProgress(AppServer, "ProxyScanRequest: transport:0x%x wiFiBands:0x%x", (int) transport, (int) wiFiBands);
+    ChipLogProgress(AppServer, "ProxyScanRequest: transport:0x%x wiFiBands:0x%x", transport.Raw(), wiFiBands.Raw());
 
     // A ProxyScanRequest MAY select multiple transports (CommissioningProxy
     // cluster spec, ProxyScanRequest Transport field).  Scan every requested
@@ -649,15 +653,16 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 }
 
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStartRequest(
-    CapabilitiesBitmap transport, uint16_t timeout, WiFiBandBitmap wiFiBands, chip::FabricIndex fabricIndex, chip::NodeId nodeId,
-    app::CommandHandler * commandObj, const DataModel::InvokeRequest & request)
+    chip::BitMask<CapabilitiesBitmap> transport, uint16_t timeout, chip::BitMask<WiFiBandBitmap> wiFiBandsMask,
+    chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj, const DataModel::InvokeRequest & request)
 {
     ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest transport:%u timeout:%u fabricIndex:%u nodeId:0x" ChipLogFormatX64,
-                    static_cast<uint8_t>(transport), timeout, fabricIndex, ChipLogValueX64(nodeId));
+                    transport.Raw(), timeout, fabricIndex, ChipLogValueX64(nodeId));
 
-    const uint8_t tbits = static_cast<uint8_t>(transport);
-    const bool needsPaf = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF)) != 0;
-    const bool needsBle = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
+    const WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
+    const uint8_t tbits            = transport.Raw();
+    const bool needsPaf            = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF)) != 0;
+    const bool needsBle            = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
 
     // A background scan may select multiple transports (spec: "Multiple
     // transports can be selected for the scan").  Start each requested transport
@@ -697,12 +702,16 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 }
 
 Protocols::InteractionModel::Status
-Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands,
+Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(chip::BitMask<CapabilitiesBitmap> transportMask,
+                                                                           chip::BitMask<WiFiBandBitmap> wiFiBandsMask,
                                                                            chip::FabricIndex fabricIndex, chip::NodeId nodeId)
 {
     ChipLogProgress(AppServer,
                     "ProxyBackgroundScanStopRequest transport:0x%x wiFiBands:0x%x fabricIndex:%u nodeId:0x" ChipLogFormatX64,
-                    static_cast<uint8_t>(transport), static_cast<uint16_t>(wiFiBands), fabricIndex, ChipLogValueX64(nodeId));
+                    transportMask.Raw(), wiFiBandsMask.Raw(), fabricIndex, ChipLogValueX64(nodeId));
+
+    const CapabilitiesBitmap transport = static_cast<CapabilitiesBitmap>(transportMask.Raw());
+    const WiFiBandBitmap wiFiBands      = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
 
     // Fan the stop out to every transport; each matches the request against its
     // own per-fabric record.  NotFound is returned only if no transport had a

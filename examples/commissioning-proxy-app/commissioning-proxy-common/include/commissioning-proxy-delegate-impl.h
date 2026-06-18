@@ -50,15 +50,15 @@ protected:
         return *mServer;
     }
 
-    Protocols::InteractionModel::Status ProxyScanRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                                                         chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
-                                                         chip::app::CommandHandler * commandObj,
-                                                         const DataModel::InvokeRequest & request) override;
+    Protocols::InteractionModel::Status
+    ProxyScanRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                     chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
+                     chip::app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) override;
 
     Protocols::InteractionModel::Status ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
-                                                            CapabilitiesBitmap transport, uint16_t discriminator,
+                                                            chip::BitMask<CapabilitiesBitmap> transport, uint16_t discriminator,
                                                             chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
-                                                            WiFiBandBitmap wiFiBand, app::CommandHandler * commandObj,
+                                                            chip::BitMask<WiFiBandBitmap> wiFiBand, app::CommandHandler * commandObj,
                                                             const DataModel::InvokeRequest & request) override;
 
     Protocols::InteractionModel::Status ProxyMessageRequest(uint16_t sessionId, chip::Optional<chip::ByteSpan> message,
@@ -69,15 +69,16 @@ protected:
     Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex fabricIndex) override;
 
     Protocols::InteractionModel::Status
-    ProxyBackgroundScanStartRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t timeout,
-                                    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+    ProxyBackgroundScanStartRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                                    uint16_t timeout,
+                                    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
                                     chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj,
                                     const DataModel::InvokeRequest & request) override;
 
     Protocols::InteractionModel::Status
-    ProxyBackgroundScanStopRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
-                                   chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands, chip::FabricIndex fabricIndex,
-                                   chip::NodeId nodeId) override;
+    ProxyBackgroundScanStopRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                                   chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
+                                   chip::FabricIndex fabricIndex, chip::NodeId nodeId) override;
 
     uint8_t GetMaxSessions() override;
     uint8_t GetActiveSessionCount() override;
