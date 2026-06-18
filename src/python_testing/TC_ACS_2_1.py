@@ -66,6 +66,7 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 # --app-args "--KVS kvs1 --discriminator 1234" --script src/python_testing/TC_ACS_2_1.py
 # --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1"
 
+
 class TC_ACS_2_1(MatterBaseTest):
     def desc_TC_ACS_2_1(self) -> str:
         return "[TC-ACS-2.1] Attributes with DUT as a server"
