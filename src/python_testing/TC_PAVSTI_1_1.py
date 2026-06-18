@@ -584,5 +584,6 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 )
                 asserts.assert_equal(user_response.lower(), "y")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
