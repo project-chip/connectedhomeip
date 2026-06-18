@@ -81,7 +81,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
             TestStep("2b", "If Access feature is supported, skip remaining steps and end test case"),
             TestStep("2c", "If Limitation feature is supported, read LimitRange attribute"),
             TestStep("2d", "If Positioning feature is supported, read Resolution attribute"),
-            TestStep("2e", "Establish wilcard subscription to all attributes"),
+            TestStep("2e", "Establish wildcard subscription to all attributes"),
             TestStep("2f", "Read CurrentState attribute"),
             TestStep("2g", "If Latching feature is not supported or state is unlatched, skip steps 2h to 2m"),
             TestStep("2h", "Read LatchControlModes attribute"),
@@ -156,7 +156,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
         # STEP 2b: If Access feature is supported, skip remaining steps
         self.step("2b")
         if is_access_supported:
-            log.info("Acess feature is supported. Skipping remaining steps.")
+            log.info("Access feature is supported. Skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
 

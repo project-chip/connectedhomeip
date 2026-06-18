@@ -71,7 +71,7 @@ class TC_CLDIM_6_2(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported OR Access feature is supported, skip remaining steps"),
-            TestStep("2c", "Establish wilcard subscription to all attributes"),
+            TestStep("2c", "Establish wildcard subscription to all attributes"),
             TestStep("2d", "Read CurrentState attribute"),
             TestStep("2e", "If Latching feature not supported or state is unlatched, skip steps 2f to 2k"),
             TestStep("2f", "Read LatchControlModes attribute"),
@@ -79,7 +79,7 @@ class TC_CLDIM_6_2(MatterBaseTest):
             TestStep("2h", "Send GroupedSetTarget command with Latch=False"),
             TestStep("2i", "If LatchControlModes is remote unlatching, skip step 2j"),
             TestStep("2j", "Manually unlatch the device"),
-            TestStep("2k", "Wait for CurrentState.Latched to be False"),
+            TestStep("2k", "Wait for CurrentState.Latch to be False"),
             TestStep(3, "Send GroupedStep command with invalid Direction"),
             TestStep(4, "Send GroupedStep command with invalid Speed"),
             TestStep(5, "Send GroupedStep command with NumberOfSteps = 0"),
@@ -169,7 +169,7 @@ class TC_CLDIM_6_2(MatterBaseTest):
                 self.step("2j")
                 self.wait_for_user_input(prompt_msg="Manual unlatch the device, and press Enter when ready.")
 
-            # STEP 2k: Wait for CurrentState.Latched to be False
+            # STEP 2k: Wait for CurrentState.Latch to be False
             self.step("2k")
             sub_handler.await_all_expected_report_matches(
                 expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
