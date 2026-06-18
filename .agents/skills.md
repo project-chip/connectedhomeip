@@ -31,7 +31,9 @@ etc.) to assist with development and code review in the Matter repository.
 ### GitHub Action Failure Investigation
 
 -   **Location**: `.agents/skills/github-action-failure-investigation/`
--   **Purpose**: Guidelines for fetching, downloading, and analyzing failed GitHub Actions runs, including raw logs, packet captures, and detecting runner freezes.
+-   **Purpose**: Guidelines for fetching, downloading, and analyzing failed
+    GitHub Actions runs, including raw logs, packet captures, and detecting
+    runner freezes.
 -   **Triggers**: Use when investigating a failed GitHub Actions run or job.
 
 ## Using Skills
