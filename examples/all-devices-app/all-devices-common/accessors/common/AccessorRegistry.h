@@ -29,9 +29,6 @@ namespace chip::app {
 class AccessorRegistry
 {
 public:
-    /**
-     * @brief Returns the singleton instance of the AccessorRegistry.
-     */
     static AccessorRegistry & Instance()
     {
         static AccessorRegistry instance;
@@ -39,20 +36,9 @@ public:
     }
 
     /**
-     * @brief Registers a device accessor with the registry.
-     *
-     * @param accessor The accessor to register.
-     * @return CHIP_NO_ERROR on success.
+     * @brief The accessor must live longer than the registration.
      */
-    CHIP_ERROR Register(OOBAccessor * accessor)
-    {
-        if (accessor == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        mAccessors.PushBack(accessor);
-        return CHIP_NO_ERROR;
-    }
+    void Register(OOBAccessor & accessor) { mAccessors.PushBack(&accessor); }
 
     /**
      * @brief Unregisters a device accessor from the registry.
