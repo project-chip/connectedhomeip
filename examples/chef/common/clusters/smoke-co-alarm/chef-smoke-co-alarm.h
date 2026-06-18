@@ -20,7 +20,7 @@
 
 #include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
 
-namespace chip::app::Clusters::SmokeCoAlarm { 
+namespace chip::app::Clusters::SmokeCoAlarm {
 /**
  * @brief Chef delegate for the (code-driven) Smoke CO Alarm cluster.
  *
@@ -42,4 +42,4 @@ public:
  *        exposes the Smoke CO Alarm device type. Called from ApplicationInit().
  */
 void SmokeCoAlarmInit();
-void SmokeCoAlarmShutdown();   
+void SmokeCoAlarmShutdown();
