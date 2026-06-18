@@ -59,4 +59,3 @@ public:
 };
 
 } // namespace chip::app
-
