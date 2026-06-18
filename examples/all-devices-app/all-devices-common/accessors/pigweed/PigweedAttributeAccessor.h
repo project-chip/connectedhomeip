@@ -32,17 +32,17 @@ public:
 
     std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, const TLV::TLVReader & reader) override
     {
-        Platform::ScopedMemoryBuffer<uint8_t> tlvRequest;
-        size_t tlvLen = 0;
-
-        CHIP_ERROR err = OOBDataSerializer::BuildSetAttributeRequest(path, reader, tlvLen, tlvRequest);
-        if (err != CHIP_NO_ERROR)
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, reader);
+        if (std::holds_alternative<CHIP_ERROR>(buildResult))
         {
+            CHIP_ERROR err = std::get<CHIP_ERROR>(buildResult);
+            ChipLogError(Support, "Failed to build OOB SetAttribute request: %" CHIP_ERROR_FORMAT, err.Format());
             return ::pw::Status::Internal();
         }
 
+        auto & buffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
         CHIP_ERROR result =
-            AccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, ByteSpan(tlvRequest.Get(), tlvLen));
+            AccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, ByteSpan(buffer.data(), buffer.size()));
         if (result != CHIP_ERROR_NOT_FOUND)
         {
             if (result == CHIP_NO_ERROR)

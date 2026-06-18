@@ -24,6 +24,8 @@
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
+#include <lib/support/ReadOnlyBuffer.h>
+
 namespace chip::app::OOBDataSerializer {
 
 static constexpr uint8_t kTagEndpointId  = 1;
@@ -55,7 +57,7 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
  * @brief Dynamically allocates and builds a unified, out-of-band "SetAttribute" request TLV buffer.
  *
  * This helper handles dynamic memory allocation based on the actual size of the attribute value element,
- * serializes the metadata, copies the value, and stores the completed package in the provided ScopedMemoryBuffer.
+ * serializes the metadata, copies the value, and returns the completed package as a ReadOnlyBuffer.
  *
  * The built request will have the following serialized TLV format:
  * Structure
@@ -68,17 +70,10 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
  * @param[in]     attributeValueReader  A TLVReader that MUST be positioned exactly on the data element of the attribute's value
  *                                      to be copied (e.g., a primitive element or a container header). This reader is not
  *                                      advanced or modified by the function.
- * @param[in,out] tlvLen                On input, this value is ignored. On successful return, it is updated with the exact
- *                                      total byte size of the fully serialized, finalized merged request.
- * @param[out]    tlvRequest            A ScopedMemoryBuffer that will take ownership of the newly allocated heap memory
- *                                      containing the completed request TLV buffer on success. It is cleared at the start
- *                                      and remains cleared upon failure.
  *
- * @return        #CHIP_NO_ERROR on successful buffer generation.
- *                #CHIP_ERROR_NO_MEMORY if the heap allocation fails.
- *                Other #CHIP_ERROR codes if serialization or element copying fails.
+ * @return        A variant containing either a CHIP_ERROR on failure or the finalized ReadOnlyBuffer on success.
  */
-CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path, const chip::TLV::TLVReader & attributeValueReader,
-                                    size_t & tlvLen, Platform::ScopedMemoryBuffer<uint8_t> & tlvRequest);
+std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
+                                                                             const chip::TLV::TLVReader & attributeValueReader);
 
 } // namespace chip::app::OOBDataSerializer

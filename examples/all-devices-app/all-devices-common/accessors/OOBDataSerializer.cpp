@@ -72,11 +72,9 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
     return request;
 }
 
-CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path, const chip::TLV::TLVReader & attributeValueReader,
-                                    size_t & tlvLen, Platform::ScopedMemoryBuffer<uint8_t> & tlvRequest)
+std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
+                                                                             const chip::TLV::TLVReader & attributeValueReader)
 {
-    tlvRequest.Free();
-
     // Create a copy of the reader and skip the element to calculate its EXACT byte size
     chip::TLV::TLVReader readerHelper;
     readerHelper.Init(attributeValueReader);
@@ -86,6 +84,7 @@ CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path, cons
     size_t additionalBytesForPath = 256; // Enough for initial padding of EndpointId, clusterId and attributeId
     size_t totalBufferLen         = elementSize + additionalBytesForPath;
 
+    Platform::ScopedMemoryBuffer<uint8_t> tlvRequest;
     if (!tlvRequest.Alloc(totalBufferLen))
     {
         ChipLogError(Support, "Failed to allocate memory for SetAttribute OOB request buffer");
@@ -118,10 +117,11 @@ CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path, cons
     ReturnErrorAndLogOnFailure(tlvWriter.EndContainer(outerType), Support, "Failed to end TLV structure container");
 
     // Get TLV length and move ownership back to tlvRequest.
-    tlvLen = tlvWriter.GetLengthWritten();
+    size_t tlvLen = tlvWriter.GetLengthWritten();
     ReturnErrorAndLogOnFailure(tlvWriter.Finalize(tlvRequest), Support, "Failed to finalize TLV buffer creator");
 
-    return CHIP_NO_ERROR;
+    uint8_t * rawPtr = tlvRequest.Release();
+    return ReadOnlyBuffer<uint8_t>(rawPtr, tlvLen, true /* allocated */);
 }
 
 } // namespace chip::app::OOBDataSerializer
