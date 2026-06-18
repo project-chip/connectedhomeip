@@ -512,11 +512,13 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return kInitialPhaseComplete;
     case CommissioningStage::kInitialPhaseComplete:
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
         if (IsCommissioningWithoutPower())
         {
             // Cleanup, the setup phase will happen after discovery of the device on the operational network.
             return CommissioningStage::kCleanup;
         }
+#endif
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
         return CommissioningStage::kFindOperationalForStayActive;
