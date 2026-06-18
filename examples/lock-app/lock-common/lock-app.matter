@@ -2072,7 +2072,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2111,7 +2111,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -2461,8 +2460,8 @@ cluster DoorLock = 257 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kDUPLICATE = 2 [spec_name = "DUPLICATE"];
-    kOCCUPIED = 3 [spec_name = "OCCUPIED"];
+    kDuplicate = 2;
+    kOccupied = 3;
   }
 
   enum UserStatusEnum : enum8 {

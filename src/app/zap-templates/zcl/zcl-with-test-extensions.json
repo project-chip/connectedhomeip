@@ -132,6 +132,7 @@
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
+        "temperature-controlled-cabinet-topology-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thermostat-cluster.xml",
@@ -343,6 +344,17 @@
             "TxErrCount",
             "CollisionCount",
             "OverrunCount",
+            "ClusterRevision"
+        ],
+        "Fan Control": [
+            "FanMode",
+            "PercentSetting",
+            "PercentCurrent",
+            "SpeedSetting",
+            "SpeedCurrent",
+            "RockSetting",
+            "WindSetting",
+            "AirflowDirection",
             "ClusterRevision"
         ],
         "General Commissioning": [
@@ -840,7 +852,13 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
-        "Power Source": ["ClusterRevision"],
+        "Power Source": [
+            "ClusterRevision",
+            "ActiveWiredFaults",
+            "ActiveBatFaults",
+            "ActiveBatChargeFaults",
+            "EndpointList"
+        ],
         "Valve Configuration and Control": [
             "OpenDuration",
             "AutoCloseTime",

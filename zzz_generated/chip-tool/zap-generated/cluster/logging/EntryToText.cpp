@@ -107,6 +107,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "OvenMode";
     case chip::app::Clusters::LaundryDryerControls::Id:
         return "LaundryDryerControls";
+    case chip::app::Clusters::TemperatureControlledCabinetTopology::Id:
+        return "TemperatureControlledCabinetTopology";
     case chip::app::Clusters::ModeSelect::Id:
         return "ModeSelect";
     case chip::app::Clusters::LaundryWasherMode::Id:
@@ -1642,6 +1644,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::LaundryDryerControls::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::LaundryDryerControls::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TemperatureControlledCabinetTopology::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::DisabledCabinets::Id:
+            return "DisabledCabinets";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::Topology::Id:
+            return "Topology";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

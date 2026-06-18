@@ -1181,6 +1181,64 @@ server cluster A = 1 { /* Test comment */ }
 
         self.assertIdlEqual(actual, expected)
 
+    def test_optional_nullable_support(self):
+        actual = parseText("""
+            server cluster MyCluster = 0x123 {
+                attribute optional int8u optAttr = 1;
+                attribute nullable int8u nullAttr = 2;
+                attribute optional nullable int8u optNullAttr = 3;
+
+                info optional event OptionalEvent = 1 {}
+                critical optional event OptionalCriticalEvent = 2 {}
+
+                optional command OptionalCommand(): DefaultSuccess = 10;
+                timed optional command OptionalTimedCommand(): DefaultSuccess = 11;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(name="MyCluster",
+                    code=0x123,
+                    attributes=[
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=1, name="optAttr", qualities=FieldQuality.OPTIONAL)),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=2, name="nullAttr", qualities=FieldQuality.NULLABLE)),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=3, name="optNullAttr", qualities=FieldQuality.OPTIONAL | FieldQuality.NULLABLE)),
+                    ],
+                    events=[
+                        Event(priority=EventPriority.INFO, name="OptionalEvent",
+                              code=1, fields=[], qualities=EventQuality.OPTIONAL),
+                        Event(priority=EventPriority.CRITICAL, name="OptionalCriticalEvent",
+                              code=2, fields=[], qualities=EventQuality.OPTIONAL),
+                    ],
+                    commands=[
+                        Command(name="OptionalCommand", code=10, input_param=None,
+                                output_param="DefaultSuccess", qualities=CommandQuality.OPTIONAL),
+                        Command(name="OptionalTimedCommand", code=11, input_param=None, output_param="DefaultSuccess",
+                                qualities=CommandQuality.TIMED_INVOKE | CommandQuality.OPTIONAL),
+                    ]
+                    )])
+
+        self.assertIdlEqual(actual, expected)
+
+        # Also verify properties
+        self.assertTrue(actual.clusters[0].attributes[0].is_optional)
+        self.assertFalse(actual.clusters[0].attributes[0].is_nullable)
+
+        self.assertFalse(actual.clusters[0].attributes[1].is_optional)
+        self.assertTrue(actual.clusters[0].attributes[1].is_nullable)
+
+        self.assertTrue(actual.clusters[0].attributes[2].is_optional)
+        self.assertTrue(actual.clusters[0].attributes[2].is_nullable)
+
+        self.assertTrue(actual.clusters[0].events[0].is_optional)
+        self.assertTrue(actual.clusters[0].events[1].is_optional)
+
+        self.assertTrue(actual.clusters[0].commands[0].is_optional)
+        self.assertTrue(actual.clusters[0].commands[1].is_optional)
+
 
 if __name__ == '__main__':
     unittest.main()
