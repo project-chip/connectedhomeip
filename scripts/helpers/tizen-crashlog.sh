@@ -22,9 +22,9 @@
 # (src/test_driver/tizen/chip_tests/runner.sh and
 #  src/test_driver/tizen/integration_tests/lighting-app/runner.sh).
 #
-# The runners set core_pattern to "/mnt/chip/core.%e.%p.%t" which creates
+# The runners set core_pattern to "/mnt/chip/dump/core.%e.%p.%t" which creates
 # raw core dumps instantly on the shared filesystem. This script analyzes
-# those raw core dumps from out/tizen-*/ directories.
+# those raw core dumps from out/tizen-*/dump/ directories.
 #
 # For analyzing crash-manager dumps from physical Tizen devices (zip format),
 # use scripts/helpers/tizen-sdb-crashlog.sh instead.
@@ -95,6 +95,14 @@ function resolve_binary_path() {
     # Search in root and tests/ subfolder
     if [[ -f "$target_dir/$binary" ]]; then echo "$target_dir/$binary"
     elif [[ -f "$target_dir/tests/$binary" ]]; then echo "$target_dir/tests/$binary"
+    else
+        # Linux %e in core_pattern truncates the executable name to 15 characters.
+        # If no exact match, try prefix matching to find the full binary name.
+        local found
+        found=$(find "$target_dir" "$target_dir/tests" -maxdepth 1 -type f -name "${binary}*" -executable 2>/dev/null | head -1)
+        if [ -n "$found" ]; then
+            echo "$found"
+        fi
     fi
 }
 
@@ -208,7 +216,7 @@ function run_gdb_analysis() {
 
 parse_arguments "$@"
 
-echo "Analyzing raw core dumps from out/tizen-*/"
+echo "Analyzing raw core dumps from out/tizen-*/dump/"
 echo ""
 
 found_any=false
@@ -219,7 +227,7 @@ for target in out/tizen-*; do
     [ -d "$target" ] || continue
     while IFS= read -r -d '' f; do
         ALL_FILES+=("$f:$target")
-    done < <(find "$target" -maxdepth 1 -type f -name "core.*" -size +0 -print0 2>/dev/null)
+    done < <(find "$target/dump" -maxdepth 1 -type f -name "core.*" -size +0 -print0 2>/dev/null)
 done
 
 # If --last is specified, sort by modification time and take only the most recent
@@ -254,8 +262,8 @@ for entry in "${ALL_FILES[@]}"; do
 done
 
 if [ "$found_any" = false ]; then
-    echo "No raw core dumps found in out/tizen-*/"
+    echo "No raw core dumps found in out/tizen-*/dump/"
     echo ""
-    echo "Raw core dumps should be created with pattern: /mnt/chip/core.%e.%p.%t"
+    echo "Raw core dumps should be created with pattern: /mnt/chip/dump/core.%e.%p.%t"
     echo "Make sure the test runner set the core_pattern before running tests."
 fi
