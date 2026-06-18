@@ -76,7 +76,7 @@ while IFS= read -r TEST; do
         FAILED+=("$NAME")
         STATUS=$((STATUS + 1))
         echo -e "DONE: \e[31mFAIL\e[0m (exit code: $RV)"
-        
+
         # Raw core dumps are created instantly in /mnt/chip/dump/
         # No need to wait or copy - they're already on shared filesystem
         if [ "$RV" -gt 128 ]; then

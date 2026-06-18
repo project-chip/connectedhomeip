@@ -66,10 +66,10 @@ run_test_with_crash_handling() {
     echo "RUN: $TEST_NAME"
     RV=0
     "$@" || RV=$?
-    
+
     if [ "$RV" -ne 0 ]; then
         echo "DONE: FAIL (exit code: $RV)"
-        
+
         # Raw core dumps are created instantly in /mnt/chip/dump/
         # No need to wait - they're already on shared filesystem
         if [ "$RV" -gt 128 ]; then
@@ -78,7 +78,7 @@ run_test_with_crash_handling() {
     else
         echo "DONE: SUCCESS"
     fi
-    
+
     return $RV
 }
 

@@ -132,10 +132,10 @@ function run_gdb_analysis() {
     echo "ANALYZING CRASH: $crash_name"
     echo "BINARY:          $binary_path"
     echo "COREDUMP:        $coredump ($coredump_size)"
-    
+
     local gdb_bin="gdb-multiarch"
     local sysroot=""
-    
+
     # Use provided sysroot path if available
     if [ -n "$SYSROOT_PATH" ]; then
         sysroot="$SYSROOT_PATH"
@@ -150,7 +150,7 @@ function run_gdb_analysis() {
             sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
         fi
     fi
-    
+
     if [ -n "$sysroot" ]; then
         echo "SYSROOT:         $sysroot"
     fi
@@ -248,7 +248,7 @@ for entry in "${ALL_FILES[@]}"; do
     f="${entry%%:*}"
     target_dir="${entry##*:}"
     fname=$(basename "$f")
-    
+
     # Extract binary name from core filename (core.NAME.PID.TIMESTAMP)
     # Format: core.TestServer.12345.1781607184
     binary=$(echo "$fname" | cut -d'.' -f2)
