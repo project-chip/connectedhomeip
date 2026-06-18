@@ -116,9 +116,9 @@ class SetupPayload:
         CHUNK3_START = CHUNK2_START + CHUNK2_LEN
         CHUNK3_LEN = 13
 
-        bytes = manualcode_format.build(self.manualcode_dict())
+        data = manualcode_format.build(self.manualcode_dict())
         bits = bitarray()
-        bits.frombytes(bytes)
+        bits.frombytes(data)
 
         chunk1 = str(int(bits[CHUNK1_START:CHUNK1_START + CHUNK1_LEN].to01(), 2)).zfill(1)
         chunk2 = str(int(bits[CHUNK2_START:CHUNK2_START + CHUNK2_LEN].to01(), 2)).zfill(5)

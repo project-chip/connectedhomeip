@@ -219,9 +219,12 @@ struct TestGroupcastCluster : public ::testing::Test
     FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
     ScopedAttributeChangeListenerRegistration mScopedListenerRegistration; // RAII registration
 
-    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
+    chip::Groupcast::Testing mTesting;
+    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl,
+                                               mTesting },
                                              BitFlags<Feature>{ Feature::kSender } };
-    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl },
+    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl,
+                                                 mTesting },
                                                BitFlags<Feature>{ Feature::kListener, Feature::kPerGroup } };
 
     TestGroupcastCluster() : mScopedListenerRegistration(customDataModel, mTestContext) {}
@@ -336,6 +339,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupFailsOnBadAargs)
         joinGroupCmd.endpoints       = DataModel::List<const EndpointId>(kEndpoints, 1);
 
         auto result = tester.Invoke(Commands::JoinGroup::Id, joinGroupCmd);
+        ASSERT_TRUE(result.GetStatusCode().has_value());
         EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Success);
     }
 
@@ -584,8 +588,8 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         }
 
         // Group2: 40 endpoints from intervals 1-2
-        EndpointId group2_endpoints[2 * kMaxEndpoints];
-        for (size_t i = 0; i < 2 * kMaxEndpoints; i++)
+        EndpointId group2_endpoints[2 * static_cast<size_t>(kMaxEndpoints)];
+        for (size_t i = 0; i < 2 * static_cast<size_t>(kMaxEndpoints); i++)
         {
             group2_endpoints[i] = static_cast<EndpointId>(i + 1);
         }
@@ -594,7 +598,7 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         EndpointId group3_endpoints[8];
         for (size_t i = 0; i < 8; i++)
         {
-            group3_endpoints[i] = static_cast<EndpointId>(4 * kMaxEndpoints + i + 1);
+            group3_endpoints[i] = static_cast<EndpointId>(4 * static_cast<size_t>(kMaxEndpoints) + i + 1);
         }
 
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
@@ -793,7 +797,7 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
     tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
     // Read MaxMcastAddrCount
-    app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::TypeInfo::DecodableType maxMcastAddrCount;
+    app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::TypeInfo::DecodableType maxMcastAddrCount{};
     ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id, maxMcastAddrCount), CHIP_NO_ERROR);
     ASSERT_GT(maxMcastAddrCount, 0u);
 
@@ -811,9 +815,7 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
         {
             data.groupID = i + 1;
             auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
             data.key.ClearValue();
         }
     }
@@ -821,17 +823,13 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
     {
         data.groupID = maxMcastAddrCount + 1;
         auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
     // Leave all groups
     {
         data.groupID = 0;
         auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
     // Join MaxMcastAddrCount PerGroup address groups
     {
@@ -841,26 +839,20 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
         {
             data.groupID = i + 1;
             auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         }
     }
     // Join MaxMcastAddrCount+1
     {
         data.groupID = maxMcastAddrCount + 1;
         auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::ResourceExhausted);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
     }
     // Leave all groups
     {
         data.groupID = 0;
         auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
     // Join 1 IANA address plus (MaxMcastAddrCount - 1) PerGroup groups
     {
@@ -872,9 +864,7 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
             data.mcastAddrPolicy = MakeOptional((0 == i) ? app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr
                                                          : app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
             auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
-            ASSERT_TRUE(result.status.has_value());
-            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                      Protocols::InteractionModel::Status::Success);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
         }
     }
     // Join MaxMcastAddrCount+1
@@ -882,18 +872,14 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
         data.groupID         = maxMcastAddrCount + 1;
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
         auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
     // Join MaxMcastAddrCount+2
     {
         data.groupID         = maxMcastAddrCount + 2;
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
         auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::ResourceExhausted);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
     }
     // Join MaxMcastAddrCount+1 (existing group)
     {
@@ -901,9 +887,7 @@ TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
         data.endpoints       = DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2));
         auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
     }
 }
 
@@ -922,7 +906,8 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
     // Neither Listener, nor Sender
     {
-        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl });
+        app::Clusters::GroupcastCluster cluster(
+            { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate, mAccessControl, mTesting });
         chip::Testing::ClusterTester tester(cluster);
         tester.SetFabricIndex(kTestFabricIndex);
         tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -940,6 +925,17 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         // Join group: New keyset and key
         auto result = tester.Invoke(Commands::JoinGroup::Id, data);
         EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Per spec 11.27.7.1.4 (JoinGroup Command/Key Field), a keyset created via JoinGroup with a Key has exactly one epoch
+        // key (num_keys_used == 1) with EpochStartTime0 = 1.
+        {
+            Credentials::GroupDataProvider::KeySet storedKeyset;
+            EXPECT_EQ(mProvider.GetKeySet(kTestFabricIndex, kKeyset, storedKeyset), CHIP_NO_ERROR);
+            EXPECT_EQ(storedKeyset.keyset_id, kKeyset);
+            EXPECT_EQ(storedKeyset.policy, Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst);
+            EXPECT_EQ(storedKeyset.num_keys_used, 1u);
+            EXPECT_EQ(storedKeyset.epoch_keys[0].start_time, 1u);
+        }
 
         // Join group: Existing keyset and key (invalid)
         data.groupID = 2;
@@ -992,21 +988,15 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         // Join group: ReplaceEndpoints
         data.replaceEndpoints = MakeOptional(true);
         result                = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 
         data.replaceEndpoints = MakeOptional(false);
         result                = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 
         data.replaceEndpoints.ClearValue();
         result = tester.Invoke(Commands::JoinGroup::Id, data);
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
-                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
         // Join group: McastAddrPolicy kPerGroup without kPerGroup feature set
         data.groupID         = 2;
@@ -1449,7 +1439,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     // Create a Listener and Sender capable group with 1 endpoint.
     // Remove the endpoint from the group. Verify that the group still exists for Sender.
     app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate,
-                                                         mAccessControl },
+                                                         mAccessControl, mTesting },
                                                        BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
     ASSERT_EQ(ListenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
     chip::Testing::ClusterTester listenerAndSenderTester(ListenerAndSender);
@@ -2137,6 +2127,63 @@ TEST_F(TestGroupcastCluster, TestTotalMaxMembership)
     data.key.ClearValue();
     auto result = tester.Invoke(Commands::JoinGroup::Id, data);
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
+}
+
+// A LeaveGroup command whose Endpoints list exceeds the maximum constraint ("1 to 20") is rejected
+// with CONSTRAINT_ERROR, without writing past the fixed-size response buffer.
+TEST_F(TestGroupcastCluster, TestLeaveGroupEndpointsExceedingMaxReturnsConstraintError)
+{
+    static constexpr uint16_t kMaxCommandEndpoints = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
+    // exceeds kMaxMembershipEndpoints (response buffer sizing) and kMaxCommandEndpoints
+    static constexpr uint16_t kEndpointsInGroup = kMaxMembershipEndpoints + 5;
+    const GroupId kGroup                        = 0xab01;
+    const KeysetId kKeyset                      = 0xabcd;
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+    tester.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    // Join the group with kEndpointsInGroup distinct endpoints, kMaxCommandEndpoints at a time.
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID  = kGroup;
+        data.keySetID = kKeyset;
+        data.key      = MakeOptional(ByteSpan(key));
+
+        EndpointId nextEndpoint = 1;
+        for (uint16_t added = 0; added < kEndpointsInGroup;)
+        {
+            EndpointId chunk[kMaxCommandEndpoints];
+            uint16_t count = 0;
+            for (; count < kMaxCommandEndpoints && added < kEndpointsInGroup; count++, added++)
+            {
+                chunk[count] = nextEndpoint++;
+            }
+            data.endpoints = DataModel::List<const EndpointId>(chunk, count);
+            auto result    = tester.Invoke(Commands::JoinGroup::Id, data);
+            ASSERT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+            data.key.ClearValue();
+        }
+    }
+
+    // Leaving the group while naming more than the maximum number of endpoints is rejected with
+    // CONSTRAINT_ERROR; no response payload is produced.
+    {
+        EndpointId leaveEndpoints[kEndpointsInGroup];
+        for (uint16_t i = 0; i < kEndpointsInGroup; i++)
+        {
+            leaveEndpoints[i] = static_cast<EndpointId>(i + 1);
+        }
+
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroup;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(leaveEndpoints, kEndpointsInGroup));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+        EXPECT_FALSE(result.response.has_value());
+    }
 }
 
 } // namespace

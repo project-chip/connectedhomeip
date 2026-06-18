@@ -20,5 +20,16 @@
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <lib/core/DataModelTypes.h>
 
+namespace chip {
+namespace app {
+namespace Clusters {
+class ElectricalSensorManager;
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 // The DEM Delegate is used for the TestEventTriggers
 chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate();
+
+// Global accessor for the ElectricalSensorManager (defined in each app's Main.cpp)
+chip::app::Clusters::ElectricalSensorManager * GetESManager();

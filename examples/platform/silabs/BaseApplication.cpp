@@ -24,7 +24,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include "OTAConfig.h"
+#endif // SILABS_OTA_ENABLED
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
@@ -90,6 +92,10 @@
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 #include <app-common/zap-generated/callback.h>
 #endif
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+#include "CustomerAppTask.h"
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
 
 /**********************************************************
  * Defines and Constants
@@ -283,8 +289,6 @@ CHIP_ERROR BaseApplication::Init()
         appError(err);
         return err;
     }
-
-    GetPlatform().WatchdogInit();
     return err;
 }
 
@@ -1034,3 +1038,12 @@ bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
 }
+
+#ifdef CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    // Route through CustomerAppTask / AppTaskImpl (CRTP) so overrides use DMPostAttributeChangeCallbackImpl.
+    CustomerAppTask::GetAppTask().DMPostAttributeChangeCallback(attributePath, type, size, value);
+}
+#endif // CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

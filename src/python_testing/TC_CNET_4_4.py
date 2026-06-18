@@ -80,7 +80,7 @@ class TC_CNET_4_4(MatterBaseTest):
             scan_results = await self.send_single_cmd(cmd=cmd)
             asserts.assert_true(matchers.is_type(scan_results, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from scan network")
-            log.info(f"Scan results: {scan_results}")
+            log.info("Scan results: %s", scan_results)
 
             if scan_results.debugText:
                 debug_text_len = len(scan_results.debug_text)

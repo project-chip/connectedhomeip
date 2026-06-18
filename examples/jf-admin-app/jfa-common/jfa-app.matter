@@ -701,7 +701,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  readonly attribute optional char_string<32> endpointUniqueID = 5;
+  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -815,7 +815,7 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+  provisional fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
     nullable node_id adminNodeID = 0;
     fabric_idx fabricIndex = 254;
   }
@@ -827,7 +827,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -937,8 +937,8 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
-  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  readonly attribute optional int32u configurationVersion = 24;
+  provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  provisional readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -948,9 +948,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Provides an interface for providing OTA software updates */
+/** This cluster implements the Provider role in the OTA process. */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -986,18 +986,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional octet_string<512> metadataForProvider = 7;
+    optional long_octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional char_string<256> imageURI = 2;
+    optional long_char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional octet_string<512> metadataForRequestor = 7;
+    optional long_octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -1015,17 +1015,17 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Determine availability of a new Software Image */
+  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** Determine next action to take for a downloaded Software Image */
+  /** This command requests the specified version be installed on the device. */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** Notify OTA Provider that an update was applied */
+  /** This command tells the Provider that the specified update has been applied. */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
+/** This cluster implements the Requestor role in the OTA process. */
 cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
@@ -1092,11 +1092,11 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
     AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
+    optional long_octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  /** Announce the presence of an OTA Provider */
+  /** This command MAY be invoked by Administrators to announce the presence of a particular OTA Provider. */
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
@@ -2100,7 +2100,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2139,7 +2139,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -2151,7 +2150,7 @@ cluster GroupKeyManagement = 63 {
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
+  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2533,7 +2532,7 @@ cluster ColorControl = 768 {
 }
 
 /** The Joint Fabric Datastore Cluster is a cluster that provides a mechanism for the Joint Fabric Administrators to manage the set of Nodes, Groups, and Group membership among Nodes in the Joint Fabric. */
-provisional cluster JointFabricDatastore = 1874 {
+cluster JointFabricDatastore = 1874 {
   revision 1;
 
   enum DatastoreAccessControlEntryAuthModeEnum : enum8 {
@@ -2544,7 +2543,6 @@ provisional cluster JointFabricDatastore = 1874 {
 
   enum DatastoreAccessControlEntryPrivilegeEnum : enum8 {
     kView = 1;
-    kProxyView = 2;
     kOperate = 3;
     kManage = 4;
     kAdminister = 5;
@@ -2579,22 +2577,15 @@ provisional cluster JointFabricDatastore = 1874 {
   }
 
   struct DatastoreNodeInformationEntryStruct {
-    node_id nodeID = 1;
-    char_string<32> friendlyName = 2;
-    DatastoreStatusEntryStruct commissioningStatusEntry = 3;
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+    DatastoreStatusEntryStruct commissioningStatusEntry = 2;
   }
 
   struct DatastoreEndpointGroupIDEntryStruct {
     node_id nodeID = 0;
     endpoint_no endpointID = 1;
     group_id groupID = 2;
-    DatastoreStatusEntryStruct statusEntry = 3;
-  }
-
-  struct DatastoreEndpointEntryStruct {
-    endpoint_no endpointID = 0;
-    node_id nodeID = 1;
-    char_string<32> friendlyName = 2;
     DatastoreStatusEntryStruct statusEntry = 3;
   }
 
@@ -2634,10 +2625,16 @@ provisional cluster JointFabricDatastore = 1874 {
   }
 
   struct DatastoreAdministratorInformationEntryStruct {
+    node_id nodeID = 0;
+    char_string<32> friendlyName = 1;
+    vendor_id vendorID = 2;
+    long_octet_string<400> icac = 3;
+  }
+
+  struct DatastoreEndpointEntryStruct {
+    endpoint_no endpointID = 0;
     node_id nodeID = 1;
     char_string<32> friendlyName = 2;
-    vendor_id vendorID = 3;
-    long_octet_string<400> icac = 4;
   }
 
   struct DatastoreGroupInformationEntryStruct {
@@ -2658,10 +2655,9 @@ provisional cluster JointFabricDatastore = 1874 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    DatastoreGroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
-  readonly attribute access(read: administer) octet_string<254> anchorRootCA = 0;
+  readonly attribute access(read: administer) long_octet_string<400> anchorRootCA = 0;
   readonly attribute access(read: administer) node_id anchorNodeID = 1;
   readonly attribute access(read: administer) vendor_id anchorVendorID = 2;
   readonly attribute access(read: administer) char_string<32> friendlyName = 3;
@@ -2708,7 +2704,7 @@ provisional cluster JointFabricDatastore = 1874 {
     nullable int16u groupKeySetID = 2;
     nullable int16u groupCAT = 3;
     nullable int16u groupCATVersion = 4;
-    DatastoreAccessControlEntryPrivilegeEnum groupPermission = 5;
+    nullable DatastoreAccessControlEntryPrivilegeEnum groupPermission = 5;
   }
 
   request struct RemoveGroupRequest {
@@ -2723,9 +2719,9 @@ provisional cluster JointFabricDatastore = 1874 {
   }
 
   request struct UpdateAdminRequest {
-    nullable node_id nodeID = 0;
-    nullable char_string<32> friendlyName = 1;
-    nullable long_octet_string<400> icac = 2;
+    node_id nodeID = 0;
+    optional char_string<32> friendlyName = 1;
+    optional long_octet_string<400> icac = 2;
   }
 
   request struct RemoveAdminRequest {
@@ -2790,45 +2786,45 @@ provisional cluster JointFabricDatastore = 1874 {
     node_id nodeID = 1;
   }
 
-  /** This command SHALL be used to add a KeySet to the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL add a KeySet to the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) AddKeySet(AddKeySetRequest): DefaultSuccess = 0;
-  /** This command SHALL be used to update a KeySet in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL update a KeySet in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) UpdateKeySet(UpdateKeySetRequest): DefaultSuccess = 1;
-  /** This command SHALL be used to remove a KeySet from the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL remove a KeySet from the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) RemoveKeySet(RemoveKeySetRequest): DefaultSuccess = 2;
-  /** This command SHALL be used to add a group to the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL add a group to the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) AddGroup(AddGroupRequest): DefaultSuccess = 3;
-  /** This command SHALL be used to update a group in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL update a group in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) UpdateGroup(UpdateGroupRequest): DefaultSuccess = 4;
-  /** This command SHALL be used to remove a group from the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL remove a group from the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) RemoveGroup(RemoveGroupRequest): DefaultSuccess = 5;
-  /** This command SHALL be used to add an admin to the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL add an admin to the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) AddAdmin(AddAdminRequest): DefaultSuccess = 6;
-  /** This command SHALL be used to update an admin in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL update an admin entry in the AdminList attribute. */
   command access(invoke: administer) UpdateAdmin(UpdateAdminRequest): DefaultSuccess = 7;
-  /** This command SHALL be used to remove an admin from the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL remove an admin from the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) RemoveAdmin(RemoveAdminRequest): DefaultSuccess = 8;
-  /** The command SHALL be used to add a node to the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL add a node to the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) AddPendingNode(AddPendingNodeRequest): DefaultSuccess = 9;
-  /** The command SHALL be used to request that Datastore information relating to a Node of the accessing fabric is refreshed. */
+  /** Upon receipt, this SHALL request that Datastore information relating to a Node of the accessing fabric is refreshed. */
   command access(invoke: administer) RefreshNode(RefreshNodeRequest): DefaultSuccess = 10;
-  /** The command SHALL be used to update the friendly name for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL update the friendly name for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) UpdateNode(UpdateNodeRequest): DefaultSuccess = 11;
-  /** This command SHALL be used to remove a node from the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL remove a node from the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) RemoveNode(RemoveNodeRequest): DefaultSuccess = 12;
-  /** This command SHALL be used to update the state of an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL update the state of an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) UpdateEndpointForNode(UpdateEndpointForNodeRequest): DefaultSuccess = 13;
-  /** This command SHALL be used to add a Group ID to an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL add a Group ID to an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) AddGroupIDToEndpointForNode(AddGroupIDToEndpointForNodeRequest): DefaultSuccess = 14;
-  /** This command SHALL be used to remove a Group ID from an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL remove a Group ID from an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) RemoveGroupIDFromEndpointForNode(RemoveGroupIDFromEndpointForNodeRequest): DefaultSuccess = 15;
-  /** This command SHALL be used to add a binding to an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL add a binding to an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) AddBindingToEndpointForNode(AddBindingToEndpointForNodeRequest): DefaultSuccess = 16;
-  /** This command SHALL be used to remove a binding from an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL remove a binding from an endpoint for a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) RemoveBindingFromEndpointForNode(RemoveBindingFromEndpointForNodeRequest): DefaultSuccess = 17;
-  /** This command SHALL be used to add an ACL to a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL add an ACL to a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) AddACLToNode(AddACLToNodeRequest): DefaultSuccess = 18;
-  /** This command SHALL be used to remove an ACL from a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
+  /** Upon receipt, this SHALL remove an ACL from a node in the Joint Fabric Datastore Cluster of the accessing fabric. */
   command access(invoke: administer) RemoveACLFromNode(RemoveACLFromNodeRequest): DefaultSuccess = 19;
 }
 
@@ -2836,18 +2832,19 @@ provisional cluster JointFabricDatastore = 1874 {
 provisional cluster JointFabricAdministrator = 1875 {
   revision 1;
 
+  enum ICACCSRResponseStatusCodeEnum : enum8 {
+    kOK = 0 [spec_name = "OK"];
+    kBusy = 1;
+    kPAKEParameterError = 2;
+    kWindowNotOpen = 3;
+    kVIDNotVerified = 4;
+    kInvalidAdministratorFabricIndex = 5;
+  }
+
   enum ICACResponseStatusEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
     kInvalidPublicKey = 1;
     kInvalidICAC = 2;
-  }
-
-  enum StatusCodeEnum : enum8 {
-    kBusy = 2;
-    kPAKEParameterError = 3;
-    kWindowNotOpen = 4;
-    kVIDNotVerified = 5;
-    kInvalidAdministratorFabricIndex = 6;
   }
 
   enum TransferAnchorResponseStatusEnum : enum8 {
@@ -2856,7 +2853,7 @@ provisional cluster JointFabricAdministrator = 1875 {
     kTransferAnchorStatusNoUserConsent = 2;
   }
 
-  readonly attribute access(read: administer) nullable fabric_idx administratorFabricIndex = 0;
+  provisional readonly attribute access(read: administer) nullable fabric_idx administratorFabricIndex = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2864,7 +2861,8 @@ provisional cluster JointFabricAdministrator = 1875 {
   readonly attribute int16u clusterRevision = 65533;
 
   response struct ICACCSRResponse = 1 {
-    long_octet_string<600> icaccsr = 0;
+    ICACCSRResponseStatusCodeEnum statusCode = 0;
+    optional long_octet_string<600> icaccsr = 1;
   }
 
   request struct AddICACRequest {
@@ -2895,7 +2893,7 @@ provisional cluster JointFabricAdministrator = 1875 {
   command access(invoke: administer) ICACCSRRequest(): ICACCSRResponse = 0;
   /** This command SHALL be generated and executed during Joint Commissioning Method and subsequently be responded in the form of an ICACResponse command. */
   command access(invoke: administer) AddICAC(AddICACRequest): ICACResponse = 2;
-  /** This command SHALL fail with a InvalidAdministratorFabricIndex status code sent back to the initiator if the AdministratorFabricIndex field has the value of null. */
+  /** This command SHALL fail with a InvalidAdministratorFabricIndex status code sent back to the initiator if the AdministratorFabricIndex attribute has the value of null. */
   command access(invoke: administer) OpenJointCommissioningWindow(OpenJointCommissioningWindowRequest): DefaultSuccess = 4;
   /** This command SHALL be sent by a candidate Joint Fabric Anchor Administrator to the current Joint Fabric Anchor Administrator to request transfer of the Anchor Fabric. */
   command access(invoke: administer) TransferAnchorRequest(): TransferAnchorResponse = 5;
@@ -2906,7 +2904,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 5;
+  device type ma_rootdevice = 22, version 4;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -2975,14 +2973,14 @@ endpoint 0 {
     emits event VersionApplied;
     emits event DownloadError;
     callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
+    callback attribute updatePossible;
+    callback attribute updateState;
+    callback attribute updateStateProgress;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AnnounceOTAProvider;
   }

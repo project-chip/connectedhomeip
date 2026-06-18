@@ -140,7 +140,7 @@ tests:
           to TH on EP0"
       PICS: GRPKEY.C.C00.Tx
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, "groupKeyMulticastPolicy": 0 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
 
           Verify that  KeySetWrite command on TH(Reference app)log and below is the sample log provided for the raspi platform:
 
@@ -439,7 +439,7 @@ tests:
           [1775758228.012] [2754009:2754011] [TOO] Sending cluster (0x00000006) command (0x00000002) on Group 1
           [1775758228.012] [2754009:2754011] [DMG] ICR moving to [AddingComm]
           [1775758228.012] [2754009:2754011] [DMG] ICR moving to [AddedComma]
-          [1775758228.012] [2754009:2754011] [EM] <<< [E:14931i S:1 M:157645958] (G) Msg TX from 000000000001B669 to 1:FFFFFFFFFFFF0001 [CAE0] [UDP:[ff35:40:ff05::fa]:5540] --- Type 0001:08 (IM:InvokeCommandRequest) (B:66)
+          [1775758228.012] [2754009:2754011] [EM] <<< [E:14931i S:1 M:157645958] (G) Msg TX from 000000000001B669 to 1:FFFFFFFFFFFF0001 [CAE0] [UDP:[ff05::fa]:5540] --- Type 0001:08 (IM:InvokeCommandRequest) (B:66)
           [1775758228.013] [2754009:2754011] [IN] Interface wlan0 has a link local address
           [1775758228.013] [2754009:2754011] [IN] Successfully send Multicast message on interface wlan0
       disabled: true

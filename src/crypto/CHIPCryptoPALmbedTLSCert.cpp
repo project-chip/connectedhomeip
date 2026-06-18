@@ -28,7 +28,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
-#include <mbedtls/ecp.h>
 #include <mbedtls/oid.h>
 #include <mbedtls/pk.h>
 #include <mbedtls/version.h>
@@ -36,6 +35,8 @@
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #include <psa/crypto.h>
+#else
+#include <mbedtls/ecp.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
 #include <mbedtls/x509_csr.h>
@@ -117,7 +118,7 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_raw_sig_span.size() == (kP256_FE_Length * 2), error = CHIP_ERROR_INTERNAL);
-    TEMPORARY_RETURN_IGNORED signature.SetLength(out_raw_sig_span.size());
+    SuccessOrExit(error = signature.SetLength(out_raw_sig_span.size()));
 
     // Verify the signature using the public key
     error = pubkey.ECDSA_validate_msg_signature(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(cri).CHIP_CRYPTO_PAL_PRIVATE_X509(p),

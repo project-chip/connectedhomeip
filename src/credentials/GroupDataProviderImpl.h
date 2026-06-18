@@ -36,7 +36,8 @@ public:
     // TODO Make this configurable. Note: if PGA feature is enabled it SHALL be >= 4. else it SHALL = 1.
     static constexpr uint16_t kMaxMcastAddrCount = 4;
 
-    GroupDataProviderImpl() : GroupDataProvider(kMaxMembershipPerFabric, kMaxGroupKeysPerFabric) {}
+    // TODO(#72056): When groupcast is enabled by default, maxGroupsPerFabric passed in should be kMaxMembershipPerFabric
+    GroupDataProviderImpl() : GroupDataProvider(CHIP_CONFIG_MAX_GROUPS_PER_FABRIC, kMaxGroupKeysPerFabric) {}
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
         GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric)
     {}
@@ -112,8 +113,8 @@ public:
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
     // Groupcast configurations
-    uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
-    uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
+    uint16_t getMaxMembershipCount() const override { return kMaxMembershipCount; }
+    uint16_t getMaxMcastAddrCount() const override { return kMaxMcastAddrCount; }
 
     bool ConsumeAuxAclNotificationNeeded() override
     {
