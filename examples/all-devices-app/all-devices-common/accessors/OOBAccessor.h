@@ -32,7 +32,7 @@ class OOBAccessor : public chip::IntrusiveListNodeBase<chip::IntrusiveMode::Auto
 public:
     virtual ~OOBAccessor() = default;
 
-    static constexpr CharSpan kActionSetAttribute = chip::literals::operator""_span("SetAttribute", 12);
+    static constexpr CharSpan kActionSetAttribute = "SetAttribute"_span;
 
     /**
      * @brief A utility class for parsing a unified TLV buffer containing an out-of-band "SetAttribute" request.
