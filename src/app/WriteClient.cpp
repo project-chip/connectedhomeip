@@ -34,6 +34,7 @@ namespace app {
 void WriteClient::Close()
 {
     MoveToState(State::AwaitingDestruction);
+    mExchangeCtx.Release();
 
     if (mpCallback)
     {
@@ -545,9 +546,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::AwaitingResponse &&
-        // We had sent the last chunk of data, and received all responses
-        mChunks.IsNull())
+    if (mState == State::AwaitingResponse)
     {
         MoveToState(State::ResponseReceived);
     }
