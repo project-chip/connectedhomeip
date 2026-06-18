@@ -493,7 +493,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(18)
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportBegin, timeout_sec=5)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
         self.step(19)
@@ -527,7 +527,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(21)
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
         self.step(22)
