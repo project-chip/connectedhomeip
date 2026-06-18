@@ -34,7 +34,7 @@ mkdir -p /mnt/chip/dump
 # Save original core_pattern and set to raw core dumps (no crash-manager)
 ORIGINAL_CORE_PATTERN=$(cat /proc/sys/kernel/core_pattern 2>/dev/null || echo "")
 if [ -n "$ORIGINAL_CORE_PATTERN" ]; then
-    echo "/mnt/chip/dump/core.%e.%p.%t" > /proc/sys/kernel/core_pattern
+    echo "/mnt/chip/dump/core.%e.%p.%t" >/proc/sys/kernel/core_pattern
     echo "Core pattern set to: /mnt/chip/dump/core.%e.%p.%t (raw dumps, no crash-manager)"
 fi
 

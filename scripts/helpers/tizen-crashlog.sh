@@ -65,11 +65,26 @@ EOF
 function parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --verbose) VERBOSE=true; shift ;;
-            --sysroot) SYSROOT_PATH="$2"; shift 2 ;;
-            --last) LAST_ONLY=true; shift ;;
-            --help) help; exit 0 ;;
-            *) echo "ERROR: Unknown option $1"; exit 1 ;;
+            --verbose)
+                VERBOSE=true
+                shift
+                ;;
+            --sysroot)
+                SYSROOT_PATH="$2"
+                shift 2
+                ;;
+            --last)
+                LAST_ONLY=true
+                shift
+                ;;
+            --help)
+                help
+                exit 0
+                ;;
+            *)
+                echo "ERROR: Unknown option $1"
+                exit 1
+                ;;
         esac
     done
 }
@@ -93,8 +108,10 @@ function resolve_binary_path() {
     local target_dir="$1"
     local binary="$2"
     # Search in root and tests/ subfolder
-    if [[ -f "$target_dir/$binary" ]]; then echo "$target_dir/$binary"
-    elif [[ -f "$target_dir/tests/$binary" ]]; then echo "$target_dir/tests/$binary"
+    if [[ -f "$target_dir/$binary" ]]; then
+        echo "$target_dir/$binary"
+    elif [[ -f "$target_dir/tests/$binary" ]]; then
+        echo "$target_dir/tests/$binary"
     else
         # Linux %e in core_pattern truncates the executable name to 15 characters.
         # If no exact match, try prefix matching to find the full binary name.
@@ -189,7 +206,10 @@ function run_gdb_analysis() {
         fi
     fi
     local solib_path_str
-    solib_path_str=$(IFS=:; echo "${solib_paths[*]}")
+    solib_path_str=$(
+        IFS=:
+        echo "${solib_paths[*]}"
+    )
     gdb_args+=("-ex" "set solib-search-path $solib_path_str")
 
     gdb_args+=(

@@ -85,15 +85,43 @@ EOF
 function parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --target) TARGET_DEVICE="$2"; shift 2 ;;
-            --hours) SEARCH_HOURS="$2"; shift 2 ;;
-            --out-dir) OUT_DIR="$2"; shift 2 ;;
-            --sysroot) SYSROOT_PATH="$2"; shift 2 ;;
-            --last) SELECT_LAST=true; shift ;;
-            --verbose) VERBOSE=true; shift ;;
-            --no-clean) CLEANUP=false; shift ;;
-            --help) help; exit 0 ;;
-            *) echo "ERROR: Unknown option $1"; help; exit 1 ;;
+            --target)
+                TARGET_DEVICE="$2"
+                shift 2
+                ;;
+            --hours)
+                SEARCH_HOURS="$2"
+                shift 2
+                ;;
+            --out-dir)
+                OUT_DIR="$2"
+                shift 2
+                ;;
+            --sysroot)
+                SYSROOT_PATH="$2"
+                shift 2
+                ;;
+            --last)
+                SELECT_LAST=true
+                shift
+                ;;
+            --verbose)
+                VERBOSE=true
+                shift
+                ;;
+            --no-clean)
+                CLEANUP=false
+                shift
+                ;;
+            --help)
+                help
+                exit 0
+                ;;
+            *)
+                echo "ERROR: Unknown option $1"
+                help
+                exit 1
+                ;;
         esac
     done
 }
@@ -153,7 +181,7 @@ function setup_sdb() {
     echo "------------------------------------------------------------"
 
     while true; do
-        read -r -p "Select a device [0-$(( ${#device_lines[@]} - 1 ))]: " choice
+        read -r -p "Select a device [0-$((${#device_lines[@]} - 1))]: " choice
         if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -lt "${#device_lines[@]}" ]; then
             local device_id
             device_id=$(echo "${device_lines[$choice]}" | awk '{print $1}')
@@ -190,8 +218,10 @@ function resolve_binary_path() {
     local target_dir="$1"
     local binary="$2"
     # Search in root and tests/ subfolder
-    if [[ -f "$target_dir/$binary" ]]; then echo "$target_dir/$binary"
-    elif [[ -f "$target_dir/tests/$binary" ]]; then echo "$target_dir/tests/$binary"
+    if [[ -f "$target_dir/$binary" ]]; then
+        echo "$target_dir/$binary"
+    elif [[ -f "$target_dir/tests/$binary" ]]; then
+        echo "$target_dir/tests/$binary"
     else
         # Linux %e in core_pattern truncates the executable name to 15 characters.
         # If no exact match, try prefix matching to find the full binary name.
@@ -389,7 +419,7 @@ function select_crash_log() {
     echo "------------------------------------------------------------"
 
     while true; do
-        read -r -p "Select a crash log to analyze [0-$(( ${#VALID_CRASHES[@]} - 1 ))]: " choice
+        read -r -p "Select a crash log to analyze [0-$((${#VALID_CRASHES[@]} - 1))]: " choice
         if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -lt ${#VALID_CRASHES[@]} ]; then
             SELECTED_ZIP="${VALID_CRASHES[$choice]}"
             break
@@ -555,7 +585,7 @@ function select_build_target() {
     echo "------------------------------------------------------------"
 
     while true; do
-        read -r -p "Select a build target [0-$(( ${#targets[@]} - 1 ))]: " choice
+        read -r -p "Select a build target [0-$((${#targets[@]} - 1))]: " choice
         if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -lt ${#targets[@]} ]; then
             SELECTED_TARGET="${targets[$choice]}"
             break
@@ -603,14 +633,14 @@ function run_gdb_analysis() {
         if [[ "$target_dir" == *"arm64"* || "$target_dir" == *"aarch64"* ]]; then
             gdb_bin="$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-14.2/bin/aarch64-linux-gnu-gdb"
             # Only use SDK sysroot if it actually exists and contains libs
-            if [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/usr/lib64" ] || \
-               [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/lib64" ]; then
+            if [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/usr/lib64" ] ||
+                [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/lib64" ]; then
                 sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core"
             fi
         else
             gdb_bin="$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-14.2/bin/arm-linux-gnueabi-gdb"
-            if [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core/usr/lib" ] || \
-               [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core/lib" ]; then
+            if [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core/usr/lib" ] ||
+                [ -d "$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core/lib" ]; then
                 sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
             fi
         fi
@@ -664,7 +694,10 @@ function run_gdb_analysis() {
         fi
     fi
     local solib_path_str
-    solib_path_str=$(IFS=:; echo "${solib_paths[*]}")
+    solib_path_str=$(
+        IFS=:
+        echo "${solib_paths[*]}"
+    )
     gdb_args+=("-ex" "set solib-search-path $solib_path_str")
 
     gdb_args+=(
@@ -750,8 +783,8 @@ if [ -z "$SYSROOT_PATH" ] && [ ! -d "$SELECTED_TARGET/system_libs" ]; then
         local_sdk_sysroot="$TIZEN_SDK_ROOT/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
     fi
     # Check if SDK sysroot has actual library content
-    if [ ! -d "$local_sdk_sysroot/usr/lib64" ] && [ ! -d "$local_sdk_sysroot/usr/lib" ] && \
-       [ ! -d "$local_sdk_sysroot/lib64" ] && [ ! -d "$local_sdk_sysroot/lib" ]; then
+    if [ ! -d "$local_sdk_sysroot/usr/lib64" ] && [ ! -d "$local_sdk_sysroot/usr/lib" ] &&
+        [ ! -d "$local_sdk_sysroot/lib64" ] && [ ! -d "$local_sdk_sysroot/lib" ]; then
         pull_system_libs "$SELECTED_TARGET"
     fi
 fi
