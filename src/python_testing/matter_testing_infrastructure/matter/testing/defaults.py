@@ -31,5 +31,5 @@ class TestingDefaults:
     TRUST_ROOT_INDEX: final = 1
 
     # Subprocess handling
-    DEFAULT_TIMEOUT_S: float = 300.0  # Default timeout when waiting for a subprocess to finish its job
-    TERMINATION_TIMEOUT_S: float = 5.0  # Default timeout for subprocess termination
+    DEFAULT_TIMEOUT_S: final = 300.0  # Default timeout when waiting for a subprocess to finish its job
+    TERMINATION_TIMEOUT_S: final = 5.0  # Default timeout for subprocess termination
