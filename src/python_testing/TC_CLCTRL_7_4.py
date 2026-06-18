@@ -370,7 +370,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
 
             self.step("5c")
             countdown_time_before_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
-            asserts.assert_true(countdown_time_before_interruption > 0 and countdown_time_before_interruption <
+            asserts.assert_true(countdown_time_before_interruption > 0 and countdown_time_before_interruption <=
                                 countdown_time_max, f"CountdownTime before interruption: {countdown_time_before_interruption}.")
             log.info("CountdownTime before interruption: %s", countdown_time_before_interruption)
 

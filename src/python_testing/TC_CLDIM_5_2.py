@@ -84,17 +84,17 @@ class TC_CLDIM_5_2(MatterBaseTest):
             TestStep("2m", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT."),
             TestStep("2n", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT."),
             TestStep("2o", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT."),
-            TestStep("3a", "If manual latching is required, skip steps 3b and 3c"),
+            TestStep("3a", "If remote latching is supported, skip steps 3b and 3c"),
             TestStep("3b", "Send GroupedSetTarget command with Latch=True"),
             TestStep("3c", "Manually latch the device"),
-            TestStep("3d", "If manual latching is not required, skip steps 3e to 3f"),
+            TestStep("3d", "If remote latching is not supported, skip steps 3e to 3f"),
             TestStep("3e", "Send GroupedSetTarget command with Latch=True"),
             TestStep("3f", "Verify TargetState attribute is updated"),
             TestStep("3g", "Wait for CurrentState.Latch to be updated to True"),
             TestStep("4a", "Send GroupedStep command while device is latched"),
             TestStep("4b", "Send GroupedSetTarget command while device is latched"),
-            TestStep("5a", "If manual latching is required, unlatch device manually"),
-            TestStep("5b", "If manual latching is required, skip steps 5c to 5d"),
+            TestStep("5a", "If remote unlatching is not supported, unlatch device manually"),
+            TestStep("5b", "If remote unlatching is not supported, skip steps 5c to 5d"),
             TestStep("5c", "Send GroupedSetTarget command with Latch=False"),
             TestStep("5d", "Verify TargetState attribute is updated"),
             TestStep("5e", "Wait for CurrentState.Latch to be updated to False"),
@@ -247,11 +247,11 @@ class TC_CLDIM_5_2(MatterBaseTest):
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
             self.mark_current_step_skipped()
 
-        # STEP 3a: If manual latching is required, skip steps 3b and 3c
+        # STEP 3a: If remote latching is supported, skip steps 3b and 3c
         self.step("3a")
         sub_handler.reset()
         if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
-            log.info("Manual latching is required. Skipping steps 3b and 3c.")
+            log.info("Remote latching is supported. Skipping steps 3b and 3c.")
             self.mark_step_range_skipped("3b", "3c")
         else:
             # STEP 3b: Send GroupedSetTarget command with Latch=True
@@ -269,7 +269,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
             self.step("3c")
             self.wait_for_user_input(prompt_msg="Manual latch the device, and press Enter when ready.")
 
-        # STEP 3d: If manual latching is not required, skip steps 3e to 3f
+        # STEP 3d: If remote latching is not supported, skip steps 3e to 3f
         self.step("3d")
         if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
             self.mark_step_range_skipped("3e", "3f")
@@ -323,7 +323,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
 
-        # STEP 5a: If manual unlatching is required, unlatch device manually
+        # STEP 5a: If remote unlatching is not supported, unlatch device manually
         self.step("5a")
         if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
             self.wait_for_user_input(prompt_msg="Manual unlatch the device, and press Enter when ready.")
@@ -331,31 +331,31 @@ class TC_CLDIM_5_2(MatterBaseTest):
             log.info("Manual latching is not required. Skipping step.")
             self.mark_current_step_skipped()
 
-        # STEP 5b: If manual unlatching is not required, skip steps 5c to 5d
+        # STEP 5b: If remote unlatching is not supported, skip steps 5c to 5d
         self.step("5b")
         if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
-            log.info("Manual latching is not required. Skipping steps 5c to 5d.")
+            log.info("Remote unlatching is not supported. Skipping steps 5c to 5d.")
             self.mark_step_range_skipped("5c", "5d")
-            return
-        # STEP 5c: Send GroupedSetTarget command with Latch=False
-        self.step("5c")
-        sub_handler.reset()
-        if self.groupcast_enabled:
-            log.info("Sending GroupedSetTarget command by groupcast")
-            self.default_controller.SendGroupCommand(
-                self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False))
         else:
-            log.info("Sending GroupedSetTarget command by unicast")
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
-                endpoint=endpoint
-            )
+            # STEP 5c: Send GroupedSetTarget command with Latch=False
+            self.step("5c")
+            sub_handler.reset()
+            if self.groupcast_enabled:
+                log.info("Sending GroupedSetTarget command by groupcast")
+                self.default_controller.SendGroupCommand(
+                    self.kGroupId, Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False))
+            else:
+                log.info("Sending GroupedSetTarget command by unicast")
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.GroupedSetTarget(latch=False),
+                    endpoint=endpoint
+                )
 
-        # STEP 5d: Verify TargetState attribute is updated
-        self.step("5d")
-        target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-        log.info("TargetState: %s", target_state)
-        asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
+            # STEP 5d: Verify TargetState attribute is updated
+            self.step("5d")
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            log.info("TargetState: %s", target_state)
+            asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
 
         # STEP 5e: Wait for CurrentState.Latch to be updated to False
         self.step("5e")

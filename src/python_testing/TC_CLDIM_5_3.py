@@ -303,7 +303,7 @@ class TC_CLDIM_5_3(MatterBaseTest):
 
             # STEP 5d: Wait for CurrentState.Position to be updated to MinPosition
             self.step("5d")
-            if current_state.position > 0:
+            if current_state.position != min_position:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
             else:
@@ -327,12 +327,8 @@ class TC_CLDIM_5_3(MatterBaseTest):
 
             # STEP 5g: Wait for CurrentState.Position to be updated to 100%
             self.step("5g")
-            if max_position < 10000:
-                sub_handler.await_all_expected_report_matches(
-                    expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
-            else:
-                log.info("MaxPosition not < 10000. Skipping step 5g.")
-                self.mark_current_step_skipped()
+            sub_handler.await_all_expected_report_matches(
+                expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
         # STEP 6: Send GroupedSetTarget command with invalid Position
         self.step(6)
