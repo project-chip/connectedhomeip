@@ -733,7 +733,7 @@ CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex)
 
 CHIP_ERROR GetEthCarrierDetect(const char * ifname, bool & carrierDetect)
 {
-    struct ifreq ifr           = {};
+    struct ifreq ifr            = {};
     struct ethtool_value evalue = {};
 
     evalue.cmd = ETHTOOL_GLINK;
