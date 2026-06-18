@@ -323,6 +323,7 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_ExplicitBridged)
 
     // Explicit chime:2,bridged is expanded into a parent bridged-node and the chime child.
     EXPECT_EQ(configs[0].type, "bridged-node");
+    EXPECT_EQ(configs[0].label, "Chime");
     EXPECT_EQ(configs[0].endpoint, 2);
     EXPECT_EQ(configs[0].parentId, 1);
     EXPECT_TRUE(configs[0].bridged);
@@ -351,6 +352,7 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardBridged)
     // Wildcard block starts at maxEp + 1 = 2.
     // For each device in wildcard, we get [bridged-node, device]
     EXPECT_EQ(configs[1].type, "bridged-node");
+    EXPECT_EQ(configs[1].label, "Chime");
     EXPECT_EQ(configs[1].endpoint, 2);
     EXPECT_EQ(configs[1].parentId, 1);
     EXPECT_TRUE(configs[1].bridged);
@@ -361,6 +363,7 @@ TEST_F(TestDeviceTypeParser, ExpandWildcards_WildcardBridged)
     EXPECT_TRUE(configs[2].bridged);
 
     EXPECT_EQ(configs[3].type, "bridged-node");
+    EXPECT_EQ(configs[3].label, "Speaker");
     EXPECT_EQ(configs[3].endpoint, 4);
     EXPECT_EQ(configs[3].parentId, 1);
     EXPECT_TRUE(configs[3].bridged);

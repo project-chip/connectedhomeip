@@ -279,7 +279,7 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     # Tools
     'chip-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
     'darwin-framework-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='darwin-framework-tool'),
-    'matter-repl-yaml-tester': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='yamltest_with_matter_repl_tester.py'),
+
 
     # No target_name as this is either chiptool.py or darwinframework.py depending on the selected TestRunTime
     'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.TOOL)
@@ -434,7 +434,6 @@ class TestTag(StrEnum):
 class TestRunTime(StrEnum):
     CHIP_TOOL_PYTHON = 'chip_tool_python'                          # use the python yaml test parser with chip-tool
     DARWIN_FRAMEWORK_TOOL_PYTHON = 'darwin_framework_tool_python'  # use the python yaml test parser with chip-tool
-    MATTER_REPL_PYTHON = 'matter_repl_python'                      # use the python yaml test runner
 
 
 @dataclass
@@ -554,75 +553,61 @@ class TestDefinition:
                 assert app.setupCode is not None, "Setup code should have been set in app.start()"
                 setupCode = app.setupCode
 
-            if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                assert 'matter-repl-yaml-tester' in subproc_info_repo, \
-                    "Matter REPL YAML tester should have been set for selected test runtime"
-                python_cmd = subproc_info_repo['matter-repl-yaml-tester'].with_args(
-                    '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", str(pics_file))
-                if value_wait_extra_duration_ms is not None:
-                    python_cmd = python_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
+            assert 'chip-tool' in subproc_info_repo, \
+                "Chip tool should have been set for selected test runtime"
+            assert 'chip-tool-with-python' in subproc_info_repo, \
+                "Chip tool with Python should have been set for selected test runtime"
+            pairing_server_args = []
 
-                if dry_run:
-                    log.info(shlex.join(python_cmd.to_cmd()))
-                else:
-                    runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
-                                         dependencies=[apps_register], timeout_seconds=timeout_seconds)
-            else:  # CHIP_TOOL_PYTHON
-                assert 'chip-tool' in subproc_info_repo, \
-                    "Chip tool should have been set for selected test runtime"
-                assert 'chip-tool-with-python' in subproc_info_repo, \
-                    "Chip tool with Python should have been set for selected test runtime"
-                pairing_server_args = []
-
-                pairing_cmd = subproc_info_repo['chip-tool-with-python']
-                if ble_controller_tool is not None:
-                    if op_network == 'WiFi':
-                        pairing_cmd = pairing_cmd.with_args(
-                            "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
-                        pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
-                    elif op_network == 'Thread':
-                        pairing_cmd = pairing_cmd.with_args(
-                            "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", TEST_SETUP_QR_CODE)
-                        pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
-                elif wifipaf_wifi:
-                    pairing_cmd = pairing_cmd.with_args("pairing", "wifipaf-wifi", TEST_NODE_ID,
-                                                        "MatterAP", "MatterAPPassword", TEST_PASSCODE, TEST_DISCRIMINATOR)
-                elif op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
+            pairing_cmd = subproc_info_repo['chip-tool-with-python']
+            if ble_controller_tool is not None:
+                if op_network == 'WiFi':
                     pairing_cmd = pairing_cmd.with_args(
-                        "pairing", "thread-meshcop", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
-                        "--thread-ba-host", thread_ba_host, "--thread-ba-port", str(thread_ba_port))
-                else:
-                    pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
+                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
+                    pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                elif op_network == 'Thread':
+                    pairing_cmd = pairing_cmd.with_args(
+                        "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", TEST_SETUP_QR_CODE)
+                    pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+            elif wifipaf_wifi:
+                pairing_cmd = pairing_cmd.with_args("pairing", "wifipaf-wifi", TEST_NODE_ID,
+                                                    "MatterAP", "MatterAPPassword", TEST_PASSCODE, TEST_DISCRIMINATOR)
+            elif op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
+                pairing_cmd = pairing_cmd.with_args(
+                    "pairing", "thread-meshcop", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
+                    "--thread-ba-host", thread_ba_host, "--thread-ba-port", str(thread_ba_port))
+            else:
+                pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 
-                if target.command == 'lit-icd' and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                    pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
+            if target.command == 'lit-icd' and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
-                test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))
-                if value_wait_extra_duration_ms is not None:
-                    test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
+            test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))
+            if value_wait_extra_duration_ms is not None:
+                test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
 
-                interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
+            interactive_server_args = ['interactive server'] + tool_storage_args + pairing_server_args
 
-                if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                    interactive_server_args = interactive_server_args + ['--interface-id', '-1']
+            if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                interactive_server_args = interactive_server_args + ['--interface-id', '-1']
 
-                server_args = (
-                    '--server_path', str(subproc_info_repo['chip-tool'].path),
-                    '--server_arguments', ' '.join(interactive_server_args))
+            server_args = (
+                '--server_path', str(subproc_info_repo['chip-tool'].path),
+                '--server_arguments', ' '.join(interactive_server_args))
 
-                pairing_cmd = pairing_cmd.with_args(*server_args)
-                test_cmd = test_cmd.with_args(*server_args)
+            pairing_cmd = pairing_cmd.with_args(*server_args)
+            test_cmd = test_cmd.with_args(*server_args)
 
-                if dry_run:
-                    log.info("Pairing command: %s", shlex.join(pairing_cmd.to_cmd()))
-                    log.info("Testcase command: %s", shlex.join(test_cmd.to_cmd()))
-                else:
-                    runner.RunSubprocess(pairing_cmd,
-                                         name='PAIR', dependencies=[apps_register])
-                    runner.RunSubprocess(
-                        test_cmd,
-                        name='TEST', dependencies=[apps_register],
-                        timeout_seconds=timeout_seconds)
+            if dry_run:
+                log.info("Pairing command: %s", shlex.join(pairing_cmd.to_cmd()))
+                log.info("Testcase command: %s", shlex.join(test_cmd.to_cmd()))
+            else:
+                runner.RunSubprocess(pairing_cmd,
+                                     name='PAIR', dependencies=[apps_register])
+                runner.RunSubprocess(
+                    test_cmd,
+                    name='TEST', dependencies=[apps_register],
+                    timeout_seconds=timeout_seconds)
 
         except BaseException:
             log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")

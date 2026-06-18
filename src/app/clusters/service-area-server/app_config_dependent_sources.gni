@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "ServiceAreaCluster.cpp",
   "service-area-cluster-objects.h",
   "service-area-delegate.h",
-  "service-area-server.cpp",
   "service-area-server.h",
   "service-area-storage-delegate.cpp",
   "service-area-storage-delegate.h",
