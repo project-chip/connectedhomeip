@@ -45,9 +45,18 @@ bool IsExcludedFromWildcard(const std::string & type)
 } // namespace
 
 // App custom argument handling
-constexpr uint16_t kOptionDeviceType = 0xffd0;
-constexpr uint16_t kOptionPort       = 0xffd7;
-constexpr uint16_t kOptionGroupcast  = 0xffda;
+constexpr uint16_t kOptionDeviceType    = 0xffd0;
+constexpr uint16_t kOptionWiFi          = 0xffd2;
+constexpr uint16_t kOptionKVS           = 0xffd3;
+constexpr uint16_t kOptionDiscriminator = 0xffd4;
+constexpr uint16_t kOptionVendorId      = 0xffd5;
+constexpr uint16_t kOptionProductId     = 0xffd6;
+constexpr uint16_t kOptionPort          = 0xffd7;
+constexpr uint16_t kOptionInterfaceId   = 0xffd8;
+constexpr uint16_t kOptionBLE           = 0xffd9;
+constexpr uint16_t kOptionGroupcast     = 0xffda;
+constexpr uint16_t kOptionAppPipe       = 0xffdb;
+constexpr uint16_t kOptionTraceTo       = 0xffdc;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -105,6 +114,37 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
         return true;
     }
+    case kOptionBLE:
+        if (!ParseInt(value, mConfig.bleController))
+        {
+            ChipLogError(Support, "Invalid BLE controller specified: %s", value);
+            return false;
+        }
+        return true;
+    case kOptionWiFi:
+        mConfig.enableWiFi = true;
+        ChipLogProgress(AppServer, "WiFi usage enabled");
+        return true;
+    case kOptionKVS:
+        mConfig.kvsPath = value;
+        return true;
+    case kOptionDiscriminator: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        if (*endptr != '\0' || val > 0xFFF)
+        {
+            ChipLogError(Support, "Invalid discriminator: %s", value);
+            return false;
+        }
+        mConfig.discriminator = static_cast<uint16_t>(val);
+        return true;
+    }
+    case kOptionVendorId:
+        mConfig.vendorId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
+    case kOptionProductId:
+        mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
+        return true;
     case kOptionPort: {
         char * endptr;
         unsigned long val = strtoul(value, &endptr, 0);
@@ -113,14 +153,24 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             ChipLogError(Support, "Invalid port: %s", value);
             return false;
         }
-        mConfig.port                                        = static_cast<uint16_t>(val);
-        LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(val);
+        mConfig.port = static_cast<uint16_t>(val);
         ChipLogProgress(AppServer, "Port option set to %u", static_cast<uint16_t>(val));
         return true;
     }
+    case kOptionInterfaceId:
+        mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
+        return true;
     case kOptionGroupcast:
         mConfig.enableGroupcast = true;
         ChipLogProgress(AppServer, "Groupcast usage enabled");
+        return true;
+    case kOptionAppPipe:
+        mConfig.appPipePath = value;
+        ChipLogProgress(AppServer, "App pipe path set to %s", value);
+        return true;
+    case kOptionTraceTo:
+        mConfig.traceTo.push_back(value);
+        ChipLogProgress(AppServer, "Added trace destination: %s", value);
         return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
@@ -134,8 +184,21 @@ OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        { "ble-controller", kArgumentRequired, kOptionBLE },
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        { "wifi", kNoArgument, kOptionWiFi },
+#endif
+        { "KVS", kArgumentRequired, kOptionKVS },
+        { "discriminator", kArgumentRequired, kOptionDiscriminator },
+        { "vendor-id", kArgumentRequired, kOptionVendorId },
+        { "product-id", kArgumentRequired, kOptionProductId },
         { "port", kArgumentRequired, kOptionPort },
+        { "interface-id", kArgumentRequired, kOptionInterfaceId },
         { "groupcast", kNoArgument, kOptionGroupcast },
+        { "app-pipe", kArgumentRequired, kOptionAppPipe },
+        { "trace-to", kArgumentRequired, kOptionTraceTo },
         {}, // need empty terminator
     };
 
@@ -157,8 +220,42 @@ OptionSet * AppOptions::GetOptions()
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
         result += "       Example: --device aggregator:1 --device \"chime:2,parent=1,bridged\"\n\n";
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        result += "  --ble-controller <number>\n";
+        result += "       Select the BLE controller to use (default: 0)\n\n";
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        result += "  --wifi\n";
+        result += "       Enable wifi support for commissioning\n\n";
+#endif
+
+        result += "  --KVS <path>\n";
+        result += "       Path to the Key Value Store file (default: " CHIP_CONFIG_KVS_PATH ")\n\n";
+
+        result += "  --discriminator <number>\n";
+        result += "       Discriminator value for commissioning (default: 3840)\n\n";
+
+        result += "  --vendor-id <number>\n";
+        result += "       Vendor ID value for commissioning\n\n";
+
+        result += "  --product-id <number>\n";
+        result += "       Product ID value for commissioning\n\n";
+
         result += "  --port <number>\n";
         result += "       Listen port for secure device messages (default: 5540)\n\n";
+
+        result += "  --interface-id <number>\n";
+        result += "       Interface ID to use for multicast multicast DNS\n\n";
+
+        result += "  --groupcast\n";
+        result += "       Enable groupcast messaging support\n\n";
+
+        result += "  --app-pipe <path>\n";
+        result += "       Path to the named pipe for receiving runtime commands\n\n";
+
+        result += "  --trace-to <destination>\n";
+        result += "       Enable tracing destination (e.g., json:log, json:file_path)\n\n";
 
         return result;
     }();

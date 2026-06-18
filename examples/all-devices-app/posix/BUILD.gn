@@ -22,6 +22,7 @@ executable("all-devices-app") {
   defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
 
   sources = [
+    "AppCommandDelegate.cpp",
     "PosixBleRssiRangingAdapter.cpp",
     "PosixChimeDevice.cpp",
     "include/CHIPProjectAppConfig.h",
@@ -54,6 +55,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/platform/linux:app-main-loop",
     "${chip_root}/examples/platform/linux:commissionable-init",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
+    "${chip_root}/examples/platform/linux:named-pipes",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",

@@ -18,7 +18,6 @@
 
 #include <AppMainLoop.h>
 #include <AppRootNode.h>
-#include <CommissionableInit.h>
 #include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
@@ -49,7 +48,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
 
-#include <AppCommandDelegate.h>
+#include "include/AppCommandDelegate.h"
 #include <BleInit.h>
 #include <TermHandling.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
@@ -153,7 +152,7 @@ public:
             []() {
                 BitFlags<AppRootNode::EnabledFeatures> features;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-                features.Set(AppRootNode::EnabledFeatures::kWiFi, LinuxDeviceOptions::GetInstance().mWiFi);
+                features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::GetConfig().enableWiFi);
 #endif
                 return features;
             }())
@@ -197,7 +196,6 @@ public:
 private:
     Context mContext;
     chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
-
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
@@ -216,6 +214,10 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
         return;
     }
 
+    // TODO(#72638): The hardcoded type-casts to specific device implementations below prevent those
+    // classes from being selectively compiled out or stripped by LTO when they are disabled.
+    // A more generic and pluggable registration mechanism (e.g., via DeviceFactory or an interface)
+    // should be developed to allow true conditional compilation of devices.
     for (size_t i = 0; i < deviceConfigs.size(); i++)
     {
         const auto & config = deviceConfigs[i];
@@ -224,30 +226,28 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
         if (config.type == "occupancy-sensor")
         {
             auto * occupancyDevice = static_cast<OccupancySensorDevice *>(device);
-            gAllDevicesAppCommandDelegate.RegisterOccupancySensingCluster(config.endpoint,
-                                                                          &occupancyDevice->OccupancySensingCluster());
+            gAllDevicesAppCommandDelegate.RegisterOccupancySensingCluster(&occupancyDevice->OccupancySensingCluster());
         }
         else if (config.type == "contact-sensor" || config.type == "water-leak-detector")
         {
             auto * booleanStateDevice = static_cast<BooleanStateSensorDevice *>(device);
-            gAllDevicesAppCommandDelegate.RegisterBooleanStateCluster(config.endpoint, &booleanStateDevice->BooleanState());
+            gAllDevicesAppCommandDelegate.RegisterBooleanStateCluster(&booleanStateDevice->BooleanState());
         }
         else if (config.type == "on-off-light")
         {
             auto * lightDevice = static_cast<LoggingOnOffLightDevice *>(device);
-            gAllDevicesAppCommandDelegate.RegisterOnOffCluster(config.endpoint, &lightDevice->OnOffCluster());
+            gAllDevicesAppCommandDelegate.RegisterOnOffCluster(&lightDevice->OnOffCluster());
         }
     }
 
-    gAllDevicesAppCommandDelegate.RegisterBasicInformationCluster(kRootEndpointId,
-                                                                  &devices.RootNode().GetRootNodeDevice().BasicInformation());
+    gAllDevicesAppCommandDelegate.RegisterBasicInformationCluster(&devices.RootNode().GetRootNodeDevice().BasicInformation());
     gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
 
     CHIP_ERROR err = gNamedPipeCommands.Start(namedPipePath, &gAllDevicesAppCommandDelegate);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to start named pipe at %s: %" CHIP_ERROR_FORMAT, namedPipePath, err.Format());
-        (void) gNamedPipeCommands.Stop();
+        LogErrorOnFailure(gNamedPipeCommands.Stop());
     }
 }
 
@@ -328,57 +328,41 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(devices.Startup());
 
     // Set up named pipe command handlers against the registered devices.
-    const char * namedPipePath = LinuxDeviceOptions::GetInstance().app_pipe;
-    if ((namedPipePath != nullptr) && (strlen(namedPipePath) > 0))
+    const std::string & namedPipePath = AppOptions::GetConfig().appPipePath;
+    if (!namedPipePath.empty())
     {
-        SetupNamedPipe(devices, namedPipePath);
+        SetupNamedPipe(devices, namedPipePath.c_str());
     }
 
     initParams.dataModelProvider      = &devices.DataModelProvider();
     initParams.groupDataProvider      = &gGroupDataProvider;
-    initParams.operationalServicePort = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    initParams.operationalServicePort = AppOptions::GetConfig().port.value_or(CHIP_PORT);
     ChipLogProgress(AppServer, "Using operationalServicePort %u\n", initParams.operationalServicePort);
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-    initParams.interfaceId                   = LinuxDeviceOptions::GetInstance().interfaceId;
 
-#if defined(ENABLE_TRACING) && ENABLE_TRACING
-    chip::CommandLineApp::TracingSetup tracing_setup;
-    if (LinuxDeviceOptions::GetInstance().traceTo.empty())
+    if (AppOptions::GetConfig().interfaceId.has_value())
     {
-        tracing_setup.EnableTracingFor("json:log");
+        initParams.interfaceId =
+            Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(AppOptions::GetConfig().interfaceId.value()));
     }
     else
     {
-        for (const auto & trace_destination : LinuxDeviceOptions::GetInstance().traceTo)
-        {
-            tracing_setup.EnableTracingFor(trace_destination.c_str());
-        }
+        initParams.interfaceId = Inet::InterfaceId::Null();
+    }
+
+#if defined(ENABLE_TRACING) && ENABLE_TRACING
+    chip::CommandLineApp::TracingSetup tracing_setup;
+    for (const auto & trace_destination : AppOptions::GetConfig().traceTo)
+    {
+        tracing_setup.EnableTracingFor(trace_destination.c_str());
     }
 #endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-    if (LinuxDeviceOptions::GetInstance().traceStreamFilename.HasValue())
-    {
-        const char * traceFilename = LinuxDeviceOptions::GetInstance().traceStreamFilename.Value().c_str();
-        auto traceStream           = new chip::trace::TraceStreamFile(traceFilename);
-        chip::trace::AddTraceStream(traceStream);
-    }
-    else if (LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled)
-    {
-        auto traceStream = new chip::trace::TraceStreamLog();
-        chip::trace::AddTraceStream(traceStream);
-    }
-
-    if (LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled)
-    {
-        chip::trace::TraceDecoderOptions options;
-        options.mEnableProtocolInteractionModelResponse = false;
-
-        chip::trace::TraceDecoder * decoder = new chip::trace::TraceDecoder();
-        decoder->SetOptions(options);
-        chip::trace::AddTraceStream(decoder);
-    }
-    chip::trace::InitTrace();
+    // Note: Transport tracing options are currently not supported via the custom AppOptions parser.
+    // If transport tracing is required in the future, corresponding options should be added to AppOptions.
+    // See examples/platform/linux/Options.cpp and examples/platform/linux/AppMain.cpp for examples
+    // of how to parse transport tracing options from the command line.
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
     // Init ZCL Data Model and CHIP App Server
@@ -431,16 +415,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
-    (void) gNamedPipeCommands.Stop();
+    LogErrorOnFailure(gNamedPipeCommands.Stop());
     devices.Shutdown();
     Server::GetInstance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
 
 #if defined(ENABLE_TRACING) && ENABLE_TRACING
     tracing_setup.StopTracing();
-#endif
-#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-    chip::trace::DeInitTrace();
 #endif
 }
 
@@ -458,35 +439,53 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, const AppOptions::AppConfig & config)
+{
+    auto discriminator = config.discriminator.value_or(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR));
+
+    const auto setupPasscode             = MakeOptional(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
+    const uint32_t spake2pIterationCount = Crypto::kSpake2p_Min_PBKDF_Iterations;
+
+    Optional<std::vector<uint8_t>> serializedSpake2pVerifier = NullOptional;
+    Optional<std::vector<uint8_t>> spake2pSalt               = NullOptional;
+
+    return provider.Init(          //
+        serializedSpake2pVerifier, //
+        spake2pSalt,               //
+        spake2pIterationCount,     //
+        setupPasscode,             //
+        discriminator              //
+    );
+}
+
 CHIP_ERROR Initialize(int argc, char * argv[])
 {
     ChipLogProgress(AppServer, "Initializing...");
     ReturnErrorOnFailure(Platform::MemoryInit());
 
-    ReturnErrorOnFailure(ParseArguments(argc, argv, AppOptions::GetOptions()));
+    static HelpOptions sHelpOptions(argv[0], "Usage: all-devices-app [options]", "1.0");
+    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), &sHelpOptions, nullptr };
+    if (!ArgParser::ParseArgs(argv[0], argc, argv, sAppOptionSets))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
     const char * kvsPath =
-        LinuxDeviceOptions::GetInstance().KVS == nullptr ? CHIP_CONFIG_KVS_PATH : LinuxDeviceOptions::GetInstance().KVS;
+        AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    ReturnErrorOnFailure(
-        chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance()));
+    ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     static AllDevicesExampleDeviceInfoProviderImpl sExampleDeviceInfoProvider;
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    ReturnErrorOnFailure(chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
-                                                                  LinuxDeviceOptions::GetInstance()));
-
-    auto vendorId  = LinuxDeviceOptions::GetInstance().payload.vendorID != 0
-         ? std::make_optional(LinuxDeviceOptions::GetInstance().payload.vendorID)
-         : std::nullopt;
-    auto productId = LinuxDeviceOptions::GetInstance().payload.productID != 0
-        ? std::make_optional(LinuxDeviceOptions::GetInstance().payload.productID)
-        : std::nullopt;
+    const auto & config = AppOptions::GetConfig();
+    auto vendorId  = config.vendorId.has_value() ? config.vendorId : std::nullopt;
+    auto productId = config.productId.has_value() ? config.productId : std::nullopt;
     static AllDevicesExampleDeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(
         DeviceLayer::GetDeviceInstanceInfoProvider(), vendorId, productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
@@ -495,7 +494,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 
-    ReturnErrorOnFailure(chip::app::InitBle(LinuxDeviceOptions::GetInstance().mBleDevice));
+    ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));
 
     return CHIP_NO_ERROR;
 }

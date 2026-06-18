@@ -35,6 +35,17 @@ public:
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
         std::optional<uint16_t> port;
         bool enableGroupcast = false;
+        std::string appPipePath;
+        std::vector<std::string> traceTo;
+
+        // Restored original custom options
+        std::optional<uint16_t> discriminator;
+        std::optional<uint16_t> vendorId;
+        std::optional<uint16_t> productId;
+        std::optional<uint32_t> interfaceId;
+        std::string kvsPath;
+        bool enableWiFi = false;
+        int bleController = 0;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
