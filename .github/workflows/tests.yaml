@@ -125,6 +125,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-sensing-union-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/audio-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
