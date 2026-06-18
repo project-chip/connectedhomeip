@@ -74,6 +74,6 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
  * @return        A variant containing either a CHIP_ERROR on failure or the finalized ReadOnlyBuffer on success.
  */
 std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
-                                                                             const chip::TLV::TLVReader & attributeValueReader);
+                                                                           const chip::TLV::TLVReader & attributeValueReader);
 
 } // namespace chip::app::OOBDataSerializer
