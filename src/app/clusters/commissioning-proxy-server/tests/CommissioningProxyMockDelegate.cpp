@@ -34,15 +34,19 @@ CommissioningProxyMockDelegate::CommissioningProxyMockDelegate()  = default;
 CommissioningProxyMockDelegate::~CommissioningProxyMockDelegate() = default;
 
 Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyConnectRequest(
-    DataModel::Nullable<chip::ByteSpan> address, chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+    DataModel::Nullable<chip::ByteSpan> address, chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
     uint16_t discriminator, chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
-    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand, app::CommandHandler * commandObj,
+    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBand, app::CommandHandler * commandObj,
     const DataModel::InvokeRequest & request)
 {
     // Send the ProxyConnectResponse synchronously (mock simulates immediate success).
     CP::Commands::ProxyConnectResponse::Type response;
     response.sessionID = 1;
     commandObj->AddResponse(request.path, response);
+
+    // Mock simulates a successful connection; track it so GetActiveSessionCount()
+    // reflects the session for the cluster's MaxSessions and disconnect-state logic.
+    mActiveSessionCount++;
 
     // Transition cluster state to connected, as OnPafConnectSuccess would do in production.
     if (mServer != nullptr)
@@ -57,8 +61,8 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyConnect
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyScanRequest(CapabilitiesBitmap transport,
-                                                                                     WiFiBandBitmap wiFiBands,
+Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyScanRequest(chip::BitMask<CapabilitiesBitmap> transport,
+                                                                                     chip::BitMask<WiFiBandBitmap> wiFiBands,
                                                                                      app::CommandHandler * commandObj,
                                                                                      const DataModel::InvokeRequest & request)
 {
@@ -113,20 +117,26 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyMessage
 Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyDisconnectRequest(uint16_t sessionId,
                                                                                            chip::FabricIndex fabricIndex)
 {
+    // Mock simulates a successful disconnect; release one tracked session so the
+    // cluster's "disconnect only when no sessions remain" logic can be exercised.
+    if (mActiveSessionCount > 0)
+    {
+        mActiveSessionCount--;
+    }
     return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyBackgroundScanStartRequest(
-    CP::CapabilitiesBitmap transport, uint16_t timeout, CP::WiFiBandBitmap wiFiBands, chip::FabricIndex fabricIndex,
-    chip::NodeId nodeId, app::CommandHandler * commandObj, const DataModel::InvokeRequest & request)
+    chip::BitMask<CP::CapabilitiesBitmap> transport, uint16_t timeout, chip::BitMask<CP::WiFiBandBitmap> wiFiBands,
+    chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj, const DataModel::InvokeRequest & request)
 {
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyBackgroundScanStopRequest(CP::CapabilitiesBitmap transport,
-                                                                                                   CP::WiFiBandBitmap wiFiBands,
-                                                                                                   chip::FabricIndex fabricIndex,
-                                                                                                   chip::NodeId nodeId)
+Protocols::InteractionModel::Status
+CommissioningProxyMockDelegate::ProxyBackgroundScanStopRequest(chip::BitMask<CP::CapabilitiesBitmap> transport,
+                                                               chip::BitMask<CP::WiFiBandBitmap> wiFiBands,
+                                                               chip::FabricIndex fabricIndex, chip::NodeId nodeId)
 {
     return Protocols::InteractionModel::Status::Success;
 }

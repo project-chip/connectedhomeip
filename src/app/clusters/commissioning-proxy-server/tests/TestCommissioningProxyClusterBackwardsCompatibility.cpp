@@ -16,6 +16,27 @@
  *    limitations under the License.
  */
 
+// =============================================================================
+// Purpose of this separate suite (do not fold into TestCommissioningProxyCluster).
+//
+// This suite exists to exercise CodegenIntegration.cpp / the Instance wrapper,
+// which is the glue between the code-driven CommissioningProxyCluster and the
+// CodegenDataModelProvider registry. Verifying that glue requires linking
+// mock_model (which transitively pulls in mock_ember).
+//
+// The main TestCommissioningProxyCluster suite intentionally CANNOT link
+// mock_model: it is aggregated into the Zephyr monolithic test binary
+// (via src/BUILD.gn -> ":tests"), where mock_ember collides with real Ember and
+// produces duplicate-symbol linker errors. This suite is therefore built only as
+// a standalone host binary and is the ONLY place CodegenIntegration.cpp is
+// compiled and linked. Deleting it, or moving its coverage into the main suite,
+// would break the Zephyr build and drop all coverage of the Instance wrapper.
+//
+// The "BackwardsCompatibility" name follows the repo-wide convention for "the
+// host-only mock_model suite", even though CommissioningProxy is a new cluster
+// with no legacy Ember API to be compatible with.
+// =============================================================================
+
 #include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
 #include <app/clusters/commissioning-proxy-server/tests/CommissioningProxyMockDelegate.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>

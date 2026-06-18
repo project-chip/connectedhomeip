@@ -88,6 +88,13 @@ public:
         mDelegate.SetServer(this);
     }
 
+    ~CommissioningProxyCluster() override
+    {
+        // Clear the delegate's back-pointer so it never dangles if the delegate
+        // outlives this cluster (e.g. a delegate reused across unit-test cases).
+        mDelegate.SetServer(nullptr);
+    }
+
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
     const BitFlags<CommissioningProxy::Feature> & Features() const { return mFeatureFlags; }
     CommissioningProxy::Delegate & GetDelegate() { return mDelegate; }

@@ -49,8 +49,8 @@ constexpr bool HasExactlyOneBitSet(T v)
 
 // Masks of all spec-defined bits for each bitmap type.
 // Any bit outside these masks is a reserved bit and SHALL be rejected with InvalidCommand.
-constexpr uint8_t kValidTransportBits =
-    static_cast<uint8_t>(CapabilitiesBitmap::kBle) | static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF);
+constexpr uint8_t kValidTransportBits = static_cast<uint8_t>(CapabilitiesBitmap::kBle) |
+    static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF) | static_cast<uint8_t>(CapabilitiesBitmap::kNtl);
 constexpr uint16_t kValidWiFiBandBits = static_cast<uint16_t>(WiFiBandBitmap::k2g4) | static_cast<uint16_t>(WiFiBandBitmap::k5g);
 
 CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
@@ -67,7 +67,9 @@ CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                         AttributeValueDecoder & decoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    // These attributes are stored by the delegate but reporting is the cluster's
+    // responsibility. Snapshot the value across the delegate write and only emit a
+    // change report when the stored value actually changes, to avoid redundant reports.
     switch (request.path.mAttributeId)
     {
     case ScanMaxTime::Id: {
@@ -75,6 +77,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
         ReturnErrorOnFailure(decoder.Decode(time));
         // Spec: ScanMaxTime has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(time >= 1, Status::ConstraintError);
+        // No change → no write, no report.
+        VerifyOrReturnValue(time != mDelegate.GetScanMaxTime(), Status::Success);
         mDelegate.SetScanMaxTime(time);
         break;
     }
@@ -83,6 +87,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
         ReturnErrorOnFailure(decoder.Decode(cacheTimeout));
         // Spec: CacheTimeout has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(cacheTimeout >= 1, Status::ConstraintError);
+        // No change → no write, no report.
+        VerifyOrReturnValue(cacheTimeout != mDelegate.GetCacheTimeout(), Status::Success);
         mDelegate.SetCacheTimeout(cacheTimeout);
         break;
     }
@@ -90,7 +96,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
 
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, err);
+    NotifyAttributeChanged(request.path.mAttributeId);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -232,8 +239,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
     }
 
     // WiFiBand is only valid when the WI feature is enabled per spec
-    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand =
-        static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
+    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBand;
 
     if (commandData.wiFiBand.HasValue())
     {
@@ -250,7 +256,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
             return Status::InvalidTransportType;
         }
 
-        wiFiBand = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(commandData.wiFiBand.Value().Raw());
+        wiFiBand = commandData.wiFiBand.Value();
     }
 
     // Spec "If MaxSessions are in use, a RESOURCE_EXHAUSTED status
@@ -296,11 +302,16 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
     auto delegateStatus = mDelegate.ProxyDisconnectRequest(commandData.sessionID.Value(), request.subjectDescriptor.fabricIndex);
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
 
-    // Transition cluster state back to disconnected now that the session is gone.
-    CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
-    if (stateErr != CHIP_NO_ERROR)
+    // With MaxSessions > 1 several sessions may be open at once. Only transition
+    // the cluster back to disconnected once the last session is gone; otherwise the
+    // proxy would incorrectly report disconnected while other sessions are active.
+    if (mDelegate.GetActiveSessionCount() == 0)
     {
-        ChipLogError(Zcl, "HandleProxyDisconnectRequest: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
+        CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
+        if (stateErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProxyDisconnectRequest: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
+        }
     }
 
     return Status::Success;
@@ -330,8 +341,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(
         }
     }
 
-    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands =
-        static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
+    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands;
     if (commandData.wiFiBands.HasValue())
     {
         // WiFiBands field is only valid when the WI feature is enabled.
@@ -348,7 +358,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(
             return Status::InvalidTransportType;
         }
 
-        wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
+        wiFiBands = commandData.wiFiBands.Value();
     }
 
     ReturnErrorOnFailure(
@@ -382,7 +392,7 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
         }
     }
 
-    WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(0);
+    chip::BitMask<WiFiBandBitmap> wiFiBands;
     if (commandData.wiFiBands.HasValue())
     {
         // WiFiBands field is only valid when the WI feature is enabled.
@@ -399,7 +409,7 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
             return Status::InvalidTransportType;
         }
 
-        wiFiBands = static_cast<WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
+        wiFiBands = commandData.wiFiBands.Value();
     }
 
     chip::FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
@@ -436,7 +446,7 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel:
         }
     }
 
-    WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(0);
+    chip::BitMask<WiFiBandBitmap> wiFiBands;
     if (commandData.wiFiBands.HasValue())
     {
         // WiFiBands field is only valid when the WI feature is enabled.
@@ -445,7 +455,7 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel:
         // Reserved bits must be clear.
         VerifyOrReturnError((commandData.wiFiBands.Value().Raw() & ~kValidWiFiBandBits) == 0, Status::InvalidCommand);
 
-        wiFiBands = static_cast<WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
+        wiFiBands = commandData.wiFiBands.Value();
     }
 
     chip::FabricIndex fabricIndex = request.subjectDescriptor.fabricIndex;
