@@ -77,8 +77,8 @@ public:
      */
     virtual Protocols::InteractionModel::Status
     ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
-                        chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport, uint16_t discriminator,
-                        chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
+                        chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                        uint16_t discriminator, chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
                         chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBand,
                         app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) = 0;
 
@@ -158,12 +158,10 @@ public:
      * @param request       Invoke path.
      * @return Success, Busy (another caller's scan is running), or InvalidCommand.
      */
-    virtual Protocols::InteractionModel::Status
-    ProxyBackgroundScanStartRequest(chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
-                                    uint16_t timeout,
-                                    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands,
-                                    chip::FabricIndex fabricIndex, chip::NodeId nodeId, app::CommandHandler * commandObj,
-                                    const DataModel::InvokeRequest & request) = 0;
+    virtual Protocols::InteractionModel::Status ProxyBackgroundScanStartRequest(
+        chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport, uint16_t timeout,
+        chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBands, chip::FabricIndex fabricIndex,
+        chip::NodeId nodeId, app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) = 0;
 
     /**
      * @brief Stop the background scan started by ProxyBackgroundScanStartRequest.
