@@ -151,13 +151,17 @@ object ChipClient {
           object : GetConnectedDeviceCallback {
             override fun onDeviceConnected(devicePointer: Long) {
               Log.d(TAG, "Got connected device pointer")
-              continuation.resume(devicePointer)
+              if (continuation.isActive) {
+                continuation.resume(devicePointer)
+              }
             }
 
             override fun onConnectionFailure(nodeId: Long, error: Exception) {
               val errorMessage = "Unable to get connected device with nodeId $nodeId"
               Log.e(TAG, errorMessage, error)
-              continuation.resumeWithException(IllegalStateException(errorMessage))
+              if (continuation.isActive) {
+                continuation.resumeWithException(IllegalStateException(errorMessage))
+              }
             }
           }
         )
