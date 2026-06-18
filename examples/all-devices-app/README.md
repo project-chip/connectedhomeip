@@ -84,9 +84,11 @@ The application supports the following device types (specified via the
 -   `on-off-light`
 -   `on-off-light-switch`
 -   `on-off-plug-in-unit`
+-   `oven`
 -   `power-source`
 -   `pressure-sensor`
 -   `rain-sensor`
+-   `refrigerator`
 -   `soil-sensor`
 -   `speaker`
 -   `water-freeze-detector`
@@ -102,7 +104,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <air-purifier|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|mounted-dimmable-load-control|mounted-on-off-control|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|power-source|pressure-sensor|rain-sensor|soil-sensor|speaker|water-freeze-detector|water-leak-detector|water-valve>
+  --device <air-purifier|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|mounted-dimmable-load-control|mounted-on-off-control|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|rain-sensor|refrigerator|soil-sensor|speaker|water-freeze-detector|water-leak-detector|water-valve>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1

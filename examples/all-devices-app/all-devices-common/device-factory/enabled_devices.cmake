@@ -67,6 +67,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light-switch/OnOffLightSwitchDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/oven/OvenDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/BatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/impl/DecreasingBatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/PressureSensorDevice.cpp"
@@ -75,12 +76,14 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/BleRssiRangingAdapter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/refrigerator/RefrigeratorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/water-valve/WaterValveDevice.cpp"
@@ -147,10 +150,12 @@ foreach(_key
         on-off-light
         on-off-light-switch
         on-off-plug-in-unit
+        oven
         power-source
         pressure-sensor
         proximity-ranger
         rain-sensor
+        refrigerator
         smoke-co-alarm
         soil-sensor
         speaker

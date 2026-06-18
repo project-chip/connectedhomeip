@@ -42,9 +42,11 @@
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/on-off-light-switch/OnOffLightSwitchDevice.h>
 #include <devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.h>
+#include <devices/oven/OvenDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/refrigerator/RefrigeratorDevice.h>
 #include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
@@ -330,6 +332,20 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<LoggingSpeakerDevice>(
                     LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_OVEN)
+        {
+            RegisterCreator("oven", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<OvenDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_REFRIGERATOR)
+        {
+            RegisterCreator("refrigerator", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<RefrigeratorDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)

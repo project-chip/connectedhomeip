@@ -135,6 +135,10 @@ _available_devices = [
     "ON_OFF_PLUG_IN_UNIT",
   ],
   [
+    "oven",
+    "OVEN",
+  ],
+  [
     "power-source",
     "POWER_SOURCE",
   ],
@@ -149,6 +153,10 @@ _available_devices = [
   [
     "rain-sensor",
     "RAIN_SENSOR",
+  ],
+  [
+    "refrigerator",
+    "REFRIGERATOR",
   ],
   [
     "smoke-co-alarm",

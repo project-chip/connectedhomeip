@@ -176,7 +176,7 @@ To update or validate this list manually, follow these steps:
 | 130       | TLS Client Management                                      | 2050 (0x0802) | Yes                | No                  |                                       |
 | 131       | Target Navigator                                           | 1285 (0x0505) | No                 | No                  |                                       |
 | 132       | Temperature Alarm                                          | 100 (0x0064)  | No                 | No                  |                                       |
-| 133       | Temperature Control                                        | 86 (0x0056)   | Yes                | No                  |                                       |
+| 133       | Temperature Control                                        | 86 (0x0056)   | Yes                | Yes                 |                                       |
 | 134       | Temperature Controlled Cabinet Topology                    | 75 (0x004B)   | No                 | No                  |                                       |
 | 135       | Temperature Measurement                                    | 1026 (0x0402) | Yes                | Yes                 |                                       |
 | 136       | Thermostat                                                 | 513 (0x0201)  | No                 | No                  |                                       |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **86**             | **47**              |                                       |
+| **Total** | **159**                                                    |               | **86**             | **50**              |                                       |
