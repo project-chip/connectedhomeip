@@ -46,6 +46,8 @@ public:
      * ├── Context Tag 3: AttributeId (uint32_t)
      * └── Context Tag 4: Raw, unwrapped Attribute Value.
      *
+     * Note that the order of elements in the TLV MUST be kept as shown above.
+     *
      * To use this parser:
      * @code
         OOBAccessor::SetAttributeRequestParser parser;
