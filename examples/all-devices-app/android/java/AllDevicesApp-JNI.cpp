@@ -105,20 +105,11 @@ JNI_METHOD(jobjectArray, getSupportedDeviceTypes)(JNIEnv * env, jobject self)
     return array;
 }
 
-JNI_METHOD(jboolean, startApp)(JNIEnv * env, jobject self, jobjectArray selectedDevices)
+JNI_METHOD(jboolean, startApp)(JNIEnv * env, jobject self, jstring configurationJson)
 {
-    chip::DeviceLayer::StackLock lock;
+    JniUtfString utfStr(env, configurationJson);
 
-    std::vector<std::string> devices;
-    jsize len = env->GetArrayLength(selectedDevices);
-    for (jsize i = 0; i < len; i++)
-    {
-        jstring jstr = (jstring) env->GetObjectArrayElement(selectedDevices, i);
-        JniUtfString utfStr(env, jstr);
-        devices.push_back(utfStr.c_str());
-    }
-
-    CHIP_ERROR err = AllDevicesAppStart(devices);
+    CHIP_ERROR err = AllDevicesAppStart(utfStr.c_str());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to start AllDevicesApp: %" CHIP_ERROR_FORMAT, err.Format());
@@ -147,6 +138,8 @@ JNI_METHOD(void, resetApp)(JNIEnv * env, jobject self)
 
 JNI_METHOD(jobjectArray, getOnboardingCodes)(JNIEnv * env, jobject self, jint discriminator)
 {
+    chip::DeviceLayer::StackLock lock;
+
     chip::SetupPayload payload;
     payload.version = 0;
     payload.rendezvousInformation.SetValue(chip::RendezvousInformationFlag::kOnNetwork);

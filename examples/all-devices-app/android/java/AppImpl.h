@@ -23,5 +23,5 @@
 #include <vector>
 
 CHIP_ERROR AllDevicesAppInit(int discriminator);
-CHIP_ERROR AllDevicesAppStart(const std::vector<std::string> & selectedDevices);
+CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson);
 void AllDevicesAppShutdown();

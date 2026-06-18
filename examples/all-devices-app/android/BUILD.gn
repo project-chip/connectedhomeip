@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("//build_overrides/jsoncpp.gni")
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
@@ -35,6 +36,7 @@ shared_library("jni") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
+    jsoncpp_root,
   ]
 
   cflags = [ "-Wconversion" ]

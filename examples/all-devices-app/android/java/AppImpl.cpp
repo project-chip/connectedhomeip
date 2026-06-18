@@ -32,6 +32,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
+#include <json/json.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -62,7 +63,7 @@ CHIP_ERROR AllDevicesAppInit(int discriminator)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AllDevicesAppStart(const std::vector<std::string> & selectedDevices)
+CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
 {
     chip::DeviceLayer::StackLock lock;
 
@@ -127,21 +128,74 @@ CHIP_ERROR AllDevicesAppStart(const std::vector<std::string> & selectedDevices)
 
     ReturnErrorOnFailure(gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId));
 
-    // Register chosen devices on consecutive endpoints
-    EndpointId nextEndpointId = 1;
-    for (const auto & deviceType : selectedDevices)
+    // Parse the data model configuration from JSON
+    Json::Value root;
+    Json::Reader reader;
+    if (!reader.parse(configurationJson, root))
     {
-        auto device = DeviceFactory::GetInstance().Create(deviceType);
-        if (device == nullptr)
-        {
-            ChipLogError(AppServer, "Failed to create device of type: %s", deviceType.c_str());
-            continue;
-        }
+        ChipLogError(AppServer, "Failed to parse configuration JSON: %s", reader.getFormattedErrorMessages().c_str());
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
-        ChipLogProgress(AppServer, "Registering device %s on endpoint %u", deviceType.c_str(), nextEndpointId);
-        ReturnErrorOnFailure(device->Register(nextEndpointId, dataModelProvider, kInvalidEndpointId));
-        gConstructedDevices.push_back(std::move(device));
-        nextEndpointId++;
+    if (root.isArray())
+    {
+        for (unsigned int i = 0; i < root.size(); i++)
+        {
+            Json::Value item = root[i];
+            std::string deviceType = item.get("deviceType", "").asString();
+            int endpointId = item.get("endpointId", 0).asInt();
+            int parentId = item.get("parentId", 0).asInt();
+            std::string nodeLabel = item.get("nodeLabel", "").asString();
+            bool bridged = item.get("bridged", false).asBool();
+
+            if (deviceType.empty() || endpointId <= 0)
+            {
+                ChipLogError(AppServer, "Invalid device entry at index %u", i);
+                continue;
+            }
+
+            EndpointId parentEndpoint = (parentId > 0) ? static_cast<EndpointId>(parentId) : kInvalidEndpointId;
+
+            if (bridged && deviceType != "bridged-node")
+            {
+                // Create intermediate bridged-node parent
+                auto bridgedNode = DeviceFactory::GetInstance().Create("bridged-node", nodeLabel.empty() ? deviceType : nodeLabel);
+                if (bridgedNode == nullptr)
+                {
+                    ChipLogError(AppServer, "Failed to create bridged-node for device: %s", deviceType.c_str());
+                    continue;
+                }
+
+                ChipLogProgress(AppServer, "Registering intermediate bridged-node on endpoint %u (parent: %d)", endpointId, parentId);
+                ReturnErrorOnFailure(bridgedNode->Register(static_cast<EndpointId>(endpointId), dataModelProvider, parentEndpoint));
+                gConstructedDevices.push_back(std::move(bridgedNode));
+
+                // Create leaf device parented to the bridged-node endpoint
+                auto leafDevice = DeviceFactory::GetInstance().Create(deviceType, "");
+                if (leafDevice == nullptr)
+                {
+                    ChipLogError(AppServer, "Failed to create leaf device of type: %s", deviceType.c_str());
+                    continue;
+                }
+
+                ChipLogProgress(AppServer, "Registering bridged leaf device %s on endpoint %u (parent: %u)", deviceType.c_str(), endpointId + 1, endpointId);
+                ReturnErrorOnFailure(leafDevice->Register(static_cast<EndpointId>(endpointId + 1), dataModelProvider, static_cast<EndpointId>(endpointId)));
+                gConstructedDevices.push_back(std::move(leafDevice));
+            }
+            else
+            {
+                auto device = DeviceFactory::GetInstance().Create(deviceType, nodeLabel);
+                if (device == nullptr)
+                {
+                    ChipLogError(AppServer, "Failed to create device of type: %s", deviceType.c_str());
+                    continue;
+                }
+
+                ChipLogProgress(AppServer, "Registering device %s on endpoint %u (parent: %d)", deviceType.c_str(), endpointId, parentId);
+                ReturnErrorOnFailure(device->Register(static_cast<EndpointId>(endpointId), dataModelProvider, parentEndpoint));
+                gConstructedDevices.push_back(std::move(device));
+            }
+        }
     }
 
     initParams.dataModelProvider = gDataModelProvider;

@@ -28,7 +28,7 @@ public class App {
 
   public native String[] getSupportedDeviceTypes();
 
-  public native boolean startApp(String[] selectedDevices);
+  public native boolean startApp(String configurationJson);
 
   public native String[] getOnboardingCodes(int discriminator);
 
