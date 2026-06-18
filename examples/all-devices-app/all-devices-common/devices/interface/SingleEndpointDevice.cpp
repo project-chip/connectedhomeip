@@ -32,6 +32,7 @@ CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint,
 void SingleEndpointDevice::SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider)
 {
     ShutdownEndpointRegistration(mEndpointId, provider);
+    mEndpointId = kInvalidEndpointId;
 }
 
 } // namespace chip::app

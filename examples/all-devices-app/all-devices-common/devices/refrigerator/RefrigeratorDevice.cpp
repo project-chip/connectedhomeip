@@ -50,6 +50,7 @@ void RefrigeratorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mCabinet.Unregister(provider);
     ShutdownEndpointRegistration(mEndpointId, provider);
+    mEndpointId = kInvalidEndpointId;
 }
 
 } // namespace chip::app

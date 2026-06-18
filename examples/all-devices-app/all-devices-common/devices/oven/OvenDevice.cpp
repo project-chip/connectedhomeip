@@ -52,6 +52,7 @@ void OvenDevice::Unregister(CodeDrivenDataModelProvider & provider)
     mSurface.Unregister(provider);
     mCavity.Unregister(provider);
     ShutdownEndpointRegistration(mEndpointId, provider);
+    mEndpointId = kInvalidEndpointId;
 }
 
 } // namespace chip::app

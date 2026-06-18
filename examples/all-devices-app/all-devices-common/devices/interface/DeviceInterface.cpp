@@ -41,7 +41,12 @@ CHIP_ERROR DeviceInterface::InitEndpointRegistration(EndpointId endpoint, CodeDr
     // TODO: This needs to be updated to be more customizable and allow the cluster to be created with
     //  optional attributes or semantic tags being set.
     mDescriptorCluster.Create(endpoint, DescriptorCluster::OptionalAttributesSet(0), composition.tagList);
-    ReturnErrorOnFailure(provider.AddCluster(mDescriptorCluster.Registration()));
+    CHIP_ERROR err = provider.AddCluster(mDescriptorCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        mDescriptorCluster.Destroy();
+        return err;
+    }
 
     mEndpointRegistration.endpointEntry = DataModel::EndpointEntry{
         .id                 = endpoint,

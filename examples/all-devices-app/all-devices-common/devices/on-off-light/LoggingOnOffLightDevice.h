@@ -43,6 +43,8 @@ public:
     {}
     ~LoggingOnOffLightDevice() override = default;
 
+    Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
+
 protected:
     LoggingOnOffLightDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context) :
         SingleEndpointDevice(deviceTypes), mContext(context)
@@ -51,8 +53,6 @@ protected:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-    Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
 
 private:
     class OnOffDelegate : public Clusters::OnOffDelegate

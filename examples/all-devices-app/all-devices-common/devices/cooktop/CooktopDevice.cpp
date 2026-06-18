@@ -65,6 +65,7 @@ void CooktopDevice::Unregister(CodeDrivenDataModelProvider & provider)
     mSurface1.Unregister(provider);
 
     ShutdownEndpointRegistration(mEndpointId, provider);
+    mEndpointId = kInvalidEndpointId;
 }
 
 } // namespace chip::app
