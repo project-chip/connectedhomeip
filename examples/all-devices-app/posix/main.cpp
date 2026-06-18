@@ -21,6 +21,10 @@
 #include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include <TraceDecoder.h>
+#include <TraceHandlers.h>
+#endif
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -42,11 +46,15 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
-#include <string>
 #include <system/SystemLayer.h>
 
+#include <AppCommandDelegate.h>
 #include <BleInit.h>
 #include <TermHandling.h>
+#include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
+#include <devices/interface/SingleEndpointDevice.h>
+#include <devices/occupancy-sensor/OccupancySensorDevice.h>
+#include <devices/on-off-light/LoggingOnOffLightDevice.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -64,6 +72,9 @@ DefaultTimerDelegate gTimerDelegate;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
+
+AllDevicesAppCommandDelegate gAllDevicesAppCommandDelegate;
+NamedPipeCommands gNamedPipeCommands;
 
 void StopSignalHandler(int /* signal */)
 {
@@ -178,15 +189,68 @@ public:
 
     chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
 
+    AppRootNode & RootNode() { return mRootNode; }
+
+    const std::vector<std::unique_ptr<DeviceInterface>> & GetConstructedDevices() const { return mConstructedDevices; }
+
 private:
     Context mContext;
     chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
-
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
 };
+
+void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipePath)
+{
+    auto deviceConfigs              = AppOptions::GetDeviceTypeEntries();
+    const auto & constructedDevices = devices.GetConstructedDevices();
+
+    // Calling code already checked that deviceConfigs.size() == constructedDevices.size().
+    VerifyOrDie(deviceConfigs.size() == constructedDevices.size());
+
+    // TODO(#72638): The hardcoded type references to specific device implementations below prevent those
+    // classes from being selectively compiled out or stripped by LTO when they are disabled.
+    // A more generic and pluggable registration mechanism (e.g., via DeviceFactory or an interface)
+    // should be developed to allow true conditional compilation of devices.
+    for (size_t i = 0; i < deviceConfigs.size(); i++)
+    {
+        const auto & config = deviceConfigs[i];
+        auto * device       = constructedDevices[i].get();
+
+        if (config.type == "occupancy-sensor")
+        {
+            auto * occupancyDevice = static_cast<OccupancySensorDevice *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::OccupancySensingCluster>(&occupancyDevice->OccupancySensingCluster());
+        }
+        else if (config.type == "contact-sensor" || config.type == "water-leak-detector")
+        {
+            auto * booleanStateDevice = static_cast<BooleanStateSensorDevice *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::BooleanStateCluster>(&booleanStateDevice->BooleanState());
+        }
+        else if (config.type == "on-off-light")
+        {
+            auto * lightDevice = static_cast<LoggingOnOffLightDevice *>(device);
+            gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+                .RegisterClusterInstance<chip::app::Clusters::OnOffCluster>(&lightDevice->OnOffCluster());
+        }
+    }
+
+    gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
+        .RegisterClusterInstance<chip::app::Clusters::BasicInformationCluster>(
+            &devices.RootNode().GetRootNodeDevice().BasicInformation());
+    gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
+
+    CHIP_ERROR err = gNamedPipeCommands.Start(namedPipePath, &gAllDevicesAppCommandDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to start named pipe at %s: %" CHIP_ERROR_FORMAT, namedPipePath, err.Format());
+        LogErrorOnFailure(gNamedPipeCommands.Stop());
+    }
+}
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
@@ -264,6 +328,19 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SuccessOrDie(devices.Startup());
 
+    if (AppOptions::GetDeviceTypeEntries().size() != devices.GetConstructedDevices().size())
+    {
+        ChipLogError(AppServer, "Failed to initialize some of the --device entries on command line. Cannot proceed.");
+        chipDie();
+    }
+
+    // Set up named pipe command handlers against the registered devices.
+    const std::string & namedPipePath = AppOptions::GetConfig().appPipePath;
+    if (!namedPipePath.empty())
+    {
+        SetupNamedPipe(devices, namedPipePath.c_str());
+    }
+
     initParams.dataModelProvider      = &devices.DataModelProvider();
     initParams.groupDataProvider      = &gGroupDataProvider;
     initParams.operationalServicePort = AppOptions::GetConfig().port.value_or(CHIP_PORT);
@@ -280,8 +357,20 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         initParams.interfaceId = Inet::InterfaceId::Null();
     }
 
+#if defined(ENABLE_TRACING) && ENABLE_TRACING
     chip::CommandLineApp::TracingSetup tracing_setup;
-    tracing_setup.EnableTracingFor("json:log");
+    for (const auto & trace_destination : AppOptions::GetConfig().traceTo)
+    {
+        tracing_setup.EnableTracingFor(trace_destination.c_str());
+    }
+#endif
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    // Note: Transport tracing options are currently not supported via the custom AppOptions parser.
+    // If transport tracing is required in the future, corresponding options should be added to AppOptions.
+    // See examples/platform/linux/Options.cpp and examples/platform/linux/AppMain.cpp for examples
+    // of how to parse transport tracing options from the command line.
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
@@ -333,10 +422,14 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
+    LogErrorOnFailure(gNamedPipeCommands.Stop());
     devices.Shutdown();
     Server::GetInstance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
+
+#if defined(ENABLE_TRACING) && ENABLE_TRACING
     tracing_setup.StopTracing();
+#endif
 }
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -397,8 +490,10 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
     const auto & config = AppOptions::GetConfig();
+    auto vendorId       = config.vendorId.has_value() ? config.vendorId : std::nullopt;
+    auto productId      = config.productId.has_value() ? config.productId : std::nullopt;
     static AllDevicesExampleDeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(
-        DeviceLayer::GetDeviceInstanceInfoProvider(), config.vendorId, config.productId);
+        DeviceLayer::GetDeviceInstanceInfoProvider(), vendorId, productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();
