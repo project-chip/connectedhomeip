@@ -23,6 +23,7 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <devices/endpoint-allocator/EndpointIdAllocator.h>
+#include <lib/support/Span.h>
 
 namespace chip::app {
 

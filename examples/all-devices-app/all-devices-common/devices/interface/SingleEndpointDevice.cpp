@@ -24,6 +24,7 @@ namespace chip::app {
 CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                             EndpointComposition composition)
 {
+    VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
     return InitEndpointRegistration(endpoint, provider, composition);
