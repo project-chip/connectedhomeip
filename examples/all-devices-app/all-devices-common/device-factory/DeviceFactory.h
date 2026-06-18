@@ -26,20 +26,25 @@
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
+#include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
+#include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
+#include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
+#include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
-#include <functional>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <map>
 #include <platform/DefaultTimerDelegate.h>
+
+#include <functional>
+#include <map>
 
 namespace chip::app {
 
@@ -54,7 +59,7 @@ namespace chip::app {
 class DeviceFactory
 {
 public:
-    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
+    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
 
     struct Context
     {
@@ -81,15 +86,25 @@ public:
         mRegistry[deviceTypeArg] = std::move(creator);
     }
 
+    /**
+     * Convenience overload to support making the label optional for creator registrations
+     * that do not care about the label (i.e. most cases).
+     */
+    void RegisterCreator(const std::string & deviceTypeArg, std::function<std::unique_ptr<DeviceInterface>()> && creator)
+    {
+        RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
+    }
+
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 
     bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 
-    std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg)
+    std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg, const std::string & nodeLabel = "")
     {
-        if (IsValidDevice(deviceTypeArg))
+        auto it = mRegistry.find(deviceTypeArg);
+        if (it != mRegistry.end())
         {
-            return mRegistry.find(deviceTypeArg)->second();
+            return it->second(nodeLabel);
         }
         ChipLogError(
             Support,
@@ -149,13 +164,13 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
         {
-            RegisterCreator("bridged-node", [this]() {
+            RegisterCreator("bridged-node", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 static int sBridgedNodeCount = 0;
                 sBridgedNodeCount++;
+                std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
                 return std::make_unique<BridgedNodeDevice>(mContext->timerDelegate,
-                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount),
-                                                           "Bridged Node " + std::to_string(sBridgedNodeCount));
+                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
@@ -282,6 +297,51 @@ private:
                         .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                         .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
                     });
+            });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_RAIN_SENSOR)
+        {
+            RegisterCreator("rain-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<BooleanStateSensorDevice>(
+                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)
+        {
+            RegisterCreator("water-freeze-detector", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<BooleanStateSensorDevice>(
+                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
+        {
+            RegisterCreator("humidity-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingHumiditySensorDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
+        {
+            RegisterCreator("light-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingLightSensorDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
+        {
+            RegisterCreator("pressure-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingPressureSensorDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
+        {
+            RegisterCreator("flow-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingFlowSensorDevice>(mContext->timerDelegate);
             });
         }
 

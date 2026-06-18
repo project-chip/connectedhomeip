@@ -154,7 +154,8 @@ public:
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
-            auto device = DeviceFactory::GetInstance().Create(entry.type);
+            auto device = DeviceFactory::GetInstance().Create(entry.type, entry.label);
+
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
