@@ -186,7 +186,9 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #endif
 
     VerifyOrReturnError(sRootNodeDevice != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(sRootNodeDevice->Register(kRootEndpointId, *sDataModelProvider, chip::kInvalidEndpointId));
+
+    chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    ReturnErrorOnFailure(sRootNodeDevice->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
         .groupDataProvider = *groupDataProvider,

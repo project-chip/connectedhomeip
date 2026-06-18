@@ -126,7 +126,8 @@ CHIP_ERROR CreateAndRegisterRootNode(CommonCaseDeviceServerInitParams & initPara
 
     VerifyOrReturnError(gRootNodeDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    return gRootNodeDevice->Register(kRootEndpointId, *gDataModelProvider, kInvalidEndpointId);
+    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    return gRootNodeDevice->Register(rootAllocator, *gDataModelProvider);
 }
 
 CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams & initParams)

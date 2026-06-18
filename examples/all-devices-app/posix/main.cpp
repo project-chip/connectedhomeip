@@ -42,6 +42,7 @@
 #include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <devices/endpoint-allocator/DynamicEndpointIdAllocator.h>
+#include <devices/endpoint-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -162,7 +163,9 @@ public:
     CHIP_ERROR Startup()
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
-        ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
+
+        ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(rootAllocator, mDataModelProvider));
 
         std::set<EndpointId> reservedIds;
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
