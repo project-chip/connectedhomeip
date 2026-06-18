@@ -18,7 +18,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/service-area-cluster-objects.h"
     "${CLUSTER_DIR}/service-area-delegate.h"
-    "${CLUSTER_DIR}/service-area-server.cpp"
+    "${CLUSTER_DIR}/ServiceAreaCluster.cpp"
     "${CLUSTER_DIR}/service-area-server.h"
     "${CLUSTER_DIR}/service-area-storage-delegate.cpp"
     "${CLUSTER_DIR}/service-area-storage-delegate.h"
