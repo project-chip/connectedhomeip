@@ -89,7 +89,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
             TestStep("2b", "If Positioning feature is not supported OR Access feature is supported, skip remaining steps"),
             TestStep("2c", "Read StepValue attribute"),
             TestStep("2d", "If Limitation feature is supported, read LimitRange attribute"),
-            TestStep("2e", "Establish wilcard subscription to all attributes"),
+            TestStep("2e", "Establish wildcard subscription to all attributes"),
             TestStep("2f", "Read CurrentState attribute"),
             TestStep("2g", "If Latching feature not supported or state is unlatched, skip steps 2h to 2m"),
             TestStep("2h", "Read LatchControlModes attribute"),
@@ -99,7 +99,7 @@ class TC_CLDIM_6_1(MatterBaseTest):
             TestStep("2l", "Manually unlatch the device"),
             TestStep("2m", "Wait for CurrentState.Latched to be False"),
             TestStep("2n", "If the Groupcast cluster is enabled on EP0, the TH reads the Groupcast membership attribute on the DUT."),
-            TestStep("2o", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT."),
+            TestStep("2o", "If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupID field = 0 to the DUT."),
             TestStep("2p", "If the Groupcast cluster is enabled on EP0, the TH sends Groupcast JoinGroup command with GroupID = 1, Endpoints = endpoint under test, KeySetID = 0x01a1 and Key = a0a1a2a3a4a5a6a7a8a9aaabacadaeaf to the DUT."),
             TestStep("3a", "Send GroupedStep command to increase position to MaxPosition"),
             TestStep("3b", "Wait for CurrentState.Position to be updated to MaxPosition"),
@@ -255,12 +255,12 @@ class TC_CLDIM_6_1(MatterBaseTest):
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
             self.mark_current_step_skipped()
 
-        # STEP 2o: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT
+        # STEP 2o: If the Groupcast cluster is enabled on EP0 and membership is not empty, the TH sends the Groupcast LeaveGroup command with GroupID field = 0 to the DUT
         self.step("2o")
         if self.groupcast_enabled:
             log.info("Groupcast cluster is enabled on EP0")
             if membership:
-                log.info("Groupcast membership is not empty, sending the Groupcast LeaveGroup command with GroupdID field = 0 to the DUT")
+                log.info("Groupcast membership is not empty, sending the Groupcast LeaveGroup command with GroupID field = 0 to the DUT")
                 await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
             else:
                 log.info("Groupcast membership is empty, skipping step")
