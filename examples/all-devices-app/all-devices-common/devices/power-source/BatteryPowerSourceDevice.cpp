@@ -31,9 +31,9 @@ BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan description,
 {}
 
 CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                              EndpointId parentId)
+                                              EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
 
     // Power Source (some arbitrary configuration)
     SimpleBatteryPowerSourceCluster::Config config(mDescription, mReplaceability, mTimerDelegate);

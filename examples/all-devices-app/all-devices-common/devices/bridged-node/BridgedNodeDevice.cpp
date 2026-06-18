@@ -32,9 +32,9 @@ BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, std::string 
     mUniqueId(std::move(uniqueId)), mNodeLabel(std::move(nodeLabel))
 {}
 
-CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
 
     // Create the Bridged Device Basic Information cluster.
     mBridgedDeviceBasicInformationCluster.Create(endpoint,

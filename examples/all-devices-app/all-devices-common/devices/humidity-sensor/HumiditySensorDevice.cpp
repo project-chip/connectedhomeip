@@ -29,9 +29,10 @@ HumiditySensorDevice::HumiditySensorDevice(TimerDelegate & timerDelegate,
     mTimerDelegate(timerDelegate), mHumidityConfig(humidityConfig)
 {}
 
-CHIP_ERROR HumiditySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR HumiditySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));

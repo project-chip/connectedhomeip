@@ -35,9 +35,9 @@ FanDevice::FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnO
     VerifyOrDie(mContext.includeOnOffCluster == (mOnOffDelegate != nullptr));
 }
 
-CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
 
     // Identify
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));

@@ -48,9 +48,9 @@ NetworkInfrastructureManagerDevice::~NetworkInfrastructureManagerDevice()
 }
 
 CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                        EndpointId parentId)
+                                                        EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
 
     // 1. Thread Border Router Management
     ThreadBorderRouterManagementCluster::Config tbrConfig(*this, Server::GetInstance().GetFailSafeContext(), mBreadCrumbTracker,

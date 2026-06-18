@@ -34,9 +34,10 @@ DimmableLightDevice::DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate
     mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
-CHIP_ERROR DimmableLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR DimmableLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                         EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));

@@ -48,6 +48,8 @@ struct EndpointComposition
         parentId(parent),
         pattern(compositionPattern), tagList(tags)
     {}
+
+    static constexpr EndpointComposition WithParent(EndpointId parent) { return EndpointComposition(parent); }
 };
 
 /// A device is an entity that maintains some cluster functionality.
@@ -62,6 +64,8 @@ public:
     /// It should return error if there's any failure when adding the device's clusters to the provider.
     /// An empty or default EndpointComposition represents that there is no parent or static tags.
     virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                EndpointComposition composition = {}) = 0;
+    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                 EndpointComposition composition = {}) = 0;
 
     /// Removes a device's clusters from the given provider. This
