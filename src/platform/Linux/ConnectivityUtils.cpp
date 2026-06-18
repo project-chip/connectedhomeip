@@ -43,6 +43,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -710,71 +711,46 @@ CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiag
 
 CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-
-    int skfd;
-    struct ethtool_cmd ecmd = {};
-    ecmd.cmd                = ETHTOOL_GSET;
     struct ifreq ifr        = {};
+    struct ethtool_cmd ecmd = {};
+
+    ecmd.cmd = ETHTOOL_GSET;
 
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
     Platform::CopyString(ifr.ifr_name, ifname);
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(fd != -1, CHIP_ERROR_OPEN_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
+    auto deferClose = MakeDefer([fd]() { close(fd); });
 
-    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Cannot get interface settings: %s", strerror(errno));
-        err = CHIP_ERROR_READ_FAILED;
-    }
-    else
-    {
-        fullDuplex = ecmd.duplex == DUPLEX_FULL;
-        err        = CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(ioctl(fd, SIOCETHTOOL, &ifr) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Cannot get interface settings: %s", strerror(errno)));
 
-    close(skfd);
-
-    return err;
+    fullDuplex = ecmd.duplex == DUPLEX_FULL;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GetEthCarrierDetect(const char * ifname, bool & carrierDetect)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-
-    int skfd;
     struct ifreq ifr           = {};
-    struct ethtool_value edata = {};
+    struct ethtool_value evalue = {};
 
-    edata.cmd = ETHTOOL_GLINK;
+    evalue.cmd = ETHTOOL_GLINK;
 
-    ifr.ifr_data = reinterpret_cast<char *>(&edata);
+    ifr.ifr_data = reinterpret_cast<char *>(&evalue);
     Platform::CopyString(ifr.ifr_name, ifname);
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(fd != -1, CHIP_ERROR_OPEN_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
+    auto deferClose = MakeDefer([fd]() { close(fd); });
 
-    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Cannot get link status: %s", strerror(errno));
-        err = CHIP_ERROR_READ_FAILED;
-    }
-    else
-    {
-        carrierDetect = edata.data != 0;
-        err           = CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(ioctl(fd, SIOCETHTOOL, &ifr) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Cannot get link status: %s", strerror(errno)));
 
-    close(skfd);
-
-    return err;
+    carrierDetect = evalue.data != 0;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace ConnectivityUtils
