@@ -25,6 +25,8 @@ source_set("accessors") {
   sources = [
     "AccessorRegistry.h",
     "OOBAccessor.h",
+    "OOBDataSerializer.cpp",
+    "OOBDataSerializer.h",
     "SingleEndpointDeviceAccessor.h",
   ]
 
