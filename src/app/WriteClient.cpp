@@ -548,6 +548,8 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     if (mState == State::AwaitingResponse)
     {
+        // NOTE: if we have more chunks (i.e. `!mChunks.IsNull()`), then the
+        //       SendWriteRequest() call below will move back to an AwaitingResponse state
         MoveToState(State::ResponseReceived);
     }
 
