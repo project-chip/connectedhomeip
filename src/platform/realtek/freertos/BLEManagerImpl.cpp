@@ -127,9 +127,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     matter_ble_cback_register((P_MATTER_BLE_CBACK) (ble_callback_dispatcher));
 
     // Set related flags
-    mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
+    mFlags.ClearAll();
     mFlags.Set(Flags::kBLEStackInitialized);
-    mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
+    mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled);
 
     InitSubscribed();
