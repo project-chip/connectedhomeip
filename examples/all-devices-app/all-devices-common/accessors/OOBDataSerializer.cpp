@@ -71,9 +71,8 @@ CHIP_ERROR SetAttributeRequestParser::Init(ByteSpan tlvBuffer)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
-                                    const chip::TLV::TLVReader & attributeValueReader, size_t & tlvLen,
-                                    Platform::ScopedMemoryBuffer<uint8_t> & tlvRequest)
+CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path, const chip::TLV::TLVReader & attributeValueReader,
+                                    size_t & tlvLen, Platform::ScopedMemoryBuffer<uint8_t> & tlvRequest)
 {
     tlvRequest.Free();
 
@@ -99,21 +98,21 @@ CHIP_ERROR BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
                                Support, "Failed to start TLV structure container");
 
     // Tag 1: EndpointId
-    ReturnErrorAndLogOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kTagEndpointId), path.mEndpointId),
-                               Support, "Failed to write EndpointId tag");
+    ReturnErrorAndLogOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kTagEndpointId), path.mEndpointId), Support,
+                               "Failed to write EndpointId tag");
 
     // Tag 2: ClusterId
-    ReturnErrorAndLogOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kTagClusterId), path.mClusterId),
-                               Support, "Failed to write ClusterId tag");
+    ReturnErrorAndLogOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kTagClusterId), path.mClusterId), Support,
+                               "Failed to write ClusterId tag");
 
     // Tag 3: AttributeId
-    ReturnErrorAndLogOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kTagAttributeId), path.mAttributeId),
-                               Support, "Failed to write AttributeId tag");
+    ReturnErrorAndLogOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kTagAttributeId), path.mAttributeId), Support,
+                               "Failed to write AttributeId tag");
 
     // Tag 4: Attribute Value
     readerHelper.Init(attributeValueReader);
-    ReturnErrorAndLogOnFailure(tlvWriter.CopyElement(chip::TLV::ContextTag(kTagValue), readerHelper),
-                               Support, "Failed to copy attribute value TLV element");
+    ReturnErrorAndLogOnFailure(tlvWriter.CopyElement(chip::TLV::ContextTag(kTagValue), readerHelper), Support,
+                               "Failed to copy attribute value TLV element");
 
     ReturnErrorAndLogOnFailure(tlvWriter.EndContainer(outerType), Support, "Failed to end TLV structure container");
 
