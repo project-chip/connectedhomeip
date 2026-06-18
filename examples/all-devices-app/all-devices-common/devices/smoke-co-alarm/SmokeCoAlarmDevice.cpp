@@ -32,10 +32,37 @@ const std::array<ExpressedStateEnum, chip::app::Clusters::SmokeCoAlarmCluster::k
 namespace chip {
 namespace app {
 
-SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig,
-                                       const Clusters::SmokeCoAlarmCluster::Config & smokeConfig) :
+namespace {
+
+// This is an example device, so it bakes in a representative, spec-valid configuration rather than taking one
+// from the factory. The factory only needs to pass in context (the timer delegate).
+
+// CO concentration: numeric + level indication, measured in air as ppm.
+SmokeCoAlarmDevice::ConcentrationCluster::Config DefaultCoConfig()
+{
+    return SmokeCoAlarmDevice::ConcentrationCluster::Config{
+        .clusterId = CarbonMonoxideConcentrationMeasurement::Id,
+        .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
+                                                                 ConcentrationMeasurement::Feature::kLevelIndication),
+        .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+        .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+    };
+}
+
+// Combined smoke + CO alarm exposing every optional attribute, to showcase the cluster's full surface.
+SmokeCoAlarmCluster::Config DefaultSmokeConfig()
+{
+    SmokeCoAlarmCluster::Config config;
+    config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
+    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    return config;
+}
+
+} // namespace
+
+SmokeCoAlarmDevice::SmokeCoAlarmDevice(TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
-    mTimerDelegate(timerDelegate), mCoConfig(coConfig), mSmokeConfig(smokeConfig)
+    mTimerDelegate(timerDelegate), mCoConfig(DefaultCoConfig()), mSmokeConfig(DefaultSmokeConfig())
 {}
 
 CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -46,8 +73,10 @@ CHIP_ERROR SmokeCoAlarmDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mSmokeCoAlarmCluster.Create(endpoint, mSmokeConfig);
-    mSmokeCoAlarmDelegate.Init(mTimerDelegate, mSmokeCoAlarmCluster.Cluster());
-    mSmokeCoAlarmCluster.Cluster().SetDelegate(&mSmokeCoAlarmDelegate);
+    // The delegate holds references to the timer delegate and the cluster, so it can only be built now that the
+    // cluster exists.
+    mSmokeCoAlarmDelegate = std::make_unique<AppSmokeCoAlarmDelegate>(mTimerDelegate, mSmokeCoAlarmCluster.Cluster());
+    mSmokeCoAlarmCluster.Cluster().SetDelegate(mSmokeCoAlarmDelegate.get());
     ReturnErrorOnFailure(provider.AddCluster(mSmokeCoAlarmCluster.Registration()));
 
     mCoMeasurementCluster.Create(endpoint, mCoConfig);
@@ -69,6 +98,8 @@ void SmokeCoAlarmDevice::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mSmokeCoAlarmCluster.Cluster()));
         mSmokeCoAlarmCluster.Destroy();
     }
+    // Releasing the delegate cancels any pending self-test timer (see ~AppSmokeCoAlarmDelegate).
+    mSmokeCoAlarmDelegate.reset();
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));

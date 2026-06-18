@@ -76,6 +76,10 @@ void ChefSmokeCoAlarmDelegate::OnExpressedStateChanged(ExpressedStateEnum newExp
     ChipLogProgress(Zcl, "[Smoke-CO-Alarm] => ExpressedState changed to %u", to_underlying(newExpressedState));
 }
 
+void SmokeCoAlarmShutdown()
+{
+    DeviceLayer::SystemLayer().CancelTimer(EndSelfTestingEventHandler, nullptr);
+}
 } // namespace SmokeCoAlarm
 } // namespace Clusters
 } // namespace app

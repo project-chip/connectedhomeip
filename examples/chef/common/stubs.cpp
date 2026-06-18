@@ -119,7 +119,7 @@ void InitIdentifyCluster()
 #include <app/clusters/chime-server/CodegenIntegration.h>
 #endif
 
-#include "clusters/smoke-co-alarm/chef-smoke-co-alarm.h"
+#include <clusters/smoke-co-alarm/chef-smoke-co-alarm.h>
 
 namespace {
 
@@ -880,6 +880,7 @@ void ApplicationInit()
 void ApplicationShutdown()
 {
     ChipLogProgress(NotSpecified, "Chef Application Down !!!");
+    SmokeCoAlarmShutdown();
 }
 
 // No-op function, used to force linking this file,

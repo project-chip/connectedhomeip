@@ -272,22 +272,7 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                Clusters::SmokeCoAlarmCluster::Config smokeConfig;
-                smokeConfig.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm)
-                    .Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
-                smokeConfig.optionalAttribs =
-                    Clusters::SmokeCoAlarmCluster::OptionalAttributeSet(Clusters::SmokeCoAlarmCluster::OptionalAttributeSet::All());
-                return std::make_unique<SmokeCoAlarmDevice>(
-                    mContext->timerDelegate,
-                    SmokeCoAlarmDevice::ConcentrationCluster::Config{
-                        .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
-                        .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
-                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
-                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
-                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                    },
-                    smokeConfig);
+                return std::make_unique<SmokeCoAlarmDevice>(mContext->timerDelegate);
             });
         }
 
