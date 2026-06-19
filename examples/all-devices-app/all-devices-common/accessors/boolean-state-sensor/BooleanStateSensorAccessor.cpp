@@ -23,11 +23,10 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice * device) : mDevice(device)
+BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice & device) : mDevice(device)
 {
-    VerifyOrDie(mDevice != nullptr);
     mSupportedPaths[0] =
-        ConcreteDataAttributePath(mDevice->GetEndpointId(), BooleanState::Id, BooleanState::Attributes::StateValue::Id);
+        ConcreteDataAttributePath(mDevice.GetEndpointId(), BooleanState::Id, BooleanState::Attributes::StateValue::Id);
 }
 
 std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
@@ -46,7 +45,7 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan acti
     }
 
     auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
-    if (request.path.mEndpointId != mDevice->GetEndpointId())
+    if (request.path.mEndpointId != mDevice.GetEndpointId())
     {
         return std::nullopt; // Not for our endpoint
     }
@@ -67,7 +66,7 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const Concret
         case BooleanState::Attributes::StateValue::Id: {
             bool stateValue;
             ReturnErrorOnFailure(decoder.Decode(stateValue));
-            auto event = mDevice->BooleanState().SetStateValue(stateValue);
+            auto event = mDevice.BooleanState().SetStateValue(stateValue);
             VerifyOrReturnError(event.has_value(), CHIP_ERROR_INCORRECT_STATE);
             return CHIP_NO_ERROR;
         }

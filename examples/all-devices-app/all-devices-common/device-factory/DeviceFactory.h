@@ -199,7 +199,8 @@ private:
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
             RegisterAccessorCreator("contact-sensor", [](DeviceInterface * device) {
-                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
+                VerifyOrDie(device != nullptr);
+                return std::make_unique<BooleanStateSensorAccessor>(*static_cast<BooleanStateSensorDevice *>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -210,7 +211,8 @@ private:
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
             RegisterAccessorCreator("water-leak-detector", [](DeviceInterface * device) {
-                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice *>(device));
+                VerifyOrDie(device != nullptr);
+                return std::make_unique<BooleanStateSensorAccessor>(*static_cast<BooleanStateSensorDevice *>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
