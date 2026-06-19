@@ -210,7 +210,7 @@ void WebRTCProviderManager::UnregisterWebrtcTransport(uint16_t sessionId)
 CHIP_ERROR
 WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
 {
-    ChipLogError(Zcl, "Handle Provide Offer Delegate called");
+    ChipLogProgress(Camera, "Handle Provide Offer Delegate called");
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id             = args.sessionId;
     outSession.peerNodeID     = args.peerNodeId;

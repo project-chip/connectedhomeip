@@ -156,9 +156,14 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
+        return;
+    }
 
     ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
 
 #ifdef CONFIG_ESP_HOSTED_NETWORK_SPLIT_ENABLED
     /* Create and register the netif with "WIFI_STA_DEF" key */

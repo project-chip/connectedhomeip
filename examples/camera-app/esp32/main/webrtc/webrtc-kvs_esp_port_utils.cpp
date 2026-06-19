@@ -153,83 +153,63 @@ std::string json_escape(const std::string & input)
     return output;
 }
 
-static int extract_sdp(const char * json, char * sdp_buf, size_t sdp_buf_len)
+// Extracts the string value of the given top-level JSON key into out_buf (null-terminated, clamped to out_buf_len).
+// Returns 0 on success, -1 if the input is invalid, the JSON cannot be parsed, or the key is not found.
+static int extract_json_field(const char * json, const char * key, char * out_buf, size_t out_buf_len)
 {
-    if (json == nullptr || sdp_buf == nullptr || sdp_buf_len == 0)
+    if (json == nullptr || key == nullptr || out_buf == nullptr || out_buf_len == 0)
     {
-        ChipLogError(Camera, "extract_sdp failed");
+        ChipLogError(Camera, "extract_json_field: invalid arguments for key '%s'", key ? key : "(null)");
         return -1;
     }
 
     jsmn_parser parser;
     jsmntok_t tokens[64];
-    int ret;
 
     jsmn_init(&parser);
-    ret = jsmn_parse(&parser, json, strlen(json), tokens, sizeof(tokens) / sizeof(tokens[0]));
+    int ret = jsmn_parse(&parser, json, strlen(json), tokens, sizeof(tokens) / sizeof(tokens[0]));
     if (ret < 0)
     {
-        printf("Failed to parse JSON: %d\n", ret);
+        ChipLogError(Camera, "Failed to parse JSON: %d", ret);
         return -1;
     }
 
-    for (int i = 1; i < ret; i++)
+    size_t key_len = strlen(key);
+    for (int i = 1; i + 1 < ret; i++)
     {
-        if (tokens[i].type == JSMN_STRING && strncmp(json + tokens[i].start, "sdp", tokens[i].end - tokens[i].start) == 0)
+        if (tokens[i].type != JSMN_STRING)
         {
-            int len = tokens[i + 1].end - tokens[i + 1].start;
-            if (len >= sdp_buf_len)
-                len = sdp_buf_len - 1;
-            strncpy(sdp_buf, json + tokens[i + 1].start, len);
-            sdp_buf[len] = '\0';
-            return 0;
+            continue;
         }
-    }
-
-    return -1; // SDP not found
-}
-
-static int extract_candidate(const char * json, char * sdp_buf, size_t sdp_buf_len)
-{
-    // Sanity checks for input parameters
-    if (json == nullptr || sdp_buf == nullptr || sdp_buf_len == 0)
-    {
-        ChipLogError(Camera, "extract_candidate failed");
-        return -1;
-    }
-
-    jsmn_parser parser;
-    jsmntok_t tokens[64];
-    int ret;
-
-    jsmn_init(&parser);
-    ret = jsmn_parse(&parser, json, strlen(json), tokens, sizeof(tokens) / sizeof(tokens[0]));
-    if (ret < 0)
-    {
-        printf("Failed to parse JSON: %d\n", ret);
-        return -1;
-    }
-
-    for (int i = 1; i < ret; i++)
-    {
-        if (tokens[i].type == JSMN_STRING && strncmp(json + tokens[i].start, "candidate", tokens[i].end - tokens[i].start) == 0)
+        size_t name_len = static_cast<size_t>(tokens[i].end - tokens[i].start);
+        if (name_len != key_len || strncmp(json + tokens[i].start, key, key_len) != 0)
         {
-            int len = tokens[i + 1].end - tokens[i + 1].start;
-            if (len >= sdp_buf_len)
-                len = sdp_buf_len - 1;
-            strncpy(sdp_buf, json + tokens[i + 1].start, len);
-            sdp_buf[len] = '\0';
-            return 0;
+            continue;
         }
+
+        int tok_len = tokens[i + 1].end - tokens[i + 1].start;
+        if (tok_len < 0)
+        {
+            return -1;
+        }
+        // Clamp to the destination buffer, leaving room for the null terminator.
+        size_t copy_len = static_cast<size_t>(tok_len);
+        if (copy_len > out_buf_len - 1)
+        {
+            copy_len = out_buf_len - 1;
+        }
+        memcpy(out_buf, json + tokens[i + 1].start, copy_len);
+        out_buf[copy_len] = '\0';
+        return 0;
     }
 
-    return -1; // Candidate not found
+    return -1; // key not found
 }
 
 void webrtc_bridge_message_received_cb(const void * data, int len)
 {
     // handle message
-    printf("Received Message from P4-Streamer: \n%.*s\n", len, (const char *) data);
+    ChipLogProgress(Camera, "Received Message from P4-Streamer: %.*s", len, (const char *) data);
 
     // Use nothrow to check for allocation failure
     std::unique_ptr<signaling_msg_t> msg(new (std::nothrow) signaling_msg_t());
@@ -260,19 +240,14 @@ void webrtc_bridge_message_received_cb(const void * data, int len)
     switch (msg->messageType)
     {
     case SIGNALING_MSG_TYPE_OFFER:
-        if (extract_sdp(msg->payload, sdp_buf, sdp_buf_len) == 0)
-        {
-            ESP_LOGD(TAG, "Extracted SDP:\n%s\n", sdp_buf);
-        }
-        break;
     case SIGNALING_MSG_TYPE_ANSWER:
-        if (extract_sdp(msg->payload, sdp_buf, sdp_buf_len) == 0)
+        if (extract_json_field(msg->payload, "sdp", sdp_buf, sdp_buf_len) == 0)
         {
             ESP_LOGD(TAG, "Extracted SDP:\n%s\n", sdp_buf);
         }
         break;
     case SIGNALING_MSG_TYPE_ICE_CANDIDATE:
-        if (extract_candidate(msg->payload, sdp_buf, sdp_buf_len) == 0)
+        if (extract_json_field(msg->payload, "candidate", sdp_buf, sdp_buf_len) == 0)
         {
             ESP_LOGD(TAG, "Extracted Candidate:\n%s\n", sdp_buf);
         }
@@ -286,11 +261,11 @@ void webrtc_bridge_message_received_cb(const void * data, int len)
     {
         uint16_t sessionId = 0;
         snprintf(peerClientId, sizeof(peerClientId), "%s", msg->peerClientId);
-        printf("Peer Client ID: \n%s\n", peerClientId);
+        ChipLogProgress(Camera, "Peer Client ID: %s", peerClientId);
 
         sessionId = static_cast<uint16_t>(strtoul(peerClientId, nullptr, 0)); // base 0 auto-detects "0x"
 
-        printf("Session ID: %u\n", sessionId);
+        ChipLogProgress(Camera, "Session ID: %u", sessionId);
 
         std::string unescaped_msg = json_unescape(std::string(sdp_buf));
 
@@ -306,16 +281,16 @@ void webrtc_bridge_message_received_cb(const void * data, int len)
                 if (transport != nullptr)
                 {
                     transport->OnLocalDescription(unescaped_msg, SDPType::Offer);
-                    printf("Set SDP Offer to WebRTCProviderManager\n");
+                    ChipLogProgress(Camera, "Set SDP Offer to WebRTCProviderManager");
                 }
                 else
                 {
-                    printf("Transport is not found for sessionID: %u\n", sessionId);
+                    ChipLogError(Camera, "Transport is not found for sessionID: %u", sessionId);
                 }
             }
             else
             {
-                printf("Delegate is not of type WebRTCProviderManager\n");
+                ChipLogError(Camera, "Delegate is not of type WebRTCProviderManager");
             }
         }
         else if (msg->messageType == SIGNALING_MSG_TYPE_ANSWER)
@@ -328,17 +303,16 @@ void webrtc_bridge_message_received_cb(const void * data, int len)
                 if (transport != nullptr)
                 {
                     transport->OnLocalDescription(unescaped_msg, SDPType::Answer);
-                    printf("Set SDP Answer to WebRTCProviderManager\n");
+                    ChipLogProgress(Camera, "Set SDP Answer to WebRTCProviderManager");
                 }
                 else
                 {
-                    printf("Transport is not found for sessionID: %u\n", sessionId);
+                    ChipLogError(Camera, "Transport is not found for sessionID: %u", sessionId);
                 }
-                printf("Set SDP Answer to WebRTCProviderManager\n");
             }
             else
             {
-                printf("Delegate is not of type WebRTCProviderManager\n");
+                ChipLogError(Camera, "Delegate is not of type WebRTCProviderManager");
             }
         }
         else if (msg->messageType == SIGNALING_MSG_TYPE_ICE_CANDIDATE)
@@ -351,17 +325,16 @@ void webrtc_bridge_message_received_cb(const void * data, int len)
                 if (transport != nullptr)
                 {
                     transport->OnICECandidate(unescaped_msg); // todo: session id based
-                    printf("Set Candidate to WebRTCProviderManager\n");
+                    ChipLogProgress(Camera, "Set Candidate to WebRTCProviderManager");
                 }
                 else
                 {
-                    printf("Transport is not found for sessionID: %u\n", sessionId);
+                    ChipLogError(Camera, "Transport is not found for sessionID: %u", sessionId);
                 }
-                printf("Set Candidate to WebRTCProviderManager\n");
             }
             else
             {
-                printf("Delegate is not of type WebRTCProviderManager\n");
+                ChipLogError(Camera, "Delegate is not of type WebRTCProviderManager");
             }
         }
     }
