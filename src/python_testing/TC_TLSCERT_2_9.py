@@ -46,6 +46,8 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_TLSCERT_2_9(TC_TLSCERT_Base):
+    disable_wildcard_subscription = True
+
     def desc_TC_TLSCERT_2_9(self) -> str:
         return "[TC-TLSCERT-2.9] ProvisionClientCertificate command verification"
 

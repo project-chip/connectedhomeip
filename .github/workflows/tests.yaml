@@ -1037,7 +1037,8 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        timeout-minutes: 60
+        # Updating the timeout for REPL Tests - Linux (RUN)(TC_[D-O]) takes over 60 minutes consistently in CI
+        timeout-minutes: 70
 
         if: github.actor != 'restyled-io[bot]'
 
