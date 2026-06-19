@@ -67,8 +67,9 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const Concret
         case BooleanState::Attributes::StateValue::Id: {
             bool stateValue;
             ReturnErrorOnFailure(decoder.Decode(stateValue));
-            mDevice->BooleanState().SetStateValue(stateValue);
-            return std::make_optional(CHIP_NO_ERROR);
+            auto event = mDevice->BooleanState().SetStateValue(stateValue);
+            VerifyOrReturnError(event.has_value(), CHIP_ERROR_INCORRECT_STATE);
+            return CHIP_NO_ERROR;
         }
         default:
             break;
