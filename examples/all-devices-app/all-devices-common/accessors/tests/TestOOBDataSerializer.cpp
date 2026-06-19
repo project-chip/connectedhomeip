@@ -34,37 +34,31 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_BooleanStateValue)
 {
     ConcreteDataAttributePath path(1, 2, 3); // ep=1, cluster=2, attr=3
 
-    // Serialize a boolean value (true) into a TLV buffer
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
 
-    // Put a simple boolean element
     EXPECT_EQ(writer.Put(TLV::AnonymousTag(), true), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    // Read the serialized boolean back via a TLVReader
     TLV::TLVReader reader;
     reader.Init(buffer, writer.GetLengthWritten());
     EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
 
-    // Build the request
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, reader);
     EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
     EXPECT_GT(requestBuffer.size(), 0U);
 
-    // Parse the request
     auto parseResult = OOBDataSerializer::ParseAttributeRequest(ByteSpan(requestBuffer.data(), requestBuffer.size()));
     EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(parseResult));
 
     auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
-    EXPECT_EQ(request.path.mEndpointId, 1);
-    EXPECT_EQ(request.path.mClusterId, 2);
-    EXPECT_EQ(request.path.mAttributeId, 3);
+    EXPECT_EQ(request.path.mEndpointId, 1U);
+    EXPECT_EQ(request.path.mClusterId, 2U);
+    EXPECT_EQ(request.path.mAttributeId, 3U);
 
-    // Read the value out
     bool parsedValue = false;
     EXPECT_EQ(request.value.Get(parsedValue), CHIP_NO_ERROR);
     EXPECT_TRUE(parsedValue);
@@ -93,9 +87,9 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_Uint32Value)
     EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(parseResult));
 
     auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
-    EXPECT_EQ(request.path.mEndpointId, 10);
-    EXPECT_EQ(request.path.mClusterId, 20);
-    EXPECT_EQ(request.path.mAttributeId, 30);
+    EXPECT_EQ(request.path.mEndpointId, 10U);
+    EXPECT_EQ(request.path.mClusterId, 20U);
+    EXPECT_EQ(request.path.mAttributeId, 30U);
 
     uint32_t parsedValue = 0;
     EXPECT_EQ(request.value.Get(parsedValue), CHIP_NO_ERROR);
@@ -104,7 +98,6 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_Uint32Value)
 
 TEST_F(TestOOBDataSerializer, Parse_InvalidStructure)
 {
-    // Parse an empty buffer or a buffer not representing a structure
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
@@ -118,7 +111,6 @@ TEST_F(TestOOBDataSerializer, Parse_InvalidStructure)
 
 TEST_F(TestOOBDataSerializer, Parse_MismatchedTags)
 {
-    // Write context tags in incorrect order or wrong tag numbers
     uint8_t buffer[128];
     TLV::TLVWriter writer;
     writer.Init(buffer);
@@ -126,7 +118,6 @@ TEST_F(TestOOBDataSerializer, Parse_MismatchedTags)
     TLV::TLVType outerType;
     EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType), CHIP_NO_ERROR);
 
-    // Write tag 2 (ClusterId) first instead of tag 1 (EndpointId)
     EXPECT_EQ(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagClusterId), static_cast<uint32_t>(20)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagEndpointId), static_cast<uint16_t>(10)), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Put(TLV::ContextTag(OOBDataSerializer::kTagAttributeId), static_cast<uint32_t>(30)), CHIP_NO_ERROR);
@@ -144,7 +135,6 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_ArrayValue)
 {
     ConcreteDataAttributePath path(1, 2, 3);
 
-    // Serialize a TLV Array containing three uint32_t elements: [10, 20, 30]
     uint8_t buffer[128];
     TLV::TLVWriter writer;
     writer.Init(buffer);
@@ -157,31 +147,26 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_ArrayValue)
     EXPECT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    // Read the serialized array back
     TLV::TLVReader reader;
     reader.Init(buffer, writer.GetLengthWritten());
     EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
     EXPECT_EQ(reader.GetType(), TLV::kTLVType_Array);
 
-    // Build the request
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, reader);
     EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
 
-    // Parse the request
     auto parseResult = OOBDataSerializer::ParseAttributeRequest(ByteSpan(requestBuffer.data(), requestBuffer.size()));
     EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(parseResult));
 
     auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
-    EXPECT_EQ(request.path.mEndpointId, 1);
-    EXPECT_EQ(request.path.mClusterId, 2);
-    EXPECT_EQ(request.path.mAttributeId, 3);
+    EXPECT_EQ(request.path.mEndpointId, 1U);
+    EXPECT_EQ(request.path.mClusterId, 2U);
+    EXPECT_EQ(request.path.mAttributeId, 3U);
 
-    // Verify the parsed value is the array
     EXPECT_EQ(request.value.GetType(), TLV::kTLVType_Array);
 
-    // Enter the array container and read the elements
     TLV::TLVType outerType;
     EXPECT_EQ(request.value.EnterContainer(outerType), CHIP_NO_ERROR);
 
@@ -200,7 +185,6 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_ArrayValue)
     EXPECT_EQ(request.value.Get(val3), CHIP_NO_ERROR);
     EXPECT_EQ(val3, 30U);
 
-    // Make sure there are no more elements
     EXPECT_EQ(request.value.Next(), CHIP_END_OF_TLV);
     EXPECT_EQ(request.value.ExitContainer(outerType), CHIP_NO_ERROR);
 }
