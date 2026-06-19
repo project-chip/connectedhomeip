@@ -26,6 +26,7 @@
 #include <app/data-model/List.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
@@ -646,49 +647,42 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthCarrierDetect(bool & carrierDetect)
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 {
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    uint64_t currentUptime = 0;
+    ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(currentUptime));
+
     struct ifaddrs * ifaddr = nullptr;
+    VerifyOrReturnError(getifaddrs(&ifaddr) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces"));
+    auto deferClose = MakeDefer([ifaddr]() { freeifaddrs(ifaddr); });
 
-    if (getifaddrs(&ifaddr) == -1)
+    struct ifaddrs * ifa = nullptr;
+    // Walk through linked list, maintaining head pointer so we can free list later.
+    for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        struct ifaddrs * ifa = nullptr;
-
-        // Walk through linked list, maintaining head pointer so we can free list later.
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
-            {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
-                break;
-            }
+            ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
+            break;
         }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-
-                mEthPacketRxCount  = stats->rx_packets;
-                mEthPacketTxCount  = stats->tx_packets;
-                mEthTxErrCount     = stats->tx_errors;
-                mEthCollisionCount = stats->collisions;
-                mEthOverrunCount   = stats->rx_over_errors;
-                err                = CHIP_NO_ERROR;
-            }
-        }
-
-        freeifaddrs(ifaddr);
     }
 
-    // Record the current uptime as the baseline for TimeSinceReset
-    ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(mEthTimeSinceResetBaseline));
+    if (ifa != nullptr)
+    {
+        if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+        {
+            struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
 
-    return err;
+            mEthPacketRxCount          = stats->rx_packets;
+            mEthPacketTxCount          = stats->tx_packets;
+            mEthTxErrCount             = stats->tx_errors;
+            mEthCollisionCount         = stats->collisions;
+            mEthOverrunCount           = stats->rx_over_errors;
+            mEthTimeSinceResetBaseline = currentUptime;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_READ_FAILED;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
