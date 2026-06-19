@@ -311,11 +311,7 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<OnOffLightSwitchDevice>(LoggingOnOffLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                return std::make_unique<OnOffLightSwitchDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)

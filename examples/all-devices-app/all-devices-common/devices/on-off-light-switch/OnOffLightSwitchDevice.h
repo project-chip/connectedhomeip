@@ -17,15 +17,29 @@
 
 #pragma once
 
-#include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/switch-server/SwitchCluster.h>
+#include <devices/interface/SingleEndpointDevice.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class OnOffLightSwitchDevice : public LoggingOnOffLightDevice
+class OnOffLightSwitchDevice : public SingleEndpointDevice
 {
 public:
-    OnOffLightSwitchDevice(const Context & context);
+    explicit OnOffLightSwitchDevice(TimerDelegate & timerDelegate);
     ~OnOffLightSwitchDevice() override = default;
+
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointId parentId = kInvalidEndpointId) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    Clusters::SwitchCluster & Switch() { return mSwitchCluster.Cluster(); }
+
+private:
+    TimerDelegate & mTimerDelegate;
+    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    LazyRegisteredServerCluster<Clusters::SwitchCluster> mSwitchCluster;
 };
 
 } // namespace chip::app

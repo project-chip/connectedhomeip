@@ -19,10 +19,41 @@
 
 #include <devices/Types.h>
 
+using namespace chip::app::Clusters;
+
 namespace chip::app {
 
-OnOffLightSwitchDevice::OnOffLightSwitchDevice(const Context & context) :
-    LoggingOnOffLightDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1), context)
+OnOffLightSwitchDevice::OnOffLightSwitchDevice(TimerDelegate & timerDelegate) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)), mTimerDelegate(timerDelegate)
 {}
+
+CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+{
+    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+
+    mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kLatchingSwitch),
+                          SwitchCluster::StartupConfiguration{ .numberOfPositions = 2 });
+    ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
+
+    return provider.AddEndpoint(mEndpointRegistration);
+}
+
+void OnOffLightSwitchDevice::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    SingleEndpointUnregistration(provider);
+    if (mSwitchCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mSwitchCluster.Cluster()));
+        mSwitchCluster.Destroy();
+    }
+    if (mIdentifyCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
+        mIdentifyCluster.Destroy();
+    }
+}
 
 } // namespace chip::app
