@@ -59,14 +59,8 @@
 
 bool AppTaskCommon::sIsCommissioningFailed = false;
 
-extern "C" {
-#if defined(CONFIG_PM) &&                                                                                                          \
-    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
-#include <zephyr/sys/reboot.h>
-
-extern bool pm_has_deep_sleep_retention_occurred(void);
-#endif
-}
+#include "Reboot.h"
+#include <zephyr_pm_observer.h>
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
 #include <zephyr/pm/policy.h>
@@ -253,6 +247,8 @@ void AppTaskCommon::PrintFirmwareInfo(void)
 CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 {
     PrintFirmwareInfo();
+
+    pm_observer_init();
 
     InitLeds();
     UpdateStatusLED();
@@ -558,14 +554,11 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         return;
     }
 
-#if defined(CONFIG_PM) &&                                                                                                          \
-    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
-    if (pm_has_deep_sleep_retention_occurred())
+    if (pm_observer_deepsleepped())
     {
-        ChipLogError(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
-        sys_reboot(SYS_REBOOT_WARM);
+        ChipLogDetail(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
+        Reboot(SoftwareRebootReason::kOther);
     }
-#endif
 
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
