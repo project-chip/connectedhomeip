@@ -80,24 +80,15 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
         )
         asserts.assert_true(result.status.ok(), msg=f"PwRPC write failed for endpoint {endpoint}.")
 
-    def desc_TC_BOOL_1_1(self) -> str:
-        return "[TC_BOOL_1_1] Boolean State Sensor Commissioning and State Read Test"
-
-    def steps_TC_BOOL_1_1(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read Boolean State Value on Endpoint 1 and Endpoint 2"),
-            TestStep(3, "Toggle and assert state values on Endpoint 1 and Endpoint 2 independently via PwRPC"),
-        ]
-
     @async_test_body
     async def test_TC_BOOL_1_1(self):
-        # Step 1: Commissioning (handled automatically by the test runner)
-        self.step(1)
+        "[TC_BOOL_1_1] Boolean State Sensor Commissioning and State Read Test"
+
+        self.step(1, "Commissioning, already done", is_commissioning=True)
         logger.info("Successfully completed commissioning step.")
 
         # Step 2: Read Boolean State Value on Endpoint 1 and Endpoint 2
-        self.step(2)
+        self.step(2, "Read Boolean State Value on Endpoint 1 and Endpoint 2")
 
         # Read Endpoint 1
         initial_val_ep1 = await self.read_boolean_state_value(endpoint=1)
@@ -108,7 +99,7 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
         logger.info("Initial Boolean State Value on Endpoint 2: %s", initial_val_ep2)
 
         # Step 3: Toggle and assert state values on Endpoint 1 and Endpoint 2 independently via PwRPC
-        self.step(3)
+        self.step(3, "Toggle and assert state values on Endpoint 1 and Endpoint 2 independently via PwRPC")
 
         # Establish PwRPC connection
         logger.info("Establishing Pigweed RPC connection...")
