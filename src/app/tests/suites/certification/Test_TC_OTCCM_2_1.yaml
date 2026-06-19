@@ -20,6 +20,9 @@ CI:
       args:
           - --device
           - oven
+      test_args:
+          - --endpoint
+          - "2"
 
 PICS:
     - OTCCM.S

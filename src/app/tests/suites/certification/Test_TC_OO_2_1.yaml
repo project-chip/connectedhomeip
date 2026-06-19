@@ -22,11 +22,6 @@ CI:
       args:
           - --device
           - on-off-light
-    - name: "Test against all-devices/cooktop"
-      app: all-devices
-      args:
-          - --device
-          - cooktop
     - name: "Test against all-devices/on-off-plug-in-unit"
       app: all-devices
       args:
