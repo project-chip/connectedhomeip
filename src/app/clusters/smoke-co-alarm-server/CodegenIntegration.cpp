@@ -17,6 +17,7 @@
  */
 
 #include "CodegenIntegration.h"
+#include <app/util/af-types.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
@@ -289,5 +290,13 @@ bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpoint, bool & v) const
     return true;
 }
 
+// Weak no-op fallbacks for the legacy plugin init/shutdown hooks emitted into MATTER_PLUGINS_INIT /
+// MATTER_PLUGINS_SHUTDOWN for every server cluster. An application that wants a functional cluster
+// registers it explicitly (e.g. chef's SmokeCoAlarmInit() or all-clusters-app's smco-stub.cpp, which
+// provides a strong MatterSmokeCoAlarmPluginServerInitCallback() that overrides this stub).
 __attribute__((weak)) void MatterSmokeCoAlarmPluginServerInitCallback() {}
 __attribute__((weak)) void MatterSmokeCoAlarmPluginServerShutdownCallback() {}
+// Endpoint-taking hooks invoked by the generated CodeDrivenInitShutdown.cpp dispatcher because
+// "Smoke CO Alarm" is in the CodeDrivenClusters list. No-ops here; registration is done by the app.
+__attribute__((weak)) void MatterSmokeCoAlarmClusterInitCallback(chip::EndpointId) {}
+__attribute__((weak)) void MatterSmokeCoAlarmClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
