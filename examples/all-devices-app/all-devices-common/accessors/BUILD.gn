@@ -27,7 +27,6 @@ source_set("accessors") {
     "OOBAccessor.h",
     "OOBDataSerializer.cpp",
     "OOBDataSerializer.h",
-    "SingleEndpointDeviceAccessor.h",
   ]
 
   public_deps = [
