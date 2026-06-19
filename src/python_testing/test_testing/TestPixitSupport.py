@@ -26,11 +26,12 @@ matter_testing_infrastructure/matter/testing/test_pixit.py.
 
 import unittest
 
+from mobly import signals
+
 from matter.testing import global_stash
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.pixit import pixit
-from mobly import signals
 
 
 class TestMatterBaseTestPixit(unittest.TestCase):
