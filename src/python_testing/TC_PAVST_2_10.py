@@ -40,7 +40,7 @@
 import logging
 
 from mobly import asserts
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
@@ -73,6 +73,11 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         if self.server is not None:
             self.server.terminate()
         super().teardown_class()
+
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+        super().teardown_test()
 
     def steps_TC_PAVST_2_10(self) -> list[TestStep]:
         return [
@@ -108,8 +113,8 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Precondition
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(
-            endpoint=endpoint, server=self.server, host_ip=host_ip)
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(
+            server=self.server, host_ip=host_ip)
 
         # Reads CurrentConnections attribute (step 1)
         self.step(1)
@@ -122,13 +127,13 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=cfg.ConnectionID),
                         endpoint=endpoint)
                 except InteractionModelError as e:
-                    log.warning(f"Failed to deallocate connection {cfg.ConnectionID} during cleanup: {e}")
+                    log.warning("Failed to deallocate connection %s during cleanup: %s", cfg.ConnectionID, e)
 
         # Read supported formats (step 2)
         self.step(2)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats)
-        log.info(f"aSupportedFormats={aSupportedFormats}")
+        log.info("aSupportedFormats=%s", aSupportedFormats)
 
         # Read allocated video streams (step 3)
         self.step(3)
@@ -149,7 +154,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         # Define invalid URL cases
-        stream_id = self.server.create_stream()
+        stream_id = self.server.create_stream(SupportedIngestInterface.cmaf.value)
         invalid_cases = [
             ("non‑https scheme", f"http://{host_ip}:1234/streams/{stream_id}/"),
             ("fragment", f"https://{host_ip}:1234/streams/{stream_id}#/frag"),
@@ -161,7 +166,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         for idx, (desc, url) in enumerate(invalid_cases, start=5):
             self.step(idx)
             status = await self.allocate_one_pushav_transport(
-                endpoint, tlsEndPoint=tlsEndpointId, url=url, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidURL, expiryTime=30)
+                endpoint, tlsEndPoint=self.tlsEndpointId, url=url, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidURL, expiryTime=30)
             asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidURL,
                                  f"Push AV Transport should return InvalidURL for {desc}")
 

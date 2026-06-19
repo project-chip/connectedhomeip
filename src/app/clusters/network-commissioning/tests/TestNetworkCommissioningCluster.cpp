@@ -23,6 +23,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -55,17 +56,24 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    inline static NoopBreadcrumbTracker tracker;
+    inline static NetworkCommissioningCluster::Context defaultContext{
+        .breadcrumbTracker   = tracker,
+        .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
+        .platformManager     = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
 };
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
-    NoopBreadcrumbTracker tracker;
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
 
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
 
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
@@ -93,8 +101,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    NoopBreadcrumbTracker tracker;
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -114,10 +121,79 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
         ASSERT_TRUE(tester.WriteAttribute(InterfaceEnabled::Id, true).IsSuccess());
         ASSERT_EQ(tester.GetDirtyList().size(), 1u);
         ASSERT_EQ(tester.GetDirtyList()[0],
-                  app::AttributePathParams(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id));
+                  app::ConcreteAttributePath(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id));
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
+{
+    Testing::FakeWiFiDriver fakeWifiDriver;
+
+    // Positive test: handler is active and reacts to event
+    {
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
+
+        fakeWifiDriver.mRevertConfigurationCalled = false;
+
+        // Post the event
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired };
+
+        ASSERT_EQ(DeviceLayer::PlatformMgr().PostEvent(&event), CHIP_NO_ERROR);
+
+        // Run event loop to process the event
+        // Run event loop to process the event
+        CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void {
+                CHIP_ERROR stopErr = DeviceLayer::PlatformMgr().StopEventLoopTask();
+                EXPECT_EQ(stopErr, CHIP_NO_ERROR);
+            },
+            (intptr_t) nullptr);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        DeviceLayer::PlatformMgr().RunEventLoop();
+
+        EXPECT_TRUE(fakeWifiDriver.mRevertConfigurationCalled);
+
+        cluster.Deinit();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Negative test: handler is removed and does not react to event.
+    // We prove that Deinit removed the handler by verifying that posting the event
+    // does NOT trigger RevertConfiguration, whereas it did in the positive test above.
+    {
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
+
+        cluster.Deinit();
+
+        fakeWifiDriver.mRevertConfigurationCalled = false;
+
+        // Post the event
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired };
+        ASSERT_EQ(DeviceLayer::PlatformMgr().PostEvent(&event), CHIP_NO_ERROR);
+
+        // Run event loop to process the event
+        // Run event loop to process the event
+        CHIP_ERROR err = DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void {
+                CHIP_ERROR stopErr = DeviceLayer::PlatformMgr().StopEventLoopTask();
+                EXPECT_EQ(stopErr, CHIP_NO_ERROR);
+            },
+            (intptr_t) nullptr);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        DeviceLayer::PlatformMgr().RunEventLoop();
+
+        EXPECT_FALSE(fakeWifiDriver.mRevertConfigurationCalled);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
 }
 
 } // namespace

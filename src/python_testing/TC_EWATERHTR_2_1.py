@@ -21,21 +21,20 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${EVSE_APP}
+#     app: ${WATER_HEATER_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
 #       --featureSet 0x03
-#       --application water-heater
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --endpoint 2
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -97,7 +96,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         feature_map = await self.read_whm_attribute_expect_success(attribute="FeatureMap")
         em_supported = bool(feature_map & Clusters.WaterHeaterManagement.Bitmaps.Feature.kEnergyManagement)
         tp_supported = bool(feature_map & Clusters.WaterHeaterManagement.Bitmaps.Feature.kTankPercent)
-        log.info(f"FeatureMap: {feature_map} : TP supported: {tp_supported} | EM supported: {em_supported}")
+        log.info("FeatureMap: %s : TP supported: %s | EM supported: %s", feature_map, tp_supported, em_supported)
 
         self.step("3")
         heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")

@@ -53,13 +53,6 @@ def getTargets(cluster_id: int):
     return targets
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
-
-
 def runArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Update the ClusterRevision for a chosen cluster in all .zap files')
@@ -71,10 +64,7 @@ def runArgumentsParser():
                         help='If set, only clusters with this old revision will be updated.  This is a decimal integer.')
     parser.add_argument('--dry-run', default=False, action='store_true',
                         help="Don't do any generation, just log what .zap files would be updated (default: False)")
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.set_defaults(parallel=True)
-
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args()
 
     if args.cluster_id is None:
@@ -110,7 +100,7 @@ def updateOne(item):
     """
     (args, target) = item
 
-    with open(target, "r") as file:
+    with open(target) as file:
         data = json.load(file)
 
     for endpointType in data['endpointTypes']:
@@ -129,8 +119,6 @@ def updateOne(item):
 
 
 def main():
-    checkPythonVersion()
-
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s %(name)s %(levelname)-7s %(message)s'

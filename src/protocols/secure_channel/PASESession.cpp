@@ -123,9 +123,10 @@ PASESession::~PASESession()
 
 void PASESession::OnSessionReleased()
 {
-    // Call into our super-class before we clear our state.
-    PairingSession::OnSessionReleased();
+    // Clear our own state first, then call the base class.
+    // See CASESession::OnSessionReleased for the full rationale.
     Clear();
+    PairingSession::OnSessionReleased();
 }
 
 void PASESession::Finish()
@@ -139,19 +140,20 @@ void PASESession::Clear()
     MATTER_TRACE_SCOPE("Clear", "PASESession");
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
-    memset(&mPASEVerifier, 0, sizeof(mPASEVerifier));
+    ClearSecretData(reinterpret_cast<uint8_t *>(&mPASEVerifier), sizeof(mPASEVerifier));
     mNextExpectedMsg.ClearValue();
 
     mSpake2p.Clear();
     mCommissioningHash.Clear();
 
     mIterationCount = 0;
-    mSaltLength     = 0;
     if (mSalt != nullptr)
     {
+        ClearSecretData(mSalt, mSaltLength);
         chip::Platform::MemoryFree(mSalt);
         mSalt = nullptr;
     }
+    mSaltLength      = 0;
     mPairingComplete = false;
     PairingSession::Clear();
 }
@@ -267,7 +269,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     // When commissioning starts, the peer is assumed to be active.
     mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
+    SuccessOrExit(err = mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime));
 
     mLocalMRPConfig = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
@@ -533,7 +535,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     uint8_t random[kPBKDFParamRandomNumberSize];
 
     ByteSpan salt;
-    uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
+    SensitiveDataFixedBuffer<kSpake2p_WS_Length * 2> serializedWS;
 
     ChipLogDetail(SecureChannel, "Received PBKDF param response");
 
@@ -602,11 +604,11 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     err = SetupSpake2p();
     SuccessOrExit(err);
 
-    err = Spake2pVerifier::ComputeWS(mIterationCount, salt, mSetupPINCode, serializedWS, sizeof(serializedWS));
+    err = Spake2pVerifier::ComputeWS(mIterationCount, salt, mSetupPINCode, serializedWS.Bytes(), serializedWS.Capacity());
     SuccessOrExit(err);
 
-    err = mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length, &serializedWS[kSpake2p_WS_Length],
-                               kSpake2p_WS_Length);
+    err = mSpake2p.BeginProver(nullptr, 0, nullptr, 0, serializedWS.Bytes(), kSpake2p_WS_Length,
+                               serializedWS.Bytes() + kSpake2p_WS_Length, kSpake2p_WS_Length);
     SuccessOrExit(err);
 
     err = SendMsg1();
@@ -659,7 +661,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     uint8_t Y[kMAX_Point_Length];
     size_t Y_len = sizeof(Y);
 
-    uint8_t verifier[kMAX_Hash_Length];
+    SensitiveDataFixedBuffer<kMAX_Hash_Length> verifier;
     size_t verifier_len = kMAX_Hash_Length;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg1");
@@ -687,7 +689,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
 
     SuccessOrExit(err = mSpake2p.ComputeRoundOne(X, X_len, Y, &Y_len));
     VerifyOrReturnError(Y_len == sizeof(Y), CHIP_ERROR_INTERNAL);
-    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(X, X_len, verifier, &verifier_len));
+    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(X, X_len, verifier.Bytes(), &verifier_len));
     msg1 = nullptr;
 
     {
@@ -702,7 +704,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kPb), ByteSpan(Y)));
-        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kCb), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake2Tags::kCb), ByteSpan(verifier.Bytes(), verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg2));
 
@@ -730,7 +732,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     MATTER_TRACE_SCOPE("HandleMsg2_and_SendMsg3", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint8_t verifier[kMAX_Hash_Length];
+    SensitiveDataFixedBuffer<kMAX_Hash_Length> verifier;
     size_t verifier_len = kMAX_Hash_Length;
 
     System::PacketBufferHandle resp;
@@ -766,7 +768,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     // ExitContainer() will return CHIP_END_OF_TLV if the EndOfContainer TLV element terminator is missing.
     SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
-    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
+    SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier.Bytes(), &verifier_len));
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
     msg2 = nullptr;
@@ -782,7 +784,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake3Tags::kCa), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(AsTlvContextTag(Pake3Tags::kCa), ByteSpan(verifier.Bytes(), verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg3));
 
@@ -795,7 +797,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     ChipLogDetail(SecureChannel, "Sent spake2p msg3");
 
 exit:
-
     if (err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
@@ -864,6 +865,22 @@ CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         err = CHIP_ERROR_INVALID_PASE_PARAMETER;
         break;
 
+    case kProtocolCodeNoSharedRoot:
+        // kProtocolCodeNoSharedRoot only has a defined meaning in CASE (where it indicates
+        // the responder lacks a trusted root for the initiator's fabric). PASE has no
+        // shared-root semantics, so a peer sending this status during PASE is misconfigured.
+        // Mapping it to CHIP_ERROR_NO_SHARED_TRUSTED_ROOT is more useful for diagnostics
+        // than collapsing to CHIP_ERROR_INTERNAL.
+        err = CHIP_ERROR_NO_SHARED_TRUSTED_ROOT;
+        break;
+
+    case kProtocolCodeBusy:
+        // Spec doesn't explicitly forbid a peer returning kProtocolCodeBusy during PASE,
+        // even though it's not commonly seen. Distinguishing "device temporarily busy" from
+        // generic INTERNAL helps callers decide whether to retry.
+        err = CHIP_ERROR_BUSY;
+        break;
+
     default:
         err = CHIP_ERROR_INTERNAL;
         break;
@@ -899,7 +916,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime));
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((mNextExpectedMsg.HasValue() && payloadHeader.HasMessageType(mNextExpectedMsg.Value())) ||

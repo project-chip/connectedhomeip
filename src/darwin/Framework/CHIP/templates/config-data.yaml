@@ -21,3 +21,6 @@ LegacyCommandsWithOnlyOptionalArguments:
 
 # Clusters that should have private headers/implementations generated.
 DarwinPrivateClusters: []
+
+# Clusters with private extensions that should have private headers/implementations generated.
+DarwinClustersWithPrivateExtensions: []

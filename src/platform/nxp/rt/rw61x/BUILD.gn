@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 # Copyright 2023-2025 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,10 +49,7 @@ source_set("nxp_ota") {
 }
 
 config("nxp_platform_config") {
-  defines = [
-    "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"",
-    "CONFIG_BOOT_REASON_SDK_SUPPORT=1",
-  ]
+  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
   include_dirs = [
     ".",
     "../../common",
@@ -89,6 +86,7 @@ static_library("nxp_platform") {
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
     "../../../SingletonConfigurationManager.cpp",
+    "../../common/BootReason.h",
     "../../common/CHIPDevicePlatformEvent.h",
     "../../common/ConfigurationManagerImpl.cpp",
     "../../common/ConfigurationManagerImpl.h",
@@ -102,6 +100,7 @@ static_library("nxp_platform") {
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",
     "../../common/SoftwareUpdateManagerImpl.h",
+    "BootReason.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
@@ -169,6 +168,7 @@ static_library("nxp_platform") {
   if (chip_enable_ota_requestor) {
     defines += [ "CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE=1" ]
     sources += ota_sources
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
     if (nxp_enable_ota_factory_data_processor) {
       defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
     }
@@ -182,9 +182,10 @@ static_library("nxp_platform") {
     }
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h",
       "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.h",

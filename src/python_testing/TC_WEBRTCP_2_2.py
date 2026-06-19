@@ -43,6 +43,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -130,17 +131,16 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         asserts.assert_false(resp.deferredOffer, "Expected 'deferredOffer' to be False.")
 
-        # TODO: Enable this check after integrating with Camera AvStreamManager
-        # asserts.assert_not_equal(
-        #     resp.videoStreamID,
-        #     NullValue,
-        #     "videoStreamID in SolicitOfferResponse should be valid."
-        # )
-        # asserts.assert_not_equal(
-        #     resp.audioStreamID,
-        #     NullValue,
-        #     "audioStreamID in SolicitOfferResponse should be valid."
-        # )
+        asserts.assert_not_equal(
+            resp.videoStreamID,
+            NullValue,
+            "videoStreamID in SolicitOfferResponse should be valid."
+        )
+        asserts.assert_not_equal(
+            resp.audioStreamID,
+            NullValue,
+            "audioStreamID in SolicitOfferResponse should be valid."
+        )
 
         # Save the session ID for later steps
         current_session_id = resp.webRTCSessionID
@@ -153,8 +153,39 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
         )
         asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to be 1")
 
-        # Verify the session contains the correct WebRTCSessionID
-        asserts.assert_equal(current_sessions[0].id, current_session_id, "Session ID should match")
+        session = current_sessions[0]
+
+        # ID is uint16 type and contains a valid value (0–65534)
+        matter_asserts.assert_int_in_range(session.id, 0, 65534, "Session ID")
+
+        # PeerNodeID is node-id type and contains a valid non-zero node-id value
+        matter_asserts.assert_valid_uint64(session.peerNodeID, "PeerNodeID")
+        asserts.assert_greater(session.peerNodeID, 0, "PeerNodeID should be a valid non-zero node-id")
+
+        # PeerEndpointID is endpoint-no type and contains a valid endpoint value (0–65534)
+        matter_asserts.assert_int_in_range(session.peerEndpointID, 0, 65534, "PeerEndpointID")
+
+        # StreamUsage is StreamUsageEnum type and contains a valid StreamUsageEnum value
+        matter_asserts.assert_valid_enum(session.streamUsage, "StreamUsage", Clusters.Globals.Enums.StreamUsageEnum)
+        asserts.assert_not_equal(session.streamUsage, Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                                 "StreamUsage should be a valid known StreamUsageEnum value")
+
+        # Verify the stored session ID matches the one returned in the SolicitOfferResponse
+        asserts.assert_equal(session.id, current_session_id, "Session ID in CurrentSessions should match SolicitOfferResponse")
+
+        # Verify current session contains the allocated VideoStreamID
+        asserts.assert_not_equal(
+            session.videoStreamID,
+            NullValue,
+            "videoStreamID in CurrentSessions should be valid."
+        )
+
+        # Verify current session contains the allocated AudioStreamID
+        asserts.assert_not_equal(
+            session.audioStreamID,
+            NullValue,
+            "audioStreamID in CurrentSessions should be valid."
+        )
 
         self.step(5)
         # Send EndSession with invalid WebRTCSessionID (current + 1)

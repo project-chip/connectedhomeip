@@ -26,6 +26,11 @@
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -99,8 +104,10 @@ CHIP_ERROR AppendAllInRange(const AttributeIdRange range, ReadOnlyBufferBuilder<
 
 } // namespace ThreadNetworkDiagnostics
 
-ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mClusterType(clusterType)
+ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(
+    EndpointId endpointId, ClusterType clusterType, ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider) :
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
+    mClusterType(clusterType), mProvider(provider)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -114,7 +121,7 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
         return encoder.Encode(mClusterType == ClusterType::kMinimal ? BitFlags<Feature>() : kFeaturesAll);
     default:
         // Since ReadAttribute() is invoked only for valid attributes this is safe
-        return WriteThreadNetworkDiagnosticAttributeToTlv(request.path.mAttributeId, encoder);
+        return mProvider.ReadAttribute(request.path.mAttributeId, encoder);
     }
 }
 
@@ -145,10 +152,43 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
     return builder.ReferenceExisting(DefaultServerCluster::GlobalAttributes());
 }
 
+namespace {
+
+[[maybe_unused]] const char * GetNetworkFaultString(uint8_t fault)
+{
+    switch (static_cast<NetworkFaultEnum>(fault))
+    {
+    case NetworkFaultEnum::kUnspecified:
+        return "Unspecified";
+    case NetworkFaultEnum::kLinkDown:
+        return "LinkDown";
+    case NetworkFaultEnum::kHardwareFailure:
+        return "HardwareFailure";
+    case NetworkFaultEnum::kNetworkJammed:
+        return "NetworkJammed";
+    default:
+        return "Unknown";
+    }
+}
+
+} // namespace
+
 // Notified when the Node’s connection status to a Thread network has changed.
 void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus)
 {
-    ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged");
+    if (newConnectionStatus == ConnectionStatusEnum::kConnected)
+    {
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x",
+                        chip::DeviceLayer::Internal::GetOpenThreadPanId(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance()));
+#else
+        ChipLogProgress(Zcl, "ThdDiag: Conn");
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "ThdDiag: Disconn");
+    }
 
     VerifyOrReturn(mContext != nullptr);
     Events::ConnectionStatus::Type event{ newConnectionStatus };
@@ -159,7 +199,15 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
                                                             const GeneralFaults<kMaxNetworkFaults> & current)
 {
-    ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged");
+    if (current.size() > 0)
+    {
+        [[maybe_unused]] uint8_t latestFault = current.data()[current.size() - 1];
+        ChipLogDetail(Zcl, "ThdDiag: Fault. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ThdDiag: No faults");
+    }
 
     /* Verify that the data size matches the expected one. */
     static_assert(sizeof(*current.data()) == sizeof(NetworkFaultEnum));
@@ -193,7 +241,7 @@ ThreadNetworkDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & 
     switch (request.path.mCommandId)
     {
     case Commands::ResetCounts::Id: {
-        ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
+        mProvider.ResetCounts();
         return Protocols::InteractionModel::Status::Success;
     }
     default:

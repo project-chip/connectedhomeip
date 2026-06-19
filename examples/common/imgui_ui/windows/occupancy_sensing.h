@@ -18,7 +18,7 @@
 
 #include "window.h"
 
-#include <stdint.h>
+#include <optional>
 #include <string>
 
 #include <app/data-model/Nullable.h>
@@ -43,10 +43,8 @@ private:
     const chip::EndpointId mEndpointId;
     const std::string mTitle;
 
-    using BitMask = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
-
-    BitMask mOccupancy;
-    chip::Optional<BitMask> mTargetOccupancy;
+    bool mOccupied;
+    std::optional<bool> mTargetOccupied;
 };
 
 } // namespace Windows

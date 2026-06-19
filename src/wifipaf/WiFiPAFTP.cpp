@@ -26,6 +26,7 @@
 #define _CHIP_WIFI_PAFTP_H
 #include "WiFiPAFTP.h"
 
+#include <cstdio>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
@@ -69,6 +70,7 @@ static inline bool DidReceiveData(BitFlags<WiFiPAFTP::HeaderFlags> rx_flags)
 const uint16_t WiFiPAFTP::sDefaultFragmentSize = CHIP_PAF_DEFAULT_MTU; // minimum MTU - 3 bytes for operation header
 const uint16_t WiFiPAFTP::sMaxFragmentSize =
     CHIP_PAF_DEFAULT_MTU; // Maximum size of PAFTP segment. Ref: 4.21.3.1, "Supported Maximum Service Specific Info Length"
+const uint16_t WiFiPAFTP::sMinFragmentSize = kTransferProtocolMaxHeaderSize + 1;
 
 CHIP_ERROR WiFiPAFTP::Init(void * an_app_state, bool expect_first_ack)
 {

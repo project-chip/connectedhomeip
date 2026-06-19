@@ -27,9 +27,11 @@
 #include <clusters/AdministratorCommissioning/AttributeIds.h>
 #include <clusters/AirQuality/AttributeIds.h>
 #include <clusters/AmbientContextSensing/AttributeIds.h>
+#include <clusters/AmbientSensingUnion/AttributeIds.h>
 #include <clusters/ApplicationBasic/AttributeIds.h>
 #include <clusters/ApplicationLauncher/AttributeIds.h>
 #include <clusters/AudioOutput/AttributeIds.h>
+#include <clusters/AvAnalysis/AttributeIds.h>
 #include <clusters/BallastConfiguration/AttributeIds.h>
 #include <clusters/BasicInformation/AttributeIds.h>
 #include <clusters/Binding/AttributeIds.h>
@@ -59,10 +61,14 @@
 #include <clusters/DishwasherAlarm/AttributeIds.h>
 #include <clusters/DishwasherMode/AttributeIds.h>
 #include <clusters/DoorLock/AttributeIds.h>
+#include <clusters/DynamicLighting/AttributeIds.h>
 #include <clusters/EcosystemInformation/AttributeIds.h>
+#include <clusters/ElectricalAlarm/AttributeIds.h>
+#include <clusters/ElectricalDistribution/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalGridConditions/AttributeIds.h>
 #include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
+#include <clusters/ElectricalProtectionAlarm/AttributeIds.h>
 #include <clusters/EnergyEvse/AttributeIds.h>
 #include <clusters/EnergyEvseMode/AttributeIds.h>
 #include <clusters/EnergyPreference/AttributeIds.h>
@@ -78,6 +84,7 @@
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groups/AttributeIds.h>
 #include <clusters/HepaFilterMonitoring/AttributeIds.h>
+#include <clusters/Humidistat/AttributeIds.h>
 #include <clusters/IcdManagement/AttributeIds.h>
 #include <clusters/Identify/AttributeIds.h>
 #include <clusters/IlluminanceMeasurement/AttributeIds.h>
@@ -98,6 +105,7 @@
 #include <clusters/MicrowaveOvenMode/AttributeIds.h>
 #include <clusters/ModeSelect/AttributeIds.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
+#include <clusters/NetworkIdentityManagement/AttributeIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OnOff/AttributeIds.h>
@@ -115,6 +123,7 @@
 #include <clusters/PowerSourceConfiguration/AttributeIds.h>
 #include <clusters/PowerTopology/AttributeIds.h>
 #include <clusters/PressureMeasurement/AttributeIds.h>
+#include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProxyConfiguration/AttributeIds.h>
 #include <clusters/ProxyDiscovery/AttributeIds.h>
 #include <clusters/ProxyValid/AttributeIds.h>
@@ -132,12 +141,15 @@
 #include <clusters/ScenesManagement/AttributeIds.h>
 #include <clusters/ServiceArea/AttributeIds.h>
 #include <clusters/SmokeCoAlarm/AttributeIds.h>
+#include <clusters/SmokeConcentrationMeasurement/AttributeIds.h>
 #include <clusters/SoftwareDiagnostics/AttributeIds.h>
 #include <clusters/SoilMeasurement/AttributeIds.h>
 #include <clusters/Switch/AttributeIds.h>
 #include <clusters/TargetNavigator/AttributeIds.h>
 #include <clusters/TemperatureControl/AttributeIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/AttributeIds.h>
 #include <clusters/TemperatureMeasurement/AttributeIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/AttributeIds.h>
 #include <clusters/Thermostat/AttributeIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/AttributeIds.h>
 #include <clusters/ThreadBorderRouterManagement/AttributeIds.h>
@@ -145,7 +157,6 @@
 #include <clusters/ThreadNetworkDirectory/AttributeIds.h>
 #include <clusters/TimeFormatLocalization/AttributeIds.h>
 #include <clusters/TimeSynchronization/AttributeIds.h>
-#include <clusters/Timer/AttributeIds.h>
 #include <clusters/TlsCertificateManagement/AttributeIds.h>
 #include <clusters/TlsClientManagement/AttributeIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/AttributeIds.h>

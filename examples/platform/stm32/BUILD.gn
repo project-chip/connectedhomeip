@@ -41,7 +41,7 @@ config("chip_examples_project_config") {
 }
 
 source_set("openthread_core_config_stm32_chip_examples") {
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources = [
       #  "project_include/OpenThreadConfig.h"
     ]

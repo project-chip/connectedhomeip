@@ -80,7 +80,8 @@ offers extra sample applications for different device-types
                 <li> <a href="../../../examples/air-quality-sensor-app/silabs/README.md">Air Quality Sensor App</a></li>
                 <li> <a href="../../../examples/closure-app/silabs/README.md">Closure App</a></li>
                 <li> <a href="../../../examples/dishwasher-app/silabs/README.md">Dishwasher App</a></li>
-                <li> <a href="../../../examples/evse-app/silabs/README.md">Energy Management App</a></li>
+                <li> <a href="../../../examples/evse-app/silabs/README.md">EVSE App</a></li>
+                <li> <a href="../../../examples/water-heater-app/silabs/README.md">Water Heater App</a></li>
                 <li> <a href="../../../examples/lit-icd-app/silabs/README.md">LIT ICD App</a></li>
                 <li> <a href="../../../examples/refrigerator-app/silabs/README.md">Refrigerator App</a></li>
                 <li> <a href="../../../examples/window-app/silabs/README.md">Window App</a></li>

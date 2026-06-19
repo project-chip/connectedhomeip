@@ -67,8 +67,8 @@ Auto-initializing...
 ### Supported Device Types
 
 The available device types depend on what's registered in the `DeviceFactory`.
-Check `all-devices-common/devices/device-factory/DeviceFactory.h` for the list
-of supported types.
+Check `all-devices-common/device-factory/DeviceFactory.h` for the list of
+supported types.
 
 ## Changing Device Type (Factory Reset)
 

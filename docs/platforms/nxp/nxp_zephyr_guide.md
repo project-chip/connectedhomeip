@@ -255,7 +255,7 @@ As an example, the Matter CLI on `frdm_rw612` is configured to be output on
 `flexcomm3` with a baudrate of `115200`. The logs are configured to be output on
 `flexcomm0` with a baudrate of `115200`.
 
-> **Note**: `frdm_rw612` and ` frdm_rw612``flexcomm3 ` is wired to the USB
+> **Note**: `frdm_rw612` and `frdm_rw612``flexcomm3` is wired to the USB
 > `MCULINK` port of the board by default. `rd_rw612_bga` `flexcomm0` is wired to
 > `GPIO2` (RX) and `GPIO3` (TX). Those pins are accessible on `HD2` pin header.
 > `frdm_rw612` `flexcomm0` is wired to RX and TX pins located at `J5 mikroBUS`.

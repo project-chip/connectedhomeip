@@ -88,7 +88,9 @@
 #define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 
 // Enable some test-only interaction model APIs.
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+#endif
 
 #define CHIP_ENABLE_ROTATING_DEVICE_ID 1
 
@@ -107,6 +109,10 @@
 
 // delay (in sec) before which we assume undiscovered cached players may be in STR mode
 #define CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC 5
+
+// Enable automatic port retry to handle port conflicts
+#define CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY 1
+#define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
 
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 

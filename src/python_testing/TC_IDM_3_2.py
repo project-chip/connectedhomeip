@@ -32,65 +32,36 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from typing import Any, Optional
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
-from matter.clusters import ClusterObjects as ClusterObjects
-# from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing import global_attribute_ids
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_3_2(BasicCompositionTests):
+class TC_IDM_3_2(IDMBaseTest):
     """Test case for IDM-3.2: Write Response Action from DUT to TH. [{DUT_Server}]"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
 
-    async def find_timed_write_attribute(
-        self, endpoints_data: dict[int, Any]
-    ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
-        """
-        Find an attribute that requires timed write on the actual device
-        Uses the wildcard read data that's already in endpoints_data
-        """
-        log.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
+    # This test can take some time to run in heavily congested test environments, adding a longer timeout.
 
-        for endpoint_id, endpoint in endpoints_data.items():
-            for cluster_type, cluster_data in endpoint.items():
-                cluster_id = cluster_type.id
-
-                cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
-                # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
-                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
-                    # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
-
-                for attr_type in cluster_data:
-                    # Check if this is an attribute descriptor class
-                    if (isinstance(attr_type, type) and
-                            issubclass(attr_type, ClusterObjects.ClusterAttributeDescriptor)):
-                        # Check if this attribute requires timed write using the must_use_timed_write class property
-                        if attr_type.must_use_timed_write:
-                            log.info(f"Found timed write attribute: {attr_type.__name__} "
-                                     f"in cluster {cluster_type.__name__} on endpoint {endpoint_id}")
-                            return endpoint_id, attr_type
-
-        log.warning("No timed write attributes found on device")
-        return None, None
+    @property
+    def default_timeout(self) -> int:
+        return 300
 
     def steps_TC_IDM_3_2(self) -> list[TestStep]:
         return [
@@ -142,79 +113,10 @@ class TC_IDM_3_2(BasicCompositionTests):
                              f"Write to unsupported endpoint should return UNSUPPORTED_ENDPOINT, got {write_status}")
 
         self.step(2)
-        '''
-        Write all attributes on an unsupported cluster to DUT
-        Find an unsupported cluster
-        '''
-        supported_cluster_ids = set()
-        for endpoint_clusters in self.endpoints.values():
-            supported_cluster_ids.update({
-                cluster.id for cluster in endpoint_clusters
-                if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard
-            })
-
-        # Get all possible standard clusters
-        all_standard_cluster_ids = {
-            cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS
-            if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard
-        }
-
-        # Find unsupported clusters
-        unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
-
-        if not unsupported_cluster_ids:
-            self.skip_step("No unsupported standard clusters found to test")
-
-        # Use the first unsupported cluster
-        unsupported_cluster_id = next(iter(unsupported_cluster_ids))
-        cluster_attributes = ClusterObjects.ALL_ATTRIBUTES[unsupported_cluster_id]
-        test_unsupported_attribute = next(iter(cluster_attributes.values()))
-
-        write_status = await self.write_single_attribute(
-            attribute_value=test_unsupported_attribute,
-            endpoint_id=self.endpoint,
-            expect_success=False
-        )
-        # Verify we get UNSUPPORTED_CLUSTER error
-        asserts.assert_equal(write_status, Status.UnsupportedCluster,
-                             f"Write to unsupported cluster should return UNSUPPORTED_CLUSTER, got {write_status}")
+        await self.write_unsupported_cluster(endpoint_id=self.endpoint)
 
         self.step(3)
-        # Write an unsupported attribute to DUT
-        unsupported_endpoint = None
-        unsupported_attribute = None
-        for endpoint_id, endpoint in self.endpoints.items():
-            for cluster_type, cluster_data in endpoint.items():
-                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
-                    continue
-
-                all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
-                dut_attrs = set(cluster_data.get(cluster_type.Attributes.AttributeList, []))
-
-                unsupported = [
-                    attr_id for attr_id in (all_attrs - dut_attrs)
-                    if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal
-                ]
-                if unsupported:
-                    unsupported_attribute = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
-                    unsupported_endpoint = endpoint_id
-                    log.info(f"Found unsupported attribute: {unsupported_attribute} in cluster {cluster_type.id}")
-                    break
-            if unsupported_attribute:
-                log.info(f"Unsupported attribute: {unsupported_attribute}")
-                break
-
-        if not unsupported_attribute:
-            log.warning("No unsupported attributes found - this may be OK for non-commissionable devices")
-        else:
-            write_status2 = await self.write_single_attribute(
-                attribute_value=unsupported_attribute(0),
-                endpoint_id=unsupported_endpoint,
-                expect_success=False
-            )
-            log.info(f"Writing unsupported attribute: {unsupported_attribute}")
-            asserts.assert_equal(write_status2, Status.UnsupportedAttribute,
-                                 f"Write to unsupported attribute should return UNSUPPORTED_ATTRIBUTE, got {write_status2}")
+        await self.write_unsupported_attribute()
 
         self.skip_step(4)
         # Currently skipping step 4 as we have removed support in the python framework for this functionality currently.
@@ -286,7 +188,7 @@ class TC_IDM_3_2(BasicCompositionTests):
 
             # Get the current DataVersion
             current_data_version = read_result[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            log.info(f"Current DataVersion for cluster {test_cluster.id}: {current_data_version}")
+            log.info("Current DataVersion for cluster %s: %s", test_cluster.id, current_data_version)
 
             write_result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
@@ -319,7 +221,7 @@ class TC_IDM_3_2(BasicCompositionTests):
             )
 
             initial_data_version = initial_read[self.endpoint][test_cluster][Clusters.Attribute.DataVersion]
-            log.info(f"Initial DataVersion for step 6: {initial_data_version}")
+            log.info("Initial DataVersion for step 6: %s", initial_data_version)
 
             # Write without DataVersion (this should succeed and increment the DataVersion)
             new_value1 = "New-Label-Step6"
@@ -368,7 +270,7 @@ class TC_IDM_3_2(BasicCompositionTests):
             '''
 
             # Test with the real timed-write attribute found on the device
-            log.info(f"Testing timed write attribute: {timed_attr}")
+            log.info("Testing timed write attribute: %s", timed_attr)
 
             # Test NEEDS_TIMED_INTERACTION - Writing timed-write-required attribute without timed transaction
             # Found below logic in /home/ubuntu/connectedhomeapi/connectedhomeip/src/controller/python/tests/scripts/cluster_objects.py and TC_IDM_1_2 test logic.

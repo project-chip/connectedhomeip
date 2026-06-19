@@ -30,11 +30,18 @@
 
 #if defined(CONFIG_ESP_CONSOLE_UART_DEFAULT) || defined(CONFIG_ESP_CONSOLE_UART_CUSTOM)
 #include "driver/uart.h"
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+#include "driver/uart_vfs.h"
+#endif
 #endif
 
 #ifdef CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
 #include "driver/usb_serial_jtag.h"
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+#include "driver/usb_serial_jtag_vfs.h"
+#else
 #include "esp_vfs_usb_serial_jtag.h"
+#endif
 #endif
 
 namespace chip {
@@ -60,8 +67,15 @@ int streamer_esp32_init(streamer_t * streamer)
     fsync(fileno(stdout));
     setvbuf(stdin, NULL, _IONBF, 0);
 #if defined(CONFIG_ESP_CONSOLE_UART_DEFAULT) || defined(CONFIG_ESP_CONSOLE_UART_CUSTOM)
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
     esp_vfs_dev_uart_port_set_rx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
     esp_vfs_dev_uart_port_set_tx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
+#else
+    uart_vfs_dev_port_set_rx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
+    uart_vfs_dev_port_set_tx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
+#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
+
     if (!uart_is_driver_installed((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM))
     {
         ESP_ERROR_CHECK(uart_driver_install((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, 256, 0, 0, NULL, 0));
@@ -80,13 +94,16 @@ int streamer_esp32_init(streamer_t * streamer)
 #endif
     };
     ESP_ERROR_CHECK(uart_param_config((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
     esp_vfs_dev_uart_use_driver(0);
+#else
+    uart_vfs_dev_use_driver(CONFIG_ESP_CONSOLE_UART_NUM);
+#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
+
 #endif // CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
 
 #ifdef CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
-    esp_vfs_dev_usb_serial_jtag_set_rx_line_endings(ESP_LINE_ENDINGS_CR);
-    esp_vfs_dev_usb_serial_jtag_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);
-
     fcntl(fileno(stdout), F_SETFL, O_NONBLOCK);
     fcntl(fileno(stdin), F_SETFL, O_NONBLOCK);
 
@@ -95,8 +112,16 @@ int streamer_esp32_init(streamer_t * streamer)
         .rx_buffer_size = 256,
     };
     usb_serial_jtag_driver_install(&usb_serial_jtag_config);
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+    usb_serial_jtag_vfs_set_rx_line_endings(ESP_LINE_ENDINGS_CR);
+    usb_serial_jtag_vfs_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);
+    usb_serial_jtag_vfs_use_driver();
+#else
+    esp_vfs_dev_usb_serial_jtag_set_rx_line_endings(ESP_LINE_ENDINGS_CR);
+    esp_vfs_dev_usb_serial_jtag_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);
     esp_vfs_usb_serial_jtag_use_driver();
     esp_vfs_dev_uart_register();
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
 #endif // CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
     esp_console_config_t console_config = {
         .max_cmdline_length = CONFIG_CHIP_SHELL_CMD_LINE_BUF_MAX_LENGTH,

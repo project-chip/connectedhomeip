@@ -47,6 +47,25 @@ private:
     DeviceEnergyManagementDelegate * mDelegate;
 };
 
+/**
+ * @brief   Helper function to create and initialize the DeviceEnergyManagement cluster
+ *
+ * Creates the delegate and instance, then calls Init() to register attribute and command handlers
+ *
+ * @param endpointId The endpoint ID to create the cluster on
+ * @param aDelegate  Reference to store the created delegate
+ * @param aInstance  Reference to store the created instance
+ * @param aFeatureMap The feature map for the cluster
+ * @return CHIP_NO_ERROR if the DeviceEnergyManagement cluster is initialized successfully, otherwise an error code
+ */
+CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId,
+                                      std::unique_ptr<DeviceEnergyManagement::DeviceEnergyManagementDelegate> & aDelegate,
+                                      std::unique_ptr<DeviceEnergyManagementManager> & aInstance,
+                                      chip::BitMask<DeviceEnergyManagement::Feature> aFeatureMap);
+
+void DeviceEnergyManagementShutdown(std::unique_ptr<DeviceEnergyManagementManager> & aInstance,
+                                    std::unique_ptr<DeviceEnergyManagement::DeviceEnergyManagementDelegate> & aDelegate);
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

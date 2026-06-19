@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace AmbientContextSensing {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -45,15 +45,24 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AmbientContextTypeSupported
+namespace ObjectCountThresholdReached {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ObjectCountThresholdReached::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace ObjectCountThresholdReached
+namespace ObjectCountConfig {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ObjectCountConfig::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kManage);
+} // namespace ObjectCountConfig
+namespace ObjectCount {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ObjectCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace ObjectCount
 namespace SimultaneousDetectionLimit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SimultaneousDetectionLimit::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          Access::Privilege::kOperate);
+                                                          std::nullopt);
 } // namespace SimultaneousDetectionLimit
-namespace ObjectCountReached {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ObjectCountReached::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace ObjectCountReached
 namespace HoldTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HoldTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -68,6 +77,12 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace PredictedActivity
+namespace SensorFusionSupported {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SensorFusionSupported::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SensorFusionSupported
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     SimultaneousDetectionLimit::kMetadataEntry,
     HoldTime::kMetadataEntry,
@@ -80,9 +95,12 @@ constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
 namespace Commands {} // namespace Commands
 
 namespace Events {
-namespace AmbientContextDetected {
+namespace AmbientContextDetectStarted {
 inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
-} // namespace AmbientContextDetected
+} // namespace AmbientContextDetectStarted
+namespace AmbientContextDetectEnded {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace AmbientContextDetectEnded
 
 } // namespace Events
 } // namespace AmbientContextSensing

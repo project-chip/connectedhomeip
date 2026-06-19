@@ -35,9 +35,9 @@ source_set("tls-certificate-management-server") {
 
   deps = [
     ":certificate-table",
-    "${chip_root}/src/app:attribute-persistence",
-    "${chip_root}/src/app/server",
+    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/server-cluster:server-cluster",
+    "${chip_root}/src/credentials",
     "${chip_root}/zzz_generated/app-common/clusters:all-headers",
     "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
   ]

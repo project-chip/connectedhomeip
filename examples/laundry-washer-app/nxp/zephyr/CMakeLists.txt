@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -40,11 +40,6 @@ project(chip-nxp-all-clusters-app-example)
 
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
-
-# This is required to include Mbedtls user config file for NXP platform.
-# We use zephyr_include_directories to ensure the include is propagated to
-# the Zephyr Mbedtls module.
-zephyr_include_directories(${CHIP_ROOT}/src)
 
 target_include_directories(app
     PRIVATE
@@ -124,7 +119,6 @@ endif()
 target_sources(app
     PRIVATE
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
-    ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
     ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/laundry-washer-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-controls-delegate-impl.cpp

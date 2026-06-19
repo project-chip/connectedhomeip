@@ -26,16 +26,12 @@ import matter.tlv.TlvWriter
 
 class AmbientContextSensingClusterAmbientContextTypeStruct(
   val ambientContextSensed: List<AmbientContextSensingClusterSemanticTagStruct>,
-  val detectionStartTime: Optional<UInt>,
-  val objectCountThreshold: Optional<UShort>,
-  val objectCount: Optional<UShort>,
+  val detectionConfidence: Optional<UByte>?,
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextTypeStruct {\n")
     append("\tambientContextSensed : $ambientContextSensed\n")
-    append("\tdetectionStartTime : $detectionStartTime\n")
-    append("\tobjectCountThreshold : $objectCountThreshold\n")
-    append("\tobjectCount : $objectCount\n")
+    append("\tdetectionConfidence : $detectionConfidence\n")
     append("}\n")
   }
 
@@ -47,17 +43,13 @@ class AmbientContextSensingClusterAmbientContextTypeStruct(
         item.toTlv(AnonymousTag, this)
       }
       endArray()
-      if (detectionStartTime.isPresent) {
-        val optdetectionStartTime = detectionStartTime.get()
-        put(ContextSpecificTag(TAG_DETECTION_START_TIME), optdetectionStartTime)
-      }
-      if (objectCountThreshold.isPresent) {
-        val optobjectCountThreshold = objectCountThreshold.get()
-        put(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD), optobjectCountThreshold)
-      }
-      if (objectCount.isPresent) {
-        val optobjectCount = objectCount.get()
-        put(ContextSpecificTag(TAG_OBJECT_COUNT), optobjectCount)
+      if (detectionConfidence != null) {
+        if (detectionConfidence.isPresent) {
+          val optdetectionConfidence = detectionConfidence.get()
+          put(ContextSpecificTag(TAG_DETECTION_CONFIDENCE), optdetectionConfidence)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_DETECTION_CONFIDENCE))
       }
       endStructure()
     }
@@ -65,9 +57,7 @@ class AmbientContextSensingClusterAmbientContextTypeStruct(
 
   companion object {
     private const val TAG_AMBIENT_CONTEXT_SENSED = 0
-    private const val TAG_DETECTION_START_TIME = 1
-    private const val TAG_OBJECT_COUNT_THRESHOLD = 2
-    private const val TAG_OBJECT_COUNT = 3
+    private const val TAG_DETECTION_CONFIDENCE = 1
 
     fun fromTlv(
       tlvTag: Tag,
@@ -82,32 +72,23 @@ class AmbientContextSensingClusterAmbientContextTypeStruct(
           }
           tlvReader.exitContainer()
         }
-      val detectionStartTime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTION_START_TIME))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DETECTION_START_TIME)))
+      val detectionConfidence =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTION_CONFIDENCE))) {
+            Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_DETECTION_CONFIDENCE)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
-        }
-      val objectCountThreshold =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD)))
-        } else {
-          Optional.empty()
-        }
-      val objectCount =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OBJECT_COUNT))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_OBJECT_COUNT)))
-        } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_DETECTION_CONFIDENCE))
+          null
         }
 
       tlvReader.exitContainer()
 
       return AmbientContextSensingClusterAmbientContextTypeStruct(
         ambientContextSensed,
-        detectionStartTime,
-        objectCountThreshold,
-        objectCount,
+        detectionConfidence,
       )
     }
   }

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 # Copyright 2023 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,6 +48,7 @@ source_set("nxp_ota") {
 
   deps = [
     ":nxp_platform",
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/platform:platform",
   ]
 }
@@ -80,7 +81,9 @@ static_library("nxp_platform") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
+    "../common/BootReason.h",
     "../common/CHIPDevicePlatformEvent.h",
+    "../common/ConfigurationManagerImpl.cpp",
     "../common/ConfigurationManagerImpl.h",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.h",
@@ -93,22 +96,29 @@ static_library("nxp_platform") {
     "../common/NetworkProvisioningServerImpl.h",
     "../common/PlatformManagerImpl.h",
     "../common/SoftwareUpdateManagerImpl.h",
-    "../mcxw71/ConfigurationManagerImpl.cpp",
+    "BootReason.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
   deps = [ "${chip_root}/src/app:app_config" ]
 
   if (chip_crypto == "platform") {
-    sources += [
-      "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
-      "../common/crypto/PersistentStorageOpKeystoreBase.h",
-      "../common/crypto/S200/CHIPCryptoPalS200.cpp",
-      "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
-      "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
-    ]
+    if (nxp_crypto_impl != "se05x") {
+      sources += [
+        "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
+        "../common/crypto/PersistentStorageOpKeystoreBase.h",
+        "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
+        "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
+      ]
+    }
+
+    sources += [ "../common/crypto/S200/CHIPCryptoPalS200.cpp" ]
 
     include_dirs = [ "${nxp_sdk_build_root}/mbedtls/config" ]
+  } else if (chip_crypto == "psa") {
+    if (chip_crypto_spake2p == "custom") {
+      sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
+    }
   }
 
   if (chip_enable_ble) {
@@ -123,12 +133,13 @@ static_library("nxp_platform") {
   # When the app is built using gn, the app selects the nxp_ota target through its build file.
   if (nxp_external_sdk && chip_enable_ota_requestor) {
     sources += ota_sources
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (nxp_use_low_power) {
-    sources += [ "../mcxw71/LowPowerHooks.cpp" ]
+    sources += [ "LowPowerHooks.cpp" ]
   }
 
   deps += [
@@ -136,7 +147,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "../common/ThreadStackManagerImpl.cpp",
@@ -174,11 +185,17 @@ static_library("nxp_platform") {
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
 
   public_deps += [
-    "${chip_root}/examples/platform/nxp/mcxw71/app/support:freertos_memory_utils",
+    "${chip_root}/examples/platform/nxp/mcxw72/app/support:freertos_memory_utils",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
   ]
+
+  if (nxp_crypto_impl == "se05x") {
+    deps += [
+      "${chip_root}/src/platform/nxp/crypto/${nxp_crypto_impl}:nxp_crypto_lib",
+    ]
+  }
 
   public_configs = [ ":nxp_platform_config" ]
 }

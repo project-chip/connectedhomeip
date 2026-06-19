@@ -46,6 +46,11 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::ProvideICECandidates::kMetadataEntry, Commands::EndSession::kMetadataEntry,
 };
 
+constexpr CommandId kGeneratedCommands[] = {
+    Commands::SolicitOfferResponse::Id,
+    Commands::ProvideOfferResponse::Id,
+};
+
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
 {
     auto descriptor = commandHandler.GetSubjectDescriptor();
@@ -271,6 +276,12 @@ CHIP_ERROR WebRTCTransportProviderCluster::AcceptedCommands(const ConcreteCluste
                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+CHIP_ERROR WebRTCTransportProviderCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                             ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return builder.ReferenceExisting(kGeneratedCommands);
 }
 
 CHIP_ERROR WebRTCTransportProviderCluster::Attributes(const ConcreteClusterPath & path,

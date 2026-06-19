@@ -14,7 +14,7 @@ namespace AmbientContextSensing {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 15;
+inline constexpr uint32_t kAttributesCount = 18;
 
 namespace HumanActivityDetected {
 inline constexpr AttributeId Id = 0x00000000;
@@ -36,25 +36,37 @@ namespace AmbientContextTypeSupported {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace AmbientContextTypeSupported
 
-namespace SimultaneousDetectionLimit {
+namespace ObjectCountThresholdReached {
 inline constexpr AttributeId Id = 0x00000005;
+} // namespace ObjectCountThresholdReached
+
+namespace ObjectCountConfig {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace ObjectCountConfig
+
+namespace ObjectCount {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace ObjectCount
+
+namespace SimultaneousDetectionLimit {
+inline constexpr AttributeId Id = 0x00000008;
 } // namespace SimultaneousDetectionLimit
 
-namespace ObjectCountReached {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace ObjectCountReached
-
 namespace HoldTime {
-inline constexpr AttributeId Id = 0x00000007;
+inline constexpr AttributeId Id = 0x00000009;
 } // namespace HoldTime
 
 namespace HoldTimeLimits {
-inline constexpr AttributeId Id = 0x00000008;
+inline constexpr AttributeId Id = 0x0000000A;
 } // namespace HoldTimeLimits
 
 namespace PredictedActivity {
-inline constexpr AttributeId Id = 0x00000009;
+inline constexpr AttributeId Id = 0x0000000B;
 } // namespace PredictedActivity
+
+namespace SensorFusionSupported {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace SensorFusionSupported
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

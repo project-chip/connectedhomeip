@@ -150,8 +150,8 @@ if (current_os == "zephyr") {
   group("all") {
     deps = [ ":lwip" ]
   }
-} else if (lwip_platform == "bl616" && defined(chip_enable_openthread) &&
-           chip_enable_openthread == false) {
+} else if (lwip_platform == "bl616" && defined(chip_enable_thread) &&
+           chip_enable_thread == false) {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
@@ -160,8 +160,8 @@ if (current_os == "zephyr") {
   group("all") {
     deps = [ ":lwip" ]
   }
-} else if (lwip_platform == "bl702" && defined(chip_enable_openthread) &&
-           chip_enable_openthread == false) {
+} else if (lwip_platform == "bl702" && defined(chip_enable_thread) &&
+           chip_enable_thread == false) {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]

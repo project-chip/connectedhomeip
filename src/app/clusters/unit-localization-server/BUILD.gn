@@ -22,6 +22,7 @@ source_set("unit-localization-server") {
 
   public_deps = [
     "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/UnitLocalization",

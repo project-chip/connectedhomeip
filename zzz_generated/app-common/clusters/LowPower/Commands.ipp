@@ -50,7 +50,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace Sleep.
+} // namespace Sleep
 } // namespace Commands
 } // namespace LowPower
 } // namespace Clusters

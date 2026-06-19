@@ -33,16 +33,22 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AmbientConte
             return AmbientContextType::kMetadataEntry;
         case AmbientContextTypeSupported::Id:
             return AmbientContextTypeSupported::kMetadataEntry;
+        case ObjectCountThresholdReached::Id:
+            return ObjectCountThresholdReached::kMetadataEntry;
+        case ObjectCountConfig::Id:
+            return ObjectCountConfig::kMetadataEntry;
+        case ObjectCount::Id:
+            return ObjectCount::kMetadataEntry;
         case SimultaneousDetectionLimit::Id:
             return SimultaneousDetectionLimit::kMetadataEntry;
-        case ObjectCountReached::Id:
-            return ObjectCountReached::kMetadataEntry;
         case HoldTime::Id:
             return HoldTime::kMetadataEntry;
         case HoldTimeLimits::Id:
             return HoldTimeLimits::kMetadataEntry;
         case PredictedActivity::Id:
             return PredictedActivity::kMetadataEntry;
+        case SensorFusionSupported::Id:
+            return SensorFusionSupported::kMetadataEntry;
         default:
             return std::nullopt;
         }

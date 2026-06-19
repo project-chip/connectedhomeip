@@ -43,7 +43,7 @@ class JointFabricAdministratorCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
-  class ICACCSRResponse(val icaccsr: ByteArray)
+  class ICACCSRResponse(val statusCode: UByte, val icaccsr: ByteArray?)
 
   class ICACResponse(val statusCode: UByte)
 
@@ -109,26 +109,41 @@ class JointFabricAdministratorCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_ICACCSR: Int = 0
+    val TAG_STATUS_CODE: Int = 0
+    var statusCode_decoded: UByte? = null
+
+    val TAG_ICACCSR: Int = 1
     var icaccsr_decoded: ByteArray? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_ICACCSR)) {
-        icaccsr_decoded = tlvReader.getByteArray(tag)
+      if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
+        statusCode_decoded = tlvReader.getUByte(tag)
+      } else if (tag == ContextSpecificTag(TAG_ICACCSR)) {
+        icaccsr_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
     }
 
-    if (icaccsr_decoded == null) {
-      throw IllegalStateException("icaccsr not found in TLV")
+    if (statusCode_decoded == null) {
+      throw IllegalStateException("statusCode not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return ICACCSRResponse(icaccsr_decoded)
+    return ICACCSRResponse(statusCode_decoded, icaccsr_decoded)
   }
 
   suspend fun addICAC(ICACValue: ByteArray, timedInvokeTimeout: Duration? = null): ICACResponse {

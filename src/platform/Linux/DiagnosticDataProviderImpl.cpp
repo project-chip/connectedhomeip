@@ -33,6 +33,7 @@
 
 #include <arpa/inet.h>
 #include <dirent.h>
+#include <fstream>
 #include <ifaddrs.h>
 #include <linux/ethtool.h>
 #include <linux/if_link.h>
@@ -76,8 +77,22 @@ enum class WiFiStatsCountType
 
 #if defined(__GLIBC__)
 // Static variable to store the maximum heap size
-static size_t maxHeapHighWatermark = 0;
+static uint64_t maxHeapHighWatermark = 0;
 #endif
+
+CHIP_ERROR GetThreadName(pid_t tid, char * nameBuf, size_t nameBufSize)
+{
+    char path[64];
+    snprintf(path, sizeof(path), "/proc/self/task/%u/comm", tid);
+
+    std::ifstream commFile(path);
+    VerifyOrReturnError(commFile.is_open(), CHIP_ERROR_READ_FAILED);
+
+    commFile.getline(nameBuf, nameBufSize);
+    VerifyOrReturnError(commFile.gcount() > 0, CHIP_ERROR_READ_FAILED);
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
@@ -320,10 +335,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
                 continue;
 
             ThreadMetrics * thread = new ThreadMetrics();
+            pid_t tid              = atoi(entry->d_name);
+            thread->id             = tid;
 
-            Platform::CopyString(thread->NameBuf, entry->d_name);
-            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
-            thread->id = atoi(entry->d_name);
+            if (GetThreadName(tid, thread->NameBuf, sizeof(thread->NameBuf)) == CHIP_NO_ERROR)
+            {
+                thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            }
 
             // TODO: Get stack info of each thread: thread->stackFreeCurrent,
             // thread->stackFreeMinimum, thread->stackSize.
@@ -533,22 +551,18 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
 {
-    if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetEthPHYRate(ConnectivityMgrImpl().GetEthernetIfName(), pHYRate);
+    return ConnectivityUtils::GetEthPHYRate(ifName, pHYRate);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
 {
-    if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetEthFullDuplex(ConnectivityMgrImpl().GetEthernetIfName(), fullDuplex);
+    return ConnectivityUtils::GetEthFullDuplex(ifName, fullDuplex);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthTimeSinceReset(uint64_t & timeSinceReset)
@@ -616,6 +630,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthOverrunCount(uint64_t & overrunCoun
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthCarrierDetect(bool & carrierDetect)
+{
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
+
+    return ConnectivityUtils::GetEthCarrierDetect(ifName, carrierDetect);
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
@@ -663,34 +685,27 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetWiFiChannelNumber(ConnectivityMgrImpl().GetWiFiIfName(), channelNumber);
+    return ConnectivityUtils::GetWiFiChannelNumber(ifName, channelNumber);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetWiFiRssi(ConnectivityMgrImpl().GetWiFiIfName(), rssi);
+    return ConnectivityUtils::GetWiFiRssi(ifName, rssi);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
+
     uint32_t count;
-
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
-
-    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(ConnectivityMgrImpl().GetWiFiIfName(), count));
+    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(ifName, count));
     VerifyOrReturnError(count >= mBeaconLostCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
     beaconLostCount = count - mBeaconLostCount;
 
@@ -699,12 +714,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconL
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
 {
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetWiFiCurrentMaxRate(ConnectivityMgrImpl().GetWiFiIfName(), currentMaxRate);
+    return ConnectivityUtils::GetWiFiCurrentMaxRate(ifName, currentMaxRate);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)

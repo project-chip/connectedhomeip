@@ -232,6 +232,21 @@
 #endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
 
 /**
+ *  @def CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+ *
+ *  @brief
+ *    Size of a statically allocated P256 keypair handle in CryptoPAL.
+ *
+ *  If this is 0 (the default), then key handles are not supported and
+ *  serialized keypairs (containing the raw public and private keys) are used instead.
+ *
+ *  Platforms that use PSA can define this to match the size of psa_key_id_t (4).
+ */
+#ifndef CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+#define CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE (0)
+#endif // CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE
+
+/**
  * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
  *
  * @brief
@@ -1107,6 +1122,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
  *
  * Binds to number of GroupMapping entries per fabric
+ * TODO cleanup this config #43166
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
@@ -1122,11 +1138,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+ *
+ * @brief Defines the maximum number of group memberships
+ */
+#ifndef CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+#define CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT 10
+#endif // CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
  *
  * Binds to number of GroupState entries to support per fabric
+ * TODO cleanup this config #43166
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
 #define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)
@@ -1144,7 +1170,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 3
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC (3 + 1) // support 3 KeySets + IPK per fabric
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
@@ -1332,19 +1358,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
 #endif
-
-/**
- * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
- * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
- * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
- * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
- * The cost of this compatibity mode is twice as many decryption steps per received group message.
- *
- * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
- */
-#ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-#define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 
 /**
  *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
@@ -2050,6 +2063,34 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 #define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
 #endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+ *
+ * @brief The maximum number of PushAV transports per device per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+#define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 4
+#endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_ZONES
+ *
+ * @brief The maximum number of zones
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_ZONES
+#define CHIP_CONFIG_MAX_NUM_ZONES 4
+#endif // CHIP_CONFIG_MAX_NUM_ZONES
+
+/**
+ * @def CHIP_MEMORY_SANITIZER_ENABLED
+ *
+ * @brief True when building with Clang MemorySanitizer (MSan).
+ */
+#ifndef CHIP_MEMORY_SANITIZER_ENABLED
+#define CHIP_MEMORY_SANITIZER_ENABLED 0
+#endif
+
 /**
  * @}
  */
