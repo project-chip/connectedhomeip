@@ -230,7 +230,7 @@ void webrtc_bridge_message_received_cb(const void * data, int len)
     // The extracted SDP/candidate is a substring of the JSON payload, so the payload length
     // (+1 for the null terminator) is a safe upper bound for the output buffer.
     size_t sdp_buf_len = msg->payloadLen + 1;
-    char * sdp_buf = (char *) heap_caps_malloc_prefer(sdp_buf_len, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
+    char * sdp_buf     = (char *) heap_caps_malloc_prefer(sdp_buf_len, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
     if (sdp_buf == nullptr)
     {
         ChipLogError(Camera, "webrtc_bridge_message_received_cb: failed to allocate sdp_buf");

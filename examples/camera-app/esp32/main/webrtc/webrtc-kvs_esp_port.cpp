@@ -122,8 +122,7 @@ void KVSWebRTCPeerConnection::SetRemoteDescription(const std::string & sdp, SDPT
     }
     size_t sdp_json_size = static_cast<size_t>(needed) + 1;
 
-    char * sdp_json =
-        (char *) heap_caps_malloc_prefer(sdp_json_size, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
+    char * sdp_json = (char *) heap_caps_malloc_prefer(sdp_json_size, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
     if (sdp_json == nullptr)
     {
         ChipLogError(Camera, "SetRemoteDescription: failed to allocate sdp_json");
