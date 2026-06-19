@@ -33,7 +33,6 @@ using namespace Camera;
 
 static const char * TAG = "webrtc-kvs_esp_port_utils";
 
-static size_t gSDPLength = 8192;
 static char peerClientId[SS_MAX_SIGNALING_CLIENT_ID_LEN + 1];
 
 extern CameraDevice gCameraDevice;
@@ -227,10 +226,10 @@ static int extract_candidate(const char * json, char * sdp_buf, size_t sdp_buf_l
     return -1; // Candidate not found
 }
 
-void webrtc_bridge_message_received_cb(void * data, int len)
+void webrtc_bridge_message_received_cb(const void * data, int len)
 {
     // handle message
-    printf("Received Message from P4-Streamer: \n%.*s\n", len, (char *) data);
+    printf("Received Message from P4-Streamer: \n%.*s\n", len, (const char *) data);
 
     // Use nothrow to check for allocation failure
     std::unique_ptr<signaling_msg_t> msg(new (std::nothrow) signaling_msg_t());
@@ -242,7 +241,16 @@ void webrtc_bridge_message_received_cb(void * data, int len)
 
     deserialize_signaling_message((const char *) data, len, msg.get());
 
-    char * sdp_buf = (char *) heap_caps_malloc_prefer(gSDPLength, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
+    if (msg->payload == nullptr || msg->payloadLen == 0)
+    {
+        ChipLogError(Camera, "webrtc_bridge_message_received_cb: message has no payload");
+        return;
+    }
+
+    // The extracted SDP/candidate is a substring of the JSON payload, so the payload length
+    // (+1 for the null terminator) is a safe upper bound for the output buffer.
+    size_t sdp_buf_len = msg->payloadLen + 1;
+    char * sdp_buf = (char *) heap_caps_malloc_prefer(sdp_buf_len, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
     if (sdp_buf == nullptr)
     {
         ChipLogError(Camera, "webrtc_bridge_message_received_cb: failed to allocate sdp_buf");
@@ -252,19 +260,19 @@ void webrtc_bridge_message_received_cb(void * data, int len)
     switch (msg->messageType)
     {
     case SIGNALING_MSG_TYPE_OFFER:
-        if (extract_sdp(msg->payload, sdp_buf, gSDPLength) == 0)
+        if (extract_sdp(msg->payload, sdp_buf, sdp_buf_len) == 0)
         {
             ESP_LOGD(TAG, "Extracted SDP:\n%s\n", sdp_buf);
         }
         break;
     case SIGNALING_MSG_TYPE_ANSWER:
-        if (extract_sdp(msg->payload, sdp_buf, gSDPLength) == 0)
+        if (extract_sdp(msg->payload, sdp_buf, sdp_buf_len) == 0)
         {
             ESP_LOGD(TAG, "Extracted SDP:\n%s\n", sdp_buf);
         }
         break;
     case SIGNALING_MSG_TYPE_ICE_CANDIDATE:
-        if (extract_candidate(msg->payload, sdp_buf, gSDPLength) == 0)
+        if (extract_candidate(msg->payload, sdp_buf, sdp_buf_len) == 0)
         {
             ESP_LOGD(TAG, "Extracted Candidate:\n%s\n", sdp_buf);
         }

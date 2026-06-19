@@ -49,7 +49,7 @@ void WebRTCProviderManager::Init()
 {
     ChipLogProgress(Camera, "Initializing WebRTC PeerConnection");
     // Register our handler for signaling messages
-    webrtc_bridge_register_handler((webrtc_bridge_msg_cb_t) &webrtc_bridge_message_received_cb);
+    webrtc_bridge_register_handler(&webrtc_bridge_message_received_cb);
 }
 
 void WebRTCProviderManager::CloseConnection()

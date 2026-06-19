@@ -20,7 +20,7 @@
 #include "webrtc-provider-manager.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-void webrtc_bridge_message_received_cb(void * data, int len);
+void webrtc_bridge_message_received_cb(const void * data, int len);
 
 class EspWebRTCPeerConnection
 {
