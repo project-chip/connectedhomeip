@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include <app/clusters/bindings/BindingCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/switch-server/SwitchCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -34,12 +34,13 @@ public:
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::SwitchCluster & Switch() { return mSwitchCluster.Cluster(); }
+    // Endpoint interface overrides
+    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
 private:
     TimerDelegate & mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-    LazyRegisteredServerCluster<Clusters::SwitchCluster> mSwitchCluster;
+    LazyRegisteredServerCluster<Clusters::BindingCluster> mBindingCluster;
 };
 
 } // namespace chip::app

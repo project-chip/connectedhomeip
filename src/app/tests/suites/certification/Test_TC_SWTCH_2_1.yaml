@@ -20,11 +20,6 @@ CI:
       args:
           - --device
           - generic-switch
-    - name: "Test against all-devices/on-off-light-switch"
-      app: all-devices
-      args:
-          - --device
-          - on-off-light-switch
 
 PICS:
     - SWTCH.S

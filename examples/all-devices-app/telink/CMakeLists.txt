@@ -50,7 +50,8 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 
                # all-devices common sources (interfaces, root node base, supported devices)
-               ${ALL_DEVICES_DEVICE_SOURCES})
+               ${ALL_DEVICES_DEVICE_SOURCES}
+               ${ALL_DEVICES_CLUSTER_SOURCES})
 
 target_sources(app PRIVATE
                src/AppTask.cpp

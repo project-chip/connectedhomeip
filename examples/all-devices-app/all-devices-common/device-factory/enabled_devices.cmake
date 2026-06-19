@@ -212,3 +212,14 @@ if(NOT CMAKE_BUILD_EARLY_EXPANSION)
         "${CMAKE_CURRENT_BINARY_DIR}/app_config/enabled_devices.h"
     )
 endif()
+
+# ---------------------------------------------------------------------------
+# Source files for clusters that are not included in the default SDK build
+# but are required by enabled devices (e.g. Binding cluster for client switches).
+# ---------------------------------------------------------------------------
+set(ALL_DEVICES_CLUSTER_SOURCES
+    "${CHIP_ROOT}/src/app/clusters/bindings/BindingCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp"
+    "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
+    "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
+)

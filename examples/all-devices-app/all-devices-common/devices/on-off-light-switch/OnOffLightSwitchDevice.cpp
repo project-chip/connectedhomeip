@@ -17,11 +17,20 @@
 
 #include "OnOffLightSwitchDevice.h"
 
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/binding-table.h>
+#include <clusters/Identify/Ids.h>
+#include <clusters/OnOff/Ids.h>
 #include <devices/Types.h>
+#include <platform/PlatformManager.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
+
+namespace {
+const ClusterId kClientClusters[] = { OnOff::Id, Identify::Id };
+} // namespace
 
 OnOffLightSwitchDevice::OnOffLightSwitchDevice(TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)), mTimerDelegate(timerDelegate)
@@ -34,9 +43,14 @@ CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrive
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mSwitchCluster.Create(endpoint, BitFlags<Switch::Feature>(Switch::Feature::kLatchingSwitch),
-                          SwitchCluster::StartupConfiguration{ .numberOfPositions = 2 });
-    ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
+    mBindingCluster.Create(
+        BindingCluster::Context{
+            .bindingTable    = Binding::Table::GetInstance(),
+            .bindingManager  = Binding::Manager::GetInstance(),
+            .platformManager = DeviceLayer::PlatformMgr(),
+        },
+        endpoint);
+    ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
 }
@@ -44,16 +58,21 @@ CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrive
 void OnOffLightSwitchDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
-    if (mSwitchCluster.IsConstructed())
+    if (mBindingCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mSwitchCluster.Cluster()));
-        mSwitchCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mBindingCluster.Cluster()));
+        mBindingCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
+}
+
+CHIP_ERROR OnOffLightSwitchDevice::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
+{
+    return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
 }
 
 } // namespace chip::app
