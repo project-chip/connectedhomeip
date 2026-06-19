@@ -116,7 +116,7 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
             device="",
             baudrate=115200,
             token_databases=[],
-            socket_addr="0.0.0.0:33000",
+            socket_addr="127.0.0.1:33000",
             compiled_protos=[attributes_service_pb2],
             rpc_logging=True,
             channel_id=rpc.DEFAULT_CHANNEL_ID,
