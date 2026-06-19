@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//with_pw_rpc.gni")
 
 import("${chip_root}/config/standalone/args.gni")
 
