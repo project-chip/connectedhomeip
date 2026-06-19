@@ -73,6 +73,10 @@ CHIP_ERROR DimmableLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
     LevelControlCluster::Config lcConfig(endpoint, mContext.timerDelegate, mLevelControlDelegate);
     lcConfig.WithOnOff(mOnOffCluster.Cluster());
     lcConfig.WithLighting(DataModel::NullNullable);
+    lcConfig.WithOnOffTransitionTime(0);
+    lcConfig.WithOnTransitionTime(0);
+    lcConfig.WithOffTransitionTime(0);
+    lcConfig.WithDefaultMoveRate(DataModel::NullNullable);
     mLevelControlCluster.Create(lcConfig);
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
