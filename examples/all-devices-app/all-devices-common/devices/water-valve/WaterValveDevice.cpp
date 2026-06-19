@@ -93,7 +93,7 @@ CHIP_ERROR WaterValveDevice::HandleCloseValve()
 
 void WaterValveDevice::HandleRemainingDurationTick(uint32_t duration)
 {
-    ChipLogProgress(AppServer, "WaterValveDevice: Remaining duration tick: %u", duration);
+    ChipLogProgress(AppServer, "WaterValveDevice: Remaining duration tick: %lu", static_cast<unsigned long>(duration));
 }
 
 } // namespace chip::app
