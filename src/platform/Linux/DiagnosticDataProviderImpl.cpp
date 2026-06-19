@@ -567,7 +567,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthTimeSinceReset(uint64_t & timeSinceReset)
 {
-    return GetDiagnosticDataProvider().GetUpTime(timeSinceReset);
+    uint64_t currentUptime = 0;
+    ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(currentUptime));
+    VerifyOrReturnError(currentUptime >= mEthTimeSinceResetBaseline, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    timeSinceReset = currentUptime - mEthTimeSinceResetBaseline;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthPacketRxCount(uint64_t & packetRxCount)
@@ -678,6 +684,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 
         freeifaddrs(ifaddr);
     }
+
+    // Record the current uptime as the baseline for TimeSinceReset
+    ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(mEthTimeSinceResetBaseline));
 
     return err;
 }
