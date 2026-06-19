@@ -105,7 +105,7 @@ chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
+std::unique_ptr<DeviceInterface> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 DefaultTimerDelegate gTimerDelegate;
 
