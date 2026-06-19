@@ -17,31 +17,25 @@ the appropriate accessor based on the target Endpoint ID.
 ```mermaid
 classDiagram
     class AccessorRegistry {
-        -accessors: List~SingleEndpointDeviceAccessor~
-        +Register(accessor) CHIP_ERROR
-        +SetAttribute(path, decoder)
-        +InvokeAction(endpointId, actionName, arguments)
+        -mAccessors: IntrusiveList~OOBAccessor~
+        +Register(accessor: OOBAccessor&) void
+        +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) CHIP_ERROR
     }
     class OOBAccessor {
         <<Interface>>
-        +HandleAction(actionName, tlvBuffer)*
+        +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) std::optional~CHIP_ERROR~*
     }
-
-    namespace BooleanStateSensorExample {
-        class BooleanStateSensorAccessor {
-            +HandleAction(actionName, tlvBuffer)*
-        }
-        class BooleanStateSensorDevice {
-        }
+    class BooleanStateSensorAccessor {
+        +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) std::optional~CHIP_ERROR~
+    }
+    class BooleanStateSensorDevice {
     }
 
     class PigweedAttributeAccessor {
         <<Pigweed Interceptor>>
-        -registry: AccessorRegistry
-        +Write(path, tlvReader)
+        +Write(path: ConcreteDataAttributePath, reader: TLVReader)
     }
     class ShellCommandHandler {
-        -registry: AccessorRegistry
         +HandleCommand(args)
     }
 
