@@ -70,14 +70,15 @@ CHIP_ERROR DimmableLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    LevelControlCluster::Config lcConfig(endpoint, mContext.timerDelegate, mLevelControlDelegate);
-    lcConfig.WithOnOff(mOnOffCluster.Cluster());
-    lcConfig.WithLighting(DataModel::NullNullable);
-    lcConfig.WithOnOffTransitionTime(0);
-    lcConfig.WithOnTransitionTime(0);
-    lcConfig.WithOffTransitionTime(0);
-    lcConfig.WithDefaultMoveRate(DataModel::NullNullable);
-    mLevelControlCluster.Create(lcConfig);
+    // Optional LevelControl transition attributes enabled in CI PICS (ci-pics-values).
+    // Initialize with demo defaults (0 transition, null move rate) to pass Test_TC_LVL_2_1.
+    mLevelControlCluster.Create(LevelControlCluster::Config(endpoint, mContext.timerDelegate, mLevelControlDelegate)
+                                    .WithOnOff(mOnOffCluster.Cluster())
+                                    .WithLighting(DataModel::NullNullable)
+                                    .WithOnOffTransitionTime(0)
+                                    .WithOnTransitionTime(0)
+                                    .WithOffTransitionTime(0)
+                                    .WithDefaultMoveRate(DataModel::NullNullable));
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
