@@ -21,12 +21,13 @@ source ./scripts/bootstrap.sh -p linux
 scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env -pw true'
 
 # Build app
-cd examples/all-devices-app/posix && gn gen --add-export-compile-commands="*" out && ninja -C out && cd ../../..
+scripts/run_in_build_env.sh "./scripts/build/build_examples.py \
+    --target linux-x64-all-devices-ipv6only-no-ble-no-wifi-rpc-asan-clang-test build"
 
 # Run test
 scripts/run_in_python_env.sh out/python_env \
     './scripts/tests/run_python_test.py \
-    --app examples/all-devices-app/posix/out/all-devices-app \
+    --app out/linux-x64-all-devices-ipv6only-no-ble-no-wifi-rpc-asan-clang-test/all-devices-app \
     --app-args "\
         --device contact-sensor:1 \
         --device water-leak-detector:2" \
