@@ -225,6 +225,8 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
             // ValidateIncomingTransportOptions() function already checked the trackName length
             CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName.Value(), trackNameBuffer);
             trackName.SetValue(trackNameBuffer);
+        } else {
+            trackName.ClearValue();
         }
 
         metadataEnabled = aCMAFContainerOptions.metadataEnabled;
@@ -343,15 +345,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         }
 
         // Rebind videoStreams list view to point to our storage
-        if (!mVideoStreamsStorage.empty())
-        {
-            videoStreams.SetValue(
-                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
-        }
-        else
-        {
-            videoStreams.ClearValue();
-        }
+        UpdateVideoStreamsList();
 
         // Copy audio streams storage (base types only)
         mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
@@ -364,15 +358,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         }
 
         // Rebind audioStreams list view to point to our storage
-        if (!mAudioStreamsStorage.empty())
-        {
-            audioStreams.SetValue(
-                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
-        }
-        else
-        {
-            audioStreams.ClearValue();
-        }
+        UpdateAudioStreamsList();
 
         return *this;
     }
@@ -400,79 +386,33 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         expiryTime = transportOptions.expiryTime;
 
         // Handle videoStreams from decodable type - perform deep copy into flat buffer
+        ClearVideoStreams();
         if (transportOptions.videoStreams.HasValue())
         {
-            mVideoStreamsStorage.clear();
-            mVideoStreamNameBufferUsed = 0;
-            auto iter                  = transportOptions.videoStreams.Value().begin();
+            auto iter = transportOptions.videoStreams.Value().begin();
             while (iter.Next())
             {
-                // Defense-in-depth: stop if flat buffer is full
-                if (mVideoStreamNameBufferUsed + kMaxStreamNameLength > mVideoStreamNameBuffer.size())
+                auto err = AddVideoStream(iter.GetValue());
+                if (!::chip::ChipError::IsSuccess(err))
                 {
-                    ChipLogError(Zcl, "Push-AV: video stream list exceeds buffer capacity, truncating");
                     break;
                 }
-
-                auto & videoStream = iter.GetValue();
-                Structs::VideoStreamStruct::Type newStream;
-                newStream.videoStreamID = videoStream.videoStreamID;
-
-                // Deep copy stream name into flat buffer
-                size_t offset = mVideoStreamNameBufferUsed;
-                MutableCharSpan nameBuffer(mVideoStreamNameBuffer.data() + offset, kMaxStreamNameLength);
-                CopyCharSpanToMutableCharSpanWithTruncation(videoStream.videoStreamName, nameBuffer);
-                newStream.videoStreamName = nameBuffer;
-
-                mVideoStreamsStorage.push_back(newStream);
-                mVideoStreamNameBufferUsed += kMaxStreamNameLength;
             }
-            videoStreams.SetValue(
-                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
-        }
-        else
-        {
-            mVideoStreamsStorage.clear();
-            mVideoStreamNameBufferUsed = 0;
-            videoStreams.ClearValue();
         }
 
         // Handle audioStreams from decodable type - perform deep copy into flat buffer
+        ClearAudioStreams();
         if (transportOptions.audioStreams.HasValue())
         {
-            mAudioStreamsStorage.clear();
-            mAudioStreamNameBufferUsed = 0;
-            auto iter                  = transportOptions.audioStreams.Value().begin();
+            auto iter = transportOptions.audioStreams.Value().begin();
             while (iter.Next())
             {
-                // Defense-in-depth: stop if flat buffer is full
-                if (mAudioStreamNameBufferUsed + kMaxStreamNameLength > mAudioStreamNameBuffer.size())
+                auto err = AddAudioStream(iter.GetValue());
+                if (!::chip::ChipError::IsSuccess(err))
                 {
-                    ChipLogError(Zcl, "Push-AV: audio stream list exceeds buffer capacity, truncating");
                     break;
                 }
-
-                auto & audioStream = iter.GetValue();
-                Structs::AudioStreamStruct::Type newStream;
-                newStream.audioStreamID = audioStream.audioStreamID;
-
-                // Deep copy stream name into flat buffer
-                size_t offset = mAudioStreamNameBufferUsed;
-                MutableCharSpan nameBuffer(mAudioStreamNameBuffer.data() + offset, kMaxStreamNameLength);
-                CopyCharSpanToMutableCharSpanWithTruncation(audioStream.audioStreamName, nameBuffer);
-                newStream.audioStreamName = nameBuffer;
-
-                mAudioStreamsStorage.push_back(newStream);
-                mAudioStreamNameBufferUsed += kMaxStreamNameLength;
             }
-            audioStreams.SetValue(
-                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
-        }
-        else
-        {
-            mAudioStreamsStorage.clear();
-            mAudioStreamNameBufferUsed = 0;
-            audioStreams.ClearValue();
         }
 
         return *this;
@@ -488,14 +428,12 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         videoStreams.ClearValue();
     }
 
-    void AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
+    CHIP_ERROR AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
     {
         // Defense-in-depth: reject if flat buffer is full
-        if (mVideoStreamNameBufferUsed + kMaxStreamNameLength > mVideoStreamNameBuffer.size())
-        {
-            ChipLogError(Zcl, "Push-AV: AddVideoStream rejected, video stream buffer full");
-            return;
-        }
+        VerifyOrReturnError(mVideoStreamNameBufferUsed + kMaxStreamNameLength <= mVideoStreamNameBuffer.size(),
+                            CHIP_ERROR_BUFFER_TOO_SMALL,
+                            ChipLogError(Zcl, "Push-AV: AddVideoStream rejected, video stream buffer full"));
 
         // Deep copy stream name into flat buffer
         size_t offset = mVideoStreamNameBufferUsed;
@@ -509,8 +447,8 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         mVideoStreamsStorage.push_back(newStream);
         mVideoStreamNameBufferUsed += kMaxStreamNameLength;
 
-        videoStreams.SetValue(
-            DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        UpdateVideoStreamsList();
+        return CHIP_NO_ERROR;
     }
 
     void UpdateVideoStreamsList()
@@ -534,14 +472,12 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         audioStreams.ClearValue();
     }
 
-    void AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
+    CHIP_ERROR AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
     {
         // Defense-in-depth: reject if flat buffer is full
-        if (mAudioStreamNameBufferUsed + kMaxStreamNameLength > mAudioStreamNameBuffer.size())
-        {
-            ChipLogError(Zcl, "Push-AV: AddAudioStream rejected, audio stream buffer full");
-            return;
-        }
+        VerifyOrReturnError(mAudioStreamNameBufferUsed + kMaxStreamNameLength <= mAudioStreamNameBuffer.size(),
+                            CHIP_ERROR_BUFFER_TOO_SMALL,
+                            ChipLogError(Zcl, "Push-AV: AddAudioStream rejected, audio stream buffer full"));
 
         // Deep copy stream name into flat buffer
         size_t offset = mAudioStreamNameBufferUsed;
@@ -555,8 +491,8 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         mAudioStreamsStorage.push_back(newStream);
         mAudioStreamNameBufferUsed += kMaxStreamNameLength;
 
-        audioStreams.SetValue(
-            DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        UpdateAudioStreamsList();
+        return CHIP_NO_ERROR;
     }
 
     void UpdateAudioStreamsList()

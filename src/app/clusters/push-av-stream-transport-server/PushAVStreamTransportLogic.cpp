@@ -817,7 +817,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newVideoStream.videoStreamID   = finalVideoStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddVideoStream(newVideoStream);
+            TEMPORARY_RETURN_IGNORED transportOptionsPtr->AddVideoStream(newVideoStream);
         }
 
         if (transportOptions.audioStreamID.HasValue())
@@ -859,7 +859,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newAudioStream.audioStreamID   = finalAudioStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddAudioStream(newAudioStream);
+            TEMPORARY_RETURN_IGNORED transportOptionsPtr->AddAudioStream(newAudioStream);
         }
     }
 
