@@ -87,7 +87,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         self.twoDCartSupported = aFeatureMap & cluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
         self.userDefinedSupported = aFeatureMap & cluster.Bitmaps.Feature.kUserDefined
         self.perZoneSenseSupported = aFeatureMap & cluster.Bitmaps.Feature.kPerZoneSensitivity
@@ -97,7 +97,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             maxUserDefinedZones = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.MaxUserDefinedZones
             )
-            log.info(f"Rx'd MaxUserDefinedZones: {maxUserDefinedZones}")
+            log.info("Rx'd MaxUserDefinedZones: %s", maxUserDefinedZones)
             asserts.assert_true(maxUserDefinedZones >= 5,
                                 "Expected Max value of UserDefinedZones to be least 5")
         else:
@@ -108,11 +108,11 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
         maxZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxZones
         )
-        log.info(f"Rx'd MaxZones: {maxZones}")
+        log.info("Rx'd MaxZones: %s", maxZones)
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Zones
         )
-        log.info(f"Rx'd Zones: {zones}")
+        log.info("Rx'd Zones: %s", zones)
         if self.userDefinedSupported:
             asserts.assert_true(maxZones >= maxUserDefinedZones,
                                 "Expected Max value of Zones should be >= UserDefinedZones")
@@ -133,14 +133,14 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
         triggers = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.Triggers
         )
-        log.info(f"Rx'd Triggers: {triggers}")
+        log.info("Rx'd Triggers: %s", triggers)
         asserts.assert_true(len(triggers) <= maxZones, f"The number of triggers in the list should at most be {maxZones}")
 
         self.step(6)
         sensitivityMax = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SensitivityMax
         )
-        log.info(f"Rx'd SensitivityMax: {sensitivityMax}")
+        log.info("Rx'd SensitivityMax: %s", sensitivityMax)
         asserts.assert_true(sensitivityMax >= 2 and sensitivityMax <= 10, "SensitivityMax should be between 2 and 10")
 
         if not self.perZoneSenseSupported:
@@ -148,7 +148,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             sensitivity = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.Sensitivity
             )
-            log.info(f"Rx'd Sensitivity: {sensitivity}")
+            log.info("Rx'd Sensitivity: %s", sensitivity)
             asserts.assert_true(sensitivity >= 1 and sensitivity <= sensitivityMax,
                                 f"Sensitivity should be between 1 and {sensitivityMax}")
         else:
@@ -160,12 +160,12 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             twoDCartesianMax = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.TwoDCartesianMax
             )
-            log.info(f"Rx'd TwoDCartesianMax: {twoDCartesianMax}")
+            log.info("Rx'd TwoDCartesianMax: %s", twoDCartesianMax)
 
             videoSensorParams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.VideoSensorParams
             )
-            log.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
+            log.info("Rx'd VideoSensorParams: %s", videoSensorParams)
             asserts.assert_true(twoDCartesianMax.x == videoSensorParams.sensorWidth - 1 and twoDCartesianMax.y ==
                                 videoSensorParams.sensorHeight - 1, "TwoDCartesianMax should be within the VideoSensorParams dimensions")
         else:

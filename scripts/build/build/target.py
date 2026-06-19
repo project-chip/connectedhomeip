@@ -86,14 +86,15 @@ class TargetPart:
             if self.except_if_re.search(full_input):
                 if report_rejected_parts:
                     # likely nothing will match when we get such an error
-                    log.error(f"'{self.name}' does not support '{full_input}' due to rule EXCEPT IF '{self.except_if_re.pattern}'")
+                    log.error("'%s' does not support '%s' due to rule EXCEPT IF '%s'",
+                              self.name, full_input, self.except_if_re.pattern)
                 return False
 
         if self.only_if_re:
             if not self.only_if_re.search(full_input):
                 if report_rejected_parts:
                     # likely nothing will match when we get such an error
-                    log.error(f"'{self.name}' does not support '{full_input}' due to rule ONLY IF '{self.only_if_re.pattern}'")
+                    log.error("'%s' does not support '%s' due to rule ONLY IF '%s'", self.name, full_input, self.only_if_re.pattern)
                 return False
 
         return True
@@ -462,7 +463,7 @@ class BuildTarget:
             kargs.update(part.build_arguments)
 
         if not quiet:
-            log.info("Preparing builder '%s'" % (name,))
+            log.info("Preparing builder '%s'", name)
 
         builder = self.builder_class(repository_path, runner=runner, output_dir_lock=output_dir_lock, **kargs)
         builder.target = self

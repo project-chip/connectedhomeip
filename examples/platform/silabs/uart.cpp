@@ -96,7 +96,7 @@ extern "C" {
 
 #define HELPER4(x) HELPER3(x)
 
-// On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
+// On MG24 boards VCOM runs on the EUSART device
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)

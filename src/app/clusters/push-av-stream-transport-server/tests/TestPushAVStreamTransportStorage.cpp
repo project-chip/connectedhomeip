@@ -181,6 +181,32 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorage)
     EXPECT_EQ(motionZone2Base.sensitivity.Value(), 10);
 }
 
+// Test corner case where kMotion with motionZones present-but-null (spec: null motionZones ==
+// "motion anywhere triggers"). Verify the decodable->storage copy preserves
+// that state as a present Optional containing a null Nullable.
+TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorageMotionZonesNull)
+{
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    // present (HasValue) but explicitly null (IsNull)
+    triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable<uint8_t>(5));
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    TransportTriggerOptionsStorage transportTriggerOptionsStorage(triggerOptions);
+
+    EXPECT_EQ(transportTriggerOptionsStorage.triggerType, TransportTriggerTypeEnum::kMotion);
+    ASSERT_TRUE(transportTriggerOptionsStorage.motionZones.HasValue());
+    EXPECT_TRUE(transportTriggerOptionsStorage.motionZones.Value().IsNull());
+}
+
 TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
 {
     CMAFContainerOptionsStruct cmafContainerOptions;
@@ -188,70 +214,22 @@ TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     CMAFContainerOptionsStorage cmafContainerOptionsStorage(cmafContainerOptions);
-
-    // Clear the cencKey and cencKeyID strings to test deep copy of cencKey and cencKeyID
-    cencKey.clear();
-    cencKeyID.clear();
 
     EXPECT_EQ(cmafContainerOptionsStorage.chunkDuration, 1000);
     EXPECT_TRUE(cmafContainerOptionsStorage.metadataEnabled.HasValue());
     EXPECT_TRUE(cmafContainerOptionsStorage.metadataEnabled.Value());
 
-    std::string cencKeyStr(cmafContainerOptionsStorage.CENCKey.Value().data(),
-                           cmafContainerOptionsStorage.CENCKey.Value().data() + cmafContainerOptionsStorage.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "1234567890ABCDEF");
-
-    std::string cencKeyIDStr(cmafContainerOptionsStorage.CENCKeyID.Value().data(),
-                             cmafContainerOptionsStorage.CENCKeyID.Value().data() +
-                                 cmafContainerOptionsStorage.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "1234567890ABCDEF");
-
-    CMAFContainerOptionsStorage cmafContainerOptionsStorageCopy(cmafContainerOptionsStorage);
-
-    EXPECT_EQ(cmafContainerOptionsStorageCopy.chunkDuration, 1000);
-    EXPECT_TRUE(cmafContainerOptionsStorageCopy.metadataEnabled.HasValue());
-    EXPECT_TRUE(cmafContainerOptionsStorageCopy.metadataEnabled.Value());
-
-    std::string cencKeyStrCopy(cmafContainerOptionsStorageCopy.CENCKey.Value().data(),
-                               cmafContainerOptionsStorageCopy.CENCKey.Value().data() +
-                                   cmafContainerOptionsStorageCopy.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrCopy, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrCopy(cmafContainerOptionsStorageCopy.CENCKeyID.Value().data(),
-                                 cmafContainerOptionsStorageCopy.CENCKeyID.Value().data() +
-                                     cmafContainerOptionsStorageCopy.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrCopy, "1234567890ABCDEF");
-
     // Accessing buffer using base struct
 
-    CMAFContainerOptionsStruct BaseCMAFContainerOptions = static_cast<CMAFContainerOptionsStruct>(cmafContainerOptionsStorageCopy);
+    CMAFContainerOptionsStruct BaseCMAFContainerOptions = static_cast<CMAFContainerOptionsStruct>(cmafContainerOptionsStorage);
 
     EXPECT_EQ(BaseCMAFContainerOptions.chunkDuration, 1000);
     EXPECT_TRUE(BaseCMAFContainerOptions.metadataEnabled.HasValue());
     EXPECT_TRUE(BaseCMAFContainerOptions.metadataEnabled.Value());
-
-    std::string cencKeyStrBase(BaseCMAFContainerOptions.CENCKey.Value().data(),
-                               BaseCMAFContainerOptions.CENCKey.Value().data() + BaseCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrBase, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrBase(BaseCMAFContainerOptions.CENCKeyID.Value().data(),
-                                 BaseCMAFContainerOptions.CENCKeyID.Value().data() +
-                                     BaseCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrBase, "1234567890ABCDEF");
 }
 
 TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
@@ -261,12 +239,8 @@ TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     /*Test ContainerOptionsStorage*/
 
@@ -279,47 +253,11 @@ TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
 
     ContainerOptionsStorage containerOptionsStorage(containerOptions);
 
-    // Clear the cencKey and cencKeyID strings to test deep copy of cencKey and cencKeyID
-    cencKey.clear();
-    cencKeyID.clear();
-
     EXPECT_EQ(containerOptionsStorage.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(containerOptionsStorage.CMAFContainerOptions.HasValue());
     EXPECT_EQ(containerOptionsStorage.CMAFContainerOptions.Value().chunkDuration, 1000);
     EXPECT_TRUE(containerOptionsStorage.CMAFContainerOptions.Value().metadataEnabled.HasValue());
     EXPECT_TRUE(containerOptionsStorage.CMAFContainerOptions.Value().metadataEnabled.Value());
-
-    std::string cencKeyStrContainer(containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().data(),
-                                    containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().data() +
-                                        containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrContainer, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrContainer(containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
-                                      containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
-                                          containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrContainer, "1234567890ABCDEF");
-
-    ContainerOptionsStorage containerOptionsStorageCopy(containerOptionsStorage);
-
-    EXPECT_EQ(containerOptionsStorageCopy.containerType, ContainerFormatEnum::kCmaf);
-    EXPECT_TRUE(containerOptionsStorageCopy.CMAFContainerOptions.HasValue());
-    EXPECT_EQ(containerOptionsStorageCopy.CMAFContainerOptions.Value().chunkDuration, 1000);
-    EXPECT_TRUE(containerOptionsStorageCopy.CMAFContainerOptions.Value().metadataEnabled.HasValue());
-    EXPECT_TRUE(containerOptionsStorageCopy.CMAFContainerOptions.Value().metadataEnabled.Value());
-
-    std::string cencKeyStrContainerCopy(containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().data(),
-                                        containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().data() +
-                                            containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrContainerCopy, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrContainerCopy(containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
-                                          containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
-                                              containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrContainerCopy, "1234567890ABCDEF");
 
     // Accessing buffer using base struct
 
@@ -330,18 +268,6 @@ TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
     EXPECT_EQ(BaseContainerOptions.CMAFContainerOptions.Value().chunkDuration, 1000);
     EXPECT_TRUE(BaseContainerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue());
     EXPECT_TRUE(BaseContainerOptions.CMAFContainerOptions.Value().metadataEnabled.Value());
-
-    std::string containerCENCKeyStrBase(BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().data(),
-                                        BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().data() +
-                                            BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().size());
-
-    EXPECT_EQ(containerCENCKeyStrBase, "1234567890ABCDEF");
-
-    std::string containerCENCKeyIDStrBase(BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
-                                          BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
-                                              BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size());
-
-    EXPECT_EQ(containerCENCKeyIDStrBase, "1234567890ABCDEF");
 }
 
 TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
@@ -412,12 +338,8 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
@@ -545,14 +467,10 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
 
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
-
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     /*Test TransportOptionsStorage*/
     triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;

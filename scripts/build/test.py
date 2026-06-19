@@ -109,7 +109,7 @@ class TestBuilder(unittest.TestCase):
             'esp32-devkitc-light-rpc',
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
-            'efr32-brd4187c-light-rpc-no-version',
+            'efr32-brd4187c-light-rpc',
         ]
 
         for target in TARGETS:

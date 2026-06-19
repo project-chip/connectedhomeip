@@ -43,12 +43,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:194
+            image: ghcr.io/project-chip/chip-build-nxp:199
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -62,6 +62,7 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                        - 'third_party/simw-top-mini/**'
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -116,6 +117,8 @@ jobs:
                       --target nxp-rw61x-freertos-thermostat-wifi-se05x-factory \
                       build \
                   "
+            - name: clean build
+              run: rm -rf ./out
             - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\
@@ -144,11 +147,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:194
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:199
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -162,10 +165,11 @@ jobs:
                         - '**/nxp/**'
                         - '**/Zephyr/**'
                         - '**/zephyr/**'
+                        - 'third_party/simw-top-mini/**'
                       pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'
-            - name: Build NXP Zephyr examples
+            - name: Build NXP Zephyr all-clusters example
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
                   == 'true' || steps.changed_paths.outputs.pigweed == 'true'
@@ -173,13 +177,54 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-all-clusters \
+                      build \
+                  "
+
+            - name: clean build
+              run: rm -rf ./out
+
+            - name: Build NXP Zephyr thermostat Wi-Fi example
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-thermostat \
+                      build \
+                  "
+
+            - name: clean build
+              run: rm -rf ./out
+
+            - name: Build NXP Zephyr thermostat Thread example
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-thermostat-thread \
+                      build \
+                  "
+
+            - name: clean build
+              run: rm -rf ./out
+
+            - name: Build NXP Zephyr laundry-washer-factory example
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
                       build \
                   "
+
             - name: clean build
               run: rm -rf ./out
+
             - name: Build NXP Zephyr Unit Tests
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
