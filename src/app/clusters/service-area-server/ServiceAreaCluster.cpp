@@ -16,8 +16,8 @@
  *
  */
 
-#include "service-area-server.h"
 #include "service-area-delegate.h"
+#include "service-area-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
