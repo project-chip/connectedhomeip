@@ -68,8 +68,7 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
  *
  * @param[in]     path                  The concrete data attribute path containing Endpoint, Cluster, and Attribute IDs.
  * @param[in]     attributeValueReader  A TLVReader that MUST be positioned exactly on the data element of the attribute's value
- *                                      to be copied (e.g., a primitive element or a container header). This reader is not
- *                                      advanced or modified by the function.
+ *                                      to be copied.
  *
  * @return        A variant containing either a CHIP_ERROR on failure or the finalized ReadOnlyBuffer on success.
  */

@@ -180,7 +180,7 @@ public:
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
             ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
-            auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, device.get());
+            auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, *device);
             if (accessor)
             {
                 AccessorRegistry::Instance().Register(*accessor);

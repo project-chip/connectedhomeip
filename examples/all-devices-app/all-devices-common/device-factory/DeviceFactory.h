@@ -62,7 +62,7 @@ class DeviceFactory
 {
 public:
     using DeviceCreator         = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
-    using DeviceAccessorCreator = std::function<std::unique_ptr<OOBAccessor>(DeviceInterface *)>;
+    using DeviceAccessorCreator = std::function<std::unique_ptr<OOBAccessor>(DeviceInterface &)>;
 
     struct Context
     {
@@ -120,7 +120,7 @@ public:
         return nullptr;
     }
 
-    std::unique_ptr<OOBAccessor> CreateAccessor(const std::string & deviceTypeArg, DeviceInterface * device)
+    std::unique_ptr<OOBAccessor> CreateAccessor(const std::string & deviceTypeArg, DeviceInterface & device)
     {
         if (IsValidDevice(deviceTypeArg) && mAccessorRegistry.find(deviceTypeArg) != mAccessorRegistry.end())
         {
@@ -198,9 +198,8 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
-            RegisterAccessorCreator("contact-sensor", [](DeviceInterface * device) {
-                VerifyOrDie(device != nullptr);
-                return std::make_unique<BooleanStateSensorAccessor>(*static_cast<BooleanStateSensorDevice *>(device));
+            RegisterAccessorCreator("contact-sensor", [](DeviceInterface & device) {
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -210,9 +209,8 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
-            RegisterAccessorCreator("water-leak-detector", [](DeviceInterface * device) {
-                VerifyOrDie(device != nullptr);
-                return std::make_unique<BooleanStateSensorAccessor>(*static_cast<BooleanStateSensorDevice *>(device));
+            RegisterAccessorCreator("water-leak-detector", [](DeviceInterface & device) {
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
