@@ -297,6 +297,20 @@ menu "CHIP Core"
                 Delta OTA updates allow for smaller, more efficient updates by only
                 sending the changes between the current and new firmware versions.
 
+        config ENABLE_MULTI_IMAGE_OTA
+            bool "Enable multi-image OTA"
+            depends on ENABLE_OTA_REQUESTOR
+            depends on !ENABLE_ENCRYPTED_OTA && !ENABLE_DELTA_OTA
+            default n
+            help
+                Enable this option to bundle multiple firmware binaries (primary
+                application, co-processors, peripherals, ...) into a single .ota
+                file routed in one BDX session. When enabled the
+                MultiImageOTAProcessor replaces the single-image
+                OTAImageProcessorImpl. Mutually exclusive with the whole-payload
+                encrypted and delta OTA features, which cannot survive the
+                SkipData() routing the multi-image processor relies on.
+
         config OTA_AUTO_REBOOT_ON_APPLY
             bool "Reboot the device after applying the OTA image"
             depends on ENABLE_OTA_REQUESTOR

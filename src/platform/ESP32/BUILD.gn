@@ -102,7 +102,8 @@ static_library("ESP32") {
       sources += [
         "multi-ota/AppImageProcessor.cpp",
         "multi-ota/AppImageProcessor.h",
-        "multi-ota/MultiImageHeader.h",
+        "multi-ota/MultiOTAImageHeader.h",
+        "multi-ota/MultiOTAImageHeader.cpp",
         "multi-ota/MultiImageOTAProcessorImpl.cpp",
         "multi-ota/MultiImageOTAProcessorImpl.h",
         "multi-ota/SubImageProcessor.h",

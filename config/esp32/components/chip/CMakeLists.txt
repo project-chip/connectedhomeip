@@ -287,6 +287,10 @@ if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
 
+if (CONFIG_ENABLE_MULTI_IMAGE_OTA)
+    chip_gn_arg_append("chip_enable_multi_ota_requestor"           "true")
+endif()
+
 if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
     chip_gn_arg_append("chip_enable_access_restrictions"                 "true")
 endif()
