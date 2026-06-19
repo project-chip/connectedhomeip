@@ -1661,10 +1661,6 @@ NS_ASSUME_NONNULL_BEGIN
         _networkID = [NSData data];
 
         _connected = @(0);
-
-        _networkIdentifier = nil;
-
-        _clientIdentifier = nil;
     }
     return self;
 }
@@ -1675,15 +1671,13 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.networkID = self.networkID;
     other.connected = self.connected;
-    other.networkIdentifier = self.networkIdentifier;
-    other.clientIdentifier = self.clientIdentifier;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkID:%@; connected:%@; networkIdentifier:%@; clientIdentifier:%@; >", NSStringFromClass([self class]), [_networkID base64EncodedStringWithOptions:0], _connected, [_networkIdentifier base64EncodedStringWithOptions:0], [_clientIdentifier base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkID:%@; connected:%@; >", NSStringFromClass([self class]), [_networkID base64EncodedStringWithOptions:0], _connected];
     return descriptionString;
 }
 

@@ -59,8 +59,6 @@ class NetworkCommissioningCluster(
     val networkingStatus: UByte,
     val debugText: String?,
     val networkIndex: UByte?,
-    val clientIdentity: ByteArray?,
-    val possessionSignature: ByteArray?,
   )
 
   class ConnectNetworkResponse(
@@ -68,8 +66,6 @@ class NetworkCommissioningCluster(
     val debugText: String?,
     val errorValue: Int?,
   )
-
-  class QueryIdentityResponse(val identity: ByteArray, val possessionSignature: ByteArray?)
 
   class NetworksAttribute(val value: List<NetworkCommissioningClusterNetworkInfoStruct>)
 
@@ -282,9 +278,6 @@ class NetworkCommissioningCluster(
     ssid: ByteArray,
     credentials: ByteArray,
     breadcrumb: ULong?,
-    networkIdentity: ByteArray?,
-    clientIdentifier: ByteArray?,
-    possessionNonce: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ): NetworkConfigResponse {
     val commandId: UInt = 2u
@@ -300,21 +293,6 @@ class NetworkCommissioningCluster(
 
     val TAG_BREADCRUMB_REQ: Int = 2
     breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
-
-    val TAG_NETWORK_IDENTITY_REQ: Int = 3
-    networkIdentity?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_NETWORK_IDENTITY_REQ), networkIdentity)
-    }
-
-    val TAG_CLIENT_IDENTIFIER_REQ: Int = 4
-    clientIdentifier?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_CLIENT_IDENTIFIER_REQ), clientIdentifier)
-    }
-
-    val TAG_POSSESSION_NONCE_REQ: Int = 5
-    possessionNonce?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_POSSESSION_NONCE_REQ), possessionNonce)
-    }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -337,12 +315,6 @@ class NetworkCommissioningCluster(
 
     val TAG_NETWORK_INDEX: Int = 2
     var networkIndex_decoded: UByte? = null
-
-    val TAG_CLIENT_IDENTITY: Int = 3
-    var clientIdentity_decoded: ByteArray? = null
-
-    val TAG_POSSESSION_SIGNATURE: Int = 4
-    var possessionSignature_decoded: ByteArray? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
@@ -373,30 +345,6 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
-        clientIdentity_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
-        possessionSignature_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
       } else {
         tlvReader.skipElement()
       }
@@ -408,13 +356,7 @@ class NetworkCommissioningCluster(
 
     tlvReader.exitContainer()
 
-    return NetworkConfigResponse(
-      networkingStatus_decoded,
-      debugText_decoded,
-      networkIndex_decoded,
-      clientIdentity_decoded,
-      possessionSignature_decoded,
-    )
+    return NetworkConfigResponse(networkingStatus_decoded, debugText_decoded, networkIndex_decoded)
   }
 
   suspend fun addOrUpdateThreadNetwork(
@@ -455,12 +397,6 @@ class NetworkCommissioningCluster(
     val TAG_NETWORK_INDEX: Int = 2
     var networkIndex_decoded: UByte? = null
 
-    val TAG_CLIENT_IDENTITY: Int = 3
-    var clientIdentity_decoded: ByteArray? = null
-
-    val TAG_POSSESSION_SIGNATURE: Int = 4
-    var possessionSignature_decoded: ByteArray? = null
-
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
@@ -490,30 +426,6 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
-        clientIdentity_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
-        possessionSignature_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
       } else {
         tlvReader.skipElement()
       }
@@ -525,13 +437,7 @@ class NetworkCommissioningCluster(
 
     tlvReader.exitContainer()
 
-    return NetworkConfigResponse(
-      networkingStatus_decoded,
-      debugText_decoded,
-      networkIndex_decoded,
-      clientIdentity_decoded,
-      possessionSignature_decoded,
-    )
+    return NetworkConfigResponse(networkingStatus_decoded, debugText_decoded, networkIndex_decoded)
   }
 
   suspend fun removeNetwork(
@@ -572,12 +478,6 @@ class NetworkCommissioningCluster(
     val TAG_NETWORK_INDEX: Int = 2
     var networkIndex_decoded: UByte? = null
 
-    val TAG_CLIENT_IDENTITY: Int = 3
-    var clientIdentity_decoded: ByteArray? = null
-
-    val TAG_POSSESSION_SIGNATURE: Int = 4
-    var possessionSignature_decoded: ByteArray? = null
-
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
@@ -607,30 +507,6 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
-        clientIdentity_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
-        possessionSignature_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
       } else {
         tlvReader.skipElement()
       }
@@ -642,13 +518,7 @@ class NetworkCommissioningCluster(
 
     tlvReader.exitContainer()
 
-    return NetworkConfigResponse(
-      networkingStatus_decoded,
-      debugText_decoded,
-      networkIndex_decoded,
-      clientIdentity_decoded,
-      possessionSignature_decoded,
-    )
+    return NetworkConfigResponse(networkingStatus_decoded, debugText_decoded, networkIndex_decoded)
   }
 
   suspend fun connectNetwork(
@@ -775,12 +645,6 @@ class NetworkCommissioningCluster(
     val TAG_NETWORK_INDEX: Int = 2
     var networkIndex_decoded: UByte? = null
 
-    val TAG_CLIENT_IDENTITY: Int = 3
-    var clientIdentity_decoded: ByteArray? = null
-
-    val TAG_POSSESSION_SIGNATURE: Int = 4
-    var possessionSignature_decoded: ByteArray? = null
-
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
@@ -810,30 +674,6 @@ class NetworkCommissioningCluster(
               null
             }
           }
-      } else if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
-        clientIdentity_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
-        possessionSignature_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
       } else {
         tlvReader.skipElement()
       }
@@ -845,81 +685,7 @@ class NetworkCommissioningCluster(
 
     tlvReader.exitContainer()
 
-    return NetworkConfigResponse(
-      networkingStatus_decoded,
-      debugText_decoded,
-      networkIndex_decoded,
-      clientIdentity_decoded,
-      possessionSignature_decoded,
-    )
-  }
-
-  suspend fun queryIdentity(
-    keyIdentifier: ByteArray,
-    possessionNonce: ByteArray?,
-    timedInvokeTimeout: Duration? = null,
-  ): QueryIdentityResponse {
-    val commandId: UInt = 9u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_KEY_IDENTIFIER_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_KEY_IDENTIFIER_REQ), keyIdentifier)
-
-    val TAG_POSSESSION_NONCE_REQ: Int = 1
-    possessionNonce?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_POSSESSION_NONCE_REQ), possessionNonce)
-    }
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_IDENTITY: Int = 0
-    var identity_decoded: ByteArray? = null
-
-    val TAG_POSSESSION_SIGNATURE: Int = 1
-    var possessionSignature_decoded: ByteArray? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_IDENTITY)) {
-        identity_decoded = tlvReader.getByteArray(tag)
-      } else if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
-        possessionSignature_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getByteArray(tag)
-            } else {
-              null
-            }
-          }
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (identity_decoded == null) {
-      throw IllegalStateException("identity not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return QueryIdentityResponse(identity_decoded, possessionSignature_decoded)
+    return NetworkConfigResponse(networkingStatus_decoded, debugText_decoded, networkIndex_decoded)
   }
 
   suspend fun readMaxNetworksAttribute(): UByte {

@@ -35,8 +35,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNetworkID), networkID);
     encoder.Encode(to_underlying(Fields::kConnected), connected);
-    encoder.Encode(to_underlying(Fields::kNetworkIdentifier), networkIdentifier);
-    encoder.Encode(to_underlying(Fields::kClientIdentifier), clientIdentifier);
     return encoder.Finalize();
 }
 
@@ -57,14 +55,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kConnected))
         {
             err = DataModel::Decode(reader, connected);
-        }
-        else if (__context_tag == to_underlying(Fields::kNetworkIdentifier))
-        {
-            err = DataModel::Decode(reader, networkIdentifier);
-        }
-        else if (__context_tag == to_underlying(Fields::kClientIdentifier))
-        {
-            err = DataModel::Decode(reader, clientIdentifier);
         }
 
         ReturnErrorOnFailure(err);

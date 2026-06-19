@@ -1859,9 +1859,6 @@ class ChipClusters:
                     "ssid": "bytes",
                     "credentials": "bytes",
                     "breadcrumb": "int",
-                    "networkIdentity": "bytes",
-                    "clientIdentifier": "bytes",
-                    "possessionNonce": "bytes",
                 },
             },
             0x00000003: {
@@ -1895,14 +1892,6 @@ class ChipClusters:
                     "networkID": "bytes",
                     "networkIndex": "int",
                     "breadcrumb": "int",
-                },
-            },
-            0x00000009: {
-                "commandId": 0x00000009,
-                "commandName": "QueryIdentity",
-                "args": {
-                    "keyIdentifier": "bytes",
-                    "possessionNonce": "bytes",
                 },
             },
         },

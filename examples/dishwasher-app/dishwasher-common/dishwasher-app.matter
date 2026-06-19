@@ -903,7 +903,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 3;
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -934,7 +934,6 @@ cluster NetworkCommissioning = 49 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
-    kPerDeviceCredentials = 0x8;
   }
 
   bitmap ThreadCapabilitiesBitmap : bitmap16 {
@@ -951,14 +950,11 @@ cluster NetworkCommissioning = 49 {
     kWPAPersonal = 0x4 [spec_name = "WPA-PERSONAL"];
     kWPA2Personal = 0x8 [spec_name = "WPA2-PERSONAL"];
     kWPA3Personal = 0x10 [spec_name = "WPA3-PERSONAL"];
-    kWPA3MatterPDC = 0x20 [spec_name = "WPA3-Matter-PDC"];
   }
 
   struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
-    optional nullable octet_string<20> networkIdentifier = 2;
-    optional nullable octet_string<20> clientIdentifier = 3;
   }
 
   struct ThreadInterfaceScanResultStruct {
@@ -1014,9 +1010,6 @@ cluster NetworkCommissioning = 49 {
     octet_string<32> ssid = 0;
     octet_string<64> credentials = 1;
     optional int64u breadcrumb = 2;
-    optional octet_string<140> networkIdentity = 3;
-    optional octet_string<20> clientIdentifier = 4;
-    optional octet_string<32> possessionNonce = 5;
   }
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -1033,8 +1026,6 @@ cluster NetworkCommissioning = 49 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional long_char_string<512> debugText = 1;
     optional int8u networkIndex = 2;
-    optional octet_string<140> clientIdentity = 3;
-    optional octet_string<64> possessionSignature = 4;
   }
 
   request struct ConnectNetworkRequest {
@@ -1054,16 +1045,6 @@ cluster NetworkCommissioning = 49 {
     optional int64u breadcrumb = 2;
   }
 
-  request struct QueryIdentityRequest {
-    octet_string<20> keyIdentifier = 0;
-    optional octet_string<32> possessionNonce = 1;
-  }
-
-  response struct QueryIdentityResponse = 10 {
-    octet_string<140> identity = 0;
-    optional octet_string<64> possessionSignature = 1;
-  }
-
   /** This command is used to scan for available networks on the network interface associated with the cluster instance. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
   /** This command is used to add or update a Wi-Fi network configuration. */
@@ -1076,8 +1057,6 @@ cluster NetworkCommissioning = 49 {
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
   /** This command is used to re-order the network configuration list. */
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
-  /** This command is used to query the identity of a network configuration. */
-  command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
