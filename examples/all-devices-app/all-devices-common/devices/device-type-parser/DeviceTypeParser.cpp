@@ -21,8 +21,31 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <cstring>
+
+namespace {
+std::string KebabCaseToTitleCase(const std::string & input)
+{
+    std::string output  = input;
+    bool capitalizeNext = true;
+    for (char & c : output)
+    {
+        if (c == '-')
+        {
+            c              = ' ';
+            capitalizeNext = true;
+        }
+        else if (capitalizeNext)
+        {
+            c              = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+            capitalizeNext = false;
+        }
+    }
+    return output;
+}
+} // namespace
 
 bool DeviceTypeParser::ParseEndpointId(const char * str, chip::EndpointId & endpoint)
 {
@@ -176,6 +199,7 @@ void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcard
                         .endpoint = nextEp,
                         .parentId = entry.parentId,
                         .bridged  = true,
+                        .label    = KebabCaseToTitleCase(deviceType),
                     });
                     expandedEntries.push_back({
                         .type     = deviceType,
@@ -209,6 +233,7 @@ void DeviceTypeParser::ExpandWildcards(const std::vector<std::string> & wildcard
                 .endpoint = entry.endpoint,
                 .parentId = entry.parentId,
                 .bridged  = true,
+                .label    = KebabCaseToTitleCase(entry.type),
             });
             expandedEntries.push_back({
                 .type     = entry.type,

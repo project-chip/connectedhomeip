@@ -39,6 +39,8 @@ public:
      *        is invoked.
      */
     virtual void OnSelfTestRequested() = 0;
+    virtual void OnSmokeSensitivityLevelChanged(SmokeCoAlarm::SensitivityEnum newSmokeSensitivityLevel) {}
+    virtual void OnExpressedStateChanged(SmokeCoAlarm::ExpressedStateEnum newExpressedState) {}
 };
 
 class SmokeCoAlarmCluster : public DefaultServerCluster

@@ -439,3 +439,5 @@ documentation:
 2. **`supported_clusters.md`**: If your device introduced support for a new
    cluster, update its **Used in All-Devices** status to `Yes` and list your
    device type in the **Notes/Devices** column.
+3. **`README.md`**: Update the **Supported Devices** list and the `--device` CLI
+   help options example block under the **Running the Application** section.

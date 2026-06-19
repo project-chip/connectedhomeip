@@ -102,7 +102,7 @@ To update or validate this list manually, follow these steps:
 | 56        | Ethernet Network Diagnostics                               | 55 (0x0037)   | Yes                | No                  |                                       |
 | 57        | Fan Control                                                | 514 (0x0202)  | Yes                | Yes                 |                                       |
 | 58        | Fixed Label                                                | 64 (0x0040)   | Yes                | No                  |                                       |
-| 59        | Flow Measurement                                           | 1028 (0x0404) | Yes                | No                  |                                       |
+| 59        | Flow Measurement                                           | 1028 (0x0404) | Yes                | Yes                 |                                       |
 | 60        | Formaldehyde Concentration Measurement                     | 1067 (0x042B) | Yes                | Yes                 | Instance of Concentration Measurement |
 | 61        | General Commissioning                                      | 48 (0x0030)   | Yes                | Yes                 |                                       |
 | 62        | General Diagnostics                                        | 51 (0x0033)   | Yes                | Yes                 |                                       |
@@ -113,7 +113,7 @@ To update or validate this list manually, follow these steps:
 | 67        | Humidistat                                                 | 517 (0x0205)  | Yes                | No                  |                                       |
 | 68        | ICD Management                                             | 70 (0x0046)   | Yes                | No                  |                                       |
 | 69        | Identify                                                   | 3 (0x0003)    | Yes                | Yes                 |                                       |
-| 70        | Illuminance Measurement                                    | 1024 (0x0400) | Yes                | No                  |                                       |
+| 70        | Illuminance Measurement                                    | 1024 (0x0400) | Yes                | Yes                 |                                       |
 | 71        | Joint Fabric Administrator                                 | 1875 (0x0753) | No                 | No                  |                                       |
 | 72        | Joint Fabric Datastore                                     | 1874 (0x0752) | No                 | No                  |                                       |
 | 73        | Keypad Input                                               | 1289 (0x0509) | No                 | No                  |                                       |
@@ -150,7 +150,7 @@ To update or validate this list manually, follow these steps:
 | 104       | Power Source                                               | 47 (0x002F)   | Yes                | Yes                 |                                       |
 | 105       | Power Source Configuration                                 | 46 (0x002E)   | No                 | No                  |                                       |
 | 106       | Power Topology                                             | 156 (0x009C)  | Yes                | No                  |                                       |
-| 107       | Pressure Measurement                                       | 1027 (0x0403) | Yes                | No                  |                                       |
+| 107       | Pressure Measurement                                       | 1027 (0x0403) | Yes                | Yes                 |                                       |
 | 108       | Proximity Ranging                                          | 1075 (0x0433) | Yes                | Yes                 |                                       |
 | 109       | Proxy Configuration                                        | 66 (0x0042)   | No                 | No                  |                                       |
 | 110       | Proxy Discovery                                            | 67 (0x0043)   | No                 | No                  |                                       |
@@ -163,7 +163,7 @@ To update or validate this list manually, follow these steps:
 | 117       | Radon Concentration Measurement                            | 1071 (0x042F) | Yes                | Yes                 | Instance of Concentration Measurement |
 | 118       | Refrigerator Alarm                                         | 87 (0x0057)   | No                 | No                  |                                       |
 | 119       | Refrigerator And Temperature Controlled Cabinet Mode       | 82 (0x0052)   | No                 | No                  | Instance of Mode Base                 |
-| 120       | Relative Humidity Measurement                              | 1029 (0x0405) | Yes                | No                  |                                       |
+| 120       | Relative Humidity Measurement                              | 1029 (0x0405) | Yes                | Yes                 |                                       |
 | 121       | Scenes                                                     | 5 (0x0005)    | No                 | No                  |                                       |
 | 122       | Scenes Management                                          | 98 (0x0062)   | Yes                | Yes                 |                                       |
 | 123       | Service Area                                               | 336 (0x0150)  | No                 | No                  |                                       |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **86**             | **42**              |                                       |
+| **Total** | **159**                                                    |               | **86**             | **46**              |                                       |
