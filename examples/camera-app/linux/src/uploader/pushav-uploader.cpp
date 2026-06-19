@@ -418,6 +418,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::filesystem::path extension = filePath.extension();
     // .upload files are modified MPD snapshots - treat as MPD and strip .upload for remote URL
     bool isUploadMpd = (extension == ".upload");
+    bool isMpdExtension = (extension == ".mpd");
     if (isUploadMpd)
     {
         // Check if the base filename (without .upload) is an MPD file
@@ -553,7 +554,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 
     // Delete file after upload, except for .mpd files which are kept (FFmpeg may still be writing).
     // .upload files (modified MPD snapshots) are always deleted after upload.
-    if (extension != ".mpd" || isUploadMpd)
+    if (!isMpdExtension || isUploadMpd)
     {
         if (!std::filesystem::remove(data.first, ec))
         {
