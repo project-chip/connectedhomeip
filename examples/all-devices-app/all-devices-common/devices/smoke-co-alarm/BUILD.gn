@@ -16,6 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("smoke-co-alarm") {
   sources = [
+    "LoggingOnlySmokeCoAlarmDevice.cpp",
+    "LoggingOnlySmokeCoAlarmDevice.h",
     "SmokeCoAlarmDevice.cpp",
     "SmokeCoAlarmDevice.h",
   ]

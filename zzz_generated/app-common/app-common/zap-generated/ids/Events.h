@@ -149,6 +149,7 @@
 #include <clusters/TemperatureControl/EventIds.h>
 #include <clusters/TemperatureControlledCabinetTopology/EventIds.h>
 #include <clusters/TemperatureMeasurement/EventIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/EventIds.h>
 #include <clusters/Thermostat/EventIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EventIds.h>
 #include <clusters/ThreadBorderRouterManagement/EventIds.h>
