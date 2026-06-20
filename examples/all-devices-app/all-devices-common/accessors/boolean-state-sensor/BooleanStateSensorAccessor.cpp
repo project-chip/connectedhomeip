@@ -72,7 +72,7 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const Concret
             return CHIP_NO_ERROR;
         }
         default:
-            return CHIP_ERROR_UNSUPPORTED_WRITE; // Writing to this attribute is not allowed.;
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
         }
     }
     default:
