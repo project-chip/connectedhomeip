@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include <accessors/OOBAccessor.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -38,11 +36,19 @@ public:
     void Register(OOBAccessor & accessor) { mAccessors.PushBack(&accessor); }
 
     /**
-     * @brief Routes an action/simulation invocation to the registered accessors.
+     * @brief Routes a simulation or out-of-band control action to the registered accessors.
      *
-     * @param actionName Action name. An OOBAccessor that handles this action must be registered.
-     * @param tlvBuffer Buffer containing TLV data for the action request.
-     * @return CHIP_ERROR_NOT_FOUND if no accessor handles this request. OR the status from the accssor.
+     * The schema of `tlvBuffer` is action-specific and defined by the accessor handling the action.
+     * For example, the standard "SetAttribute" action expects a flat TLV Structure containing:
+     *   - Context Tag 1: Endpoint ID (uint16_t)
+     *   - Context Tag 2: Cluster ID (uint32_t)
+     *   - Context Tag 3: Attribute ID (uint32_t)
+     *   - Context Tag 4: Attribute Value (Any valid TLV element matching the attribute's type)
+     *
+     * See OOBDataSerializer::ParseAttributeRequest and OOBDataSerializer::BuildSetAttributeRequest for a concrete
+     * parsing-building implementation.
+     *
+     * @return CHIP_ERROR_NOT_FOUND if no accessor handles this action; otherwise, the result of the action.
      */
     CHIP_ERROR HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
     {

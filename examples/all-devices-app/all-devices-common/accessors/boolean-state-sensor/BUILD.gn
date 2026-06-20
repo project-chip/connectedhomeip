@@ -27,6 +27,4 @@ source_set("boolean-state-sensor-accessor") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
   ]
-
-  public_configs = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/:includes" ]
 }

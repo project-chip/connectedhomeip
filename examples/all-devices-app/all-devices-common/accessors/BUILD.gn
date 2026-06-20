@@ -30,14 +30,12 @@ source_set("accessors") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
   ]
 
   public_configs = [
     ":includes",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices:includes",
     "${chip_root}/src:includes",
   ]
 
