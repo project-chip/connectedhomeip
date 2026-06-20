@@ -172,7 +172,6 @@ void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 #endif // #if ENABLE_REENTRANCY
 
 /**
-/**
  * @brief Read the size of a secure object in SE05x.
  * @param[in] objid - Object identifier
  * @param[out] psize - Pointer to store the object size
