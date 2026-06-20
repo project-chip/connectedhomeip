@@ -182,8 +182,8 @@ source_set("app-options") {
 
 source_set("named-pipes") {
   sources = [
-    "NamedPipeCommands.cpp",
-    "NamedPipeCommands.h",
+    "../../../linux/NamedPipeCommands.cpp",
+    "../../../linux/NamedPipeCommands.h",
   ]
 
   public_deps = [
@@ -196,8 +196,8 @@ source_set("named-pipes") {
 
 source_set("commissionable-init") {
   sources = [
-    "CommissionableInit.cpp",
-    "CommissionableInit.h",
+    "../../../linux/CommissionableInit.cpp",
+    "../../../linux/CommissionableInit.h",
   ]
 
   public_deps = [
