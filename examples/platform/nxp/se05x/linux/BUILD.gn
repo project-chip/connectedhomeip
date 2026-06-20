@@ -237,10 +237,6 @@ source_set("app-main") {
 
   sources = [
     "../../../linux/AppMain.h",
-    "../../../linux/CommissionableInit.cpp",
-    "../../../linux/CommissionableInit.h",
-    "../../../linux/NamedPipeCommands.cpp",
-    "../../../linux/NamedPipeCommands.h",
     "../DeviceAttestationSe05xCredsExample.cpp",
     "AppMain.cpp",
   ]
