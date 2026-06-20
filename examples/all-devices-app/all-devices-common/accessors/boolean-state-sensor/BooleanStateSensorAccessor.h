@@ -31,7 +31,7 @@ namespace chip::app {
 class BooleanStateSensorAccessor : public OOBAccessor
 {
 public:
-    BooleanStateSensorAccessor(BooleanStateSensorDevice & device);
+    BooleanStateSensorAccessor(BooleanStateSensorDevice & device) : mDevice(device) {}
     ~BooleanStateSensorAccessor() override = default;
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
