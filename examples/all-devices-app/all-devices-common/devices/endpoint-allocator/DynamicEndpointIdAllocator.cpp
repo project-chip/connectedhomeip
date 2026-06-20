@@ -47,6 +47,7 @@ void DynamicEndpointIdAllocator::ForceNext(EndpointId endpoint)
 
 EndpointId DynamicEndpointIdAllocator::Allocate()
 {
+    // Exhaustion of the 16-bit endpoint ID space is treated as a fatal configuration error.
     VerifyOrDie(mNext != kInvalidEndpointId);
     EndpointId allocated = mNext++;
     mUsedIds.insert(allocated);
