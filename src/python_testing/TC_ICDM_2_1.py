@@ -38,6 +38,7 @@
 import re
 
 from mobly import asserts
+from support_modules.icd_support import kUatColorInstructionBitMask, kUatNumberInstructionBitMask, uat_instruction_bitmasks
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
@@ -52,18 +53,6 @@ cluster = Clusters.Objects.IcdManagement
 uat = cluster.Bitmaps.UserActiveModeTriggerBitmap
 modes = cluster.Enums.OperatingModeEnum
 features = cluster.Bitmaps.Feature
-
-# BitMask for all user active mode trigger hints that are depedent on the UserActiveModeTriggerInstruction
-kUatInstructionDependentBitMask = uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes | uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonLightsBlink | uat.kSetupButtonTimes | uat.kAppDefinedButton
-
-# BitMask for UserActiveModeTriggerHint that REQUIRE the prescense of the UserActiveModeTriggerInstruction
-kUatInstructionMandatoryBitMask = uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes | uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonTimes | uat.kAppDefinedButton
-
-# BitMask for all user active mode trigger hints that have the UserActiveModeTriggerInstruction as an uint
-kUatNumberInstructionBitMask = uat.kActuateSensorSeconds | uat.kActuateSensorTimes | uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonTimes
-
-# BitMask for all user active mode trigger hints that provide a color in the UserActiveModeTriggerInstruction
-kUatColorInstructionBitMask = uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kSetupButtonLightsBlink
 
 
 class TC_ICDM_2_1(MatterBaseTest):
@@ -136,6 +125,9 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         cluster = Clusters.Objects.IcdManagement
         attributes = cluster.Attributes
+
+        # Instruction-dependency masks
+        kUatInstructionDependentBitMask, kUatInstructionMandatoryBitMask = uat_instruction_bitmasks()
 
         # Commissioning
         self.step("1a")
