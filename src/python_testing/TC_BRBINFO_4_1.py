@@ -226,7 +226,9 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                 self.dut_fsa_stdin.write(f"pairing onnetwork 2 {setupPinCode} --icd-registration true\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
-            await asyncio.sleep(5)
+            # 5s is insufficient for mDNS discovery + ICD commissioning through the bridge;
+            # use 15s to provide enough time for discovery/commissioning before continuing.
+            await asyncio.sleep(15)
 
     def teardown_class(self):
         if self._active_change_event_subscription is not None:
