@@ -30,7 +30,8 @@ source_set("accessors") {
   ]
 
   public_deps = [
-    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
 
