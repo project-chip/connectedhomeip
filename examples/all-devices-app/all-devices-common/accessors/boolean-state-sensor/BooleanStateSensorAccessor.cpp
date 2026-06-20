@@ -59,8 +59,9 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan acti
 std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path,
                                                                    AttributeValueDecoder & decoder)
 {
-    if (path.mClusterId == BooleanState::Id)
+    switch (path.mClusterId)
     {
+    case BooleanState::Id: {
         switch (path.mAttributeId)
         {
         case BooleanState::Attributes::StateValue::Id: {
@@ -71,8 +72,11 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const Concret
             return CHIP_NO_ERROR;
         }
         default:
-            break;
+            return CHIP_ERROR_UNSUPPORTED_WRITE; // Writing to this attribute is not allowed.;
         }
+    }
+    default:
+        return std::nullopt;
     }
 
     return std::nullopt;
