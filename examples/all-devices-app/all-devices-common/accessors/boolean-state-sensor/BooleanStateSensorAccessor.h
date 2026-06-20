@@ -40,7 +40,6 @@ private:
     std::optional<CHIP_ERROR> SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
 
     BooleanStateSensorDevice & mDevice;
-    ConcreteDataAttributePath mSupportedPaths[1];
 };
 
 } // namespace chip::app
