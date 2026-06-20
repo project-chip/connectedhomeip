@@ -116,6 +116,11 @@ executable("all-devices-app") {
       "$dir_pw_trace_tokenized",
       "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+
+      # We reuse the common attributes service because it already provides a fully functional
+      # RPC read/write interface and TLV serialization out-of-the-box.
+      # Note: The ZCL types are used strictly as a hint from the client so the RPC server
+      # knows which Protobuf field type (e.g. uint8, uint16, uint32) to put the TLV data into, and is not coupled with ember.
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",
     ]
