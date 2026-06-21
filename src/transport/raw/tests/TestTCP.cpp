@@ -871,11 +871,11 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
 
-    // Test a single packet buffer with zero message size.
+    // Test a single packet buffer with zero message size - should be rejected.
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, 4);
     ASSERT_NE(&buf, nullptr);
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
@@ -930,6 +930,38 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     // The receipt of a message exceeding the allowed size should have
     // closed the connection.
     EXPECT_TRUE(TestAccess::GetEndpoint(state).IsNull());
+}
+
+TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
+{
+    TCPImpl tcp;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    uint16_t port = GetRandomPort();
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+
+    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr, port);
+
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, port);
+    auto state                          = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_TRUE(state);
+    TCPEndPointHandle lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_TRUE(lEndPoint);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestData testData[1];
+
+    // A message of exactly kMaxTCPMessageSize (kLargeBufMaxSizeWithoutReserve - 4)
+    // should be accepted, not rejected.
+    constexpr uint32_t kMaxValidSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
+    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ kMaxValidSize, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 }
 
 } // namespace

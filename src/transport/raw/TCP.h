@@ -338,7 +338,13 @@ public:
         }
     }
 
-    ~TCP() override { mPendingPackets.ReleaseAll(); }
+    ~TCP() override
+    {
+        mPendingPackets.ReleaseAll();
+
+        // Call Close to free the listening socket and close all active connections.
+        Close();
+    }
 
 private:
     ActiveTCPConnectionState mConnectionsBuffer[kActiveConnectionsSize];

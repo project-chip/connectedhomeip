@@ -1912,7 +1912,7 @@ CHIP_ERROR DeviceCommissioner::SetUdcListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::FindCommissionableNode(char * instanceName)
+void DeviceCommissioner::FindCommissionableNode(const char * instanceName)
 {
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instanceName);
     DiscoverCommissionableNodes(filter);
@@ -2215,6 +2215,16 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     VerifyOrDie(self->GetCommissioningStage() == CommissioningStage::kFindOperationalForStayActive ||
                 self->GetCommissioningStage() == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
+
+    bool supportsConcurrent =
+        self->mCommissioningDelegate->GetCommissioningParameters().GetSupportsConcurrentConnection().ValueOr(true);
+    if (!supportsConcurrent)
+    {
+        // Concurrent mode not supported.
+        // We are in operational phase so the commissioning channel is not
+        // available anymore and it is not possible to re-arm the fail-safe timer.
+        return;
+    }
 
     // We need to do the fail-safe arming over the PASE session.
     auto * commissioneeDevice = self->FindCommissioneeDevice(peerId.GetNodeId());

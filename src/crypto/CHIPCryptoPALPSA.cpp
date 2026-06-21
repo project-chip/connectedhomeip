@@ -539,7 +539,7 @@ exit:
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
@@ -649,7 +649,7 @@ exit:
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR add_entropy_source(entropy_source /* fn_source */, void * /* p_source */, size_t /* threshold */)
@@ -909,7 +909,7 @@ void P256Keypair::Clear()
     {
         PsaP256KeypairContext & context = ToPsaContext(mKeypair);
         psa_destroy_key(context.key_id);
-        memset(&context, 0, sizeof(context));
+        ClearSecretData(reinterpret_cast<uint8_t *>(&context), sizeof(context));
         mInitialized = false;
     }
 }
@@ -1025,6 +1025,10 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
+
+    ClearSecretData(Kcab);
+    ClearSecretData(Kae);
+
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 

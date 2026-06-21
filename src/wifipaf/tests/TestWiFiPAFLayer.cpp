@@ -183,6 +183,37 @@ TEST_F(TestWiFiPAFLayer, CheckPafSession)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_NOT_FOUND);
 }
 
+// Run under ASan to catch regressions of the heap-buffer-overflow read.
+TEST_F(TestWiFiPAFLayer, GetPktSnRejectsShortFragment)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Publisher,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    ASSERT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    ASSERT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
+
+    // Flag byte 0x2B sets kFragmentAck and kManagementOpcode, pushing SnOffset
+    // to 3 (header + mgmt-op + ack). With a 3-byte buffer, dereferencing
+    // pHead + 3 is a heap-buffer-overflow read.
+    constexpr uint8_t kShortFragmentWithMaxFlags[] = { 0x2B, 0x8F, 0x2B };
+    auto packet = System::PacketBufferHandle::NewWithData(kShortFragmentWithMaxFlags, sizeof(kShortFragmentWithMaxFlags));
+    ASSERT_FALSE(packet.IsNull());
+
+    EXPECT_EQ(newEndPoint->Receive(std::move(packet)), CHIP_ERROR_MESSAGE_INCOMPLETE);
+
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+}
+
 TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
 {
     WiFiPAFSession sessionInfo = {
