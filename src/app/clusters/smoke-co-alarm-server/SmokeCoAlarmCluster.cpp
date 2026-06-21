@@ -232,6 +232,10 @@ void SmokeCoAlarmCluster::SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensi
 {
     VerifyOrReturn(SupportsSmokeAlarm());
     SetAttributeValue(mSmokeSensitivityLevel, newSmokeSensitivityLevel, SmokeSensitivityLevel::Id);
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnSmokeSensitivityLevelChanged(newSmokeSensitivityLevel);
+    }
 }
 
 void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
@@ -439,6 +443,11 @@ void SmokeCoAlarmCluster::SetExpressedState(ExpressedStateEnum newExpressedState
     {
         Events::AllClear::Type event{};
         mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    }
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnExpressedStateChanged(newExpressedState);
     }
 }
 

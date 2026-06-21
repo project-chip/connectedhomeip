@@ -71,6 +71,18 @@ _available_devices = [
     "FAN",
   ],
   [
+    "flow-sensor",
+    "FLOW_SENSOR",
+  ],
+  [
+    "humidity-sensor",
+    "HUMIDITY_SENSOR",
+  ],
+  [
+    "light-sensor",
+    "LIGHT_SENSOR",
+  ],
+  [
     "network-infrastructure-manager",
     "NETWORK_INFRASTRUCTURE_MANAGER",
   ],
@@ -87,8 +99,16 @@ _available_devices = [
     "POWER_SOURCE",
   ],
   [
+    "pressure-sensor",
+    "PRESSURE_SENSOR",
+  ],
+  [
     "proximity-ranger",
     "PROXIMITY_RANGER",
+  ],
+  [
+    "rain-sensor",
+    "RAIN_SENSOR",
   ],
   [
     "smoke-co-alarm",
@@ -105,6 +125,10 @@ _available_devices = [
   [
     "temperature-sensor",
     "TEMPERATURE_SENSOR",
+  ],
+  [
+    "water-freeze-detector",
+    "WATER_FREEZE_DETECTOR",
   ],
   [
     "water-leak-detector",

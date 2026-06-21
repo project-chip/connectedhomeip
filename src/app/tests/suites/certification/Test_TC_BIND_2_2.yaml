@@ -92,8 +92,7 @@ tests:
 
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
           "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,
-          "groupKeyMulticastPolicy": 0}' 74 0
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000}' 74 0
 
           On TH1(Chip-tool), Verify the success response for KeySetWrite
 
@@ -132,8 +131,7 @@ tests:
 
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
           "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,
-          "groupKeyMulticastPolicy": 0}' 2 0
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000}' 2 0
 
           On TH1(Chip-tool), Verify the success response for KeySetWrite
 
