@@ -237,6 +237,12 @@
 @interface MCContentLauncherClusterSupportedStreamingProtocolsAttribute : MCAttribute <NSNumber *>
 @end
 
+@interface MCContentLauncherClusterMovableAttribute : MCAttribute <NSNumber *>
+@end
+
+@interface MCContentLauncherClusterPresetsAttribute : MCAttribute <NSArray *>
+@end
+
 @interface MCContentLauncherClusterGeneratedCommandListAttribute : MCAttribute <NSArray *>
 @end
 

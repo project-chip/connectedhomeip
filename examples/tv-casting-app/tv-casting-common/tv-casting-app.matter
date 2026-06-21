@@ -2374,7 +2374,7 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1;
+  revision 3;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -2422,12 +2422,24 @@ cluster ContentLauncher = 1290 {
     kAny = 16;
   }
 
+  enum QueueTypeEnum : enum8 {
+    kReplace = 0;
+    kNext = 1;
+    kLast = 2;
+  }
+
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kURLNotAvailable = 1;
     kAuthFailed = 2;
     kTextTrackNotAvailable = 3;
     kAudioTrackNotAvailable = 4;
+    kInvalidData = 5;
+    kAccountMismatch = 6;
+    kContentAppNotAvailable = 7;
+    kReplicationNotAllowed = 8;
+    kReplicationNotSupported = 9;
+    kPresetNotFound = 10;
   }
 
   bitmap Feature : bitmap32 {
@@ -2436,6 +2448,9 @@ cluster ContentLauncher = 1290 {
     kAdvancedSeek = 0x4;
     kTextTracks = 0x8;
     kAudioTracks = 0x10;
+    kContentReplication = 0x20;
+    kContentQueueing = 0x40;
+    kPresets = 0x80;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -2447,6 +2462,27 @@ cluster ContentLauncher = 1290 {
     double width = 0;
     double height = 1;
     MetricTypeEnum metric = 2;
+  }
+
+  struct ContentAppInfo {
+    int16u contentAppVendorID = 0;
+    int16u contentAppProductID = 1;
+    long_char_string<1024> data = 2;
+  }
+
+  struct LaunchUrlInfo {
+    long_char_string<8192> url = 0;
+    optional nullable long_char_string<1024> data = 1;
+    optional nullable long_char_string<256> contentType = 2;
+    optional nullable char_string contentHeaders[] = 3;
+    optional nullable int32u offsetMillisecs = 4;
+    optional nullable QueueTypeEnum queueType = 5;
+    optional nullable long_char_string<8192> nextUrl = 6;
+  }
+
+  struct ReplicationInfo {
+    optional nullable LaunchUrlInfo launchUrlInfo = 0;
+    optional nullable ContentAppInfo contentAppInfo = 1;
   }
 
   struct TrackPreferenceStruct {
@@ -2462,13 +2498,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct AdditionalInfoStruct {
-    char_string<256> name = 0;
-    char_string<8192> value = 1;
+    long_char_string<256> name = 0;
+    long_char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    char_string<1024> value = 1;
+    long_char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -2477,13 +2513,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional char_string<8192> imageURL = 0;
+    optional long_char_string<8192> imageURL = 0;
     optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    char_string<256> providerName = 0;
+    long_char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -2491,8 +2527,19 @@ cluster ContentLauncher = 1290 {
     optional StyleInformationStruct waterMark = 5;
   }
 
+  struct ContentPresetStruct {
+    int8u presetID = 0;
+    char_string<48> presetName = 1;
+  }
+
+  provisional info event ContentReplication = 0 {
+    StatusEnum status = 0;
+  }
+
   readonly attribute optional char_string acceptHeader[] = 0;
   readonly attribute optional SupportedProtocolsBitmap supportedStreamingProtocols = 1;
+  provisional readonly attribute optional boolean movable = 2;
+  provisional readonly attribute optional ContentPresetStruct presets[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2505,12 +2552,20 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 2;
     optional PlaybackPreferencesStruct playbackPreferences = 3;
     optional boolean useCurrentContext = 4;
+    optional nullable int16u contentAppVendorID = 5;
+    optional nullable int16u contentAppProductID = 6;
   }
 
   request struct LaunchURLRequest {
-    char_string contentURL = 0;
-    optional char_string displayString = 1;
+    long_char_string<8192> contentURL = 0;
+    optional long_char_string<256> displayString = 1;
     optional BrandingInformationStruct brandingInformation = 2;
+    optional PlaybackPreferencesStruct playbackPreferences = 3;
+    optional nullable long_char_string<256> contentType = 4;
+    optional nullable char_string contentHeaders[] = 5;
+    optional nullable int32u offsetMillisecs = 6;
+    optional nullable QueueTypeEnum queueType = 7;
+    optional nullable long_char_string<8192> nextUrl = 8;
   }
 
   response struct LauncherResponse = 2 {
@@ -2518,10 +2573,23 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 1;
   }
 
+  response struct ContentReplicationResponse = 4 {
+    StatusEnum status = 0;
+    optional nullable ReplicationInfo replicationInfo = 1;
+  }
+
+  request struct PlayPresetRequest {
+    int8u presetID = 0;
+  }
+
   /** Upon receipt, this SHALL launch the specified content with optional search criteria. */
   command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
   /** Upon receipt, this SHALL launch content from the specified URL. */
   command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
+  /** Upon receipt, this SHALL request replication information for the currently playing content. */
+  command ContentReplicationRequest(): ContentReplicationResponse = 3;
+  /** This command will play the preset passed in. */
+  command PlayPreset(PlayPresetRequest): DefaultSuccess = 5;
 }
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */

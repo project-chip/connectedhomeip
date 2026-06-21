@@ -15116,6 +15116,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Upon receipt, this SHALL launch content from the specified URL.
  */
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+/**
+ * Command ContentReplicationRequest
+ *
+ * Upon receipt, this SHALL request replication information for the currently playing content.
+ */
+- (void)contentReplicationRequestWithParams:(MTRContentLauncherClusterContentReplicationRequestParams * _Nullable)params completion:(void (^)(MTRContentLauncherClusterContentReplicationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)contentReplicationRequestWithCompletion:(void (^)(MTRContentLauncherClusterContentReplicationResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command PlayPreset
+ *
+ * This command will play the preset passed in.
+ */
+- (void)playPresetWithParams:(MTRContentLauncherClusterPlayPresetParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeAcceptHeaderWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeAcceptHeaderWithParams:(MTRSubscribeParams *)params
@@ -15130,6 +15144,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeSupportedStreamingProtocolsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+- (void)readAttributeMovableWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeMovableWithParams:(MTRSubscribeParams *)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeMovableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributePresetsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributePresetsWithParams:(MTRSubscribeParams *)params
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributePresetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -23733,12 +23759,24 @@ typedef NS_ENUM(uint8_t, MTRContentLauncherParameter) {
     MTRContentLauncherParameterAny MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRContentLauncherQueueType) {
+    MTRContentLauncherQueueTypeReplace MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRContentLauncherQueueTypeNext MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRContentLauncherQueueTypeLast MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRContentLauncherStatus) {
     MTRContentLauncherStatusSuccess MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00,
     MTRContentLauncherStatusURLNotAvailable MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x01,
     MTRContentLauncherStatusAuthFailed MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x02,
     MTRContentLauncherStatusTextTrackNotAvailable MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
     MTRContentLauncherStatusAudioTrackNotAvailable MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
+    MTRContentLauncherStatusInvalidData MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRContentLauncherStatusAccountMismatch MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRContentLauncherStatusContentAppNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRContentLauncherStatusReplicationNotAllowed MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRContentLauncherStatusReplicationNotSupported MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRContentLauncherStatusPresetNotFound MTR_PROVISIONALLY_AVAILABLE = 0x0A,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_ENUM(uint8_t, MTRContentLauncherContentLaunchStatus) {
@@ -23753,6 +23791,9 @@ typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
     MTRContentLauncherFeatureAdvancedSeek MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x4,
     MTRContentLauncherFeatureTextTracks MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x8,
     MTRContentLauncherFeatureAudioTracks MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x10,
+    MTRContentLauncherFeatureContentReplication MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRContentLauncherFeatureContentQueueing MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRContentLauncherFeaturePresets MTR_PROVISIONALLY_AVAILABLE = 0x80,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedProtocolsBitmap) {
