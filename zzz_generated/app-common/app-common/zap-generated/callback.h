@@ -8340,6 +8340,18 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData);
 /**
+ * @brief Content Launcher Cluster ContentReplicationRequest Command callback (from client)
+ */
+bool emberAfContentLauncherClusterContentReplicationRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::DecodableType & commandData);
+/**
+ * @brief Content Launcher Cluster PlayPreset Command callback (from client)
+ */
+bool emberAfContentLauncherClusterPlayPresetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::PlayPreset::DecodableType & commandData);
+/**
  * @brief Audio Output Cluster SelectOutput Command callback (from client)
  */
 bool emberAfAudioOutputClusterSelectOutputCallback(
