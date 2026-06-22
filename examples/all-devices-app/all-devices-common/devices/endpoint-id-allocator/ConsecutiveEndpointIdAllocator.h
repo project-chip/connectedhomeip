@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,31 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <devices/power-source/BatteryPowerSourceDevice.h>
-#include <platform/DefaultTimerDelegate.h>
+#include <devices/endpoint-id-allocator/EndpointIdAllocator.h>
 
 namespace chip::app {
 
-/**
- * @brief An implementation of a Battery Power Source Device that decreases battery level over time.
- *
- */
-class DecreasingBatteryPowerSourceDevice : public BatteryPowerSourceDevice, public TimerContext
+/// Allocates consecutive endpoint IDs starting from a specified initial ID.
+///
+/// Intended for standalone or embedded examples that require simple incremental allocation.
+class ConsecutiveEndpointIdAllocator : public EndpointIdAllocator
 {
 public:
-    DecreasingBatteryPowerSourceDevice();
-    ~DecreasingBatteryPowerSourceDevice() override;
+    explicit ConsecutiveEndpointIdAllocator(EndpointId startEndpoint = 1) : mNext(startEndpoint) {}
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-    // TimerContext
-    void TimerFired() override;
+    EndpointId Allocate() override { return mNext++; }
 
 private:
-    DefaultTimerDelegate mTimerDelegate;
+    EndpointId mNext;
 };
 
 } // namespace chip::app

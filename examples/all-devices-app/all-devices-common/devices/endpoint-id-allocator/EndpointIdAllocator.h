@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,31 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <devices/power-source/BatteryPowerSourceDevice.h>
-#include <platform/DefaultTimerDelegate.h>
+#include <app/util/basic-types.h>
 
 namespace chip::app {
 
-/**
- * @brief An implementation of a Battery Power Source Device that decreases battery level over time.
- *
- */
-class DecreasingBatteryPowerSourceDevice : public BatteryPowerSourceDevice, public TimerContext
+/// Interface for dynamically allocating endpoint IDs across devices and sub-parts.
+///
+/// Decouples device initialization from fixed endpoint IDs by providing on-demand allocation.
+class EndpointIdAllocator
 {
 public:
-    DecreasingBatteryPowerSourceDevice();
-    ~DecreasingBatteryPowerSourceDevice() override;
+    virtual ~EndpointIdAllocator() = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-    // TimerContext
-    void TimerFired() override;
-
-private:
-    DefaultTimerDelegate mTimerDelegate;
+    /// Allocates and returns the next usable EndpointId.
+    virtual EndpointId Allocate() = 0;
 };
 
 } // namespace chip::app
