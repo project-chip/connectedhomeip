@@ -294,6 +294,17 @@ Type TypeGet(chip::EndpointId endpoint)
     return cluster->GetType();
 }
 
+void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus)
+{
+    ChipLogProgress(Zcl, "ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
+                    configStatus.Has(ConfigStatus::kOperational), configStatus.Has(ConfigStatus::kOnlineReserved));
+
+    ChipLogProgress(Zcl, "Lift(PA=%u Encoder=%u Reversed=%u) Tilt(PA=%u Encoder=%u)",
+                    configStatus.Has(ConfigStatus::kLiftPositionAware), configStatus.Has(ConfigStatus::kLiftEncoderControlled),
+                    configStatus.Has(ConfigStatus::kLiftMovementReversed), configStatus.Has(ConfigStatus::kTiltPositionAware),
+                    configStatus.Has(ConfigStatus::kTiltEncoderControlled));
+}
+
 void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus> & configStatus)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
@@ -324,6 +335,13 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
         configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
 
     ConfigStatusSet(endpoint, configStatus);
+}
+
+void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus)
+{
+    ChipLogProgress(Zcl, "OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u", opStatus.Raw(),
+                    opStatus.GetField(OperationalStatus::kGlobal), opStatus.GetField(OperationalStatus::kLift),
+                    opStatus.GetField(OperationalStatus::kTilt));
 }
 
 chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)

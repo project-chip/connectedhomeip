@@ -119,6 +119,15 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
+    /**
+     * @brief Computes the motion lock status from the current Mode and ConfigStatus members.
+     *
+     * @return Status::Success if motion is allowed.
+     *         Status::Busy if maintenance mode is active.
+     *         Status::Failure if calibration mode is active (or otherwise not operational).
+     */
+    std::optional<DataModel::ActionReturnStatus> GetMotionLockStatus() const;
+
     // Setters and Getters
     BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
 
@@ -167,21 +176,11 @@ protected:
     void SetEndProductType(EndProductType type);
 
 private:
-    /**
-     * @brief Computes the motion lock status from the current Mode and ConfigStatus members.
-     *
-     * @return Status::Success if motion is allowed.
-     *         Status::Busy if maintenance mode is active.
-     *         Status::Failure if calibration mode is active (or otherwise not operational).
-     */
-    std::optional<DataModel::ActionReturnStatus> GetMotionLockStatus() const;
     void UpdateOperationalStateForField(chip::BitMask<OperationalStatus> field, OperationalState state);
 
     std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen();
     std::optional<DataModel::ActionReturnStatus> HandleDownOrClose();
     std::optional<DataModel::ActionReturnStatus> HandleStopMotion(const Commands::StopMotion::DecodableType & fields);
-    std::optional<DataModel::ActionReturnStatus> HandleGoToLiftValue(const Commands::GoToLiftValue::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleGoToTiltValue(const Commands::GoToTiltValue::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields);
     std::optional<DataModel::ActionReturnStatus>
@@ -209,24 +208,6 @@ private:
     chip::BitMask<Mode> mMode;
     chip::BitMask<SafetyStatus> mSafetyStatus;
 };
-
-// Helper functions
-chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
-
-LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
-bool IsPercent100thsValid(Percent100ths percent100ths);
-bool IsPercent100thsValid(NPercent100ths npercent100ths);
-
-OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
-OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
-Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta);
-
-uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
-uint16_t ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute);
-
-uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
-
-uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
 
 } // namespace WindowCovering
 } // namespace Clusters
