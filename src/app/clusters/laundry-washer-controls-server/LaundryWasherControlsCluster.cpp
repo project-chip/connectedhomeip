@@ -43,11 +43,18 @@ DataModel::ActionReturnStatus LaundryWasherControlsCluster::ReadAttribute(const 
             return encoder.EncodeNull();
         }
         ReturnErrorOnFailure(err);
-    }
         return encoder.Encode(mSpinSpeedCurrent);
-    case NumberOfRinses::Id:
-        ReturnErrorOnFailure(NumberOfRinsesValidity(mNumberOfRinses));
+    }
+    case NumberOfRinses::Id: {
+        CHIP_ERROR err = NumberOfRinsesValidity(mNumberOfRinses);
+        if (err == CHIP_IM_GLOBAL_STATUS(InvalidInState))
+        {
+            // Fallback to default value when reading.
+            return encoder.Encode(NumberOfRinsesEnum::kNone);
+        }
+        ReturnErrorOnFailure(err);
         return encoder.Encode(mNumberOfRinses);
+    }
     case SupportedRinses::Id:
         return ReadSupportedRinses(request.path, encoder);
     default:
