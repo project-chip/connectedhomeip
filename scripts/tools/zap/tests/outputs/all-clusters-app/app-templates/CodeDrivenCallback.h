@@ -161,13 +161,13 @@ void MatterAirQualityClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAirQualityClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
-void MatterMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId);
-
-void MatterMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
-
 void MatterSmokeCoAlarmClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterSmokeCoAlarmClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterScenesManagementClusterInitCallback(chip::EndpointId endpointId);
 
