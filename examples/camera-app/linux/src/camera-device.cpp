@@ -312,7 +312,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
         { videorate, "videorate" },           //
         { videorate_caps, "videorate_caps" }, //
         { queue, "queue" },                   //
-        { appsink, "appsink" }              //
+        { appsink, "appsink" }                //
     };
     bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
 
@@ -368,7 +368,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
     GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
     GstElement * queue      = gst_element_factory_make("queue", "queue");
-    GstElement * appsink     = gst_element_factory_make("appsink", "sink");
+    GstElement * appsink    = gst_element_factory_make("appsink", "sink");
 
     // Check for any nullptr among the created elements
     const std::vector<std::pair<GstElement *, const char *>> elements = {
@@ -427,7 +427,7 @@ GstElement * CreateSnapshotPipelineTestVideosrc(const SnapshotPipelineConfig & c
     GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
     GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
     GstElement * queue      = gst_element_factory_make("queue", "queue");
-    GstElement * appsink     = gst_element_factory_make("appsink", "sink");
+    GstElement * appsink    = gst_element_factory_make("appsink", "sink");
 
     const std::vector<std::pair<GstElement *, const char *>> elements = {
         { pipeline, "pipeline" },     //
@@ -898,7 +898,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
 {
     VideoResolutionStruct matchedRes;
     ImageCodecEnum matchedCodec;
-    uint16_t streamId = 0;
+    uint16_t streamId               = 0;
     SnapshotStream * snapshotStream = nullptr;
 
     if (streamID.IsNull())
@@ -917,7 +917,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
                 s.snapshotStreamParams.imageCodec == matchedCodec)
             {
                 snapshotStream = &s;
-                streamId = s.snapshotStreamParams.snapshotStreamID;
+                streamId       = s.snapshotStreamParams.snapshotStreamID;
                 break;
             }
         }
@@ -925,7 +925,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     else
     {
         streamId = streamID.Value();
-        auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+        auto it  = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
             return s.snapshotStreamParams.snapshotStreamID == streamId;
         });
         if (it == mSnapshotStreams.end())
@@ -934,8 +934,8 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
         snapshotStream = &(*it);
-        matchedRes   = it->snapshotStreamParams.minResolution;
-        matchedCodec = it->snapshotStreamParams.imageCodec;
+        matchedRes     = it->snapshotStreamParams.minResolution;
+        matchedCodec   = it->snapshotStreamParams.imageCodec;
     }
 
     if (snapshotStream == nullptr)
@@ -945,7 +945,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     }
 
     GstElement * snapshotPipeline = reinterpret_cast<GstElement *>(snapshotStream->snapshotContext);
-    bool startedOnDemand = false;
+    bool startedOnDemand          = false;
 
     if (snapshotPipeline == nullptr)
     {
@@ -957,7 +957,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
         snapshotPipeline = reinterpret_cast<GstElement *>(snapshotStream->snapshotContext);
-        startedOnDemand = true;
+        startedOnDemand  = true;
     }
 
     if (snapshotPipeline == nullptr)
@@ -1474,8 +1474,6 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
             return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
         }
     }
-
-
 
     return CameraError::SUCCESS;
 }
