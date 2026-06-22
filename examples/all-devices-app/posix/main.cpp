@@ -198,7 +198,8 @@ public:
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
-            ReturnErrorOnFailure(device->Register(entry.endpoint, mDataModelProvider, entry.parentId));
+            ReturnErrorOnFailure(
+                device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
             auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, *device);
             if (accessor)
             {
@@ -209,8 +210,6 @@ public:
             {
                 endpointIdAllocator.ForceNext(entry.endpoint);
             }
-            ReturnErrorOnFailure(
-                device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
             mConstructedDevices.push_back(std::move(device));
         }
 
