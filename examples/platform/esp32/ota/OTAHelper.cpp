@@ -23,6 +23,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+#include <platform/ESP32/multi-ota/AppImageProcessor.h>
 #include <platform/ESP32/multi-ota/MultiImageOTAProcessorImpl.h>
 #else
 #include <platform/ESP32/OTAImageProcessorImpl.h>
@@ -57,6 +58,10 @@ CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 #if CONFIG_ENABLE_MULTI_IMAGE_OTA
 MultiImageOTAProcessorImpl gImageProcessor;
+// Default sub-processor for the primary application firmware (§15.1). The registration node is a
+// caller-owned static, as required by the intrusive registry.
+AppImageProcessor gAppImageProcessor;
+ImageProcessorEntry gAppImageEntry{ kAppImageProcessorTag, &gAppImageProcessor };
 #else
 OTAImageProcessorImpl gImageProcessor;
 #endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
@@ -153,6 +158,11 @@ void OTAHelpers::InitOTARequestor()
 {
     if (!GetRequestorInstance())
     {
+#if CONFIG_ENABLE_MULTI_IMAGE_OTA
+        // Register the application-firmware sub-processor before the requestor is initialised (§10.4).
+        // Without this the dispatcher finds no processor for the app image and skips it.
+        LogErrorOnFailure(gImageProcessor.RegisterProcessor(gAppImageEntry));
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
         SetRequestorInstance(&gRequestorCore);
         gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
         TEMPORARY_RETURN_IGNORED gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
