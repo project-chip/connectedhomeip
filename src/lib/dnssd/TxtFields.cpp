@@ -136,7 +136,7 @@ size_t GetPlusSignIdx(const ByteSpan & value)
 uint16_t GetProduct(const ByteSpan & value)
 {
     size_t plussign = GetPlusSignIdx(value);
-    if (plussign < value.size() - 1)
+    if (plussign + 1 < value.size())
     {
         const uint8_t * productStrStart = value.data() + plussign + 1;
         size_t productStrLen            = value.size() - plussign - 1;

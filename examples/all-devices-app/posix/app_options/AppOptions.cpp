@@ -55,6 +55,8 @@ constexpr uint16_t kOptionPort          = 0xffd7;
 constexpr uint16_t kOptionInterfaceId   = 0xffd8;
 constexpr uint16_t kOptionBLE           = 0xffd9;
 constexpr uint16_t kOptionGroupcast     = 0xffda;
+constexpr uint16_t kOptionAppPipe       = 0xffdb;
+constexpr uint16_t kOptionTraceTo       = 0xffdc;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -162,6 +164,14 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.enableGroupcast = true;
         ChipLogProgress(AppServer, "Groupcast usage enabled");
         return true;
+    case kOptionAppPipe:
+        mConfig.appPipePath = value;
+        ChipLogProgress(AppServer, "App pipe path set to %s", value);
+        return true;
+    case kOptionTraceTo:
+        mConfig.traceTo.push_back(value);
+        ChipLogProgress(AppServer, "Added trace destination: %s", value);
+        return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -187,6 +197,8 @@ OptionSet * AppOptions::GetOptions()
         { "port", kArgumentRequired, kOptionPort },
         { "interface-id", kArgumentRequired, kOptionInterfaceId },
         { "groupcast", kNoArgument, kOptionGroupcast },
+        { "app-pipe", kArgumentRequired, kOptionAppPipe },
+        { "trace-to", kArgumentRequired, kOptionTraceTo },
         {}, // need empty terminator
     };
 
@@ -217,6 +229,33 @@ OptionSet * AppOptions::GetOptions()
         result += "  --wifi\n";
         result += "       Enable wifi support for commissioning\n\n";
 #endif
+
+        result += "  --KVS <path>\n";
+        result += "       Path to the Key Value Store file (default: " CHIP_CONFIG_KVS_PATH ")\n\n";
+
+        result += "  --discriminator <number>\n";
+        result += "       Discriminator value for commissioning (default: 3840)\n\n";
+
+        result += "  --vendor-id <number>\n";
+        result += "       Vendor ID value for commissioning\n\n";
+
+        result += "  --product-id <number>\n";
+        result += "       Product ID value for commissioning\n\n";
+
+        result += "  --port <number>\n";
+        result += "       Listen port for secure device messages (default: 5540)\n\n";
+
+        result += "  --interface-id <number>\n";
+        result += "       Interface ID to use for multicast multicast DNS\n\n";
+
+        result += "  --groupcast\n";
+        result += "       Enable groupcast messaging support\n\n";
+
+        result += "  --app-pipe <path>\n";
+        result += "       Path to the named pipe for receiving runtime commands\n\n";
+
+        result += "  --trace-to <destination>\n";
+        result += "       Enable tracing destination (e.g., json:log, json:file_path)\n\n";
 
         return result;
     }();

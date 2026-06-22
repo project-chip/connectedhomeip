@@ -77,6 +77,7 @@ jobs:
           rm -rf ./out
 
       - name: Build example BL702 Lighting App (Wi-Fi)
+        if: github.event_name != 'pull_request'
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-wifi-littlefs-shell build "
@@ -124,7 +125,7 @@ jobs:
             "./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-ethernet-littlefs-mfd build "
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl616 bl616+ethernet lighting-app \
-              out/bouffalolab-bl616dk-light-ethernet-littlefs-mfd/chip-bl616-lighting-example.out \
+              out/bouffalolab-bl616dk-light-ethernet-littlefs-mfd/chip-bl616-lighting-example.elf \
               /tmp/bloat_reports/
           rm -rf ./out
 
@@ -134,17 +135,38 @@ jobs:
             "./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-wifi-littlefs-mfd-shell build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl616 bl616+wifi+shell lighting-app \
-              out/bouffalolab-bl616dk-light-wifi-littlefs-mfd-shell/chip-bl616-lighting-example.out \
+              out/bouffalolab-bl616dk-light-wifi-littlefs-mfd-shell/chip-bl616-lighting-example.elf \
+              /tmp/bloat_reports/
+          rm -rf ./out
+
+      - name: Build example BL616CL Lighting App (Wi-Fi)
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-bl616cldk-light-wifi-littlefs-mfd build"
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl616 bl616+wifi+shell lighting-app \
+              out/bouffalolab-bl616cldk-light-wifi-littlefs-mfd/chip-bl616cl-lighting-example.elf \
               /tmp/bloat_reports/
           rm -rf ./out
 
       - name: Build example BL616 Lighting App (Thread)
+        if: github.event_name != 'pull_request'
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py --target bouffalolab-bl616dk-light-thread-littlefs-mfd build"
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl616 bl616+thread lighting-app \
-              out/bouffalolab-bl616dk-light-thread-littlefs-mfd/chip-bl616-lighting-example.out \
+              out/bouffalolab-bl616dk-light-thread-littlefs-mfd/chip-bl616-lighting-example.elf \
+              /tmp/bloat_reports/
+          rm -rf ./out
+
+      - name: Build example BL616 Contact Sensor App (Wi-Fi)
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bouffalolab-bl616dk-contact-sensor-wifi-littlefs-mfd build"
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl616 bl616+wifi contact-sensor-app \
+              out/bouffalolab-bl616dk-contact-sensor-wifi-littlefs-mfd/chip-bl616-contact-sensor-example.elf \
               /tmp/bloat_reports/
           rm -rf ./out
 

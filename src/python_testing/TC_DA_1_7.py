@@ -135,6 +135,7 @@ class TC_DA_1_7(MatterBaseTest):
     '''
 
     def setup_class(self):
+        super().setup_class()
         self.allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
         self.post_cert_test = self.user_params.get("post_cert_test", False)
 
