@@ -73,7 +73,7 @@ CHIP_ERROR
 OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                OperationalState::GenericOperationalState & operationalState)
 {
-    if (index >= sizeof(kOpStateIds) / sizeof(kOpStateIds[0]))
+    if (index >= MATTER_ARRAY_SIZE(kOpStateIds))
     {
         return CHIP_ERROR_NOT_FOUND;
     }

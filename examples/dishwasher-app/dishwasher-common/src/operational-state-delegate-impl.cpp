@@ -116,7 +116,7 @@ void OperationalState::Shutdown()
 
 void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(endpointId == 1u); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
 
     gOperationalStateDelegate           = new OperationalStateDelegate;

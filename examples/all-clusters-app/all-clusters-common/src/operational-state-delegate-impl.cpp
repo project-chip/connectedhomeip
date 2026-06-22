@@ -205,8 +205,8 @@ void OperationalState::Shutdown()
 
 void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // NOLINT(bugprone-signed-bitwise) -- nlassert macro false positive
-    VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr); // NOLINT(bugprone-signed-bitwise)
+    VerifyOrDie(endpointId == 1u);
+    VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
 
     gOperationalStateDelegate           = new OperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;

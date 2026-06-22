@@ -101,7 +101,7 @@ public:
      */
     OperationalStateCluster(EndpointId endpointId, Delegate * delegate, const Config & config = {});
 
-    ~OperationalStateCluster() override;
+    ~OperationalStateCluster() override = default;
 
     // ---- Application-facing API ----
 
@@ -142,14 +142,14 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 protected:
-    OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint32_t revision, Delegate * delegate,
+    OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate * delegate,
                             const Config & config = {});
 
     virtual bool IsDerivedClusterStatePauseCompatible(uint8_t aState) { return false; }
     virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; }
 
     virtual std::optional<DataModel::ActionReturnStatus>
-    HandleDerivedClusterCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input, CommandHandler * handler)
+    HandleDerivedClusterCommand(const ConcreteCommandPath & path, chip::TLV::TLVReader & input, CommandHandler * handler)
     {
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -159,18 +159,12 @@ protected:
 
     Delegate * GetDelegate() { return mDelegate; }
 
-    // Builds the standard OperationalCommandResponse carrying `err` and adds it to `handler`.
-    // Shared by every command handler (base + derived) to avoid duplicating the response-encoding
-    // setup at each call site. Always returns std::nullopt (the response has already been added).
-    static std::optional<DataModel::ActionReturnStatus>
-    AddCommandResponse(const DataModel::InvokeRequest & request, CommandHandler * handler, const GenericOperationalError & err);
-
 private:
     Delegate * mDelegate;
     // ClusterRevision is not a fixed constant for this class: it varies by the concrete (derived)
     // cluster. OperationalState and RvcOperationalState are at revision 3, while OvenCavityOperationalState
     // is at revision 2, so each derived class passes its own value through the protected constructor.
-    const uint32_t mRevision;
+    const uint16_t mRevision;
     const Config mConfig;
 
     DataModel::Nullable<uint8_t> mCurrentPhase;
@@ -178,55 +172,27 @@ private:
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
     QuieterReportingAttribute<uint32_t> mCountdownTime{ DataModel::NullNullable };
 
-    std::optional<DataModel::ActionReturnStatus> HandlePauseOrResumeState(const DataModel::InvokeRequest & request,
+    // Selects which of the two commands handled by each shared helper is being processed.
+    enum class PauseOrResume : uint8_t
+    {
+        kPause,
+        kResume
+    };
+    enum class StartOrStop : uint8_t
+    {
+        kStart,
+        kStop
+    };
+
+    std::optional<DataModel::ActionReturnStatus> HandlePauseOrResumeState(const ConcreteCommandPath & path,
                                                                           chip::TLV::TLVReader & input, CommandHandler * handler,
-                                                                          bool isPause);
-    std::optional<DataModel::ActionReturnStatus> HandleStartOrStopState(const DataModel::InvokeRequest & request,
+                                                                          PauseOrResume action);
+    std::optional<DataModel::ActionReturnStatus> HandleStartOrStopState(const ConcreteCommandPath & path,
                                                                         chip::TLV::TLVReader & input, CommandHandler * handler,
-                                                                        bool isStart);
+                                                                        StartOrStop action);
 };
 
 } // namespace OperationalState
-
-namespace RvcOperationalState {
-
-class RvcOperationalStateCluster : public OperationalState::OperationalStateCluster
-{
-public:
-    RvcOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
-                               const OperationalState::OperationalStateCluster::Config & config = {});
-
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-
-protected:
-    bool IsDerivedClusterStatePauseCompatible(uint8_t aState) override;
-    bool IsDerivedClusterStateResumeCompatible(uint8_t aState) override;
-
-    std::optional<DataModel::ActionReturnStatus> HandleDerivedClusterCommand(const DataModel::InvokeRequest & request,
-                                                                             chip::TLV::TLVReader & input,
-                                                                             CommandHandler * handler) override;
-
-private:
-    std::optional<DataModel::ActionReturnStatus> HandleGoHomeCommand(const DataModel::InvokeRequest & request,
-                                                                     chip::TLV::TLVReader & input, CommandHandler * handler);
-};
-
-} // namespace RvcOperationalState
-
-namespace OvenCavityOperationalState {
-
-class OvenCavityOperationalStateCluster : public OperationalState::OperationalStateCluster
-{
-public:
-    OvenCavityOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
-                                      const OperationalState::OperationalStateCluster::Config & config = {});
-
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-};
-
-} // namespace OvenCavityOperationalState
 
 } // namespace Clusters
 } // namespace app

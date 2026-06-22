@@ -17,6 +17,8 @@
  */
 
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/operational-state-server/OvenCavityOperationalStateCluster.h>
+#include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
 #include <app/clusters/operational-state-server/operational-state-cluster-objects.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>

@@ -43,18 +43,15 @@ OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, Delegate
     OperationalStateCluster(endpointId, OperationalState::Id, OperationalState::kRevision, delegate, config)
 {}
 
-OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint32_t revision, Delegate * delegate,
+OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate * delegate,
                                                  const Config & config) :
-    DefaultServerCluster({ endpointId, clusterId }),
-    mDelegate(delegate), mRevision(revision), mConfig(config)
+    DefaultServerCluster({ endpointId, clusterId }), mDelegate(delegate), mRevision(revision), mConfig(config)
 {
     mCountdownTime.policy()
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement)
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
 }
-
-OperationalStateCluster::~OperationalStateCluster() = default;
 
 // ---------------------------------------------------------------------------
 // Attribute setters / getters
@@ -124,32 +121,18 @@ void OperationalStateCluster::OnOperationalErrorDetected(const Structs::ErrorSta
 
     UpdateCountdownTimeFromClusterLogic();
 
-    if (mContext == nullptr)
-    {
-        ChipLogError(Zcl, "OperationalStateCluster: cannot emit OperationalError event, no context");
-        return;
-    }
+    VerifyOrReturn(mContext != nullptr);
     GenericErrorEvent event(mPath.mClusterId, aError);
-    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
-    {
-        ChipLogError(Zcl, "OperationalStateCluster: failed to emit OperationalError event");
-    }
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 void OperationalStateCluster::OnOperationCompletionDetected(uint8_t aCompletionErrorCode,
                                                             const Optional<DataModel::Nullable<uint32_t>> & aTotalOperationalTime,
                                                             const Optional<DataModel::Nullable<uint32_t>> & aPausedTime)
 {
-    if (mContext == nullptr)
-    {
-        ChipLogError(Zcl, "OperationalStateCluster: cannot emit OperationCompletion event, no context");
-        return;
-    }
+    VerifyOrReturn(mContext != nullptr);
     GenericOperationCompletionEvent event(mPath.mClusterId, aCompletionErrorCode, aTotalOperationalTime, aPausedTime);
-    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
-    {
-        ChipLogError(Zcl, "OperationalStateCluster: failed to emit OperationCompletion event");
-    }
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 
     UpdateCountdownTimeFromClusterLogic();
 }
@@ -213,7 +196,6 @@ bool OperationalStateCluster::IsSupportedOperationalState(uint8_t aState)
             return true;
         }
     }
-    ChipLogDetail(Zcl, "OperationalStateCluster: no operational state with value %u", aState);
     return false;
 }
 
@@ -228,9 +210,9 @@ DataModel::ActionReturnStatus OperationalStateCluster::ReadAttribute(const DataM
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
-        return encoder.Encode(static_cast<uint16_t>(mRevision));
+        return encoder.Encode(mRevision);
     case FeatureMap::Id:
-        return encoder.Encode(uint32_t(0));
+        return encoder.Encode<uint32_t>(0);
     case PhaseList::Id: {
         char firstBuf[kMaxPhaseNameLength];
         MutableCharSpan firstPhase(firstBuf);
@@ -319,6 +301,13 @@ CHIP_ERROR OperationalStateCluster::GeneratedCommands(const ConcreteClusterPath 
 {
     // OperationalCommandResponse (0x04) is sent in response to every accepted command.
     // RVC and OvenCavity derived clusters share the same command ID value.
+    static_assert(OperationalState::Commands::OperationalCommandResponse::Id ==
+                      RvcOperationalState::Commands::OperationalCommandResponse::Id,
+                  "Derived clusters must share the same command ID for OperationalCommandResponse");
+    static_assert(OperationalState::Commands::OperationalCommandResponse::Id ==
+                      OvenCavityOperationalState::Commands::OperationalCommandResponse::Id,
+                  "Derived clusters must share the same command ID for OperationalCommandResponse");
+
     static constexpr CommandId kGeneratedCommands[] = { OperationalState::Commands::OperationalCommandResponse::Id };
     return builder.ReferenceExisting(kGeneratedCommands);
 }
@@ -334,15 +323,15 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::InvokeComm
     switch (request.path.mCommandId)
     {
     case OperationalState::Commands::Pause::Id:
-        return HandlePauseOrResumeState(request, input_arguments, handler, true);
+        return HandlePauseOrResumeState(request.path, input_arguments, handler, PauseOrResume::kPause);
     case OperationalState::Commands::Resume::Id:
-        return HandlePauseOrResumeState(request, input_arguments, handler, false);
+        return HandlePauseOrResumeState(request.path, input_arguments, handler, PauseOrResume::kResume);
     case OperationalState::Commands::Stop::Id:
-        return HandleStartOrStopState(request, input_arguments, handler, false);
+        return HandleStartOrStopState(request.path, input_arguments, handler, StartOrStop::kStop);
     case OperationalState::Commands::Start::Id:
-        return HandleStartOrStopState(request, input_arguments, handler, true);
+        return HandleStartOrStopState(request.path, input_arguments, handler, StartOrStop::kStart);
     default:
-        return HandleDerivedClusterCommand(request, input_arguments, handler);
+        return HandleDerivedClusterCommand(request.path, input_arguments, handler);
     }
 }
 
@@ -350,19 +339,24 @@ std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::InvokeComm
 // Command handlers
 // ---------------------------------------------------------------------------
 
-std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::AddCommandResponse(const DataModel::InvokeRequest & request,
-                                                                                         CommandHandler * handler,
-                                                                                         const GenericOperationalError & err)
+namespace {
+
+// Builds the standard OperationalCommandResponse carrying `err` and adds it to `handler`.
+std::optional<DataModel::ActionReturnStatus> AddCommandResponse(const ConcreteCommandPath & path, CommandHandler * handler,
+                                                                const GenericOperationalError & err)
 {
     OperationalState::Commands::OperationalCommandResponse::Type response;
     response.commandResponseState = err;
-    handler->AddResponse(request.path, response);
+    handler->AddResponse(path, response);
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-OperationalStateCluster::HandlePauseOrResumeState(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input,
-                                                  CommandHandler * handler, bool isPause)
+} // namespace
+
+std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandlePauseOrResumeState(const ConcreteCommandPath & path,
+                                                                                               chip::TLV::TLVReader & input,
+                                                                                               CommandHandler * handler,
+                                                                                               PauseOrResume action)
 {
     // Pause/Resume are fieldless commands; just confirm there is no trailing payload.
     if (input.VerifyEndOfContainer() != CHIP_NO_ERROR)
@@ -370,6 +364,7 @@ OperationalStateCluster::HandlePauseOrResumeState(const DataModel::InvokeRequest
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
+    const bool isPause = (action == PauseOrResume::kPause);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint8_t opState   = GetCurrentOperationalState();
     uint8_t noOpState = isPause ? to_underlying(OperationalStateEnum::kPaused) : to_underlying(OperationalStateEnum::kRunning);
@@ -390,17 +385,22 @@ OperationalStateCluster::HandlePauseOrResumeState(const DataModel::InvokeRequest
     if (err.errorStateID == 0 && opState != noOpState)
     {
         if (isPause)
+        {
             mDelegate->HandlePauseStateCallback(err);
+        }
         else
+        {
             mDelegate->HandleResumeStateCallback(err);
+        }
     }
 
-    return AddCommandResponse(request, handler, err);
+    return AddCommandResponse(path, handler, err);
 }
 
-std::optional<DataModel::ActionReturnStatus>
-OperationalStateCluster::HandleStartOrStopState(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input,
-                                                CommandHandler * handler, bool isStart)
+std::optional<DataModel::ActionReturnStatus> OperationalStateCluster::HandleStartOrStopState(const ConcreteCommandPath & path,
+                                                                                             chip::TLV::TLVReader & input,
+                                                                                             CommandHandler * handler,
+                                                                                             StartOrStop action)
 {
     // Start/Stop are fieldless commands; just confirm there is no trailing payload.
     if (input.VerifyEndOfContainer() != CHIP_NO_ERROR)
@@ -408,109 +408,21 @@ OperationalStateCluster::HandleStartOrStopState(const DataModel::InvokeRequest &
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
+    const bool isStart = (action == StartOrStop::kStart);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint8_t noOpState = isStart ? to_underlying(OperationalStateEnum::kRunning) : to_underlying(OperationalStateEnum::kStopped);
 
     if (GetCurrentOperationalState() != noOpState)
     {
         if (isStart)
+        {
             mDelegate->HandleStartStateCallback(err);
+        }
         else
+        {
             mDelegate->HandleStopStateCallback(err);
+        }
     }
 
-    return AddCommandResponse(request, handler, err);
-}
-
-// ---------------------------------------------------------------------------
-// RvcOperationalStateCluster
-// ---------------------------------------------------------------------------
-
-RvcOperationalState::RvcOperationalStateCluster::RvcOperationalStateCluster(
-    EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
-    const OperationalState::OperationalStateCluster::Config & config) :
-    OperationalState::OperationalStateCluster(endpointId, RvcOperationalState::Id, RvcOperationalState::kRevision, delegate, config)
-{}
-
-CHIP_ERROR
-RvcOperationalState::RvcOperationalStateCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
-{
-    static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
-        RvcOperationalState::Commands::Pause::kMetadataEntry,
-        RvcOperationalState::Commands::Resume::kMetadataEntry,
-        RvcOperationalState::Commands::GoHome::kMetadataEntry,
-    };
-    return builder.ReferenceExisting(Span(kCommands));
-}
-
-bool RvcOperationalState::RvcOperationalStateCluster::IsDerivedClusterStatePauseCompatible(uint8_t aState)
-{
-    return aState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger);
-}
-
-bool RvcOperationalState::RvcOperationalStateCluster::IsDerivedClusterStateResumeCompatible(uint8_t aState)
-{
-    return (aState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
-            aState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
-}
-
-std::optional<DataModel::ActionReturnStatus>
-RvcOperationalState::RvcOperationalStateCluster::HandleDerivedClusterCommand(const DataModel::InvokeRequest & request,
-                                                                             chip::TLV::TLVReader & input, CommandHandler * handler)
-{
-    switch (request.path.mCommandId)
-    {
-    case RvcOperationalState::Commands::GoHome::Id:
-        return HandleGoHomeCommand(request, input, handler);
-    default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
-    }
-}
-
-std::optional<DataModel::ActionReturnStatus>
-RvcOperationalState::RvcOperationalStateCluster::HandleGoHomeCommand(const DataModel::InvokeRequest & request,
-                                                                     chip::TLV::TLVReader & input, CommandHandler * handler)
-{
-    if (input.VerifyEndOfContainer() != CHIP_NO_ERROR)
-    {
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    }
-
-    OperationalState::GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    uint8_t opState = GetCurrentOperationalState();
-
-    if (opState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
-        opState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked))
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
-    }
-
-    if (err.errorStateID == 0 && opState != to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
-    {
-        GetDelegate()->HandleGoHomeCommandCallback(err);
-    }
-
-    return AddCommandResponse(request, handler, err);
-}
-
-// ---------------------------------------------------------------------------
-// OvenCavityOperationalStateCluster
-// ---------------------------------------------------------------------------
-
-OvenCavityOperationalState::OvenCavityOperationalStateCluster::OvenCavityOperationalStateCluster(
-    EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
-    const OperationalState::OperationalStateCluster::Config & config) :
-    OperationalState::OperationalStateCluster(endpointId, OvenCavityOperationalState::Id, OvenCavityOperationalState::kRevision,
-                                              delegate, config)
-{}
-
-CHIP_ERROR OvenCavityOperationalState::OvenCavityOperationalStateCluster::AcceptedCommands(
-    const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
-{
-    static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
-        OvenCavityOperationalState::Commands::Stop::kMetadataEntry,
-        OvenCavityOperationalState::Commands::Start::kMetadataEntry,
-    };
-    return builder.ReferenceExisting(Span(kCommands));
+    return AddCommandResponse(path, handler, err);
 }

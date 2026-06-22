@@ -19,6 +19,10 @@ source_set("operational-state-server") {
     "OperationalStateCluster.cpp",
     "OperationalStateCluster.h",
     "OperationalStateDelegate.h",
+    "OvenCavityOperationalStateCluster.cpp",
+    "OvenCavityOperationalStateCluster.h",
+    "RvcOperationalStateCluster.cpp",
+    "RvcOperationalStateCluster.h",
     "operational-state-cluster-objects.h",
   ]
 

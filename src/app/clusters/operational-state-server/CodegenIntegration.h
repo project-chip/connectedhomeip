@@ -23,6 +23,8 @@
 // register it with the ServerClusterInterfaceRegistry.
 
 #include "OperationalStateDelegate.h"
+#include "OvenCavityOperationalStateCluster.h"
+#include "RvcOperationalStateCluster.h"
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/support/CHIPMem.h>
 

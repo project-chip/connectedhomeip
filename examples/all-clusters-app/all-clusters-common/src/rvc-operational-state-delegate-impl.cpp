@@ -109,9 +109,8 @@ void RvcOperationalState::Shutdown()
 
 void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // NOLINT(bugprone-signed-bitwise) -- nlassert macro false positive
-    VerifyOrDie(gRvcOperationalStateInstance == nullptr &&
-                gRvcOperationalStateDelegate == nullptr); // NOLINT(bugprone-signed-bitwise)
+    VerifyOrDie(endpointId == 1u);
+    VerifyOrDie(gRvcOperationalStateInstance == nullptr && gRvcOperationalStateDelegate == nullptr);
 
     gRvcOperationalStateDelegate        = new RvcOperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
