@@ -80,7 +80,6 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
-
 class TC_SC_5_2(MatterBaseTest):
 
     def desc_TC_SC_5_2(self) -> str:
@@ -94,25 +93,30 @@ class TC_SC_5_2(MatterBaseTest):
             TestStep("0a", "Commissioning, already done", is_commissioning=True),
             TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Manage privileges for group 0x0103."),
-            TestStep("2", "TH sends KeySetWrite command with pre-installed key."),
-            TestStep("3", "If Groupcast enabled on RootNode, skip to step 12. Otherwise, TH binds GroupId 0x0103 and 0x0101 with GroupKeySetID 0x01a3 in GroupKeyMap."),
+            TestStep("2a", "TH sends KeySetWrite command for GroupKeySetID 0x01a3."),
+            TestStep("2b", "TH sends KeySetWrite command for GroupKeySetID 0x01a4 (same key)."),
+            TestStep("3", "If Groupcast enabled on RootNode, skip to step 12. Otherwise, TH binds GroupId 0x0103 with GroupKeySetID 0x01a3, and GroupId 0x0101 with GroupKeySetID 0x01a4 in GroupKeyMap."),
             TestStep("4", "TH sends RemoveAllGroups command to DUT on the current endpoint under test."),
             TestStep("5", "TH sends AddGroup Command with GroupID 0x0103 to DUT on the current endpoint under test."),
-            TestStep("6", "TH sends AddGroup command for GroupID 0x0101 as a group command using GroupID 0x0103."),
-            TestStep("7", "TH sends ViewGroup with GroupID 0x0101 (GroupNames supported)."),
-            TestStep("8", "TH sends ViewGroup with GroupID 0x0101 (GroupNames not supported)."),
+            TestStep("6a", "TH sends AddGroup command for GroupID 0x0101 as a group command using GroupID 0x0103."),
+            TestStep("6b", "TH sends ViewGroup with GroupID 0x0101 to confirm successful addition."),
+            TestStep("7a", "TH sends AddGroup command for GroupID 0x0102 as a group command using GroupID 0x0101 (encrypted using the same KeySet)."),
+            TestStep("7b", "TH sends ViewGroup with GroupID 0x0102 to confirm that the AddGroup command was rejected."),
             TestStep("9", "TH sends RemoveGroup with GroupID 0x0101."),
             TestStep("10", "TH sends ViewGroup with GroupID 0x0101 to confirm removal."),
             TestStep("11", "TH sends RemoveAllGroups to clean up legacy groups."),
             TestStep("12", "If Groupcast NOT enabled or Listener disabled, skip to step 17. TH sends LeaveGroup(groupID=0)."),
-            TestStep("13", "TH sends JoinGroup command with GroupID 0x0103."),
+            TestStep("13", "TH sends JoinGroup command for GroupID 0x0103 (KeySet 0x01a3) and GroupID 0x0101 (KeySet 0x01a4)."),
             TestStep("14", "TH reads Membership attribute from Groupcast cluster."),
             TestStep("15a", "TH subscribes to the Groupcast cluster's GroupcastTesting event on the RootNode endpoint."),
             TestStep("15b", "TH sends GroupcastTesting command with TestOperation=EnableListenerTesting and DurationSeconds=120."),
-            TestStep("15c", "TH sends a command requiring Operate privilege available on the endpoint provided in step 13 as a group command using GroupID 0x0103."),
-            TestStep("16a", "TH validates the group message was received by checking the GroupcastTesting event from DUT (AccessAllowed: true)."),
-            TestStep("16b", "TH sends GroupcastTesting command with DisableTesting to restore normal operation."),
-            TestStep("17", "TH sends KeySetRemove with GroupKeySetID 0x01a3."),
+            TestStep("16a", "TH sends a command requiring Operate privilege available on the endpoint provided in step 13 as a group command using GroupID 0x0103."),
+            TestStep("16b", "TH validates the group message was received by checking the GroupcastTesting event from DUT (AccessAllowed: true)."),
+            TestStep("16c", "TH sends the same group command destined for Group 0x0101 (encrypted using the same KeySet)."),
+            TestStep("16d", "TH validates the group message was rejected by checking the GroupcastTesting event from DUT (AccessAllowed: false)."),
+            TestStep("16e", "TH sends GroupcastTesting command with DisableTesting to restore normal operation."),
+            TestStep("17a", "TH sends KeySetRemove for GroupKeySetID 0x01a3."),
+            TestStep("17b", "TH sends KeySetRemove for GroupKeySetID 0x01a4."),
             TestStep("18", "TH writes ACL to restore default access."),
         ]
 
@@ -145,6 +149,9 @@ class TC_SC_5_2(MatterBaseTest):
         node_id = self.dut_node_id
         groupcast_enabled = await is_groupcast_on_root_node(self)
 
+        GROUP_INFO_FLAG_USE_IANA_ADDR = dev_ctrl.GROUP_INFO_FLAG_NONE
+        GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY = dev_ctrl.GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY
+
         # Step 1: Write ACL
         self.step("1")
         acl = [
@@ -161,28 +168,56 @@ class TC_SC_5_2(MatterBaseTest):
         ]
         await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
 
-        # Step 2: KeySetWrite
-        self.step("2")
-        key_set = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
+        # Step 2a: Write KeySet 0x01a3 (only one key present, slots 1 and 2 set to NullValue)
+        self.step("2a")
+        key_set_a3 = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=0x01a3,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             epochKey0=bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
             epochStartTime0=2220000,
-            epochKey1=bytes.fromhex("d1d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
-            epochStartTime1=2220001,
-            epochKey2=bytes.fromhex("d2d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
-            epochStartTime2=2220002)
-        await dev_ctrl.SendCommand(node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(key_set))
+            epochKey1=NullValue,
+            epochStartTime1=NullValue,
+            epochKey2=NullValue,
+            epochStartTime2=NullValue)
+        await dev_ctrl.SendCommand(node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(key_set_a3))
+
+        # Step 2b: Write KeySet 0x01a4 with the exact same key material
+        self.step("2b")
+        key_set_a4 = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
+            groupKeySetID=0x01a4,
+            groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"),
+            epochStartTime0=2220000,
+            epochKey1=NullValue,
+            epochStartTime1=NullValue,
+            epochKey2=NullValue,
+            epochStartTime2=NullValue)
+        await dev_ctrl.SendCommand(node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(key_set_a4))
+
+        # Update local key configuration at the sender (controller) to match what is configured on the DUT
+        dev_ctrl.SetGroupKeySet(keyset_id=0x01a3, policy=0, num_keys=1,
+                                epoch_key0=bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"), epoch_start_time0=2220000,
+                                epoch_key1=None, epoch_start_time1=0,
+                                epoch_key2=None, epoch_start_time2=0)
+        dev_ctrl.SetGroupKeySet(keyset_id=0x01a4, policy=0, num_keys=1,
+                                epoch_key0=bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"), epoch_start_time0=2220000,
+                                epoch_key1=None, epoch_start_time1=0,
+                                epoch_key2=None, epoch_start_time2=0)
 
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "11")
         else:
-            dev_ctrl.SetGroupInfo(0x0103, "Group #3")
+            # Configure controller's local group mapping for the unicast test path
+            dev_ctrl.SetGroupInfo(0x0103, "Group 0x0103", GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY)
+            dev_ctrl.SetGroupKey(0x0103, 0x01a3)
+            dev_ctrl.SetGroupInfo(0x0101, "Group 0x0101", GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY)
+            dev_ctrl.SetGroupKey(0x0101, 0x01a4)
+
             # Step 3: GroupKeyMap binding
             self.step("3")
             mapping = [
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=0x0103, groupKeySetID=0x01a3, fabricIndex=1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=0x0101, groupKeySetID=0x01a3, fabricIndex=1),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=0x0101, groupKeySetID=0x01a4, fabricIndex=1),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
@@ -196,34 +231,26 @@ class TC_SC_5_2(MatterBaseTest):
             result = await dev_ctrl.SendCommand(node_id, groups_endpoint, Clusters.Groups.Commands.AddGroup(0x0103, "Test Group 0103"))
             asserts.assert_equal(result.status, Status.Success, "AddGroup 0x0103 failed")
 
-            # Step 6: AddGroup 0x0101 as group command via GroupID 0x0103
-            self.step("6")
+            # Step 6a: AddGroup 0x0101 as group command via GroupID 0x0103
+            self.step("6a")
             dev_ctrl.SendGroupCommand(0x0103, Clusters.Groups.Commands.AddGroup(0x0101, "Test Group 0101"))
             await asyncio.sleep(3)
 
-            # Check if GroupNames are supported
-            group_feature_map = await self.read_single_attribute_check_success(
-                cluster=Clusters.Groups,
-                attribute=Clusters.Groups.Attributes.FeatureMap,
-                endpoint=groups_endpoint)
-            group_names_supported = bool(group_feature_map & Clusters.Groups.Bitmaps.Feature.kGroupNames)
+            # Step 6b: ViewGroup 0x0101 to confirm success
+            self.step("6b")
+            result = await dev_ctrl.SendCommand(node_id, groups_endpoint, Clusters.Groups.Commands.ViewGroup(0x0101))
+            asserts.assert_equal(result.status, Status.Success, "ViewGroup failed")
+            asserts.assert_equal(result.groupID, 0x0101, "ViewGroup groupID mismatch")
 
-            # Step 7: ViewGroup 0x0101 with GroupNames
-            if group_names_supported:
-                self.step("7")
-                result = await dev_ctrl.SendCommand(node_id, groups_endpoint, Clusters.Groups.Commands.ViewGroup(0x0101))
-                asserts.assert_equal(result.status, Status.Success, "ViewGroup failed")
-                asserts.assert_equal(result.groupID, 0x0101, "ViewGroup groupID mismatch")
-                asserts.assert_equal(result.groupName, "Test Group 0101", "ViewGroup groupName mismatch")
-                self.skip_step("8")
-            # Step 8: ViewGroup 0x0101 without GroupNames
-            else:
-                self.skip_step("7")
-                self.step("8")
-                result = await dev_ctrl.SendCommand(node_id, groups_endpoint, Clusters.Groups.Commands.ViewGroup(0x0101))
-                asserts.assert_equal(result.status, Status.Success, "ViewGroup failed")
-                asserts.assert_equal(result.groupID, 0x0101, "ViewGroup groupID mismatch")
-                asserts.assert_equal(result.groupName, "", "ViewGroup groupName mismatch")
+            # Step 7a: AddGroup 0x0102 as group command via GroupID 0x0101
+            self.step("7a")
+            dev_ctrl.SendGroupCommand(0x0101, Clusters.Groups.Commands.AddGroup(0x0102, "Test Group 0102"))
+            await asyncio.sleep(3)
+
+            # Step 7b: ViewGroup 0x0102 to confirm rejection
+            self.step("7b")
+            result = await dev_ctrl.SendCommand(node_id, groups_endpoint, Clusters.Groups.Commands.ViewGroup(0x0102))
+            asserts.assert_equal(result.status, Status.NotFound, "ViewGroup should return NOT_FOUND for rejected AddGroup")
 
             # Step 9: RemoveGroup 0x0101
             self.step("9")
@@ -245,10 +272,8 @@ class TC_SC_5_2(MatterBaseTest):
             is_groupcast_listener = ln_enabled
 
         if not is_groupcast_listener:
-            self.mark_step_range_skipped("12", "16b")
+            self.mark_step_range_skipped("12", "16e")
         else:
-            # update the controller GroupInfo for groupID 0x0103 to use IANA address policy
-            dev_ctrl.SetGroupInfo(0x0103, "Group #3", 0)
             # Step 12: LeaveGroup
             self.step("12")
             # Check if there are any groups on the DUT.
@@ -257,10 +282,18 @@ class TC_SC_5_2(MatterBaseTest):
                 # LeaveGroup with groupID 0 will leave all groups on the fabric.
                 await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
 
+            # Configure controller's local group mapping for the Groupcast path
+            dev_ctrl.SetGroupInfo(0x0103, "Group 0x0103", GROUP_INFO_FLAG_USE_IANA_ADDR)
+            dev_ctrl.SetGroupKey(0x0103, 0x01a3)
+            dev_ctrl.SetGroupInfo(0x0101, "Group 0x0101", GROUP_INFO_FLAG_USE_IANA_ADDR)
+            dev_ctrl.SetGroupKey(0x0101, 0x01a4)
+
             # Step 13: JoinGroup
             self.step("13")
             await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
                 groupID=0x0103, endpoints=[groups_endpoint], keySetID=0x01a3))
+            await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
+                groupID=0x0101, endpoints=[groups_endpoint], keySetID=0x01a4))
 
             # Step 14: Read Membership
             self.step("14")
@@ -268,6 +301,7 @@ class TC_SC_5_2(MatterBaseTest):
                 cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership, endpoint=0)
             group_ids = [entry.groupID for entry in membership]
             asserts.assert_in(0x0103, group_ids, "GroupID 0x0103 not found in Membership")
+            asserts.assert_in(0x0101, group_ids, "GroupID 0x0101 not found in Membership")
 
             # Step 15a: Subscribe to GroupcastTesting events on the RootNode.
             self.step("15a")
@@ -293,13 +327,13 @@ class TC_SC_5_2(MatterBaseTest):
                 operate_only_command.cluster_object.__name__, operate_only_command.command_object.__name__,
                 groups_endpoint)
 
-            # Step 15c: Send the operate-only command as a group command to GroupID 0x0103.
-            self.step("15c")
+            # Step 16a: Send the operate-only command as a group command to GroupID 0x0103.
+            self.step("16a")
             dev_ctrl.SendGroupCommand(0x0103, operate_only_command.command_object())
             await asyncio.sleep(3)
 
-            # Step 16a: Validate the DUT received the group command via the GroupcastTesting event.
-            self.step("16a")
+            # Step 16b: Validate the DUT received the group command via the GroupcastTesting event.
+            self.step("16b")
             event_data = event_sub.wait_for_event_report(
                 Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, 0x0103, "Incorrect group ID in GroupcastTesting event")
@@ -308,17 +342,33 @@ class TC_SC_5_2(MatterBaseTest):
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
                                  "GroupcastTesting event should report Success")
 
-            # Step 16b: Disable GroupcastTesting to restore normal operation.
-            self.step("16b")
+            # Step 16c: Send the same group command destined for Group 0x0101 (encrypted using the same KeySet 0x01a3)
+            self.step("16c")
+            dev_ctrl.SendGroupCommand(0x0101, operate_only_command.command_object())
+            await asyncio.sleep(3)
+
+            # Step 16d: Validate the DUT rejected the group command via the GroupcastTesting event.
+            self.step("16d")
+            event_data = event_sub.wait_for_event_report(
+                Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            asserts.assert_equal(event_data.groupID, 0x0101, "Incorrect group ID in GroupcastTesting event")
+            asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
+
+            # Step 16e: Disable GroupcastTesting to restore normal operation.
+            self.step("16e")
             await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.GroupcastTesting(
                 testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kDisableTesting))
 
             # restore the GroupInfo for groupID 0x0103 to use Per-Group address policy
             dev_ctrl.SetGroupInfo(0x0103, "Group #3")
 
-        # Step 17: KeySetRemove
-        self.step("17")
+        # Step 17a: KeySetRemove 0x01a3
+        self.step("17a")
         await dev_ctrl.SendCommand(node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetRemove(0x01a3))
+
+        # Step 17b: KeySetRemove 0x01a4
+        self.step("17b")
+        await dev_ctrl.SendCommand(node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetRemove(0x01a4))
 
         # Step 18: Restore ACL
         self.step("18")
