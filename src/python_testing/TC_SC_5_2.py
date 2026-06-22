@@ -80,6 +80,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+
 class TC_SC_5_2(MatterBaseTest):
 
     def desc_TC_SC_5_2(self) -> str:
