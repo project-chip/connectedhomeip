@@ -114,6 +114,7 @@ psoc6_executable("clusters_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/ambient-context-sensing-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
