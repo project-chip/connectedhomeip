@@ -181,6 +181,7 @@ public:
     colorLoopCommand(const chip::EndpointId endpoint,
                      const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::DecodableType & commandData);
     void updateHueSatCommand(chip::EndpointId endpoint);
+    void initHueSatTransitionState(chip::EndpointId endpoint);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
