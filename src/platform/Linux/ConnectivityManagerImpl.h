@@ -158,6 +158,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
+    CHIP_ERROR SetWiFiIfName(const char * ifName);
 #endif
 
 private:

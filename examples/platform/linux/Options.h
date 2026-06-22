@@ -57,6 +57,7 @@ struct LinuxDeviceOptions
     uint32_t mBleDevice        = 0;
     bool wifiSupports5g        = false;
     bool mWiFi                 = false;
+    chip::Optional<std::string> mWiFiInterface; // WiFi interface name override (from --wifi=<interface>)
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     uint16_t mThreadNodeId = 0;

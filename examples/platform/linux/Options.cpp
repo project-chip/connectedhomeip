@@ -170,7 +170,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    { "wifi", kNoArgument, kDeviceOption_WiFi },
+    { "wifi", kArgumentOptional, kDeviceOption_WiFi },
     { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
@@ -277,8 +277,8 @@ const char * sDeviceOptionHelp =
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     "\n"
-    "  --wifi\n"
-    "       Enable Wi-Fi management via wpa_supplicant.\n"
+    "  --wifi[=interface]\n"
+    "       Enable Wi-Fi management via wpa_supplicant, optionally specifying the interface name.\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     "\n"
@@ -565,6 +565,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_WiFi:
         LinuxDeviceOptions::GetInstance().mWiFi = true;
+        if (aValue != nullptr && *aValue != 0)
+        {
+            LinuxDeviceOptions::GetInstance().mWiFiInterface.Emplace(aValue);
+        }
         break;
 
     case kDeviceOption_WiFiSupports5g:
