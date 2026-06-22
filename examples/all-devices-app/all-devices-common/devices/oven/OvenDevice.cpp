@@ -32,7 +32,8 @@ OvenDevice::OvenDevice(TimerDelegate & timerDelegate) :
     mSurface(timerDelegate)
 {}
 
-CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = allocator.Allocate();

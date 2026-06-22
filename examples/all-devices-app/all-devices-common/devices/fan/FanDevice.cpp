@@ -42,8 +42,8 @@ FanDevice::FanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Cluster
 
 CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(RegisterDescriptor(
-        endpoint, provider, EndpointComposition(composition.parentId, composition.pattern, mContext.tagList)));
+    ReturnErrorOnFailure(
+        RegisterDescriptor(endpoint, provider, EndpointComposition(composition.parentId, composition.pattern, mContext.tagList)));
 
     // Identify
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));

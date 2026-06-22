@@ -26,7 +26,8 @@ WaterValveDevice::WaterValveDevice(TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate)
 {}
 
-CHIP_ERROR WaterValveDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR WaterValveDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                      EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

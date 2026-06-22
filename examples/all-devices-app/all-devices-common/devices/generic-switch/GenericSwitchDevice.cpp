@@ -25,7 +25,8 @@ GenericSwitchDevice::GenericSwitchDevice(TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kGenericSwitch, 1)), mTimerDelegate(timerDelegate)
 {}
 
-CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                         EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

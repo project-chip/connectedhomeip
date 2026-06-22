@@ -30,8 +30,7 @@ public:
     explicit DeviceEnergyManagementDevice(TimerDelegate & timerDelegate);
     ~DeviceEnergyManagementDevice() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Clusters::DeviceEnergyManagement::Delegate

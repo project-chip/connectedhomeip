@@ -36,7 +36,8 @@ OnOffLightSwitchDevice::OnOffLightSwitchDevice(TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLightSwitch, 1)), mTimerDelegate(timerDelegate)
 {}
 
-CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                            EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

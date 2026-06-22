@@ -40,7 +40,8 @@ CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate) :
     mSurface2(timerDelegate)
 {}
 
-CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                   EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = allocator.Allocate();
