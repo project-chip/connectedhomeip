@@ -41,7 +41,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
-#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -159,12 +159,28 @@ public:
             }())
     {}
 
+    std::set<EndpointId> GetReservedEndpointIds() const
+    {
+        std::set<EndpointId> usedIds;
+        usedIds.insert(kRootEndpointId);
+
+        for (const auto & entry : AppOptions::GetDeviceTypeEntries())
+        {
+            if (entry.endpoint != kInvalidEndpointId)
+            {
+                usedIds.insert(entry.endpoint);
+            }
+        }
+        return usedIds;
+    }
+
     CHIP_ERROR Startup()
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-        ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-        ReturnErrorOnFailure(mRootNode.RootDevice().Register(rootAllocator, mDataModelProvider));
+        DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
+        endpointIdAllocator.ForceNext(kRootEndpointId);
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
@@ -173,8 +189,12 @@ public:
             VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
             ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
                             entry.endpoint, entry.parentId);
+            if (entry.endpoint != kInvalidEndpointId)
+            {
+                endpointIdAllocator.ForceNext(entry.endpoint);
+            }
             ReturnErrorOnFailure(
-                device->Register(entry.endpoint, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
+                device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
             mConstructedDevices.push_back(std::move(device));
         }
 

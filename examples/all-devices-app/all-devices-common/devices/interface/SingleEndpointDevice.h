@@ -37,10 +37,6 @@ class SingleEndpointDevice : public DeviceInterface
 public:
     virtual ~SingleEndpointDevice() = default;
 
-    /// Subclasses implement this to perform single-endpoint registration on a specific endpoint ID.
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override = 0;
-
     /// Implements DeviceInterface::Register by allocating an endpoint via allocator.
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override
@@ -49,6 +45,10 @@ public:
     }
 
     EndpointId GetEndpointId() const { return mEndpointId; }
+
+    /// Subclasses implement this to perform single-endpoint registration on a specific endpoint ID.
+    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                EndpointComposition composition = {}) = 0;
 
 protected:
     /// The caller creating a SingleEndpointDevice MUST ensure that the underlying data for the Span of

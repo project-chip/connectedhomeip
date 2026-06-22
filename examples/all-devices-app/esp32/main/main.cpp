@@ -26,7 +26,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -253,8 +253,9 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             .wifiDriver = sWiFiDriver,
         });
 
-    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-    err = gRootNodeDevice->Register(rootAllocator, dataModelProvider);
+    DynamicEndpointIdAllocator endpointIdAllocator({ kRootEndpointId, CONFIG_ALL_DEVICES_ENDPOINT });
+    endpointIdAllocator.ForceNext(kRootEndpointId);
+    err = gRootNodeDevice->Register(endpointIdAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -276,7 +277,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    err = gConstructedDevice->Register(CONFIG_ALL_DEVICES_ENDPOINT, dataModelProvider, kInvalidEndpointId);
+    endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
+    err = gConstructedDevice->Register(endpointIdAllocator, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());

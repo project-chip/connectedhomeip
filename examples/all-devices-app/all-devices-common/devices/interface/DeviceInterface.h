@@ -92,8 +92,6 @@ public:
     /// An empty or default EndpointComposition represents that there is no parent or static tags.
     virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                 EndpointComposition composition = {}) = 0;
-    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                EndpointComposition composition = {}) = 0;
 
     /// Removes a device's clusters from the given provider. This
     /// must only be called when register has succeeded before. Expected
