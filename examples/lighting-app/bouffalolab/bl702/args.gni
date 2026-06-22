@@ -33,3 +33,8 @@ pw_build_LINK_DEPS = [
   "$dir_pw_log:impl",
 ]
 chip_app_data_model_target = "//:bouffalolab-lighting"
+
+openthread_project_include_dirs = [
+  "${chip_root}/examples/lighting-app/bouffalolab/bl702",
+  "${bouffalolab_iot_sdk_build_root}/repo/components/network/thread/openthread_port/include",
+]

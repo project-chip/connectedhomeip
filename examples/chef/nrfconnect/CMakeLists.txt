@@ -115,6 +115,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/mode-select/chef-supported-modes-manager.cpp
     ${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp
     ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
+    ${CHEF}/common/clusters/smoke-co-alarm/chef-smoke-co-alarm.cpp
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
     ${CHEF}/common/clusters/switch/SwitchManager.cpp
     ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
