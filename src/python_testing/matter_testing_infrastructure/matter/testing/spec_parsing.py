@@ -183,6 +183,9 @@ class XmlAttribute:
     read_access: int
     write_access: int
     write_optional: bool
+    # Quality flags from the spec XML <quality> element
+    changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
+    quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
     constraints: Optional[Constraints] = None
 
     def access_string(self):
@@ -649,6 +652,27 @@ class ClusterParser:
         quality = xml_field.find('./quality')
         return quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'].lower() == 'true'
 
+    @staticmethod
+    def _is_change_omitted_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Changes Omitted (C) quality.
+
+        Attributes with this quality do not report value changes in subscription reports.
+        They correspond to <quality changeOmitted="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('changeOmitted', 'false').lower() == 'true'
+
+    @staticmethod
+    def _is_quieter_reporting_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Quieter Reporting (Q) quality.
+
+        Attributes with this quality may be reported less frequently than the normal
+        minimum interval allows.  They correspond to <quality quieterReporting="true"/>
+        in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('quieterReporting', 'false').lower() == 'true'
+
     def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Optional[Constraints]:
         """
         Parse constraint information from XML field element.
@@ -1026,6 +1050,8 @@ class ClusterParser:
                                             read_access=get_access_privilege_or_unknown(read_access),
                                             write_access=get_access_privilege_or_unknown(write_access),
                                             write_optional=write_optional,
+                                            changes_omitted=self._is_change_omitted_attribute(element),
+                                            quieter_reporting=self._is_quieter_reporting_attribute(element),
                                             constraints=constraints)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:

@@ -54,6 +54,7 @@ from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
+from .exceptions import ChipStackError
 from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
 
@@ -1850,19 +1851,22 @@ class ChipDeviceControllerBase:
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeId, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
-        allow_large_payload = payloadCapability == TransportPayloadCapability.LARGE_PAYLOAD or payloadCapability == TransportPayloadCapability.MRP_OR_TCP_PAYLOAD
-        res = await ClusterCommand.SendCommand(
-            future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
-                EndpointId=endpoint,
-                ClusterId=payload.cluster_id,
-                CommandId=payload.command_id,
-            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
-        res.raise_on_error()
-        return await future
+        async def _send_impl():
+            future = eventLoop.create_future()
+            device = await self.GetConnectedDevice(nodeId, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+            allow_large_payload = payloadCapability == TransportPayloadCapability.LARGE_PAYLOAD or payloadCapability == TransportPayloadCapability.MRP_OR_TCP_PAYLOAD
+            res = await ClusterCommand.SendCommand(
+                future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
+                    EndpointId=endpoint,
+                    ClusterId=payload.cluster_id,
+                    CommandId=payload.command_id,
+                ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
+            res.raise_on_error()
+            return await future
+
+        return await self._run_with_session_retry(nodeId, _send_impl)
 
     async def SendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
                                 timedRequestTimeoutMs: typing.Optional[int] = None,
@@ -1894,16 +1898,18 @@ class ChipDeviceControllerBase:
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeId, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+        async def _batch_send_impl():
+            future = eventLoop.create_future()
+            device = await self.GetConnectedDevice(nodeId, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+            res = await ClusterCommand.SendBatchCommands(
+                future, eventLoop, device.deviceProxy, commands,
+                timedRequestTimeoutMs=timedRequestTimeoutMs,
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+            res.raise_on_error()
+            return await future
 
-        res = await ClusterCommand.SendBatchCommands(
-            future, eventLoop, device.deviceProxy, commands,
-            timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
-        res.raise_on_error()
-        return await future
+        return await self._run_with_session_retry(nodeId, _batch_send_impl)
 
     def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Optional[int] = None):
         '''
@@ -1972,16 +1978,17 @@ class ChipDeviceControllerBase:
         self.CheckIsActive()
 
         eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeId, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+        async def _write_impl():
+            future = eventLoop.create_future()
+            device = await self.GetConnectedDevice(nodeId, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+            attrs = self._prepare_write_attribute_requests(attributes)
+            ClusterAttribute.WriteAttributes(
+                future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
+            return await future
 
-        attrs = self._prepare_write_attribute_requests(attributes)
-
-        ClusterAttribute.WriteAttributes(
-            future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding).raise_on_error()
-        return await future
+        return await self._run_with_session_retry(nodeId, _write_impl)
 
     async def TestOnlyWriteAttributeWithLegacyList(self, nodeId: int,
                                                    attributes: list[typing.Union[
@@ -2204,6 +2211,22 @@ class ChipDeviceControllerBase:
             )
         raise ValueError("Unsupported Attribute Path")
 
+    async def _run_with_session_retry(self, nodeId: int, fn):
+        """Runs the async function `fn` and retries up to 3 times if it fails with CHIP_ERROR_MISSING_SECURE_SESSION (0x77)."""
+        max_retries = 3
+        for attempt in range(max_retries + 1):
+            try:
+                return await fn()
+            except ChipStackError as e:
+                if e.err == 0x00000077 and attempt < max_retries:
+                    LOGGER.warning(
+                        "Session to node 0x%016X went defunct (Missing Secure Session), retrying connection (attempt %d/%d)...",
+                        nodeId, attempt + 1, max_retries
+                    )
+                    continue
+                raise
+        raise RuntimeError("Unreachable")
+
     async def Read(
         self,
         nodeId: int,
@@ -2304,31 +2327,33 @@ class ChipDeviceControllerBase:
         # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
 
         eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
-        attributePaths = [self._parseAttributePathTuple(
-            v) for v in attributes] if attributes else None
-        clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
-            v) for v in dataVersionFilters] if dataVersionFilters else None  # type: ignore[arg-type]
-        eventPaths = [self._parseEventPathTuple(
-            v) for v in events] if events else None
+        async def _read_impl():
+            future = eventLoop.create_future()
+            device = await self.GetConnectedDevice(nodeId, payloadCapability=payloadCapability)
+            attributePaths = [self._parseAttributePathTuple(
+                v) for v in attributes] if attributes else None
+            clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
+                v) for v in dataVersionFilters] if dataVersionFilters else None  # type: ignore[arg-type]
+            eventPaths = [self._parseEventPathTuple(
+                v) for v in events] if events else None
 
-        allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
-                                                  TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
-        transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
-        ClusterAttribute.Read(transaction, device=device.deviceProxy,
-                              attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
-                              eventNumberFilter=eventNumberFilter,
-                              subscriptionParameters=ClusterAttribute.SubscriptionParameters(
-                                  reportInterval[0], reportInterval[1]) if reportInterval else None,
-                              fabricFiltered=fabricFiltered,
-                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe, allowLargePayload=allowLargePayload).raise_on_error()
-        await future
+            allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
+                                                      TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
+            transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
+            ClusterAttribute.Read(transaction, device=device.deviceProxy,
+                                  attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
+                                  eventNumberFilter=eventNumberFilter,
+                                  subscriptionParameters=ClusterAttribute.SubscriptionParameters(
+                                      reportInterval[0], reportInterval[1]) if reportInterval else None,
+                                  fabricFiltered=fabricFiltered,
+                                  keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe, allowLargePayload=allowLargePayload).raise_on_error()
+            await future
+            if result := transaction.GetSubscriptionHandler():
+                return result
+            return transaction.GetReadResponse()
 
-        if result := transaction.GetSubscriptionHandler():
-            return result
-        return transaction.GetReadResponse()
+        return await self._run_with_session_retry(nodeId, _read_impl)
 
     async def ReadAttribute(
         self,
