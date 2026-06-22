@@ -96,6 +96,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/level-control/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/clusters/microwave-oven-control-server/tests",
+      "${chip_root}/src/app/clusters/mode-base-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/network-identity-management-server/tests",
       "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",

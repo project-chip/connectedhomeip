@@ -31,9 +31,10 @@ SoilSensorDevice::SoilSensorDevice(TimerDelegate & timerDelegate, SoilMoistureMe
     mTimerDelegate(timerDelegate), mMoistureLimits(moistureLimits), mTempConfig(tempConfig)
 {}
 
-CHIP_ERROR SoilSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR SoilSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                      EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -53,7 +54,7 @@ CHIP_ERROR SoilSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
 void SoilSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mTemperatureMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mTemperatureMeasurementCluster.Cluster()));

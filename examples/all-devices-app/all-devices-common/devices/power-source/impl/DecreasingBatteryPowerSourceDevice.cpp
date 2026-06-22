@@ -31,9 +31,9 @@ DecreasingBatteryPowerSourceDevice::~DecreasingBatteryPowerSourceDevice()
 }
 
 CHIP_ERROR DecreasingBatteryPowerSourceDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                        EndpointId parentId)
+                                                        EndpointComposition composition)
 {
-    ReturnErrorOnFailure(BatteryPowerSourceDevice::Register(endpoint, provider, parentId));
+    ReturnErrorOnFailure(BatteryPowerSourceDevice::Register(endpoint, provider, composition));
     // Kick off the timer loop to decrease battery level every few seconds
     return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
 }

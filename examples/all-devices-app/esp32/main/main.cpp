@@ -26,6 +26,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
+#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -104,7 +105,7 @@ chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
+std::unique_ptr<DeviceInterface> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 DefaultTimerDelegate gTimerDelegate;
 
@@ -251,7 +252,10 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         WifiRootNodeDevice::WifiContext{
             .wifiDriver = sWiFiDriver,
         });
-    err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+
+    DynamicEndpointIdAllocator endpointIdAllocator({ kRootEndpointId, CONFIG_ALL_DEVICES_ENDPOINT });
+    endpointIdAllocator.ForceNext(kRootEndpointId);
+    err = gRootNodeDevice->Register(endpointIdAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -273,7 +277,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    err = gConstructedDevice->Register(CONFIG_ALL_DEVICES_ENDPOINT, dataModelProvider, kInvalidEndpointId);
+    endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
+    err = gConstructedDevice->Register(endpointIdAllocator, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());

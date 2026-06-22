@@ -48,6 +48,7 @@ source_set("clusters") {
     "illuminance-measurement-server",
     "level-control",
     "microwave-oven-control-server",
+    "mode-base-server",
     "network-commissioning",
     "network-identity-management-server",
     "occupancy-sensor-server",
