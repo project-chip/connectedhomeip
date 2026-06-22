@@ -31,10 +31,10 @@ CommandHandlerInterfaceOnlyClusters:
     - Network Commissioning
     - Operational State
     - Oven Cavity Operational State
-    - RVC Operational State
     - Oven Mode
     - Proximity Ranging
     - RVC Clean Mode
+    - RVC Operational State
     - RVC Run Mode
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
@@ -144,17 +144,17 @@ CodeDrivenClusters:
     - OTA Software Update Requestor
     - Occupancy Sensing
     - Operational Credentials
-    - Oven Mode
     - Operational State
     - Oven Cavity Operational State
+    - Oven Mode
     - Power Topology
     - Pressure Measurement
     - Proximity Ranging
     - Push AV Stream Transport
     - RVC Clean Mode
+    - RVC Operational State
     - RVC Run Mode
     - Refrigerator And Temperature Controlled Cabinet Mode
-    - RVC Operational State
     - Relative Humidity Measurement
     - Scenes Management
     - Smoke CO Alarm
