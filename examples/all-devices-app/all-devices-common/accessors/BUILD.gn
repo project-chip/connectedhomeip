@@ -23,8 +23,8 @@ config("includes") {
 
 source_set("accessors") {
   sources = [
-    "AccessorRegistry.h",
     "OOBAccessor.h",
+    "OOBAccessorRegistry.h",
     "OOBDataSerializer.cpp",
     "OOBDataSerializer.h",
   ]
