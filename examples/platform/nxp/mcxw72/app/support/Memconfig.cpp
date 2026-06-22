@@ -202,9 +202,9 @@ void * __wrap__calloc_r(void * REENT, size_t num, size_t size)
  * -> vPortFree -> wrap_xTaskResumeAll -> EnableGlobalIRQ -> xTaskResumeAll
  */
 
-static volatile uint8_t heap_operation = 0;
+static volatile uint8_t heap_operation   = 0;
 static volatile bool global_irq_disabled = false;
-static volatile uint32_t global_primask = 0;
+static volatile uint32_t global_primask  = 0;
 
 void * __wrap_pvPortMalloc(size_t xWantedSize)
 {
@@ -238,7 +238,7 @@ void __wrap_vTaskSuspendAll(void)
 {
     if (heap_operation > 0 && !global_irq_disabled)
     {
-        global_primask = DisableGlobalIRQ();
+        global_primask      = DisableGlobalIRQ();
         global_irq_disabled = true;
     }
 

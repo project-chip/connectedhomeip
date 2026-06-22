@@ -179,6 +179,7 @@ Additional arguments that can be passed in the `west build` command line :
 | `prj_thread_ftd_fdata.conf`                | Thread FTD, factory data                               | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
 | `prj_thread_ftd_ota.conf`                  | Thread FTD, OTA                                        | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
 | `prj_thread_ftd_ota_fdata.conf`            | Thread FTD, OTA, factory data                          | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_fdata_el2go_ota.conf`      | Thread FTD, OTA, factory data with `EL2GO`             | RW61x                                 |
 | `prj_thread_ftd_wifi_br_ota.conf`          | Wi-Fi + Thread Border Router, OTA                      | RW61x, RT1060, RT1170                 |
 | `prj_thread_ftd_wifi_br_ota_fdata.conf`    | Wi-Fi + Thread Border Router, OTA, factory data        | RW61x, RT1060, RT1170                 |
 | `prj_thread_ftd_wifi_br_ota_fdata_v2.conf` | Wi-Fi + Thread Border Router, OTA SW v2 , factory data | RW61x, RT1060, RT1170                 |

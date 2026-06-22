@@ -285,10 +285,12 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
     ThreadStackMgr().ErasePersistentInfo();
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::FactoryDataPrvdImpl().FactoryReset();
+#endif
 
     /* Schedule a reset in the next idle call */
     PlatformMgrImpl().ScheduleResetInIdle();
