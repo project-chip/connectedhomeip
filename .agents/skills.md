@@ -19,6 +19,15 @@ etc.) to assist with development and code review in the Matter repository.
     Pull Request descriptions.
 -   **Triggers**: Use when preparing or writing descriptions for pull requests.
 
+### Podman VSCode Build
+
+-   **Location**: `.agents/skills/podman-vscode-build/`
+-   **Purpose**: Guidelines for building and testing Matter examples using
+    Podman with the official vscode build image in a non-interactive
+    environment.
+-   **Triggers**: Use when running builds or tests inside a Podman container,
+    especially when targeting embedded or cross-compiled platforms.
+
 ## Using Skills
 
 AI agents will automatically discover and load these skills when they are

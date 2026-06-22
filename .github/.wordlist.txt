@@ -1330,6 +1330,7 @@ reviwed
 rfid
 rfids
 RGB
+ripgrep
 riscv
 rloc
 rmw
