@@ -343,8 +343,13 @@ CHIP_ERROR NFCDataRetrievalInfo::SynchronizeNetworkCredentials()
     if (ssid_len > 0 && password_len > 0)
     {
         ChipLogDetail(Crypto, "SE05x: Setting Wi-Fi credentials");
+#ifdef __ZEPHYR__
+        ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgrImpl()._Put("g/wi/s", op_data_set, ssid_len));
+        ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgrImpl()._Put("g/wi/p", password, password_len));
+#else
         ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgrImpl()._Put("wifi-ssid", op_data_set, ssid_len));
         ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgrImpl()._Put("wifi-pass", password, password_len));
+#endif
     }
     // Store Thread credentials if available
     else if (op_data_set_len > 0)
