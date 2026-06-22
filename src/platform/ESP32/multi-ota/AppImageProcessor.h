@@ -26,8 +26,6 @@ namespace chip {
 /**
  * @brief App image processor.
  * This processor is responsible for doing the OTA update of the app image.
- * It is registered automatically at startup for the platform-defined app image ID.
- * @note This processor is only responsible for the app image. It does not handle the other images.
  */
 class AppImageProcessor : public SubImageProcessor
 {

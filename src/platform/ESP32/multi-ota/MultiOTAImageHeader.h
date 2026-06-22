@@ -26,9 +26,7 @@ namespace chip {
 
 typedef uint32_t OTAProcessorTag;
 
-/// Platform-defined application firmware image ID. Fixed ABI constant shared by the
-/// dispatcher, the AppImageProcessor registration, and the packaging tool. Lives in the
-/// platform-reserved range 0x00000001..0x000000FF.
+/// Platform-defined application firmware image ID.
 constexpr OTAProcessorTag kAppImageProcessorTag = 1;
 
 constexpr uint32_t kMultiOTAImageFileIdentifier = 0x4D494F54u; // "MIOT"
@@ -53,14 +51,11 @@ struct SubImageHeader
 
 static_assert(sizeof(SubImageHeader) == 48, "SubImageHeader size must be 48 bytes");
 
-// A fixed preamble (numImages; the magic and reserved bytes are validated but not retained) followed
-// by the variable-length list of SubImageHeader entries together form the MultiOTAImageHeader.
+// Fixed preamble (numImages) plus the variable-length list of SubImageHeader entries.
 struct MultiOTAImageHeader
 {
     uint8_t numImages;                    // number of SubImageHeader entries (1..kMaxNumImages)
-    Span<const SubImageHeader> subImages; // the entries; points into the parser's buffer, valid only until
-                                          // Clear(). Callers that need the list for the whole OTA session
-                                          // must copy it out into their own storage before calling Clear().
+    Span<const SubImageHeader> subImages; // points into the parser's buffer; valid only until Clear()
 };
 
 class MultiOTAImageHeaderParser

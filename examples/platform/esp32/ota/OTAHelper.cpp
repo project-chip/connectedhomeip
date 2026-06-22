@@ -58,8 +58,7 @@ CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 #if CONFIG_ENABLE_MULTI_IMAGE_OTA
 MultiImageOTAProcessorImpl gImageProcessor;
-// Default sub-processor for the primary application firmware (§15.1). The registration node is a
-// caller-owned static, as required by the intrusive registry.
+// Default sub-processor for the primary application firmware.
 AppImageProcessor gAppImageProcessor;
 ImageProcessorEntry gAppImageEntry{ kAppImageProcessorTag, &gAppImageProcessor };
 #else
@@ -159,7 +158,7 @@ void OTAHelpers::InitOTARequestor()
     if (!GetRequestorInstance())
     {
 #if CONFIG_ENABLE_MULTI_IMAGE_OTA
-        // Register the application-firmware sub-processor before the requestor is initialised (§10.4).
+        // Register the application-firmware sub-processor before the requestor is initialised.
         // Without this the dispatcher finds no processor for the app image and skips it.
         LogErrorOnFailure(gImageProcessor.RegisterProcessor(gAppImageEntry));
 #endif // CONFIG_ENABLE_MULTI_IMAGE_OTA

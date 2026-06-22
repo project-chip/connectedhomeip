@@ -40,24 +40,69 @@ enum class AbortReason : uint8_t
 struct AbortContext
 {
     AbortReason reason = AbortReason::kUnknown;
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error   = CHIP_NO_ERROR;
 };
 
+/**
+ * @brief Handles one component's binary within a multi-image OTA bundle.
+ *
+ * The application implements one per registered image ID; the dispatcher routes that component's
+ * bytes to it. All methods run on the Matter thread and must not block.
+ */
 class SubImageProcessor
 {
 public:
     virtual ~SubImageProcessor() = default;
 
+    /**
+     * @brief Prepare to receive this component's binary. Called once, before IsReadyForOTA().
+     *
+     * @param entry  Header for this component (image ID, version, length, SHA-256). Valid only for
+     *               the duration of the call.
+     * @retval CHIP_NO_ERROR  Ready to proceed.
+     * @retval other          Aborts the session.
+     */
     virtual CHIP_ERROR Init(const SubImageHeader & entry) = 0;
 
+    /**
+     * @brief Whether Init() has run (the processor is mid-transfer).
+     * @return true if initialised; false otherwise.
+     */
     virtual bool IsInitialized() = 0;
 
+    /**
+     * @brief Report readiness for this OTA cycle. .
+     *
+     * @param[out] state  kReady (stream via Write()), kAlreadyUpToDate or kNotReady (skip).
+     * @retval CHIP_NO_ERROR  state was set.
+     * @retval other          Aborts the session.
+     */
     virtual CHIP_ERROR IsReadyForOTA(DeviceState & state) = 0;
 
+    /**
+     * @brief Consume one ordered chunk of the component's binary. Called only when kReady.
+     *
+     * @param block  Raw binary bytes (no header); valid only for the duration of the call.
+     *               Chunks total exactly entry.length bytes across all calls.
+     * @retval CHIP_NO_ERROR  Chunk accepted.
+     * @retval other          Aborts the session.
+     */
     virtual CHIP_ERROR Write(ByteSpan & block) = 0;
 
+    /**
+     * @brief Tear down an aborted session. Called on every Init()'d processor.
+     *
+     * @param context  reason = kError (with context.error) or kCancelled.
+     */
     virtual void Abort(AbortContext & context) = 0;
 
+    /**
+     * @brief Commit the component during the apply phase. Called once per Init()'d processor.
+     *
+     * Default is a no-op (components flashed during Write() need nothing here).
+     * @retval CHIP_NO_ERROR  Commit succeeded.
+     * @retval other          Commit failed.
+     */
     virtual CHIP_ERROR Apply() { return CHIP_NO_ERROR; }
 };
 

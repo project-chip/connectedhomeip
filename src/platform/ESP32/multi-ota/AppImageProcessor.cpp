@@ -27,8 +27,6 @@ AppImageProcessor::~AppImageProcessor() = default;
 
 CHIP_ERROR AppImageProcessor::Init(const SubImageHeader & entry)
 {
-    // Light-weight (DESIGN §4.1): cache the entry only. Heavy I/O (partition erase, hashing) is
-    // deferred to the first Write(), so resources are allocated only once kReady is confirmed.
     mEntry         = entry;
     mTotalLength   = entry.length;
     mBytesReceived = 0;
@@ -45,8 +43,6 @@ bool AppImageProcessor::IsInitialized()
 
 CHIP_ERROR AppImageProcessor::IsReadyForOTA(DeviceState & state)
 {
-    // The application image is always written: every bundle carries a rebuilt app image with the new
-    // softwareVersion (DESIGN §3.5), so the app sub-processor never skips.
     state = DeviceState::kReady;
     return CHIP_NO_ERROR;
 }
@@ -57,8 +53,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
     if (mPartition == nullptr)
     {
         mPartition = esp_ota_get_next_update_partition(nullptr);
-        VerifyOrReturnError(mPartition != nullptr, CHIP_ERROR_INTERNAL,
-                            ChipLogError(SoftwareUpdate, "No OTA partition available"));
+        VerifyOrReturnError(mPartition != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(SoftwareUpdate, "No OTA partition available"));
 
         esp_err_t err = esp_ota_begin(mPartition, OTA_WITH_SEQUENTIAL_WRITES, &mOtaHandle);
         VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL,
@@ -67,7 +62,6 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
         ReturnErrorOnFailure(mHasher.Begin());
     }
 
-    // Never accept more bytes than the entry declares.
     VerifyOrReturnError(mBytesReceived + block.size() <= mTotalLength, CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(SoftwareUpdate, "App image overflow"));
 
@@ -78,8 +72,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
     ReturnErrorOnFailure(mHasher.AddData(block));
     mBytesReceived += block.size();
 
-    // Last chunk: verify the SHA-256 over the written bytes against the SubImageHeader (DESIGN §3.3),
-    // then close out the staged image.
+    // Last chunk: verify the SHA-256, then close the staged image.
     if (mBytesReceived == mTotalLength)
     {
         uint8_t digest[Crypto::kSHA256_Hash_Length];
@@ -104,8 +97,7 @@ void AppImageProcessor::Abort(AbortContext & context)
 {
     ChipLogProgress(SoftwareUpdate, "AppImageProcessor abort (reason=%u)", static_cast<unsigned>(context.reason));
 
-    // Discard the partially staged image and release all state. Clearing mPartition makes a
-    // subsequent Apply() a no-op (CHIP_ERROR_INCORRECT_STATE), so the device stays on old firmware.
+    // Discard partial state. Clearing mPartition makes a later Apply() a no-op (stays on old firmware).
     if (mOtaHandle != 0)
     {
         esp_ota_abort(mOtaHandle);
@@ -119,7 +111,6 @@ void AppImageProcessor::Abort(AbortContext & context)
 
 CHIP_ERROR AppImageProcessor::Apply()
 {
-    // Commit point: make the freshly written image the boot target on the next reboot.
     VerifyOrReturnError(mPartition != nullptr, CHIP_ERROR_INCORRECT_STATE);
     esp_err_t err = esp_ota_set_boot_partition(mPartition);
     VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL,

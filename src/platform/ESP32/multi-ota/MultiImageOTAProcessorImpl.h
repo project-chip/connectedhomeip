@@ -32,7 +32,6 @@ struct ImageProcessorEntry
     ImageProcessorEntry * next = nullptr;
 };
 
-// How each sub-image was processed during the download, reported to ShouldApplyUpdate (§5).
 enum class SubImageStatus : uint8_t
 {
     kWritten,         // sub-processor was kReady; all bytes delivered
@@ -61,17 +60,14 @@ public:
     CHIP_ERROR ConfirmCurrentImage() override;
 
     /**
-     * Register a processor entry to Image processor registry.
-     * @param entry The processor entry to register.
-     * @return CHIP_NO_ERROR if the processor was registered successfully
-     * CHIP_ERROR_INVALID_ARGUMENT if the processor is null or the tag is 0
-     * CHIP_ERROR_DUPLICATE_KEY_ID if the processor is already bound to a tag
-     * CHIP_ERROR if other error occurred
+     * Register a sub-processor under its image-ID tag. The caller owns the entry node.
+     * @retval CHIP_ERROR_INVALID_ARGUMENT  processor is null or tag is 0
+     * @retval CHIP_ERROR_DUPLICATE_KEY_ID  tag already registered
      */
     CHIP_ERROR RegisterProcessor(ImageProcessorEntry & entry);
 
     /**
-     * Invoked once after a successful download, on the Matter thread, before the apply phase (§5).
+     * Invoked once after a successful download, on the Matter thread, before the apply phase.
      * Inspect the per-sub-image results and return true to apply the staged update, or false to
      * discard it (the device stays on the old firmware and the next QueryImage retries the bundle).
      * Must not block — decide from the in-RAM results only. Default implementation returns true.
@@ -88,12 +84,12 @@ private:
     ImageProcessorEntry * mRegistryHead = nullptr;
     CHIP_ERROR mLastErr                 = CHIP_NO_ERROR;
 
-    // Routing state: where we are in the payload, and the entry currently being written.
+    // Tracker for the current sub-image, and the entry currently being written.
     uint32_t mCurrentSubImageCursor      = 0;
     bool mCurrentEntryStarted            = false;   // readiness for the active entry already decided
     SubImageProcessor * mActiveProcessor = nullptr; // processor for the active (kReady) entry
 
-    // Per-sub-image result table (one slot per sub-image), reported to ShouldApplyUpdate (§5).
+    // Per-sub-image result table, reported to ShouldApplyUpdate() callback.
     Platform::ScopedMemoryBuffer<SubImageResult> mSubImageResults;
     uint8_t mSubImageResultCount = 0;
 

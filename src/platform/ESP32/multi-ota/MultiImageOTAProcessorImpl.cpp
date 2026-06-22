@@ -155,14 +155,11 @@ void MultiImageOTAProcessorImpl::HandleFinalize(intptr_t context)
     auto * imageProcessor = reinterpret_cast<MultiImageOTAProcessorImpl *>(context);
     VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
-    // Reaching Finalize means the download completed: BDX only calls Finalize() on the EOF block, and
-    // each sub-processor has already committed its image on its last Write() chunk
+    // Download complete; let the application decide whether to apply the update.
     Span<const SubImageResult> results(imageProcessor->mSubImageResults.Get(), imageProcessor->mSubImageResultCount);
     if (!imageProcessor->ShouldApplyUpdate(results))
     {
-        // discard the staged update and stay on the old firmware. Aborting the
-        // sub-processors clears AppImageProcessor's partition handle, so a subsequent Apply() is a
-        // no-op. The next QueryImage retries the bundle.
+        // Abort OTA for all the sub-processors and discard the update.
         ChipLogProgress(SoftwareUpdate, "ShouldApplyUpdate vetoed apply; discarding update");
         imageProcessor->AbortSubProcessors(AbortReason::kCancelled, CHIP_NO_ERROR);
         LogErrorOnFailure(imageProcessor->ReleaseBlock());
@@ -227,11 +224,10 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
     ByteSpan remainingBlock    = block;
     const uint64_t payloadSize = imageProcessor->mParams.totalFileBytes;
 
-    // Route the block's bytes to the sub-processors. A single block may span several entries
-    // (split-block rule); we keep consuming until the block is empty, then request one more block.
+    // Consume the entire block before fetching the next one. It may span several entries.
     while (!remainingBlock.empty())
     {
-        // Locate the sub-image whose byte range covers the current payload cursor.
+        // Find the sub-image covering the cursor position
         const SubImageHeader * activeSubImage = nullptr;
         for (const auto & subImage : imageProcessor->mMultiOTAImageHeader.subImages)
         {
@@ -243,7 +239,7 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
             }
         }
 
-        // Cursor is not in any sub-image, bundle is invalid stop the download
+        // Cursor outside every sub-image — malformed bundle.
         if (activeSubImage == nullptr)
         {
             imageProcessor->mLastErr = CHIP_ERROR_INVALID_FILE_IDENTIFIER;
@@ -257,7 +253,6 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
         const uint32_t subImageEnd         = activeSubImage->offset + activeSubImage->length;
         const uint32_t bytesLeftInSubImage = subImageEnd - imageProcessor->mCurrentSubImageCursor;
 
-        // Decide readiness exactly once, when the entry starts (R2 step 3/4).
         if (!imageProcessor->mCurrentEntryStarted)
         {
             SubImageProcessor * processor = nullptr;
@@ -265,33 +260,31 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
 
             if (imageProcessor->GetSubProcessor(activeSubImage->imageId, processor) != CHIP_NO_ERROR || processor == nullptr)
             {
-                // No processor registered for this image ID — assume already up to date (R2 step 3).
+                // No processor registered for this image ID, assume already up to date.
                 ChipLogDetail(SoftwareUpdate, "No processor for image ID 0x%" PRIx32 ", skipping", activeSubImage->imageId);
                 readiness = DeviceState::kAlreadyUpToDate;
             }
             else
             {
-                if (!processor->IsInitialized())
-                {
-                    imageProcessor->mLastErr = processor->Init(*activeSubImage);
-                    VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
-                                   imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
-                                   PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
-                }
+                // Init() unconditionally so each session starts fresh. Called once for each sub-image.
+                imageProcessor->mLastErr = processor->Init(*activeSubImage);
+                VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
+                               imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
+                               PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
+
                 imageProcessor->mLastErr = processor->IsReadyForOTA(readiness);
                 VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
                                imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
                                PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
             }
 
-            // Not being written this cycle: skip the whole entry (R2 step 5). SkipData IS the next
-            // block request
+            // OTA will be skipped this cycle: skip the whole entry and move to the next one
             if (readiness != DeviceState::kReady)
             {
                 const SubImageStatus status =
                     (readiness == DeviceState::kNotReady) ? SubImageStatus::kSkippedNotReady : SubImageStatus::kSkippedUpToDate;
                 imageProcessor->RecordSubImageResult(activeSubImage->imageId, activeSubImage->version, status);
-                imageProcessor->mParams.downloadedBytes += bytesLeftInSubImage; // progress counts skipped bytes (step 7)
+                imageProcessor->mParams.downloadedBytes += bytesLeftInSubImage; // progress counts skipped bytes
                 imageProcessor->mCurrentSubImageCursor = subImageEnd;
                 LogErrorOnFailure(imageProcessor->mDownloader->SkipData(bytesLeftInSubImage));
                 return;
@@ -314,7 +307,7 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
         imageProcessor->mCurrentSubImageCursor += bytesToDeliver;
         remainingBlock = remainingBlock.SubSpan(bytesToDeliver);
 
-        // Entry fully delivered — record the outcome; the next entry (if any) starts next iteration.
+        // Entry fully delivered: record it and advance to the next.
         if (imageProcessor->mCurrentSubImageCursor == subImageEnd)
         {
             imageProcessor->RecordSubImageResult(activeSubImage->imageId, activeSubImage->version, SubImageStatus::kWritten);
@@ -323,10 +316,8 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
         }
     }
 
-    // Request the next block once, unless the last entry's final bytes were just delivered: the EOF
-    // block has already queued Finalize(), so a FetchNextData() here would corrupt the BDX session
-    // (R2 step 6). The app image is always the last, always-written entry, so the symmetric
-    // "skip into EOF" case cannot occur.
+    // Fetch the next block unless the whole payload is delivered: the EOF block already queued
+    // Finalize(), so fetching again would corrupt the BDX session.
     const bool payloadConsumed =
         imageProcessor->mMultiOTAImageHeaderParser.IsHeaderParsed() && imageProcessor->mCurrentSubImageCursor >= payloadSize;
     if (!payloadConsumed)
@@ -421,14 +412,14 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
         VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
-        // exactly one app image, and it is the last entry
+        // The app image must be the last entry, and there must be exactly one.
         VerifyOrReturnError(mMultiOTAImageHeader.subImages.back().imageId == kAppImageProcessorTag,
                             CHIP_ERROR_INVALID_FILE_IDENTIFIER);
 
         size_t appImageCount = 0;
-        // every sub image entry must lie within the payload
         for (const auto & subImage : mMultiOTAImageHeader.subImages)
         {
+            // Every entry must lie within the payload.
             VerifyOrReturnError(static_cast<uint64_t>(subImage.offset) + subImage.length <= mParams.totalFileBytes,
                                 CHIP_ERROR_INVALID_FILE_IDENTIFIER);
             if (subImage.imageId == kAppImageProcessorTag)
@@ -438,12 +429,10 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
         }
         VerifyOrReturnError(appImageCount == 1, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
 
-        // Allocate the per-sub-image result table (one slot per sub-image) for the ShouldApplyUpdate hook.
         VerifyOrReturnError(mSubImageResults.Alloc(mMultiOTAImageHeader.subImages.size()), CHIP_ERROR_NO_MEMORY);
         mSubImageResultCount = 0;
 
-        // The MultiImageHeader is fully decoded. Both progress accounting and the routing cursor
-        // start at the first binary's offset, i.e. sizeof(MultiImageHeader) = 8 + numImages * 48.
+        // Cursor and progress start at the first binary's offset.
         const uint32_t headerSize = kFixedHeaderSize + mMultiOTAImageHeader.subImages.size() * kSubImageHeaderSize;
         mParams.downloadedBytes   = headerSize;
         mCurrentSubImageCursor    = headerSize;
@@ -469,7 +458,6 @@ CHIP_ERROR MultiImageOTAProcessorImpl::GetSubProcessor(OTAProcessorTag tag, SubI
 
 void MultiImageOTAProcessorImpl::RecordSubImageResult(OTAProcessorTag tag, uint32_t version, SubImageStatus status)
 {
-    // The table is sized to numImages and each entry is recorded exactly once, in order.
     if (mSubImageResults.Get() != nullptr && mSubImageResultCount < mMultiOTAImageHeader.subImages.size())
     {
         mSubImageResults[mSubImageResultCount++] = SubImageResult{ tag, version, status };
