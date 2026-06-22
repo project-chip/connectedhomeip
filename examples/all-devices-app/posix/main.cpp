@@ -204,11 +204,11 @@ public:
             }
             ReturnErrorOnFailure(
                 device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
-            auto accessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, *device);
-            if (accessor)
+            auto oobAccessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, *device);
+            if (oobAccessor)
             {
-                AccessorRegistry::Instance().Register(*accessor);
-                mConstructedAccessors.push_back(std::move(accessor));
+                AccessorRegistry::Instance().Register(*oobAccessor);
+                mConstructedAccessors.push_back(std::move(oobAccessor));
             }
             mConstructedDevices.push_back(std::move(device));
         }
