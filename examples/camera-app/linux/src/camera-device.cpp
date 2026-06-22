@@ -418,6 +418,65 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
 
     return pipeline;
 }
+
+GstElement * CreateSnapshotPipelineTestVideosrc(const SnapshotPipelineConfig & config, CameraError & error)
+{
+    GstElement * pipeline   = gst_pipeline_new("snapshot-pipeline-test");
+    GstElement * source     = gst_element_factory_make("videotestsrc", "source");
+    GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+    GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
+    GstElement * queue      = gst_element_factory_make("queue", "queue");
+    GstElement * appsink     = gst_element_factory_make("appsink", "sink");
+
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },     //
+        { source, "source" },         //
+        { capsfilter, "capsfilter" }, //
+        { jpegenc, "jpegenc" },       //
+        { queue, "queue" },           //
+        { appsink, "appsink" }        //
+    };
+    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
+
+    if (isElementFactoryMakeFailed)
+    {
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, queue, appsink);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    // Configure videotestsrc: pattern=18 (ball animation), live=true
+    g_object_set(source, "pattern", 18, "is-live", TRUE, nullptr);
+
+    // Set resolution and framerate caps
+    GstCaps * caps = gst_caps_new_simple(                    //
+        "video/x-raw",                                       //
+        "width", G_TYPE_INT, config.width,                   //
+        "height", G_TYPE_INT, config.height,                 //
+        "framerate", GST_TYPE_FRACTION, config.framerate, 1, //
+        nullptr                                              //
+    );
+    g_object_set(capsfilter, "caps", caps, nullptr);
+    gst_caps_unref(caps);
+
+    // Set JPEG quality
+    g_object_set(jpegenc, "quality", config.quality, nullptr);
+
+    // Configure appsink
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, nullptr);
+
+    // Add and link elements
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
+    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, appsink, nullptr))
+    {
+        ChipLogError(Camera, "Elements could not be linked.");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    return pipeline;
+}
 } // namespace Snapshot
 
 } // namespace GstreamerPipepline
@@ -510,8 +569,6 @@ CameraError CameraDevice::InitializeStreams()
 GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int framerate,
                                                   const std::string & filename, CameraError & error)
 {
-    const auto cameraType = GstreamerPipepline::detectCameraType(device);
-
     const GstreamerPipepline::Snapshot::SnapshotPipelineConfig config = {
         .device    = device,
         .width     = width,
@@ -520,6 +577,14 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
         .framerate = framerate,
         .filename  = filename,
     };
+
+    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
+    {
+        ChipLogProgress(Camera, "Using test video source for snapshot pipeline");
+        return GstreamerPipepline::Snapshot::CreateSnapshotPipelineTestVideosrc(config, error);
+    }
+
+    const auto cameraType = GstreamerPipepline::detectCameraType(device);
 
     switch (cameraType)
     {
@@ -914,12 +979,12 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
 
     // Pull sample from appsink
     ChipLogProgress(Camera, "Pulling sample from appsink...");
-    GstSample * sample = gst_app_sink_pull_sample(GST_APP_SINK(appsink));
+    GstSample * sample = gst_app_sink_try_pull_sample(GST_APP_SINK(appsink), 2 * GST_SECOND);
     gst_object_unref(appsink);
 
     if (!sample)
     {
-        ChipLogError(Camera, "Failed to pull sample from appsink");
+        ChipLogError(Camera, "Failed to pull sample from appsink (timeout or error)");
         if (startedOnDemand)
         {
             StopSnapshotStream(streamId);
@@ -928,6 +993,17 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     }
 
     GstBuffer * buffer = gst_sample_get_buffer(sample);
+    if (!buffer)
+    {
+        ChipLogError(Camera, "Failed to get buffer from sample");
+        gst_sample_unref(sample);
+        if (startedOnDemand)
+        {
+            StopSnapshotStream(streamId);
+        }
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
     GstMapInfo map;
 
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
@@ -1150,7 +1226,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(audioPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
+    gst_element_get_state(audioPipeline, &state, nullptr, 5 * GST_SECOND);
     if (state != GST_STATE_PLAYING)
     {
         ChipLogError(Camera, "Audio pipeline did not reach PLAYING state.");
@@ -1192,12 +1268,15 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
     if (audioPipeline != nullptr)
     {
         GstStateChangeReturn result = gst_element_set_state(audioPipeline, GST_STATE_NULL);
-        if (result == GST_STATE_CHANGE_FAILURE)
-        {
-            return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
-        }
+
+        // Always clean up, regardless of state change result
         gst_object_unref(audioPipeline);
         it->audioContext = nullptr;
+
+        if (result == GST_STATE_CHANGE_FAILURE)
+        {
+            return CameraError::ERROR_AUDIO_STREAM_STOP_FAILED;
+        }
     }
 
     // Stop the audio playback pipeline
@@ -1326,10 +1405,37 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(snapshotPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
-    if (state != GST_STATE_PLAYING)
+    GstStateChangeReturn state_result = gst_element_get_state(snapshotPipeline, &state, nullptr, 5 * GST_SECOND);
+    if (state_result == GST_STATE_CHANGE_FAILURE || state != GST_STATE_PLAYING)
     {
-        ChipLogError(Camera, "Snapshot pipeline did not reach PLAYING state.");
+        ChipLogError(Camera, "Snapshot pipeline did not reach PLAYING state. Result: %d, State: %d", state_result, state);
+
+        // Try to get error message from GStreamer bus
+        GstBus * bus = gst_element_get_bus(snapshotPipeline);
+        if (bus)
+        {
+            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
+            if (msg)
+            {
+                GError * err       = nullptr;
+                gchar * debug_info = nullptr;
+
+                if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
+                {
+                    gst_message_parse_error(msg, &err, &debug_info);
+                    ChipLogError(Camera, "GStreamer Error: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogError(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                g_error_free(err);
+                g_free(debug_info);
+                gst_message_unref(msg);
+            }
+            gst_object_unref(bus);
+        }
+
         gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
         gst_object_unref(snapshotPipeline);
         it->snapshotContext = nullptr;
@@ -1357,14 +1463,15 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
     {
         // Stop the pipeline
         GstStateChangeReturn result = gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
+
+        // Always clean up, regardless of state change result
+        gst_object_unref(snapshotPipeline);
+        it->snapshotContext = nullptr;
+
         if (result == GST_STATE_CHANGE_FAILURE)
         {
             return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
         }
-
-        // Unreference the pipeline
-        gst_object_unref(snapshotPipeline);
-        it->snapshotContext = nullptr;
     }
 
 
