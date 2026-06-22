@@ -28,7 +28,10 @@ from matter.tlv import uint
 
 
 class TestSpecParsingSelection(DeviceConformanceTests):
+    requires_dut = False
+
     def setup_class(self):
+        super().setup_class()
         # Overriding the DeviceConformanceTest setup_class so we don't go out to a real device
         pass
 

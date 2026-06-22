@@ -49,6 +49,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_AVSM_VideoStreamsPersistence(self) -> str:
         return "[TC-AVSM-VideoStreamsPersistence] Validate Video Streams Persistence functionality with Server as DUT"
 

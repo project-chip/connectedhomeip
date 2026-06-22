@@ -49,6 +49,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_TLSCERT_2_3(TC_TLSCERT_Base):
+    disable_wildcard_subscription = True
+
     def pics_TC_TLSCERT_2_3(self):
         return ["TLSCERT.S"]
 
