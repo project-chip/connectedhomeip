@@ -184,6 +184,7 @@ CHIP_ERROR LaundryWasherControlsCluster::ReadSpinSpeeds(const ConcreteAttributeP
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(spinSpeed));
         }
+        return CHIP_NO_ERROR;
     });
 }
 
@@ -201,6 +202,7 @@ CHIP_ERROR LaundryWasherControlsCluster::ReadSupportedRinses(const ConcreteAttri
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(supportedRinse));
         }
+        return CHIP_NO_ERROR;
     });
 }
 
