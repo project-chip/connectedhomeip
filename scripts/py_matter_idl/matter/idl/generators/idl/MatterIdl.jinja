@@ -7,7 +7,6 @@
  optional ExtensionFieldSet extensionFieldSets[] = 5;
 #}
 
-{{- field.api_maturity | idltxt -}}
 {%- if field.qualities %}{{field.qualities | idltxt}} {% endif -%}
 {{field.data_type.name}}
 {%- if field.data_type.max_length -%} <{{field.data_type.max_length}}> {%- endif -%}
@@ -19,7 +18,6 @@
 {% macro render_struct(s) -%}{#
  Macro for the output of a complete struct
 #}
-{{- s.api_maturity | idltxt -}}
 {%- if s.is_shared%}shared {% endif -%}
 {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
 {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
@@ -44,18 +42,18 @@ struct {{s.name}} {##}
 // This IDL was auto-generated from a parsed data structure
 
 {% for enum in idl.global_enums %}
-{{enum.api_maturity | idltxt}}enum {{enum.name}} : {{ enum.base_type}} {
+enum {{enum.name}} : {{ enum.base_type}} {
   {% for entry in enum.entries %}
-  {{entry.api_maturity | idltxt}}{{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
+  {{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
   {% endfor %}
 }
 
 {% endfor %}
 
 {%- for bitmap in idl.global_bitmaps %}
-{{bitmap.api_maturity | idltxt}}bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
+bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% for entry in bitmap.entries %}
-  {{entry.api_maturity | idltxt}}{{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
+  {{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
   {% endfor %}
 }
 
@@ -74,9 +72,9 @@ struct {{s.name}} {##}
 
   {% for enum in cluster.enums | selectattr("is_global")%}
   /* GLOBAL:
-  {{enum.api_maturity | idltxt}}enum {{enum.name}} : {{ enum.base_type}} {
+  enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
-    {{entry.api_maturity | idltxt}}{{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
+    {{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
   */
@@ -85,9 +83,9 @@ struct {{s.name}} {##}
 
   {%- for bitmap in cluster.bitmaps | selectattr("is_global")%}
   /* GLOBAL:
-  {{bitmap.api_maturity | idltxt}}bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
+  bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
-    {{entry.api_maturity | idltxt}}{{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
+    {{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
   */
@@ -102,22 +100,20 @@ struct {{s.name}} {##}
   {% endfor %}
 
   {%- for enum in cluster.enums | rejectattr("is_global")%}
-  {%+ if enum.api_maturity %}{{enum.api_maturity | idltxt}}{% endif -%}
-  {%- if enum.is_shared%}shared {% endif -%}
+  {%+ if enum.is_shared%}shared {% endif -%}
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
-    {{entry.api_maturity | idltxt}}{{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
+    {{entry.name}} = {{entry.code}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
 
   {% endfor %}
 
   {%- for bitmap in cluster.bitmaps | rejectattr("is_global")%}
-  {%+ if bitmap.api_maturity %}{{bitmap.api_maturity | idltxt}}{% endif -%}
-  {%- if bitmap.is_shared%}shared {% endif -%}
+  {%+ if bitmap.is_shared%}shared {% endif -%}
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
-    {{entry.api_maturity | idltxt}}{{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
+    {{entry.name}} = 0x{{"%X" | format(entry.code)}} {{-specification_name_clarification(entry)}};
     {% endfor %}
   }
 
@@ -156,7 +152,7 @@ struct {{s.name}} {##}
   {% if c.description %}
   /** {{c.description}} */
   {% endif %}
-  {{c.api_maturity | idltxt}}{{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}(
+  {{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}(
      {%- if c.input_param %}{{c.input_param}}{% endif -%}
   ): {{c.output_param}} = {{c.code}};
   {% endfor %}

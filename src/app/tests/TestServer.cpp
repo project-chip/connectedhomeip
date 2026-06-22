@@ -44,24 +44,21 @@ public:
     }
 };
 
-class TestFactoryResetEventHandler
+class TestEventHandler
 {
 public:
     ChipDeviceEvent mEvent{};
 
     static void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
     {
-        if (event->Type == DeviceEventType::kFactoryReset)
-        {
-            reinterpret_cast<TestFactoryResetEventHandler *>(arg)->mEvent = *event;
-        }
+        reinterpret_cast<TestEventHandler *>(arg)->mEvent = *event;
     }
 };
 
 TEST_F(TestServer, TestFactoryResetEvent)
 {
-    TestFactoryResetEventHandler handler;
-    EXPECT_SUCCESS(PlatformMgr().AddEventHandler(TestFactoryResetEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler)));
+    TestEventHandler handler;
+    EXPECT_SUCCESS(PlatformMgr().AddEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler)));
 
     Server::GetInstance().ScheduleFactoryReset();
 
@@ -71,7 +68,7 @@ TEST_F(TestServer, TestFactoryResetEvent)
 
     EXPECT_EQ(handler.mEvent.Type, DeviceEventType::kFactoryReset);
 
-    PlatformMgr().RemoveEventHandler(TestFactoryResetEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
+    PlatformMgr().RemoveEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
 }
 
 } // namespace server

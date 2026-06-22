@@ -62,9 +62,6 @@ class TC_JFDS_2_1(MatterBaseTest):
         self.fabric_a_ctrl = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_a_server_app = None
-        self.dev_ctrl_eco_a = None
-        self.fabric_a_persistent_storage = None
-        self.cert_authority_manager_a = None
 
         jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not jfc_server_app:
@@ -100,12 +97,12 @@ class TC_JFDS_2_1(MatterBaseTest):
             self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
             self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
             self.dut_rpc_server_ip = "127.0.0.1"
-            self.dut_rpc_server_port = str(self.get_random_port())
+            self.dut_rpc_server_port = "33033"
             # Start Fabric A JF-Administrator App
             self.fabric_a_admin = AppServerSubprocess(
                 jfa_server_app,
                 storage_dir=self.storage_fabric_a,
-                port=self.get_random_port(),
+                port=random.randint(5001, 5999),
                 discriminator=self.jfadmin_fabric_a_discriminator,
                 passcode=self.jfadmin_fabric_a_passcode,
                 extra_args=["--capabilities", "0x04", "--rpc-server-port", self.dut_rpc_server_port])
@@ -179,16 +176,6 @@ class TC_JFDS_2_1(MatterBaseTest):
         if self.fabric_a_server_app is not None:
             self.fabric_a_server_app.terminate()
 
-        if self.dev_ctrl_eco_a is not None:
-            self.dev_ctrl_eco_a.Shutdown()
-            self.dev_ctrl_eco_a = None
-        if self.cert_authority_manager_a is not None:
-            self.cert_authority_manager_a.Shutdown()
-            self.cert_authority_manager_a = None
-        if self.fabric_a_persistent_storage is not None:
-            self.fabric_a_persistent_storage.Shutdown()
-            self.fabric_a_persistent_storage = None
-
         super().teardown_class()
 
     def steps_TC_JFDS_2_1(self) -> list[TestStep]:
@@ -211,19 +198,19 @@ class TC_JFDS_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_JFDS_2_1(self):
         # Creating a Controller for Ecosystem A
-        self.fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
-        self.cert_authority_manager_a = CertificateAuthority.CertificateAuthorityManager(
+        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
-            persistentStorage=self.fabric_a_persistent_storage)
-        self.cert_authority_manager_a.LoadAuthoritiesFromStorage()
-        self.dev_ctrl_eco_a = self.cert_authority_manager_a.activeCaList[0].adminList[0].NewController(
+            persistentStorage=_fabric_a_persistent_storage)
+        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
+        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
         # Discover endpoint with JointFabricDatastore cluster via Descriptor
-        descriptor_response = await self.dev_ctrl_eco_a.ReadAttribute(
+        descriptor_response = await devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[(Clusters.Descriptor)],
             returnClusterObject=True)
 
@@ -237,14 +224,14 @@ class TC_JFDS_2_1(MatterBaseTest):
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
 
         self.step("1")
-        response = await self.dev_ctrl_eco_a.ReadAttribute(
+        response = await devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[
                 (jfds_endpoint, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
             returnClusterObject=True)
         anchor_root_ca = response[jfds_endpoint][Clusters.JointFabricDatastore].anchorRootCA
         asserts.assert_greater_equal(len(anchor_root_ca), 1)
 
-        opcreds_response = await self.dev_ctrl_eco_a.ReadAttribute(
+        opcreds_response = await devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[
                 (0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)],
             returnClusterObject=True)
@@ -256,21 +243,21 @@ class TC_JFDS_2_1(MatterBaseTest):
         )
 
         self.step("2")
-        response = await self.dev_ctrl_eco_a.ReadAttribute(
+        response = await devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[
                 (jfds_endpoint, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
             returnClusterObject=True)
         asserts.assert_equal(response[jfds_endpoint][Clusters.JointFabricDatastore].anchorNodeID, self.jfadmin_fabric_a_node_id)
 
         self.step("3")
-        response = await self.dev_ctrl_eco_a.ReadAttribute(
+        response = await devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[
                 (jfds_endpoint, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
             returnClusterObject=True)
         asserts.assert_equal(response[jfds_endpoint][Clusters.JointFabricDatastore].anchorVendorID, self.jfctrl_fabric_a_vid)
 
         self.step("4")
-        response = await self.dev_ctrl_eco_a.ReadAttribute(
+        response = await devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[
                 (jfds_endpoint, Clusters.JointFabricDatastore.Attributes.FriendlyName)],
             returnClusterObject=True)
@@ -279,7 +266,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         asserts.assert_less_equal(len(response[jfds_endpoint][Clusters.JointFabricDatastore].friendlyName), 32)
 
         self.step("5")
-        response = await self.dev_ctrl_eco_a.ReadAttribute(
+        response = await devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.Status)],
             returnClusterObject=True)
         asserts.assert_in(
@@ -290,6 +277,9 @@ class TC_JFDS_2_1(MatterBaseTest):
                 Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kDeletePending,
                 Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitFailed
             ])
+
+        # Shutdown the Python Controllers started at the beginning of this script
+        devCtrlEcoA.Shutdown()
 
 
 if __name__ == "__main__":

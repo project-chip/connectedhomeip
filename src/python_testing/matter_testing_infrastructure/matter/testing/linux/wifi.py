@@ -27,8 +27,6 @@ from typing import Any, Union
 
 import sdbus
 
-from matter.testing.concurrency.context import TerminableThread
-
 from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
@@ -164,7 +162,7 @@ class NANSimulator:
         receiver.NANReceive.emit(receive_args)
 
 
-class WpaSupplicantMock(TerminableThread):
+class WpaSupplicantMock(threading.Thread):
     """Mock server for WpaSupplicant D-Bus API.
 
     This mock runs on its own thread and exposes a minimal subset of the
@@ -180,9 +178,6 @@ class WpaSupplicantMock(TerminableThread):
     link to simulate network connectivity.
 
     Extended to support NAN (Neighbor Awareness Networking) for WiFi-PAF testing.
-
-    Should be used as a context manager or with explicit call to `resource_start()`
-    and `resource_terminate()`.
     """
 
     class Wpa(sdbus.DbusInterfaceCommonAsync,
@@ -546,19 +541,10 @@ class WpaSupplicantMock(TerminableThread):
             self.nan_simulator.register_interface(name, interface)
 
         self.loop = asyncio.new_event_loop()
-        super().__init__(target=self.loop.run_forever)
-
-    def resource_start(self) -> None:
         self.loop.run_until_complete(self.startup())
-        super().resource_start()
+        super().__init__(target=self.loop.run_forever)
+        self.start()
 
-    def resource_terminate(self):
+    def terminate(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
-        super().resource_terminate()
-
-        if not self.loop.is_closed():
-            try:
-                self.loop.close()
-            except Exception:
-                log.exception("Failed to close WpaSupplicantMock event loop")
-                raise
+        self.join()

@@ -34,6 +34,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from typing import List
 
 from mobly import asserts
 
@@ -60,11 +61,11 @@ class TestGroupTableReports(MatterBaseTest):
         self.groupKey = Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
             groupKeySetID=self.kGroupKeyset1,
             groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b"0123456789abcdef",
+            epochKey0="0123456789abcdef".encode(),
             epochStartTime0=1110000,
-            epochKey1=b"0123456789abcdef",
+            epochKey1="0123456789abcdef".encode(),
             epochStartTime1=1110001,
-            epochKey2=b"0123456789abcdef",
+            epochKey2="0123456789abcdef".encode(),
             epochStartTime2=1110002)
 
         await self.TH1.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(self.groupKey))
@@ -74,7 +75,7 @@ class TestGroupTableReports(MatterBaseTest):
         self.kGroup3 = 0x0103
 
         self.print_step(3, "TH maps Keyset 1 to Group 1, 2 and 3")
-        mapping_structs: list[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
+        mapping_structs: List[Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct] = []
 
         mapping_structs.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
             groupId=self.kGroup1,

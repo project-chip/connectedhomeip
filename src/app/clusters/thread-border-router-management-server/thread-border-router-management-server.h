@@ -16,9 +16,4 @@
  */
 
 #pragma once
-
-// NOTE: This file exists for backward compatibility only.
-// New code should include the new CodeDriven files directly:
-// #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
-
-#include <app/clusters/thread-border-router-management-server/CodegenIntegration.h>
+#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>

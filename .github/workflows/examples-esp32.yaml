@@ -185,11 +185,6 @@ jobs:
               with:
                 platform-name: ESP32
 
-            - name: Notify Slack on Failure
-              if: failure()
-              uses: ./.github/actions/notify-slack-failure
-              with:
-                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     esp32_1:
         name: ESP32_1
 
@@ -257,8 +252,3 @@ jobs:
                    source $IDF_PATH/export.sh
                    cd $GITHUB_WORKSPACE
                    scripts/examples/esp_example.sh thread-br-app sdkconfig.defaults esp32s3
-            - name: Notify Slack on Failure
-              if: failure()
-              uses: ./.github/actions/notify-slack-failure
-              with:
-                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

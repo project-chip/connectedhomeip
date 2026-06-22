@@ -234,11 +234,6 @@ constexpr DataModel::DeviceTypeEntry kLaundryDryer = {
     .deviceTypeRevision = kLaundryDryerDeviceTypeRevision,
 };
 
-constexpr DataModel::DeviceTypeEntry kHumidifierDehumidifier = {
-    .deviceTypeId       = kHumidifierDehumidifierDeviceTypeId,
-    .deviceTypeRevision = kHumidifierDehumidifierDeviceTypeRevision,
-};
-
 constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
     .deviceTypeId       = kNetworkInfrastructureManagerDeviceTypeId,
     .deviceTypeRevision = kNetworkInfrastructureManagerDeviceTypeRevision,
@@ -482,16 +477,6 @@ constexpr DataModel::DeviceTypeEntry kElectricalEnergyTariff = {
 constexpr DataModel::DeviceTypeEntry kElectricalMeter = {
     .deviceTypeId       = kElectricalMeterDeviceTypeId,
     .deviceTypeRevision = kElectricalMeterDeviceTypeRevision,
-};
-
-constexpr DataModel::DeviceTypeEntry kElectricalCircuitBreaker = {
-    .deviceTypeId       = kElectricalCircuitBreakerDeviceTypeId,
-    .deviceTypeRevision = kElectricalCircuitBreakerDeviceTypeRevision,
-};
-
-constexpr DataModel::DeviceTypeEntry kElectricalDistributionEnclosure = {
-    .deviceTypeId       = kElectricalDistributionEnclosureDeviceTypeId,
-    .deviceTypeRevision = kElectricalDistributionEnclosureDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kControlBridge = {

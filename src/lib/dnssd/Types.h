@@ -21,7 +21,6 @@
 #include <cstring>
 #include <optional>
 
-#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/PeerId.h>

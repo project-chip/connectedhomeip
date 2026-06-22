@@ -81,6 +81,23 @@ Davis, CA 95616, USA
       </optionalConform>
     </feature>
   </features>
+  <dataTypes>
+    <struct name="CircuitNodeStruct">
+      <field id="1" name="Node" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Endpoint" type="endpoint-no">
+        <optionalConform/>
+      </field>
+      <field id="3" name="Label" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+  </dataTypes>
   <attributes>
     <attribute id="0x0000" name="AvailableEndpoints" type="list">
       <entry type="endpoint-no"/>

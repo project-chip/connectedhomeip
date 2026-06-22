@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x009B" name="Energy Preference"/>
+    <clusterId id="0x009B" name="Energy Preference">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EPREF" scope="Endpoint"/>
   <features>

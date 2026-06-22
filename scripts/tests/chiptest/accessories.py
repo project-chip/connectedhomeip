@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, Self, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from chiptest.concurrency.context import StartStopContextMixin, TerminableResource, mp_wrapped_spawn_context
+from chiptest.concurrency.context import StartStopContextMixin, mp_wrapped_spawn_context
 from chiptest.concurrency.process import ProcessConfig, WrappedProcess, with_annotated_exception
 from chiptest.concurrency.work_queue import CancellableQueue, QueueCancelled
 from chiptest.log_config import LogConfig
@@ -261,10 +261,8 @@ def with_accessories_lock(fn: Callable[Concatenate[S, P], R]) -> Callable[Concat
     return wrapper
 
 
-class AppsRegister(TerminableResource):
+class AppsRegister:
     def __init__(self, net_ns_wrapper: str | None = None, log_config: LogConfig | None = None) -> None:
-        super().__init__()
-
         self._accessories: dict[str, App] = {}
         self._accessories_lock = threading.RLock()
 
@@ -272,7 +270,7 @@ class AppsRegister(TerminableResource):
         self._log_config = log_config if log_config is not None else LogConfig()
         self._server_manager: XmlRpcServerProcessManager | None = None
 
-    def resource_start(self) -> None:
+    def init(self) -> None:
         if self._server_manager is None:
             self._server_manager = XmlRpcServerProcessManager(self, self._net_ns_wrapper, self._log_config)
 
@@ -283,9 +281,8 @@ class AppsRegister(TerminableResource):
         log.debug("Starting XMLRPC Manager")
         self._server_manager.start()
         log.debug("XMLRPC Manager started")
-        return
 
-    def resource_terminate(self) -> None:
+    def uninit(self) -> None:
         if self._server_manager is None:
             log.debug("XMLRPC server is already down")
             return
@@ -295,11 +292,8 @@ class AppsRegister(TerminableResource):
         self._server_manager = None
         log.debug("XMLRPC Manager stopped")
 
-    # Legacy function aliases for backward compatibility.
-    def init(self) -> None:
-        self.resource_start()
-
-    uninit = resource_terminate
+    def terminate(self):
+        self.uninit()
 
     @property
     @with_accessories_lock

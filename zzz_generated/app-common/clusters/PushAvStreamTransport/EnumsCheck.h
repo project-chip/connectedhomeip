@@ -102,7 +102,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kCommand:
     case EnumType::kMotion:
     case EnumType::kContinuous:
-    case EnumType::kAmbientContext:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

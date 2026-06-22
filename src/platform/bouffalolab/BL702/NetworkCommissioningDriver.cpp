@@ -270,13 +270,7 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
             }
 
             p->security.SetRaw(pmsg->records[i].auth_mode);
-
-            static_assert(kMaxWiFiSSIDLength <= sizeof(p->ssid), "SSID buffer too small for kMaxWiFiSSIDLength");
-
-            // Keep old behaviour due to compatibility with SDK
-            strncpy((char *) p->ssid, (const char *) pmsg->records[i].ssid,
-                    kMaxWiFiSSIDLength); // NOLINT(bugprone-unsafe-functions)
-
+            strncpy((char *) p->ssid, (const char *) pmsg->records[i].ssid, kMaxWiFiSSIDLength);
             p->ssidLen         = strlen((char *) pmsg->records[i].ssid);
             p->channel         = pmsg->records[i].channel;
             p->wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;

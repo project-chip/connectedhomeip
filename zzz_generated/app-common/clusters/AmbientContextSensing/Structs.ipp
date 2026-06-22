@@ -34,7 +34,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kAmbientContextSensed), ambientContextSensed);
-    encoder.Encode(to_underlying(Fields::kDetectionConfidence), detectionConfidence);
+    encoder.Encode(to_underlying(Fields::kDetectionStartTime), detectionStartTime);
     return encoder.Finalize();
 }
 
@@ -52,9 +52,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ambientContextSensed);
         }
-        else if (__context_tag == to_underlying(Fields::kDetectionConfidence))
+        else if (__context_tag == to_underlying(Fields::kDetectionStartTime))
         {
-            err = DataModel::Decode(reader, detectionConfidence);
+            err = DataModel::Decode(reader, detectionStartTime);
         }
 
         ReturnErrorOnFailure(err);

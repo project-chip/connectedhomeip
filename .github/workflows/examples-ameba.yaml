@@ -49,17 +49,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: ameba
-            - name: Build example Ameba Apps
+            - name: Build example Ameba All Clusters App
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target ameba-amebad-all-clusters \
                         --target ameba-amebad-all-clusters-minimal \
                         --target ameba-amebad-light \
+                        --target ameba-amebad-pigweed \
                         build \
                      "
-            - name: Notify Slack on Failure
-              if: failure()
-              uses: ./.github/actions/notify-slack-failure
-              with:
-                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

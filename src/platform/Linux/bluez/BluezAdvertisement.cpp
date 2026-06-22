@@ -25,7 +25,6 @@
 #include <glib.h>
 
 #include <ble/Ble.h>
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
@@ -120,11 +119,11 @@ CHIP_ERROR BluezAdvertisement::Init(BluezAdapter1 * apAdapter, const char * aAdv
     GAutoPtr<char> rootPath;
     g_object_get(G_OBJECT(mEndpoint.GetGattApplicationObjectManager()), "object-path", &rootPath.GetReceiver(), nullptr);
     g_snprintf(mAdvPath, sizeof(mAdvPath), "%s/advertising", rootPath.get());
-    chip::Platform::CopyString(mAdvUUID, aAdvUUID);
+    g_strlcpy(mAdvUUID, aAdvUUID, sizeof(mAdvUUID));
 
     if (aAdvName != nullptr)
     {
-        chip::Platform::CopyString(mAdvName, aAdvName);
+        g_strlcpy(mAdvName, aAdvName, sizeof(mAdvName));
     }
     else
     {

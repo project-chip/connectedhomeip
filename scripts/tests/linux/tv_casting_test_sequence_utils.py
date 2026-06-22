@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
 """
 This file defines the utility classes for creating and managing test sequences to validate the casting experience between
@@ -55,7 +55,7 @@ class Step:
         self,
         app: App,
         timeout_sec: Optional[int] = DEFAULT_TIMEOUT_SEC,
-        output_msg: Optional[list[str]] = None,
+        output_msg: Optional[List[str]] = None,
         input_cmd: Optional[str] = None,
     ):
         # Validate that either `output_msg` or `input_cmd` is provided, but not both.
@@ -85,12 +85,12 @@ class Sequence:
     be used for validating the casting experience.
     """
 
-    def __init__(self, name: str, steps: list[Step]):
+    def __init__(self, name: str, steps: List[Step]):
         self.name = name
         self.steps = steps
 
     @staticmethod
-    def get_test_sequence_by_name(test_sequences: list['Sequence'], test_sequence_name: str) -> Optional['Sequence']:
+    def get_test_sequence_by_name(test_sequences: List['Sequence'], test_sequence_name: str) -> Optional['Sequence']:
         """Retrieve a test sequence from a list of sequences by its name."""
 
         for sequence in test_sequences:
@@ -99,7 +99,7 @@ class Sequence:
         return None
 
     @staticmethod
-    def get_test_sequences() -> list['Sequence']:
+    def get_test_sequences() -> List['Sequence']:
         """Retrieve all the test sequences to validate the casting experience between the Linux tv-casting-app and the Linux tv-app."""
 
         from linux.tv_casting_test_sequences import test_sequences

@@ -135,7 +135,8 @@ class Gh:
                     per_page=per_page)):
                 if not i.artifacts:
                     break
-                yield from i.artifacts
+                for a in i.artifacts:
+                    yield a
                 log.debug("ASP: artifact page %d of %d", page, page_limit)
                 if page_limit and page >= page_limit:
                     break

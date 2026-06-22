@@ -62,7 +62,7 @@ class Secrets:
             self.fp.truncate()
             pickle.dump(self.secrets, self.fp)
             self.fp.flush()
-        except OSError as e:
+        except IOError as e:
             print("ERROR: " + str(e), file=sys.stderr)
 
     def clear(self, label: str, **kw):

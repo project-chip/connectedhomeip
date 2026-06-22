@@ -29,7 +29,6 @@
 #include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -239,7 +238,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WPA
     struct netif * netif = nullptr;
     netif                = static_cast<struct netif *>(net_get_mlan_handle());
-    chip::Platform::CopyString(ifp->Name, "wlan0");
+    strncpy(ifp->Name, "wlan0", Inet::InterfaceId::kMaxIfNameLength);
     ifp->name          = CharSpan(ifp->Name, strlen(ifp->Name));
     ifp->isOperational = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();

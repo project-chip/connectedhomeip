@@ -73,11 +73,6 @@ jobs:
                   name: qemu-esp32-logs
                   path: /tmp/log_output
 
-            - name: Notify Slack on Failure
-              if: failure()
-              uses: ./.github/actions/notify-slack-failure
-              with:
-                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     qemu-tizen:
         name: Tizen
 
@@ -106,8 +101,3 @@ jobs:
                         build
                     " \
                 || { ./scripts/helpers/tizen-crashlog.sh; exit 1; }
-            - name: Notify Slack on Failure
-              if: failure()
-              uses: ./.github/actions/notify-slack-failure
-              with:
-                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

@@ -66,7 +66,7 @@ public:
     PendingNotificationContext * mContext;
 };
 
-// The pool for all the pending commands.
+// The pool for all the pending comands.
 class PendingNotificationMap
 {
 public:

@@ -364,6 +364,13 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    if (result == CHIP_NO_ERROR)
+    {
+        result = CheckARL(subjectDescriptor, requestPath, requestPrivilege);
+    }
+#endif
+
     if ((CHIP_NO_ERROR != result) && (Access::AuthMode::kGroup == subjectDescriptor.authMode) &&
         (Access::RequestType::kCommandInvokeRequest == requestPath.requestType) &&
         (Access::Privilege::kOperate == requestPrivilege) && IsGroupId(subjectDescriptor.subject))
@@ -375,17 +382,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         ReturnErrorOnFailure(groups->GetGroupInfo(subjectDescriptor.fabricIndex, gid, info));
         if (info.HasAuxiliaryACL() && IsGroupAuxiliaryDelegateRegistered())
         {
-            result = mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
+            return mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         }
     }
-
-    // CheckARL runs last: it must apply to grants from ACL or the AuxiliaryACL fallback above.
-#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    if (result == CHIP_NO_ERROR)
-    {
-        result = CheckARL(subjectDescriptor, requestPath, requestPrivilege);
-    }
-#endif
 
     return result;
 }

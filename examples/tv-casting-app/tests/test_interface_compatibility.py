@@ -4,9 +4,9 @@ Property Test — Property 3: Interface compatibility (attribute & event decoder
 **Validates: Requirements 1.3, 2.3**
 
 This test parses both the slim attribute decoder
-(`CHIPAttributeTLVValueDecoder-override.cpp`) and the full zap-generated
+(`casting-CHIPAttributeTLVValueDecoder.cpp`) and the full zap-generated
 decoder (`zap-generated/CHIPAttributeTLVValueDecoder.cpp`), as well as
-the slim event decoder (`CHIPEventTLVValueDecoder-override.cpp`) and the
+the slim event decoder (`casting-CHIPEventTLVValueDecoder.cpp`) and the
 full zap-generated event decoder (`zap-generated/CHIPEventTLVValueDecoder.cpp`),
 and verifies:
 
@@ -34,7 +34,7 @@ SLIM_ATTR_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "CHIPAttributeTLVValueDecoder-override.cpp",
+    "casting-CHIPAttributeTLVValueDecoder.cpp",
 )
 
 FULL_ATTR_DECODER = os.path.join(
@@ -51,7 +51,7 @@ SLIM_EVENT_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "CHIPEventTLVValueDecoder-override.cpp",
+    "casting-CHIPEventTLVValueDecoder.cpp",
 )
 
 FULL_EVENT_DECODER = os.path.join(

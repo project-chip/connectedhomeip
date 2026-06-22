@@ -22,7 +22,7 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any
+from typing import Any, Dict
 
 import constants
 import stateful_shell
@@ -105,7 +105,14 @@ def load_config() -> None:
     return config
 
 
-def load_cicd_config() -> dict[str, Any]:
+def check_python_version() -> None:
+    if sys.version_info[0] < 3:
+        flush_print('Must use Python 3. Current version is ' +
+                    str(sys.version_info[0]))
+        exit(1)
+
+
+def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         return json.loads(config_file.read())
 
@@ -268,6 +275,7 @@ def bundle_telink(device_name: str) -> None:
 
 def main() -> int:
 
+    check_python_version()
     config = load_config()
     cicd_config = load_cicd_config()
 

@@ -23,7 +23,7 @@ import sys
 
 ZEPHYR_BASE = os.environ.get('ZEPHYR_BASE')
 if ZEPHYR_BASE is None:
-    raise OSError("ZEPHYR_BASE environment variable is not set")
+    raise EnvironmentError("ZEPHYR_BASE environment variable is not set")
 
 try:
     from core import BuildConfiguration

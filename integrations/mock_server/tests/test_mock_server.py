@@ -17,6 +17,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from typing import List
 
 from route_configuration import QueryConfig, Route, RouteResponse, load_configurations
 from router import match_route
@@ -93,7 +94,7 @@ class TestConfigLoader(unittest.TestCase):
 
 
 class TestRouter(unittest.TestCase):
-    routes: list[Route] = []
+    routes: List[Route] = []
 
     def setUp(self):
         self.routes = [

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# coding=utf-8
 
 #
 #   Copyright (c) 2020 Project CHIP Authors
@@ -23,6 +24,8 @@
 #         This file contains definitions for working with data encoded in Chip TLV format
 #
 
+
+from __future__ import absolute_import, print_function
 
 import struct
 from collections import OrderedDict
@@ -134,7 +137,7 @@ class float32(float):
     pass
 
 
-class TLVWriter:
+class TLVWriter(object):
     def __init__(self, encoding=None, implicitProfile=None):
         self._encoding = encoding if encoding is not None else bytearray()
         self._implicitProfile = implicitProfile
@@ -443,7 +446,7 @@ class TLVWriter:
             raise ValueError("Invalid TLV container type")
 
 
-class TLVReader:
+class TLVReader(object):
     def __init__(self, tlv):
         self._tlv = tlv
         self._bytesRead = 0

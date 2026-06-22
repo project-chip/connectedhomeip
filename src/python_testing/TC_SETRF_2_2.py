@@ -42,6 +42,8 @@
 # === END CI TEST ARGUMENTS ===
 
 
+from typing import List
+
 from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
@@ -115,11 +117,11 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         endpoint = self.get_endpoint()
 
         # Variables that will be used in the test to store intermediate values
-        tariffComponentIDs: list[int] = []
+        tariffComponentIDs: List[int] = []
         tariffComponentID1: int | None = None
         tariffComponentStruct1: Clusters.CommodityTariff.Structs.TariffComponentStruct | None = None
-        dayEntryIDs: list[int] = []
-        dayEntryIDs1: list[int] = []
+        dayEntryIDs: List[int] = []
+        dayEntryIDs1: List[int] = []
         dayEntryID1: int | None = None
         dayEntryStruct1: Clusters.CommodityTariff.Structs.DayEntryStruct | None = None
 

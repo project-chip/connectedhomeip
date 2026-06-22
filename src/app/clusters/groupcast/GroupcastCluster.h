@@ -30,7 +30,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
@@ -39,9 +38,7 @@ namespace Clusters {
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
  */
-class GroupcastCluster : public DefaultServerCluster,
-                         public Credentials::GroupDataProvider::GroupListener,
-                         public ::chip::Groupcast::Testing::Delegate
+class GroupcastCluster : public DefaultServerCluster, public Credentials::GroupDataProvider::GroupListener
 {
 public:
     static constexpr uint16_t kMaxMembershipEndpoints = 255;
@@ -63,9 +60,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
-
-    // Groupcast::Testing::Delegate implementation
-    void FlushGroupcastTestingEvent() override;
 
 private:
     struct EndpointList
@@ -125,6 +119,8 @@ private:
     void UpdateUsedMcastAddrCount();
     void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
+
+    void EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor);
 
     GroupcastContext mGroupcastContext;
     const BitFlags<Groupcast::Feature> mFeatures;

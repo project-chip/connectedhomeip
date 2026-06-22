@@ -18,8 +18,8 @@
 import json
 import logging
 import time
-from asyncio import Event, Semaphore, create_task, gather, sleep, wait_for
-from typing import Optional
+from asyncio import Event, Semaphore, TimeoutError, create_task, gather, sleep, wait_for  # noqa: A004
+from typing import Dict, List, Optional
 
 from mdns_discovery.data_classes.aaaa_record import AaaaRecord
 from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
@@ -83,7 +83,7 @@ class MdnsDiscovery:
     # Public methods
     async def get_commissioner_services(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                        ) -> list[MdnsServiceInfo]:
+                                        ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers commissioner mDNS services on the network.
 
@@ -106,7 +106,7 @@ class MdnsDiscovery:
 
     async def get_commissionable_services(self, log_output: bool = False,
                                           discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                          ) -> list[MdnsServiceInfo]:
+                                          ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers commissionable mDNS services on the network.
 
@@ -129,7 +129,7 @@ class MdnsDiscovery:
 
     async def get_operational_services(self, log_output: bool = False,
                                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                       ) -> list[MdnsServiceInfo]:
+                                       ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers operational mDNS services on the network.
 
@@ -152,7 +152,7 @@ class MdnsDiscovery:
 
     async def get_border_router_services(self, log_output: bool = False,
                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                         ) -> list[MdnsServiceInfo]:
+                                         ) -> List[MdnsServiceInfo]:
         """
         Asynchronously discovers border router mDNS services on the network.
 
@@ -175,7 +175,7 @@ class MdnsDiscovery:
 
     async def get_all_services(self, log_output: bool = False,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                               ) -> dict[str, list[MdnsServiceInfo]]:
+                               ) -> Dict[str, List[MdnsServiceInfo]]:
         """
         Asynchronously discovers all available mDNS services within the network.
 
@@ -364,7 +364,7 @@ class MdnsDiscovery:
         log.error(f"Service record information (PTR) for '{service_types}' not found.")
         return []
 
-    async def get_all_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> list[str]:
+    async def get_all_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> List[str]:
         """
         Asynchronously discovers all available mDNS service types within the network and returns a list
         of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
@@ -427,7 +427,7 @@ class MdnsDiscovery:
         return sub_types
 
     async def discover(self,
-                       service_types: Optional[list[str]] = None,
+                       service_types: Optional[List[str]] = None,
                        all_services: bool = False,
                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                        query_service: bool = False,

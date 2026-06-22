@@ -15,6 +15,7 @@
 #
 
 from dataclasses import dataclass
+from typing import List
 
 from .library_handle import _GetBleLibraryHandle
 
@@ -28,7 +29,7 @@ class AdapterInfo:
     powered_on: bool
 
 
-def GetAdapters() -> list[AdapterInfo]:
+def GetAdapters() -> List[AdapterInfo]:
     """Get a list of BLE adapters available on the system. """
     handle = _GetBleLibraryHandle()
 

@@ -14,11 +14,12 @@
 #    limitations under the License.
 #
 
+from typing import List
 
 from matter.idl.matter_idl_types import Cluster, Idl
 
 
-def server_side_clusters(idl: Idl) -> list[Cluster]:
+def server_side_clusters(idl: Idl) -> List[Cluster]:
     """
     Return a list of clusters that are instantiated in at least one endpoint
     within the given IDL.
@@ -32,7 +33,7 @@ def server_side_clusters(idl: Idl) -> list[Cluster]:
     return [c for c in idl.clusters if c.name in cluster_names]
 
 
-def binding_clusters(idl: Idl) -> list[Cluster]:
+def binding_clusters(idl: Idl) -> List[Cluster]:
     """
     Return a list of clusters that show up as bindings on some endpoints
     within the given IDL.

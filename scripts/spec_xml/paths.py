@@ -28,7 +28,7 @@ def get_chip_root():
     try:
         return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     except Exception as e:
-        raise OSError(
+        raise EnvironmentError(
             "Unable to determine CHIP root directory. Please ensure the environment is activated."
         ) from e
 

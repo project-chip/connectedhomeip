@@ -26,7 +26,6 @@
 #include <tizen.h>
 #include <wifi-manager.h>
 
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -873,8 +872,8 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     bool isWiFiActivated      = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    chip::Platform::CopyString(sInstance.mWiFiSSID, ssid);
-    chip::Platform::CopyString(sInstance.mWiFiKey, key);
+    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
+    g_strlcpy(sInstance.mWiFiKey, key, sizeof(sInstance.mWiFiKey));
 
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, {
@@ -907,7 +906,7 @@ CHIP_ERROR WiFiManager::Disconnect(const char * ssid)
     bool isWiFiActivated      = false;
     wifi_manager_ap_h foundAp = nullptr;
 
-    chip::Platform::CopyString(sInstance.mWiFiSSID, ssid);
+    g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
 
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, {

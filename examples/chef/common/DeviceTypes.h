@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>

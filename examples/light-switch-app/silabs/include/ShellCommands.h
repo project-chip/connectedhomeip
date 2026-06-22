@@ -19,8 +19,12 @@
 
 #pragma once
 
+#if defined(ENABLE_CHIP_SHELL)
+
 namespace LightSwitchCommands {
 
 void RegisterSwitchCommands();
 
 } // namespace LightSwitchCommands
+
+#endif // defined(ENABLE_CHIP_SHELL)

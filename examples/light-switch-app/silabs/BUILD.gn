@@ -63,7 +63,6 @@ if (wifi_soc) {
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
       "${examples_common_plat_dir}/freertos_config",
-      "${examples_common_plat_dir}/customer",
     ]
 
     defines = []
@@ -88,7 +87,6 @@ if (wifi_soc) {
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
       "${examples_common_plat_dir}/freertos_config",
-      "${examples_common_plat_dir}/customer",
     ]
 
     defines = []
@@ -107,8 +105,10 @@ silabs_executable("light_switch_app") {
   defines = []
 
   sources = [
-    "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
     "src/AppTask.cpp",
+    "src/BindingHandler.cpp",
+    "src/DataModelCallbacks.cpp",
+    "src/LightSwitchMgr.cpp",
   ]
 
   deps = [

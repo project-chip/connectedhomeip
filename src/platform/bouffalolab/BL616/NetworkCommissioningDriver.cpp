@@ -157,23 +157,14 @@ CHIP_ERROR BflbWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
 
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
 
-    // Bounds check added to prevent buffer overflow vulnerabilities.
-    VerifyOrReturnError(ssidLen <= sizeof(conn_param.ssid), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // Keep old behaviour due to compatibility with SDK
-    strncpy((char *) conn_param.ssid, ssid, ssidLen); // NOLINT(bugprone-unsafe-functions)
+    strncpy((char *) conn_param.ssid, ssid, ssidLen);
     conn_param.ssid_len = ssidLen;
 
     if (keyLen)
     {
-        // Bounds check added to prevent buffer overflow vulnerabilities.
-        VerifyOrReturnError(keyLen <= sizeof(conn_param.key), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        // Keep old behaviour due to compatibility with SDK
-        strncpy((char *) conn_param.key, key, keyLen); // NOLINT(bugprone-unsafe-functions)
+        strncpy((char *) conn_param.key, key, keyLen);
         conn_param.key_len = keyLen;
     }
-
     conn_param.freq1         = 0;
     conn_param.freq2         = 0;
     conn_param.use_dhcp      = 1;

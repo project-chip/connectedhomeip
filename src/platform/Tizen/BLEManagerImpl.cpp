@@ -50,7 +50,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SetupDiscriminator.h>
@@ -994,7 +993,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
     VerifyOrReturnError(deviceName, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(strlen(deviceName.get()) >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    chip::Platform::CopyString(buf, bufSize, deviceName.get());
+    g_strlcpy(buf, deviceName.get(), bufSize);
     ChipLogProgress(DeviceLayer, "BLE device name: %s", buf);
 
     return CHIP_NO_ERROR;

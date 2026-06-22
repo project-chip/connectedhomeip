@@ -177,8 +177,8 @@
     NSString * instanceNameStr = [self getInstanceName];
     if (instanceNameStr != nil && instanceNameStr.length > 0) {
         const char * instanceName = [instanceNameStr UTF8String];
-        // Using CopyString for safe string copy with guaranteed null-termination.
-        chip::Platform::CopyString(cppIdOptions.mCommissioneeInstanceName, instanceName);
+        strncpy(cppIdOptions.mCommissioneeInstanceName, instanceName, sizeof(cppIdOptions.mCommissioneeInstanceName) - 1);
+        cppIdOptions.mCommissioneeInstanceName[sizeof(cppIdOptions.mCommissioneeInstanceName) - 1] = '\0';
     }
 
     NSArray<MCTargetAppInfo *> * targetAppInfos = [self getTargetAppInfoList];

@@ -38,7 +38,7 @@ public:
     ~BDXDiagnosticLogsProvider(){};
 
     /**
-     * Initializes the BDX transfer session by creating a new exchange context for the transfer session.
+     * Intializes the BDX transfer session by creating a new exchange context for the transfer session.
      * It starts the BDX transfer session by calling InitiateTransfer which sends the SendInit BDX message
      * to the log requestor.
      *

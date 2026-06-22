@@ -81,7 +81,7 @@ class FileSystemGeneratorStorage(GeneratorStorage):
             os.makedirs(target_dir)
 
         log.info("Writing new data to: '%s'", target)
-        with open(target, "w") as out:
+        with open(target, "wt") as out:
             out.write(content)
 
 

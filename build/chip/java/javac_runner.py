@@ -80,7 +80,7 @@ def FindCommand(command):
 
 
 def ReadBuildConfig(build_config):
-    with open(build_config) as file:
+    with open(build_config, 'r') as file:
         return json.load(file)
 
 
@@ -130,7 +130,7 @@ def main():
     if retcode != EXIT_SUCCESS:
         return retcode
 
-    with open(args.outfile, 'w') as f:
+    with open(args.outfile, 'wt') as f:
         prefixlen = len(args.classdir) + 1
         for root, dirnames, filenames in os.walk(args.classdir):
             for filename in filenames:

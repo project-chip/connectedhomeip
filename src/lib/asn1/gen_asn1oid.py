@@ -26,6 +26,7 @@
 #      TLV encodings (notably the Matter Certificate object).
 #
 
+from __future__ import absolute_import, print_function
 
 import optparse
 import sys

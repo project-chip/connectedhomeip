@@ -33,14 +33,13 @@ namespace app {
  */
 struct ConcreteAttributePath : public ConcreteClusterPath
 {
-    CHIP_CPP20(constexpr) ConcreteAttributePath()
+    ConcreteAttributePath()
     {
         // Note: mExpanded is in the superclass, so we can't use a field
         // initializer.
         mExpanded = false;
     }
 
-    CHIP_CPP20(constexpr)
     ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteClusterPath(aEndpointId, aClusterId), mAttributeId(aAttributeId)
     {

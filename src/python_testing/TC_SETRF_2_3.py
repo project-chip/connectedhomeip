@@ -41,6 +41,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from typing import List
 
 from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
@@ -164,10 +165,10 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         currentDayEntryDayofWeekValue: int = None
         dateCurrentValue: int = None
         dayTypeCurrentValue: cluster.Enums.DayTypeEnum = None
-        dayEntryIDsCurrentValue: list[int] = []
-        tariffComponentIDsCurrentValue: list[int] = []
-        tariffComponentsCurrentValue: list[cluster.Structs.TariffComponentStruct] = []
-        dayPatternIDsCurrentValue: list[int] = []
+        dayEntryIDsCurrentValue: List[int] = []
+        tariffComponentIDsCurrentValue: List[int] = []
+        tariffComponentsCurrentValue: List[cluster.Structs.TariffComponentStruct] = []
+        dayPatternIDsCurrentValue: List[int] = []
 
         self.step("1")
         # Commissioning

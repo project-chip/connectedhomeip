@@ -21,6 +21,7 @@
 #include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -45,7 +46,6 @@
 #include <string>
 #include <system/SystemLayer.h>
 
-#include <BleInit.h>
 #include <TermHandling.h>
 
 using namespace chip;
@@ -191,24 +191,24 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
 
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
-
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
         .timerDelegate     = gTimerDelegate,                         //
-        .storageDelegate   = *initParams.persistentStorageDelegate,  //
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
+    RegisterDeviceFactoryOverrides(gTimerDelegate);
+
+    static chip::CommonCaseDeviceServerInitParams initParams;
+
+    SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
     if (AppOptions::GetConfig().enableGroupcast)
     {
-        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegateImpl groupAuxDelegate;
-        SuccessOrDie(groupAuxDelegate.Initialize(&gGroupDataProvider, &Server::GetInstance().GetFabricTable()));
+        static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(
+            &gGroupDataProvider, &Server::GetInstance().GetFabricTable());
         initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
         gGroupDataProvider.SetGroupcastEnabled(true);
     }
@@ -376,8 +376,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ChipLogProgress(AppServer, "Initializing...");
     ReturnErrorOnFailure(Platform::MemoryInit());
 
-    static HelpOptions sHelpOptions(argv[0], "Usage: all-devices-app [options]", "1.0");
-    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), &sHelpOptions, nullptr };
+    static OptionSet * sAppOptionSets[] = { AppOptions::GetOptions(), nullptr };
     if (!ArgParser::ParseArgs(argv[0], argc, argv, sAppOptionSets))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -402,7 +401,11 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 
-    ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));
+#if CONFIG_NETWORK_LAYER_BLE
+    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
+    ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(AppOptions::GetConfig().bleController, false));
+    ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+#endif
 
     return CHIP_NO_ERROR;
 }

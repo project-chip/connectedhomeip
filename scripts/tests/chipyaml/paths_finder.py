@@ -16,6 +16,7 @@
 
 import os
 import tempfile
+import typing
 from pathlib import Path
 
 import click
@@ -29,7 +30,7 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 
 class PathsFinder:
-    def __init__(self, roots: list[str] = [DEFAULT_CHIP_ROOT]):
+    def __init__(self, roots: typing.List[str] = [DEFAULT_CHIP_ROOT]):
         self._roots = roots
 
     def get(self, target_name: str) -> Path | None:

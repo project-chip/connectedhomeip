@@ -19,7 +19,7 @@ import logging
 import threading
 import time
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Callable, List, Optional, Set
 
 from ..native import PyChipError
 from .library_handle import _GetDiscoveryLibraryHandle
@@ -66,7 +66,7 @@ class NodeAddress:
 class AggregatedDiscoveryResults:
     """Discovery results for a node."""
     peerId: PeerId
-    addresses: set[NodeAddress]
+    addresses: Set[NodeAddress]
 
 
 @dataclass
@@ -79,7 +79,7 @@ class PendingDiscovery:
 
 
 @dataclass
-class CommissionableNode:
+class CommissionableNode():
     instanceName: Optional[str] = None
     hostName: Optional[str] = None
     port: Optional[int] = None
@@ -97,7 +97,7 @@ class CommissionableNode:
     supportsTcpClient: Optional[bool] = None
     supportsTcpServer: Optional[bool] = None
     isICDOperatingAsLIT: Optional[bool] = None
-    addresses: Optional[list[str]] = None
+    addresses: Optional[List[str]] = None
     rotatingId: Optional[str] = None
 
 
@@ -109,7 +109,7 @@ _RESULT_WAIT_TIME_SEC = 0.05
 class _PendingDiscoveries:
     """Manages a list of pending discoveries and associated callbacks."""
 
-    activeDiscoveries: list[PendingDiscovery] = []
+    activeDiscoveries: List[PendingDiscovery] = []
 
     def __init__(self):
         self.operationCondition = threading.Condition()

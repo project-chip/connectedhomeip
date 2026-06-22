@@ -197,6 +197,3 @@ tests:
 CI:
     - name: network-manager
       app: network-manager
-    - name: network-infrastructure-manager
-      app: all-devices
-      args: ["--device", "network-infrastructure-manager"]

@@ -30,8 +30,6 @@ namespace Crypto {
 class ESP32P256Keypair : public P256Keypair
 {
 public:
-    ~ESP32P256Keypair();
-
     using P256Keypair::Initialize;
 
     /**

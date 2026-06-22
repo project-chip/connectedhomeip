@@ -34,8 +34,7 @@ namespace Testing {
 ///
 /// Parameters:
 ///     cluster - The cluster interface to test.
-///     expected - initializer_list or any other iterable of expected attribute entries supporting `std::size(container)` syntax.
-///     May be empty for global attributes only.
+///     expected - An initializer list of expected attribute entries (may be empty for only globals)
 ///
 /// @note This function will assert (die) if `cluster.GetPaths()` does not return exactly one path.
 ///
@@ -44,39 +43,16 @@ namespace Testing {
 /// ClusterImpl cluster(kTestEndpointId, ....);
 /// ASSERT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::SomeAttribute::kMetadataEntry }));
 /// ```
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
+                             std::initializer_list<const app::DataModel::AttributeEntry> expected);
 
-template <class T>
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const T & expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-    if (CHIP_ERROR err = cluster.Attributes(path, attributesBuilder); err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
-    }
-
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
-
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(std::size(expected)));
-    for (const auto & entry : expected)
-    {
-        SuccessOrDie(expectedBuilder.Append(entry));
-    }
-
-    SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
-
-    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
-}
-
-// Overload for std::initializer_list to not get "template argument deduction failed" when calling `IsAttributesListEqualTo(cluster,
-// {...})`
-template <typename T = const app::DataModel::AttributeEntry>
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected)
-{
-    return IsAttributesListEqualTo<std::initializer_list<T>>(cluster, expected);
-}
+/// Overload of IsAttributesListEqualTo that accepts a standard vector of attribute entries.
+///
+/// Parameters:
+///     cluster - The cluster interface to test.
+///     expected - A vector containing the expected attribute entries (must include all
+///                non-global, non-optional attributes).
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const std::vector<app::DataModel::AttributeEntry> & expected);
 
 /// Compares the accepted commands of a cluster against an expected set.
 ///
@@ -85,8 +61,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::initial
 ///
 /// Parameters:
 ///     cluster - The cluster interface to test.
-///     expected - initializer_list or any other iterable of expected accepted command entries supporting `std::size(container)`
-///     syntax. May be empty.
+///     expected - An initializer list of expected accepted command entries. May be empty.
 ///
 /// @note This function will assert (die) if `cluster.GetPaths()` does not return exactly one path.
 ///
@@ -96,36 +71,8 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::initial
 /// ClusterImpl cluster(kTestEndpointId, ...);
 /// ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { Commands::SomeCommand::kMetadataEntry }));
 /// ```
-template <class T>
-bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, const T & expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
-    if (CHIP_ERROR err = cluster.AcceptedCommands(path, commandsBuilder); err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Test, "Failed to get accepted commands list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
-    }
-
-    ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> expectedBuilder;
-
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(std::size(expected)));
-    for (const auto & entry : expected)
-    {
-        SuccessOrDie(expectedBuilder.Append(entry));
-    }
-
-    return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
-}
-
-// Overload for std::initializer_list to not get "template argument deduction failed" when calling
-// `IsAcceptedCommandsListEqualTo(cluster, {...})`
-template <typename T = const app::DataModel::AcceptedCommandEntry>
-bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected)
-{
-    return IsAcceptedCommandsListEqualTo<std::initializer_list<T>>(cluster, expected);
-}
+bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
+                                   std::initializer_list<const app::DataModel::AcceptedCommandEntry> expected);
 
 /// Compares the generated commands of a cluster against an expected set.
 ///
@@ -134,8 +81,7 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::i
 ///
 /// Parameters:
 ///     cluster - The cluster interface to test.
-///     expected - initializer_list or any other iterable of expected generated command entries supporting `std::size(container)`
-///     syntax. May be empty.
+///     expected - An initializer list of expected generated command entries. May be empty.
 ///
 /// @note This function will assert (die) if `cluster.GetPaths()` does not return exactly one path.
 ///
@@ -144,36 +90,7 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::i
 /// ClusterImpl cluster(kTestEndpointId, ...);
 /// ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::SomeCommandResponse::kMetadataEntry }));
 /// ```
-template <class T>
-bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, const T & expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<CommandId> commandsBuilder;
-    if (CHIP_ERROR err = cluster.GeneratedCommands(path, commandsBuilder); err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Test, "Failed to get generated commands list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
-    }
-
-    ReadOnlyBufferBuilder<CommandId> expectedBuilder;
-
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(std::size(expected)));
-    for (const auto & entry : expected)
-    {
-        SuccessOrDie(expectedBuilder.Append(entry));
-    }
-
-    return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
-}
-
-// Overload for std::initializer_list to not get "template argument deduction failed" when calling
-// `IsGeneratedCommandsListEqualTo(cluster, {...})`
-template <typename T = const CommandId>
-bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected)
-{
-    return IsGeneratedCommandsListEqualTo<std::initializer_list<T>>(cluster, expected);
-}
+bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<const CommandId> expected);
 
 } // namespace Testing
 } // namespace chip

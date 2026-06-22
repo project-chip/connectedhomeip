@@ -17,14 +17,13 @@
 import contextlib
 import dataclasses
 import logging
+import threading
 from collections.abc import Iterator
-from multiprocessing.managers import SyncManager
+from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
 from typing import Self
 
 import coloredlogs
-
-log = logging.getLogger(__name__)
 
 LOG_LEVELS = tuple(coloredlogs.find_defined_levels().keys())
 """Possible log levels for coloredlogs."""
@@ -40,18 +39,19 @@ _FIELD_STYLES = coloredlogs.DEFAULT_FIELD_STYLES | {
 
 
 class LogMessageCounter:
-    """Cross-process cancellable counter for printed log messages."""
+    """Cross-thread or cross-process cancellable counter for printed log messages."""
 
-    USER_CANCEL_TIMEOUT_SEC = 1.0
+    _counter: int | ValueProxy
 
-    def __init__(self, mp_manager: SyncManager) -> None:
-        self._cond = mp_manager.Condition()
-        self._counter = mp_manager.Value('i', 0)
-        self._cancelled = mp_manager.Event()
-
-        # Usage counter of this counter.
-        self._users_cond = mp_manager.Condition()
-        self._users_counter = mp_manager.Value('i', 0)
+    def __init__(self, mp_manager: SyncManager | None = None) -> None:
+        if mp_manager is None:
+            self._cond = threading.Condition()
+            self._counter = 0
+            self._cancelled = threading.Event()
+        else:
+            self._cond = mp_manager.Condition()
+            self._counter = mp_manager.Value('i', 0)
+            self._cancelled = mp_manager.Event()
 
     def increment(self) -> None:
         """Atomically increment the shared message count."""
@@ -59,7 +59,10 @@ class LogMessageCounter:
             if self.cancelled:
                 return
 
-            self._counter.value += 1
+            if isinstance(self._counter, int):
+                self._counter += 1
+            else:
+                self._counter.value += 1
             self._cond.notify_all()
 
     def cancel(self) -> None:
@@ -77,34 +80,18 @@ class LogMessageCounter:
     def total(self) -> int:
         """Return total number of printed messages."""
         with self._cond:
-            return self._counter.value
+            return self._counter if isinstance(self._counter, int) else self._counter.value
 
     def wait_for_count_or_cancel(self, count: int, timeout: float | None = None) -> bool:
         """Wait until the total message count reaches at least the specified count or until cancelled."""
         with self._cond:
-            return self._cond.wait_for(lambda: self._counter.value >= count or self.cancelled, timeout=timeout)
-
-    @contextlib.contextmanager
-    def register_user(self) -> Iterator[Self]:
-        """Context manager to register a user of this counter."""
-        with self._users_cond:
-            self._users_counter.value += 1
-
-        try:
-            yield self
-        finally:
-            with self._users_cond:
-                self._users_counter.value -= 1
-                self._users_cond.notify_all()
+            return self._cond.wait_for(lambda: self.total >= count or self.cancelled, timeout=timeout)
 
     def __enter__(self) -> Self:
         return self
 
     def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
         self.cancel()
-        with self._users_cond:
-            if not self._users_cond.wait_for(lambda: self._users_counter.value == 0, timeout=self.USER_CANCEL_TIMEOUT_SEC):
-                log.warning("Log message counter still has %d users after waiting for cancellation", self._users_counter.value)
 
 
 class ProcessThreadTaskFilter(logging.Filter):
@@ -134,16 +121,6 @@ class ProcessThreadTaskFilter(logging.Filter):
             self.msg_counter.increment()
 
         return True
-
-    @contextlib.contextmanager
-    def msg_counter_ctx(self, msg_counter: LogMessageCounter) -> Iterator[Self]:
-        """Context manager to temporarily set the message counter for this filter."""
-        prev_counter = self.msg_counter
-        try:
-            self.msg_counter = msg_counter
-            yield self
-        finally:
-            self.msg_counter = prev_counter
 
 
 @dataclasses.dataclass

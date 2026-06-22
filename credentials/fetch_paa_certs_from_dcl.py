@@ -95,7 +95,7 @@ def write_cert(certificate, subject):
             der_certificate = pem_certificate.public_bytes(
                 serialization.Encoding.DER)
             outfile.write(der_certificate)
-    except (OSError, ValueError) as e:
+    except (IOError, ValueError) as e:
         print(
             f"ERROR: Failed to convert {filename + '.pem'}: {str(e)}. Skipping...")
 

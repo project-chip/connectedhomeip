@@ -16,13 +16,12 @@
  */
 #pragma once
 
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate);
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate);
 
 } // namespace app
 } // namespace chip

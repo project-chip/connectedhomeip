@@ -739,11 +739,7 @@ private:
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
-    DataModel::Provider * mDataModelProvider = nullptr;
-    // Tracks whether the provider was shut down and needs Startup() called again.
-    // We can't null mDataModelProvider on shutdown because tests and other code
-    // may still reference it between Shutdown() and the next Init().
-    bool mDataModelProviderNeedsStartup           = false;
+    DataModel::Provider * mDataModelProvider      = nullptr;
     Messaging::ExchangeContext * mCurrentExchange = nullptr;
 
     enum class State : uint8_t

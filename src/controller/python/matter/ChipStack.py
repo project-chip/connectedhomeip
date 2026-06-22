@@ -24,6 +24,7 @@
 """Chip Stack interface
 """
 
+from __future__ import absolute_import, print_function
 
 import asyncio
 import builtins
@@ -142,7 +143,7 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 
 @_singleton
-class ChipStack:
+class ChipStack(object):
     def __init__(self, persistentStorage: PersistentStorage, enableServerInteractions=True):
         builtins.enableDebugMode = False
 

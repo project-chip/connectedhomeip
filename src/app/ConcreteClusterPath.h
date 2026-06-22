@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <lib/support/Compiler.h>
 
 namespace chip {
 namespace app {
@@ -30,9 +29,8 @@ namespace app {
  */
 struct ConcreteClusterPath
 {
-    CHIP_CPP20(constexpr)
     ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
-    CHIP_CPP20(constexpr) ConcreteClusterPath() = default;
+    ConcreteClusterPath() = default;
 
     ConcreteClusterPath(const ConcreteClusterPath & aOther)             = default;
     ConcreteClusterPath & operator=(const ConcreteClusterPath & aOther) = default;

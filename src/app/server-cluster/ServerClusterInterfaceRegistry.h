@@ -16,12 +16,10 @@
  */
 #pragma once
 
-#include <app/AppConfig.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 #include <cstdint>
 #include <new>
@@ -88,16 +86,7 @@ public:
 
     void Destroy()
     {
-        if (!IsConstructed())
-        {
-            // Should not happen — Init/Shutdown are paired at the CodegenDataModelProvider level.
-#if CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
-            ChipLogError(AppServer, "Destroy() called on already-destroyed cluster — this should not happen");
-#else
-            chipDie();
-#endif
-            return;
-        }
+        VerifyOrDie(IsConstructed());
         Registration().~ServerClusterRegistration();
         memset(mRegistration, 0, sizeof(mRegistration));
 

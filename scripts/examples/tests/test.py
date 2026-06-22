@@ -19,7 +19,7 @@ import logging
 import os
 import subprocess
 import sys
-from collections.abc import Iterator
+from typing import List
 
 import coloredlogs
 
@@ -28,13 +28,13 @@ log = logging.getLogger(__name__)
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
-def build_expected_output(root: str, out: str) -> Iterator[str]:
+def build_expected_output(root: str, out: str) -> List[str]:
     with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt')) as file:
-        for line in file:
+        for line in file.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 
 
-def build_actual_output(root: str, out: str) -> Iterator[str]:
+def build_actual_output(root: str, out: str) -> List[str]:
     # Fake out that we have a project root
     binary = os.path.join(SCRIPT_ROOT, '../gn_to_cmakelists.py')
     project = os.path.join(SCRIPT_ROOT, "test_project.json")
@@ -45,7 +45,8 @@ def build_actual_output(root: str, out: str) -> Iterator[str]:
     ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
 
     with open(cmake) as f:
-        yield from f
+        for line in f.readlines():
+            yield line
 
 
 def main():

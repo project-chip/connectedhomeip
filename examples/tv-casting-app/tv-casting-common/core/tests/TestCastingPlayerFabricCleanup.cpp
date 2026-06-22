@@ -32,7 +32,6 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPMemString.h>
 
 using namespace chip;
 using namespace matter::casting::core;
@@ -56,8 +55,8 @@ TEST_F(TestCastingPlayerFabricCleanup, RemoveFabric_MethodExists)
 {
     // Create a test CastingPlayer
     CastingPlayerAttributes attrs;
-    chip::Platform::CopyString(attrs.id, "test-player-1");
-    chip::Platform::CopyString(attrs.deviceName, "Test Device");
+    strncpy(attrs.id, "test-player-1", sizeof(attrs.id) - 1);
+    strncpy(attrs.deviceName, "Test Device", sizeof(attrs.deviceName) - 1);
     attrs.nodeId      = 0x1234567890ABCDEF;
     attrs.fabricIndex = 1;
     attrs.vendorId    = 0x1234;
@@ -82,7 +81,7 @@ TEST_F(TestCastingPlayerFabricCleanup, RemoveFabric_MethodExists)
 TEST_F(TestCastingPlayerFabricCleanup, CastingPlayer_CreationWithFabricInfo)
 {
     CastingPlayerAttributes attrs;
-    chip::Platform::CopyString(attrs.id, "test-player-2");
+    strncpy(attrs.id, "test-player-2", sizeof(attrs.id) - 1);
     attrs.nodeId      = 0xABCDEF1234567890;
     attrs.fabricIndex = 5;
 
@@ -101,7 +100,7 @@ TEST_F(TestCastingPlayerFabricCleanup, CastingPlayer_CreationWithFabricInfo)
 TEST_F(TestCastingPlayerFabricCleanup, RemoveFabric_MultipleCallsSafe)
 {
     CastingPlayerAttributes attrs;
-    chip::Platform::CopyString(attrs.id, "test-player-3");
+    strncpy(attrs.id, "test-player-3", sizeof(attrs.id) - 1);
     attrs.nodeId      = 0x1111222233334444;
     attrs.fabricIndex = 2;
 
@@ -124,7 +123,7 @@ TEST_F(TestCastingPlayerFabricCleanup, RemoveFabric_MultipleCallsSafe)
 TEST_F(TestCastingPlayerFabricCleanup, RemoveFabric_WithZeroFabricIndex)
 {
     CastingPlayerAttributes attrs;
-    chip::Platform::CopyString(attrs.id, "test-player-4");
+    strncpy(attrs.id, "test-player-4", sizeof(attrs.id) - 1);
     attrs.nodeId      = 0;
     attrs.fabricIndex = 0;
 
@@ -144,7 +143,7 @@ TEST_F(TestCastingPlayerFabricCleanup, RemoveFabric_WithZeroFabricIndex)
 TEST_F(TestCastingPlayerFabricCleanup, Disconnect_MethodExists)
 {
     CastingPlayerAttributes attrs;
-    chip::Platform::CopyString(attrs.id, "test-player-5");
+    strncpy(attrs.id, "test-player-5", sizeof(attrs.id) - 1);
     attrs.nodeId      = 0x5555666677778888;
     attrs.fabricIndex = 3;
 
@@ -164,8 +163,8 @@ TEST_F(TestCastingPlayerFabricCleanup, Disconnect_MethodExists)
 TEST_F(TestCastingPlayerFabricCleanup, CastingPlayer_AttributesAccessible)
 {
     CastingPlayerAttributes attrs;
-    chip::Platform::CopyString(attrs.id, "test-player-6");
-    chip::Platform::CopyString(attrs.deviceName, "Test Device Name");
+    strncpy(attrs.id, "test-player-6", sizeof(attrs.id) - 1);
+    strncpy(attrs.deviceName, "Test Device Name", sizeof(attrs.deviceName) - 1);
     attrs.nodeId      = 0x9999AAAABBBBCCCC;
     attrs.fabricIndex = 7;
     attrs.vendorId    = 0xABCD;
@@ -195,7 +194,7 @@ TEST_F(TestCastingPlayerFabricCleanup, FabricCleanup_ExpectedPattern)
     // 4. Call completion callback with error
 
     CastingPlayerAttributes attrs;
-    chip::Platform::CopyString(attrs.id, "test-player-7");
+    strncpy(attrs.id, "test-player-7", sizeof(attrs.id) - 1);
     attrs.nodeId      = 0xDDDDEEEEFFFF0000;
     attrs.fabricIndex = 4;
 

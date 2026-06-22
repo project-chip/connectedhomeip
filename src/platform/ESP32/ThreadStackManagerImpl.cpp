@@ -35,12 +35,9 @@
 #include "esp_err.h"
 #include "esp_openthread.h"
 #include "esp_openthread_lock.h"
-#include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_vfs_eventfd.h"
-#include "lwip/netif.h"
-
-#include <lib/core/CHIPError.h>
+#include "lib/core/CHIPError.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -61,17 +58,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     _LockThreadStack();
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
     _UnlockThreadStack();
-    ReturnErrorOnFailure(err);
-#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
-    // When using LwIP for OpenThread, we should set the RendezvousNetworkInterface to prevent no route error when
-    // sending DNS Announcement message.
-    RunOnTCPIP([this]() {
-        esp_netif_t * openthread_netif = esp_openthread_get_netif();
-        chip::Inet::InterfaceId interface(netif_get_by_index(esp_netif_get_netif_impl_index(openthread_netif)));
-        GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::SetRendezvousNetworkInterface(interface);
-    });
-#endif // !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()

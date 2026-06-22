@@ -17,72 +17,91 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/FailSafeContext.h>
-#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
-#include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/ThreadBorderRouterManagement/Ids.h>
-#include <lib/support/BitFlags.h>
-#include <platform/PlatformManager.h>
+#include <app/clusters/thread-border-router-management-server/thread-br-delegate.h>
+#include <app/reporting/reporting.h>
+#include <lib/core/Optional.h>
+#include <lib/support/Span.h>
 
-namespace chip::app::Clusters {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ThreadBorderRouterManagement {
 
-class ThreadBorderRouterManagementCluster : public DefaultServerCluster,
-                                            public ThreadBorderRouterManagementDelegate::ActivateDatasetCallback,
-                                            public ThreadBorderRouterManagementDelegate::AttributeChangeCallback
+class ServerInstance : public CommandHandlerInterface,
+                       public AttributeAccessInterface,
+                       public Delegate::ActivateDatasetCallback,
+                       public Delegate::AttributeChangeCallback
 {
 public:
-    class Config
-    {
-    public:
-        Config(ThreadBorderRouterManagementDelegate & delegate, FailSafeContext & failSafeContext,
-               BreadCrumbTracker & breadcrumbTracker, DeviceLayer::PlatformManager & platformManager) :
-            mDelegate(delegate),
-            mFailSafeContext(failSafeContext), mBreadcrumbTracker(breadcrumbTracker), mPlatformManager(platformManager)
-        {}
+    using Status = Protocols::InteractionModel::Status;
+    ServerInstance(EndpointId endpointId, Delegate * delegate, FailSafeContext & failSafeContext) :
+        CommandHandlerInterface(Optional<EndpointId>(endpointId), Id),
+        AttributeAccessInterface(Optional<EndpointId>(endpointId), Id), mDelegate(delegate), mServerEndpointId(endpointId),
+        mFailsafeContext(failSafeContext)
+    {}
+    virtual ~ServerInstance() = default;
 
-    private:
-        friend class ThreadBorderRouterManagementCluster;
-        ThreadBorderRouterManagementDelegate & mDelegate;
-        FailSafeContext & mFailSafeContext;
-        BreadCrumbTracker & mBreadcrumbTracker;
-        DeviceLayer::PlatformManager & mPlatformManager;
-    };
+    CHIP_ERROR Init();
 
-    ThreadBorderRouterManagementCluster(EndpointId endpoint, const Config & config);
-    ~ThreadBorderRouterManagementCluster();
+    // CommandHanlerInterface
+    void InvokeCommand(HandlerContext & ctx) override;
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-    void ReportAttributeChanged(AttributeId attributeId) override;
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown(ClusterShutdownType reason) override;
-
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
-
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & payload,
-                                                               CommandHandler * ctx) override;
-
-    // ThreadBorderRouterManagementDelegate::ActivateDatasetCallback
+    // ActivateDatasetCallback
     void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
 
-    // Platform event handler
-    static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    // AttributeChangeCallback
+    void ReportAttributeChanged(AttributeId attributeId) override;
 
-protected:
-    ThreadBorderRouterManagementDelegate & mDelegate;
-    BitFlags<ThreadBorderRouterManagement::Feature> mFeatureMap;
-    FailSafeContext & mFailSafeContext;
-    BreadCrumbTracker & mBreadcrumbTracker;
-    DeviceLayer::PlatformManager & mPlatformManager;
-    CommandHandler::Handle mAsyncCommandHandle;
-    uint32_t mSetActiveDatasetSequenceNumber = 0;
+private:
+    // TODO: Split the business logic from the unit test class
+    friend class TestThreadBorderRouterManagementCluster;
+    // Command Handlers
+    Status HandleGetActiveDatasetRequest(HandlerContext & ctx, Thread::OperationalDataset & dataset)
+    {
+        return HandleGetDatasetRequest(ctx, Delegate::DatasetType::kActive, dataset);
+    }
+    Status HandleGetPendingDatasetRequest(HandlerContext & ctx, Thread::OperationalDataset & dataset)
+    {
+        return HandleGetDatasetRequest(ctx, Delegate::DatasetType::kPending, dataset);
+    }
+    Status HandleSetActiveDatasetRequest(HandlerContext & ctx, const Commands::SetActiveDatasetRequest::DecodableType & req);
+    Status HandleSetPendingDatasetRequest(HandlerContext & ctx, const Commands::SetPendingDatasetRequest::DecodableType & req);
+    Status HandleGetDatasetRequest(HandlerContext & ctx, Delegate::DatasetType type, Thread::OperationalDataset & dataset);
+
+    // Attribute Read handlers
+    void ReadFeatureMap(BitFlags<Feature> & feature);
+    std::optional<uint64_t> ReadActiveDatasetTimestamp();
+    std::optional<uint64_t> ReadPendingDatasetTimestamp();
+    CHIP_ERROR ReadBorderRouterName(MutableCharSpan & borderRouterName);
+    CHIP_ERROR ReadBorderAgentID(MutableByteSpan & borderAgentId);
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetSkipCASESessionCheck(bool skipCheck) { mSkipCASESessionCheck = skipCheck; }
+    bool mSkipCASESessionCheck;
+#endif
+    bool IsCommandOverCASESession(CommandHandlerInterface::HandlerContext & ctx);
+    static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    void OnFailSafeTimerExpired();
+    void CommitSavedBreadcrumb();
+
+    Delegate * mDelegate;
+    app::CommandHandler::Handle mAsyncCommandHandle;
+    ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
     Optional<uint64_t> mBreadcrumb;
+    uint32_t mSetActiveDatasetSequenceNumber = 0;
+    EndpointId mServerEndpointId;
+    FailSafeContext & mFailsafeContext;
 };
 
-} // namespace chip::app::Clusters
+} // namespace ThreadBorderRouterManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip

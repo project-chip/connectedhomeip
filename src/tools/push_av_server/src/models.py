@@ -2,20 +2,20 @@
 Data models for the Push AV Server.
 """
 
-from enum import StrEnum
-from typing import Optional
+from enum import Enum
+from typing import Dict, Optional, Tuple
 
 from pydantic import BaseModel
 
 
-class SupportedIngestInterface(StrEnum):
+class SupportedIngestInterface(str, Enum):
     """Supported ingest interfaces for media streams."""
     cmaf = "cmaf-ingest"  # Interface 1
     dash = "dash"  # Interface 2, DASH version
     hls = "hls"  # Interface 2, HLS version
 
 
-class TrackState(StrEnum):
+class TrackState(str, Enum):
     """State of a track in the upload process."""
     NOT_STARTED = "not_started"
     INITIAL_PLAYLIST_UPLOADED = "initial_playlist_uploaded"  # HLS only
@@ -49,11 +49,11 @@ class Session(BaseModel):
     # The id is the index in the stream's list.
     # Keeping a duplicated value here to have it included in API responses.
     id: int
-    uploaded_segments: list[tuple[str, str]] = []
-    uploaded_manifests: list[tuple[str, str]] = []
+    uploaded_segments: list[Tuple[str, str]] = []
+    uploaded_manifests: list[Tuple[str, str]] = []
     complete: bool = False
     # Track state management
-    tracks: dict[str, Track] = {}
+    tracks: Dict[str, Track] = {}
     # HLS-specific tracking attributes
     hls_expected_track_count: Optional[int] = None
     hls_completed_tracks: int = 0

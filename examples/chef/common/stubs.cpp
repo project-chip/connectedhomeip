@@ -1,6 +1,5 @@
 #include "DeviceTypes.h"
 #include "FakeAttributeAccess.h"
-#include "multi_column_switch_tags.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
@@ -669,12 +668,6 @@ void GenericSwitchInit()
     {
         return;
     }
-
-    if (chef::isMultiColumnSwitch())
-    {
-        return;
-    }
-
     // Rotary endpoint
     LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::BilresaRotary::kRotaryTagList)));
 
@@ -841,7 +834,6 @@ void ApplicationInit()
     WaterHeaterInit();
     ChimeInit();
     InitModeSelect();
-    chef::InitMultiColumnSwitch();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER

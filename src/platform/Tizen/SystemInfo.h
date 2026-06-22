@@ -18,7 +18,6 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/Compiler.h>
 #include <stdint.h>
 
 namespace chip {
@@ -37,7 +36,7 @@ public:
     static CHIP_ERROR GetPlatformVersion(PlatformVersion & version);
 
 private:
-    CHIP_CPP20(constinit) static SystemInfo sInstance;
+    static SystemInfo sInstance;
     uint8_t mMajor = 0;
     uint8_t mMinor = 0;
 };

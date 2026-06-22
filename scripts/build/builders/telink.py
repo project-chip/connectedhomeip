@@ -189,9 +189,8 @@ class TelinkBuilder(Builder):
                  tflm_config: bool = False,
                  chip_enable_nfc_onboarding_payload: bool = False,
                  log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
-                 all_devices_enabled_devices=None,
                  ):
-        super().__init__(root, runner, output_dir_lock)
+        super(TelinkBuilder, self).__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_ota = enable_ota
@@ -208,7 +207,6 @@ class TelinkBuilder(Builder):
         self.tflm_config = tflm_config
         self.chip_enable_nfc_onboarding_payload = chip_enable_nfc_onboarding_payload
         self.log_level = log_level
-        self.all_devices_enabled_devices = all_devices_enabled_devices or []
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -271,9 +269,6 @@ class TelinkBuilder(Builder):
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
-        if self.all_devices_enabled_devices:
-            flags.append(f"-DALL_DEVICES_ENABLED_DEVICES={shlex.quote(';'.join(self.all_devices_enabled_devices))}")
-
         if self.log_level == TelinkLogLevel.DEFAULT:
             pass
         elif self.log_level == TelinkLogLevel.ALL:
@@ -312,19 +307,12 @@ class TelinkBuilder(Builder):
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
-    def _AllDevicesOutputName(self):
-        """Return the binary base name produced by the all-devices-app build."""
-        if self.all_devices_enabled_devices:
-            return 'example-device-app'
-        return 'all-devices-app'
-
     @lock_output_dir
     def build_outputs(self):
-        app_name = self._AllDevicesOutputName() if self.app == TelinkApp.ALL_DEVICES else self.app.AppNamePrefix()
         yield BuilderOutput(
             os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
-            f'{app_name}.elf')
+            '%s.elf' % self.app.AppNamePrefix())
         if self.options.enable_link_map_file:
             yield BuilderOutput(
                 os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
-                f'{app_name}.map')
+                '%s.map' % self.app.AppNamePrefix())

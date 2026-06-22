@@ -98,10 +98,9 @@ bool VerifyAndLogIfNoEventGenerator(DataModel::EventsGenerator * eventsGenerator
     return true;
 }
 
-void EmitDSTTableEmptyEvent(DataModel::EventsGenerator * eventsGenerator, const BitFlags<TimeSynchronization::Feature> features)
+void EmitDSTTableEmptyEvent(DataModel::EventsGenerator * eventsGenerator)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
-    VerifyOrReturn(features.Has(Feature::kTimeZone));
 
     Events::DSTTableEmpty::Type event;
     eventsGenerator->GenerateEvent(event, kRootEndpointId);
@@ -110,11 +109,9 @@ void EmitDSTTableEmptyEvent(DataModel::EventsGenerator * eventsGenerator, const 
     // delegate->scheduleDSTTableEmptyEvent()
 }
 
-void EmitDSTStatusEvent(bool dstOffsetActive, DataModel::EventsGenerator * eventsGenerator,
-                        const BitFlags<TimeSynchronization::Feature> features)
+void EmitDSTStatusEvent(bool dstOffsetActive, DataModel::EventsGenerator * eventsGenerator)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
-    VerifyOrReturn(features.Has(Feature::kTimeZone));
 
     Events::DSTStatus::Type event;
     event.DSTOffsetActive = dstOffsetActive;
@@ -122,10 +119,9 @@ void EmitDSTStatusEvent(bool dstOffsetActive, DataModel::EventsGenerator * event
 }
 
 void EmitTimeZoneStatusEvent(const Span<TimeSyncDataProvider::TimeZoneStore> & timeZone,
-                             DataModel::EventsGenerator * eventsGenerator, const BitFlags<TimeSynchronization::Feature> features)
+                             DataModel::EventsGenerator * eventsGenerator)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
-    VerifyOrReturn(features.Has(Feature::kTimeZone));
 
     const auto & tzList = timeZone;
     VerifyOrReturn(tzList.size() != 0);
@@ -152,11 +148,9 @@ void EmitTimeFailureEvent(TimeSynchronization::Delegate * delegate, DataModel::E
     // https://github.com/project-chip/connectedhomeip/issues/27200
 }
 
-void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenerator,
-                                       const BitFlags<TimeSynchronization::Feature> features)
+void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenerator)
 {
     VerifyOrReturn(VerifyAndLogIfNoEventGenerator(eventsGenerator));
-    VerifyOrReturn(features.Has(Feature::kTimeSyncClient));
 
     Events::MissingTrustedTimeSource::Type event;
     eventsGenerator->GenerateEvent(event, kRootEndpointId);
@@ -371,7 +365,7 @@ CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
 
 void TimeSynchronizationCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    mTimeSyncContext.platformManager.RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+    mTimeSyncContext.platformManager.RemoveEventHandler(OnPlatformEventWrapper, 0);
     mTimeSyncContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -825,7 +819,7 @@ CHIP_ERROR TimeSynchronizationCluster::ClearDSTOffset()
 {
     InitDSTOffset();
     ReturnErrorOnFailure(mTimeSyncDataProvider.ClearDSTOffset());
-    EmitDSTTableEmptyEvent(GetEventsGenerator(), mFeatures);
+    EmitDSTTableEmptyEvent(GetEventsGenerator());
     return CHIP_NO_ERROR;
 }
 
@@ -886,7 +880,7 @@ CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(DataModel::Nullable<uint64_t
     VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
     if (TimeState::kChanged == UpdateTimeZoneState())
     {
-        EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator(), mFeatures);
+        EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator());
     }
     VerifyOrReturnError(GetTimeZone().size() != 0, CHIP_ERROR_INVALID_TIME);
     const auto & tzStore = GetTimeZone()[0];
@@ -905,7 +899,7 @@ CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(DataModel::Nullable<uint64_t
     localTime.SetNonNull((localTimeSec * kMicrosecondsPerSecond) + usRemainder);
     if (newState == TimeState::kChanged)
     {
-        EmitDSTStatusEvent(dstOffset != 0, GetEventsGenerator(), mFeatures);
+        EmitDSTStatusEvent(dstOffset != 0, GetEventsGenerator());
     }
     return CHIP_NO_ERROR;
 }
@@ -1023,10 +1017,9 @@ void TimeSynchronizationCluster::OnFabricRemoved(const FabricTable & fabricTable
     {
         DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
         TEMPORARY_RETURN_IGNORED SetTrustedTimeSource(tts);
-        EmitMissingTrustedTimeSourceEvent(GetEventsGenerator(), mFeatures);
+        EmitMissingTrustedTimeSourceEvent(GetEventsGenerator());
     }
 }
-
 std::optional<DataModel::ActionReturnStatus> TimeSynchronizationCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                        TLV::TLVReader & input_arguments,
                                                                                        CommandHandler * handler)
@@ -1152,7 +1145,7 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
     else
     {
         tts.SetNull();
-        EmitMissingTrustedTimeSourceEvent(GetEventsGenerator(), mFeatures);
+        EmitMissingTrustedTimeSourceEvent(GetEventsGenerator());
     }
 
     TEMPORARY_RETURN_IGNORED SetTrustedTimeSource(tts);
@@ -1182,7 +1175,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     if (to_underlying(mEventFlag) & to_underlying(TimeSyncEventFlag::kTimeZoneStatus))
     {
         ClearEventFlag(TimeSyncEventFlag::kTimeZoneStatus);
-        EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator(), mFeatures);
+        EmitTimeZoneStatusEvent(GetTimeZone(), GetEventsGenerator());
     }
     GetDelegate()->TimeZoneListChanged(GetTimeZone());
 
@@ -1196,7 +1189,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
         if (tz.name.HasValue() && GetDelegate()->HandleUpdateDSTOffset(tz.name.Value()))
         {
             response.DSTOffsetRequired = false;
-            EmitDSTStatusEvent(true, GetEventsGenerator(), mFeatures);
+            EmitDSTStatusEvent(true, GetEventsGenerator());
         }
     }
 
@@ -1206,7 +1199,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
         TEMPORARY_RETURN_IGNORED ClearDSTOffset();
         if (dstState == TimeState::kActive || dstState == TimeState::kChanged)
         {
-            EmitDSTStatusEvent(false, GetEventsGenerator(), mFeatures);
+            EmitDSTStatusEvent(false, GetEventsGenerator());
         }
     }
 
@@ -1238,7 +1231,7 @@ TimeSynchronizationCluster::HandleSetDSTOffset(CommandHandler * commandObj, cons
     // if DST state changes, generate DSTStatus event
     if (dstState != UpdateDSTOffsetState())
     {
-        EmitDSTStatusEvent(TimeState::kActive == UpdateDSTOffsetState(), GetEventsGenerator(), mFeatures);
+        EmitDSTStatusEvent(TimeState::kActive == UpdateDSTOffsetState(), GetEventsGenerator());
     }
 
     return Protocols::InteractionModel::Status::Success;

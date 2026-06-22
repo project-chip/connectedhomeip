@@ -470,9 +470,11 @@ bool emberAfJointFabricDatastoreClusterUpdateAdminCallback(
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     auto nodeId                                      = commandData.nodeID;
+    auto friendlyName                                = commandData.friendlyName.Value();
+    auto icac                                        = commandData.icac.Value();
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    SuccessOrExit(err = jointFabricDatastore.UpdateAdmin(nodeId, commandData.friendlyName, commandData.icac));
+    SuccessOrExit(err = jointFabricDatastore.UpdateAdmin(nodeId, friendlyName, icac));
 
 exit:
     if (err == CHIP_NO_ERROR)

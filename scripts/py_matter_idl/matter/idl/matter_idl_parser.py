@@ -16,7 +16,7 @@ import dataclasses
 import functools
 import logging
 import pprint
-from typing import Optional
+from typing import Dict, List, Optional
 
 import click
 from lark import Lark
@@ -50,7 +50,7 @@ class PrefixCppDocComment:
             return
 
         actual_pos = self.start_pos + self.value_len
-        while actual_pos < len(content) and content[actual_pos] in ' \t\n\r':
+        while content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
         # A doc comment will apply to any supported element assuming it immediately
@@ -67,7 +67,8 @@ class PrefixCppDocComment:
             yield cluster
             for attribute in cluster.attributes:
                 yield attribute.definition
-            yield from cluster.commands
+            for command in cluster.commands:
+                yield command
             for struct in cluster.structs:
                 yield struct
                 for field in struct.fields:
@@ -505,16 +506,10 @@ class MatterIdlTransformer(Transformer):
         return AddServerClusterToEndpointTransform(
             ServerClusterInstantiation(parse_meta=meta, name=cluster_id, attributes=attributes, events_emitted=events, commands=commands))
 
-    @v_args(meta=True)
-    def cluster_content(self, meta, args):
-        api_maturity, element = args[0], args[1]
+    @v_args(inline=True)
+    def cluster_content(self, api_maturity, element):
         if api_maturity is not None:
             element.api_maturity = api_maturity
-        if not self.skip_meta:
-            if isinstance(element, Attribute):
-                element.definition.parse_meta = ParseMetaData(meta)
-            elif hasattr(element, 'parse_meta'):
-                element.parse_meta = ParseMetaData(meta)
         return element
 
     @v_args(inline=True, meta=True)
@@ -584,7 +579,7 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
-def _referenced_type_names(cluster: Cluster) -> list[str]:
+def _referenced_type_names(cluster: Cluster) -> List[str]:
     """
     Return the ORDERED and UNIQUE names of all data types referenced by the given cluster.
     """
@@ -714,7 +709,7 @@ class ParserWithLines:
         #
         # A zap PR to allow us to not need this is:
         #    https://github.com/project-chip/zap/pull/1216
-        clusters: dict[int, Cluster] = {}
+        clusters: Dict[int, Cluster] = {}
         for c in idl.clusters:
             if c.code in clusters:
                 if c != clusters[c.code]:

@@ -16,7 +16,7 @@ WORKDIR /opt
 # are generally not required for compilation
 # Executables are also removed as those confuse cmake. It tries to run `make` from the sysroot and fails.
 RUN set -x \
-  && SYSROOT_VERSION="build-2026.05.14" \
+  && SYSROOT_VERSION="build-2026.05.07" \
   && git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools \
   # TODO: Remove experimental solution to create the sysroot file in cross-compile image
   && echo "experimental/matter/sysroot/ubuntu-24.04-aarch64 version:${SYSROOT_VERSION}" > ensure_file.txt \

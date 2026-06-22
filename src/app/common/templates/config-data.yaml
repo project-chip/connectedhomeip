@@ -36,7 +36,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
-    - Proximity Ranging
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
@@ -134,7 +133,6 @@ CodeDrivenClusters:
     - Groupcast
     - Groups
     - HEPA Filter Monitoring
-    - Humidistat
     - ICD Management
     - Identify
     - Illuminance Measurement
@@ -147,7 +145,6 @@ CodeDrivenClusters:
     - Operational Credentials
     - Power Topology
     - Pressure Measurement
-    - Proximity Ranging
     - Push AV Stream Transport
     - Relative Humidity Measurement
     - Scenes Management
@@ -157,7 +154,6 @@ CodeDrivenClusters:
     - TLS Client Management
     - Temperature Control
     - Temperature Measurement
-    - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization

@@ -48,9 +48,9 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kAmbientContextDetected      = 0,
-    kObjectCountThresholdReached = 1,
-    kObjectCount                 = 2,
+    kAmbientContextDetected = 0,
+    kObjectCountReached     = 1,
+    kObjectCount            = 2,
 };
 
 struct Type
@@ -62,7 +62,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     Optional<Structs::AmbientContextTypeStruct::Type> ambientContextDetected;
-    Optional<bool> objectCountThresholdReached;
+    Optional<bool> objectCountReached;
     Optional<uint16_t> objectCount;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -76,7 +76,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
 
     Optional<Structs::AmbientContextTypeStruct::DecodableType> ambientContextDetected;
-    Optional<bool> objectCountThresholdReached;
+    Optional<bool> objectCountReached;
     Optional<uint16_t> objectCount;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -87,8 +87,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kEventStartTimePos = 0,
-    kEventStartTimeSys = 1,
+    kEventStartTime = 0,
 };
 
 struct Type
@@ -99,8 +98,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Optional<uint64_t> eventStartTimePos;
-    Optional<uint64_t> eventStartTimeSys;
+    uint64_t eventStartTime = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -112,8 +110,7 @@ public:
     static constexpr EventId GetEventId() { return Events::AmbientContextDetectEnded::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
 
-    Optional<uint64_t> eventStartTimePos;
-    Optional<uint64_t> eventStartTimeSys;
+    uint64_t eventStartTime = static_cast<uint64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

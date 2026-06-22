@@ -1,15 +1,14 @@
 #include "GroupcastCluster.h"
 #include <access/AccessControl.h>
-#include <app/EventManagement.h>
-#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/AccessControl/Events.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/Attributes.h>
-#include <clusters/Groupcast/Events.h>
 #include <clusters/Groupcast/Metadata.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <transport/raw/GroupcastTesting.h>
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -68,41 +67,16 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     SetDataModelProvider(context.provider);
     UpdateUsedMcastAddrCount();
 
-    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
-    {
-        mGroupcastContext.testing.SetDelegate(this);
-    }
-
     return CHIP_NO_ERROR;
 }
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
-    {
-        mGroupcastContext.testing.SetDelegate(nullptr);
-    }
-
     mGroupcastTestingTimer.Cancel();
     mMembershipChangedTimer.Cancel();
     mGroupcastContext.groupDataProvider.RemoveListener(this);
     ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
-}
-
-void GroupcastCluster::FlushGroupcastTestingEvent()
-{
-    VerifyOrReturn(mGroupcastContext.testing.IsEnabled());
-
-    Clusters::Groupcast::Events::GroupcastTesting::Type event;
-
-    // Convert to event type
-    mGroupcastContext.testing.ToEventType(event);
-
-    // Generate event on Root Endpoint (Endpoint 0)
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
-    mContext->interactionContext.eventsGenerator.ScheduleUrgentEventDeliverySync();
-    mGroupcastContext.testing.Clear();
 }
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -123,7 +97,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::UsedMcastAddrCount::Id:
         return ReadUsedMcastAddrCount(request.path.mEndpointId, encoder);
     case Groupcast::Attributes::FabricUnderTest::Id:
-        return encoder.Encode(mGroupcastContext.testing.GetFabricIndex());
+        return encoder.Encode(chip::Groupcast::GetTesting().GetFabricIndex());
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
@@ -207,7 +181,7 @@ CHIP_ERROR GroupcastCluster::GeneratedCommands(const ConcreteClusterPath & path,
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
-    FabricIndex fabricUnderTest = mGroupcastContext.testing.GetFabricIndex();
+    FabricIndex fabricUnderTest = chip::Groupcast::GetTesting().GetFabricIndex();
     VerifyOrReturnError(fabricUnderTest == kUndefinedFabricIndex || fabricUnderTest == fabricIndex, Status::ConstraintError);
 
     if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
@@ -239,13 +213,14 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 
 void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
 {
-    if (fabricUnderTest != mGroupcastContext.testing.GetFabricIndex())
+    auto & testing = chip::Groupcast::GetTesting();
+    if (fabricUnderTest != testing.GetFabricIndex())
     {
-        mGroupcastContext.testing.Clear();
-        mGroupcastContext.testing.SetFabricIndex(fabricUnderTest);
+        testing.Clear();
+        testing.SetFabricIndex(fabricUnderTest);
         NotifyAttributeChanged(Groupcast::Attributes::FabricUnderTest::Id);
     }
-    mGroupcastContext.testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
+    testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
 }
 
 // MembershipChangedTimer implementation
@@ -530,7 +505,7 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
+        EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
 
     return Status::Success;
@@ -622,7 +597,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::Config
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
+        EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
 
     return Status::Success;
@@ -739,7 +714,7 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
     }
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
+        EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
 
     return Status::Success;
@@ -835,6 +810,24 @@ void GroupcastCluster::NotifyUsedMcastAddrCountOnChange()
     {
         NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
     }
+}
+
+void GroupcastCluster::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor)
+{
+    VerifyOrReturn(mContext != nullptr);
+
+    AccessControl::Events::AuxiliaryAccessUpdated::Type event;
+    event.fabricIndex = subjectDescriptor.fabricIndex;
+    if (subjectDescriptor.subject != kUndefinedNodeId)
+    {
+        event.adminNodeID.SetNonNull(subjectDescriptor.subject);
+    }
+    else
+    {
+        event.adminNodeID.SetNull();
+    }
+
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace Clusters

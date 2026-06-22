@@ -365,10 +365,6 @@ if (CONFIG_CHIP_ENABLE_GROUPCAST)
 chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
 endif()
 
-if (CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
-chip_gn_arg_bool("chip_device_config_enable_thread_meshcop" CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
-endif()
-
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
@@ -509,10 +505,8 @@ if (CONFIG_ENABLE_DELTA_OTA)
     list(APPEND matter_requires espressif__esp_delta_ota)
 endif()
 
-if(NOT TARGET matterlib)
-    add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
-                         REQUIRES ${matter_requires})
-endif()
+add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
+                     REQUIRES ${matter_requires})
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}

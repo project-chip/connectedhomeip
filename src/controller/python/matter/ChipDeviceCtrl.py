@@ -26,7 +26,7 @@
 """
 
 # Needed to use types in type hints before they are fully defined.
-from __future__ import annotations
+from __future__ import absolute_import, annotations, print_function
 
 import asyncio
 import builtins
@@ -63,22 +63,23 @@ __all__ = ["ChipDeviceController", "CommissioningParameters",
 # Type aliases for ReadAttribute method to improve type safety
 AttributeReadRequest = typing.Union[
     None,  # Empty tuple, all wildcard
-    tuple[int],  # Endpoint
+    typing.Tuple[int],  # Endpoint
     # Wildcard endpoint, Cluster id present
-    tuple[type[ClusterObjects.Cluster]],
+    typing.Tuple[typing.Type[ClusterObjects.Cluster]],
     # Wildcard endpoint, Cluster + Attribute present
-    tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
-    tuple[int, type[ClusterObjects.Cluster]],  # Wildcard attribute id
+    typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+    typing.Tuple[int, typing.Type[ClusterObjects.Cluster]
+                 ],  # Wildcard attribute id
     # Concrete path
-    tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
+    typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
     ClusterAttribute.TypedAttributePath  # Directly specified attribute path
 ]
 
-AttributeReadRequestList = typing.Optional[list[AttributeReadRequest]]
+AttributeReadRequestList = typing.Optional[typing.List[AttributeReadRequest]]
 
 # Type alias for subscription target specifications
-SubscriptionTargetList = list[tuple[int,
-                                    typing.Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
+SubscriptionTargetList = typing.List[typing.Tuple[int,
+                                                  typing.Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
 
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
@@ -230,7 +231,7 @@ class ScopedNodeId(Structure):
 _OnCheckInCompleteFunct = CFUNCTYPE(None, ScopedNodeId)
 
 _OnCheckInCompleteWaitListLock = threading.Lock()
-_OnCheckInCompleteWaitList: dict[ScopedNodeId, set] = {}
+_OnCheckInCompleteWaitList: typing.Dict[ScopedNodeId, set] = {}
 
 
 @_OnCheckInCompleteFunct
@@ -350,7 +351,7 @@ class CommissioningContext(CallbackContext):
 
 
 class CommissionableNode(discovery.CommissionableNode):
-    def SetDeviceController(self, devCtrl: ChipDeviceController):
+    def SetDeviceController(self, devCtrl: 'ChipDeviceController'):
         self._devCtrl = devCtrl
 
     def Commission(self, nodeId: int, setupPinCode: int) -> int:
@@ -376,7 +377,7 @@ class CommissionableNode(discovery.CommissionableNode):
                 yield k, self.__dict__[k]
 
 
-class DeviceProxyWrapper:
+class DeviceProxyWrapper():
     ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
         freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
         if this is copied around that a double free will occur, but how this is used today
@@ -496,8 +497,8 @@ DiscoveryFilterType: typing.TypeAlias = discovery.FilterType
 DiscoveryType: typing.TypeAlias = discovery.DiscoveryType
 
 
-class ChipDeviceControllerBase:
-    activeList: set = set()
+class ChipDeviceControllerBase():
+    activeList: typing.Set = set()
 
     def __init__(self, name: str = ''):
         self.devCtrl = None
@@ -1193,27 +1194,10 @@ class ChipDeviceControllerBase:
         # Intentionally return None instead of raising exceptions on error
         return (address.value.decode(), port.value) if error == 0 else None
 
-    def GetLastThreadMeshcopDiscoveryDiagnostic(self) -> dict[str, typing.Any]:
-        '''
-        Get diagnostic data captured during the most recent Thread MeshCoP discovery.
-
-        Returns:
-            dict: Parsed JSON diagnostic data from the native Thread MeshCoP proxy.
-        '''
-        self.CheckIsActive()
-
-        diagnostic = create_string_buffer(2048)
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(
-                self.devCtrl, diagnostic, len(diagnostic))
-        ).raise_on_error()
-
-        return json.loads(diagnostic.value.decode())
-
     async def DiscoverCommissionableNodes(self,
                                             filterType: discovery.FilterType = discovery.FilterType.NONE,
                                             filter: typing.Any = None,  # noqa: A002
-                                            stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, list[CommissionableNode]]:
+                                            stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
         '''
         Discover commissionable nodes via DNS-SD with specified filters.
         Supported filters are:
@@ -1534,7 +1518,7 @@ class ChipDeviceControllerBase:
                 LOGGER.info('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        class DeviceAvailableClosure:
+        class DeviceAvailableClosure():
             def deviceAvailable(self, device, err):
                 nonlocal returnDevice
                 nonlocal returnErr
@@ -1608,7 +1592,7 @@ class ChipDeviceControllerBase:
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        class DeviceAvailableClosure:
+        class DeviceAvailableClosure():
             def __init__(self, loop, future: asyncio.Future):
                 self._returnDevice = c_void_p(None)
                 self._returnErr = None
@@ -1695,11 +1679,11 @@ class ChipDeviceControllerBase:
             specificationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
             maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
 
-    async def TestOnlySendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
+    async def TestOnlySendBatchCommands(self, nodeId: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
                                         timedRequestTimeoutMs: typing.Optional[int] = None,
                                         interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                                         suppressResponse: typing.Optional[bool] = None, remoteMaxPathsPerInvoke: typing.Optional[int] = None,
-                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: typing.Optional[list[int]] = None):
+                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: typing.Optional[typing.List[int]] = None):
         '''
         Please see SendBatchCommands for description.
         TestOnly overridable arguments:
@@ -1752,11 +1736,11 @@ class ChipDeviceControllerBase:
 
     def _prepare_write_attribute_requests(
         self,
-        attributes: list[typing.Union[
-            tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-            tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+        attributes: typing.List[typing.Union[
+            typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+            typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
         ]]
-    ) -> list[ClusterAttribute.AttributeWriteRequest]:
+    ) -> typing.List[ClusterAttribute.AttributeWriteRequest]:
         """Helper method to prepare attribute write requests."""
         attrs = []
         for v in attributes:
@@ -1777,11 +1761,11 @@ class ChipDeviceControllerBase:
         return attrs
 
     async def TestOnlyWriteAttributeWithMismatchedTimedRequestField(self, nodeid: int,
-                                                                    attributes: list[typing.Union[
-                                                                        tuple[int,
+                                                                    attributes: typing.List[typing.Union[
+                                                                        typing.Tuple[int,
                                                                                      ClusterObjects.ClusterAttributeDescriptor],
-                                                                        tuple[int,
-                                                                              ClusterObjects.ClusterAttributeDescriptor, int]
+                                                                        typing.Tuple[int,
+                                                                                     ClusterObjects.ClusterAttributeDescriptor, int]
                                                                     ]],
                                                                     timedRequestTimeoutMs: int,
                                                                     timedRequestFieldValue: bool,
@@ -1859,7 +1843,7 @@ class ChipDeviceControllerBase:
         res.raise_on_error()
         return await future
 
-    async def SendBatchCommands(self, nodeId: int, commands: list[ClusterCommand.InvokeRequestInfo],
+    async def SendBatchCommands(self, nodeId: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
                                 timedRequestTimeoutMs: typing.Optional[int] = None,
                                 interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                                 suppressResponse: typing.Optional[bool] = None,
@@ -1921,9 +1905,9 @@ class ChipDeviceControllerBase:
         return
 
     async def WriteAttribute(self, nodeId: int,
-                             attributes: list[typing.Union[
-                                 tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-                                 tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                             attributes: typing.List[typing.Union[
+                                 typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                 typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
                              ]],
                              timedRequestTimeoutMs: typing.Optional[int] = None,
                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -1956,9 +1940,9 @@ class ChipDeviceControllerBase:
                                           forceLegacyListEncoding=False)
 
     async def _WriteAttribute(self, nodeId: int,
-                              attributes: list[typing.Union[
-                                  tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-                                  tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                              attributes: typing.List[typing.Union[
+                                  typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                  typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
                               ]],
                               timedRequestTimeoutMs: typing.Optional[int] = None,
                               interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -1979,9 +1963,9 @@ class ChipDeviceControllerBase:
         return await future
 
     async def TestOnlyWriteAttributeWithLegacyList(self, nodeId: int,
-                                                   attributes: list[typing.Union[
-                                                       tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-                                                       tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                                                   attributes: typing.List[typing.Union[
+                                                       typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                                       typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
                                                    ]],
                                                    timedRequestTimeoutMs: typing.Optional[int] = None,
                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -2009,7 +1993,7 @@ class ChipDeviceControllerBase:
                                           forceLegacyListEncoding=True)
 
     def WriteGroupAttribute(
-            self, groupid: int, attributes: list[tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Optional[int] = None):
+            self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Optional[int] = None):
         '''
         Write a list of attributes on a target group.
 
@@ -2095,15 +2079,15 @@ class ChipDeviceControllerBase:
     # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
-        tuple[int],  # Endpoint
+        typing.Tuple[int],  # Endpoint
         # Wildcard endpoint, Cluster id present
-        tuple[type[ClusterObjects.Cluster]],
+        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
         # Wildcard endpoint, Cluster + Attribute present
-        tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
+        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
         # Wildcard attribute id
-        tuple[int, type[ClusterObjects.Cluster]],
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
         # Directly specified attribute path
         ClusterAttribute.AttributePath
     ]):
@@ -2133,7 +2117,7 @@ class ChipDeviceControllerBase:
             )
         raise ValueError("Unsupported Attribute Path")
 
-    def _parseDataVersionFilterTuple(self, pathTuple: list[tuple[int, type[ClusterObjects.Cluster], int]]):
+    def _parseDataVersionFilterTuple(self, pathTuple: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]):
         endpoint = None
         cluster = None
 
@@ -2153,17 +2137,17 @@ class ChipDeviceControllerBase:
 
     def _parseEventPathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
-        tuple[str, int],  # all wildcard with urgency set
-        tuple[int, int],  # Endpoint,
+        typing.Tuple[str, int],  # all wildcard with urgency set
+        typing.Tuple[int, int],  # Endpoint,
         # Wildcard endpoint, Cluster id present
-        tuple[type[ClusterObjects.Cluster], int],
+        typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
         # Wildcard endpoint, Cluster + Event present
-        tuple[type[ClusterObjects.ClusterEvent], int],
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
         # Wildcard event id
-        tuple[int, type[ClusterObjects.Cluster], int],
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
         # Concrete path
-        tuple[int,
-              type[ClusterObjects.ClusterEvent], int]
+        typing.Tuple[int,
+                     typing.Type[ClusterObjects.ClusterEvent], int]
     ]):
         if pathTuple in [('*'), ()]:
             # Wildcard
@@ -2202,36 +2186,36 @@ class ChipDeviceControllerBase:
     async def Read(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[typing.Union[
+        attributes: typing.Optional[typing.List[typing.Union[
             None,  # Empty tuple, all wildcard
-            tuple[int],  # Endpoint
+            typing.Tuple[int],  # Endpoint
             # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster]],
+            typing.Tuple[typing.Type[ClusterObjects.Cluster]],
             # Wildcard endpoint, Cluster + Attribute present
-            tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
+            typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
             # Wildcard attribute id
-            tuple[int, type[ClusterObjects.Cluster]],
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
             # Concrete path
-            tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
             # Directly specified attribute path
             ClusterAttribute.AttributePath
         ]]] = None,
-        dataVersionFilters: typing.Optional[list[tuple[int, type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[list[
+        dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[typing.List[
             typing.Union[
             None,  # Empty tuple, all wildcard
-            tuple[str, int],  # all wildcard with urgency set
-            tuple[int, int],  # Endpoint,
+            typing.Tuple[str, int],  # all wildcard with urgency set
+            typing.Tuple[int, int],  # Endpoint,
             # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster], int],
+            typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
             # Wildcard endpoint, Cluster + Event present
-            tuple[type[ClusterObjects.ClusterEvent], int],
+            typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
             # Wildcard event id
-            tuple[int, type[ClusterObjects.Cluster], int],
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
             # Concrete path
-            tuple[int, type[ClusterObjects.ClusterEvent], int]
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
             ]]] = None,
         eventNumberFilter: typing.Optional[int] = None,
-        returnClusterObject: bool = False, reportInterval: typing.Optional[tuple[int, int]] = None,
+        returnClusterObject: bool = False, reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
         payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
     ):
@@ -2328,22 +2312,22 @@ class ChipDeviceControllerBase:
     async def ReadAttribute(
         self,
         nodeId: int,
-        attributes: typing.Optional[list[typing.Union[
+        attributes: typing.Optional[typing.List[typing.Union[
             None,  # Empty tuple, all wildcard
-            tuple[int],  # Endpoint
+            typing.Tuple[int],  # Endpoint
             # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster]],
+            typing.Tuple[typing.Type[ClusterObjects.Cluster]],
             # Wildcard endpoint, Cluster + Attribute present
-            tuple[type[ClusterObjects.ClusterAttributeDescriptor]],
+            typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
             # Wildcard attribute id
-            tuple[int, type[ClusterObjects.Cluster]],
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
             # Concrete path
-            tuple[int, type[ClusterObjects.ClusterAttributeDescriptor]],
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
             # Directly specified attribute path
             ClusterAttribute.AttributePath
-        ]]], dataVersionFilters: typing.Optional[list[tuple[int, type[ClusterObjects.Cluster], int]]] = None,
+        ]]], dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None,
         returnClusterObject: bool = False,
-        reportInterval: typing.Optional[tuple[int, int]] = None,
+        reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
         payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
     ):
@@ -2417,21 +2401,21 @@ class ChipDeviceControllerBase:
     async def ReadEvent(
         self,
         nodeId: int,
-        events: list[typing.Union[
+        events: typing.List[typing.Union[
             None,  # Empty tuple, all wildcard
-            tuple[str, int],  # all wildcard with urgency set
-            tuple[int, int],  # Endpoint,
+            typing.Tuple[str, int],  # all wildcard with urgency set
+            typing.Tuple[int, int],  # Endpoint,
             # Wildcard endpoint, Cluster id present
-            tuple[type[ClusterObjects.Cluster], int],
+            typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
             # Wildcard endpoint, Cluster + Event present
-            tuple[type[ClusterObjects.ClusterEvent], int],
+            typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
             # Wildcard event id
-            tuple[int, type[ClusterObjects.Cluster], int],
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
             # Concrete path
-            tuple[int, type[ClusterObjects.ClusterEvent], int]
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
         ]], eventNumberFilter: typing.Optional[int] = None,
         fabricFiltered: bool = True,
-        reportInterval: typing.Optional[tuple[int, int]] = None,
+        reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
         keepSubscriptions: bool = False,
         autoResubscribe: bool = True,
         payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
@@ -2713,10 +2697,6 @@ class ChipDeviceControllerBase:
                 c_void_p, c_char_p, c_uint16, c_char_p, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.argtypes = [
-                c_void_p, c_char_p, c_uint32]
-            self._dmLib.pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson.restype = PyChipError
-
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.restype = PyChipError
@@ -2959,7 +2939,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
                  nodeId: int,
                  adminVendorId: int,
                  fabricAdmin: FabricAdmin.FabricAdmin,
-                 catTags: list[int] = [],
+                 catTags: typing.List[int] = [],
                  paaTrustStorePath: str = "",
                  useTestCommissioner: bool = False,
                  name: str = '',

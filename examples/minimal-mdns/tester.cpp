@@ -20,7 +20,6 @@
 #include <memory>
 
 #include <TracingCommandLineArgument.h>
-#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/MinimalMdnsServer.h>

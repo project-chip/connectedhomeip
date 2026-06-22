@@ -472,7 +472,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 
     if (timeout == System::Clock::kZero)
     {
-        ReturnErrorOnFailure(mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
+        mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
     else
     {

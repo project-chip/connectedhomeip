@@ -37,21 +37,21 @@ public:
     virtual ~ClosureControlClusterDelegate() = default;
 
     /**
-     * @brief This function handles Stop command implementation.
+     * @brief This function handles Stop command implementaion.
      *
-     * @return Success when closure successfully handles stop.
+     * @return Success when closure succesfully handles stop.
      *         Error when stop fails.
      */
     virtual Protocols::InteractionModel::Status HandleStopCommand() = 0;
 
     /**
-     * @brief This function handles MoveTo command implementation.
+     * @brief This function handles MoveTo command implementaion.
      *
      * @param [in] position Target position to be set
      * @param [in] latch Target Latch to be set
      * @param [in] speed Target speed to be set
      *
-     * @return Success when closure successfully handles motion.
+     * @return Success when closure succesfully handles motion.
      *         Error when motion fails.
      */
     virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & position,
@@ -59,9 +59,9 @@ public:
                                                                     const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**
-     * @brief This function handles Calibrate command implementation.
+     * @brief This function handles Calibrate command implementaion.
      *
-     * @return Success when closure successfully handles calibration.
+     * @return Success when closure succesfully handles calibration.
      *         Error when calibration fails.
      */
     virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;

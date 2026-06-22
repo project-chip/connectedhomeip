@@ -309,7 +309,8 @@ class TypeLookupContext:
         include a cluster, the enum list will be empty.
         """
         if self.cluster:
-            yield from self.cluster.enums
+            for e in self.cluster.enums:
+                yield e
 
     @property
     def all_bitmaps(self):
@@ -320,7 +321,8 @@ class TypeLookupContext:
         include a cluster, the bitmap list will be empty.
         """
         if self.cluster:
-            yield from self.cluster.bitmaps
+            for b in self.cluster.bitmaps:
+                yield b
 
     @property
     def all_structs(self):
@@ -330,7 +332,8 @@ class TypeLookupContext:
         include a cluster, the struct list will be empty.
         """
         if self.cluster:
-            yield from self.cluster.structs
+            for e in self.cluster.structs:
+                yield e
 
     def is_enum_type(self, name: str):
         """

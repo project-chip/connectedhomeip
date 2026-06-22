@@ -15,13 +15,13 @@
 import http.server
 import json
 import urllib.parse
-from typing import Optional
+from typing import List, Optional, Type
 
 from route_configuration import Configuration, Route
 from router import match_route
 
 
-def createMockServerHandler(config: Configuration) -> type[http.server.BaseHTTPRequestHandler]:
+def createMockServerHandler(config: Configuration) -> Type[http.server.BaseHTTPRequestHandler]:
     """
     Creates a custom HTTP request handler class configured with predefined routes and responses.
 
@@ -93,7 +93,7 @@ def createMockServerHandler(config: Configuration) -> type[http.server.BaseHTTPR
             query_params: dict[str, list[str]] = urllib.parse.parse_qs(parsed_path.query)
 
             # Find the matching route from the configuration
-            routes: list[Route] = config.routing
+            routes: List[Route] = config.routing
             route: Optional[Route] = match_route(routes, self.command, path, query_params)
 
             if not route:

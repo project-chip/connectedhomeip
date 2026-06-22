@@ -122,7 +122,7 @@ CHIP_ERROR PairingCommand::RunCommand()
                      ChipLogValueX64(anchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
-    else if (!mRegularDevice.ValueOr(false))
+    else
     {
         // Skip commissioning complete for JCM and other device commissioning methods but not Anchor Administrator commissioning.
         mSkipCommissioningComplete = MakeOptional(true);
@@ -683,11 +683,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        if (mRegularDevice.ValueOr(false))
-        {
-            ChipLogProgress(JointFabric, "Device (nodeId=%ld) commissioned with success", nodeId);
-        }
-        else if (!mSkipCommissioningComplete.ValueOr(false))
+        if (!mSkipCommissioningComplete.ValueOr(false))
         {
             ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
             TEMPORARY_RETURN_IGNORED SetAnchorNodeId(nodeId);

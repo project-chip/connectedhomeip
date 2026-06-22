@@ -22,16 +22,19 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
-namespace chip::app::Clusters {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ThreadBorderRouterManagement {
 
-class ThreadBorderRouterManagementDelegate
+constexpr size_t kBorderRouterNameMaxLength = 63;
+constexpr size_t kBorderAgentIdLength       = 16;
+
+class Delegate
 {
 public:
-    static constexpr size_t kBorderRouterNameMaxLength = 63;
-    static constexpr size_t kBorderAgentIdLength       = 16;
-
-    ThreadBorderRouterManagementDelegate()          = default;
-    virtual ~ThreadBorderRouterManagementDelegate() = default;
+    Delegate()          = default;
+    virtual ~Delegate() = default;
 
     class ActivateDatasetCallback
     {
@@ -106,4 +109,7 @@ public:
     virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;
 };
 
-} // namespace chip::app::Clusters
+} // namespace ThreadBorderRouterManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -19,20 +19,16 @@
 
 #include <app_config/enabled_devices.h>
 #include <devices/Types.h>
-#include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
-#include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <map>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -56,7 +52,6 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
-        PersistentStorageDelegate & storageDelegate;
     };
 
     static DeviceFactory & GetInstance()
@@ -113,28 +108,6 @@ private:
         // NOTE: context is set in `::Init`, so each lambda checks its
         //       existence separately. `Init` must be called before mRegistry
         //       factories are usable.
-        if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
-        {
-            RegisterCreator("air-quality-sensor", [this]() {
-                VerifyOrDie(mContext.has_value());
-                using namespace Clusters::ConcentrationMeasurement;
-                return std::make_unique<AirQualitySensorDevice>(
-                    mContext->timerDelegate,
-                    AirQualitySensorDevice::Config{
-                        .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(
-                            Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
-                            Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor),
-                        .co2Config =
-                            ConcentrationMeasurementCluster::Config{
-                                .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
-                                .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
-                                .medium    = MeasurementMediumEnum::kAir,
-                                .unit      = MeasurementUnitEnum::kPpm,
-                            },
-                    });
-            });
-        }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
             RegisterCreator("contact-sensor", [this]() {
@@ -177,13 +150,6 @@ private:
                 });
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
-        {
-            RegisterCreator("network-infrastructure-manager", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return std::make_unique<NetworkInfrastructureManagerDevice>(mContext->storageDelegate);
-            });
-        }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
         {
             RegisterCreator("on-off-light", [this]() {
@@ -210,15 +176,6 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); });
-        }
-
-        if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
-        {
-            RegisterCreator("proximity-ranger", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
-                                                               Span<Clusters::ProximityRanging::RangingAdapter * const>());
-            });
         }
 
         // at least one device type MUST be enabled

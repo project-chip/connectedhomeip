@@ -752,6 +752,7 @@ void BLEManagerImpl::HandleWriteEvent(volatile sl_bt_msg_t * evt)
 {
     uint16_t attribute = evt->data.evt_gatt_server_user_write_request.characteristic;
     bool do_provision  = chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().IsProvisionRequired();
+    ChipLogDetail(DeviceLayer, "Char Write Req, char : %d", attribute);
 
     if (gattdb_CHIPoBLEChar_Rx == attribute)
     {

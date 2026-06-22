@@ -24,10 +24,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/server/Server.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-#include <CommissionerMain.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
 #include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -200,23 +196,6 @@ void JFAManager::HandleCommissioningCompleteEvent()
                 newAdmin.icac         = ByteSpan(mICACBuffer, mICACBufferLen);
 
                 LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddAdmin(newAdmin));
-
-                if (!mCommissionerInitialized)
-                {
-                    CHIP_ERROR err = InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
-                                                      LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort, fb.GetFabricId(),
-                                                      fabricIndex);
-                    if (err == CHIP_NO_ERROR)
-                    {
-                        mCommissionerInitialized = true;
-                        ChipLogProgress(JointFabric, "Commissioner mode initialized on commissioned fabric index %u",
-                                        static_cast<unsigned>(fabricIndex));
-                    }
-                    else
-                    {
-                        ChipLogError(JointFabric, "Failed to initialize commissioner mode: %" CHIP_ERROR_FORMAT, err.Format());
-                    }
-                }
 
                 ChipLogProgress(JointFabric, "Joint Fabric Administrator commissioned on fabric index %d", fabricIndex);
             }

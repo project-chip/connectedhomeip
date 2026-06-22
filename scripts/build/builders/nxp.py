@@ -186,7 +186,7 @@ class NxpBuilder(GnBuilder):
                  se05x_enable: bool = False,
                  log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
                  ):
-        super().__init__(
+        super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env, build_system),
             runner=runner,
             output_dir_lock=output_dir_lock)

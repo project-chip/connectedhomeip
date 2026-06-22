@@ -25,6 +25,7 @@
 #include <Globals.h>
 #include <LEDWidget.h>
 
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
@@ -106,6 +107,12 @@ static void InitServer(intptr_t context)
     static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
     VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
+#endif
+
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    initParams.groupDataProvider->SetGroupcastEnabled(true);
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate sGroupAuxAccessDelegate(initParams.groupDataProvider);
+    initParams.groupAuxiliaryAccessControlDelegate = &sGroupAuxAccessDelegate;
 #endif
 
     static AmebaObserver sAmebaObserver;
