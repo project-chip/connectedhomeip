@@ -342,7 +342,7 @@ class TC_SC_5_2(MatterBaseTest):
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
                                  "GroupcastTesting event should report Success")
 
-            # Step 16c: Send the same group command destined for Group 0x0101 (encrypted using the same KeySet 0x01a3)
+            # Step 16c: Send the same group command destined for Group 0x0101 (encrypted using KeySet 0x01a4, which has the same key material)
             self.step("16c")
             dev_ctrl.SendGroupCommand(0x0101, operate_only_command.command_object())
             await asyncio.sleep(3)
