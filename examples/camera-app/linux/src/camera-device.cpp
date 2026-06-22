@@ -340,7 +340,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     gst_caps_unref(caps);
 
     // Configure appsink
-    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, nullptr);
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
 
     // Add elements to the pipeline
     gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, appsink, nullptr);
@@ -404,7 +404,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     g_object_set(jpegenc, "quality", config.quality, nullptr);
 
     // Configure appsink
-    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, nullptr);
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
 
     // Add and link elements
     gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
@@ -463,7 +463,7 @@ GstElement * CreateSnapshotPipelineTestVideosrc(const SnapshotPipelineConfig & c
     g_object_set(jpegenc, "quality", config.quality, nullptr);
 
     // Configure appsink
-    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, nullptr);
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
 
     // Add and link elements
     gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
@@ -1428,9 +1428,9 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
                     {
                         ChipLogError(Camera, "Debug info: %s", debug_info);
                     }
+                    g_error_free(err);
+                    g_free(debug_info);
                 }
-                g_error_free(err);
-                g_free(debug_info);
                 gst_message_unref(msg);
             }
             gst_object_unref(bus);
