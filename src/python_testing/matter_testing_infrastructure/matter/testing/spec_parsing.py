@@ -36,6 +36,7 @@ import matter.testing.conformance as conformance_support
 from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
                                         ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                         parse_callable_from_xml)
+from matter.testing.data_model_errata import apply_errata, load_authoritative_errata
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
@@ -47,7 +48,7 @@ LOGGER = logging.getLogger(__name__)
 # Type alias maintained for constants access; actual values are ints at runtime
 ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
-_PRIVILEGE_STR = {
+_PRIVILEGE_STR: dict[Optional[int], str] = {
     None: "N/A",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kView: "V",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate: "O",
@@ -182,6 +183,9 @@ class XmlAttribute:
     read_access: int
     write_access: int
     write_optional: bool
+    # Quality flags from the spec XML <quality> element
+    changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
+    quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
     constraints: Optional[Constraints] = None
 
     def access_string(self):
@@ -648,6 +652,27 @@ class ClusterParser:
         quality = xml_field.find('./quality')
         return quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'].lower() == 'true'
 
+    @staticmethod
+    def _is_change_omitted_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Changes Omitted (C) quality.
+
+        Attributes with this quality do not report value changes in subscription reports.
+        They correspond to <quality changeOmitted="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('changeOmitted', 'false').lower() == 'true'
+
+    @staticmethod
+    def _is_quieter_reporting_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Quieter Reporting (Q) quality.
+
+        Attributes with this quality may be reported less frequently than the normal
+        minimum interval allows.  They correspond to <quality quieterReporting="true"/>
+        in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('quieterReporting', 'false').lower() == 'true'
+
     def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Optional[Constraints]:
         """
         Parse constraint information from XML field element.
@@ -1025,6 +1050,8 @@ class ClusterParser:
                                             read_access=get_access_privilege_or_unknown(read_access),
                                             write_access=get_access_privilege_or_unknown(write_access),
                                             write_optional=write_optional,
+                                            changes_omitted=self._is_change_omitted_attribute(element),
+                                            quieter_reporting=self._is_quieter_reporting_attribute(element),
                                             constraints=constraints)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:
@@ -1238,7 +1265,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return zip_root / data_model_level.dirname
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], errata_path: Union[str, Traversable, None] = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -1364,6 +1391,21 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
             id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
         clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
+
+    if errata_path is not None:
+        errata_data = load_authoritative_errata(errata_path)
+        if errata_data:
+            active_rev = None
+            if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+                active_rev = data_model_directory.dirname
+            elif hasattr(data_model_directory, 'parent'):
+                active_rev = data_model_directory.parent.name
+
+            errata_problems = apply_errata(clusters, errata_data, active_spec_revision=active_rev)
+            problems.extend(errata_problems)
+        else:
+            problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
+                                          severity=ProblemSeverity.ERROR, problem=f"Failed to load required errata overlay: '{errata_path}'"))
 
     check_clusters_for_unknown_commands(clusters, problems)
 

@@ -56,6 +56,8 @@ D_OK_SINGLE = bytes.fromhex(
 
 
 class TC_ACL_2_10(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_ACL_2_10(self) -> str:
         return "[TC-ACL-2.10] Persistence"
 

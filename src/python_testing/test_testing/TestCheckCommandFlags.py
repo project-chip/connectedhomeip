@@ -52,6 +52,7 @@ log = logging.getLogger(__name__)
 
 
 class TestCheckCommandFlags(MatterBaseTest):
+    requires_dut = False
 
     @async_test_body
     async def test_invalid_transport_type_for_large_payload(self):

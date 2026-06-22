@@ -1295,6 +1295,15 @@ class IDMBaseTest(BasicCompositionTests):
                         Clusters.NetworkCommissioning.Attributes.InterfaceEnabled,
                         # Location attribute of BasicInformation cluster default value is "XX", requires value to be max length of 2 uppercase letters.
                         Clusters.BasicInformation.Attributes.Location,
+                        # Thermostat spec (cluster 0x0201, revision 8) requires the server to silently
+                        # ignore writes to ControlSequenceOfOperation for Zigbee back-compat. The write
+                        # returns Success but the value never changes, so no subscription report is emitted.
+                        # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1121-controlsequenceofoperation-attribute
+                        Clusters.Thermostat.Attributes.ControlSequenceOfOperation,
+                        # MinSetpointDeadBand is optionally writable, but any writes SHALL be silently
+                        # ignored per spec (backwards compatibility).
+                        # Spec Link: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1119-minsetpointdeadband-attribute
+                        Clusters.Thermostat.Attributes.MinSetpointDeadBand,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
                         log.debug("%s: Skipping %s - known to have write constraints", test_step, attribute.__name__)
@@ -1355,18 +1364,22 @@ class IDMBaseTest(BasicCompositionTests):
                     )
 
                     if resp[0].Status == Status.Success:
-                        changed_count += 1
-                        log.info("%s: [%s] Changed %s (0x%04X) on endpoint %s, cluster 0x%04X: %s -> %s",
-                                 test_step, changed_count, attribute.__name__, attribute_id, endpoint_id, cluster_id, cached_val,
-                                 new_val)
+                        readback = await self.read_single_attribute_check_success(
+                            endpoint=endpoint_id, cluster=cluster_class, attribute=attribute,
+                        )
 
-                        # Track this change for verification
+                        changed_count += 1
+                        log.info(
+                            "%s: [%d] Changed %s (0x%04X) on endpoint %s, cluster 0x%04X: %s -> %s",
+                            test_step, changed_count, attribute.__name__, attribute_id,
+                            endpoint_id, cluster_id, cached_val, readback)
+
                         changed_attributes.append(ChangedAttribute(
                             endpoint=endpoint_id,
                             cluster=cluster_class,
                             attribute=attribute,
                             old_value=cached_val,
-                            new_value=new_val
+                            new_value=readback
                         ))
 
                     elif resp[0].Status == Status.UnsupportedAccess:
@@ -1381,7 +1394,11 @@ class IDMBaseTest(BasicCompositionTests):
         # Wait in small increments, checking periodically
         count = 0
         last_report_count = len(handler.get_all_reported_attributes())
-        max_wait_time = 30
+        # DUT can batch a backlog of reports for unexpectedly long stretches
+        # (~30s seen in CI on all-clusters-app) after a burst of writes. Cap
+        # generously; the loop exits early via the changed_count check on
+        # healthy runs.
+        max_wait_time = 60
         while count < max_wait_time:
             await asyncio.sleep(1)
             count += 1
@@ -1425,24 +1442,21 @@ class IDMBaseTest(BasicCompositionTests):
             verified_count, 0,
             f"{test_step}: No change reports verified, expected {changed_count} reports")
 
-        # Revert the attributes to their original values
-        if changed_attributes:
-            for change in changed_attributes:
-                ep = change.endpoint
-                attr = change.attribute
-                old_value = change.old_value
+        # Revert the attributes to their original values so later steps see the device
+        # in the same state we found it. Log (don't fail) on a revert that the DUT rejects;
+        # the verification above has already passed and we don't want cleanup noise to
+        # mask the real test outcome.
+        for change in changed_attributes:
+            ep = change.endpoint
+            attr = change.attribute
+            old_value = change.old_value
 
-                resp = await self.default_controller.WriteAttribute(
-                    nodeId=self.dut_node_id,
-                    attributes=[(ep, attr(old_value))]
-                )
-                if resp[0].Status == Status.Success:
-                    revert_success = True
-                    break
-
-                asserts.assert_equal(
-                    revert_success, True,
-                    f"Failed to revert {attr.__name__} on endpoint {ep}: {resp[0].Status}"
-                )
+            resp = await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(ep, attr(old_value))]
+            )
+            if resp[0].Status != Status.Success:
+                log.warning("%s: Failed to revert %s on endpoint %s to %s: %s",
+                            test_step, attr.__name__, ep, old_value, resp[0].Status)
 
         return verified_count
