@@ -32,9 +32,10 @@ using namespace chip::app::Clusters::LaundryWasherControls;
 using namespace chip::app::Clusters::LaundryWasherControls::Attributes;
 using namespace chip::Testing;
 
-constexpr CharSpan kSpinSpeedOptions[] = { "Low"_span, "Medium"_span, "High"_span };
-constexpr NumberOfRinsesEnum kSupportedRinsesOptions[] = { NumberOfRinsesEnum::kNone, NumberOfRinsesEnum::kNormal, NumberOfRinsesEnum::kExtra };
-constexpr NumberOfRinsesEnum kInvalidRinsesOption = NumberOfRinsesEnum::kMax;
+constexpr CharSpan kSpinSpeedOptions[]                 = { "Low"_span, "Medium"_span, "High"_span };
+constexpr NumberOfRinsesEnum kSupportedRinsesOptions[] = { NumberOfRinsesEnum::kNone, NumberOfRinsesEnum::kNormal,
+                                                           NumberOfRinsesEnum::kExtra };
+constexpr NumberOfRinsesEnum kInvalidRinsesOption      = NumberOfRinsesEnum::kMax;
 
 class TestLaundryWasherControlsDelegate : public Delegate
 {
@@ -74,7 +75,6 @@ struct TestLaundryWasherControlsCluster : public ::testing::Test
     EndpointId kTestEndpointId = 1;
 };
 
-
 } // namespace
 
 TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
@@ -84,12 +84,12 @@ TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-        {
-            SpinSpeedCurrent::kMetadataEntry,
-            SpinSpeeds::kMetadataEntry,
-            NumberOfRinses::kMetadataEntry,
-            SupportedRinses::kMetadataEntry,
-        }));
+                                            {
+                                                SpinSpeedCurrent::kMetadataEntry,
+                                                SpinSpeeds::kMetadataEntry,
+                                                NumberOfRinses::kMetadataEntry,
+                                                SupportedRinses::kMetadataEntry,
+                                            }));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -100,10 +100,10 @@ TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-        {
-            SpinSpeedCurrent::kMetadataEntry,
-            SpinSpeeds::kMetadataEntry,
-        }));
+                                            {
+                                                SpinSpeedCurrent::kMetadataEntry,
+                                                SpinSpeeds::kMetadataEntry,
+                                            }));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -113,11 +113,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
         LaundryWasherControlsCluster cluster(kTestEndpointId, configOnlyRinse);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-        {
-            NumberOfRinses::kMetadataEntry,
-            SupportedRinses::kMetadataEntry
-        }));
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster, { NumberOfRinses::kMetadataEntry, SupportedRinses::kMetadataEntry }));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -229,7 +225,8 @@ TEST_F(TestLaundryWasherControlsCluster, TestReadWriteAttributeAndBounds)
 
     // Out of bounds
     SpinSpeedCurrent::TypeInfo::Type spinSpeedCurrentWrite = i;
-    EXPECT_EQ(tester.WriteAttribute(SpinSpeedCurrent::Id, spinSpeedCurrentWrite), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(SpinSpeedCurrent::Id, spinSpeedCurrentWrite),
+              Protocols::InteractionModel::Status::ConstraintError);
 
     // numberOfRinses
     // Supported
@@ -283,7 +280,8 @@ TEST_F(TestLaundryWasherControlsCluster, TestSetDelegate)
     LaundryWasherControlsCluster::Config configWithDefautlDelegate{ LaundryWasherControlsCluster::SupportFeatures::kSpinAndRinse };
     LaundryWasherControlsCluster cluster(kTestEndpointId, configWithDefautlDelegate);
 
-    // Default delegate returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED for all indexes, so writing any value should fail with error besides `Null` for spinSpeeds.
+    // Default delegate returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED for all indexes, so writing any value should fail with error
+    // besides `Null` for spinSpeeds.
     EXPECT_EQ(cluster.SetSpinSpeedCurrent(DataModel::NullNullable), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetSpinSpeedCurrent(0), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     EXPECT_EQ(cluster.SetNumberOfRinses(NumberOfRinsesEnum::kNone), CHIP_IM_GLOBAL_STATUS(InvalidInState));

@@ -25,7 +25,7 @@ using namespace LaundryWasherControls;
 using namespace LaundryWasherControls::Attributes;
 
 DataModel::ActionReturnStatus LaundryWasherControlsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                            AttributeValueEncoder & encoder)
+                                                                          AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -35,16 +35,15 @@ DataModel::ActionReturnStatus LaundryWasherControlsCluster::ReadAttribute(const 
         return encoder.Encode(mFeatures);
     case SpinSpeeds::Id:
         return ReadSpinSpeeds(request.path, encoder);
-    case SpinSpeedCurrent::Id:
+    case SpinSpeedCurrent::Id: {
+        CHIP_ERROR err = SpinSpeedIndexValidity(mSpinSpeedCurrent);
+        if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
         {
-            CHIP_ERROR err = SpinSpeedIndexValidity(mSpinSpeedCurrent);
-            if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
-            {
-                // Fallback to null when reading.
-                return encoder.EncodeNull();
-            }
-            ReturnErrorOnFailure(err);
+            // Fallback to null when reading.
+            return encoder.EncodeNull();
         }
+        ReturnErrorOnFailure(err);
+    }
         return encoder.Encode(mSpinSpeedCurrent);
     case NumberOfRinses::Id:
         ReturnErrorOnFailure(NumberOfRinsesValidity(mNumberOfRinses));
@@ -57,20 +56,22 @@ DataModel::ActionReturnStatus LaundryWasherControlsCluster::ReadAttribute(const 
 }
 
 DataModel::ActionReturnStatus LaundryWasherControlsCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                AttributeValueDecoder & decoder)
+                                                                           AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
     case SpinSpeedCurrent::Id: {
         DataModel::Nullable<uint8_t> spinSpeedCurrent;
         ReturnErrorOnFailure(decoder.Decode(spinSpeedCurrent));
-        VerifyOrReturnError(SetSpinSpeedCurrent(spinSpeedCurrent) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::ConstraintError);
+        VerifyOrReturnError(SetSpinSpeedCurrent(spinSpeedCurrent) == CHIP_NO_ERROR,
+                            Protocols::InteractionModel::Status::ConstraintError);
         return CHIP_NO_ERROR;
     }
     case NumberOfRinses::Id: {
         NumberOfRinsesEnum numberOfRinses;
         ReturnErrorOnFailure(decoder.Decode(numberOfRinses));
-        VerifyOrReturnError(SetNumberOfRinses(numberOfRinses) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::InvalidInState);
+        VerifyOrReturnError(SetNumberOfRinses(numberOfRinses) == CHIP_NO_ERROR,
+                            Protocols::InteractionModel::Status::InvalidInState);
         return CHIP_NO_ERROR;
     }
     default:
@@ -78,7 +79,8 @@ DataModel::ActionReturnStatus LaundryWasherControlsCluster::WriteAttribute(const
     }
 }
 
-CHIP_ERROR LaundryWasherControlsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR LaundryWasherControlsCluster::Attributes(const ConcreteClusterPath & path,
+                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mFeatures.Has(Feature::kSpin), SpinSpeedCurrent::kMetadataEntry },
@@ -156,7 +158,8 @@ CHIP_ERROR LaundryWasherControlsCluster::SpinSpeedIndexValidity(const DataModel:
 CHIP_ERROR LaundryWasherControlsCluster::NumberOfRinsesValidity(NumberOfRinsesEnum numberOfRinses)
 {
     NumberOfRinsesEnum supportedRinse;
-    for (size_t i = 0; i < kMaxSupportedRinsesLength && mDelegate->GetSupportedRinseAtIndex(i, supportedRinse) == CHIP_NO_ERROR; ++i)
+    for (size_t i = 0; i < kMaxSupportedRinsesLength && mDelegate->GetSupportedRinseAtIndex(i, supportedRinse) == CHIP_NO_ERROR;
+         ++i)
     {
         if (numberOfRinses == supportedRinse)
         {
@@ -184,8 +187,7 @@ CHIP_ERROR LaundryWasherControlsCluster::ReadSpinSpeeds(const ConcreteAttributeP
     });
 }
 
-CHIP_ERROR LaundryWasherControlsCluster::ReadSupportedRinses(const ConcreteAttributePath & aPath,
-                                                            AttributeValueEncoder & aEncoder)
+CHIP_ERROR LaundryWasherControlsCluster::ReadSupportedRinses(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)

@@ -16,9 +16,9 @@
  */
 
 #include "CodegenIntegration.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/static-cluster-config/LaundryWasherControls.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -29,7 +29,8 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr size_t kLaundryWasherControlsFixedClusterCount = LaundryWasherControls::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kLaundryWasherControlsFixedClusterCount =
+    LaundryWasherControls::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kLaundryWasherControlsMaxClusterCount =
     kLaundryWasherControlsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
@@ -41,7 +42,8 @@ struct AlwaysSuccessDelegate : public LaundryWasherControls::Delegate
     CHIP_ERROR GetSupportedRinseAtIndex(size_t, NumberOfRinsesEnum &) override { return CHIP_NO_ERROR; }
 };
 
-// We will use this to be able to set some values got from `Accessors::Get` functions without failing, since the cluster will check the values to be valid using the delegate.
+// We will use this to be able to set some values got from `Accessors::Get` functions without failing, since the cluster will check
+// the values to be valid using the delegate.
 AlwaysSuccessDelegate gAlwaysSuccessDelegate;
 
 // After the cluster is created, we will set the actual delegate back to the default one.
@@ -53,7 +55,8 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         BitFlags<Feature> features(featureMap);
-        LaundryWasherControlsCluster::Config config(LaundryWasherControlsCluster::SupportFeatures(featureMap), gAlwaysSuccessDelegate);
+        LaundryWasherControlsCluster::Config config(LaundryWasherControlsCluster::SupportFeatures(featureMap),
+                                                    gAlwaysSuccessDelegate);
 
         auto & server = gServers[clusterInstanceIndex];
         server.Create(endpointId, config);

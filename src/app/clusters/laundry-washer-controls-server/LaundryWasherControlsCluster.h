@@ -26,8 +26,8 @@ namespace chip::app::Clusters {
 class LaundryWasherControlsCluster : public DefaultServerCluster
 {
     // Values from spec.
-    constexpr static uint8_t kMaxSpinSpeedLength = 64;
-    constexpr static uint8_t kMaxSpinSpeedsLength = 16;
+    constexpr static uint8_t kMaxSpinSpeedLength       = 64;
+    constexpr static uint8_t kMaxSpinSpeedsLength      = 16;
     constexpr static uint8_t kMaxSupportedRinsesLength = 4;
 
 public:
@@ -37,16 +37,19 @@ public:
     {
         kSpin  = BitFlags<LaundryWasherControls::Feature>(LaundryWasherControls::Feature::kSpin).Raw(),
         kRinse = BitFlags<LaundryWasherControls::Feature>(LaundryWasherControls::Feature::kRinse).Raw(),
-        kSpinAndRinse = BitFlags<LaundryWasherControls::Feature>(LaundryWasherControls::Feature::kSpin, LaundryWasherControls::Feature::kRinse).Raw(),
+        kSpinAndRinse =
+            BitFlags<LaundryWasherControls::Feature>(LaundryWasherControls::Feature::kSpin, LaundryWasherControls::Feature::kRinse)
+                .Raw(),
     };
 
     struct Config
     {
-        Config(SupportFeatures features, LaundryWasherControls::Delegate & delegate): mFeatures(static_cast<uint32_t>(features)), mDelegate(&delegate)
+        Config(SupportFeatures features, LaundryWasherControls::Delegate & delegate) :
+            mFeatures(static_cast<uint32_t>(features)), mDelegate(&delegate)
         {
             VerifyOrDie(mFeatures != BitFlags<LaundryWasherControls::Feature>()); // At least one feature must be set.
         }
-        explicit Config(SupportFeatures features): Config(features, defaultDelegate) {}
+        explicit Config(SupportFeatures features) : Config(features, defaultDelegate) {}
 
         BitFlags<LaundryWasherControls::Feature> GetFeatures() const { return mFeatures; }
         LaundryWasherControls::Delegate * GetDelegate() const { return mDelegate; }
@@ -58,8 +61,10 @@ public:
         static inline LaundryWasherControls::DefaultDelegate defaultDelegate{};
     };
 
-    LaundryWasherControlsCluster(EndpointId endpointId, const Config & config):
-        DefaultServerCluster({ endpointId, LaundryWasherControls::Id }), mFeatures(config.GetFeatures()), mDelegate(config.GetDelegate()) {}
+    LaundryWasherControlsCluster(EndpointId endpointId, const Config & config) :
+        DefaultServerCluster({ endpointId, LaundryWasherControls::Id }), mFeatures(config.GetFeatures()),
+        mDelegate(config.GetDelegate())
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -87,7 +92,6 @@ private:
 
     DataModel::Nullable<uint8_t> mSpinSpeedCurrent{};
     LaundryWasherControls::NumberOfRinsesEnum mNumberOfRinses = LaundryWasherControls::NumberOfRinsesEnum::kNone;
-
 };
 
 } // namespace chip::app::Clusters
