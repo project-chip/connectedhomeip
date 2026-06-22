@@ -41,10 +41,6 @@
 #include <accessors/OOBAccessor.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#if PW_RPC_ENABLED
-#include <accessors/pigweed/PigweedAttributeAccessor.h>
-#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
-#endif // PW_RPC_ENABLED
 #include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
 #include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
@@ -60,6 +56,8 @@
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
 #include <Rpc.h>
+#include <accessors/pigweed/PigweedAttributeAccessor.h>
+#include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/interface/SingleEndpointDevice.h>
