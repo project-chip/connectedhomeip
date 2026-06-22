@@ -199,8 +199,8 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
-      "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+      "../../common/factory_data/FactoryDataProviderDefaultImpl.cpp",
+      "../../common/factory_data/FactoryDataProviderDefaultImpl.h",
       "../../common/factory_data/legacy/FactoryDataProvider.cpp",
       "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]
