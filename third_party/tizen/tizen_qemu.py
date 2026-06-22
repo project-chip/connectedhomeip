@@ -150,7 +150,6 @@ if args.interactive:
 if args.runner:
     kernel_args += f' runner=/mnt/chip/{args.runner}'
 
-
 qemu_args += [
     '-kernel', args.kernel,
     '-append', kernel_args,
