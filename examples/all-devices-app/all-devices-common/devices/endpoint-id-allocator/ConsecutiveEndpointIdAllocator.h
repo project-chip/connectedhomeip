@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <devices/endpoint-allocator/EndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/EndpointIdAllocator.h>
 
 namespace chip::app {
 

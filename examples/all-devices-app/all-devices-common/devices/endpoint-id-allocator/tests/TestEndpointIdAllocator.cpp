@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <devices/endpoint-allocator/ConsecutiveEndpointIdAllocator.h>
-#include <devices/endpoint-allocator/DynamicEndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;

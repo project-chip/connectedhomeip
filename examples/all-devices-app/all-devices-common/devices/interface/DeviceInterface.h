@@ -22,7 +22,7 @@
 #include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
-#include <devices/endpoint-allocator/EndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/EndpointIdAllocator.h>
 #include <lib/support/Span.h>
 
 namespace chip::app {

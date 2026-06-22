@@ -28,7 +28,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/endpoint-allocator/ConsecutiveEndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/interface/DeviceInterface.h>
 #include <devices/root-node/RootNodeDevice.h>
 #include <platform/DeviceControlServer.h>
