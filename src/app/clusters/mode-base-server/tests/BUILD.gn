@@ -1,4 +1,4 @@
-# Copyright (c) 2025-2026 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,18 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# GN args for cmake-based BL616/bflb Matter builds.
-
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/bouffalolab/BFLB/args.gni")
+import("//build_overrides/pigweed.gni")
 
-custom_toolchain = "${chip_root}/config/bouffalolab/toolchain:riscv_gcc"
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-is_debug = false
+chip_test_suite("tests") {
+  output_name = "libTestModeBaseCluster"
 
-chip_detail_logging = false
-chip_progress_logging = false
-chip_error_logging = false
+  test_sources = [ "TestModeBaseCluster.cpp" ]
 
-lwip_platform = "external"
-shell_use_all_clusters_data_model = false
+  sources = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/mode-base-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+}
