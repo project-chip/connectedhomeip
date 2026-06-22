@@ -72,8 +72,6 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const Concret
     default:
         return std::nullopt;
     }
-
-    return std::nullopt;
 }
 
 } // namespace chip::app
