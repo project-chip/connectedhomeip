@@ -25,10 +25,36 @@
 #include <devices/endpoint-id-allocator/EndpointIdAllocator.h>
 #include <lib/support/Span.h>
 
+#include <cstdint>
+
 namespace chip::app {
 
+// Constants for semantic tags. Defined in "Matter Standard Namespaces"
+//
 // TODO: Generate standard namespace ID constants from spec and place them in libCHIP.
-constexpr uint16_t kCommonPositionNamespaceId = 7;
+//       We need:
+//          - namespace id generation
+//          - tag value generation
+//       Specification describes these in `src/namespaces`
+namespace CommonNamespace {
+
+constexpr uint16_t kCompassDirectionId          = 0x02;
+constexpr uint16_t kCompassLocationId           = 0x03;
+constexpr uint16_t kDirectionId                 = 0x04;
+constexpr uint16_t kLevelId                     = 0x05;
+constexpr uint16_t kLocationId                  = 0x06; // Clusters::Globals::LocationTag
+constexpr uint16_t kNumberId                    = 0x07;
+constexpr uint16_t kPositionId                  = 0x08; // Clusters::Globals::PositionTag
+constexpr uint16_t kElectricalMeasurementId     = 0x0A;
+constexpr uint16_t kCommodityTariffChronologyId = 0x0B;
+constexpr uint16_t kCommodityTariffDirectionId  = 0x0D;
+constexpr uint16_t kLaundryId                   = 0x0E;
+constexpr uint16_t kPowerSourceId               = 0x0F;
+constexpr uint16_t kCommonAreaId                = 0x10; // Clusters::Globals::AreaTypeTag
+constexpr uint16_t kCommonLandmarkId            = 0x11; // Clusters::Globals::LandmarkTag
+constexpr uint16_t kRelativePositionId          = 0x12; // Clusters::Globals::RelativePositionTag
+
+} // namespace CommonNamespace
 
 /// Structural configuration for registering an endpoint within a node hierarchy.
 ///
@@ -45,9 +71,7 @@ struct EndpointComposition
     constexpr EndpointComposition(
         EndpointId parent,
         DataModel::EndpointCompositionPattern compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
-        Span<const SemanticTag> tags                             = {}) :
-        parentId(parent),
-        pattern(compositionPattern), tagList(tags)
+        Span<const SemanticTag> tags = {}) : parentId(parent), pattern(compositionPattern), tagList(tags)
     {}
 
     static constexpr EndpointComposition WithParent(EndpointId parent) { return EndpointComposition(parent); }
