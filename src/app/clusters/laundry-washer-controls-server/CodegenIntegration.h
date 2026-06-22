@@ -21,7 +21,7 @@
 
 namespace chip::app::Clusters::LaundryWasherControls {
 
-namespace LaundryWahserControlsServer {
+namespace LaundryWasherControlsServer {
 
 /**
  * Set the default delegate of laundry washer server at endpoint x
@@ -42,7 +42,7 @@ CHIP_ERROR GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_
 CHIP_ERROR SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
 CHIP_ERROR GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
 
-} // namespace LaundryWahserControlsServer
+} // namespace LaundryWasherControlsServer
 
 LaundryWasherControlsCluster * FindClusterOnEndpoint(EndpointId endpoint);
 

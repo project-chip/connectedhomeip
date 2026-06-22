@@ -67,7 +67,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
             DataModel::Nullable<uint8_t> spinSpeedCurrent;
             if (SpinSpeedCurrent::GetDefault(endpointId, spinSpeedCurrent) == Status::Success)
             {
-                server.Cluster().SetSpinSpeedCurrent(spinSpeedCurrent);
+                LogErrorOnFailure(server.Cluster().SetSpinSpeedCurrent(spinSpeedCurrent));
             }
         }
 
@@ -76,7 +76,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
             NumberOfRinsesEnum numberOfRinses;
             if (NumberOfRinses::GetDefault(endpointId, &numberOfRinses) == Status::Success)
             {
-                server.Cluster().SetNumberOfRinses(numberOfRinses);
+                LogErrorOnFailure(server.Cluster().SetNumberOfRinses(numberOfRinses));
             }
         }
 
