@@ -15,23 +15,10 @@
  *    limitations under the License.
  */
 
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
-
 #include "CodegenIntegration.h"
-#include "laundry-washer-controls-delegate.h"
+#include <app/static-cluster-config/LaundryWasherControls.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeValueEncoder.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/server/Server.h>
-#include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,205 +27,157 @@ using namespace chip::app::Clusters::LaundryWasherControls;
 using namespace chip::app::Clusters::LaundryWasherControls::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr size_t kLaundryWasherControlsDelegateTableSize =
-    MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-// -----------------------------------------------------------------------------
-// Delegate Implementation
-//
 namespace {
-Delegate * gDelegateTable[kLaundryWasherControlsDelegateTableSize] = { nullptr };
-}
 
-namespace {
-Delegate * GetDelegate(EndpointId endpoint)
+constexpr size_t kLaundryWasherControlsFixedClusterCount = LaundryWasherControls::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kLaundryWasherControlsMaxClusterCount =
+    kLaundryWasherControlsFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<LaundryWasherControlsCluster> gServers[kLaundryWasherControlsMaxClusterCount];
+
+struct AlwaysSuccessDelegate : public LaundryWasherControls::Delegate
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
-}
+    CHIP_ERROR GetSpinSpeedAtIndex(size_t, MutableCharSpan &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetSupportedRinseAtIndex(size_t, NumberOfRinsesEnum &) override { return CHIP_NO_ERROR; }
+};
+
+// We will use this to be able to set some values got from `Accessors::Get` functions without failing, since the cluster will check the values to be valid using the delegate.
+AlwaysSuccessDelegate gAlwaysSuccessDelegate;
+
+// After the cluster is created, we will set the actual delegate back to the default one.
+DefaultDelegate gDefaultDelegate;
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        BitFlags<Feature> features(featureMap);
+        LaundryWasherControlsCluster::Config config(LaundryWasherControlsCluster::SupportFeatures(featureMap), gAlwaysSuccessDelegate);
+
+        auto & server = gServers[clusterInstanceIndex];
+        server.Create(endpointId, config);
+
+        // Set values from ember storage.
+        if (features.Has(Feature::kSpin))
+        {
+            DataModel::Nullable<uint8_t> spinSpeedCurrent;
+            if (SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent) == Status::Success)
+            {
+                server.Cluster().SetSpinSpeedCurrent(spinSpeedCurrent);
+            }
+        }
+
+        if (features.Has(Feature::kRinse))
+        {
+            NumberOfRinsesEnum numberOfRinses;
+            if (NumberOfRinses::Get(endpointId, &numberOfRinses) == Status::Success)
+            {
+                server.Cluster().SetNumberOfRinses(numberOfRinses);
+            }
+        }
+
+        // Set the delegate to a default delegate, which will make all `.Set*()` calls and write requests on the cluster to fail.
+        // This enforces the user to set a custom delegate before using the cluster.
+        server.Cluster().SetDelegate(gDefaultDelegate);
+
+        return server.Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
+    }
+
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+};
 
 } // namespace
 
-LaundryWasherControlsServer LaundryWasherControlsServer::sInstance;
-
-/**********************************************************
- * LaundryWasherControlsServer public methods
- *********************************************************/
-void LaundryWasherControlsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void MatterLaundryWasherControlsClusterInitCallback(EndpointId endpointId)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < kLaundryWasherControlsDelegateTableSize)
-    {
-        gDelegateTable[ep] = delegate;
-    }
-}
+    IntegrationDelegate integrationDelegate;
 
-LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
-{
-    return sInstance;
-}
-
-Status LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
-{
-    DataModel::Nullable<uint8_t> spinSpeedCurrentNow;
-    Status res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
-    if ((res == Status::Success) && (spinSpeedCurrentNow != spinSpeedCurrent))
-    {
-        res = SpinSpeedCurrent::Set(endpointId, spinSpeedCurrent);
-    }
-
-    return res;
-}
-
-Status LaundryWasherControlsServer::GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
-{
-    return SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
-}
-
-Status LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
-{
-    NumberOfRinsesEnum numberOfRinses;
-    Status res = NumberOfRinses::Get(endpointId, &numberOfRinses);
-
-    if ((res == Status::Success) && (numberOfRinses != newNumberOfRinses))
-    {
-        res = NumberOfRinses::Set(endpointId, newNumberOfRinses);
-    }
-
-    return res;
-}
-
-Status LaundryWasherControlsServer::GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
-{
-    return NumberOfRinses::Get(endpointId, &numberOfRinses);
-}
-
-/**********************************************************
- * LaundryWasherControlsServer private methods
- *********************************************************/
-CHIP_ERROR LaundryWasherControlsServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    if (aPath.mClusterId != LaundryWasherControls::Id)
-    {
-        // We shouldn't have been called at all.
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::SpinSpeeds::Id:
-        return ReadSpinSpeeds(aPath, aEncoder);
-    case Attributes::SupportedRinses::Id:
-        return ReadSupportedRinses(aPath, aEncoder);
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LaundryWasherControlsServer::ReadSpinSpeeds(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    Delegate * delegate = GetDelegate(aPath.mEndpointId);
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
-
-    return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t i = 0; true; i++)
+    CodegenClusterIntegration::RegisterServer(
         {
-            char buffer[kMaxSpinSpeedLength];
-            MutableCharSpan spinSpeed(buffer);
-            auto err = delegate->GetSpinSpeedAtIndex(i, spinSpeed);
-            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-            {
-                return CHIP_NO_ERROR;
-            }
-            ReturnErrorOnFailure(err);
-            ReturnErrorOnFailure(encoder.Encode(spinSpeed));
-        }
-    });
+            .endpointId                = endpointId,
+            .clusterId                 = LaundryWasherControls::Id,
+            .fixedClusterInstanceCount = kLaundryWasherControlsFixedClusterCount,
+            .maxClusterInstanceCount   = kLaundryWasherControlsMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
+        },
+        integrationDelegate);
 }
 
-CHIP_ERROR LaundryWasherControlsServer::ReadSupportedRinses(const ConcreteReadAttributePath & aPath,
-                                                            AttributeValueEncoder & aEncoder)
+void MatterLaundryWasherControlsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    Delegate * delegate = GetDelegate(aPath.mEndpointId);
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
+    IntegrationDelegate integrationDelegate;
 
-    return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t i = 0; true; i++)
+    CodegenClusterIntegration::UnregisterServer(
         {
-            NumberOfRinsesEnum supportedRinse;
-            auto err = delegate->GetSupportedRinseAtIndex(i, supportedRinse);
-            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-            {
-                return CHIP_NO_ERROR;
-            }
-            ReturnErrorOnFailure(err);
-            ReturnErrorOnFailure(encoder.Encode(supportedRinse));
-        }
-    });
+            .endpointId                = endpointId,
+            .clusterId                 = LaundryWasherControls::Id,
+            .fixedClusterInstanceCount = kLaundryWasherControlsFixedClusterCount,
+            .maxClusterInstanceCount   = kLaundryWasherControlsMaxClusterCount,
+        },
+        integrationDelegate, shutdownType);
 }
 
-/**********************************************************
- * Register LaundryWasherControlsServer
- *********************************************************/
+namespace chip::app::Clusters::LaundryWasherControls {
 
-void MatterLaundryWasherControlsPluginServerInitCallback()
-{
-    LaundryWasherControlsServer & laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
-    AttributeAccessInterfaceRegistry::Instance().Register(&laundryWasherControlsServer);
-}
+namespace LaundryWasherControlsServer {
 
-void MatterLaundryWasherControlsPluginServerShutdownCallback()
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    LaundryWasherControlsServer & laundryWasherControlsServer = LaundryWasherControlsServer::Instance();
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&laundryWasherControlsServer);
-}
-
-Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                           EmberAfAttributeType attributeType, uint16_t size,
-                                                                           uint8_t * value)
-{
-    Delegate * delegate = GetDelegate(attributePath.mEndpointId);
-    VerifyOrDie((delegate != nullptr) && "Washer Controls implementation requires a registered delegate for validation.");
-    switch (attributePath.mAttributeId)
+    auto cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster != nullptr)
     {
-    case Attributes::SpinSpeedCurrent::Id: {
-        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
-        {
-            return Status::Success;
-        }
-        char buffer[LaundryWasherControlsServer::kMaxSpinSpeedLength];
-        MutableCharSpan spinSpeed(buffer);
-        uint8_t spinSpeedIndex = *value;
-        auto err               = delegate->GetSpinSpeedAtIndex(spinSpeedIndex, spinSpeed);
-        if (err == CHIP_NO_ERROR)
-        {
-            return Status::Success;
-        }
-        return Status::ConstraintError;
+        cluster->SetDelegate(*delegate);
     }
-    case Attributes::NumberOfRinses::Id: {
-        uint8_t supportedRinseIdx = 0;
-        while (true)
-        {
-            NumberOfRinsesEnum supportedRinse;
-            auto err = delegate->GetSupportedRinseAtIndex(supportedRinseIdx, supportedRinse);
-            if (err != CHIP_NO_ERROR)
-            {
-                // Can't find the attribute to be written in the supported list (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                // Or can't get the correct supported list
-                return Status::InvalidInState;
-            }
-            if (supportedRinse == static_cast<NumberOfRinsesEnum>(*value))
-            {
-                // The written attribute is one of the supported item
-                return Status::Success;
-            }
-            supportedRinseIdx++;
-        }
-    }
-    }
-    return Status::Success;
 }
+
+CHIP_ERROR SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
+{
+    auto cluster = FindClusterOnEndpoint(endpointId);
+    return cluster != nullptr ? cluster->SetSpinSpeedCurrent(spinSpeedCurrent) : CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
+{
+    auto cluster = FindClusterOnEndpoint(endpointId);
+    return cluster != nullptr ? cluster->GetSpinSpeedCurrent(spinSpeedCurrent) : CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
+{
+    auto cluster = FindClusterOnEndpoint(endpointId);
+    return cluster != nullptr ? cluster->SetNumberOfRinses(newNumberOfRinses) : CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
+{
+    auto cluster = FindClusterOnEndpoint(endpointId);
+    return cluster != nullptr ? cluster->GetNumberOfRinses(numberOfRinses) : CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+} // namespace LaundryWasherControlsServer
+
+LaundryWasherControlsCluster * FindClusterOnEndpoint(EndpointId endpoint)
+{
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * serverCluster = CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpoint,
+            .clusterId                 = LaundryWasherControls::Id,
+            .fixedClusterInstanceCount = kLaundryWasherControlsFixedClusterCount,
+            .maxClusterInstanceCount   = kLaundryWasherControlsMaxClusterCount,
+        },
+        integrationDelegate);
+
+    return static_cast<LaundryWasherControlsCluster *>(serverCluster);
+}
+
+} // namespace chip::app::Clusters::LaundryWasherControls

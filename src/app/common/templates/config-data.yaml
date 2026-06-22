@@ -91,7 +91,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Door Lock
     - Energy Preference
     - Laundry Dryer Controls
-    - Laundry Washer Controls
     - Mode Select
     - Pump Configuration and Control
     - Thermostat
@@ -138,6 +137,7 @@ CodeDrivenClusters:
     - ICD Management
     - Identify
     - Illuminance Measurement
+    - Laundry Washer Controls
     - Localization Configuration
     - Microwave Oven Control
     - Network Identity Management

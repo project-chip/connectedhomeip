@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 #pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/LaundryWasherControls/Enums.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
@@ -49,6 +49,19 @@ public:
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of supported rinses.
      */
     virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
+};
+
+class DefaultDelegate : public Delegate
+{
+public:
+    CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
 };
 
 } // namespace LaundryWasherControls
