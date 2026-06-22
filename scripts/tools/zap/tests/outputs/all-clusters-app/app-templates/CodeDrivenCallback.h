@@ -167,6 +167,7 @@ void MatterAirQualityClusterShutdownCallback(chip::EndpointId endpointId, Matter
 void MatterSmokeCoAlarmClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterSmokeCoAlarmClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

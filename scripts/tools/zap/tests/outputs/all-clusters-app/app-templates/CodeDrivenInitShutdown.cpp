@@ -134,6 +134,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::SmokeCoAlarm::Id:
         MatterSmokeCoAlarmClusterInitCallback(endpoint);
+        break;
     case app::Clusters::OperationalState::Id:
         MatterOperationalStateClusterInitCallback(endpoint);
         break;
@@ -319,6 +320,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::SmokeCoAlarm::Id:
         MatterSmokeCoAlarmClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::OperationalState::Id:
         MatterOperationalStateClusterShutdownCallback(endpoint, shutdownType);
         break;
