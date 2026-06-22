@@ -7967,7 +7967,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute clusterRevision;
   }
 
   server cluster RvcRunMode {
