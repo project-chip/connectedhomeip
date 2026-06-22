@@ -21,8 +21,7 @@
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h>
 
-// The following are the application-specific endpoints - it seems like this
-// should be available from endpoint_config.h
+// The following are the application-specific endpoints
 const chip::EndpointId CommissioningProxyEndpoint = 1;
 
 namespace chip {

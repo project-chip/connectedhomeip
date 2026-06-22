@@ -18,11 +18,14 @@
 
 #include <AppMain.h>
 
+#include "CPAppCommandDelegate.h"
 #include "NamedPipeCommands.h"
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
+#include "commissioning-proxy-delegate-impl.h"
+
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
@@ -33,24 +36,28 @@
 #include <cstring>
 #include <string>
 
-#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-#include <imgui_ui/ui.h>
-#include <imgui_ui/windows/connectivity.h>
-#include <imgui_ui/windows/light.h>
-#include <imgui_ui/windows/occupancy_sensing.h>
-#include <imgui_ui/windows/qrcode.h>
-#endif
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
+
 NamedPipeCommands sChipNamedPipeCommands;
-} // namespace
+CPAppCommandDelegate sCPAppCommandDelegate;
+CommissioningProxy::MyCPDelegate gMyCPDelegate;
+
+BitMask<CommissioningProxy::Feature> gFeatures(CommissioningProxy::Feature::kBackgroundScan
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                               ,
+                                               CommissioningProxy::Feature::kWiFiNetworkInterface
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+);
+
+RegisteredServerCluster<CommissioningProxy::CommissioningProxyCluster>
+    gCPCluster(CommissioningProxy::CommissioningProxyCluster::Config(CommissioningProxyEndpoint, gFeatures, gMyCPDelegate));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-static void OnChipDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+void OnChipDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
@@ -64,152 +71,7 @@ static void OnChipDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
-#if 0
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
-{
-
-    switch (attributePath.mClusterId)
-    {
-        case Clusters::CommissioningProxy::Id:
-        {
-            switch (attributePath.mAttributeId)
-            {
-                case Clusters::CommissioningProxy::Attributes::ScanMaxTime::Id:
-                {
-                    CommissioningProxyMgr().InitiateAction(CommissioningProxyManager::DISCONNECT_ACTION);
-                    break;
-                }
-
-                default:
-                {
-                    ChipLogDetail(NotSpecified, "%s: Commissioning Proxy attribute %#x (%u) (type %#x size %u) updated",
-                        __func__,
-                        attributePath.mAttributeId, attributePath.mAttributeId,
-                        type, size);
-                    break;
-                }
-            }
-            break;
-        }
-
-        default:
-        {
-            ChipLogDetail(NotSpecified, "%s: cluster %#x (%u) attribute %#x (%u) (type %#x size %u) updated",
-                __func__, attributePath.mClusterId, attributePath.mClusterId,
-                attributePath.mAttributeId, attributePath.mAttributeId, type, size);
-            break;
-        }
-    }
-}
-#endif
-
-#if 0
-#if 0
-
-
-bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::DecodableType & commandData)
-{
-    using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
-    std::vector<ScanResultT> results;
-    // ScanResultT r{};
-
-    // Start PAF
-    CHIP_ERROR err = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Commissioning Proxy PAF Scan Request Failed");
-        return false;
-    }
-
-    // TODO: parse these from commandData
-    //chip::Optional<uint16_t> srvProtoType;  // set if you want to filter
-    //uint32_t windowMs = 1500;
-
-    std::vector<chip::DeviceLayer::NanPeerInfo> peers;
-    //err = chip::DeviceLayer::ConnectivityMgrImpl().ScanNanPublishers(
-    //    serviceName, srvProtoType, windowMs, peers);
-
-    ChipLogProgress(NotSpecified, "=== %s() Transport:0x%x WiFiBands:0x%x", __func__,
-        static_cast<uint16_t>(commandData.transport.Raw()),
-        static_cast<uint16_t>((commandData.wiFiBands.HasValue() ? commandData.wiFiBands.Value().Raw() : 0)));
-
-    // Create a Handle and move it into ConnectivityManagerImpl
-    // This keeps the ProxyScanRequest open, so the scan can complete before the ProxyScanResponse is sent
-    CommandHandler::Handle handle(commandObj);
- bang1;   err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), commandPath);
-    if (err != CHIP_NO_ERROR) {
-        commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Failure);
-        return true;
-    }
-
-    // Ensure Response Timeout is greater than the ScanMaxTime
-    if (auto * ec = commandObj->GetExchangeContext())
-    {
-        ec->SetResponseTimeout(chip::System::Clock::Seconds16(140));
-    }
-
-    return true;
-}
-
-bool emberAfCommissioningProxyClusterProxyMessageRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::DecodableType & commandData)
-{
-    ChipLogError(NotSpecified, "=== %s() Received ProxyMessageRequest", __func__);
-    return true;
-}
-
-bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::DecodableType & commandData)
-{
-    ChipLogError(NotSpecified, "=== %s() Received ProxyBackGroundScanStartRequest", __func__);
-
-    // Use the NodeId and fabric Index as unique identifiers for the background scan
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    NodeId localNodeId = kUndefinedNodeId;
-
-    fabricIndex = commandObj->GetAccessingFabricIndex();
-    if (IsValidFabricIndex(fabricIndex))
-    {
-        const auto * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-        if (fabricInfo != nullptr)
-        {
-            localNodeId = fabricInfo->GetNodeId();
-        }
-    }
-
-    return true;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-#endif // #if 0
-
-#include "CPAppCommandDelegate.h"
-#include "commissioning-proxy-delegate-impl.h"
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
-#include <app/clusters/device-energy-management-server/CodegenIntegration.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
-
-// In a .cpp file
-CPAppCommandDelegate sCPAppCommandDelegate;
-// CommissioningProxyManager gCommissioningProxyManager;
-chip::app::Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
-
-chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature>
-    gFeatures(chip::app::Clusters::CommissioningProxy::Feature::kBackgroundScan
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-              ,
-              chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    );
-
-chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster>
-    gCPCluster(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::Config(CommissioningProxyEndpoint, gFeatures,
-                                                                                          gMyCPDelegate));
+} // namespace
 
 void ApplicationInit()
 {
@@ -221,13 +83,12 @@ void ApplicationInit()
     }
 
     // Register the Commissioning Proxy Code Driven mechanism
-    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == CHIP_NO_ERROR);
+    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == CHIP_NO_ERROR);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     // Derive the supported WiFi bands from the configured freq_list and report them via the WiFiBand attribute.
     {
-        using WiFiBandBitmap = chip::app::Clusters::CommissioningProxy::WiFiBandBitmap;
-        chip::BitMask<WiFiBandBitmap> bands;
+        BitMask<CommissioningProxy::WiFiBandBitmap> bands;
         const char * extCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
         if (extCmds != nullptr)
         {
@@ -239,20 +100,28 @@ void ApplicationInit()
                 {
                     uint32_t freq = static_cast<uint32_t>(std::strtoul(p, nullptr, 10));
                     if ((freq >= 2412 && freq <= 2484))
-                        bands.Set(WiFiBandBitmap::k2g4);
+                    {
+                        bands.Set(CommissioningProxy::WiFiBandBitmap::k2g4);
+                    }
                     else if ((freq >= 5035 && freq <= 5980))
-                        bands.Set(WiFiBandBitmap::k5g);
+                    {
+                        bands.Set(CommissioningProxy::WiFiBandBitmap::k5g);
+                    }
                     // Advance past this number and any comma
                     while (*p != '\0' && *p != ',' && *p != ' ')
+                    {
                         ++p;
+                    }
                     if (*p == ',')
+                    {
                         ++p;
+                    }
                 }
             }
         }
         gMyCPDelegate.SetSupportedWiFiBands(bands);
     }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
     // If the proxy is already on a fabric (i.e. it was previously commissioned
@@ -270,7 +139,7 @@ void ApplicationInit()
     {
         TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnChipDeviceEvent, 0);
     }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
     ChipLogProgress(AppServer, "%s(): Main function is Proxy Commissioner on endpoint %u", __func__, CommissioningProxyEndpoint);
 }

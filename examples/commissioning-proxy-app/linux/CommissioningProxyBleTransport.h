@@ -67,6 +67,8 @@ CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && b
 chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime);
 
 // ProxyBackgroundScanStartRequest / Stop paths for BLE.  Phase 2B-2.
+// Note: transport and wiFiBands are accepted for interface symmetry with the
+// PAF transport but are unused — BLE scanning has no band concept.
 chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transport, uint16_t timeout, WiFiBandBitmap wiFiBands,
                                                       chip::FabricIndex fabricIndex, chip::NodeId nodeId,
                                                       CommissioningProxyCluster * cluster);

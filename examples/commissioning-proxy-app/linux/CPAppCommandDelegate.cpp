@@ -191,7 +191,7 @@ void CPAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
     }
     else
     {
-        ChipLogError(NotSpecified, "Unknow event ID:%d", eventId);
+        ChipLogError(NotSpecified, "Unknown event ID:%d", eventId);
     }
 }
 

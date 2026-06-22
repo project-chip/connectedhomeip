@@ -25,7 +25,10 @@ chip_data_model("commissioning-proxy-common") {
 }
 
 source_set("commissioning-proxy-manager") {
-  deps = [ "${chip_root}/src/lib" ]
+  deps = [
+    "${chip_root}/src/app/clusters/commissioning-proxy-server",
+    "${chip_root}/src/lib",
+  ]
   public_configs = [ ":config" ]
   sources = [
     "include/commissioning-proxy-delegate-impl.h",
