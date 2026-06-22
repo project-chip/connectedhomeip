@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <accessors/AccessorRegistry.h>
+#include <accessors/OOBAccessorRegistry.h>
 #include <accessors/OOBDataSerializer.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
