@@ -97,65 +97,44 @@ CHIP_ERROR GetThreadName(pid_t tid, char * nameBuf, size_t nameBufSize)
 
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        struct ifaddrs * ifa = nullptr;
+    struct ifaddrs * ifa = nullptr;
+    VerifyOrReturnError(getifaddrs(&ifa) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
+    auto deferClose = MakeDefer([ifa]() { freeifaddrs(ifa); });
 
-        // Walk through linked list, maintaining head pointer so we can free list later.
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    for (; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (strcmp(ifa->ifa_name, ifName) == 0 && ifa->ifa_data != nullptr)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
+            auto stats = static_cast<struct rtnl_link_stats *>(ifa->ifa_data);
+            switch (type)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
+            case EthernetStatsCountType::kEthPacketRxCount:
+                count = stats->rx_packets;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthPacketTxCount:
+                count = stats->tx_packets;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthTxErrCount:
+                count = stats->tx_errors;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthCollisionCount:
+                count = stats->collisions;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthOverrunCount:
+                count = stats->rx_over_errors;
+                return CHIP_NO_ERROR;
+            default:
+                ChipLogError(DeviceLayer, "Unknown Ethernet statistic metric type");
                 break;
             }
         }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-                switch (type)
-                {
-                case EthernetStatsCountType::kEthPacketRxCount:
-                    count = stats->rx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthPacketTxCount:
-                    count = stats->tx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthTxErrCount:
-                    count = stats->tx_errors;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthCollisionCount:
-                    count = stats->collisions;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthOverrunCount:
-                    count = stats->rx_over_errors;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                default:
-                    ChipLogError(DeviceLayer, "Unknown Ethernet statistic metric type");
-                    break;
-                }
-            }
-        }
-
-        freeifaddrs(ifaddr);
     }
 
-    return err;
+    return CHIP_ERROR_READ_FAILED;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -647,31 +626,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthCarrierDetect(bool & carrierDetect)
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 {
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
+
     uint64_t currentUptime = 0;
     ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(currentUptime));
 
-    struct ifaddrs * ifaddr = nullptr;
-    VerifyOrReturnError(getifaddrs(&ifaddr) != -1, CHIP_ERROR_READ_FAILED,
-                        ChipLogError(DeviceLayer, "Failed to get network interfaces"));
-    auto deferClose = MakeDefer([ifaddr]() { freeifaddrs(ifaddr); });
-
     struct ifaddrs * ifa = nullptr;
-    // Walk through linked list, maintaining head pointer so we can free list later.
-    for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-    {
-        if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
-        {
-            ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
-            break;
-        }
-    }
+    VerifyOrReturnError(getifaddrs(&ifa) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
+    auto deferClose = MakeDefer([ifa]() { freeifaddrs(ifa); });
 
-    if (ifa != nullptr)
+    for (; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+        if (strcmp(ifa->ifa_name, ifName) == 0 && ifa->ifa_data != nullptr)
         {
-            struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-
+            auto stats                 = static_cast<struct rtnl_link_stats *>(ifa->ifa_data);
             mEthPacketRxCount          = stats->rx_packets;
             mEthPacketTxCount          = stats->tx_packets;
             mEthTxErrCount             = stats->tx_errors;
