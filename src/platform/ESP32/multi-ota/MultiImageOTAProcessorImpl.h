@@ -18,7 +18,6 @@
 #pragma once
 #include "MultiOTAImageHeader.h"
 #include "SubImageProcessor.h"
-#include "esp_ota_ops.h"
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <include/platform/OTAImageProcessor.h>
 #include <lib/core/CHIPError.h>
@@ -26,12 +25,11 @@
 
 namespace chip {
 
-typedef uint8_t OTAProcessorTag;
-
-struct SubImageProcessorEntry
+struct ImageProcessorEntry
 {
     OTAProcessorTag tag;
     SubImageProcessor * processor;
+    ImageProcessorEntry * next = nullptr;
 };
 
 class MultiImageOTAProcessorImpl : public OTAImageProcessorInterface
@@ -46,10 +44,31 @@ public:
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
 
-    CHIP_ERROR RegisterProcessor(OTAProcessorTag tag, SubImageProcessor * processor);
+    /**
+     * Register a processor entry to Image processor registry.
+     * @param entry The processor entry to register.
+     * @return CHIP_NO_ERROR if the processor was registered successfully
+     * CHIP_ERROR_INVALID_ARGUMENT if the processor is null or the tag is 0
+     * CHIP_ERROR_DUPLICATE_KEY_ID if the processor is already bound to a tag
+     * CHIP_ERROR if other error occurred
+     */
+    CHIP_ERROR RegisterProcessor(ImageProcessorEntry & entry);
 
 private:
-    SubImageProcessorEntry mSubImageProcessors;
+    OTADownloader * mDownloader = nullptr;
+    MutableByteSpan mBlock;
+    MultiOTAImageHeader mMultiOTAImageHeader;
+
+    OTAImageHeaderParser mHeaderParser;
+    MultiOTAImageHeaderParser mMultiOTAImageHeaderParser;
+    ImageProcessorEntry * mRegistryHead = nullptr;
+    CHIP_ERROR mLastErr                 = CHIP_NO_ERROR;
+
+    // Routing state: where we are in the payload, and the entry currently being written.
+    uint32_t mCurrentSubImageCursor      = 0;
+    bool mCurrentEntryStarted            = false;   // readiness for the active entry already decided
+    SubImageProcessor * mActiveProcessor = nullptr; // processor for the active (kReady) entry
+
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
     static void HandleAbort(intptr_t context);
@@ -59,14 +78,8 @@ private:
     CHIP_ERROR SetBlock(ByteSpan & block);
     CHIP_ERROR ReleaseBlock();
     CHIP_ERROR ProcessHeader(ByteSpan & block);
-
-    OTADownloader * mDownloader = nullptr;
-    MutableByteSpan mBlock;
-    const esp_partition_t * mOTAUpdatePartition = nullptr;
-    esp_ota_handle_t mOTAUpdateHandle;
-
-    OTAImageHeaderParser mHeaderParser;
-    MultiOTAImageHeaderParser mMultiOTAImageHeaderParser;
+    CHIP_ERROR ProcessMultiImageHeader(ByteSpan & block);
+    CHIP_ERROR GetSubProcessor(OTAProcessorTag tag, SubImageProcessor *& processor) const;
 };
 
 } // namespace chip

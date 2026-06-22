@@ -31,6 +31,7 @@ void MultiOTAImageHeaderParser::Init()
     mState        = State::kInitialized;
     mBufferOffset = 0;
     mNumImages    = 0;
+    mHeaderParsed = false;
     mBuffer.Alloc(kFixedHeaderSize);
 }
 
@@ -39,6 +40,7 @@ void MultiOTAImageHeaderParser::Clear()
     mState        = State::kNotInitialized;
     mBufferOffset = 0;
     mNumImages    = 0;
+    mHeaderParsed = false;
     mBuffer.Free();
 }
 
@@ -70,6 +72,10 @@ CHIP_ERROR MultiOTAImageHeaderParser::AccumulateAndDecode(ByteSpan & buffer, Mul
         Clear();
     }
 
+    if (error == CHIP_NO_ERROR)
+    {
+        mHeaderParsed = true;
+    }
     return error;
 }
 

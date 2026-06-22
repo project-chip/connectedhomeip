@@ -21,23 +21,26 @@
 #include <lib/support/Span.h>
 
 namespace chip {
+
 enum class DeviceState : uint8_t
 {
-    kReady,
-    kAlreadyUpToDate,
-    kNotReady,
+    kUnknown,
+    kReady,           // proceed — Dispatcher calls Init() then Write()
+    kNotReady,        // skip — component unavailable; blocks softwareVersion confirmation
+    kAlreadyUpToDate, // skip — component already at targetVersion; counts as verified
 };
 
 enum class AbortReason : uint8_t
 {
+    kUnknown,
     kError,
     kCancelled,
 };
 
 struct AbortContext
 {
-    AbortReason reason;
-    CHIP_ERROR error;
+    AbortReason reason = AbortReason::kUnknown;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 };
 
 class SubImageProcessor
@@ -47,11 +50,15 @@ public:
 
     virtual CHIP_ERROR Init(const SubImageHeader & entry) = 0;
 
-    virtual DeviceState IsReadyForOTA() = 0;
+    virtual bool IsInitialized() = 0;
 
-    virtual CHIP_ERROR Write(ByteSpan block) = 0;
+    virtual CHIP_ERROR IsReadyForOTA(DeviceState & state) = 0;
+
+    virtual CHIP_ERROR Write(ByteSpan & block) = 0;
 
     virtual void Abort(AbortContext & context) = 0;
+
+    virtual CHIP_ERROR Apply() { return CHIP_NO_ERROR; }
 };
 
 } // namespace chip

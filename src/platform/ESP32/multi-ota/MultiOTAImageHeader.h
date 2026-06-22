@@ -24,6 +24,13 @@
 
 namespace chip {
 
+typedef uint32_t OTAProcessorTag;
+
+/// Platform-defined application firmware image ID. Fixed ABI constant shared by the
+/// dispatcher, the AppImageProcessor registration, and the packaging tool. Lives in the
+/// platform-reserved range 0x00000001..0x000000FF.
+constexpr OTAProcessorTag kAppImageProcessorTag = 1;
+
 constexpr uint32_t kMultiOTAImageFileIdentifier = 0x4D494F54u; // "MIOT"
 
 /// Size of the MultiOTAImageHeader fixed preamble (magic + numImages + reserved)
@@ -77,6 +84,11 @@ public:
     bool IsInitialized() const { return mState != State::kNotInitialized; }
 
     /**
+     * @brief Returns if the header has been parsed.
+     */
+    bool IsHeaderParsed() const { return mHeaderParsed; }
+
+    /**
      * @brief Decode the MultiOTAImageHeader.
      *
      * The MultiOTAImageHeader consists of a fixed preamble (magic, numImages, reserved) followed by
@@ -119,6 +131,7 @@ private:
     State mState;
     uint32_t mBufferOffset;
     uint8_t mNumImages = 0;
+    bool mHeaderParsed = false;
     Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 
