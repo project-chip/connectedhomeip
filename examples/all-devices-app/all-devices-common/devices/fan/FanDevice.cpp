@@ -40,10 +40,10 @@ FanDevice::FanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Cluster
     VerifyOrDie(mContext.includeOnOffCluster == (mOnOffDelegate != nullptr));
 }
 
-CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(
-        endpoint, provider, EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kFullFamily, mContext.tagList)));
+    ReturnErrorOnFailure(RegisterDescriptor(
+        endpoint, provider, EndpointComposition(composition.parentId, composition.pattern, mContext.tagList)));
 
     // Identify
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -100,7 +100,7 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 
 void FanDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     if (mFanControlCluster.IsConstructed())
     {

@@ -55,7 +55,7 @@ protected:
                         Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 private:

@@ -41,7 +41,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <device-factory/DeviceFactory.h>
-#include <devices/endpoint-allocator/ConsecutiveEndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/root-node/RootNodeDevice.h>
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -218,7 +218,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     VerifyOrReturnError(sConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
-    ReturnErrorOnFailure(sConstructedDevice->Register(allocator, *sDataModelProvider, chip::kInvalidEndpointId));
+    ReturnErrorOnFailure(sConstructedDevice->Register(allocator, *sDataModelProvider));
 
     return CHIP_NO_ERROR;
 }

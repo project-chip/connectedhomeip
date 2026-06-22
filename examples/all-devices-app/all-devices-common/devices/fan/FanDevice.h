@@ -53,7 +53,7 @@ protected:
               Clusters::OnOffDelegate * onOffDelegate, const Context & context);
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Accessors for subclasses/implementations to interact with clusters

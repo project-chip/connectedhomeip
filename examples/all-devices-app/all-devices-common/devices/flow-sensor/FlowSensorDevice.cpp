@@ -28,9 +28,9 @@ FlowSensorDevice::FlowSensorDevice(TimerDelegate & timerDelegate, FlowMeasuremen
     mFlowConfig(flowConfig)
 {}
 
-CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -43,7 +43,7 @@ CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelPr
 
 void FlowSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mFlowMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mFlowMeasurementCluster.Cluster()));

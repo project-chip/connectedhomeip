@@ -51,6 +51,7 @@ log = logging.getLogger(__name__)
 
 
 class TestUnitTestingErrorPath(MatterBaseTest):
+    requires_dut = False
 
     @async_test_body
     async def test_unit_test_error_read(self):
