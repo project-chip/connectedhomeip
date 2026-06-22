@@ -18,7 +18,7 @@
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixChimeDevice.h>
 #include <app_config/enabled_devices.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 
 namespace chip {

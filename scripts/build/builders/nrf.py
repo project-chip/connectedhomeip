@@ -224,7 +224,7 @@ class NrfConnectBuilder(Builder):
 
     @lock_output_dir
     def _bundle(self):
-        log.info(f'Generating flashbundle at {self.output_dir}')
+        log.info('Generating flashbundle at %s', self.output_dir)
 
         self._Execute(['ninja', '-C', os.path.join(self.output_dir, 'nrfconnect'), 'flashing_script'],
                       title='Generating flashable files of ' + self.identifier)

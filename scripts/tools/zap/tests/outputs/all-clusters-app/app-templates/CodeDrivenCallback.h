@@ -136,6 +136,10 @@ void MatterAirQualityClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAirQualityClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterSmokeCoAlarmClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterSmokeCoAlarmClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterScenesManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterScenesManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -172,6 +176,10 @@ void MatterEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId, Matter
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterFanControlClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterFanControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
 

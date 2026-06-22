@@ -112,6 +112,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::AirQuality::Id:
         MatterAirQualityClusterInitCallback(endpoint);
         break;
+    case app::Clusters::SmokeCoAlarm::Id:
+        MatterSmokeCoAlarmClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterInitCallback(endpoint);
         break;
@@ -138,6 +141,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::FanControl::Id:
+        MatterFanControlClusterInitCallback(endpoint);
         break;
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterInitCallback(endpoint);
@@ -257,6 +263,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::AirQuality::Id:
         MatterAirQualityClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::SmokeCoAlarm::Id:
+        MatterSmokeCoAlarmClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
@@ -283,6 +292,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::FanControl::Id:
+        MatterFanControlClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterShutdownCallback(endpoint, shutdownType);

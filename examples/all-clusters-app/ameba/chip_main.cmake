@@ -153,6 +153,7 @@ list(
     APPEND ${list_chip_main_sources}
 
     ${chip_dir}/src/app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.cpp
+    ${chip_dir}/src/app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
@@ -173,6 +174,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/test-hidden-manufacturer-specific-stub.cpp
 
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp

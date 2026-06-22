@@ -14,6 +14,18 @@
 
 name: 68.2.1. [TC-BOOL-2.1] Attributes with server as DUT
 
+CI:
+    - name: "Test against all-devices/rain-sensor"
+      app: all-devices
+      args:
+          - --device
+          - rain-sensor
+    - name: "Test against all-devices/water-freeze-detector"
+      app: all-devices
+      args:
+          - --device
+          - water-freeze-detector
+
 PICS:
     - BOOL.S
 

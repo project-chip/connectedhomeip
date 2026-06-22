@@ -107,6 +107,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "OvenMode";
     case chip::app::Clusters::LaundryDryerControls::Id:
         return "LaundryDryerControls";
+    case chip::app::Clusters::TemperatureControlledCabinetTopology::Id:
+        return "TemperatureControlledCabinetTopology";
     case chip::app::Clusters::ModeSelect::Id:
         return "ModeSelect";
     case chip::app::Clusters::LaundryWasherMode::Id:
@@ -329,6 +331,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FaultInjection";
     case chip::app::Clusters::SampleMei::Id:
         return "SampleMei";
+    case chip::app::Clusters::TestHiddenManufacturerSpecific::Id:
+        return "TestHiddenManufacturerSpecific";
     default:
         return "Unknown";
     }
@@ -1647,6 +1651,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::TemperatureControlledCabinetTopology::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::DisabledCabinets::Id:
+            return "DisabledCabinets";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::Topology::Id:
+            return "Topology";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ModeSelect::Id: {
         switch (id)
         {
@@ -2446,6 +2471,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Forecast";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::OptOutState::Id:
             return "OptOutState";
+        case chip::app::Clusters::DeviceEnergyManagement::Attributes::PowerRangeAdjustment::Id:
+            return "PowerRangeAdjustment";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::AcceptedCommandList::Id:
@@ -5460,6 +5487,25 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::TestHiddenManufacturerSpecific::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::TestAttribute::Id:
+            return "TestAttribute";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     default:
         return "Unknown";
     }
@@ -6085,6 +6131,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestConstraintBasedForecast";
         case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Id:
             return "CancelRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Id:
+            return "PowerRangeAdjustRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelPowerRangeAdjustRequest::Id:
+            return "CancelPowerRangeAdjustRequest";
         default:
             return "Unknown";
         }

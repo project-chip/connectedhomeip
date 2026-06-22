@@ -98,8 +98,8 @@ class TC_CADMIN_1_10(CADMINBaseTest):
                 attribute=spec_version_attribute)
 
             if spec_version < MATTER_1_5_1:
-                log.info(
-                    f"Skipping this test as the DUT's SpecificationVersion is less than 1.5.1, DUT's SpecificationVersion value = 0x{spec_version:08X}")
+                log.info("Skipping this test as the DUT's SpecificationVersion is less than 1.5.1, DUT's SpecificationVersion "
+                         "value = 0x%08X", spec_version)
                 self.mark_all_remaining_steps_skipped(1)
                 return
         else:

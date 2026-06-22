@@ -97,7 +97,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
     def _wait_for_active_changed_event(self, cb: EventSubscriptionHandler, event, timeout_s: int) -> int:
         """Waits for an ActiveChanged event and returns the promised active duration."""
         promised_active_duration_event_data = cb.wait_for_event_report(event, timeout_s)
-        log.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
+        log.info("PromisedActiveDurationEvent.Data: %s", promised_active_duration_event_data)
         return promised_active_duration_event_data.promisedActiveDuration
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
@@ -226,7 +226,9 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                 self.dut_fsa_stdin.write(f"pairing onnetwork 2 {setupPinCode} --icd-registration true\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
-            await asyncio.sleep(5)
+            # 5s is insufficient for mDNS discovery + ICD commissioning through the bridge;
+            # use 15s to provide enough time for discovery/commissioning before continuing.
+            await asyncio.sleep(15)
 
     def teardown_class(self):
         if self._active_change_event_subscription is not None:
@@ -253,7 +255,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         basic_info_attributes = basic_info_cluster.Attributes
 
         dynamic_endpoint_id = await self._get_dynamic_endpoint()
-        log.info(f"Dynamic endpoint is {dynamic_endpoint_id}")
+        log.info("Dynamic endpoint is %s", dynamic_endpoint_id)
 
         self.step("0")
         log.info("Ensuring DUT is commissioned to TH")
@@ -276,7 +278,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             attribute=icdm_attributes.IdleModeDuration,
             node_id=self.icd_nodeid,
         )
-        log.info(f"IdleModeDurationS: {idle_mode_duration_s}")
+        log.info("IdleModeDurationS: %s", idle_mode_duration_s)
 
         active_mode_duration_ms = await self.read_single_attribute_check_success(
             endpoint=_ROOT_ENDPOINT_ID,
@@ -284,7 +286,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             attribute=icdm_attributes.ActiveModeDuration,
             node_id=self.icd_nodeid,
         )
-        log.info(f"ActiveModeDurationMs: {active_mode_duration_ms}")
+        log.info("ActiveModeDurationMs: %s", active_mode_duration_ms)
 
         active_mode_threshold_ms = await self.read_single_attribute_check_success(
             endpoint=_ROOT_ENDPOINT_ID,
@@ -292,7 +294,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             attribute=icdm_attributes.ActiveModeThreshold,
             node_id=self.icd_nodeid,
         )
-        log.info(f"ActiveModeThresholdMs: {active_mode_threshold_ms}")
+        log.info("ActiveModeThresholdMs: %s", active_mode_threshold_ms)
 
         self.step("2")
         event = brb_info_cluster.Events.ActiveChanged
@@ -352,11 +354,11 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         # sends 3x keep active commands
         stay_active_duration_ms = 2000
         keep_active_timeout_ms = 60000
-        log.info(f"Sending first KeepActiveCommand({stay_active_duration_ms})")
+        log.info("Sending first KeepActiveCommand(%s)", stay_active_duration_ms)
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
-        log.info(f"Sending second KeepActiveCommand({stay_active_duration_ms})")
+        log.info("Sending second KeepActiveCommand(%s)", stay_active_duration_ms)
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
-        log.info(f"Sending third KeepActiveCommand({stay_active_duration_ms})")
+        log.info("Sending third KeepActiveCommand(%s)", stay_active_duration_ms)
         await self._send_keep_active_command(stay_active_duration_ms, keep_active_timeout_ms, dynamic_endpoint_id)
 
         self.step("10")

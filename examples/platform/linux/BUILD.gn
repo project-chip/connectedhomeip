@@ -162,6 +162,35 @@ source_set("app-options") {
   public_configs = [ ":app-main-config" ]
 }
 
+source_set("named-pipes") {
+  sources = [
+    "NamedPipeCommands.cpp",
+    "NamedPipeCommands.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("commissionable-init") {
+  sources = [
+    "CommissionableInit.cpp",
+    "CommissionableInit.h",
+  ]
+
+  public_deps = [
+    ":app-options",
+    ":linux-commissionable-data-provider",
+    "${chip_root}/src/lib",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
 source_set("app-main") {
   defines = [
     "ENABLE_TRACING=${matter_enable_tracing_support}",
@@ -172,16 +201,13 @@ source_set("app-main") {
   sources = [
     "AppMain.cpp",
     "AppMain.h",
-    "CommissionableInit.cpp",
-    "CommissionableInit.h",
-    "NamedPipeCommands.cpp",
-    "NamedPipeCommands.h",
   ]
 
   public_deps = [
     ":app-main-loop",
     ":app-options",
     ":boolean-state-configuration-test-event-trigger",
+    ":commissionable-init",
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
     ":commodity-price-test-event-trigger",
@@ -192,6 +218,7 @@ source_set("app-main") {
     ":energy-reporting-test-event-trigger",
     ":linux-commissionable-data-provider",
     ":meter-identification-test-event-trigger",
+    ":named-pipes",
     ":smco-test-event-trigger",
     ":software-diagnostics-test-event-trigger",
     ":water-heater-management-test-event-trigger",

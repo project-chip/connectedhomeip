@@ -5804,6 +5804,56 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForTemperatureControlledCabinetTopologyCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TemperatureControlledCabinetTopology;
+    switch (aAttributeId) {
+    case Attributes::DisabledCabinets::Id: {
+        using TypeInfo = Attributes::DisabledCabinets::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::Topology::Id: {
+        using TypeInfo = Attributes::Topology::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    default: {
+        // Not a known TemperatureControlledCabinetTopology attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ModeSelect;
@@ -9518,6 +9568,33 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::PowerRangeAdjustment::Id: {
+        using TypeInfo = Attributes::PowerRangeAdjustment::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct new];
+            if (cppValue.Value().minPower.IsNull()) {
+                value.minPower = nil;
+            } else {
+                value.minPower = [NSNumber numberWithLongLong:cppValue.Value().minPower.Value()];
+            }
+            if (cppValue.Value().maxPower.IsNull()) {
+                value.maxPower = nil;
+            } else {
+                value.maxPower = [NSNumber numberWithLongLong:cppValue.Value().maxPower.Value()];
+            }
+            value.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().cause)];
+            value.endTime = [NSNumber numberWithUnsignedInt:cppValue.Value().endTime];
+        }
         return value;
     }
     default: {
@@ -18074,6 +18151,7 @@ static id _Nullable DecodeAttributeValueForNetworkIdentityManagementCluster(Attr
                 newElement_0 = [MTRNetworkIdentityManagementClusterClientStruct new];
                 newElement_0.clientIndex = [NSNumber numberWithUnsignedShort:entry_0.clientIndex];
                 newElement_0.clientIdentifier = AsData(entry_0.clientIdentifier);
+                newElement_0.clientIdentityType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.clientIdentityType)];
                 if (entry_0.networkIdentityIndex.IsNull()) {
                     newElement_0.networkIdentityIndex = nil;
                 } else {
@@ -25157,6 +25235,30 @@ static id _Nullable DecodeAttributeValueForSampleMEICluster(AttributeId aAttribu
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForTestHiddenManufacturerSpecificCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TestHiddenManufacturerSpecific;
+    switch (aAttributeId) {
+    case Attributes::TestAttribute::Id: {
+        using TypeInfo = Attributes::TestAttribute::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    default: {
+        // Not a known TestHiddenManufacturerSpecific attribute.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 
 id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -25278,6 +25380,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::LaundryDryerControls::Id: {
         return DecodeAttributeValueForLaundryDryerControlsCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::TemperatureControlledCabinetTopology::Id: {
+        return DecodeAttributeValueForTemperatureControlledCabinetTopologyCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ModeSelect::Id: {
         return DecodeAttributeValueForModeSelectCluster(aPath.mAttributeId, aReader, aError);
@@ -25608,6 +25713,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::SampleMei::Id: {
         return DecodeAttributeValueForSampleMEICluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::TestHiddenManufacturerSpecific::Id: {
+        return DecodeAttributeValueForTestHiddenManufacturerSpecificCluster(aPath.mAttributeId, aReader, aError);
     }
     default: {
         break;
