@@ -101,7 +101,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadClusterRevision)
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
-    uint16_t clusterRevision;
+    uint16_t clusterRevision = 0;
     EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, AmbientSensingUnion::kRevision);
 }
@@ -113,7 +113,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadFeatureMap)
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(*cluster);
 
-    uint32_t featureMap;
+    uint32_t featureMap = 0u;
     EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 0u);
 }
@@ -143,7 +143,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
         EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(*cluster);
 
-        UnionHealthEnum health;
+        UnionHealthEnum health = UnionHealthEnum::kNonFunctional;
         EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
         EXPECT_EQ(health, UnionHealthEnum::kNonFunctional);
     }
@@ -158,7 +158,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
 
         chip::Testing::ClusterTester tester(*cluster);
 
-        UnionHealthEnum health;
+        UnionHealthEnum health = UnionHealthEnum::kNonFunctional;
         EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
         EXPECT_EQ(health, UnionHealthEnum::kFullyFunctional);
     }
@@ -176,7 +176,7 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
 
         chip::Testing::ClusterTester tester(*cluster);
 
-        UnionHealthEnum health;
+        UnionHealthEnum health = UnionHealthEnum::kNonFunctional;
         EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
         EXPECT_EQ(health, UnionHealthEnum::kLimitedDegraded);
     }
