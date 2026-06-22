@@ -47,6 +47,7 @@
 #endif // PW_RPC_ENABLED
 #include <device-factory/DeviceFactory.h>
 #include <devices/device-type-parser/DeviceTypeParser.h>
+#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -167,10 +168,28 @@ public:
             }())
     {}
 
+    std::set<EndpointId> GetReservedEndpointIds() const
+    {
+        std::set<EndpointId> usedIds;
+        usedIds.insert(kRootEndpointId);
+
+        for (const auto & entry : AppOptions::GetDeviceTypeEntries())
+        {
+            if (entry.endpoint != kInvalidEndpointId)
+            {
+                usedIds.insert(entry.endpoint);
+            }
+        }
+        return usedIds;
+    }
+
     CHIP_ERROR Startup()
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
-        ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
+
+        DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
+        endpointIdAllocator.ForceNext(kRootEndpointId);
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
@@ -186,6 +205,12 @@ public:
                 AccessorRegistry::Instance().Register(*accessor);
                 mConstructedAccessors.push_back(std::move(accessor));
             }
+            if (entry.endpoint != kInvalidEndpointId)
+            {
+                endpointIdAllocator.ForceNext(entry.endpoint);
+            }
+            ReturnErrorOnFailure(
+                device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
             mConstructedDevices.push_back(std::move(device));
         }
 

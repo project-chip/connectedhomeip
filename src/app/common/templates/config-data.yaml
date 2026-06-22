@@ -26,28 +26,18 @@ CommandHandlerInterfaceOnlyClusters:
     - Camera AV Settings User Level Management
     - Commodity Price
     - Commodity Tariff
-    - Device Energy Management Mode
-    - Dishwasher Mode
     - Electrical Energy Measurement
-    - Energy EVSE Mode
     - Joint Fabric Administrator
-    - Laundry Washer Mode
     - Network Commissioning
     - Operational State
     - Oven Cavity Operational State
-    - Oven Mode
-    - Proximity Ranging
-    - RVC Clean Mode
     - RVC Operational State
-    - RVC Run Mode
-    - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Service Area
     - Soil Measurement
     - Thread Border Router Management
     - Thread Network Directory
     - Water Heater Management
-    - Water Heater Mode
     - WebRTC Transport Provider
     - WebRTC Transport Requestor
     - Zone Management
@@ -121,9 +111,12 @@ CodeDrivenClusters:
     - Commissioner Control
     - Descriptor
     - Device Energy Management
+    - Device Energy Management Mode
     - Diagnostic Logs
+    - Dishwasher Mode
     - Electrical Power Measurement
     - Energy EVSE
+    - Energy EVSE Mode
     - Ethernet Network Diagnostics
     - Fan Control
     - Fixed Label
@@ -138,17 +131,23 @@ CodeDrivenClusters:
     - ICD Management
     - Identify
     - Illuminance Measurement
+    - Laundry Washer Mode
     - Localization Configuration
     - Microwave Oven Control
+    - Microwave Oven Mode
     - Network Identity Management
     - OTA Software Update Provider
     - OTA Software Update Requestor
     - Occupancy Sensing
     - Operational Credentials
+    - Oven Mode
     - Power Topology
     - Pressure Measurement
     - Proximity Ranging
     - Push AV Stream Transport
+    - RVC Clean Mode
+    - RVC Run Mode
+    - Refrigerator And Temperature Controlled Cabinet Mode
     - Relative Humidity Measurement
     - Scenes Management
     - Smoke CO Alarm
@@ -165,6 +164,7 @@ CodeDrivenClusters:
     - Unit Localization
     - User Label
     - Valve Configuration and Control
+    - Water Heater Mode
     - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
     # keep-sorted end

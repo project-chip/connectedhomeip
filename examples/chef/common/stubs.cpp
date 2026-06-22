@@ -288,31 +288,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-    case chip::app::Clusters::RvcRunMode::Id:
-        return chefRvcRunModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-    case chip::app::Clusters::RvcCleanMode::Id:
-        return chefRvcCleanModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(endpoint, clusterId, attributeMetadata,
-                                                                                       buffer, maxReadLength);
-#endif
-#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-    case chip::app::Clusters::DishwasherMode::Id:
-        return chefDishwasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-    case chip::app::Clusters::LaundryWasherMode::Id:
-        return chefLaundryWasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
@@ -370,31 +349,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-    case chip::app::Clusters::RvcRunMode::Id:
-        return chefRvcRunModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-    case chip::app::Clusters::RvcCleanMode::Id:
-        return chefRvcCleanModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(endpoint, clusterId, attributeMetadata,
-                                                                                        buffer);
-#endif
-#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-    case chip::app::Clusters::DishwasherMode::Id:
-        return chefDishwasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-    case chip::app::Clusters::LaundryWasherMode::Id:
-        return chefLaundryWasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
@@ -783,12 +741,6 @@ void WaterHeaterInit()
         WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
                                        to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
     VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
-
-    // WaterHeaterMode initialisation
-    uint32_t WaterHeaterModefeatureMap = 0;
-    static ModeBase::DefaultChefDelegate WaterHeaterModeDelegate(WaterHeaterMode::Chef::kSupportedModes);
-    static ModeBase::Instance WaterHeaterModeInstance(&WaterHeaterModeDelegate, 1, WaterHeaterMode::Id, WaterHeaterModefeatureMap);
-    VerifyOrDieWithMsg(WaterHeaterModeInstance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterMode instance.");
 #endif
 }
 
@@ -872,16 +824,6 @@ void ApplicationInit()
     ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
     ChefWindowCovering::InitChefWindowCoveringCluster();
 #endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
-
-#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
-    ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
-    ChefOvenMode::InitChefOvenModeCluster();
-#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
-
-#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
-    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenMode cluster.");
-    ChefMicrowaveOvenMode::InitChefMicrowaveOvenModeCluster();
-#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
     ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenControl cluster.");
