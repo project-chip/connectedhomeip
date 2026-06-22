@@ -37,8 +37,8 @@
 #include <providers/AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <providers/AllDevicesExampleDeviceInstanceInfoProviderImpl.h>
 
-#include <accessors/OOBAccessorRegistry.h>
 #include <accessors/OOBAccessor.h>
+#include <accessors/OOBAccessorRegistry.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
