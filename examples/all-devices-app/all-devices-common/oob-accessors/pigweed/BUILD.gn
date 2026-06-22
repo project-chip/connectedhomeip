@@ -12,31 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
+if (chip_enable_pw_rpc) {
+  source_set("pigweed-accessor") {
+    sources = [
+      "PigweedAttributeAccessor.h",
+    ]
 
-config("includes") {
-  include_dirs = [ ".." ]
-}
-
-source_set("oob-accessors") {
-  sources = [
-    "OOBAccessor.h",
-    "OOBAccessorRegistry.h",
-    "OOBDataSerializer.cpp",
-    "OOBDataSerializer.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app:paths",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-
-  public_configs = [
-    ":includes",
-    "${chip_root}/src:includes",
-  ]
-
+    public_deps = [
+      "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
+      "${chip_root}/examples/common/pigweed:rpc_services",
+      "${chip_root}/src/lib/support",
+    ]
+  }
 }
