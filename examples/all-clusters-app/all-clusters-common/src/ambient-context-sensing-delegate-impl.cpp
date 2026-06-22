@@ -56,13 +56,13 @@ AmbientContextSensingDelegateImpl::AmbientContextSensingDelegateImpl()
 
 SemanticTagType * AmbientContextSensingDelegateImpl::GetAmbientContextTypeSupportedBuf(size_t size)
 {
-    VerifyOrReturnError(size <= kMaxACTypeSupported, nullptr);
+    VerifyOrReturnError(size <= kMaxACTypeSupported_s, nullptr);
     return mAmbientContextTypeSupportedBuf;
 }
 
 CHIP_ERROR AmbientContextSensingDelegateImpl::SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList)
 {
-    VerifyOrReturnError(predictedActivityList.size() <= kMaxPredictedActivity, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(predictedActivityList.size() <= kMaxPredictedActivity_s, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Copy the input predicted activity to local array
     for (size_t i = 0; i < predictedActivityList.size(); i++)
