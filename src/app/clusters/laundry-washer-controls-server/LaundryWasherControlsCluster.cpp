@@ -172,7 +172,7 @@ CHIP_ERROR LaundryWasherControlsCluster::NumberOfRinsesValidity(NumberOfRinsesEn
 CHIP_ERROR LaundryWasherControlsCluster::ReadSpinSpeeds(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t i = 0; true; i++)
+        for (uint8_t i = 0; i < kMaxSpinSpeedsLength; i++)
         {
             char buffer[kMaxSpinSpeedLength];
             MutableCharSpan spinSpeed(buffer);
@@ -190,7 +190,7 @@ CHIP_ERROR LaundryWasherControlsCluster::ReadSpinSpeeds(const ConcreteAttributeP
 CHIP_ERROR LaundryWasherControlsCluster::ReadSupportedRinses(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t i = 0; true; i++)
+        for (uint8_t i = 0; i < kMaxSupportedRinsesLength; i++)
         {
             NumberOfRinsesEnum supportedRinse;
             auto err = mDelegate->GetSupportedRinseAtIndex(i, supportedRinse);

@@ -42,7 +42,7 @@ struct AlwaysSuccessDelegate : public LaundryWasherControls::Delegate
     CHIP_ERROR GetSupportedRinseAtIndex(size_t, NumberOfRinsesEnum &) override { return CHIP_NO_ERROR; }
 };
 
-// We will use this to be able to set some values got from `Accessors::Get` functions without failing, since the cluster will check
+// We will use this to be able to set some values got from `Accessors::GetDefault` functions without failing, since the cluster will check
 // the values to be valid using the delegate.
 AlwaysSuccessDelegate gAlwaysSuccessDelegate;
 
@@ -65,7 +65,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
         if (features.Has(Feature::kSpin))
         {
             DataModel::Nullable<uint8_t> spinSpeedCurrent;
-            if (SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent) == Status::Success)
+            if (SpinSpeedCurrent::GetDefault(endpointId, spinSpeedCurrent) == Status::Success)
             {
                 server.Cluster().SetSpinSpeedCurrent(spinSpeedCurrent);
             }
@@ -74,7 +74,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
         if (features.Has(Feature::kRinse))
         {
             NumberOfRinsesEnum numberOfRinses;
-            if (NumberOfRinses::Get(endpointId, &numberOfRinses) == Status::Success)
+            if (NumberOfRinses::GetDefault(endpointId, &numberOfRinses) == Status::Success)
             {
                 server.Cluster().SetNumberOfRinses(numberOfRinses);
             }
