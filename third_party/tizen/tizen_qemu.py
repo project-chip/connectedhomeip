@@ -150,15 +150,6 @@ if args.interactive:
 if args.runner:
     kernel_args += f' runner=/mnt/chip/{args.runner}'
 
-if args.share:
-    filter_file = os.path.join(args.share, "test_filter")
-    chip_test_filter = os.environ.get("CHIP_TEST_FILTER")
-    if chip_test_filter:
-        log.info(f"Writing CHIP_TEST_FILTER '{chip_test_filter}' to {filter_file}")
-        with open(filter_file, "w") as f:
-            f.write(chip_test_filter.strip())
-    elif os.path.exists(filter_file):
-        os.remove(filter_file)
 
 qemu_args += [
     '-kernel', args.kernel,

@@ -41,12 +41,6 @@ fi
 # Restore original core_pattern on exit
 trap 'if [ -n "$ORIGINAL_CORE_PATTERN" ]; then echo "$ORIGINAL_CORE_PATTERN" > /proc/sys/kernel/core_pattern 2>/dev/null; fi' EXIT
 
-FILTER=""
-if [ -f "/mnt/chip/test_filter" ]; then
-    FILTER=$(cat /mnt/chip/test_filter)
-    echo "Using test filter: $FILTER"
-fi
-
 # Install lighting Matter app
 pkgcmd -i -t tpk -p /mnt/chip/org.tizen.matter.*/out/org.tizen.matter.*.tpk
 # Launch lighting Matter app
@@ -56,12 +50,6 @@ app_launcher -s org.tizen.matter.example.lighting
 run_test_with_crash_handling() {
     TEST_NAME="$1"
     shift
-
-    if [ -n "$FILTER" ]; then
-        if [[ ! "$TEST_NAME" == $FILTER ]]; then
-            return 0
-        fi
-    fi
 
     echo "RUN: $TEST_NAME"
     RV=0

@@ -47,22 +47,10 @@ trap 'if [ -n "$ORIGINAL_CORE_PATTERN" ]; then echo "$ORIGINAL_CORE_PATTERN" > /
 FAILED=()
 STATUS=0
 
-FILTER=""
-if [ -f "/mnt/chip/test_filter" ]; then
-    FILTER=$(cat /mnt/chip/test_filter)
-    echo "Using test filter: $FILTER"
-fi
-
 # Run all executables in the /mnt/chip directory except the runner.sh script
 while IFS= read -r TEST; do
 
     NAME=$(basename "$TEST")
-
-    if [ -n "$FILTER" ]; then
-        if [[ ! "$NAME" == $FILTER ]]; then
-            continue
-        fi
-    fi
 
     echo
     echo "RUN: $NAME"
