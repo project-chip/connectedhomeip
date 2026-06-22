@@ -41,7 +41,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/humidity-sensor/impl:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/light-sensor/impl:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/impl:toggling",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/power-source/impl:decreasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/pressure-sensor/impl:increasing",
