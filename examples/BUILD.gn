@@ -31,7 +31,7 @@ if (chip_build_tests) {
     }
     tests += [
       "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-type-parser/tests",
-      "${chip_root}/examples/all-devices-app/all-devices-common/accessors/tests",
+      "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/tests",
     ]
 
     # TV Casting app tests (platform-independent)

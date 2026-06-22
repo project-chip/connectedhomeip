@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <accessors/OOBAccessor.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <oob-accessors/OOBAccessor.h>
 
 namespace chip::app {
 

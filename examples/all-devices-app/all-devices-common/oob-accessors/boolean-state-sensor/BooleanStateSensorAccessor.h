@@ -18,13 +18,13 @@
 
 #include <optional>
 
-#include <accessors/OOBAccessor.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
+#include <oob-accessors/OOBAccessor.h>
 
 namespace chip::app {
 

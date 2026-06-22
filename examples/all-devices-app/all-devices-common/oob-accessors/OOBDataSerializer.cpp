@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-#include <accessors/OOBDataSerializer.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <oob-accessors/OOBDataSerializer.h>
 
 namespace chip::app::OOBDataSerializer {
 

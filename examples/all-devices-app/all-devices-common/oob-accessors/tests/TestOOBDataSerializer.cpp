@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <accessors/OOBDataSerializer.h>
 #include <lib/core/TLV.h>
+#include <oob-accessors/OOBDataSerializer.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;

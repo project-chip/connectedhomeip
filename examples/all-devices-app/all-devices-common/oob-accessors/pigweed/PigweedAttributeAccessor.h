@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include <accessors/OOBAccessorRegistry.h>
-#include <accessors/OOBDataSerializer.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/OOBDataSerializer.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
 
 namespace chip::app {

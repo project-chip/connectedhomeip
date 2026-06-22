@@ -15,9 +15,9 @@
  */
 
 #include <access/SubjectDescriptor.h>
-#include <accessors/OOBDataSerializer.h>
-#include <accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #include <lib/support/CodeUtils.h>
+#include <oob-accessors/OOBDataSerializer.h>
+#include <oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 
 using namespace chip::app::Clusters;
 

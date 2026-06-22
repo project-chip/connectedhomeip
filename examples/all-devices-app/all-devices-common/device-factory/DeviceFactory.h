@@ -43,10 +43,10 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
 
-#include <accessors/OOBAccessor.h>
-#include <accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 #include <functional>
 #include <map>
+#include <oob-accessors/OOBAccessor.h>
+#include <oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 
 namespace chip::app {
 
@@ -173,7 +173,7 @@ private:
                             ConcentrationMeasurementCluster::Config{
                                 .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
                                 .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
+                                                               Feature::kAverageMeasurement, Feature::kLevelIndication),
                                 .medium    = MeasurementMediumEnum::kAir,
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },

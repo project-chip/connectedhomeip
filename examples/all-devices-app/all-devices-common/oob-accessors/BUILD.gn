@@ -21,7 +21,7 @@ config("includes") {
   include_dirs = [ ".." ]
 }
 
-source_set("accessors") {
+source_set("oob-accessors") {
   sources = [
     "OOBAccessor.h",
     "OOBAccessorRegistry.h",
