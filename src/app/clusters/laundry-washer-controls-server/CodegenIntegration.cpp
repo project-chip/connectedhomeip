@@ -42,8 +42,8 @@ struct AlwaysSuccessDelegate : public LaundryWasherControls::Delegate
     CHIP_ERROR GetSupportedRinseAtIndex(size_t, NumberOfRinsesEnum &) override { return CHIP_NO_ERROR; }
 };
 
-// We will use this to be able to set some values got from `Accessors::GetDefault` functions without failing, since the cluster will check
-// the values to be valid using the delegate.
+// We will use this to be able to set some values got from `Accessors::GetDefault` functions without failing, since the cluster will
+// check the values to be valid using the delegate.
 AlwaysSuccessDelegate gAlwaysSuccessDelegate;
 
 // After the cluster is created, we will set the actual delegate back to the default one.
