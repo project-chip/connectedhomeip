@@ -102,7 +102,7 @@ AggregatorDevice::AggregatorDevice(TimerDelegate & timerDelegate) :
 
 CHIP_ERROR AggregatorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&GetIdentifyDelegate()));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -112,7 +112,7 @@ CHIP_ERROR AggregatorDevice::Register(EndpointId endpoint, CodeDrivenDataModelPr
 
 void AggregatorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mIdentifyCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));

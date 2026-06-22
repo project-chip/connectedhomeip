@@ -71,9 +71,7 @@ struct EndpointComposition
     constexpr EndpointComposition(
         EndpointId parent,
         DataModel::EndpointCompositionPattern compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
-        Span<const SemanticTag> tags                             = {}) :
-        parentId(parent),
-        pattern(compositionPattern), tagList(tags)
+        Span<const SemanticTag> tags = {}) : parentId(parent), pattern(compositionPattern), tagList(tags)
     {}
 
     static constexpr EndpointComposition WithParent(EndpointId parent) { return EndpointComposition(parent); }
@@ -110,9 +108,14 @@ protected:
         mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {})
     {}
 
-    CHIP_ERROR InitEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                        EndpointComposition composition = {});
-    void ShutdownEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
+    /// Internal method to register the descriptor cluster for this device on the given endpoint
+    ///
+    /// virtual in case subclasses want to track extra data (e.g. endpoint id)
+    virtual CHIP_ERROR RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition = {});
+
+    /// Reverse of `RegisterDescrioptor`
+    virtual void UnregisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     EndpointInterfaceRegistration mEndpointRegistration;

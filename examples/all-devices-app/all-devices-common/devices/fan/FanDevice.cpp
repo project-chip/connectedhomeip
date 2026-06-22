@@ -37,7 +37,7 @@ FanDevice::FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnO
 
 CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Identify
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -94,7 +94,7 @@ CHIP_ERROR FanDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 
 void FanDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     if (mFanControlCluster.IsConstructed())
     {

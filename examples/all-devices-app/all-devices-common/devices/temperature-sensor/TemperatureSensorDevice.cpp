@@ -32,7 +32,7 @@ TemperatureSensorDevice::TemperatureSensorDevice(TimerDelegate & timerDelegate,
 CHIP_ERROR TemperatureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                              EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -48,7 +48,7 @@ CHIP_ERROR TemperatureSensorDevice::Register(EndpointId endpoint, CodeDrivenData
 
 void TemperatureSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mTemperatureMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mTemperatureMeasurementCluster.Cluster()));

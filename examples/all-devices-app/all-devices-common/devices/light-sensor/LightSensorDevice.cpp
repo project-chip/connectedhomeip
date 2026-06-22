@@ -31,7 +31,7 @@ LightSensorDevice::LightSensorDevice(TimerDelegate & timerDelegate, IlluminanceM
 
 CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -44,7 +44,7 @@ CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
 
 void LightSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mIlluminanceMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIlluminanceMeasurementCluster.Cluster()));

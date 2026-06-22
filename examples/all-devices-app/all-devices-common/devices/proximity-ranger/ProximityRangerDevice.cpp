@@ -51,7 +51,7 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
         ReturnErrorOnFailure(GetRangingController().RegisterAdapter(*adapter).NoErrorIf(CHIP_ERROR_DUPLICATE_KEY_ID));
     }
 
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -89,7 +89,7 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
 
 void ProximityRangerDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     if (mProximityRangingCluster.IsConstructed())
     {

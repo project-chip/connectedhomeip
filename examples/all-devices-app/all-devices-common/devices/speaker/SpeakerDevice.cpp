@@ -33,7 +33,7 @@ SpeakerDevice::SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clu
 CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                    EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Identify
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -69,7 +69,7 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
 
 void SpeakerDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mLevelControlCluster.IsConstructed())
     {
         if (mOnOffCluster.IsConstructed())

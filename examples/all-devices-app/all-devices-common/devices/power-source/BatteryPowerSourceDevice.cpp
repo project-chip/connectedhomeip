@@ -33,7 +33,7 @@ BatteryPowerSourceDevice::BatteryPowerSourceDevice(CharSpan description,
 CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                               EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Power Source (some arbitrary configuration)
     SimpleBatteryPowerSourceCluster::Config config(mDescription, mReplaceability, mTimerDelegate);
@@ -52,7 +52,7 @@ CHIP_ERROR BatteryPowerSourceDevice::Register(chip::EndpointId endpoint, CodeDri
 
 void BatteryPowerSourceDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mBatteryPowerSourceCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mBatteryPowerSourceCluster.Cluster()));

@@ -31,7 +31,7 @@ OccupancySensorDevice::OccupancySensorDevice(OccupancySensingConfig config, Time
 CHIP_ERROR OccupancySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                            EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -49,7 +49,7 @@ CHIP_ERROR OccupancySensorDevice::Register(chip::EndpointId endpoint, CodeDriven
 
 void OccupancySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mOccupancySensingCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOccupancySensingCluster.Cluster()));

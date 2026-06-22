@@ -32,7 +32,7 @@ AirQualitySensorDevice::AirQualitySensorDevice(TimerDelegate & timerDelegate, co
 CHIP_ERROR AirQualitySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                             EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -48,7 +48,7 @@ CHIP_ERROR AirQualitySensorDevice::Register(chip::EndpointId endpoint, CodeDrive
 
 void AirQualitySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mCO2Cluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mCO2Cluster.Cluster()));
