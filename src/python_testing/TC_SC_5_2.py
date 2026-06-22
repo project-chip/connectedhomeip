@@ -242,7 +242,7 @@ class TC_SC_5_2(MatterBaseTest):
             asserts.assert_equal(result.status, Status.Success, "ViewGroup failed")
             asserts.assert_equal(result.groupID, 0x0101, "ViewGroup groupID mismatch")
 
-            # Step 7a: AddGroup 0x0102 as group command via GroupID 0x0101
+            # Step 7a: AddGroup 0x0102 as group command via GroupID 0x0101 (encrypted using KeySet 0x01a4, which has the same key material)
             self.step("7a")
             dev_ctrl.SendGroupCommand(0x0101, Clusters.Groups.Commands.AddGroup(0x0102, "Test Group 0102"))
             await asyncio.sleep(3)
