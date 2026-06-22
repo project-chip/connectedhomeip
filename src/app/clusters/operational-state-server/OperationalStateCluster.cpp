@@ -45,7 +45,8 @@ OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, Delegate
 
 OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, ClusterId clusterId, uint16_t revision, Delegate * delegate,
                                                  const Config & config) :
-    DefaultServerCluster({ endpointId, clusterId }), mDelegate(delegate), mRevision(revision), mConfig(config)
+    DefaultServerCluster({ endpointId, clusterId }),
+    mDelegate(delegate), mRevision(revision), mConfig(config)
 {
     mCountdownTime.policy()
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
