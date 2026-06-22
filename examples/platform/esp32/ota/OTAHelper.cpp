@@ -22,7 +22,11 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+#include <platform/ESP32/multi-ota/MultiImageOTAProcessorImpl.h>
+#else
 #include <platform/ESP32/OTAImageProcessorImpl.h>
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 #include <system/SystemEvent.h>
 
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
@@ -51,7 +55,11 @@ DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
+#if CONFIG_ENABLE_MULTI_IMAGE_OTA
+MultiImageOTAProcessorImpl gImageProcessor;
+#else
 OTAImageProcessorImpl gImageProcessor;
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
 chip::Optional<bool> gRequestorCanConsent;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
