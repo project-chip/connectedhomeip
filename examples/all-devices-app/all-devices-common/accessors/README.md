@@ -16,7 +16,7 @@ the appropriate accessor based on the target Endpoint ID.
 
 ```mermaid
 classDiagram
-    class AccessorRegistry {
+    class OOBAccessorRegistry {
         -mAccessors: IntrusiveList~OOBAccessor~
         +Register(accessor: OOBAccessor&) void
         +HandleAction(actionName: CharSpan, tlvBuffer: ByteSpan) CHIP_ERROR
@@ -39,9 +39,9 @@ classDiagram
         +HandleCommand(args)
     }
 
-    AccessorRegistry "1" *-- "many" OOBAccessor
+    OOBAccessorRegistry "1" *-- "many" OOBAccessor
     BooleanStateSensorAccessor --|> OOBAccessor
     BooleanStateSensorAccessor "1" --> "1" BooleanStateSensorDevice : references
-    PigweedAttributeAccessor --> AccessorRegistry : uses
-    ShellCommandHandler --> AccessorRegistry : uses
+    PigweedAttributeAccessor --> OOBAccessorRegistry : uses
+    ShellCommandHandler --> OOBAccessorRegistry : uses
 ```
