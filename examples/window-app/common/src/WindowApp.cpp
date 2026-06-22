@@ -491,7 +491,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     target  = wc->GetTargetPositionLiftPercent100ths();
     current = wc->GetCurrentPositionLiftPercent100ths();
 
-    OperationalState opState = ComputeOperationalState(target, current);
+    OperationalState opState = wc->ComputeOperationalState(target, current);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -558,7 +558,7 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     target  = wc->GetTargetPositionTiltPercent100ths();
     current = wc->GetCurrentPositionTiltPercent100ths();
 
-    OperationalState opState = ComputeOperationalState(target, current);
+    OperationalState opState = wc->ComputeOperationalState(target, current);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 

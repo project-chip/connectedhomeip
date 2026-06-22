@@ -43,6 +43,19 @@ WindowCoveringCluster * FindClusterOnEndpoint(EndpointId endpointId);
  */
 void SetDefaultDelegate(EndpointId endpointId, WindowCoveringDelegate * delegate);
 
+// Helper functions used by example apps and CodegenIntegration.
+chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint);
+
+LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
+
+OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
+OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
+
+Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta);
+
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
+uint16_t ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute);
+
 // These functions are only kept for backwards compatibility with example apps and should not be used by new code.
 void TypeSet(chip::EndpointId endpoint, Type type);
 Type TypeGet(chip::EndpointId endpoint);
