@@ -25,6 +25,15 @@ namespace chip::app {
 ///
 /// Maintains an invariant where `mNext` is always the next returned value. `ForceNext()`
 /// can be used to set `mNext` directly for user-requested endpoint IDs.
+///
+/// Class is intended to be used when:
+///   - some IDs are pre-reserved (e.g. some configuration for topology is already set with known
+///     numbers, yet we still want the ability to allocate new numbers)
+///   - require the ability to force "return this number next" (ia the `ForceNext()` member)
+///
+/// Typical usage is a pre-defined list of endpoint allocation, like "3:thermostat, 5:rain-sensor"
+/// where the given IDs (3 and 5 in the example) are pre-allocated/resreved while the rest may
+/// be dynamic.
 class DynamicEndpointIdAllocator : public EndpointIdAllocator
 {
 public:
