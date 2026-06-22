@@ -25,7 +25,7 @@ namespace chip::app {
 
 std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
 {
-    if (!actionName.data_equal(kActionSetAttribute))
+    if (!actionName.data_equal("SetAttribute"_span))
     {
         return std::nullopt;
     }

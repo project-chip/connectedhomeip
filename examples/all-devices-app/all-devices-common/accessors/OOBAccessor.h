@@ -32,8 +32,6 @@ class OOBAccessor : public chip::IntrusiveListNodeBase<chip::IntrusiveMode::Auto
 public:
     virtual ~OOBAccessor() = default;
 
-    static constexpr CharSpan kActionSetAttribute = "SetAttribute"_span;
-
     /**
      * @brief Handles a generic out-of-band action.
      *
