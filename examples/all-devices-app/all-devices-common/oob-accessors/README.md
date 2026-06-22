@@ -9,7 +9,7 @@ logic from specific transport protocols (like Pigweed RPC or Shell commands).
 
 ## Architecture Overview
 
-The framework consists of a central `AccessorRegistry` that manages a list of
+The framework consists of a central `OOBAccessorRegistry` that manages a list of
 `OOBAccessor` instances. External interfaces (such as Pigweed RPC services or
 CLI shell handlers) route requests through the registry, which forwards them to
 the appropriate accessor based on the target Endpoint ID.
