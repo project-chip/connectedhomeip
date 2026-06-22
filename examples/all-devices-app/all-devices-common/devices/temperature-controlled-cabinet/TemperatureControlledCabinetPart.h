@@ -40,13 +40,7 @@ public:
     TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config);
     ~TemperatureControlledCabinetPart() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override
-    {
-        return Register(endpoint, provider, EndpointComposition(parentId));
-    }
-
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition);
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 private:

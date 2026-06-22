@@ -25,9 +25,9 @@ GenericSwitchDevice::GenericSwitchDevice(TimerDelegate & timerDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kGenericSwitch, 1)), mTimerDelegate(timerDelegate)
 {}
 
-CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -41,7 +41,7 @@ CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
 
 void GenericSwitchDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mSwitchCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mSwitchCluster.Cluster()));

@@ -32,17 +32,18 @@ OvenDevice::OvenDevice(TimerDelegate & timerDelegate) :
     mSurface(timerDelegate)
 {}
 
-CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = allocator.Allocate();
 
-    ReturnErrorOnFailure(InitEndpointRegistration(mEndpointId, provider,
-                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(RegisterDescriptor(
+        mEndpointId, provider,
+        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mCavity.Register(allocator, provider, mEndpointId));
-    ReturnErrorOnFailure(mSurface.Register(allocator, provider, mEndpointId));
+    ReturnErrorOnFailure(mCavity.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
+    ReturnErrorOnFailure(mSurface.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
 
     return CHIP_NO_ERROR;
 }
@@ -51,7 +52,7 @@ void OvenDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mSurface.Unregister(provider);
     mCavity.Unregister(provider);
-    ShutdownEndpointRegistration(mEndpointId, provider);
+    UnregisterDescriptor(mEndpointId, provider);
     mEndpointId = kInvalidEndpointId;
 }
 

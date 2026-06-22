@@ -40,7 +40,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-energy-management",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-plug-in-unit",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/endpoint-allocator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/endpoint-id-allocator",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/fan/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/flow-sensor/impl:increasing",

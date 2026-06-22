@@ -374,7 +374,7 @@ private:
                 // Tagged with PositionTag::kTop to disambiguate from fan-no-onoff under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = kCommonPositionNamespaceId,
+                    .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
                 return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
@@ -390,7 +390,7 @@ private:
                 // Tagged with PositionTag::kBottom to disambiguate from fan (see comments above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kFanNoOnOffTag = {
                     .mfgCode     = DataModel::NullNullable,
-                    .namespaceID = kCommonPositionNamespaceId,
+                    .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
                 return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{

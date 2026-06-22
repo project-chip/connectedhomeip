@@ -35,15 +35,9 @@ public:
     {}
     ~CookSurfacePart() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override
     {
-        return Register(endpoint, provider, EndpointComposition(parentId));
-    }
-
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
-    {
-        ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, composition));
+        ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
         mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
         mOnOffCluster.Create(endpoint, Clusters::OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
         ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -53,7 +47,7 @@ public:
 
     void Unregister(CodeDrivenDataModelProvider & provider) override
     {
-        SingleEndpointUnregistration(provider);
+        UnregisterDescriptor(provider);
         if (mIdentifyCluster.IsConstructed())
         {
             LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
@@ -79,7 +73,7 @@ public:
     ~CooktopDevice() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 private:

@@ -31,7 +31,7 @@ public:
     ~DeviceEnergyManagementDevice() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentEndpoint = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Clusters::DeviceEnergyManagement::Delegate

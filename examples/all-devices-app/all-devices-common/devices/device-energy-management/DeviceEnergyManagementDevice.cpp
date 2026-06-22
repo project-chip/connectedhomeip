@@ -25,9 +25,9 @@ DeviceEnergyManagementDevice::DeviceEnergyManagementDevice(TimerDelegate & timer
 {}
 
 CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                  EndpointId parentEndpoint)
+                                                  EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentEndpoint));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -41,7 +41,7 @@ CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrive
 
 void DeviceEnergyManagementDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     if (mDemCluster.IsConstructed())
     {

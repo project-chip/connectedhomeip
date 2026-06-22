@@ -23,13 +23,13 @@ namespace {
 
 const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface1Tag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = kCommonPositionNamespaceId,
+    .namespaceID = CommonNamespace::kPositionId,
     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
 };
 
 const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
     .mfgCode     = DataModel::NullNullable,
-    .namespaceID = kCommonPositionNamespaceId,
+    .namespaceID = CommonNamespace::kPositionId,
     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
 };
 
@@ -40,13 +40,14 @@ CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate) :
     mSurface2(timerDelegate)
 {}
 
-CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = allocator.Allocate();
 
-    ReturnErrorOnFailure(InitEndpointRegistration(mEndpointId, provider,
-                                                  EndpointComposition(parentId, DataModel::EndpointCompositionPattern::kTree)));
+    ReturnErrorOnFailure(RegisterDescriptor(
+        mEndpointId, provider,
+        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(mSurface1.Register(
@@ -64,7 +65,7 @@ void CooktopDevice::Unregister(CodeDrivenDataModelProvider & provider)
     mSurface2.Unregister(provider);
     mSurface1.Unregister(provider);
 
-    ShutdownEndpointRegistration(mEndpointId, provider);
+    UnregisterDescriptor(mEndpointId, provider);
     mEndpointId = kInvalidEndpointId;
 }
 
