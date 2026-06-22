@@ -143,6 +143,18 @@ IdentifyCluster * FindIdentifyClusterOnEndpoint(EndpointId endpointId)
     {
         return &legacyInstance->mCluster.Cluster();
     }
+
+    // Fallback for the recommended bare RegisteredServerCluster<IdentifyCluster>, which registers
+    // only with the data-model provider and is not on the legacy list. Recover it from the cluster
+    // registry so dependent clusters (e.g. codegen Groups for AddGroupIfIdentifying) can find it.
+    ServerClusterInterface * registeredCluster =
+        CodegenDataModelProvider::Instance().Registry().Get({ endpointId, Clusters::Identify::Id });
+    if (registeredCluster != nullptr)
+    {
+        VerifyOrDie(registeredCluster->PathsContains({ endpointId, Clusters::Identify::Id }));
+        return static_cast<IdentifyCluster *>(registeredCluster);
+    }
+
     return nullptr;
 }
 
