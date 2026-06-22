@@ -20,7 +20,6 @@ import os
 import pathlib
 import platform
 import re
-import shlex
 import shutil
 import subprocess
 import sys
@@ -228,7 +227,7 @@ class Flasher(firmware_utils.Flasher):
 
     args = {}
     work_dir = None
-    bouffalo_sdk_chips = ["bl616"]
+    bouffalo_sdk_chips = ["bl616", "bl616cl"]
 
     def __init__(self, **options):
         super().__init__(platform=None, module=__name__, **options)
@@ -244,6 +243,17 @@ class Flasher(firmware_utils.Flasher):
                     ret_files.append(os.path.join(root, name))
 
         return ret_files
+
+    def run_bouffalo_tool(self, command):
+        command = [str(arg) for arg in command]
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        for line in process.stdout:
+            line = line.rstrip()
+            if line:
+                log.info(line)
+        ret = process.wait()
+        if ret != 0:
+            raise subprocess.CalledProcessError(ret, command)
 
     def parse_mfd(self):
 
@@ -429,12 +439,8 @@ class Flasher(firmware_utils.Flasher):
             if self.args["sk"]:
                 gen_ota_img_cmd += ["--sk", self.args["sk"]]
 
-            log.info("ota image generating: %s", shlex.join(gen_ota_img_cmd))
-            process = subprocess.Popen(gen_ota_img_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            while process.poll() is None:
-                line = process.stdout.readline().decode('utf-8').rstrip()
-                if line:
-                    log.info(line)
+            log.info("ota image generating: %s", " ".join(str(arg) for arg in gen_ota_img_cmd))
+            self.run_bouffalo_tool(gen_ota_img_cmd)
 
             fw_ota_images = self.find_file(self.work_dir, r'^FW_OTA.+\.hash$')
             if not fw_ota_images or len(fw_ota_images) == 0:
@@ -553,14 +559,13 @@ class Flasher(firmware_utils.Flasher):
                 if self.option.erase:
                     prog_cmd += ["--erase"]
 
-            log.info("firmware programming: %s", shlex.join(prog_cmd))
-            process = subprocess.Popen(prog_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            while process.poll() is None:
-                line = process.stdout.readline().decode('utf-8').rstrip()
-                if line:
-                    log.info(line)
+            log.info("firmware programming: %s", " ".join(str(arg) for arg in prog_cmd))
+            self.run_bouffalo_tool(prog_cmd)
 
         flashtool_path, flashtool_exe = get_tools()
+        if not self.args["pt"]:
+            raise Exception("Partition table is required for BL IoT SDK flashing. Please pass --pt or regenerate flash.py.")
+
         self.args["pt"] = os.path.join(os.getcwd(), str(self.args["pt"]))
         mfd_addr = get_mfd_addr()
 
@@ -671,12 +676,8 @@ class Flasher(firmware_utils.Flasher):
                     "--edata", "0x80,{};0x7c,{};0xfc,{}".format(self.args["key"], lock0, lock1)
                 ]
 
-            log.info("firmware process command: %s", shlex.join(fw_proc_cmd))
-            process = subprocess.Popen(fw_proc_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            while process.poll() is None:
-                line = process.stdout.readline().decode('utf-8').rstrip()
-                if line:
-                    log.info(line)
+            log.info("firmware process command: %s", " ".join(str(arg) for arg in fw_proc_cmd))
+            self.run_bouffalo_tool(fw_proc_cmd)
 
             os.system("mkdir -p {}/ota_images".format(self.work_dir))
             os.system("mv {}/*.ota {}/ota_images/".format(self.work_dir, self.work_dir))
@@ -702,12 +703,8 @@ class Flasher(firmware_utils.Flasher):
                     "--port", self.args["port"],
                 ]
 
-                log.info("firwmare programming: %s", shlex.join(prog_cmd))
-                process = subprocess.Popen(prog_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                while process.poll() is None:
-                    line = process.stdout.readline().decode('utf-8').rstrip()
-                    if line:
-                        log.info(line)
+                log.info("firwmare programming: %s", " ".join(str(arg) for arg in prog_cmd))
+                self.run_bouffalo_tool(prog_cmd)
 
         fw_proc_exe, flashtool_exe = get_tools()
         os.chdir(self.work_dir)

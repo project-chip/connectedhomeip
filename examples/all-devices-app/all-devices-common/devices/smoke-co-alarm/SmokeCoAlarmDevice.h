@@ -27,12 +27,15 @@
 namespace chip {
 namespace app {
 
+/// Generic smoke + CO alarm device. It wires up the clusters but is agnostic about behavior: the
+/// SmokeCoAlarmDelegate is injected, so concrete subclasses decide how the alarm actually behaves
+/// (see LoggingOnlySmokeCoAlarmDevice for the example/no-hardware implementation).
 class SmokeCoAlarmDevice : public SingleEndpointDevice
 {
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 
-    SmokeCoAlarmDevice(TimerDelegate & timerDelegate, const ConcentrationCluster::Config & coConfig);
+    SmokeCoAlarmDevice(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate);
     ~SmokeCoAlarmDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -45,7 +48,9 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    Clusters::SmokeCoAlarmDelegate & mSmokeCoAlarmDelegate;
     ConcentrationCluster::Config mCoConfig;
+    Clusters::SmokeCoAlarmCluster::Config mSmokeConfig;
 
     LazyRegisteredServerCluster<ConcentrationCluster> mCoMeasurementCluster;
     LazyRegisteredServerCluster<Clusters::SmokeCoAlarmCluster> mSmokeCoAlarmCluster;
