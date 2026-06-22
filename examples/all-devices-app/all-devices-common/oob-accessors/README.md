@@ -3,9 +3,10 @@
 This directory contains the Out-of-Band (OOB) control and simulation framework
 for the `all-devices-app`.
 
-The framework provides a generic interface (backdoor) for simulating physical events or
-writing to read-only attributes on simulated devices, decoupling the core device
-logic from specific transport protocols (like Pigweed RPC or Shell commands).
+The framework provides a generic interface (backdoor) for simulating physical
+events or writing to read-only attributes on simulated devices, decoupling the
+core device logic from specific transport protocols (like Pigweed RPC or Shell
+commands).
 
 ## Architecture Overview
 
