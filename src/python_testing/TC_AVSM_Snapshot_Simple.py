@@ -16,13 +16,16 @@
 #
 
 import logging
+
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError
 from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
 
 log = logging.getLogger(__name__)
+
 
 class TC_AVSM_Snapshot_Simple(MatterBaseTest):
     async def test_snapshot(self):
@@ -81,6 +84,7 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
                 endpoint=endpoint,
                 cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id)
             )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
