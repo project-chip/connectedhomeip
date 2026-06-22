@@ -637,6 +637,16 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     pthread_sigmask(SIG_BLOCK, &set, nullptr);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    // Apply the WiFi interface name override (from --wifi=<interface>) before initializing the
+    // CHIP stack, so that ConnectivityManager picks it up instead of auto-detecting an interface.
+    if (LinuxDeviceOptions::GetInstance().mWiFiInterface.HasValue())
+    {
+        SuccessOrExit(err = DeviceLayer::ConnectivityMgrImpl().SetWiFiIfName(
+                          LinuxDeviceOptions::GetInstance().mWiFiInterface.Value().c_str()));
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
