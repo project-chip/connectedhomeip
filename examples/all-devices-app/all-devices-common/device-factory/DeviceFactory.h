@@ -35,7 +35,7 @@
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
-#include <devices/smoke-co-alarm/SmokeCoAlarmDevice.h>
+#include <devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -290,16 +290,7 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<SmokeCoAlarmDevice>(
-                    mContext->timerDelegate,
-                    SmokeCoAlarmDevice::ConcentrationCluster::Config{
-                        .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
-                        .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
-                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
-                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
-                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                    });
+                return std::make_unique<LoggingOnlySmokeCoAlarmDevice>(mContext->timerDelegate);
             });
         }
 
