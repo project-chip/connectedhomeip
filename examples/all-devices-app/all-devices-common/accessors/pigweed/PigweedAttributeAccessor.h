@@ -41,7 +41,7 @@ public:
         }
 
         auto & buffer     = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        CHIP_ERROR result = AccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, buffer);
+        CHIP_ERROR result = OOBAccessorRegistry::Instance().HandleAction(OOBAccessor::kActionSetAttribute, buffer);
         if (result != CHIP_ERROR_NOT_FOUND)
         {
             if (result == CHIP_NO_ERROR)

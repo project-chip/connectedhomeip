@@ -154,7 +154,7 @@ public:
                     .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
                     .timerDelegate                    = mContext.timerDelegate,                    //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             []() {
@@ -205,7 +205,7 @@ public:
             auto oobAccessor = DeviceFactory::GetInstance().CreateAccessor(entry.type, *device);
             if (oobAccessor)
             {
-                AccessorRegistry::Instance().Register(*oobAccessor);
+                OOBAccessorRegistry::Instance().Register(*oobAccessor);
                 mConstructedAccessors.push_back(std::move(oobAccessor));
             }
             mConstructedDevices.push_back(std::move(device));
@@ -362,7 +362,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .timerDelegate                    = gTimerDelegate,                                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 

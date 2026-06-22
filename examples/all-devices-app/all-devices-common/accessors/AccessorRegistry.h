@@ -24,12 +24,12 @@
 
 namespace chip::app {
 
-class AccessorRegistry
+class OOBAccessorRegistry
 {
 public:
-    static AccessorRegistry & Instance()
+    static OOBAccessorRegistry & Instance()
     {
-        static AccessorRegistry instance;
+        static OOBAccessorRegistry instance;
         return instance;
     }
 
@@ -64,8 +64,8 @@ public:
     }
 
 private:
-    AccessorRegistry()  = default;
-    ~AccessorRegistry() = default;
+    OOBAccessorRegistry()  = default;
+    ~OOBAccessorRegistry() = default;
 
     IntrusiveList<OOBAccessor, IntrusiveMode::AutoUnlink> mAccessors;
 };
