@@ -36,7 +36,7 @@ CHIP_ERROR DeviceInterface::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & ou
 }
 
 CHIP_ERROR DeviceInterface::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                     EndpointComposition composition)
+                                               EndpointComposition composition)
 {
     VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
