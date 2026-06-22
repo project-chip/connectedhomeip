@@ -24,6 +24,7 @@ source_set("clusters") {
     "actions-server",
     "administrator-commissioning-server",
     "air-quality-server",
+    "ambient-context-sensing-server",
     "basic-information",
     "boolean-state-configuration-server",
     "boolean-state-server",

@@ -77,6 +77,8 @@ public:
                         EndpointId parentId = kInvalidEndpointId) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
+
 protected:
     Context mContext;
 

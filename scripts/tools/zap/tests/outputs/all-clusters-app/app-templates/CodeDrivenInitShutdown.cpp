@@ -133,6 +133,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::MicrowaveOvenMode::Id:
         MatterMicrowaveOvenModeClusterInitCallback(endpoint);
         break;
+    case app::Clusters::SmokeCoAlarm::Id:
+        MatterSmokeCoAlarmClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterInitCallback(endpoint);
         break;
@@ -307,6 +310,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::MicrowaveOvenMode::Id:
         MatterMicrowaveOvenModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::SmokeCoAlarm::Id:
+        MatterSmokeCoAlarmClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterShutdownCallback(endpoint, shutdownType);
