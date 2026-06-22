@@ -32,6 +32,22 @@ struct ImageProcessorEntry
     ImageProcessorEntry * next = nullptr;
 };
 
+// How each sub-image was processed during the download, reported to ShouldApplyUpdate (§5).
+enum class SubImageStatus : uint8_t
+{
+    kWritten,         // sub-processor was kReady; all bytes delivered
+    kSkippedUpToDate, // kAlreadyUpToDate, or no processor registered for the imageId
+    kSkippedNotReady, // kNotReady
+};
+
+// Result of processing one sub-image.
+struct SubImageResult
+{
+    OTAProcessorTag tag;
+    uint32_t version;
+    SubImageStatus status;
+};
+
 class MultiImageOTAProcessorImpl : public OTAImageProcessorInterface
 {
 public:
@@ -54,6 +70,14 @@ public:
      */
     CHIP_ERROR RegisterProcessor(ImageProcessorEntry & entry);
 
+    /**
+     * Invoked once after a successful download, on the Matter thread, before the apply phase (§5).
+     * Inspect the per-sub-image results and return true to apply the staged update, or false to
+     * discard it (the device stays on the old firmware and the next QueryImage retries the bundle).
+     * Must not block — decide from the in-RAM results only. Default implementation returns true.
+     */
+    virtual bool ShouldApplyUpdate(Span<const SubImageResult> results) { return true; }
+
 private:
     OTADownloader * mDownloader = nullptr;
     MutableByteSpan mBlock;
@@ -69,6 +93,10 @@ private:
     bool mCurrentEntryStarted            = false;   // readiness for the active entry already decided
     SubImageProcessor * mActiveProcessor = nullptr; // processor for the active (kReady) entry
 
+    // Per-sub-image result table (one slot per sub-image), reported to ShouldApplyUpdate (§5).
+    Platform::ScopedMemoryBuffer<SubImageResult> mSubImageResults;
+    uint8_t mSubImageResultCount = 0;
+
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
     static void HandleAbort(intptr_t context);
@@ -80,6 +108,9 @@ private:
     CHIP_ERROR ProcessHeader(ByteSpan & block);
     CHIP_ERROR ProcessMultiImageHeader(ByteSpan & block);
     CHIP_ERROR GetSubProcessor(OTAProcessorTag tag, SubImageProcessor *& processor) const;
+
+    void RecordSubImageResult(OTAProcessorTag tag, uint32_t version, SubImageStatus status);
+    void AbortSubProcessors(AbortReason reason, CHIP_ERROR error);
 };
 
 } // namespace chip

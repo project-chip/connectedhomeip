@@ -145,6 +145,7 @@ void MultiImageOTAProcessorImpl::HandlePrepareDownload(intptr_t context)
     imageProcessor->mCurrentEntryStarted   = false;
     imageProcessor->mActiveProcessor       = nullptr;
     imageProcessor->mLastErr               = CHIP_NO_ERROR;
+    imageProcessor->mSubImageResultCount   = 0;
     LogErrorOnFailure(imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR));
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
 }
@@ -155,8 +156,21 @@ void MultiImageOTAProcessorImpl::HandleFinalize(intptr_t context)
     VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
     // Reaching Finalize means the download completed: BDX only calls Finalize() on the EOF block, and
-    // each sub-processor has already committed its image on its last Write() chunk (e.g.
-    // AppImageProcessor's esp_ota_end). TODO(§5): invoke OnDownloadOutcome() here before the apply phase.
+    // each sub-processor has already committed its image on its last Write() chunk
+    Span<const SubImageResult> results(imageProcessor->mSubImageResults.Get(), imageProcessor->mSubImageResultCount);
+    if (!imageProcessor->ShouldApplyUpdate(results))
+    {
+        // discard the staged update and stay on the old firmware. Aborting the
+        // sub-processors clears AppImageProcessor's partition handle, so a subsequent Apply() is a
+        // no-op. The next QueryImage retries the bundle.
+        ChipLogProgress(SoftwareUpdate, "ShouldApplyUpdate vetoed apply; discarding update");
+        imageProcessor->AbortSubProcessors(AbortReason::kCancelled, CHIP_NO_ERROR);
+        LogErrorOnFailure(imageProcessor->ReleaseBlock());
+        imageProcessor->mMultiOTAImageHeaderParser.Clear();
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        return;
+    }
+
     LogErrorOnFailure(imageProcessor->ReleaseBlock());
     imageProcessor->mMultiOTAImageHeaderParser.Clear();
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
@@ -171,20 +185,8 @@ void MultiImageOTAProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    for (ImageProcessorEntry * entry = imageProcessor->mRegistryHead; entry != nullptr; entry = entry->next)
-    {
-        if (!entry->processor->IsInitialized())
-        {
-            continue;
-        }
-        AbortContext abortContext{ AbortReason::kCancelled, CHIP_NO_ERROR };
-        if (imageProcessor->mLastErr != CHIP_NO_ERROR)
-        {
-            abortContext.error  = imageProcessor->mLastErr;
-            abortContext.reason = AbortReason::kError;
-        }
-        entry->processor->Abort(abortContext);
-    }
+    const AbortReason reason = (imageProcessor->mLastErr != CHIP_NO_ERROR) ? AbortReason::kError : AbortReason::kCancelled;
+    imageProcessor->AbortSubProcessors(reason, imageProcessor->mLastErr);
     LogErrorOnFailure(imageProcessor->ReleaseBlock());
     imageProcessor->mMultiOTAImageHeaderParser.Clear();
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
@@ -286,6 +288,9 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
             // block request
             if (readiness != DeviceState::kReady)
             {
+                const SubImageStatus status =
+                    (readiness == DeviceState::kNotReady) ? SubImageStatus::kSkippedNotReady : SubImageStatus::kSkippedUpToDate;
+                imageProcessor->RecordSubImageResult(activeSubImage->imageId, activeSubImage->version, status);
                 imageProcessor->mParams.downloadedBytes += bytesLeftInSubImage; // progress counts skipped bytes (step 7)
                 imageProcessor->mCurrentSubImageCursor = subImageEnd;
                 LogErrorOnFailure(imageProcessor->mDownloader->SkipData(bytesLeftInSubImage));
@@ -309,9 +314,10 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
         imageProcessor->mCurrentSubImageCursor += bytesToDeliver;
         remainingBlock = remainingBlock.SubSpan(bytesToDeliver);
 
-        // Entry fully delivered — the next entry (if any) will be started on the next iteration.
+        // Entry fully delivered — record the outcome; the next entry (if any) starts next iteration.
         if (imageProcessor->mCurrentSubImageCursor == subImageEnd)
         {
+            imageProcessor->RecordSubImageResult(activeSubImage->imageId, activeSubImage->version, SubImageStatus::kWritten);
             imageProcessor->mCurrentEntryStarted = false;
             imageProcessor->mActiveProcessor     = nullptr;
         }
@@ -432,6 +438,10 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
         }
         VerifyOrReturnError(appImageCount == 1, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
 
+        // Allocate the per-sub-image result table (one slot per sub-image) for the ShouldApplyUpdate hook.
+        VerifyOrReturnError(mSubImageResults.Alloc(mMultiOTAImageHeader.subImages.size()), CHIP_ERROR_NO_MEMORY);
+        mSubImageResultCount = 0;
+
         // The MultiImageHeader is fully decoded. Both progress accounting and the routing cursor
         // start at the first binary's offset, i.e. sizeof(MultiImageHeader) = 8 + numImages * 48.
         const uint32_t headerSize = kFixedHeaderSize + mMultiOTAImageHeader.subImages.size() * kSubImageHeaderSize;
@@ -455,6 +465,27 @@ CHIP_ERROR MultiImageOTAProcessorImpl::GetSubProcessor(OTAProcessorTag tag, SubI
         entry = entry->next;
     }
     return CHIP_ERROR_NOT_FOUND;
+}
+
+void MultiImageOTAProcessorImpl::RecordSubImageResult(OTAProcessorTag tag, uint32_t version, SubImageStatus status)
+{
+    // The table is sized to numImages and each entry is recorded exactly once, in order.
+    if (mSubImageResults.Get() != nullptr && mSubImageResultCount < mMultiOTAImageHeader.subImages.size())
+    {
+        mSubImageResults[mSubImageResultCount++] = SubImageResult{ tag, version, status };
+    }
+}
+
+void MultiImageOTAProcessorImpl::AbortSubProcessors(AbortReason reason, CHIP_ERROR error)
+{
+    AbortContext abortContext{ reason, error };
+    for (ImageProcessorEntry * entry = mRegistryHead; entry != nullptr; entry = entry->next)
+    {
+        if (entry->processor->IsInitialized())
+        {
+            entry->processor->Abort(abortContext);
+        }
+    }
 }
 
 } // namespace chip
