@@ -98,6 +98,8 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 
 } // namespace
 
+void MatterLaundryWasherControlsPluginServerInitCallback() {}
+
 void MatterLaundryWasherControlsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
