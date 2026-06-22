@@ -857,7 +857,8 @@ TEST_F(TestProximityRangingDriver, GetWiFiUsdConfigViaNextGenerationAdapter)
 
     auto resolved = driver.GetWiFiUsdConfig();
     ASSERT_TRUE(resolved.has_value());
-    EXPECT_EQ(resolved->deviceIdentityKey[0], 0x5A);
+    WiFiUsdConfig empty{};
+    EXPECT_EQ(resolved.value_or(empty).deviceIdentityKey[0], 0x5A);
 }
 
 } // namespace
