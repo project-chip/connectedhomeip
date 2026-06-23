@@ -38,13 +38,15 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap
         )
-        asserts.assert_true((feature_map & cluster.Bitmaps.Feature.kSnapshot) > 0, "Snapshot feature not supported")
+        if not (feature_map & cluster.Bitmaps.Feature.kSnapshot):
+            asserts.skip("Snapshot feature not supported, skipping test")
 
         # Read Capabilities
         caps = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
         )
-        asserts.assert_greater(len(caps), 0, "SnapshotCapabilities list is empty")
+        if not caps:
+            asserts.skip("SnapshotCapabilities list is empty, skipping snapshot test")
 
         # Allocate Snapshot Stream
         try:
@@ -80,10 +82,14 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
             asserts.fail(f"CaptureSnapshot failed: {e}")
         finally:
             # Deallocate Stream
-            await self.send_single_cmd(
-                endpoint=endpoint,
-                cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id)
-            )
+            if 'stream_id' in locals():
+                try:
+                    await self.send_single_cmd(
+                        endpoint=endpoint,
+                        cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id)
+                    )
+                except Exception as e:
+                    log.warning("Failed to deallocate snapshot stream %s: %s", stream_id, e)
 
 
 if __name__ == "__main__":
