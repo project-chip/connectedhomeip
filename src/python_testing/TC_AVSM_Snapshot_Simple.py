@@ -57,7 +57,7 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
             )
             response = await self.send_single_cmd(endpoint=endpoint, cmd=allocate_cmd)
             stream_id = response.snapshotStreamID
-            log.info(f"Allocated snapshot stream ID: {stream_id}")
+            log.info("Allocated snapshot stream ID: %s", stream_id)
         except InteractionModelError as e:
             asserts.fail(f"Failed to allocate snapshot stream: {e}")
 
@@ -72,9 +72,9 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
                 endpoint=endpoint,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
             )
-            log.info(f"CaptureSnapshotResponse resolution: {capture_response.resolution}")
-            log.info(f"CaptureSnapshotResponse codec: {capture_response.imageCodec}")
-            log.info(f"CaptureSnapshotResponse data size: {len(capture_response.data)}")
+            log.info("CaptureSnapshotResponse resolution: %s", capture_response.resolution)
+            log.info("CaptureSnapshotResponse codec: %s", capture_response.imageCodec)
+            log.info("CaptureSnapshotResponse data size: %d", len(capture_response.data))
             asserts.assert_greater(len(capture_response.data), 0, "Captured image data is empty")
         except InteractionModelError as e:
             asserts.fail(f"CaptureSnapshot failed: {e}")
