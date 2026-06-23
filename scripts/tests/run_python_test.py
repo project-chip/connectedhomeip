@@ -41,6 +41,7 @@ from colorama import Fore, Style
 
 from matter.testing.metadata import Metadata, MetadataReader
 from matter.testing.tasks import Subprocess
+from matter.testing.defaults import TestingDefaults
 
 log = logging.getLogger(__name__)
 
@@ -354,7 +355,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     try:
         try:
-            test_script_exit_code = test_script_process.wait(script_timeout)
+            test_script_exit_code = test_script_process.wait(script_timeout + TestingDefaults.TEST_RUNNER_SLACK_S)
         except TimeoutError as e:
             log.exception("%r", e)
             test_script_exit_code = -1  # Trigger error codepath

@@ -33,3 +33,4 @@ class TestingDefaults:
     # Subprocess handling
     DEFAULT_TIMEOUT_S: final = 300.0  # Default timeout when waiting for a subprocess to finish its job
     TERMINATION_TIMEOUT_S: final = 5.0  # Default timeout for subprocess termination
+    TEST_RUNNER_SLACK_S: final = 60  # Slack time to allow a testcase to timeout itself before it's killed
