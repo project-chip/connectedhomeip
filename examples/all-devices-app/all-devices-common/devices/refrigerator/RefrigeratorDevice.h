@@ -35,14 +35,12 @@ public:
         // Note: Temperature values are represented in 0.01°C steps.
         static constexpr Config Default()
         {
-            return Config{
-                .cabinetConfig = {
-                    .temperatureSetpoint = 400, // 4.00 °C
-                    .minTemperature      = 100, // 1.00 °C
-                    .maxTemperature      = 700, // 7.00 °C
-                    .step                = 10,  // 0.10 °C
-                }
-            };
+            return Config{ .cabinetConfig = {
+                               .temperatureSetpoint = 400, // 4.00 °C
+                               .minTemperature      = 100, // 1.00 °C
+                               .maxTemperature      = 700, // 7.00 °C
+                               .step                = 10,  // 0.10 °C
+                           } };
         }
     };
 

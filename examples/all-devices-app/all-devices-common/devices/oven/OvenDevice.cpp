@@ -21,8 +21,7 @@
 namespace chip::app {
 
 OvenDevice::OvenDevice(TimerDelegate & timerDelegate, const Config & config) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)),
-    mCavity(timerDelegate, config.cavityConfig),
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)), mCavity(timerDelegate, config.cavityConfig),
     mSurface(timerDelegate)
 {}
 

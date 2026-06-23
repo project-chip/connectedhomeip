@@ -36,14 +36,12 @@ public:
         // Note: Temperature values are represented in 0.01°C steps.
         static constexpr Config Default()
         {
-            return Config{
-                .cavityConfig = {
-                    .temperatureSetpoint = 18000, // 180.00 °C
-                    .minTemperature      = 5000,  // 50.00 °C
-                    .maxTemperature      = 25000, // 250.00 °C
-                    .step                = 500,   // 5.00 °C
-                }
-            };
+            return Config{ .cavityConfig = {
+                               .temperatureSetpoint = 18000, // 180.00 °C
+                               .minTemperature      = 5000,  // 50.00 °C
+                               .maxTemperature      = 25000, // 250.00 °C
+                               .step                = 500,   // 5.00 °C
+                           } };
         }
     };
 
