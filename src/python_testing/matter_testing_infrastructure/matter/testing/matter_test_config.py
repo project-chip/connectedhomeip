@@ -30,7 +30,7 @@ class MatterTestConfig:
     paa_trust_store_path: Optional[pathlib.Path] = None
     ble_controller: Optional[int] = None
     commission_only: bool = False
-    spec_errata_path: typing.Union[None, str, Traversable] = None
+    spec_errata_path: str | Traversable | None = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID
     case_admin_subject: Optional[int] = None
