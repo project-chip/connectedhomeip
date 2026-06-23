@@ -386,7 +386,7 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
         }
         // SET FALLBACK VALUES FOR THE SCAN
         wfx_rsi.ap_chan = SL_WIFI_AUTO_CHANNEL;
-        security = SL_WIFI_WPA3_TRANSITION;
+        security        = SL_WIFI_WPA3_TRANSITION;
     }
     else
     {
