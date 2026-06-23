@@ -38,6 +38,8 @@ kConfigureTrustedTimeSource = 19
 
 
 class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
+    requires_dut = False
+
     # This test needs to be run against an app that has previously been commissioned, has been reset
     # but not factory reset, and which has been started with the --simulate-no-internal-time flag.
     # This test should be run using the provided "TestTimeSyncTrustedTimeSourceRunner.py" script

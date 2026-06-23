@@ -34,7 +34,7 @@ public:
     ~SoilSensorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::SoilMeasurementCluster & SoilMeasurementCluster() { return mSoilMeasurementCluster.Cluster(); }

@@ -16,7 +16,6 @@ import glob
 import logging
 import os
 import shlex
-import subprocess
 from enum import Enum, auto
 
 from runner.runner import Runner
@@ -215,9 +214,9 @@ class Efr32Builder(GnBuilder):
                  enable_additional_data_advertising: bool = False,
                  enable_ot_lib: bool = False,
                  enable_ot_coap_lib: bool = False,
-                 no_version: bool = False,
                  enable_917_soc: bool = False,
                  use_rps_extension: bool = True,
+                 uart_log: bool = False,
                  all_devices_enabled_devices=None
                  ):
         super().__init__(root=app.BuildRoot(root), runner=runner, output_dir_lock=output_dir_lock)
@@ -288,15 +287,11 @@ class Efr32Builder(GnBuilder):
                 'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" '
                 'use_thread_coap_lib=true openthread_external_platform=""')
 
-        if not no_version:
-            shortCommitSha = subprocess.check_output(
-                ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
-            branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
-            self.extra_gn_options.append(
-                'sl_matter_version_str="v1.3-%s-%s"' % (branchName, shortCommitSha))
-
         if use_rps_extension is False:
             self.extra_gn_options.append('use_rps_extension=false')
+
+        if uart_log is True:
+            self.extra_gn_options.append('sl_uart_log_output=true')
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
@@ -321,7 +316,7 @@ class Efr32Builder(GnBuilder):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
         if self.app == Efr32App.UNIT_TEST:
             flash_bundle_path = os.path.join(self.output_dir, self.app.FlashBundleName())
-            log.info(f'Generating flashbundle {flash_bundle_path}')
+            log.info('Generating flashbundle %s', flash_bundle_path)
 
             patterns = [
                 os.path.join(self.output_dir, "tests", "*.flash.py"),

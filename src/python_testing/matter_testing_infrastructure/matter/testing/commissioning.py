@@ -285,7 +285,7 @@ async def commission_devices(
     """
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
-        LOGGER.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        LOGGER.info("Commissioning method: %s", commissioning_info.commissioning_method)
         commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
     return all(commissioned)
@@ -447,7 +447,7 @@ async def _is_device_operational_via_dnssd(
         compressed_fabric_id = dev_ctrl.GetCompressedFabricId()
         expected_instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
 
-        LOGGER.info(f"Checking DNS-SD for operational service: {expected_instance_name}")
+        LOGGER.info("Checking DNS-SD for operational service: %s", expected_instance_name)
 
         mdns = MdnsDiscovery()
         for attempt in range(max_retries):
@@ -460,18 +460,18 @@ async def _is_device_operational_via_dnssd(
             # Check if our expected instance is in the discovered services
             for service in services:
                 if service.instance_name == expected_instance_name:
-                    LOGGER.info(f"Device {node_id} found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
+                    LOGGER.info("Device %s found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
                     return True
 
             if attempt < max_retries - 1:
-                LOGGER.info(f"DNS-SD attempt {attempt + 1}/{max_retries} did not find device, retrying...")
+                LOGGER.info("DNS-SD attempt %s/%s did not find device, retrying...", attempt + 1, max_retries)
                 await asyncio.sleep(retry_delay_sec)
 
-        LOGGER.info(f"Device {node_id} not found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
+        LOGGER.info("Device %s not found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
         return False
 
     except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
-        LOGGER.warning(f"DNS-SD check failed, will fall back to connection attempt: {e}")
+        LOGGER.warning("DNS-SD check failed, will fall back to connection attempt: %s", e)
         return False
 
 
@@ -520,14 +520,14 @@ async def _is_device_commissionable_via_dnssd(
         )
 
         if services:
-            LOGGER.info(f"Found {len(services)} commissionable device(s) via DNS-SD")
+            LOGGER.info("Found %s commissionable device(s) via DNS-SD", len(services))
             return True
 
         LOGGER.info("No commissionable devices found via DNS-SD")
         return False
 
     except (OSError, ValueError, RuntimeError, TypeError) as e:
-        LOGGER.warning(f"DNS-SD commissionable check failed: {e}")
+        LOGGER.warning("DNS-SD commissionable check failed: %s", e)
         return False
 
 
@@ -568,16 +568,16 @@ async def establish_pase_or_case_session(
         setup_code = commissioning_params.resolve_setup_code(dev_ctrl)
 
         if setup_code:
-            LOGGER.info(f"Creating PASE task for node {node_id}")
+            LOGGER.info("Creating PASE task for node %s", node_id)
             pase_future = dev_ctrl.FindOrEstablishPASESession(setup_code, node_id)
             task_list.append(asyncio.create_task(pase_future, name="pase"))
 
     # Always add CASE task (allowPASE=False to force CASE)
-    LOGGER.info(f"Creating CASE task for node {node_id}")
+    LOGGER.info("Creating CASE task for node %s", node_id)
     case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
     task_list.append(asyncio.create_task(case_future, name="case"))
 
-    LOGGER.info(f"Attempting parallel PASE/CASE connection to node {node_id}")
+    LOGGER.info("Attempting parallel PASE/CASE connection to node %s", node_id)
 
     # Wait for first successful completion
     done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
@@ -588,9 +588,7 @@ async def establish_pase_or_case_session(
     first_wait_successful = _successful_task_in_done_set(done)
     if first_wait_successful is not None:
         await _cancel_other_tasks_except(task_list, first_wait_successful)
-        LOGGER.info(
-            f"Successfully established {first_wait_successful.get_name().upper()} session to node {node_id}"
-        )
+        LOGGER.info("Successfully established %s session to node %s", first_wait_successful.get_name().upper(), node_id)
         return _session_kind_from_task_name(first_wait_successful.get_name())
 
     # First asyncio.wait returned only failures (or cancellations): inspect one representative task.
@@ -602,24 +600,18 @@ async def establish_pase_or_case_session(
     try:
         # This will raise if the task failed
         first_wait_task.result()
-        LOGGER.info(
-            f"Successfully established {first_wait_task_name.upper()} session to node {node_id}"
-        )
+        LOGGER.info("Successfully established %s session to node %s", first_wait_task_name.upper(), node_id)
     except (ChipStackError, RuntimeError, OSError) as e:
         # First-wait task failed, wait for the other if there is one
         if pending:
-            LOGGER.info(
-                f"{first_wait_task_name.upper()} failed ({e}), waiting for other connection attempt"
-            )
+            LOGGER.info("%s failed (%s), waiting for other connection attempt", first_wait_task_name.upper(), e)
             done_after_second_wait, pending_after_second_wait = await asyncio.wait(
                 pending, return_when=asyncio.FIRST_COMPLETED
             )
             second_wait_successful = _successful_task_in_done_set(done_after_second_wait)
             if second_wait_successful is not None:
                 await _cancel_other_tasks_except(pending, second_wait_successful)
-                LOGGER.info(
-                    f"Successfully established {second_wait_successful.get_name().upper()} session to node {node_id}"
-                )
+                LOGGER.info("Successfully established %s session to node %s", second_wait_successful.get_name().upper(), node_id)
                 return _session_kind_from_task_name(second_wait_successful.get_name())
 
             second_wait_task = next((t for t in done_after_second_wait if not t.cancelled()), None)
@@ -628,9 +620,7 @@ async def establish_pase_or_case_session(
             second_wait_task_name = second_wait_task.get_name()
             try:
                 second_wait_task.result()
-                LOGGER.info(
-                    f"Successfully established {second_wait_task_name.upper()} session to node {node_id}"
-                )
+                LOGGER.info("Successfully established %s session to node %s", second_wait_task_name.upper(), node_id)
                 # Cancel any remaining
                 for task in pending_after_second_wait:
                     task.cancel()
@@ -693,7 +683,7 @@ async def is_commissioned(
         )
 
         if is_operational:
-            LOGGER.info(f"Device {node_id} is operational via DNS-SD - confirmed commissioned")
+            LOGGER.info("Device %s is operational via DNS-SD - confirmed commissioned", node_id)
             return True
 
         # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
@@ -702,16 +692,16 @@ async def is_commissioned(
         )
 
         if is_commissionable:
-            LOGGER.info(f"Device {node_id} is commissionable via DNS-SD (pairing window open) - not commissioned")
+            LOGGER.info("Device %s is commissionable via DNS-SD (pairing window open) - not commissioned", node_id)
             return False
 
         # Step 3: Neither mDNS check was conclusive.
         # Device is off, broken, or on another fabric without a commissioning window.
-        LOGGER.info(f"Device {node_id} not found via any DNS-SD check - not commissioned on this fabric")
+        LOGGER.info("Device %s not found via any DNS-SD check - not commissioned on this fabric", node_id)
         return False
 
     except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
-        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
+        LOGGER.error("Failed to check commissioning status for node %s: %s", node_id, e)
         raise
 
 
@@ -752,11 +742,11 @@ async def get_commissioned_fabric_count(
         )
 
         if is_operational:
-            LOGGER.info(f"Device {node_id} is operational via DNS-SD, using CASE connection")
+            LOGGER.info("Device %s is operational via DNS-SD, using CASE connection", node_id)
         else:
             LOGGER.info(
-                f"Device {node_id} not operational via DNS-SD; assuming caller established "
-                f"PASE/CASE before TrustedRootCertificates read"
+                "Device %s not operational via DNS-SD; assuming caller established "
+                "PASE/CASE before TrustedRootCertificates read", node_id
             )
 
         result = await dev_ctrl.ReadAttribute(
@@ -774,5 +764,5 @@ async def get_commissioned_fabric_count(
         return len(root_certs)
 
     except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
-        LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
+        LOGGER.error("Failed to check commissioning status for node %s: %s", node_id, e)
         raise

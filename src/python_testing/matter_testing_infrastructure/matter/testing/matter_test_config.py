@@ -18,6 +18,7 @@ import pathlib
 import typing
 from dataclasses import dataclass, field
 from datetime import timedelta
+from importlib.resources.abc import Traversable
 from typing import Optional
 
 from matter.testing.defaults import TestingDefaults
@@ -30,6 +31,7 @@ class MatterTestConfig:
     paa_trust_store_path: Optional[pathlib.Path] = None
     ble_controller: Optional[int] = None
     commission_only: bool = False
+    spec_errata_path: typing.Union[None, str, Traversable] = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID
     case_admin_subject: Optional[int] = None
@@ -96,6 +98,12 @@ class MatterTestConfig:
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
     legacy: bool = False
+
+    # When True, skip the background wildcard attribute subscription that is normally
+    # started at the beginning of each test.  Prefer ``disable_wildcard_subscription = True``
+    # on the test class (see MatterBaseTest) so certification runs do not require this CLI flag.
+    # ``--no-wildcard-subscription`` remains for backward compatibility and local overrides.
+    no_wildcard_subscription: bool = False
 
     # Restart flag file for rebooting the DUT during test runs
     restart_flag_file: Optional[pathlib.Path] = None

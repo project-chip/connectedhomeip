@@ -111,15 +111,15 @@ class TC_AVSM_2_18(MatterBaseTest, AVSMTestBase):
 
         self.step(6)
         min_viewport_resolution = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution)
-        log.info(f"Rx'd MinViewportResolution: {min_viewport_resolution}")
+        log.info("Rx'd MinViewportResolution: %s", min_viewport_resolution)
 
         self.step(7)
         video_sensor_params = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams)
-        log.info(f"Rx'd VideoSensorParams: {video_sensor_params}")
+        log.info("Rx'd VideoSensorParams: %s", video_sensor_params)
 
         self.step(8)
         max_encoded_pixel_rate = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate)
-        log.info(f"Rx'd MaxEncodedPixelRate: {max_encoded_pixel_rate}")
+        log.info("Rx'd MaxEncodedPixelRate: %s", max_encoded_pixel_rate)
 
         self.step(9)
         has_f_wmark = (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0
@@ -137,7 +137,7 @@ class TC_AVSM_2_18(MatterBaseTest, AVSMTestBase):
         min_resolution = min_viewport_resolution
         min_bit_rate = trade_off_point.minBitRate
         max_bit_rate = trade_off_point.minBitRate
-        min_frame_rate = min(15, video_sensor_params.maxFPS)
+        min_frame_rate = min(self.user_params.get("minFrameRate", 30), video_sensor_params.maxFPS)
         max_frame_rate = video_sensor_params.maxFPS
         key_frame_interval = 4000
 

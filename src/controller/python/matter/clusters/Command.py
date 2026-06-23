@@ -171,7 +171,8 @@ class AsyncBatchCommandsTransaction:
 
     def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception | None):
         if self._future.done():
-            logger.exception(f"Received another error. Only expecting one error. imError:{imError}, chipError {chipError}")
+            # We need to eagerly stringify as specified in PyChipError docstring.
+            logger.exception("Received another error. Only expecting one error. imError:%s, chipError %s", imError, str(chipError))
             return
         if chipError != 0:
             exception = chipError.to_exception()

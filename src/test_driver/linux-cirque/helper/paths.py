@@ -21,7 +21,7 @@ from pathlib import Path
 # _STR are string representation of the path.
 # _ESC are the escaped string representation of the path, which can be used in shell commands.
 
-CHIP_REPO_PATH = Path(__file__).absolute().parents[4]
+CHIP_REPO_PATH = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 CHIP_REPO_STR = str(CHIP_REPO_PATH)
 CONTROLLER_TEST_SCRIPTS_DIR_PATH = CHIP_REPO_PATH / "src/controller/python/tests/scripts"
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC = shlex.quote(str(CHIP_REPO_PATH / "credentials/development/paa-root-certs"))
@@ -36,7 +36,7 @@ CHIP_LIGHTING_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/standalone/c
 CHIP_TOOL_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/standalone/chip-tool"))
 LIT_ICD_APP_ESC = shlex.quote(str(CHIP_REPO_PATH / "out/debug/lit_icd/lit-icd-app"))
 
-MATTER_CONTROLLER_WHEEL_DIR_PATH = CHIP_REPO_PATH / "out/debug/linux_x64_gcc/controller/python"
+MATTER_CONTROLLER_WHEEL_DIR_PATH = CHIP_REPO_PATH / "out/debug/linux_x64_gcc/obj/src/controller/python/matter-controller-wheels"
 MATTER_CONTROLLER_WHEELS = ["matter_clusters", "matter_core", "matter_repl"]
 MATTER_CONTROLLER_INSTALL_WHEELS = (
     f"pip3 install --break-system-packages --find-links {shlex.quote(str(MATTER_CONTROLLER_WHEEL_DIR_PATH))} "

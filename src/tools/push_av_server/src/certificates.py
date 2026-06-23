@@ -63,7 +63,7 @@ class CAHierarchy:
             self.root_key = serialization.load_pem_private_key(
                 self.root_key_path.read_bytes(), None
             )
-            log.info(f"CA Hierarchy loaded from disk: {self.name}")
+            log.info("CA Hierarchy loaded from disk: %s", self.name)
         elif self.root_key_path.exists() or self.root_cert_path.exists():
             # Only one of the two file exists, bailing out
             log.error("root certificate partially exist on disk, stopping early")
@@ -71,7 +71,7 @@ class CAHierarchy:
         else:
             # Start generating the root certificate
             self._generate_root_certificate()
-            log.info(f"CA Hierarchy generated: {self.name}")
+            log.info("CA Hierarchy generated: %s", self.name)
 
     def _generate_root_certificate(self):
         """Generate a new root CA certificate."""

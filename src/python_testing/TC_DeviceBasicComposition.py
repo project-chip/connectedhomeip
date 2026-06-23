@@ -35,13 +35,17 @@
 #   run2: # tests PASE connection using manual code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json --manual-code 10054912339
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
 #     factory-reset: true
 #     quiet: true
 #   run3: # tests PASE connection using QR code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --qr-code MT:-24J0Q1212-10648G00
 #     factory-reset: true
 #     quiet: true
 #   run4: # tests PASE connection using discriminator and passcode (12.1 only)
@@ -84,7 +88,8 @@
 #   run8: # Tests reusing storage from run7 (i.e. factory-reset=false)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json
+#     script-args: >
+#       --storage-path admin_storage.json
 #     factory-reset: false
 #     quiet: true
 #   run9: # Test using the generated attribute wildcard file from previous run
@@ -178,6 +183,7 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --device on-off-light
+#       --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -290,6 +296,9 @@ def check_no_duplicates(obj: Any) -> None:
 
 
 class TC_DeviceBasicComposition(BasicCompositionTests):
+    # Large wildcard priming + ACL churn are disabled for composition / multi-app CI matrix.
+    disable_wildcard_subscription = True
+
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -358,7 +367,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 Clusters.Groups in self.endpoints[ep_id]
                 for ep_id in self.endpoints if ep_id != 0
             )
-            log.info(f"has_groups_server: {has_groups_server}, has_groupcast_listener: {has_groupcast_listener}")
+            log.info("has_groups_server: %s, has_groupcast_listener: %s", has_groups_server, has_groupcast_listener)
             if has_groups_server and not has_groupcast_listener:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem="Groups server found on an endpoint but Groupcast cluster with Listener "
@@ -372,7 +381,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 Clusters.Binding in self.endpoints[ep_id]
                 for ep_id in self.endpoints if ep_id != 0
             )
-            log.info(f"has_binding_server: {has_binding_server}, has_groupcast_sender: {has_groupcast_sender}")
+            log.info("has_binding_server: %s, has_groupcast_sender: %s", has_binding_server, has_groupcast_sender)
             if has_binding_server and not has_groupcast_sender:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                                   problem="Binding server found on an endpoint but Groupcast cluster with Sender "
@@ -394,7 +403,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         success = True
         for endpoint_id, endpoint in self.endpoints.items():
             has_descriptor = (Clusters.Descriptor in endpoint)
-            log.info(f"Checking descriptor on Endpoint {endpoint_id}: {'found' if has_descriptor else 'not_found'}")
+            log.info("Checking descriptor on Endpoint %s: %s", endpoint_id, 'found' if has_descriptor else 'not_found')
             if not has_descriptor:
                 self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id),
                                   problem=f"Did not find a descriptor on endpoint {endpoint_id}", spec_location="Base Cluster Requirements for Matter")
@@ -473,8 +482,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
 
                     has_attribute = (req_attribute.id in cluster)
                     location = AttributePathLocation(endpoint_id, cluster_id, req_attribute.id)
-                    log.debug(
-                        f"Checking for mandatory global {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
+                    log.debug("Checking for mandatory global %s on %s: %s",
+                              attribute_string, location.as_cluster_string(self.cluster_mapper),
+                              'found' if has_attribute else 'not_found')
 
                     # Check attribute is actually present
                     if not has_attribute:
@@ -512,8 +522,9 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                         has_attribute = attribute_id in cluster
 
                         attribute_string = self.cluster_mapper.get_attribute_string(cluster_id, attribute_id)
-                        log.debug(
-                            f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
+                        log.debug("Checking presence of claimed supported %s on %s: %s",
+                                  attribute_string, location.as_cluster_string(self.cluster_mapper),
+                                  'found' if has_attribute else 'not_found')
 
                         if not has_attribute:
                             # Check if this is a write-only attribute by trying to read it.
@@ -732,6 +743,12 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
+                if isinstance(feature_map, ValueDecodeFailure):
+                    location = AttributePathLocation(endpoint_id, cluster_id, GlobalAttributeIds.FEATURE_MAP_ID)
+                    self.record_error(self.get_test_name(), location=location,
+                                      problem=f"Found a failure to read/decode FEATURE_MAP on {location.as_cluster_string(self.cluster_mapper)}")
+                    success = False
+                    continue
                 feature_mask = 0
                 try:
                     feature_map_enum = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature

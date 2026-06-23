@@ -39,24 +39,23 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ameba:181
+            image: ghcr.io/project-chip/chip-build-ameba:200
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: ameba
-            - name: Build example Ameba All Clusters App
+            - name: Build example Ameba Apps
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target ameba-amebad-all-clusters \
                         --target ameba-amebad-all-clusters-minimal \
                         --target ameba-amebad-light \
-                        --target ameba-amebad-pigweed \
                         build \
                      "
             - name: Notify Slack on Failure
