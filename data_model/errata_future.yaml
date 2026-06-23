@@ -12,3 +12,10 @@ AmbientContextSensing:
     # Reconciles against future spec / PR #43327
     SimultaneousDetectionLimit:
         write_access: none
+
+GroupKeyManagement:
+    # Cluster revision bumped to 4 in Matter 1.6.1 (Add "C" quality to GroupKeyMap attribute).
+    # The baseline 1.6 XML lists revision 3, so override the reference revision the conformance
+    # test expects to 4.
+    # TODO Can be removed once 1.6.1  datamodel is generated and checked in to datamodel/1.6.1/
+    revision: 4

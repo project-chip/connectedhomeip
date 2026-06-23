@@ -118,6 +118,8 @@ class TC_IDM_4_3(IDMBaseTest):
     min_interval_floor_sec: int = 0
     max_interval_ceiling_sec: int = 3
     root_node_endpoint: int = 0
+    # This removes the framework wildcard subscription from running in the background for this test.
+    disable_wildcard_subscription = True
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
@@ -129,7 +131,6 @@ class TC_IDM_4_3(IDMBaseTest):
         log.info("Calculated MRP retransmission timeout: %.2fs", mrp_timeout_sec)
 
         # Step 1: Empty report verification
-        # (This was originally test step 3 in the test plan it appears)
         self.step(1)
         # Track empty report arrival time using an async event to avoid busy-wait
         empty_report_event = asyncio.Event()
