@@ -123,7 +123,7 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
       try {
         ChipClient.withConnectedDevice(requireContext(), deviceId) { devicePtr ->
           val cluster = ChipClusters.IcdManagementCluster(devicePtr, 0)
-          suspendCoroutine { cont ->
+          suspendCoroutine<Long> { cont ->
             cluster.stayActiveRequest(
               object : ChipClusters.IcdManagementCluster.StayActiveResponseCallback {
                 override fun onError(error: Exception) {
