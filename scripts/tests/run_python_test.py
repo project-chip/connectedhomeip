@@ -39,9 +39,9 @@ import click
 import coloredlogs
 from colorama import Fore, Style
 
+from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
 from matter.testing.tasks import Subprocess
-from matter.testing.defaults import TestingDefaults
 
 log = logging.getLogger(__name__)
 
