@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2024-2025 Project CHIP Authors
+#   Copyright (c) 2024-2026 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -95,6 +95,13 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/tcc-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
 )
 

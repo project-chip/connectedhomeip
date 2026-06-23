@@ -41,9 +41,10 @@ LoggingOccupancySensorDevice::LoggingOccupancySensorDevice(TimerDelegate & timer
         timerDelegate)
 {}
 
-CHIP_ERROR LoggingOccupancySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR LoggingOccupancySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                  EndpointComposition composition)
 {
-    return OccupancySensorDevice::Register(endpoint, provider, parentId);
+    return OccupancySensorDevice::Register(endpoint, provider, composition);
 }
 
 void LoggingOccupancySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)

@@ -58,9 +58,10 @@ IncreasingLightSensorDevice::~IncreasingLightSensorDevice()
     mTimerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR IncreasingLightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR IncreasingLightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                 EndpointComposition composition)
 {
-    ReturnErrorOnFailure(LightSensorDevice::Register(endpoint, provider, parentId));
+    ReturnErrorOnFailure(LightSensorDevice::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
     mLightMeasuredValue = kDefaultLightConfig.minMeasuredValue.Value();

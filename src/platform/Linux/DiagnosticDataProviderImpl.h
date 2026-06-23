@@ -91,11 +91,12 @@ public:
 #endif
 
 private:
-    uint64_t mEthPacketRxCount  = 0;
-    uint64_t mEthPacketTxCount  = 0;
-    uint64_t mEthTxErrCount     = 0;
-    uint64_t mEthCollisionCount = 0;
-    uint64_t mEthOverrunCount   = 0;
+    uint64_t mEthPacketRxCount          = 0;
+    uint64_t mEthPacketTxCount          = 0;
+    uint64_t mEthTxErrCount             = 0;
+    uint64_t mEthCollisionCount         = 0;
+    uint64_t mEthOverrunCount           = 0;
+    uint64_t mEthTimeSinceResetBaseline = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     uint32_t mBeaconLostCount        = 0;
