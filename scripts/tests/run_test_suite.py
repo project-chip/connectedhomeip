@@ -366,6 +366,10 @@ def cmd_list(context: click.Context) -> None:
     type=click.IntRange(min=0),
     help=('Periodically show the status of test execution. '
           '0: turn off, other values: periodicity of report in number of logged messages.'))
+@click.option(
+    '--clear-worker-state',
+    is_flag=True,
+    help='Clear worker state in /tmp. Available only on Linux.')
 # Deprecated flags:
 @click.option(
     '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
@@ -418,8 +422,8 @@ def cmd_list(context: click.Context) -> None:
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
             help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            value_wait_extra_duration_ms: int | None, expected_failures: int,
-            commissioning_method: CommissioningMethod, summary_file: Path | None, periodic_status: int,
+            value_wait_extra_duration_ms: int | None, expected_failures: int, commissioning_method: CommissioningMethod,
+            summary_file: Path | None, periodic_status: int, clear_worker_state: bool,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -431,6 +435,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     if expected_failures != 0 and not keep_going:
         raise click.BadOptionUsage("--expected-failures",
                                    f"--expected-failures '{expected_failures}' used without '--keep-going'")
+
+    if clear_worker_state and not sys.platform == "linux":
+        raise click.BadOptionUsage("--clear-worker-state", "Worker state cleanup available only on Linux")
 
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
@@ -482,7 +489,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     # We use require here as we want to throw an error as these tools are mandatory for any test run.
     try:
-
         if context.obj.runtime == TestRunTime.CHIP_TOOL_PYTHON:
             subproc_info_repo.require('chip-tool')
             subproc_info_repo.require('chip-tool-with-python', target_name='chiptool.py')
@@ -504,7 +510,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     test_config = TestJobConfig(
         commissioning_method, dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds,
         value_wait_extra_duration_ms, concurrency=1)
-    worker_config = WorkerConfig.from_test_job_config(context.obj.log_config, test_config).with_formatted_name()
+    worker_config = WorkerConfig.from_test_job_config(
+        context.obj.log_config, test_config, tmp_dir_clear=clear_worker_state).with_formatted_name()
 
     try:
         with (SyncManager(address=SYNC_MANAGER_PATH) as mp_manager,

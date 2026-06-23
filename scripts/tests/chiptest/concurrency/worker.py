@@ -41,18 +41,20 @@ class WorkerConfig(ProcessConfig, TestJobConfig):
     WORKER_START_TIMEOUT: ClassVar[float] = 15
     WORKER_STOP_TIMEOUT: ClassVar[float] = 10
 
+    tmp_dir_clear: bool = False
     tmp_dir_default: ClassVar[Path] = Path(tempfile.gettempdir())
     tmp_dir_worker_base: ClassVar[Path] = Path(tempfile.gettempdir()) / "matter_test_suite"
 
     @classmethod
-    def from_test_job_config(cls, log_config: LogConfig, config: TestJobConfig):
+    def from_test_job_config(cls, log_config: LogConfig, config: TestJobConfig, *, tmp_dir_clear: bool):
         """Create a worker config from a test job config."""
         # Needs to be a shallow copy, so that we don't accidentally create unpicklable generators in the config.
         return cls(**{field.name: getattr(config, field.name) for field in dataclasses.fields(config)},
                    name=f"W{{id:0{len(str(config.concurrency))}}}",
                    log_config=log_config,
                    start_timeout_sec=WorkerConfig.WORKER_START_TIMEOUT,
-                   stop_timeout_sec=WorkerConfig.WORKER_STOP_TIMEOUT)
+                   stop_timeout_sec=WorkerConfig.WORKER_STOP_TIMEOUT,
+                   tmp_dir_clear=tmp_dir_clear)
 
 
 @dataclasses.dataclass

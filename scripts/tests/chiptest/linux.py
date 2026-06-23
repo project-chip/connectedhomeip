@@ -22,6 +22,7 @@ import contextlib
 import logging
 import os
 import shlex
+import shutil
 import subprocess
 from typing import BinaryIO
 
@@ -78,6 +79,10 @@ class LinuxWorkerProcess(WorkerProcess):
         # Create a virtual /tmp.
         tmp_dir_default = self._config.tmp_dir_default
         tmp_dir = self._config.tmp_dir_worker_base / str(self._config.id)
+
+        if self._config.tmp_dir_clear:
+            shutil.rmtree(tmp_dir)
+
         tmp_dir.mkdir(parents=True, exist_ok=True)
 
         # Check if the directory is empty.
