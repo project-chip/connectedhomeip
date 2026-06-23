@@ -97,6 +97,8 @@ executable("all-devices-app") {
       "PW_RPC_ATTRIBUTE_SERVICE=1",
     ]
 
+    sources += [ "${chip_root}/examples/platform/linux/Rpc.cpp" ]
+
     deps += [
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/pigweed:pigweed-accessor",
 
