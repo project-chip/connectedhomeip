@@ -323,6 +323,9 @@ config("pw_rpc_config") {
 }
 
 if (chip_enable_pw_rpc) {
+  # This target compiles the generic Pigweed RPC server initialization and socket/HDLC communication code.
+  # It does not compile service registrations or carry final executable link dependencies.
+  # The application target must add Rpc.cpp, specific service dependencies, and service-specific defines.
   source_set("pw_rpc") {
     sources = [ "system_rpc_server.cc" ]
 
