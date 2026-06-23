@@ -335,6 +335,17 @@ private:
      * SegmentTimeline element per the Push AV spec, which requires the final static
      * manifest to include SegmentTimeline with accurate segment durations.
      *
+     * Example transformation (SegmentTemplate with 3 segments):
+     *   Before:
+     *     <SegmentTemplate timescale="90000" duration="360000" ...>
+     *     </SegmentTemplate>
+     *   After:
+     *     <SegmentTemplate timescale="90000" duration="360000" ...>
+     *       <SegmentTimeline>
+     *           <S t="0" d="360000" r="2" />
+     *       </SegmentTimeline>
+     *     </SegmentTemplate>
+     *
      * @param mpdPath Path to the MPD file to finalize
      */
     void FinalizeMPD(const std::string & mpdPath);

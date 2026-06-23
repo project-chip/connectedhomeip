@@ -19,6 +19,7 @@
 #include "pushav-uploader.h"
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
@@ -346,17 +347,17 @@ std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string
             {
                 char * endPtr = nullptr;
                 long segNum   = std::strtol(numStr.c_str(), &endPtr, 10);
-                if (endPtr == numStr.c_str() || segNum < 0 || segNum > INT_MAX - 1000)
+                // Per spec, SegmentNumber is uint16 (range 1001-65535). In practice,
+                // SegmentNumber will never exceed 9999 due to session duration limits
+                // (5 min max / 500ms min segment duration = ~600 segments max per session).
+                // Verify the parsed value is non-negative and that adding the +1000 offset
+                // won't exceed the spec's uint16 type limit.
+                if (endPtr == numStr.c_str() || segNum < 0 || segNum > UINT16_MAX - 1000)
                 {
                     ChipLogError(Camera, "Segment number out of range: %s", numStr.c_str());
                     return path;
                 }
                 segNum += 1000; // Offset: 1 -> 1001, 2 -> 1002, etc.
-                if (segNum > 9999)
-                {
-                    ChipLogError(Camera, "Segment number overflow: %ld", segNum);
-                    segNum = 0;
-                }
                 result.replace(numStart, numEnd - numStart, std::to_string(segNum));
             }
             else
