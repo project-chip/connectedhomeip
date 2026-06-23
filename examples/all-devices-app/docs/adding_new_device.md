@@ -135,7 +135,7 @@ MySensorDevice::MySensorDevice(TimerDelegate & timerDelegate) :
 CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
 {
     // 1. Complete base single-endpoint registration
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, parentId));
 
     // 2. Instantiate and register common Identify cluster
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -151,7 +151,7 @@ CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMod
 
 void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mMySensorCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mMySensorCluster.Cluster()));
@@ -439,3 +439,5 @@ documentation:
 2. **`supported_clusters.md`**: If your device introduced support for a new
    cluster, update its **Used in All-Devices** status to `Yes` and list your
    device type in the **Notes/Devices** column.
+3. **`README.md`**: Update the **Supported Devices** list and the `--device` CLI
+   help options example block under the **Running the Application** section.

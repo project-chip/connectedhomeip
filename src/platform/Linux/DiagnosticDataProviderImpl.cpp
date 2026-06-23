@@ -26,6 +26,7 @@
 #include <app/data-model/List.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
@@ -96,65 +97,44 @@ CHIP_ERROR GetThreadName(pid_t tid, char * nameBuf, size_t nameBufSize)
 
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        struct ifaddrs * ifa = nullptr;
+    struct ifaddrs * ifa = nullptr;
+    VerifyOrReturnError(getifaddrs(&ifa) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
+    auto deferClose = MakeDefer([ifa]() { freeifaddrs(ifa); });
 
-        // Walk through linked list, maintaining head pointer so we can free list later.
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+    for (; ifa != nullptr; ifa = ifa->ifa_next)
+    {
+        if (strcmp(ifa->ifa_name, ifName) == 0 && ifa->ifa_data != nullptr)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
+            auto stats = static_cast<struct rtnl_link_stats *>(ifa->ifa_data);
+            switch (type)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
+            case EthernetStatsCountType::kEthPacketRxCount:
+                count = stats->rx_packets;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthPacketTxCount:
+                count = stats->tx_packets;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthTxErrCount:
+                count = stats->tx_errors;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthCollisionCount:
+                count = stats->collisions;
+                return CHIP_NO_ERROR;
+            case EthernetStatsCountType::kEthOverrunCount:
+                count = stats->rx_over_errors;
+                return CHIP_NO_ERROR;
+            default:
+                ChipLogError(DeviceLayer, "Unknown Ethernet statistic metric type");
                 break;
             }
         }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-                switch (type)
-                {
-                case EthernetStatsCountType::kEthPacketRxCount:
-                    count = stats->rx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthPacketTxCount:
-                    count = stats->tx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthTxErrCount:
-                    count = stats->tx_errors;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthCollisionCount:
-                    count = stats->collisions;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthOverrunCount:
-                    count = stats->rx_over_errors;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                default:
-                    ChipLogError(DeviceLayer, "Unknown Ethernet statistic metric type");
-                    break;
-                }
-            }
-        }
-
-        freeifaddrs(ifaddr);
     }
 
-    return err;
+    return CHIP_ERROR_READ_FAILED;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -551,27 +531,29 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
 {
-    if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetEthPHYRate(ConnectivityMgrImpl().GetEthernetIfName(), pHYRate);
+    return ConnectivityUtils::GetEthPHYRate(ifName, pHYRate);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
 {
-    if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetEthFullDuplex(ConnectivityMgrImpl().GetEthernetIfName(), fullDuplex);
+    return ConnectivityUtils::GetEthFullDuplex(ifName, fullDuplex);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthTimeSinceReset(uint64_t & timeSinceReset)
 {
-    return GetDiagnosticDataProvider().GetUpTime(timeSinceReset);
+    uint64_t currentUptime = 0;
+    ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(currentUptime));
+    VerifyOrReturnError(currentUptime >= mEthTimeSinceResetBaseline, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    timeSinceReset = currentUptime - mEthTimeSinceResetBaseline;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthPacketRxCount(uint64_t & packetRxCount)
@@ -634,81 +616,69 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthOverrunCount(uint64_t & overrunCoun
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthCarrierDetect(bool & carrierDetect)
+{
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
+
+    return ConnectivityUtils::GetEthCarrierDetect(ifName, carrierDetect);
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 {
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
+    const char * ifName = ConnectivityMgrImpl().GetEthernetIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    if (getifaddrs(&ifaddr) == -1)
+    uint64_t currentUptime = 0;
+    ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(currentUptime));
+
+    struct ifaddrs * ifa = nullptr;
+    VerifyOrReturnError(getifaddrs(&ifa) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno)));
+    auto deferClose = MakeDefer([ifa]() { freeifaddrs(ifa); });
+
+    for (; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        struct ifaddrs * ifa = nullptr;
-
-        // Walk through linked list, maintaining head pointer so we can free list later.
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        if (strcmp(ifa->ifa_name, ifName) == 0 && ifa->ifa_data != nullptr)
         {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
-            {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
-                break;
-            }
+            auto stats                 = static_cast<struct rtnl_link_stats *>(ifa->ifa_data);
+            mEthPacketRxCount          = stats->rx_packets;
+            mEthPacketTxCount          = stats->tx_packets;
+            mEthTxErrCount             = stats->tx_errors;
+            mEthCollisionCount         = stats->collisions;
+            mEthOverrunCount           = stats->rx_over_errors;
+            mEthTimeSinceResetBaseline = currentUptime;
+            return CHIP_NO_ERROR;
         }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-
-                mEthPacketRxCount  = stats->rx_packets;
-                mEthPacketTxCount  = stats->tx_packets;
-                mEthTxErrCount     = stats->tx_errors;
-                mEthCollisionCount = stats->collisions;
-                mEthOverrunCount   = stats->rx_over_errors;
-                err                = CHIP_NO_ERROR;
-            }
-        }
-
-        freeifaddrs(ifaddr);
     }
 
-    return err;
+    return CHIP_ERROR_READ_FAILED;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetWiFiChannelNumber(ConnectivityMgrImpl().GetWiFiIfName(), channelNumber);
+    return ConnectivityUtils::GetWiFiChannelNumber(ifName, channelNumber);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetWiFiRssi(ConnectivityMgrImpl().GetWiFiIfName(), rssi);
+    return ConnectivityUtils::GetWiFiRssi(ifName, rssi);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
+
     uint32_t count;
-
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
-
-    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(ConnectivityMgrImpl().GetWiFiIfName(), count));
+    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(ifName, count));
     VerifyOrReturnError(count >= mBeaconLostCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
     beaconLostCount = count - mBeaconLostCount;
 
@@ -717,12 +687,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconL
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
 {
-    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
+    const char * ifName = ConnectivityMgrImpl().GetWiFiIfName();
+    VerifyOrReturnError(ifName != nullptr, CHIP_ERROR_READ_FAILED);
 
-    return ConnectivityUtils::GetWiFiCurrentMaxRate(ConnectivityMgrImpl().GetWiFiIfName(), currentMaxRate);
+    return ConnectivityUtils::GetWiFiCurrentMaxRate(ifName, currentMaxRate);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
