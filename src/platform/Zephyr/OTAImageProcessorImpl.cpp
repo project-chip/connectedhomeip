@@ -58,17 +58,15 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     mHeaderParser.Init();
     mParams = {};
 
-    const struct device * flash_dev;
-
-    flash_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
+    const struct device * flash_dev = PARTITION_DEVICE(slot1_partition);
     if (flash_dev == NULL)
     {
         ChipLogError(SoftwareUpdate, "Failed to get flash device");
         return System::MapErrorZephyr(-EFAULT);
     }
 
-    int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
-                                FIXED_PARTITION_SIZE(slot1_partition), NULL);
+    int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), PARTITION_OFFSET(slot1_partition),
+                                PARTITION_SIZE(slot1_partition), NULL);
 
     if (err)
     {
