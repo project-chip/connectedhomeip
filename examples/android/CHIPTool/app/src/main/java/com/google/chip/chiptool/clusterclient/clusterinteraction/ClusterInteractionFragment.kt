@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import chip.devicecontroller.ChipDeviceController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import chip.devicecontroller.ChipClusters
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -55,20 +56,32 @@ class ClusterInteractionFragment : Fragment() {
           }
         devicePtrInitialized = true
         showMessage("Retrieving endpoints")
-        binding.endpointList.visibility = View.VISIBLE
+
+        val descriptorCluster = ChipClusters.DescriptorCluster(devicePtr, 0)
+        descriptorCluster.readPartsListAttribute(object : ChipClusters.DescriptorCluster.PartsListAttributeCallback {
+          override fun onSuccess(value: MutableList<Int>?) {
+            requireActivity().runOnUiThread {
+              val endpoints = ArrayList<EndpointItem>()
+              endpoints.add(EndpointItem(0))
+              value?.forEach { endpoints.add(EndpointItem(it)) }
+              binding.endpointList.adapter = EndpointAdapter(endpoints, EndpointListener())
+              binding.endpointList.visibility = View.VISIBLE
+            }
+          }
+
+          override fun onError(error: Exception?) {
+            Log.e(TAG, "Error reading parts list", error)
+            showMessage("Error reading endpoints: ${error?.message}")
+          }
+        })
       }
     }
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
-    var dataList: List<EndpointItem> = ArrayList()
-    // TODO: Dynamically retrieve endpoint information using descriptor cluster
-    // hardcode the endpoint for now
-    for (i in 0 until 2) {
-      dataList += EndpointItem(i)
-    }
 
-    binding.endpointList.adapter = EndpointAdapter(dataList, EndpointListener())
+    // Start with an empty list. Will be populated dynamically when Retrieve is clicked.
+    binding.endpointList.adapter = EndpointAdapter(emptyList(), EndpointListener())
     binding.endpointList.layoutManager = LinearLayoutManager(requireContext())
     binding.bottomNavigationBar.setOnNavigationItemSelectedListener(bottomNavigationListener)
 
