@@ -324,6 +324,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     timeout_key = '--timeout'
     test_arg_timeout = None
     timeout_index = split_args.index(timeout_key) if timeout_key in split_args else None
+    # Some tests have very large execution time (Nightly jobs), the --timeout flag is used as referece to create a subprocess timeout
+    # which cover the timeout of the test plus 60 seconds, and after this time  verify if the subprocess stalled and terminate it if is the case.
     if timeout_index is not None:
         try:
             # Add one minute to let the test timeout if the test reach the timeout.
@@ -367,14 +369,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_script_process.p.stdin.close()
 
     try:
-        # Some tests have very large execution time (Nightly jobs), we use the --timeout to avoid test to use default timeout
-        if test_arg_timeout is None:
-            # This will use the DEFAULT_TIMEOUT_S
-            test_script_exit_code = test_script_process.wait()
-        else:
-            log.info("Executing the test with a timeout of %d seconds", test_arg_timeout)
-            test_script_exit_code = test_script_process.wait(timeout=test_arg_timeout)
-
+        # Note:  If test_arg_timeout is None the wait() method will used the default value of 300 seconds
+        log.info("Executing the test subprocess with a timeout of %d seconds", test_arg_timeout) if test_arg_timeout is not None else log.info(
+            "Executing the test subprocess without timeout using default timeout.")
+        test_script_exit_code = test_script_process.wait(timeout=test_arg_timeout)
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
 
