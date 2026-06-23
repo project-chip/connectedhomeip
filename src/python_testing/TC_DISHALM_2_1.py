@@ -68,9 +68,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
         return "198.2.1. [TC-DISHALM-2.1] Attributes with DUT as Server"
 
     def pics_TC_DISHALM_2_1(self):
-        return [
-            "DISHALM.S"
-        ]
+        return ["DISHALM.S"]
 
     def steps_TC_DISHALM_2_1(self) -> list[TestStep]:
         return [
@@ -78,7 +76,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
             TestStep(2, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value")
+            TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value"),
         ]
 
     def _get_valid_alarm_bitmap_mask(self, allow_provisional: bool = True) -> int:
@@ -101,13 +99,15 @@ class TC_DISHALM_2_1(BasicCompositionTests):
         xml_clusters = self.xml_clusters
 
         # Get the DishwasherAlarm cluster from parsed XML
-        asserts.assert_in(dishwasher_alarm_cluster_id, xml_clusters,
-                          f"DishwasherAlarm cluster (0x{dishwasher_alarm_cluster_id:04X}) not found in data model XML")
+        asserts.assert_in(
+            dishwasher_alarm_cluster_id,
+            xml_clusters,
+            f"DishwasherAlarm cluster (0x{dishwasher_alarm_cluster_id:04X}) not found in data model XML",
+        )
         xml_cluster = xml_clusters[dishwasher_alarm_cluster_id]
 
         # Get the AlarmBitmap from the cluster's bitmaps
-        asserts.assert_in("AlarmBitmap", xml_cluster.bitmaps,
-                          "AlarmBitmap not found in DishwasherAlarm cluster bitmaps")
+        asserts.assert_in("AlarmBitmap", xml_cluster.bitmaps, "AlarmBitmap not found in DishwasherAlarm cluster bitmaps")
         alarm_bitmap = xml_cluster.bitmaps["AlarmBitmap"]
 
         mask = 0
@@ -131,8 +131,9 @@ class TC_DISHALM_2_1(BasicCompositionTests):
 
         return mask
 
-    def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int,
-                               valid_mask: int, supported_value: typing.Optional[int] = None):
+    def _validate_alarm_bitmap(
+        self, attribute_name: str, bitmap_value: int, valid_mask: int, supported_value: typing.Optional[int] = None
+    ):
         """
         Validate that an alarm bitmap only contains valid and supported bits.
 
@@ -171,11 +172,10 @@ class TC_DISHALM_2_1(BasicCompositionTests):
 
         logger.info("%s bitmap validation passed: 0x%08X", attribute_name, bitmap_value)
 
-    async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: type[ClusterObjects.ClusterAttributeDescriptor], name: str) -> int:
-        resp = await self.read_single_attribute_check_success(
-            cluster=self.cluster,
-            attribute=attribute
-        )
+    async def read_and_check_attributes_from_dishwasher_alarm(
+        self, attribute: type[ClusterObjects.ClusterAttributeDescriptor], name: str
+    ) -> int:
+        resp = await self.read_single_attribute_check_success(cluster=self.cluster, attribute=attribute)
 
         matter_asserts.assert_valid_uint32(resp, name)
 
