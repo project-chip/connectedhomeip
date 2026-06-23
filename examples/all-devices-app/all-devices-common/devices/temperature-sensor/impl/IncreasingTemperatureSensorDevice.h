@@ -34,8 +34,7 @@ public:
     IncreasingTemperatureSensorDevice();
     ~IncreasingTemperatureSensorDevice() override;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // TimerContext

@@ -45,9 +45,9 @@ IncreasingTemperatureSensorDevice::~IncreasingTemperatureSensorDevice()
 }
 
 CHIP_ERROR IncreasingTemperatureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                       EndpointId parentId)
+                                                       EndpointComposition composition)
 {
-    ReturnErrorOnFailure(TemperatureSensorDevice::Register(endpoint, provider, parentId));
+    ReturnErrorOnFailure(TemperatureSensorDevice::Register(endpoint, provider, composition));
     // Kick off the timer loop to increase temperature every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec);
 }
