@@ -12,8 +12,10 @@ development iteration.
 
 - Raspberry Pi 4 running Tizen OS with Wi-Fi configured (see
   [Installing Tizen on Raspberry Pi](./raspberry_pi_install.md))
-- `sdb` tool available in your `PATH`
-- `chip-tool` built for your host PC
+- `sdb` tool — available inside the Tizen Docker container (see
+  [Building for Tizen](./building.md#docker-compose-environment))
+- `chip-tool` built for your host PC (see
+  [Building chip-tool](./building.md#building-chip-tool-for-the-host-pc))
 
 ## Building
 
@@ -28,12 +30,22 @@ exit
 
 The output binary will be in `out/linux-arm64-light-no-thread-no-ble-clang/`.
 
+:::{note}
+All Docker services share the same workspace volume. Artifacts built in the
+`crosscompile` container (e.g., `out/linux-arm64-light-no-thread-no-ble-clang/`)
+are also accessible from the `tizen` container, and vice versa.
+:::
+
 ## Installing the Binary via SDB
 
-Deploy the compiled native executable from your development PC to the target
-Raspberry Pi over the network using SDB:
+Use `sdb` from the Tizen Docker container. The build output from `crosscompile`
+is available in the shared workspace:
 
 ```bash
+docker compose run --rm tizen bash
+sdb connect 192.168.0.118
+sdb root on
+
 # Ensure the target directory exists on the Raspberry Pi
 sdb shell mkdir -p /opt/matter/
 
@@ -49,14 +61,7 @@ sdb shell chmod +x /opt/matter/chip-lighting-app
 Run the application on the Raspberry Pi with target network parameters:
 
 ```bash
-# Execute on the Raspberry Pi terminal shell
 sdb shell /opt/matter/chip-lighting-app --wifi true --discriminator 1234 --passcode 11223344
-```
-
-Or if you already have an `sdb shell` session:
-
-```bash
-/opt/matter/chip-lighting-app --wifi true --discriminator 1234 --passcode 11223344
 ```
 
 ## Commissioning and Control via chip-tool

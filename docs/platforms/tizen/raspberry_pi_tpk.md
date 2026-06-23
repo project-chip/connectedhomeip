@@ -11,9 +11,10 @@ management, which is the recommended way for production deployments.
 
 - Raspberry Pi 4 running Tizen OS with Wi-Fi configured (see
   [Installing Tizen on Raspberry Pi](./raspberry_pi_install.md))
-- `sdb` tool available in your `PATH` (inside the Tizen Docker container or on
-  host)
-- `chip-tool` built for your host PC
+- `sdb` tool — available inside the Tizen Docker container (see
+  [Building for Tizen](./building.md#docker-compose-environment))
+- `chip-tool` built for your host PC (see
+  [Building chip-tool](./building.md#building-chip-tool-for-the-host-pc))
 
 ## Building
 
@@ -36,8 +37,14 @@ the `out/tizen-arm64-light-no-thread/` directory.
 
 ## Managing the Application via SDB
 
-Since `sdb` is bundled directly inside the Docker environment, you can run query,
-installation, and removal steps without exiting to the host machine shell.
+Use `sdb` from the Tizen Docker container. Connect to the device and switch to
+root:
+
+```bash
+docker compose run --rm tizen bash
+sdb connect 192.168.0.118
+sdb root on
+```
 
 ### Verifying and Querying Installed Applications
 

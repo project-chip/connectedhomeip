@@ -4,7 +4,7 @@
 
 ### Docker Compose Environment
 
-We use a combined Docker Compose configuration with three services for different
+We use a combined Docker Compose configuration with four services for different
 Tizen development tasks:
 
 ```yaml
@@ -50,6 +50,19 @@ services:
       PW_ENVIRONMENT_ROOT: /workspace/.environment-crosscompile
     tty: true
     stdin_open: true
+  linux:
+    image: ghcr.io/project-chip/chip-build:latest
+    network_mode: "host"
+    privileged: true
+    user: ubuntu
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      PW_ENVIRONMENT_ROOT: /workspace/.environment-linux
+    tty: true
+    stdin_open: true
 ```
 
 | Service | Purpose |
@@ -57,6 +70,10 @@ services:
 | `tizen` | Build Tizen TPK packages with the Tizen SDK toolchain; includes `sdb` |
 | `tizen-qemu` | Extends the `tizen` image with QEMU support; used for running tests in the QEMU emulator; includes `sdb` |
 | `crosscompile` | Build native Linux ARM64 binaries that can run on Tizen (e.g., on Raspberry Pi) |
+| `linux` | Build Linux x64 host tools (e.g., `chip-tool`); useful for integration testing where part of the system runs on Tizen and part on Linux |
+
+All services share the same workspace volume. Artifacts built in one container
+(e.g., `out/...`) are accessible from all other containers.
 
 The `tizen` and `tizen-qemu` containers include the `sdb` tool. You can use
 `sdb` directly from inside the container, or install the
@@ -115,9 +132,22 @@ source scripts/activate.sh
 The output binary will be in
 `out/linux-arm64-light-no-thread-no-ble-clang/`.
 
-## Alternative: Building with GN and Ninja
+### Alternative: Building with GN and Ninja
 
 For advanced use cases that require direct control over build arguments, you can
 build manually using `gn gen` and `ninja`. See the
 [lighting-app Tizen README](../../../examples/lighting-app/tizen/README.md)
 for detailed instructions.
+
+### Building chip-tool for the Host PC
+
+To build `chip-tool` for your Linux x64 host (needed for commissioning and
+controlling Tizen devices), use the `linux` Docker service:
+
+```bash
+docker compose run --rm linux bash
+source scripts/activate.sh
+./scripts/build/build_examples.py --target linux-x64-chip-tool-clang build
+```
+
+The output will be in `out/linux-x64-chip-tool-clang/`.
