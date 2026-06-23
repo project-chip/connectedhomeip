@@ -108,6 +108,8 @@ def run_all_match_tests_for_type(test_type):
 
 
 class TestMatterTestingSupport(MatterBaseTest):
+    requires_dut = False
+
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero

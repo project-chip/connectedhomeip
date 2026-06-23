@@ -119,6 +119,18 @@ def event_access_string(e: Event) -> str:
     return f"access({result}) "
 
 
+def event_optional_string(e: Event) -> str:
+    if EventQuality.OPTIONAL in e.qualities:
+        return "optional "
+    return ""
+
+
+def command_optional_string(c: Command) -> str:
+    if CommandQuality.OPTIONAL in c.qualities:
+        return "optional "
+    return ""
+
+
 def command_access_string(c: Command) -> str:
     """Generates the access string required for a command. If string is non-empty it will
        include a trailing space
@@ -181,6 +193,8 @@ class IdlGenerator(CodeGenerator):
         self.jinja_env.filters['command_access'] = command_access_string
         self.jinja_env.filters['attribute_access'] = attribute_access_string
         self.jinja_env.filters['render_default'] = render_default
+        self.jinja_env.filters['event_optional'] = event_optional_string
+        self.jinja_env.filters['command_optional'] = command_optional_string
 
         # Easier whitespace management
         self.jinja_env.trim_blocks = True

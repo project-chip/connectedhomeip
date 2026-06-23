@@ -43,8 +43,16 @@ _all_devices_all_enabled = all_devices_enabled_devices == []
 #   - Update scripts/build/build/targets.py to include the new device
 _available_devices = [
   [
+    "aggregator",
+    "AGGREGATOR",
+  ],
+  [
     "air-quality-sensor",
     "AIR_QUALITY_SENSOR",
+  ],
+  [
+    "bridged-node",
+    "BRIDGED_NODE",
   ],
   [
     "chime",
@@ -63,6 +71,18 @@ _available_devices = [
     "FAN",
   ],
   [
+    "flow-sensor",
+    "FLOW_SENSOR",
+  ],
+  [
+    "humidity-sensor",
+    "HUMIDITY_SENSOR",
+  ],
+  [
+    "light-sensor",
+    "LIGHT_SENSOR",
+  ],
+  [
     "network-infrastructure-manager",
     "NETWORK_INFRASTRUCTURE_MANAGER",
   ],
@@ -75,8 +95,24 @@ _available_devices = [
     "ON_OFF_LIGHT",
   ],
   [
+    "power-source",
+    "POWER_SOURCE",
+  ],
+  [
+    "pressure-sensor",
+    "PRESSURE_SENSOR",
+  ],
+  [
     "proximity-ranger",
     "PROXIMITY_RANGER",
+  ],
+  [
+    "rain-sensor",
+    "RAIN_SENSOR",
+  ],
+  [
+    "smoke-co-alarm",
+    "SMOKE_CO_ALARM",
   ],
   [
     "soil-sensor",
@@ -89,6 +125,10 @@ _available_devices = [
   [
     "temperature-sensor",
     "TEMPERATURE_SENSOR",
+  ],
+  [
+    "water-freeze-detector",
+    "WATER_FREEZE_DETECTOR",
   ],
   [
     "water-leak-detector",

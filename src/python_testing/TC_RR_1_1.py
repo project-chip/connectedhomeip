@@ -82,6 +82,9 @@ def generate_vid_verification_statement(fabric_index: int) -> bytes:
 
 
 class TC_RR_1_1(MatterBaseTest):
+    # Avoid background wildcard subscription + extra ACL work during max-fabric commissioning
+    disable_wildcard_subscription = True
+
     def setup_class(self):
         super().setup_class()
         self._pseudo_random_generator = random.Random(1234)

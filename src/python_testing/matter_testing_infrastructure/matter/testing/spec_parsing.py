@@ -36,6 +36,7 @@ import matter.testing.conformance as conformance_support
 from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
                                         ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                         parse_callable_from_xml)
+from matter.testing.data_model_errata import apply_errata, load_authoritative_errata
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
@@ -47,7 +48,7 @@ LOGGER = logging.getLogger(__name__)
 # Type alias maintained for constants access; actual values are ints at runtime
 ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
-_PRIVILEGE_STR = {
+_PRIVILEGE_STR: dict[Optional[int], str] = {
     None: "N/A",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kView: "V",
     ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate: "O",
@@ -106,6 +107,11 @@ class ConstraintReference:
     attribute: str
     field: Optional[str] = None
 
+    def __str__(self):
+        if self.field:
+            return f"ref:{self.attribute}.{self.field}"
+        return f"ref:{self.attribute}"
+
 
 @dataclass
 class Constraints:
@@ -121,6 +127,7 @@ class Constraints:
     max_value_ref: Optional[ConstraintReference] = None
     min_count_ref: Optional[ConstraintReference] = None
     max_count_ref: Optional[ConstraintReference] = None
+    allowed: Optional[list[str]] = None
 
     def has_constraints(self) -> bool:
         """Check if any constraints are defined."""
@@ -135,7 +142,34 @@ class Constraints:
             self.max_value_ref is not None,
             self.min_count_ref is not None,
             self.max_count_ref is not None,
+            self.allowed is not None,
         ])
+
+    def __str__(self):
+        parts = []
+        if self.min_value is not None:
+            parts.append(f"min_value={self.min_value}")
+        if self.max_value is not None:
+            parts.append(f"max_value={self.max_value}")
+        if self.min_length is not None:
+            parts.append(f"min_length={self.min_length}")
+        if self.max_length is not None:
+            parts.append(f"max_length={self.max_length}")
+        if self.min_count is not None:
+            parts.append(f"min_count={self.min_count}")
+        if self.max_count is not None:
+            parts.append(f"max_count={self.max_count}")
+        if self.min_value_ref is not None:
+            parts.append(f"min_value_ref={self.min_value_ref}")
+        if self.max_value_ref is not None:
+            parts.append(f"max_value_ref={self.max_value_ref}")
+        if self.min_count_ref is not None:
+            parts.append(f"min_count_ref={self.min_count_ref}")
+        if self.max_count_ref is not None:
+            parts.append(f"max_count_ref={self.max_count_ref}")
+        if self.allowed is not None:
+            parts.append(f"allowed={self.allowed}")
+        return "Constraints(" + ", ".join(parts) + ")"
 
 
 @dataclass
@@ -182,6 +216,9 @@ class XmlAttribute:
     read_access: int
     write_access: int
     write_optional: bool
+    # Quality flags from the spec XML <quality> element
+    changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
+    quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
     constraints: Optional[Constraints] = None
 
     def access_string(self):
@@ -192,7 +229,8 @@ class XmlAttribute:
         return f'{read_marker}{write_marker} {read_access_marker}{write_access_marker}'
 
     def __str__(self):
-        return f'{self.name}: datatype: {self.datatype} conformance: {str(self.conformance)}, access = {self.access_string()}'
+        constraint_str = f', constraints: {self.constraints}' if self.constraints and self.constraints.has_constraints() else ""
+        return f'{self.name}: datatype: {self.datatype} conformance: {str(self.conformance)}, access = {self.access_string()}{constraint_str}'
 
 
 @dataclass
@@ -648,6 +686,27 @@ class ClusterParser:
         quality = xml_field.find('./quality')
         return quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'].lower() == 'true'
 
+    @staticmethod
+    def _is_change_omitted_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Changes Omitted (C) quality.
+
+        Attributes with this quality do not report value changes in subscription reports.
+        They correspond to <quality changeOmitted="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('changeOmitted', 'false').lower() == 'true'
+
+    @staticmethod
+    def _is_quieter_reporting_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Quieter Reporting (Q) quality.
+
+        Attributes with this quality may be reported less frequently than the normal
+        minimum interval allows.  They correspond to <quality quieterReporting="true"/>
+        in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('quieterReporting', 'false').lower() == 'true'
+
     def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Optional[Constraints]:
         """
         Parse constraint information from XML field element.
@@ -897,6 +956,7 @@ class ClusterParser:
         max_value_ref = None
         min_count_ref = None
         max_count_ref = None
+        allowed = None
 
         # Parse min/max/between constraints
         min_elem = constraint_elem.find('./min')
@@ -984,6 +1044,17 @@ class ClusterParser:
             else:
                 max_count_ref = parse_reference(max_count_elem)
 
+        allowed_elems = constraint_elem.findall('./allowed')
+        if allowed_elems:
+            allowed = []
+            for a in allowed_elems:
+                if 'value' in a.attrib:
+                    allowed.append(a.attrib['value'])
+                else:
+                    for child in a:
+                        if 'value' in child.attrib:
+                            allowed.append(child.attrib['value'])
+
         # Create and return the Constraints object
         return Constraints(
             min_value=min_value,
@@ -995,7 +1066,8 @@ class ClusterParser:
             min_value_ref=min_value_ref,
             max_value_ref=max_value_ref,
             min_count_ref=min_count_ref,
-            max_count_ref=max_count_ref
+            max_count_ref=max_count_ref,
+            allowed=allowed
         )
 
     def parse_attributes(self) -> dict[uint, XmlAttribute]:
@@ -1025,6 +1097,8 @@ class ClusterParser:
                                             read_access=get_access_privilege_or_unknown(read_access),
                                             write_access=get_access_privilege_or_unknown(write_access),
                                             write_optional=write_optional,
+                                            changes_omitted=self._is_change_omitted_attribute(element),
+                                            quieter_reporting=self._is_quieter_reporting_attribute(element),
                                             constraints=constraints)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:
@@ -1171,6 +1245,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_5 = auto()
     k1_5_1 = auto()
     k1_6 = auto()
+    k1_6_1 = auto()
 
     @property
     def dirname(self):
@@ -1190,6 +1265,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.5.1"
         if self == PrebuiltDataModelDirectory.k1_6:
             return "1.6"
+        if self == PrebuiltDataModelDirectory.k1_6_1:
+            return "1.6.1"
         raise KeyError(f"Invalid enum: {self!r}")
 
 
@@ -1238,7 +1315,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return zip_root / data_model_level.dirname
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], errata_path: Union[str, Traversable, None] = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -1364,6 +1441,21 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
             id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
         clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
+
+    if errata_path is not None:
+        errata_data = load_authoritative_errata(errata_path)
+        if errata_data:
+            active_rev = None
+            if isinstance(data_model_directory, PrebuiltDataModelDirectory):
+                active_rev = data_model_directory.dirname
+            elif hasattr(data_model_directory, 'parent'):
+                active_rev = data_model_directory.parent.name
+
+            errata_problems = apply_errata(clusters, errata_data, active_spec_revision=active_rev)
+            problems.extend(errata_problems)
+        else:
+            problems.append(ProblemNotice(test_name='Data Model Errata', location=UnknownProblemLocation(),
+                                          severity=ProblemSeverity.ERROR, problem=f"Failed to load required errata overlay: '{errata_path}'"))
 
     check_clusters_for_unknown_commands(clusters, problems)
 
@@ -1913,6 +2005,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         0x01050000: PrebuiltDataModelDirectory.k1_5,
         0x01050100: PrebuiltDataModelDirectory.k1_5_1,
         0x01060000: PrebuiltDataModelDirectory.k1_6,
+        0x01060100: PrebuiltDataModelDirectory.k1_6_1,
     }
 
     if specification_version not in version_to_dm:
