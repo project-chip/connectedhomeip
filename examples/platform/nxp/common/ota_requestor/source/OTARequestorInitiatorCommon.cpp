@@ -27,7 +27,7 @@ void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
 {
     auto * otaRequestorInit = reinterpret_cast<OTARequestorInitiator *>(context);
     auto & imageProcessor   = OTAImageProcessorImpl::GetDefaultInstance();
-    // Set the global instance of the OTA requestor core component
+
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
@@ -38,6 +38,5 @@ void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
     TEMPORARY_RETURN_IGNORED imageProcessor.Init(&otaRequestorInit->gDownloader);
 
-    // Set the image processor instance used for handling image being downloaded
     otaRequestorInit->gDownloader.SetImageProcessorDelegate(&imageProcessor);
 }
