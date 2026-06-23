@@ -270,6 +270,8 @@
 #include <clusters/TemperatureControlledCabinetTopology/MetadataProvider.h>
 #include <clusters/TemperatureMeasurement/Ids.h>
 #include <clusters/TemperatureMeasurement/MetadataProvider.h>
+#include <clusters/TestHiddenManufacturerSpecific/Ids.h>
+#include <clusters/TestHiddenManufacturerSpecific/MetadataProvider.h>
 #include <clusters/Thermostat/Ids.h>
 #include <clusters/Thermostat/MetadataProvider.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Ids.h>
@@ -989,6 +991,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == TemperatureMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TestHiddenManufacturerSpecific::Id) || ...))
+    {
+        if (id == TestHiddenManufacturerSpecific::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TestHiddenManufacturerSpecific::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Thermostat::Id) || ...))
     {

@@ -233,28 +233,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> set[str]:
     }
 
 
-def _GetReplUnsupportedTests() -> set[str]:
-    """Tests that fail in matter-repl for some reason"""
-    return {
-        "Test_AddNewFabricFromExistingFabric.yaml",     # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
-        "Test_TC_OPCREDS_3_7.yaml",         # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
-        "TestExampleCluster.yaml",          # matter-repl does not load custom pseudo clusters
-        "TestAttributesById.yaml",           # matter-repl does not support AnyCommands (06/06/2023)
-        "TestCommandsById.yaml",             # matter-repl does not support AnyCommands (06/06/2023)
-        "TestEventsById.yaml",               # matter-repl does not support AnyCommands (06/06/2023)
-        "TestReadNoneSubscribeNone.yaml",    # matter-repl does not support AnyCommands (07/27/2023)
-        "Test_TC_IDM_1_2.yaml",              # matter-repl does not support AnyCommands (19/07/2023)
-        "Test_TC_BRBINFO_2_1.yaml",          # matter-repl does not support AnyCommands (24/07/2024)
-        "TestThermostat.yaml",               # matter-repl does not support AnyCommands (14/10/2024)
-        "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in matter-repl
-        "Test_TC_ICDM_3_4.yaml",           # matter-repl does not support ICD registration
-        # matter-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
-        "TestClusterMultiFabric.yaml",
-        "TestDiagnosticLogs.yaml",          # matter-repl does not implement a BDXTransferServerDelegate
-        "TestDiagnosticLogsDownloadCommand.yaml",  # matter-repl does not implement the bdx download command
-    }
-
-
 def _GetPurposefulFailureTests() -> set[str]:
     """Tests that fail in YAML on purpose."""
     return {
@@ -298,7 +276,7 @@ def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
     return targets
 
 
-def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
+def _AllFoundYamlTests(treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
     """
     use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
     """
@@ -307,7 +285,6 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
     slow_tests = _GetSlowTests()
     extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
-    matter_repl_unsupported_tests = _GetReplUnsupportedTests()
     dft_unsupported_as_in_development_tests = _GetDarwinFrameworkToolUnsupportedTests()
     chip_tool_unsupported_as_in_development_tests = _GetChipToolUnsupportedTests()
     purposeful_failure_tests = _GetPurposefulFailureTests()
@@ -335,9 +312,6 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         if path.name in purposeful_failure_tests:
             tags.add(TestTag.PURPOSEFUL_FAILURE)
 
-        if treat_repl_unsupported_as_in_development and path.name in matter_repl_unsupported_tests:
-            tags.add(TestTag.IN_DEVELOPMENT)
-
         if use_short_run_name:
             run_name = path.stem  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
         else:
@@ -357,16 +331,11 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         )
 
 
-def AllReplYamlTests():
-    yield from _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, treat_dft_unsupported_as_in_development=False,
-                                  treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=False)
-
-
 def AllChipToolYamlTests(use_short_run_name: bool = True):
-    yield from _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False,
+    yield from _AllFoundYamlTests(treat_dft_unsupported_as_in_development=False,
                                   treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=use_short_run_name)
 
 
 def AllDarwinFrameworkToolYamlTests():
-    yield from _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True,
+    yield from _AllFoundYamlTests(treat_dft_unsupported_as_in_development=True,
                                   treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True)
