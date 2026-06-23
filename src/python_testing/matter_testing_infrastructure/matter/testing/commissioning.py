@@ -708,7 +708,9 @@ async def is_commissioned(
 async def get_commissioned_fabric_count(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC,
+    *,
+    skip_operational_dnssd_check: bool = False,
 ) -> int:
     """
     Get the number of commissioned fabrics on a device.
@@ -726,6 +728,9 @@ async def get_commissioned_fabric_count(
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
         discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
+        skip_operational_dnssd_check: When True, skip the operational DNS-SD probe and read
+            ``TrustedRootCertificates`` immediately. Use when the caller already ran
+            :func:`is_device_operational_on_fabric_dnssd` or established PASE/CASE.
 
     Returns:
         Number of commissioned fabrics (count of trusted root certificates).
@@ -735,19 +740,24 @@ async def get_commissioned_fabric_count(
         ChipStackError: If unable to read the TrustedRootCertificates attribute
     """
     try:
-        # Fast DNS-SD check to determine if device is operational on this fabric
-        # This avoids the long CASE timeout if device is not commissioned
-        is_operational = await _is_device_operational_via_dnssd(
-            dev_ctrl, node_id, discovery_timeout_sec=discovery_timeout_sec
-        )
-
-        if is_operational:
-            LOGGER.info("Device %s is operational via DNS-SD, using CASE connection", node_id)
-        else:
+        if skip_operational_dnssd_check:
             LOGGER.info(
-                "Device %s not operational via DNS-SD; assuming caller established "
-                "PASE/CASE before TrustedRootCertificates read", node_id
+                "Skipping operational DNS-SD check for node %s; caller already probed or established session",
+                node_id,
             )
+        else:
+            # Fast DNS-SD check to determine if device is operational on this fabric
+            is_operational = await _is_device_operational_via_dnssd(
+                dev_ctrl, node_id, discovery_timeout_sec=discovery_timeout_sec
+            )
+
+            if is_operational:
+                LOGGER.info("Device %s is operational via DNS-SD, using CASE connection", node_id)
+            else:
+                LOGGER.info(
+                    "Device %s not operational via DNS-SD; assuming caller established "
+                    "PASE/CASE before TrustedRootCertificates read", node_id
+                )
 
         result = await dev_ctrl.ReadAttribute(
             nodeId=node_id,

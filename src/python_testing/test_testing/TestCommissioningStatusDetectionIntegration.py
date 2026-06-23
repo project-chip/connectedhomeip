@@ -51,7 +51,6 @@ Logs and artifacts:
     comes from the test harness timer, not from assertion failures in this file.
 """
 
-import asyncio
 import logging
 import os
 import tempfile
@@ -193,9 +192,6 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
         )
         LOGGER.info("Commissioning TH_SERVER complete")
 
-        # Wait for mDNS advertisement to propagate
-        await asyncio.sleep(2)
-
         LOGGER.info("Checking DNS-SD for commissioned device")
 
         # Retries are handled internally by _is_device_operational_via_dnssd
@@ -226,7 +222,6 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.th_server_discriminator
         )
-        await asyncio.sleep(2)
 
         commissioned = await is_commissioned(
             self.default_controller,
@@ -253,7 +248,6 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.th_server_discriminator
         )
-        await asyncio.sleep(2)
 
         count = await get_commissioned_fabric_count(
             self.default_controller,

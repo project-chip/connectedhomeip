@@ -77,36 +77,6 @@ def build_expected_instance_name(compressed_fabric_id: int, node_id: int) -> str
     return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
 
-def create_mock_attribute_result(fabric_count: int):
-    """Create a mock ReadAttribute result with TrustedRootCertificates.
-
-    OperationalCredentials is node-scoped and always on endpoint 0.
-    The fabric count is derived from len(TrustedRootCertificates).
-    """
-    try:
-        import matter.clusters as Clusters
-        return {
-            0: {
-                Clusters.OperationalCredentials: {
-                    Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: [
-                        b'root_cert' for _ in range(fabric_count)
-                    ]
-                }
-            }
-        }
-    except ImportError:
-        mock_opcreds = MagicMock()
-        mock_opcreds_attrs = MagicMock()
-        mock_opcreds_attrs.TrustedRootCertificates = [b'root_cert' for _ in range(fabric_count)]
-        return {
-            0: {
-                mock_opcreds: {
-                    mock_opcreds_attrs: [b'root_cert' for _ in range(fabric_count)]
-                }
-            }
-        }
-
-
 @contextlib.contextmanager
 def mock_mdns_module():
     """Context manager to inject a mock mdns_discovery module into sys.modules.
@@ -737,7 +707,9 @@ async def test_get_fabric_count_scenario1_factory_fresh():
         await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         mock_parallel.assert_called_once_with(mock_controller, TEST_NODE_ID, commissioning_params)
 
-        result = await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
+        result = await commissioning.get_commissioned_fabric_count(
+            mock_controller, TEST_NODE_ID, skip_operational_dnssd_check=True
+        )
 
         if result != 0:
             return f"Expected fabric count 0 for factory fresh, got {result}"

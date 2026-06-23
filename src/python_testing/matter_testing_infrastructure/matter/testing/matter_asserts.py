@@ -436,7 +436,9 @@ async def assert_factory_fresh(
     elif not await is_device_operational_on_fabric_dnssd(dev_ctrl, node_id, discovery_timeout_sec=timeout):
         await establish_pase_or_case_session(dev_ctrl, node_id, commissioning_params)
 
-    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, discovery_timeout_sec=timeout)
+    fabric_count = await get_commissioned_fabric_count(
+        dev_ctrl, node_id, discovery_timeout_sec=timeout, skip_operational_dnssd_check=True
+    )
     asserts.assert_equal(
         fabric_count,
         0,
@@ -511,7 +513,9 @@ async def assert_fabric_count(
     elif not await is_device_operational_on_fabric_dnssd(dev_ctrl, node_id, discovery_timeout_sec=timeout):
         await establish_pase_or_case_session(dev_ctrl, node_id, commissioning_params)
 
-    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, discovery_timeout_sec=timeout)
+    actual_count = await get_commissioned_fabric_count(
+        dev_ctrl, node_id, discovery_timeout_sec=timeout, skip_operational_dnssd_check=True
+    )
     asserts.assert_equal(
         actual_count,
         expected_count,
