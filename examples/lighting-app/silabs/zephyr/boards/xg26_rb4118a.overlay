@@ -19,7 +19,6 @@
 };
 
 /delete-node/ &slot1_partition;
-/delete-node/ &factory_partition;
 
 &flash0 {
     partitions {
