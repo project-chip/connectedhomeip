@@ -9,9 +9,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import chip.devicecontroller.ChipClusters
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -58,22 +58,24 @@ class ClusterInteractionFragment : Fragment() {
         showMessage("Retrieving endpoints")
 
         val descriptorCluster = ChipClusters.DescriptorCluster(devicePtr, 0)
-        descriptorCluster.readPartsListAttribute(object : ChipClusters.DescriptorCluster.PartsListAttributeCallback {
-          override fun onSuccess(value: MutableList<Int>?) {
-            requireActivity().runOnUiThread {
-              val endpoints = ArrayList<EndpointItem>()
-              endpoints.add(EndpointItem(0))
-              value?.forEach { endpoints.add(EndpointItem(it)) }
-              binding.endpointList.adapter = EndpointAdapter(endpoints, EndpointListener())
-              binding.endpointList.visibility = View.VISIBLE
+        descriptorCluster.readPartsListAttribute(
+          object : ChipClusters.DescriptorCluster.PartsListAttributeCallback {
+            override fun onSuccess(value: MutableList<Int>?) {
+              requireActivity().runOnUiThread {
+                val endpoints = ArrayList<EndpointItem>()
+                endpoints.add(EndpointItem(0))
+                value?.forEach { endpoints.add(EndpointItem(it)) }
+                binding.endpointList.adapter = EndpointAdapter(endpoints, EndpointListener())
+                binding.endpointList.visibility = View.VISIBLE
+              }
+            }
+
+            override fun onError(error: Exception?) {
+              Log.e(TAG, "Error reading parts list", error)
+              showMessage("Error reading endpoints: ${error?.message}")
             }
           }
-
-          override fun onError(error: Exception?) {
-            Log.e(TAG, "Error reading parts list", error)
-            showMessage("Error reading endpoints: ${error?.message}")
-          }
-        })
+        )
       }
     }
 

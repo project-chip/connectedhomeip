@@ -100,7 +100,8 @@ class OpCredClientFragment : Fragment() {
     val attributeId = attribute.id
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         ChipClient.getDeviceController(requireContext())
           .readPath(
             object : ReportCallback {
@@ -158,7 +159,8 @@ class OpCredClientFragment : Fragment() {
       )
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.invoke(
           object : InvokeCallback {
             override fun onError(ex: Exception?) {

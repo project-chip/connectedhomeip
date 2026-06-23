@@ -118,7 +118,8 @@ class OtaProviderClientFragment : Fragment() {
 
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.readAttributePath(
           object : ReportCallback {
             override fun onError(
@@ -229,7 +230,8 @@ class OtaProviderClientFragment : Fragment() {
     tlvWriter.endArray()
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.write(
           object : WriteAttributesCallback {
             override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
@@ -268,7 +270,8 @@ class OtaProviderClientFragment : Fragment() {
     val attributeId = attribute.id
     val path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.readAttributePath(
           object : ReportCallback {
             override fun onError(
@@ -370,7 +373,8 @@ class OtaProviderClientFragment : Fragment() {
     val writeRequest = AttributeWriteRequest.newInstance(endpoint, clusterId, attributeId, tlv)
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.write(
           object : WriteAttributesCallback {
             override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
@@ -494,7 +498,8 @@ class OtaProviderClientFragment : Fragment() {
     requireActivity().runOnUiThread { updateOTAStatusBtnClick() }
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         val otaRequestCluster =
           ChipClusters.OtaSoftwareUpdateRequestorCluster(devicePtr, OTA_REQUESTER_ENDPOINT_ID)
         otaRequestCluster.announceOTAProvider(

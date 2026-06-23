@@ -122,13 +122,16 @@ class MultiAdminClientFragment : Fragment() {
   private suspend fun sendBasicCommissioningCommandClick() {
     val testDuration = binding.timeoutEd.text.toString().toInt()
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.openPairingWindowCallback(
           devicePtr,
           testDuration,
           object : OpenCommissioningCallback {
             override fun onError(status: Int, deviceId: Long) {
-              showMessage("OpenBasicCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")
+              showMessage(
+                "OpenBasicCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status"
+              )
             }
 
             override fun onSuccess(deviceId: Long, manualPairingCode: String?, qrCode: String?) {
@@ -152,7 +155,8 @@ class MultiAdminClientFragment : Fragment() {
       setupPinCode = binding.setupPinCodeEd.text.toString().toULong().toLong()
     }
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
         deviceController.openPairingWindowWithPINCallback(
           devicePointer,
           testDuration,
@@ -194,7 +198,8 @@ class MultiAdminClientFragment : Fragment() {
       )
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
         deviceController.invoke(
           object : InvokeCallback {
             override fun onError(ex: Exception?) {
@@ -229,7 +234,8 @@ class MultiAdminClientFragment : Fragment() {
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
         deviceController.readAttributePath(
           object : ReportCallback {
             override fun onReport(nodeState: NodeState?) {

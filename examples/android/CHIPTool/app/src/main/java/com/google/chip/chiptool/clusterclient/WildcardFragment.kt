@@ -440,7 +440,8 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
 
   private suspend fun read(isFabricFiltered: Boolean, eventMin: Long?) {
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.readPath(
           reportCallback,
           devicePtr,

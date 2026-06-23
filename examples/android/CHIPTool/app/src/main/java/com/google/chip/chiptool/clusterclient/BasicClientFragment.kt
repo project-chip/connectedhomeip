@@ -139,7 +139,8 @@ class BasicClientFragment : Fragment() {
     val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         ChipClient.getDeviceController(requireContext())
           .readPath(
             object : ReportCallback {
@@ -186,7 +187,8 @@ class BasicClientFragment : Fragment() {
   private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
     val clusterId = BasicInformation.ID
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         ChipClient.getDeviceController(requireContext())
           .write(
             object : WriteAttributesCallback {

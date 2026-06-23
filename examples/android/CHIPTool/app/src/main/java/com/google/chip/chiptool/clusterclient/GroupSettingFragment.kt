@@ -273,7 +273,8 @@ class GroupSettingFragment : Fragment() {
     groupKeySetStruct: GroupKeyManagementClusterGroupKeySetStruct
   ) {
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
         cluster.keySetWrite(
           object : ChipClusters.DefaultClusterCallback {
@@ -316,7 +317,8 @@ class GroupSettingFragment : Fragment() {
 
   private suspend fun writeGroupKeyMap(groupId: UInt, groupKeySetId: UInt) {
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
         cluster.writeGroupKeyMapAttribute(
           object : ChipClusters.DefaultClusterCallback {
@@ -364,7 +366,8 @@ class GroupSettingFragment : Fragment() {
 
   private suspend fun sendAddGroup(groupId: UInt, groupName: String) {
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         val cluster = ChipClusters.GroupsCluster(devicePtr, 0)
         cluster.addGroup(
           object : ChipClusters.GroupsCluster.AddGroupResponseCallback {
@@ -390,7 +393,8 @@ class GroupSettingFragment : Fragment() {
 
   private suspend fun readAccessControl() {
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
         cluster.readAclAttribute(
           object : ChipClusters.AccessControlCluster.AclAttributeCallback {
@@ -399,7 +403,9 @@ class GroupSettingFragment : Fragment() {
               showMessage("Error : $e")
             }
 
-            override fun onSuccess(value: MutableList<AccessControlClusterAccessControlEntryStruct>?) {
+            override fun onSuccess(
+              value: MutableList<AccessControlClusterAccessControlEntryStruct>?
+            ) {
               requireActivity().runOnUiThread { showAddAccessControlDialog(value) }
             }
           }
@@ -475,7 +481,8 @@ class GroupSettingFragment : Fragment() {
     sendEntry.add(newEntry)
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
         cluster.writeAclAttribute(
           object : ChipClusters.DefaultClusterCallback {

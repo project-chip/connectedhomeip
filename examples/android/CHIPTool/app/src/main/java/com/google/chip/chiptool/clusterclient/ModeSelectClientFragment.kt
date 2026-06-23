@@ -88,7 +88,8 @@ class ModeSelectClientFragment : Fragment() {
     val attributeId = ChipPathId.forWildcard().id
     val path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.readAttributePath(
           object : ReportCallback {
             override fun onError(
@@ -112,14 +113,16 @@ class ModeSelectClientFragment : Fragment() {
                   ?: return
 
               requireActivity().runOnUiThread {
-                val description = attributeStates[ClusterIDMapping.ModeSelect.Attribute.Description.id]
+                val description =
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.Description.id]
                 binding.descriptionEd.setText(description?.value?.toString())
 
                 val standardNamespace =
                   attributeStates[ClusterIDMapping.ModeSelect.Attribute.StandardNamespace.id]
                 binding.standardNamespaceEd.setText(standardNamespace?.value?.toString())
 
-                val currentMode = attributeStates[ClusterIDMapping.ModeSelect.Attribute.CurrentMode.id]
+                val currentMode =
+                  attributeStates[ClusterIDMapping.ModeSelect.Attribute.CurrentMode.id]
                 binding.currentModeEd.setText(currentMode?.value?.toString())
 
                 setVisibility(
@@ -203,7 +206,8 @@ class ModeSelectClientFragment : Fragment() {
 
   private suspend fun changeToModeBtnClick() {
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         ChipClusters.ModeSelectCluster(devicePtr, addressUpdateFragment.endpointId)
           .changeToMode(
             object : ChipClusters.DefaultClusterCallback {
@@ -229,7 +233,8 @@ class ModeSelectClientFragment : Fragment() {
   private suspend fun writeAttributeBtnClick(attribute: ModeSelect.Attribute, value: UInt) {
     val clusterId = ModeSelect.ID
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr
+        ->
         deviceController.write(
           object : WriteAttributesCallback {
             override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {

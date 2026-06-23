@@ -106,7 +106,8 @@ class OnOffClientFragment : Fragment() {
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
         ChipClient.getDeviceController(requireContext())
           .readPath(
             object : ReportCallback {
@@ -282,7 +283,8 @@ class OnOffClientFragment : Fragment() {
       )
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
         deviceController.invoke(
           object : InvokeCallback {
             override fun onError(ex: Exception?) {
@@ -322,7 +324,8 @@ class OnOffClientFragment : Fragment() {
       )
 
     try {
-      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+        devicePointer ->
         deviceController.invoke(
           object : InvokeCallback {
             override fun onError(ex: Exception?) {
