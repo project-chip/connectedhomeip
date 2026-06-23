@@ -17,10 +17,22 @@
 
 #include "AppImageProcessor.h"
 
+#include <esp_system.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
+
+namespace {
+
+void HandleRestart(chip::System::Layer * systemLayer, void * appState)
+{
+    ChipLogProgress(SoftwareUpdate, "Rebooting...");
+    esp_restart();
+}
+
+} // namespace
 
 AppImageProcessor::~AppImageProcessor() = default;
 
@@ -117,7 +129,13 @@ CHIP_ERROR AppImageProcessor::Apply()
     VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL,
                         ChipLogError(SoftwareUpdate, "esp_ota_set_boot_partition failed: %s", esp_err_to_name(err)));
 
-    ChipLogProgress(SoftwareUpdate, "App image set as boot partition; reboot to apply");
+#ifdef CONFIG_OTA_AUTO_REBOOT_ON_APPLY
+    // HandleApply is called after the delayed action time has elapsed, so it is safe to schedule the restart now.
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS),
+                                                               HandleRestart, nullptr));
+#else
+    ChipLogProgress(SoftwareUpdate, "Please reboot the device manually to apply the new image");
+#endif
     return CHIP_NO_ERROR;
 }
 
