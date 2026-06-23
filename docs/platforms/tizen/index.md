@@ -16,4 +16,5 @@ applications on the Tizen platform.
 - [Installing Tizen on Raspberry Pi](./raspberry_pi_install.md)
 - [Testing Native Apps on Raspberry Pi](./raspberry_pi_native_apps.md)
 - [Testing TPK Apps on Raspberry Pi](./raspberry_pi_tpk.md)
-- [Debugging with VS Code](./debugging_vscode.md)
+- [Debugging with GDB](./debugging_gdb.md)
+- [VS Code Setup for Tizen Development](./vscode_setup.md)

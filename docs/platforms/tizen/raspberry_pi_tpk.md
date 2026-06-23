@@ -28,11 +28,11 @@ Compile the application with the `--enable-flashbundle` flag to generate the
 `.tpk` bundle:
 
 ```bash
-./scripts/build/build_examples.py --target tizen-arm64-light-no-thread-no-ble --enable-flashbundle build
+./scripts/build/build_examples.py --target tizen-arm64-light-no-thread --enable-flashbundle build
 ```
 
 The target artifacts and the generated installation bundle will be placed inside
-the `out/tizen-arm64-light-no-thread-no-ble/` directory.
+the `out/tizen-arm64-light-no-thread/` directory.
 
 ## Managing the Application via SDB
 
@@ -54,13 +54,13 @@ Expected identifier:
 ### Installing the TPK
 
 ```bash
-sdb install out/tizen-arm64-light-no-thread-no-ble/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
+sdb install out/tizen-arm64-light-no-thread/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
 ```
 
 Or using `pkgcmd` directly on the device:
 
 ```bash
-sdb push out/tizen-arm64-light-no-thread-no-ble/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk /tmp/
+sdb push out/tizen-arm64-light-no-thread/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk /tmp/
 sdb shell pkgcmd -i -t tpk -p /tmp/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
 ```
 
@@ -73,7 +73,7 @@ To uninstall the existing package and install a fresh build:
 sdb uninstall org.tizen.matter.example.lighting
 
 # 2. Install the freshly packed .tpk bundle file
-sdb install out/tizen-arm64-light-no-thread-no-ble/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
+sdb install out/tizen-arm64-light-no-thread/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
 ```
 
 :::{note}

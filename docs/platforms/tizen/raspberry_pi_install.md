@@ -89,12 +89,14 @@ Development Bridge)**.
 
 ### 1. Connect via SDB
 
-Install the Tizen extension in Visual Studio Code — it contains the `sdb` tool.
+The `sdb` tool is available inside the Tizen Docker container, or can be
+installed locally via the
+[Tizen VS Code Extension](./vscode_setup.md#tizen-extension-installation).
 
 Find your Raspberry Pi's IP address from your home router (e.g.,
 `192.168.0.117`).
 
-In WSL, navigate to the hidden VS Code extension tools directory and connect:
+Connect to the device:
 
 ```bash
 cd ~/.tizen-extension-platform/server/sdktools/data/tools/

@@ -22,10 +22,10 @@ source scripts/activate.sh
 Build the lighting app with TPK packaging:
 
 ```bash
-./scripts/build/build_examples.py --target tizen-arm64-light-no-thread-no-ble --enable-flashbundle build
+./scripts/build/build_examples.py --target tizen-arm64-light-no-thread --enable-flashbundle build
 ```
 
-The output will be in `out/tizen-arm64-light-no-thread-no-ble/`.
+The output will be in `out/tizen-arm64-light-no-thread/`.
 
 For alternative build methods using GN and Ninja, see
 [Building for Tizen – Alternative](../../../docs/platforms/tizen/building.md#alternative-building-with-gn-and-ninja).
@@ -34,12 +34,12 @@ For alternative build methods using GN and Ninja, see
 
 The `sdb` tool is available inside the Tizen Docker container. To use `sdb`
 from VS Code, install the
-[Tizen Extension for VS Code](../../../docs/platforms/tizen/building.md#tizen-studio-and-vs-code-extension-setup).
+[Tizen Extension for VS Code](../../../docs/platforms/tizen/vscode_setup.md#tizen-extension-installation).
 
 Install the TPK on the connected device:
 
 ```bash
-sdb install out/tizen-arm64-light-no-thread-no-ble/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
+sdb install out/tizen-arm64-light-no-thread/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
 ```
 
 ## Launching Application
@@ -59,9 +59,8 @@ For more details on testing TPK apps on Raspberry Pi, see
 
 ## Debugging
 
-For debugging with GDB CLI or VS Code, see
-[Debugging with VS Code](../../../docs/platforms/tizen/debugging_vscode.md).
+For debugging with GDB CLI, see
+[Debugging with GDB](../../../docs/platforms/tizen/debugging_gdb.md).
 
-For VS Code tasks (build, install, launch with gdbserver), see the
-[VS Code Tasks](../../../docs/platforms/tizen/debugging_vscode.md#vs-code-tasks-for-tizen)
-section.
+For VS Code graphical debugging and tasks, see
+[VS Code Setup for Tizen Development](../../../docs/platforms/tizen/vscode_setup.md).
