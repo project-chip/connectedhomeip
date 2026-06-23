@@ -50,222 +50,26 @@ enum class AtomicWriteState
     Open,
 };
 
-static constexpr size_t kThermostatEndpointCount =
-    MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-/**
- * @brief Retained helper that owns the legacy preset / schedule / suggestion / atomic-write logic.
- *
- * During the code-driven migration (PR 3a) this class is NO LONGER registered as an
- * AttributeAccessInterface; instead the new ThermostatCluster (a DefaultServerCluster) forwards the
- * complex list/preset/suggestion attribute reads & writes and the preset/atomic/suggestion commands
- * to this helper. It remains registered as a FabricTable::Delegate so that atomic-write sessions are
- * cleaned up when a fabric is removed.
- *
- * A follow-up PR (3b) re-houses this state into per-endpoint ThermostatCluster instances and removes
- * this helper entirely.
- */
-class ThermostatAttrAccess : public chip::FabricTable::Delegate
-{
-
-public:
-    ThermostatAttrAccess() {}
-
-    // Formerly AttributeAccessInterface overrides; now plain methods invoked by ThermostatCluster.
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder);
-
-    /**
-     * @brief Set the Active Preset to a given preset handle, or null
-     *
-     * @param endpoint The endpoint
-     * @param presetHandle The handle of the preset to set active, or null to clear the active preset
-     * @return Success if the active preset was updated, an error code if not
-     */
-    Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle);
-
-    /**
-     * @brief Apply a preset to the pending lists of presets during an atomic write
-     *
-     * @param delegate The current ThermostatDelegate
-     * @param preset The preset to append
-     * @return CHIP_NO_ERROR if successful, an error code if not
-     */
-    CHIP_ERROR AppendPendingPreset(Thermostat::Delegate * delegate, const Structs::PresetStruct::Type & preset);
-
-    /**
-     * @brief Verifies if the pending presets for a given endpoint are valid
-     *
-     * @param endpoint The endpoint
-     * @return Success if the list of pending presets is valid, an error code if not
-     */
-    Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
-
-    /**
-     * @brief Callback for when the server is removed from a given fabric; all associated atomic writes are reset
-     *
-     * @param fabricTable The fabric table
-     * @param fabricIndex The fabric index
-     */
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
-
-    /**
-     * @brief Gets the scoped node id of the originator that sent the last successful
-     *        AtomicRequest of type BeginWrite for the given endpoint.
-     *
-     * @param[in] endpoint The endpoint.
-     *
-     * @return the scoped node id for the given endpoint if set. Otherwise returns ScopedNodeId().
-     */
-    ScopedNodeId GetAtomicWriteOriginatorScopedNodeId(EndpointId endpoint);
-
-    /**
-     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
-     *
-     * @param[in] endpoint The endpoint.
-     * @param[in] originatorNodeId The originator scoped node id.
-     * @param[in] state Whether or not an atomic write is open or closed.
-     * @param attributeStatuses The set of attribute status structs the atomic write should be associated with
-     * @return true if it was able to update the atomic write state
-     * @return false if it was unable to update the atomic write state
-     */
-    bool
-    SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
-                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
-
-    /**
-     * @brief Sets the atomic write state for the given endpoint and originatorNodeId
-     *
-     */
-    /**
-     * @brief Resets the atomic write for a given endpoint
-     *
-     * @param endpoint The endpoint
-     */
-    void ResetAtomicWrite(EndpointId endpoint);
-
-    /**
-     * @brief Checks if a given endpoint has an atomic write open, optionally filtered by an attribute ID
-     *
-     * @param endpoint The endpoint
-     * @param attributeId The optional attribute ID to filter on
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
-    bool InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId = NullOptional);
-
-    /**
-     * @brief Checks if a given endpoint has an atomic write open for a given subject descriptor, optionally filtered by an
-     * attribute ID
-     *
-     * @param endpoint The endpoint
-     * @param subjectDescriptor The subject descriptor for the client making a read or write request
-     * @param attributeId The optional attribute ID to filter on
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
-    bool InAtomicWrite(EndpointId endpoint, const Access::SubjectDescriptor & subjectDescriptor,
-                       Optional<AttributeId> attributeId = NullOptional);
-
-    /**
-     * @brief Checks if a given endpoint has an atomic write open for a given command invocation, optionally filtered by an
-     * attribute ID
-     *
-     * @param endpoint The endpoint
-     * @param commandObj The CommandHandler for the invoked command
-     * @param attributeId The optional attribute ID to filter on
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
-    bool InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj, Optional<AttributeId> attributeId = NullOptional);
-
-    /**
-     * @brief Checks if a given endpoint has an atomic write open for a given command invocation and a list of attributes
-     *
-     * @param endpoint The endpoint
-     * @param commandObj The CommandHandler for the invoked command
-     * @param attributeStatuses The list of attribute statuses whose attributeIds must match the open atomic write
-     * @return true if the endpoint has an open atomic write
-     * @return false if the endpoint does not have an open atomic write
-     */
-    bool
-    InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj,
-                  Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
-
-    /**
-     * @brief Handles an AtomicRequest of type BeginWrite
-     *
-     * @param commandObj The AtomicRequest command handler
-     * @param commandPath The path for the Atomic Request command
-     * @param commandData The payload data for the Atomic Request
-     */
-    void BeginAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                          const Commands::AtomicRequest::DecodableType & commandData);
-
-    /**
-     * @brief Handles an AtomicRequest of type CommitWrite
-     *
-     * @param commandObj The AtomicRequest command handler
-     * @param commandPath The path for the Atomic Request command
-     * @param commandData The payload data for the Atomic Request
-     */
-    void CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                           const Commands::AtomicRequest::DecodableType & commandData);
-
-    /**
-     * @brief Handles an AtomicRequest of type RollbackWrite
-     *
-     * @param commandObj The AtomicRequest command handler
-     * @param commandPath The path for the Atomic Request command
-     * @param commandData The payload data for the Atomic Request
-     */
-    void RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                             const Commands::AtomicRequest::DecodableType & commandData);
-
-    friend void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext);
-
-    friend bool emberAfThermostatClusterSetActivePresetRequestCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
-
-    friend bool
-    emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                  const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
-
-    friend bool emberAfThermostatClusterAddThermostatSuggestionCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
-
-    friend bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
-
-    struct AtomicWriteSession
-    {
-        AtomicWriteState state = AtomicWriteState::Closed;
-        Platform::ScopedMemoryBufferWithSize<AttributeId> attributeIds;
-        ScopedNodeId nodeId;
-        EndpointId endpointId = kInvalidEndpointId;
-    };
-
-    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
-};
-
-/// Retained singleton owning atomic-write/preset/suggestion state during the migration.
-/// Defined in ThermostatCluster.cpp; registered as a FabricTable::Delegate by the codegen integration.
-extern ThermostatAttrAccess gThermostatAttrAccess;
-
 /**
  * @brief Code-driven Thermostat cluster server.
  *
  * One instance is created per endpoint by the codegen integration layer (see CodegenIntegration.cpp).
- * It owns the scalar (formerly Ember RAM-backed) attributes directly and handles the
- * SetpointRaiseLower command. The complex list/preset/schedule/suggestion attributes and the
- * preset/atomic/suggestion commands are forwarded to the retained ThermostatAttrAccess helper for now.
+ * It owns the scalar (formerly Ember RAM-backed) attributes directly, handles the SetpointRaiseLower
+ * command, and (since PR 3b-1) owns the atomic-write state machine and registers itself as a
+ * FabricTable::Delegate so open atomic writes are rolled back when their fabric is removed. The complex
+ * list/preset/schedule/suggestion attributes and the preset/suggestion commands are still forwarded to the
+ * retained ThermostatAttrAccess helper.
  */
-class ThermostatCluster : public DefaultServerCluster
+class ThermostatCluster : public DefaultServerCluster, public chip::FabricTable::Delegate
 {
 public:
+    /// External dependencies injected at construction (see CodegenIntegration.cpp). Kept as a struct so
+    /// additional dependencies can be threaded in by later migration steps without churning call sites.
+    struct Context
+    {
+        chip::FabricTable & fabricTable;
+    };
+
     /// Scalar attribute default values read from the Ember/ZAP configuration by the codegen
     /// integration layer. Members are typed via the generated TypeInfo so they always track the spec.
     struct StartupConfiguration
@@ -288,12 +92,16 @@ public:
         Attributes::SystemMode::TypeInfo::Type systemMode = SystemModeEnum::kAuto;
     };
 
-    ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config);
+    ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config, const Context & context);
 
-    void SetDelegate(Delegate * delegate) { mDelegate = delegate; }
-    Delegate * GetDelegate() const { return mDelegate; }
+    void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
+    Thermostat::Delegate * GetDelegate() const { return mDelegate; }
+
+    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
     // ServerClusterInterface
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType type) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -306,12 +114,71 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
+    // FabricTable::Delegate: roll back an open atomic write originated by a removed fabric.
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
     uint32_t GetFeatureMap() const { return mFeatureMap; }
 
-private:
-    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
+    //
+    // Atomic-write state machine (moved from ThermostatAttrAccess in PR 3b-1). The session is per-instance;
+    // every method operates on this cluster's endpoint (the `endpoint` parameters must equal GetEndpointId()).
+    //
 
+    /// @brief Checks if an atomic write is open, optionally filtered by an attribute ID.
+    bool InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId = NullOptional);
+
+    /// @brief Checks if an atomic write is open for the given subject descriptor, optionally filtered by an attribute ID.
+    bool InAtomicWrite(EndpointId endpoint, const Access::SubjectDescriptor & subjectDescriptor,
+                       Optional<AttributeId> attributeId = NullOptional);
+
+    /// @brief Checks if an atomic write is open for the given command invocation, optionally filtered by an attribute ID.
+    bool InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj, Optional<AttributeId> attributeId = NullOptional);
+
+    /// @brief Checks if an atomic write is open for the given command invocation and a list of attributes.
+    bool
+    InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj,
+                  Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+
+    /// @brief Sets the atomic write state for the given originatorNodeId.
+    bool
+    SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
+                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+
+    /// @brief Resets (closes) the atomic write, clears the pending preset list and cancels the timeout timer.
+    void ResetAtomicWrite(EndpointId endpoint);
+
+    /// @brief Gets the scoped node id of the originator of the open atomic write, or ScopedNodeId() if none.
+    ScopedNodeId GetAtomicWriteOriginatorScopedNodeId(EndpointId endpoint);
+
+    void BeginAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                          const Commands::AtomicRequest::DecodableType & commandData);
+    void CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                           const Commands::AtomicRequest::DecodableType & commandData);
+    void RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                             const Commands::AtomicRequest::DecodableType & commandData);
+
+private:
     bool FeatureSupported(Feature feature) const { return (mFeatureMap & static_cast<uint32_t>(feature)) != 0; }
+
+    // @brief Sets the ActivePresetHandle to the given handle (or null), validating it against the Presets list.
+    Protocols::InteractionModel::Status SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle);
+
+    // @brief Validates that the delegate's pending-preset list satisfies the spec constraints before commit.
+    Protocols::InteractionModel::Status PrecommitPresets();
+
+    // @brief Validates and appends a preset to the delegate's pending-preset list during an atomic write.
+    CHIP_ERROR AppendPendingPreset(const Structs::PresetStruct::Type & preset);
+
+    // Delegate-backed attribute encode/decode (presets / schedules / suggestions). Scalar attributes are
+    // handled directly by ReadAttribute / WriteAttribute.
+    CHIP_ERROR ReadDelegateAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteDelegateAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+
+    // Suggestion command handlers (each writes its response/status onto commandObj directly).
+    bool HandleAddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                       const Commands::AddThermostatSuggestion::DecodableType & commandData);
+    bool HandleRemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                          const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
 
     // SetpointRaiseLower handling (ported from emberAfThermostatClusterSetpointRaiseLowerCallback).
     Protocols::InteractionModel::Status HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
@@ -334,8 +201,18 @@ private:
     // Emits the relevant change event for a just-written scalar attribute, if the Events feature is supported.
     void GenerateScalarChangeEvent(AttributeId attributeId);
 
-    Delegate * mDelegate = nullptr;
+    Context mContext;
+    Thermostat::Delegate * mDelegate = nullptr;
     const uint32_t mFeatureMap;
+
+    struct AtomicWriteSession
+    {
+        AtomicWriteState state = AtomicWriteState::Closed;
+        Platform::ScopedMemoryBufferWithSize<AttributeId> attributeIds;
+        ScopedNodeId nodeId;
+        EndpointId endpointId = kInvalidEndpointId;
+    };
+    AtomicWriteSession mAtomicWriteSession;
 
     // Scalar attribute state (formerly Ember RAM-backed). Typed through the generated TypeInfo.
     Attributes::LocalTemperature::TypeInfo::Type mLocalTemperature{};
@@ -406,22 +283,17 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
 Delegate * GetDelegate(EndpointId endpoint);
 
-// These functions were removed from the ember headers.
- bool emberAfThermostatClusterSetActivePresetRequestCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
+// These ember command-callback declarations were removed from the generated headers once the cluster
+// became code-driven; they are still defined in the suggestion source file and invoked (by name)
+// from ThermostatCluster::InvokeCommand.
+bool emberAfThermostatClusterAddThermostatSuggestionCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
 
- bool
-    emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                  const Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
+bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
 
- bool emberAfThermostatClusterAddThermostatSuggestionCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
-
- bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
-        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-        const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

@@ -62,18 +62,12 @@ Delegate * GetDelegate(EndpointId)
 } // namespace app
 } // namespace chip
 
-// --- Temporary link shims for PR 3a's Ember-coupled retained-helper paths ---
-// The retained ThermostatAttrAccess helper (atomic-write index lookup) and the legacy setpoint-limit free
-// functions use Ember endpoint-config APIs (emberAfGetClusterServerEndpointIndex,
-// Attributes::X::GetDefault) whose real implementations require a full Ember app image (endpoint_config +
-// attribute store). None of these are exercised by the scalar / SetpointRaiseLower / metadata tests below,
-// so dummy implementations are sufficient to link. PR 3b re-houses this logic onto instance state and
-// removes the coupling, after which these shims can be deleted.
-uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId, chip::ClusterId, uint16_t)
-{
-    return 0;
-}
-
+// --- Temporary link shims for the Ember-coupled retained-helper Read path ---
+// The retained ThermostatAttrAccess::Read still references the Ember Attributes::FeatureMap/RemoteSensing
+// GetDefault accessors (in branches the code-driven ReadAttribute never actually reaches), whose real
+// implementations require a full Ember app image. They are not exercised by the tests below, so dummy
+// implementations are sufficient to link. PR 3b-3 removes the retained helper, after which these shims can
+// be deleted.
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -91,23 +85,6 @@ Protocols::InteractionModel::Status GetDefault(EndpointId, BitMask<RemoteSensing
     return Protocols::InteractionModel::Status::Failure;
 }
 } // namespace RemoteSensing
-#define THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(NAME)                                                                              \
-    namespace NAME                                                                                                                  \
-    {                                                                                                                              \
-    Protocols::InteractionModel::Status GetDefault(EndpointId, int16_t *)                                                           \
-    {                                                                                                                              \
-        return Protocols::InteractionModel::Status::Failure;                                                                        \
-    }                                                                                                                              \
-    }
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(AbsMinHeatSetpointLimit)
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(AbsMaxHeatSetpointLimit)
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(MinHeatSetpointLimit)
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(MaxHeatSetpointLimit)
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(AbsMinCoolSetpointLimit)
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(AbsMaxCoolSetpointLimit)
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(MinCoolSetpointLimit)
-THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM(MaxCoolSetpointLimit)
-#undef THERMOSTAT_TEST_SETPOINT_GETDEFAULT_SHIM
 } // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters
@@ -143,14 +120,20 @@ public:
 // Small holder so each test can spin up an independent cluster with a chosen feature map / config.
 struct ClusterFixture
 {
+    // Declared before `cluster` so it is constructed first (the cluster's Context holds a reference to it)
+    // and destroyed last. AddFabricDelegate/RemoveFabricDelegate are simple list operations that do not
+    // require FabricTable::Init(), so a default-constructed table is sufficient for these tests.
+    chip::FabricTable fabricTable;
     ThermostatCluster cluster;
     ClusterTester tester{ cluster };
 
     ClusterFixture(uint32_t featureMap, const ThermostatCluster::StartupConfiguration & config = DefaultConfig()) :
-        cluster(kEndpointId, featureMap, config)
+        cluster(kEndpointId, featureMap, config, ThermostatCluster::Context{ fabricTable })
     {
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
+
+    ~ClusterFixture() { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); }
 };
 
 TEST_F(TestThermostatCluster, ReadsClusterRevisionAndFeatureMap)

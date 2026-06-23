@@ -251,10 +251,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-extern ThermostatAttrAccess gThermostatAttrAccess;
-extern int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint);
-extern int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint);
-
 /**
  * @brief Checks if the given preset handle is present in the  presets attribute
  * @param[in] delegate The delegate to use.
@@ -291,10 +287,9 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
     return false;
 }
 
-Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nullable<ByteSpan> presetHandle)
+Status ThermostatCluster::SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle)
 {
-
-    auto delegate = GetDelegate(endpoint);
+    auto * delegate = mDelegate;
 
     if (delegate == nullptr)
     {
@@ -319,8 +314,11 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
     return Status::Success;
 }
 
-CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * delegate, const PresetStruct::Type & newPreset)
+CHIP_ERROR ThermostatCluster::AppendPendingPreset(const PresetStruct::Type & newPreset)
 {
+    auto * delegate = mDelegate;
+    VerifyOrReturnError(delegate != nullptr, CHIP_IM_GLOBAL_STATUS(InvalidInState), ChipLogError(Zcl, "Delegate is null"));
+
     PresetStructWithOwnedMembers preset = newPreset;
     if (!IsValidPresetEntry(preset))
     {
@@ -439,9 +437,9 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
     return delegate->AppendToPendingPresetList(preset);
 }
 
-Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
+Status ThermostatCluster::PrecommitPresets()
 {
-    auto delegate = GetDelegate(endpoint);
+    auto * delegate = mDelegate;
 
     if (delegate == nullptr)
     {
@@ -528,34 +526,20 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         Optional<int16_t> coolingSetpointValue = pendingPreset.GetCoolingSetpoint();
         if (coolingSetpointValue.HasValue())
         {
-            pendingPreset.SetCoolingSetpoint(MakeOptional(EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint)));
+            pendingPreset.SetCoolingSetpoint(MakeOptional(EnforceCoolingSetpointLimits(coolingSetpointValue.Value())));
         }
 
         Optional<int16_t> heatingSetpointValue = pendingPreset.GetHeatingSetpoint();
         if (heatingSetpointValue.HasValue())
         {
-            pendingPreset.SetHeatingSetpoint(MakeOptional(EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint)));
+            pendingPreset.SetHeatingSetpoint(MakeOptional(EnforceHeatingSetpointLimits(heatingSetpointValue.Value())));
         }
     }
 
     return Status::Success;
 }
 
-bool emberAfThermostatClusterSetActivePresetRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::SetActivePresetRequest::DecodableType & commandData)
-{
-    auto status = gThermostatAttrAccess.SetActivePreset(commandPath.mEndpointId, commandData.presetHandle);
-    commandObj->AddStatus(commandPath, status);
-    return true;
-}
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-bool emberAfThermostatClusterSetActivePresetRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::SetActivePresetRequest::DecodableType & commandData)
-{
-    return Thermostat::emberAfThermostatClusterSetActivePresetRequestCallback(commandObj, commandPath, commandData);
-}

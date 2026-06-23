@@ -100,7 +100,8 @@ public:
             config.systemMode = systemMode;
         }
 
-        gServers[clusterInstanceIndex].Create(endpointId, featureMap, config);
+        ThermostatCluster::Context clusterContext{ Server::GetInstance().GetFabricTable() };
+        gServers[clusterInstanceIndex].Create(endpointId, featureMap, config, clusterContext);
         gServers[clusterInstanceIndex].Cluster().SetDelegate(gDelegateTable[clusterInstanceIndex]);
         return gServers[clusterInstanceIndex].Registration();
     }
@@ -146,24 +147,21 @@ void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterCluste
         integrationDelegate, shutdownType);
 }
 
-void MatterThermostatPluginServerInitCallback()
-{
-    // The retained ThermostatAttrAccess helper still owns atomic-write session state and must be
-    // notified when a fabric is removed so it can roll back any open atomic writes.
-    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().AddFabricDelegate(&Thermostat::gThermostatAttrAccess);
-}
+// Each per-endpoint ThermostatCluster now registers itself as a FabricTable::Delegate in its Startup(),
+// so there is no global fabric-delegate registration to do here.
+void MatterThermostatPluginServerInitCallback() {}
 
-void MatterThermostatPluginServerShutdownCallback()
-{
-    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&Thermostat::gThermostatAttrAccess);
-}
+void MatterThermostatPluginServerShutdownCallback() {}
 
 // The generated endpoint_config function array (chipFuncArrayThermostatServer) still references these
 // Ember per-cluster lifecycle hooks because the Thermostat attributes remain ZAP/RAM-declared. For the
 // code-driven cluster they are no-ops: endpoint init/registration happens in MatterThermostatClusterInitCallback,
-// and attribute validation / change reporting now happen in ThermostatCluster::WriteAttribute (the Ember write
-// path is no longer used for this cluster once it is registered with the codegen data model provider).
+// attribute validation / change reporting now happen in ThermostatCluster::WriteAttribute, and atomic-write
+// teardown happens in ThermostatCluster::Shutdown (the Ember write path is no longer used for this cluster once
+// it is registered with the codegen data model provider).
 void emberAfThermostatClusterServerInitCallback(EndpointId endpoint) {}
+
+void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint) {}
 
 void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 
