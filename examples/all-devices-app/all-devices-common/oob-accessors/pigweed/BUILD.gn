@@ -18,9 +18,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 if (chip_enable_pw_rpc) {
   source_set("pigweed-accessor") {
-    sources = [
-      "PigweedAttributeAccessor.h",
-    ]
+    sources = [ "PigweedAttributeAccessor.h" ]
 
     public_deps = [
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
