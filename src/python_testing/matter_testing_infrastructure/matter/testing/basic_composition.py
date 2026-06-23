@@ -195,7 +195,7 @@ class BasicCompositionTests(MatterBaseTest):
         # and fail with CHIP_ERROR_NOT_CONNECTED even though CASE is available.
         harness_commissioned = (
             self.matter_test_config.commissioning_method is not None
-            or self._dut_confirmed_available
+            or getattr(self, '_dut_confirmed_available', False)
         )
 
         if harness_commissioned:
