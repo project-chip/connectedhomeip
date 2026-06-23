@@ -22,6 +22,7 @@ from .runner import Executor, LogPipe, SubprocessInfo
 
 log = logging.getLogger(__name__)
 
+
 class DarwinExecutor(Executor):
     def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
             stderr: BinaryIO | LogPipe | None = None):

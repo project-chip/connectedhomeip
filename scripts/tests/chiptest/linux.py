@@ -37,9 +37,9 @@ root_dir = os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure'), relative_to=__file__):
+    from matter.testing.commissioning_types import CommissioningMethod
     from matter.testing.linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, ThreadBorderRouter,
                                       WpaSupplicantMock, ensure_namespace_availability, ensure_private_state)
-    from matter.testing.commissioning_types import CommissioningMethod
 
 __all__ = [
     "ensure_namespace_availability",
