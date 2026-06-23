@@ -45,8 +45,8 @@
 #include <devices/oven/OvenDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
-#include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
 #include <devices/refrigerator/RefrigeratorDevice.h>
 #include <devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
