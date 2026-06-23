@@ -5,10 +5,11 @@ unit tests and integration tests without physical hardware.
 
 ## Prerequisites
 
-Ensure you have activated the build environment and set the required environment
-variables:
+Enter the Tizen QEMU environment using the `tizen-qemu` Docker service (see
+[Docker Compose Environment](./building.md#docker-compose-environment)):
 
 ```bash
+docker compose run --rm tizen-qemu bash
 source scripts/activate.sh
 ```
 
@@ -33,18 +34,6 @@ Build the Tizen unit tests using `build_examples.py`:
 
 ```bash
 ./scripts/build/build_examples.py --target tizen-arm64-tests build
-```
-
-Or build manually with GN:
-
-```sh
-gn gen --check \
-    --fail-on-unused-args \
-    --root=$PW_PROJECT_ROOT/src/test_driver/tizen \
-    "--args=target_os=\"tizen\" target_cpu=\"arm\" tizen_sdk_root=\"$TIZEN_SDK_ROOT\" tizen_sdk_sysroot=\"$TIZEN_SDK_SYSROOT\" chip_build_tests=true strip_symbols=true" \
-    $PW_PROJECT_ROOT/out/tizen-arm-tests
-
-ninja -C $PW_PROJECT_ROOT/out/tizen-arm-tests
 ```
 
 ### Running Tests in QEMU

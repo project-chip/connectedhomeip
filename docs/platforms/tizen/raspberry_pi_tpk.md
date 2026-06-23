@@ -17,8 +17,6 @@ management, which is the recommended way for production deployments.
 
 ## Building
 
-### Using build_examples.py (Recommended)
-
 Start and enter the Tizen compilation environment:
 
 ```bash
@@ -35,19 +33,6 @@ Compile the application with the `--enable-flashbundle` flag to generate the
 
 The target artifacts and the generated installation bundle will be placed inside
 the `out/tizen-arm64-light-no-thread-no-ble/` directory.
-
-### Using GN and Ninja (Alternative)
-
-```bash
-source scripts/activate.sh
-gn gen --check \
-    --fail-on-unused-args \
-    --root=$PW_PROJECT_ROOT/examples/lighting-app/tizen \
-    "--args=target_os=\"tizen\" target_cpu=\"arm64\" tizen_sdk_root=\"$TIZEN_SDK_ROOT\" tizen_sdk_sysroot=\"$TIZEN_SDK_SYSROOT_ARM64\" chip_config_network_layer_ble=false chip_enable_thread=false" \
-    $PW_PROJECT_ROOT/out/tizen-arm64-light-no-thread-no-ble
-ninja -C $PW_PROJECT_ROOT/out/tizen-arm64-light-no-thread-no-ble
-ninja -C $PW_PROJECT_ROOT/out/tizen-arm64-light-no-thread-no-ble chip-lighting-app:tpk
-```
 
 ## Managing the Application via SDB
 

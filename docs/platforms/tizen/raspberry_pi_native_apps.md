@@ -17,8 +17,6 @@ development iteration.
 
 ## Building
 
-### Using build_examples.py (Recommended)
-
 Use the `crosscompile` Docker service to build the Linux ARM64 variant:
 
 ```bash
@@ -29,17 +27,6 @@ exit
 ```
 
 The output binary will be in `out/linux-arm64-light-no-thread-no-ble-clang/`.
-
-### Using GN and Ninja (Alternative)
-
-```bash
-source scripts/activate.sh
-gn gen --check \
-    --root=$PW_PROJECT_ROOT/examples/lighting-app/linux \
-    "--args=target_os=\"linux\" target_cpu=\"arm64\" chip_config_network_layer_ble=false chip_enable_thread=false" \
-    $PW_PROJECT_ROOT/out/linux-arm64-light-no-thread-no-ble-clang
-ninja -C $PW_PROJECT_ROOT/out/linux-arm64-light-no-thread-no-ble-clang
-```
 
 ## Installing the Binary via SDB
 
