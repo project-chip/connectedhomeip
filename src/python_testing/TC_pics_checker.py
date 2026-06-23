@@ -230,7 +230,6 @@ class TC_PICS_Checker(BasicCompositionTests):
         base_facts, base_problems = derive_base_pics_facts_from_device_wildcard(wildcard, self.xml_clusters)
         for problem in base_problems:
             self.problems.append(problem)
-        derived_codes = base_pics_facts_to_pics_codes(base_facts)
 
         self.step(10)
         # Base/MCORE codes are device-wide but conventionally only declared

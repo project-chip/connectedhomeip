@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import glob
 import json
 import logging
 import os
@@ -148,9 +147,10 @@ def read_pics_from_file(path: str) -> dict[int, dict[str, bool]]:
 
     if os.path.isdir(os.path.abspath(path)):
         # Top-level files carry device-wide codes -> endpoint 0.
-        for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename) as f:
-                _merge(parse_pics_xml(f.read(), endpoint=0))
+        for filename in os.listdir(path):
+            if filename.endswith('.xml'):
+                with open(os.path.join(path, filename), encoding='utf-8') as f:
+                    _merge(parse_pics_xml(f.read(), endpoint=0))
         # Each endpoint subdir carries that endpoint's cluster codes.
         for name in sorted(os.listdir(path)):
             full = os.path.join(path, name)
@@ -160,12 +160,13 @@ def read_pics_from_file(path: str) -> dict[int, dict[str, bool]]:
             if match is None:
                 continue
             endpoint = int(match.group(1))
-            for filename in glob.glob(f'{full}/*.xml'):
-                with open(filename) as f:
-                    _merge(parse_pics_xml(f.read(), endpoint=endpoint))
+            for filename in os.listdir(full):
+                if filename.endswith('.xml'):
+                    with open(os.path.join(full, filename), encoding='utf-8') as f:
+                        _merge(parse_pics_xml(f.read(), endpoint=endpoint))
         return pics_tree
 
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         _merge({0: parse_pics(f.readlines())})
     return pics_tree
 
