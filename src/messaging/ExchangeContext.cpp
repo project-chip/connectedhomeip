@@ -190,9 +190,30 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             // If we can't even send a message (send failed with a non-transient
             // error), mark the session as defunct, just like we would if we
             // thought we sent the message and never got a response.
+            //
+            // Apply N-consecutive-failure hysteresis so a single transient
+            // transport error (e.g. ERR_RTE during a brief Thread route flap)
+            // does not flip the session into kDefunct and trigger session-state
+            // churn against MarkActiveRx. The counter lives on the SecureSession
+            // because multiple exchanges share the same failure budget.
             if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
             {
-                session->AsSecureSession()->MarkAsDefunct();
+                auto * secureSession = session->AsSecureSession();
+                uint8_t failures     = secureSession->IncrementConsecutiveSendFailures();
+                if (failures >= CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD)
+                {
+                    ChipLogError(ExchangeManager,
+                                 "MarkAsDefunct after %u consecutive send failures, last err=%" CHIP_ERROR_FORMAT,
+                                 static_cast<unsigned>(failures), err.Format());
+                    secureSession->MarkAsDefunct();
+                }
+                else
+                {
+                    ChipLogProgress(ExchangeManager,
+                                    "Send failure %u/%u on CASE session, deferring MarkAsDefunct (err=%" CHIP_ERROR_FORMAT ")",
+                                    static_cast<unsigned>(failures),
+                                    static_cast<unsigned>(CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD), err.Format());
+                }
             }
         }
         else
@@ -200,6 +221,13 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
             app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+            // A successful send proves the path is currently usable; clear any
+            // accumulated failure count so a future flap starts from zero.
+            if (session->IsSecureSession())
+            {
+                session->AsSecureSession()->ResetConsecutiveSendFailures();
+            }
 
             // Standalone acks are not application-level message sends.
             if (!isStandaloneAck)

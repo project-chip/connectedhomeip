@@ -820,6 +820,22 @@
 #endif // CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
 
 /**
+ * @def CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD
+ *
+ * @brief Number of consecutive non-MRP send failures on a CASE secure
+ * session that must be observed before the session is marked as defunct.
+ *
+ * Hysteresis avoids tearing down an otherwise-healthy session for a single
+ * transient transport error (e.g. ERR_RTE during a brief route flap on
+ * Thread). The counter is reset on any successful send and on any inbound
+ * RX (via SecureSession::MarkActiveRx).
+ *
+ */
+#ifndef CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD
+#define CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD 3
+#endif // CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD
+
+/**
  *  @def CHIP_CONFIG_MAX_GROUP_DATA_PEERS
  *
  *  @brief

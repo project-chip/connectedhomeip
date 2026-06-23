@@ -18,6 +18,8 @@
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
 
+#include <cstring>
+
 namespace chip {
 namespace Transport {
 
@@ -153,6 +155,112 @@ void SecureSession::MarkForEviction()
         // Do nothing
         return;
     }
+}
+
+void SecureSession::SetPeerAddress(const PeerAddress & address)
+{
+    mPeerAddress = address;
+    // An explicit SetPeerAddress (CASE/PASE establishment or SessionManager-initiated peer
+    // relocation) is treated as ground truth — re-anchor the routable prefix to this address.
+    CapturePeerAddressAnchor();
+}
+
+void SecureSession::CapturePeerAddressAnchor()
+{
+    // Only IPv6 unicast peers participate in /64-prefix gating; for everything else (BLE, TCP,
+    // IPv4-mapped, multicast, unspecified) leave the anchor cleared so the dispatch site falls
+    // back to the original unconditional restamp.
+    const Inet::IPAddress & ip = mPeerAddress.GetIPAddress();
+    if (mPeerAddress.GetTransportType() != Transport::Type::kUdp || !ip.IsIPv6() || ip.IsIPv6Multicast())
+    {
+        mPeerAddressAnchorValid = false;
+        mPeerAddressRestampRejectCount = 0;
+        return;
+    }
+
+    // IPAddress::Addr is four uint32_t in network byte order; the first two words form the /64.
+    const uint32_t prefixWord0 = ip.Addr[0];
+    const uint32_t prefixWord1 = ip.Addr[1];
+    memcpy(&mPeerAddressAnchorPrefix[0], &prefixWord0, sizeof(prefixWord0));
+    memcpy(&mPeerAddressAnchorPrefix[4], &prefixWord1, sizeof(prefixWord1));
+    mPeerAddressAnchorValid        = true;
+    mPeerAddressRestampRejectCount = 0;
+    memset(mPeerAddressLastRejectedPrefix, 0, sizeof(mPeerAddressLastRejectedPrefix));
+}
+
+void SecureSession::RestampPeerAddressIfRoutable(const PeerAddress & candidate)
+{
+    if (mPeerAddress == candidate)
+    {
+        return;
+    }
+
+    // No anchor (non-IPv6 peer, or never established) — preserve legacy unconditional restamp.
+    if (!mPeerAddressAnchorValid)
+    {
+        mPeerAddress = candidate;
+        return;
+    }
+
+    const Inet::IPAddress & candidateIp = candidate.GetIPAddress();
+    // Candidate isn't an IPv6 UDP peer we can prefix-compare; fall back to legacy behavior so we
+    // don't accidentally trap kBle/kTcp/IPv4 transitions.
+    if (candidate.GetTransportType() != Transport::Type::kUdp || !candidateIp.IsIPv6())
+    {
+        mPeerAddress = candidate;
+        mPeerAddressRestampRejectCount = 0;
+        return;
+    }
+
+    uint8_t candidatePrefix[8];
+    const uint32_t candidateWord0 = candidateIp.Addr[0];
+    const uint32_t candidateWord1 = candidateIp.Addr[1];
+    memcpy(&candidatePrefix[0], &candidateWord0, sizeof(candidateWord0));
+    memcpy(&candidatePrefix[4], &candidateWord1, sizeof(candidateWord1));
+
+    if (memcmp(candidatePrefix, mPeerAddressAnchorPrefix, sizeof(candidatePrefix)) == 0)
+    {
+        // Same /64 as anchor — still considered routable; accept the host-bits change.
+        mPeerAddress                   = candidate;
+        mPeerAddressRestampRejectCount = 0;
+        return;
+    }
+
+    // Candidate's /64 differs from the routable anchor. Suspect a relay-mangled source or a peer
+    // genuinely moving networks. Discard the restamp until the same new prefix repeats enough
+    // times to convince us the move is real.
+    char candidateStr[Transport::PeerAddress::kMaxToStringSize];
+    candidate.ToString(candidateStr);
+
+    if (memcmp(candidatePrefix, mPeerAddressLastRejectedPrefix, sizeof(candidatePrefix)) != 0)
+    {
+        // New rejected prefix — restart the override counter so unrelated bursts don't accumulate.
+        memcpy(mPeerAddressLastRejectedPrefix, candidatePrefix, sizeof(candidatePrefix));
+        mPeerAddressRestampRejectCount = 1;
+    }
+    else if (mPeerAddressRestampRejectCount < UINT8_MAX)
+    {
+        mPeerAddressRestampRejectCount++;
+    }
+
+    if (mPeerAddressRestampRejectCount >= kPeerAddressRestampOverrideThreshold)
+    {
+        ChipLogProgress(Inet,
+                        "SecureSession[%p, LSID:%d]: peer /64 anchor override after %u rejects, accepting %s",
+                        this, mLocalSessionId, static_cast<unsigned>(mPeerAddressRestampRejectCount), candidateStr);
+        mPeerAddress = candidate;
+        // Adopt the new prefix as the anchor going forward.
+        memcpy(mPeerAddressAnchorPrefix, candidatePrefix, sizeof(mPeerAddressAnchorPrefix));
+        mPeerAddressRestampRejectCount = 0;
+        memset(mPeerAddressLastRejectedPrefix, 0, sizeof(mPeerAddressLastRejectedPrefix));
+        return;
+    }
+
+    ChipLogProgress(Inet,
+                    "SecureSession[%p, LSID:%d]: ignoring restamp to non-routable peer %s (reject %u/%u)",
+                    this, mLocalSessionId, candidateStr,
+                    static_cast<unsigned>(mPeerAddressRestampRejectCount),
+                    static_cast<unsigned>(kPeerAddressRestampOverrideThreshold));
 }
 
 Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const

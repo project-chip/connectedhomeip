@@ -53,6 +53,45 @@ void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId
  */
 IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId);
 
+// ---- Transport-tier-aware composite scoring -------------------------------
+//
+// ScoreIpAddressWithTransport() returns a uint32_t with this layout:
+//
+//   bits [31:24]  transport tier   (Ethernet > WiFi > Thread > Unknown)
+//   bits [23:16]  Thread sub-metric (0 unless callback set; only nonzero on Thread)
+//   bits [15:0]   address-class score (IpScore promoted, preserves today's ordering)
+//
+// Because the tier dominates the upper byte, addresses on a higher-tier interface always
+// outrank addresses on a lower-tier one regardless of address class. Within a single tier
+// the existing IpScore ordering is preserved exactly. Platforms whose InterfaceId cannot
+// report a transport type degrade to tier=Unknown (=0) for all entries, which collapses
+// the composite score back to the legacy IpScore ordering.
+namespace CompositeScore {
+constexpr uint32_t kTierShift          = 24;
+constexpr uint32_t kThreadSubShift     = 16;
+constexpr uint8_t  kTierEthernet       = 3;
+constexpr uint8_t  kTierWiFi           = 2;
+constexpr uint8_t  kTierThread         = 1;
+constexpr uint8_t  kTierUnknown        = 0;
+
+inline uint32_t Encode(uint8_t tier, uint8_t threadSub, uint16_t classScore)
+{
+    return (static_cast<uint32_t>(tier) << kTierShift) |
+           (static_cast<uint32_t>(threadSub) << kThreadSubShift) |
+           static_cast<uint32_t>(classScore);
+}
+} // namespace CompositeScore
+
+uint32_t ScoreIpAddressWithTransport(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId);
+
+// Optional Thread sub-metric callback. The callback is invoked only when the address being
+// scored sits on a Thread interface, and its 8-bit return value is packed into bits [23:16]
+// of the composite score. Higher values sort earlier within the Thread tier. Apps that don't
+// register a callback get a default Thread sub-metric of 0 (i.e. address class alone decides
+// intra-Thread ordering). Setting cb=nullptr clears any prior registration.
+using ThreadSubMetricCallback = uint8_t (*)(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId);
+void SetThreadSubMetricCallback(ThreadSubMetricCallback cb);
+
 } // namespace IPAddressSorter
 } // namespace Dnssd
 } // namespace chip
