@@ -181,9 +181,6 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::DeviceEnergyManagementMode::Id:
         MatterDeviceEnergyManagementModeClusterInitCallback(endpoint);
         break;
-    case app::Clusters::FanControl::Id:
-        MatterFanControlClusterInitCallback(endpoint);
-        break;
     case app::Clusters::WindowCovering::Id:
         MatterWindowCoveringClusterInitCallback(endpoint);
         break;
@@ -377,8 +374,6 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::DeviceEnergyManagementMode::Id:
         MatterDeviceEnergyManagementModeClusterShutdownCallback(endpoint, shutdownType);
         break;
-    case app::Clusters::FanControl::Id:
-        MatterFanControlClusterShutdownCallback(endpoint, shutdownType);
     case app::Clusters::WindowCovering::Id:
         MatterWindowCoveringClusterShutdownCallback(endpoint, shutdownType);
         break;
