@@ -128,7 +128,11 @@ public:
     void OnCommissioningSessionEstablishmentStarted() override { AppTaskCommon::sIsCommissioningFailed = false; }
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
-    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { AppTaskCommon::sIsCommissioningFailed = true; }
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override
+    {
+        AppTaskCommon::sIsCommissioningFailed = true;
+        isComissioningStarted = false;
+    }
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override
     {
@@ -554,12 +558,6 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         return;
     }
 
-    if (pm_observer_deepsleepped())
-    {
-        ChipLogDetail(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
-        Reboot(SoftwareRebootReason::kOther);
-    }
-
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow fail");
@@ -889,4 +887,19 @@ void AppTaskCommon::DispatchEvent(AppEvent * aEvent)
 void AppTaskCommon::GetEvent(AppEvent * aEvent)
 {
     k_msgq_get(&sAppEventQueue, aEvent, K_FOREVER);
+}
+
+// deep-sleep platform workaround
+
+extern "C" bool __real_bt_is_ready(void);
+
+extern "C" bool __wrap_bt_is_ready(void)
+{
+    if (pm_observer_deepsleepped())
+    {
+        ChipLogDetail(DeviceLayer,
+            "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
+        Reboot(SoftwareRebootReason::kOther);
+    }
+    return __real_bt_is_ready();
 }
