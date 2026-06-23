@@ -43,7 +43,7 @@ is available in the shared workspace:
 
 ```bash
 docker compose run --rm tizen bash
-sdb connect 192.168.0.118
+sdb connect RASPBERRY_PI_IP
 sdb root on
 
 # Ensure the target directory exists on the Raspberry Pi

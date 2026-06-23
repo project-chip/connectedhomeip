@@ -50,10 +50,6 @@ Launch the application on the device using `app_launcher`:
 sdb shell app_launcher --start org.tizen.matter.example.lighting -- wifi true discriminator 1234 passcode 11223344
 ```
 
-When passing user arguments via `app_launcher`, strings cannot start with `-`
-(minus) character and all arguments must consist of a name and value. Boolean
-options should have value equal to `"true"`.
-
 For more details on testing TPK apps on Raspberry Pi, see
 [Testing TPK Apps on Raspberry Pi](../../../docs/platforms/tizen/raspberry_pi_tpk.md).
 

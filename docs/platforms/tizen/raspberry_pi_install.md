@@ -127,11 +127,11 @@ To use `sdb` from Docker:
 docker compose run --rm tizen bash
 ```
 
-Find your Raspberry Pi's IP address from your home router (e.g.,
-`192.168.0.117`), then connect and switch to root:
+Find your Raspberry Pi's IP address from your home router, then connect and
+switch to root:
 
 ```bash
-sdb connect 192.168.0.117
+sdb connect RASPBERRY_PI_IP
 sdb shell
 sdb shell root on
 ```
