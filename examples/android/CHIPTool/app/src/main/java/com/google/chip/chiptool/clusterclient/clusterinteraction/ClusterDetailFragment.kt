@@ -117,7 +117,7 @@ class ClusterDetailFragment : Fragment() {
   override fun onDestroyView() {
     super.onDestroyView()
     // Release the native device pointer to prevent a memory leak (issue #21539).
-    if (::selectedCluster.isInitialized) {
+    if (devicePtr != 0L) {
       ChipClient.getDeviceController(requireContext()).releaseConnectedDevicePointer(devicePtr)
     }
     _binding = null
