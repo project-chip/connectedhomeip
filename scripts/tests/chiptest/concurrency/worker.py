@@ -15,8 +15,6 @@
 import contextlib
 import dataclasses
 import logging
-import shlex
-import subprocess
 import sys
 import tempfile
 from abc import ABC, abstractmethod
@@ -29,12 +27,7 @@ from chiptest.concurrency.context import StartStopContextMixin
 from chiptest.log_config import LogConfig
 from chiptest.results import TestResult
 from chiptest.runner import Executor
-from chiptest.test_definition import TEST_THREAD_DATASET, CommissioningMethod, TestDefinition, TestJobConfig
-
-if sys.platform == "linux":
-    import chiptest.linux as linux
-elif sys.platform == "darwin":
-    import chiptest.darwin as darwin
+from chiptest.test_definition import TestDefinition, TestJobConfig
 
 from .process import ProcessConfig, WrappedProcess
 
@@ -108,77 +101,9 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, TestResult], StartSt
                 raise result.exception
 
 
-if sys.platform == "linux":
+class GenericWorkerProcess(WorkerProcess):
+    """Generic implementation of the worker process."""
 
-    class LinuxWorkerProcess(WorkerProcess):
-        """Linux implementation of the worker process."""
-
-        def _platform_init(self, exit_stack: contextlib.ExitStack) -> linux.LinuxNamespacedExecutor:
-            log.debug("Initializing Linux test executor")
-
-            # Create a virtual /tmp.
-            tmp_dir_default = self._config.tmp_dir_default
-            tmp_dir = self._config.tmp_dir_worker_base / str(self._config.id)
-            tmp_dir.mkdir(parents=True, exist_ok=True)
-
-            log.info("Remounting %s as %s for the worker", tmp_dir, tmp_dir_default)
-            if subprocess.run(["mount", "-o", "bind", str(tmp_dir), str(tmp_dir_default)]).returncode != 0:
-                raise RuntimeError(f"Failed to mount a virtual {tmp_dir_default}")
-
-            commissioning_method = self._config.commissioning_method
-
-            self.net_ns: linux.IsolatedNetworkNamespace = exit_stack.enter_context(linux.IsolatedNetworkNamespace(
-                index=self._config.id,
-                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                app_link_up=not commissioning_method.wifi_required,
-                add_ula=not commissioning_method.thread_required,
-                # Change the app link name so the interface will be recognized as WiFi or Ethernet depending on the commissioning
-                # method used.
-                app_link_name=commissioning_method.app_link_name, tool_link_name=commissioning_method.tool_link_name))
-            self.mgmt_ns_wrapper = shlex.join(self.net_ns.mgmt_ns.netns_cmd_wrapper)
-
-            match commissioning_method:
-                case CommissioningMethod.BLE_WIFI:
-                    exit_stack.enter_context(linux.DBusTestSystemBus())
-                    exit_stack.enter_context(linux.BluetoothMock())
-                    exit_stack.enter_context(linux.WpaSupplicantMock([commissioning_method.app_link_name],
-                                                                     "MatterAP", "MatterAPPassword", self.net_ns))
-                case CommissioningMethod.BLE_THREAD:
-                    exit_stack.enter_context(linux.DBusTestSystemBus())
-                    exit_stack.enter_context(linux.BluetoothMock())
-                    exit_stack.enter_context(linux.ThreadBorderRouter(TEST_THREAD_DATASET, self.net_ns))
-                case CommissioningMethod.THREAD_MESHCOP:
-                    exit_stack.enter_context(tbr := linux.ThreadBorderRouter(TEST_THREAD_DATASET, self.net_ns))
-                    self.thread_ba_host = tbr.get_border_agent_host()
-                    self.thread_ba_port = tbr.get_border_agent_port()
-                case CommissioningMethod.WIFIPAF_WIFI:
-                    exit_stack.enter_context(linux.DBusTestSystemBus())
-                    exit_stack.enter_context(linux.WpaSupplicantMock(
-                        [commissioning_method.app_link_name, commissioning_method.tool_link_name],
-                        "MatterAP", "MatterAPPassword", self.net_ns))
-
-            return exit_stack.enter_context(linux.LinuxNamespacedExecutor(self.net_ns))
-
-    WorkerProcessCls = LinuxWorkerProcess
-
-elif sys.platform == "darwin":
-
-    class DarwinWorkerProcess(WorkerProcess):
-        """Darwin implementation of the worker process."""
-
-        def _platform_init(self, exit_stack: contextlib.ExitStack) -> darwin.DarwinExecutor:
-            log.debug("Initializing Darwin test executor.")
-            return exit_stack.enter_context(darwin.DarwinExecutor())
-
-    WorkerProcessCls = DarwinWorkerProcess
-
-else:
-
-    class GenericWorkerProcess(WorkerProcess):
-        """Generic implementation of the worker process."""
-
-        def _platform_init(self, exit_stack: contextlib.ExitStack) -> Executor:
-            log.warning('No platform-specific executor for "%s"', sys.platform)
-            return exit_stack.enter_context(Executor())
-
-    WorkerProcessCls = GenericWorkerProcess
+    def _platform_init(self, exit_stack: contextlib.ExitStack) -> Executor:
+        log.warning('No platform-specific executor for "%s"', sys.platform)
+        return exit_stack.enter_context(Executor())

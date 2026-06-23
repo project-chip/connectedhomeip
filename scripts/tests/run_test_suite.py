@@ -32,7 +32,7 @@ import click
 from chiptest.concurrency.context import mp_wrapped_spawn_context, SYNC_MANAGER_PATH
 from chiptest.concurrency.process import ProcessPhase
 from chiptest.concurrency.work_queue import CancellableQueue
-from chiptest.concurrency.worker import WorkerConfig, WorkerJob, WorkerProcessCls
+from chiptest.concurrency.worker import WorkerConfig, WorkerJob, GenericWorkerProcess
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig, LogMessageCounter
 from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult, TestStatus
@@ -45,9 +45,12 @@ log = logging.getLogger(__name__)
 
 if sys.platform == "linux":
     import chiptest.linux
-
-if sys.platform == 'darwin':
+    WorkerProcessCls = chiptest.linux.LinuxWorkerProcess
+elif sys.platform == 'darwin':
     import chiptest.darwin
+    WorkerProcessCls = chiptest.darwin.DarwinWorkerProcess
+else:
+    WorkerProcessCls = GenericWorkerProcess
 
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
