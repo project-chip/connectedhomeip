@@ -177,7 +177,7 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
 {
 
     outBandwidthbps = 0;
-    
+
     auto * cluster = GetCameraAVStreamManagementCluster();
     if (cluster == nullptr)
     {
