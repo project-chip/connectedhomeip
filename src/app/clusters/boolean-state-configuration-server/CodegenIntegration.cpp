@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
+#include <app/clusters/boolean-state-configuration-server/MigrateBooleanStateConfigurationStorage.h>
 #include <app/static-cluster-config/BooleanStateConfiguration.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -31,12 +33,36 @@ using namespace chip::Protocols::InteractionModel;
 using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
 namespace {
 
+/**
+ * A BooleanStateConfigurationCluster subclass that performs storage migration during Startup.
+ * This ensures the persistence providers are available when migration runs.
+ */
+class CodegenBooleanStateConfigurationCluster : public chip::app::Clusters::BooleanStateConfigurationCluster
+{
+public:
+    using BooleanStateConfigurationCluster::BooleanStateConfigurationCluster;
+
+    CHIP_ERROR Startup(chip::app::ServerClusterContext & context) override
+    {
+        chip::app::SafeAttributePersistenceProvider * srcProvider = chip::app::GetSafeAttributePersistenceProvider();
+        chip::app::AttributePersistenceProvider & dstProvider     = context.attributeStorage;
+
+        if (srcProvider != nullptr)
+        {
+            LogErrorOnFailure(
+                BooleanStateConfiguration::MigrateBooleanStateConfigurationStorage(mPath.mEndpointId, *srcProvider, dstProvider));
+        }
+
+        return BooleanStateConfigurationCluster::Startup(context);
+    }
+};
+
 constexpr size_t kBooleanStateConfigurationFixedClusterCount =
     BooleanStateConfiguration::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kBooleanStateConfigurationMaxClusterCount =
     kBooleanStateConfigurationFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<BooleanStateConfigurationCluster> gServers[kBooleanStateConfigurationMaxClusterCount];
+LazyRegisteredServerCluster<CodegenBooleanStateConfigurationCluster> gServers[kBooleanStateConfigurationMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -45,19 +71,19 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         uint8_t supportedSensitivityLevels{};
-        if (SupportedSensitivityLevels::Get(endpointId, &supportedSensitivityLevels) != Status::Success)
+        if (SupportedSensitivityLevels::GetDefault(endpointId, &supportedSensitivityLevels) != Status::Success)
         {
             supportedSensitivityLevels = BooleanStateConfigurationCluster::kMinSupportedSensitivityLevels;
         }
         uint8_t defaultSensitivityLevel{};
-        if (DefaultSensitivityLevel::Get(endpointId, &defaultSensitivityLevel) != Status::Success)
+        if (DefaultSensitivityLevel::GetDefault(endpointId, &defaultSensitivityLevel) != Status::Success)
         {
             // this assumes min is at least 2
             defaultSensitivityLevel = static_cast<uint8_t>(supportedSensitivityLevels - 1);
         }
 
         BooleanStateConfigurationCluster::AlarmModeBitMask alarmsSupported{};
-        if (AlarmsSupported::Get(endpointId, &alarmsSupported) != Status::Success)
+        if (AlarmsSupported::GetDefault(endpointId, &alarmsSupported) != Status::Success)
         {
             alarmsSupported.ClearAll();
         }
@@ -99,7 +125,7 @@ void MatterBooleanStateConfigurationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBooleanStateConfigurationClusterShutdownCallback(EndpointId endpointId)
+void MatterBooleanStateConfigurationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -110,7 +136,7 @@ void MatterBooleanStateConfigurationClusterShutdownCallback(EndpointId endpointI
             .fixedClusterInstanceCount = kBooleanStateConfigurationFixedClusterCount,
             .maxClusterInstanceCount   = kBooleanStateConfigurationMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterBooleanStateConfigurationPluginServerInitCallback() {}

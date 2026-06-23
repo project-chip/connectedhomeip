@@ -22,7 +22,7 @@
 #include <controller/CommissioningDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
@@ -57,6 +57,8 @@ public:
     ByteSpan GetAttestationElements() const { return ByteSpan(mAttestationElements, mAttestationElementsLen); }
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
+
+    void SetNetworkSetupNeeded(bool needed) { mNeedsNetworkSetup = needed; }
 
 protected:
     virtual void CleanupCommissioning();

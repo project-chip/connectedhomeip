@@ -43,9 +43,10 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                           default_matter_test_main)
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -171,13 +172,13 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
 
         self.step(1)
-        attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
+        attributes: list[uint] = Clusters.ClosureControl.Attributes
 
         self.step("2a")
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
 
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
 
         self.step("2b")
         if not is_latching_supported:
@@ -188,7 +189,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-        log.info(f"LatchControlModes: {latch_control_modes}")
+        log.info("LatchControlModes: %s", latch_control_modes)
 
         self.step("2d")
         overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
@@ -197,7 +198,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             current_latch = NullValue
         else:
             current_latch = overall_current_state.latch
-        log.info(f"CurrentLatch: {current_latch}")
+        log.info("CurrentLatch: %s", current_latch)
 
         self.step("2e")
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)

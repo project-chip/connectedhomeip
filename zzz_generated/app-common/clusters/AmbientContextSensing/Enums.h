@@ -34,8 +34,9 @@ enum class Feature : uint32_t
     kHumanActivity        = 0x1,
     kObjectCounting       = 0x2,
     kObjectIdentification = 0x4,
-    kSoundClassification  = 0x8,
+    kSoundIdentification  = 0x8,
     kPredictedActivity    = 0x10,
+    kSensorFusion         = 0x20,
 };
 } // namespace AmbientContextSensing
 } // namespace Clusters

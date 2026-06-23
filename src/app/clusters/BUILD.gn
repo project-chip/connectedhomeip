@@ -1,0 +1,84 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
+
+source_set("clusters") {
+  # Note: Cluster with external dependencies must be included conditionally
+  # on a per-cluster chip_enable_* argument declared in lib.gni.
+  public_deps = [
+    # keep-sorted: start
+    "access-control-server",
+    "actions-server",
+    "administrator-commissioning-server",
+    "air-quality-server",
+    "ambient-context-sensing-server",
+    "basic-information",
+    "boolean-state-configuration-server",
+    "boolean-state-server",
+    "bridged-device-basic-information-server",
+    "camera-av-settings-user-level-management-server",
+    "chime-server",
+    "closure-control-server",
+    "closure-dimension-server",
+    "commissioner-control-server",
+    "concentration-measurement-server",
+    "descriptor",
+    "fan-control-server",
+    "flow-measurement-server",
+    "general-commissioning-server",
+    "general-diagnostics-server",
+    "group-key-mgmt-server",
+    "groupcast",
+    "groups-server",
+    "humidistat-server",
+    "identify-server",
+    "illuminance-measurement-server",
+    "level-control",
+    "microwave-oven-control-server",
+    "mode-base-server",
+    "network-commissioning",
+    "network-identity-management-server",
+    "occupancy-sensor-server",
+    "on-off-server",
+    "operational-credentials-server",
+    "power-source-server",
+    "pressure-measurement-server",
+    "proximity-ranging-server",
+    "relative-humidity-measurement-server",
+    "resource-monitoring-server",
+    "scenes-server",
+    "smoke-co-alarm-server",
+    "software-diagnostics-server",
+    "soil-measurement-server",
+    "temperature-control-server",
+    "temperature-measurement-server",
+    "thread-border-router-management-server",
+    "thread-network-diagnostics-server",
+    "thread-network-directory-server",
+    "tls-certificate-management-server",
+    "tls-client-management-server",
+    "water-heater-management-server",
+    "webrtc-transport-provider-server",
+    "wifi-network-diagnostics-server",
+    "wifi-network-management-server",
+
+    # keep-sorted: end
+  ]
+
+  if (chip_enable_push_av_stream_transport) {
+    public_deps += [ "push-av-stream-transport-server" ]
+  }
+}

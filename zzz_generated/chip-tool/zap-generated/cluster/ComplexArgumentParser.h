@@ -321,6 +321,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagem
 static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request,
                         Json::Value & value);
 
@@ -458,6 +464,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DeviceEnergyMan
 static void Finalize(chip::app::Clusters::DeviceEnergyManagement::Structs::ConstraintsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::DeviceEnergyManagement::Structs::SlotAdjustmentStruct::Type & request,
                         Json::Value & value);
 
@@ -488,6 +500,42 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ArcFaultRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverLoadRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::OverVoltageRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ResidualCurrentFaultRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::ShortCircuitRatingsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ElectricalProtectionAlarm::Structs::SurgeProtectionRatingsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
@@ -581,10 +629,26 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DynamicLighting::Structs::EffectColorStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DynamicLighting::Structs::EffectStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DynamicLighting::Structs::EffectStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type & request,
@@ -599,16 +663,91 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ProximityRanging::Structs::RDRStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RDRStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::BLERangingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::BLTChannelSoundingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingCapabilitiesStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingTriggerConditionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::ReportingConditionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ProximityRanging::Structs::WiFiRangingDeviceRoleConfigStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
                         Json::Value & value);
@@ -871,6 +1010,16 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request,
                         Json::Value & value);
@@ -911,6 +1060,21 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs:
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::AnalysisStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::ContextTriggerStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AvAnalysis::Structs::TrackedContext::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AvAnalysis::Structs::TrackedContext::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::PeakPeriodStruct::Type & request,
                         Json::Value & value);
@@ -1005,12 +1169,6 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & request,
                         Json::Value & value);
 
@@ -1047,6 +1205,12 @@ Setup(const char * label,
 
 static void
 Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type & request,

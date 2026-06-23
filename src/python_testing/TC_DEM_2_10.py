@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
@@ -52,8 +52,10 @@ from TC_DEMTestBase import DEMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -135,7 +137,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
         self.step("2")
         feature_map = await self.read_dem_attribute_expect_success(attribute="FeatureMap")
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
 
         has_pfr = feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerForecastReporting
         has_sfr = feature_map & Clusters.DeviceEnergyManagement.Bitmaps.Feature.kStateForecastReporting
@@ -164,7 +166,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                                 max_interval_sec=10, keepSubscriptions=False)
 
         async def accumulate_reports(wait_time):
-            log.info(f"Test will now wait {wait_time} seconds to accumulate reports")
+            log.info("Test will now wait %s seconds to accumulate reports", wait_time)
             await asyncio.sleep(wait_time)
 
         self.step("5")
@@ -199,7 +201,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("9")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
-            log.info(f"Received {count} Forecast updates in {wait} seconds")
+            log.info("Received %s Forecast updates in %s seconds", count, wait)
             asserts.assert_less_equal(count, 2, f"Expected <= 2 Forecast updates in {wait} seconds")
 
             self.step("10")
@@ -229,7 +231,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("13a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
-            log.info(f"Received {count} Forecast updates in {wait} seconds")
+            log.info("Received %s Forecast updates in %s seconds", count, wait)
             asserts.assert_greater_equal(count, 1, "Expected >= 1 Forecast updates after a cancelled operation")
 
             self.step("14")
@@ -281,7 +283,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("18a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]
-            log.info(f"Received {count} PowerAdjustmentCapability updates in {wait} seconds")
+            log.info("Received %s PowerAdjustmentCapability updates in %s seconds", count, wait)
             asserts.assert_less_equal(count, 2, f"Expected <= 2 PowerAdjustmentCapability updates in {wait} seconds")
 
             self.step("19")
@@ -294,7 +296,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("20a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]
-            log.info(f"Received {count} PowerAdjustmentCapability updates in {wait} seconds")
+            log.info("Received %s PowerAdjustmentCapability updates in %s seconds", count, wait)
             asserts.assert_greater_equal(count, 1, "Expected >= 1 PowerAdjustmentCapability updates after a cancelled operation")
 
             self.step("21")

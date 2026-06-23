@@ -46,7 +46,9 @@ from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
@@ -156,7 +158,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
@@ -164,7 +166,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
         aVideoStreamID = aAllocatedVideoStreams[0].videoStreamID
         aVideoRefCount = aAllocatedVideoStreams[0].referenceCount
@@ -173,7 +175,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1")
         aAudioStreamID = aAllocatedAudioStreams[0].audioStreamID
         aAudioRefCount = aAllocatedAudioStreams[0].referenceCount
@@ -185,7 +187,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         if self.privacySupport:
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
-            log.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
+            log.info("Tx'd : SoftLivestreamPrivacyModeEnabled%s", False)
 
             softLivestreamPrivMode = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftLivestreamPrivacyModeEnabled
@@ -194,7 +196,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
 
             result = await self.write_single_attribute(attr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftRecordingPrivacyModeEnabled")
-            log.info(f"Tx'd : SoftRecordingPrivacyModeEnabled{False}")
+            log.info("Tx'd : SoftRecordingPrivacyModeEnabled%s", False)
 
             softRecordingPrivMode = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SoftRecordingPrivacyModeEnabled
@@ -255,7 +257,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(aAllocatedVideoStreams[0].referenceCount, aVideoRefCount+1,
                              "The reference count for allocated video streams is not as expected")
 
@@ -263,7 +265,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         asserts.assert_equal(aAllocatedAudioStreams[0].referenceCount, aAudioRefCount+1,
                              "The reference count for allocated video streams is not as expected")
 
@@ -303,14 +305,14 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(aAllocatedVideoStreams[0].referenceCount, aVideoRefCount, "The reference count should be unchanged")
 
         self.step(11)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         asserts.assert_equal(aAllocatedAudioStreams[0].referenceCount, aAudioRefCount, "The reference count should be unchanged")
 
         self.step(12)
@@ -329,14 +331,14 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
         self.step(15)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0")
 
         await webrtc_manager.close_all()

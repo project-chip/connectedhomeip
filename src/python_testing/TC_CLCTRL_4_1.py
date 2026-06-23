@@ -42,9 +42,10 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                           default_matter_test_main)
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -218,7 +219,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("2a")
 
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
         is_ps_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_vt_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kVentilation
         is_pd_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPedestrian
@@ -246,7 +247,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("2d")
 
         attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
-        log.info(f"AttributeList: {attribute_list}")
+        log.info("AttributeList: %s", attribute_list)
 
         # STEP 2e: TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
         self.step("2e")
@@ -258,7 +259,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("3a")
 
         overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-        log.info(f"OverallCurrentState: {overall_current_state}")
+        log.info("OverallCurrentState: %s", overall_current_state)
 
         if overall_current_state is NullValue:
             asserts.assert_fail("OverallCurrentState is NullValue.")
@@ -307,7 +308,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("3f")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -318,7 +319,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
             if attributes.LatchControlModes.attribute_id in attribute_list:
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
-                log.info(f"LatchControlModes: {LatchControlModes}")
+                log.info("LatchControlModes: %s", LatchControlModes)
 
                 if LatchControlModes is NullValue:
                     asserts.assert_fail("LatchControlModes is NullValue.")
@@ -382,7 +383,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("3n")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             asserts.assert_true(main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
                                 "MainState is not in the expected state")
 
@@ -464,7 +465,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("6b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -521,7 +522,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("7b")
 
         overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-        log.info(f"OverallTargetState: {overall_target}")
+        log.info("OverallTargetState: %s", overall_target)
         asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
                              "OverallTarget.position is not MoveToSignaturePosition")
 
@@ -552,7 +553,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("8b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
             CurrentPosition = overall_current_state.position
@@ -605,7 +606,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("8g")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            log.info(f"OverallTargetState: {overall_target}")
+            log.info("OverallTargetState: %s", overall_target)
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
                                  "OverallTargetState.position is not MoveToVentilationPosition")
 
@@ -637,7 +638,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("9b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -691,7 +692,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("9g")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            log.info(f"OverallTargetState: {overall_target}")
+            log.info("OverallTargetState: %s", overall_target)
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
                                  "OverallTarget.position is not MoveToPedestrianPosition")
 
@@ -713,7 +714,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("10a")
 
         overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-        log.info(f"OverallCurrentState: {overall_current_state}")
+        log.info("OverallCurrentState: %s", overall_current_state)
         if overall_current_state is NullValue:
             asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -765,7 +766,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("10f")
 
         overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-        log.info(f"OverallTarget: {overall_target}")
+        log.info("OverallTarget: %s", overall_target)
         asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
                              "OverallTargetState.position is not MoveToFullyOpen")
 
@@ -800,7 +801,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         self.step("11b")
 
         overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-        log.info(f"OverallTargetState: {overall_target}")
+        log.info("OverallTargetState: %s", overall_target)
         asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
                              "OverallTargetState.position is not MoveToFullyClosed")
 
@@ -844,7 +845,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("12c")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            log.info(f"OverallTarget: {overall_target}")
+            log.info("OverallTarget: %s", overall_target)
             asserts.assert_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
                                  "OverallTargetState.speed is not High")
 
@@ -872,7 +873,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("12f")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            log.info(f"OverallTargetState: {overall_target}")
+            log.info("OverallTargetState: %s", overall_target)
             asserts.assert_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow,
                                  "OverallTargetState.speed is not Low")
 
@@ -901,7 +902,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("13c")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kProtected,
                                  "MainState is not Protected")
 
@@ -932,7 +933,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("13f")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
             asserts.assert_true(is_stopped, "MainState is not in the expected state")
         else:
@@ -958,7 +959,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("14c")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kDisengaged,
                                  "MainState is not Disengaged")
 
@@ -989,7 +990,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("14f")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
             asserts.assert_true(is_stopped, "MainState is not in the expected state")
         else:
@@ -1018,7 +1019,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("15c")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            log.info(f"OverallTargetState: {overall_target}")
+            log.info("OverallTargetState: %s", overall_target)
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
                                  "OverallTargetState.position is not MoveToFullyOpen")
 
@@ -1028,12 +1029,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             await asyncio.sleep(2)
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
 
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
                                  "OverallCurrentState.position is not FullyOpened")
 
@@ -1061,7 +1062,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.step("15g")
 
             overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
-            log.info(f"OverallTarget: {overall_target}")
+            log.info("OverallTarget: %s", overall_target)
             asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
                                  "OverallTargetState.position is not MoveToFullyClosed")
 
@@ -1070,12 +1071,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
             await asyncio.sleep(2)
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
 
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed,
                                  "OverallCurrentState.position is not FullyClosed")
 

@@ -181,6 +181,32 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorage)
     EXPECT_EQ(motionZone2Base.sensitivity.Value(), 10);
 }
 
+// Test corner case where kMotion with motionZones present-but-null (spec: null motionZones ==
+// "motion anywhere triggers"). Verify the decodable->storage copy preserves
+// that state as a present Optional containing a null Nullable.
+TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorageMotionZonesNull)
+{
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    // present (HasValue) but explicitly null (IsNull)
+    triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable<uint8_t>(5));
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    TransportTriggerOptionsStorage transportTriggerOptionsStorage(triggerOptions);
+
+    EXPECT_EQ(transportTriggerOptionsStorage.triggerType, TransportTriggerTypeEnum::kMotion);
+    ASSERT_TRUE(transportTriggerOptionsStorage.motionZones.HasValue());
+    EXPECT_TRUE(transportTriggerOptionsStorage.motionZones.Value().IsNull());
+}
+
 TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
 {
     CMAFContainerOptionsStruct cmafContainerOptions;
@@ -188,70 +214,22 @@ TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     CMAFContainerOptionsStorage cmafContainerOptionsStorage(cmafContainerOptions);
-
-    // Clear the cencKey and cencKeyID strings to test deep copy of cencKey and cencKeyID
-    cencKey.clear();
-    cencKeyID.clear();
 
     EXPECT_EQ(cmafContainerOptionsStorage.chunkDuration, 1000);
     EXPECT_TRUE(cmafContainerOptionsStorage.metadataEnabled.HasValue());
     EXPECT_TRUE(cmafContainerOptionsStorage.metadataEnabled.Value());
 
-    std::string cencKeyStr(cmafContainerOptionsStorage.CENCKey.Value().data(),
-                           cmafContainerOptionsStorage.CENCKey.Value().data() + cmafContainerOptionsStorage.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "1234567890ABCDEF");
-
-    std::string cencKeyIDStr(cmafContainerOptionsStorage.CENCKeyID.Value().data(),
-                             cmafContainerOptionsStorage.CENCKeyID.Value().data() +
-                                 cmafContainerOptionsStorage.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "1234567890ABCDEF");
-
-    CMAFContainerOptionsStorage cmafContainerOptionsStorageCopy(cmafContainerOptionsStorage);
-
-    EXPECT_EQ(cmafContainerOptionsStorageCopy.chunkDuration, 1000);
-    EXPECT_TRUE(cmafContainerOptionsStorageCopy.metadataEnabled.HasValue());
-    EXPECT_TRUE(cmafContainerOptionsStorageCopy.metadataEnabled.Value());
-
-    std::string cencKeyStrCopy(cmafContainerOptionsStorageCopy.CENCKey.Value().data(),
-                               cmafContainerOptionsStorageCopy.CENCKey.Value().data() +
-                                   cmafContainerOptionsStorageCopy.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrCopy, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrCopy(cmafContainerOptionsStorageCopy.CENCKeyID.Value().data(),
-                                 cmafContainerOptionsStorageCopy.CENCKeyID.Value().data() +
-                                     cmafContainerOptionsStorageCopy.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrCopy, "1234567890ABCDEF");
-
     // Accessing buffer using base struct
 
-    CMAFContainerOptionsStruct BaseCMAFContainerOptions = static_cast<CMAFContainerOptionsStruct>(cmafContainerOptionsStorageCopy);
+    CMAFContainerOptionsStruct BaseCMAFContainerOptions = static_cast<CMAFContainerOptionsStruct>(cmafContainerOptionsStorage);
 
     EXPECT_EQ(BaseCMAFContainerOptions.chunkDuration, 1000);
     EXPECT_TRUE(BaseCMAFContainerOptions.metadataEnabled.HasValue());
     EXPECT_TRUE(BaseCMAFContainerOptions.metadataEnabled.Value());
-
-    std::string cencKeyStrBase(BaseCMAFContainerOptions.CENCKey.Value().data(),
-                               BaseCMAFContainerOptions.CENCKey.Value().data() + BaseCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrBase, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrBase(BaseCMAFContainerOptions.CENCKeyID.Value().data(),
-                                 BaseCMAFContainerOptions.CENCKeyID.Value().data() +
-                                     BaseCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrBase, "1234567890ABCDEF");
 }
 
 TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
@@ -261,12 +239,8 @@ TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     /*Test ContainerOptionsStorage*/
 
@@ -279,47 +253,11 @@ TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
 
     ContainerOptionsStorage containerOptionsStorage(containerOptions);
 
-    // Clear the cencKey and cencKeyID strings to test deep copy of cencKey and cencKeyID
-    cencKey.clear();
-    cencKeyID.clear();
-
     EXPECT_EQ(containerOptionsStorage.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(containerOptionsStorage.CMAFContainerOptions.HasValue());
     EXPECT_EQ(containerOptionsStorage.CMAFContainerOptions.Value().chunkDuration, 1000);
     EXPECT_TRUE(containerOptionsStorage.CMAFContainerOptions.Value().metadataEnabled.HasValue());
     EXPECT_TRUE(containerOptionsStorage.CMAFContainerOptions.Value().metadataEnabled.Value());
-
-    std::string cencKeyStrContainer(containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().data(),
-                                    containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().data() +
-                                        containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrContainer, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrContainer(containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
-                                      containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
-                                          containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrContainer, "1234567890ABCDEF");
-
-    ContainerOptionsStorage containerOptionsStorageCopy(containerOptionsStorage);
-
-    EXPECT_EQ(containerOptionsStorageCopy.containerType, ContainerFormatEnum::kCmaf);
-    EXPECT_TRUE(containerOptionsStorageCopy.CMAFContainerOptions.HasValue());
-    EXPECT_EQ(containerOptionsStorageCopy.CMAFContainerOptions.Value().chunkDuration, 1000);
-    EXPECT_TRUE(containerOptionsStorageCopy.CMAFContainerOptions.Value().metadataEnabled.HasValue());
-    EXPECT_TRUE(containerOptionsStorageCopy.CMAFContainerOptions.Value().metadataEnabled.Value());
-
-    std::string cencKeyStrContainerCopy(containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().data(),
-                                        containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().data() +
-                                            containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStrContainerCopy, "1234567890ABCDEF");
-
-    std::string cencKeyIDStrContainerCopy(containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
-                                          containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
-                                              containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStrContainerCopy, "1234567890ABCDEF");
 
     // Accessing buffer using base struct
 
@@ -330,18 +268,6 @@ TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
     EXPECT_EQ(BaseContainerOptions.CMAFContainerOptions.Value().chunkDuration, 1000);
     EXPECT_TRUE(BaseContainerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue());
     EXPECT_TRUE(BaseContainerOptions.CMAFContainerOptions.Value().metadataEnabled.Value());
-
-    std::string containerCENCKeyStrBase(BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().data(),
-                                        BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().data() +
-                                            BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().size());
-
-    EXPECT_EQ(containerCENCKeyStrBase, "1234567890ABCDEF");
-
-    std::string containerCENCKeyIDStrBase(BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
-                                          BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
-                                              BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size());
-
-    EXPECT_EQ(containerCENCKeyIDStrBase, "1234567890ABCDEF");
 }
 
 TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
@@ -412,12 +338,8 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
-
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
@@ -545,14 +467,10 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
 
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
-
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+    std::string trackName = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
 
     /*Test TransportOptionsStorage*/
     triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
@@ -630,6 +548,232 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(transportConfigurationStorageNull.connectionID, 1);
     EXPECT_EQ(transportConfigurationStorageNull.transportStatus, TransportStatusEnum::kInactive);
     EXPECT_FALSE(transportConfigurationStorageNull.transportOptions.HasValue());
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestVideoStreamDeepCopy)
+{
+    // Test that video stream names are deep copied into flat buffer
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Create video streams with names
+    Structs::VideoStreamStruct::Type videoStream1;
+    std::string videoName1       = "FrontDoor";
+    videoStream1.videoStreamID   = 1;
+    videoStream1.videoStreamName = CharSpan(videoName1.data(), videoName1.size());
+
+    Structs::VideoStreamStruct::Type videoStream2;
+    std::string videoName2       = "BackYard";
+    videoStream2.videoStreamID   = 2;
+    videoStream2.videoStreamName = CharSpan(videoName2.data(), videoName2.size());
+
+    // Add video streams
+    transportOptionsStorage.AddVideoStream(videoStream1);
+    transportOptionsStorage.AddVideoStream(videoStream2);
+
+    // Clear original strings to verify deep copy
+    videoName1.clear();
+    videoName2.clear();
+
+    // Verify video streams are stored correctly
+    EXPECT_TRUE(transportOptionsStorage.videoStreams.HasValue());
+    DataModel::List<const Structs::VideoStreamStruct::Type> videoList = transportOptionsStorage.videoStreams.Value();
+    EXPECT_EQ(videoList.size(), (size_t) 2);
+
+    // Verify first video stream
+    std::string storedName1(videoList[0].videoStreamName.data(), videoList[0].videoStreamName.size());
+    EXPECT_EQ(storedName1, "FrontDoor");
+    EXPECT_EQ(videoList[0].videoStreamID, (uint16_t) 1);
+
+    // Verify second video stream
+    std::string storedName2(videoList[1].videoStreamName.data(), videoList[1].videoStreamName.size());
+    EXPECT_EQ(storedName2, "BackYard");
+    EXPECT_EQ(videoList[1].videoStreamID, (uint16_t) 2);
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestAudioStreamDeepCopy)
+{
+    // Test that audio stream names are deep copied into flat buffer
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Create audio streams with names
+    Structs::AudioStreamStruct::Type audioStream1;
+    std::string audioName1       = "Mic1";
+    audioStream1.audioStreamID   = 1;
+    audioStream1.audioStreamName = CharSpan(audioName1.data(), audioName1.size());
+
+    Structs::AudioStreamStruct::Type audioStream2;
+    std::string audioName2       = "Mic2";
+    audioStream2.audioStreamID   = 2;
+    audioStream2.audioStreamName = CharSpan(audioName2.data(), audioName2.size());
+
+    // Add audio streams
+    transportOptionsStorage.AddAudioStream(audioStream1);
+    transportOptionsStorage.AddAudioStream(audioStream2);
+
+    // Clear original strings to verify deep copy
+    audioName1.clear();
+    audioName2.clear();
+
+    // Verify audio streams are stored correctly
+    EXPECT_TRUE(transportOptionsStorage.audioStreams.HasValue());
+    DataModel::List<const Structs::AudioStreamStruct::Type> audioList = transportOptionsStorage.audioStreams.Value();
+    EXPECT_EQ(audioList.size(), (size_t) 2);
+
+    // Verify first audio stream
+    std::string storedName1(audioList[0].audioStreamName.data(), audioList[0].audioStreamName.size());
+    EXPECT_EQ(storedName1, "Mic1");
+    EXPECT_EQ(audioList[0].audioStreamID, (uint16_t) 1);
+
+    // Verify second audio stream
+    std::string storedName2(audioList[1].audioStreamName.data(), audioList[1].audioStreamName.size());
+    EXPECT_EQ(storedName2, "Mic2");
+    EXPECT_EQ(audioList[1].audioStreamID, (uint16_t) 2);
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestClearVideoStreams)
+{
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Add a video stream
+    Structs::VideoStreamStruct::Type videoStream;
+    std::string videoName       = "TestStream";
+    videoStream.videoStreamID   = 1;
+    videoStream.videoStreamName = CharSpan(videoName.data(), videoName.size());
+    transportOptionsStorage.AddVideoStream(videoStream);
+
+    // Verify it was added
+    EXPECT_TRUE(transportOptionsStorage.videoStreams.HasValue());
+    EXPECT_EQ(transportOptionsStorage.videoStreams.Value().size(), (size_t) 1);
+
+    // Clear video streams
+    transportOptionsStorage.ClearVideoStreams();
+
+    // Verify it was cleared
+    EXPECT_FALSE(transportOptionsStorage.videoStreams.HasValue());
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestClearAudioStreams)
+{
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Add an audio stream
+    Structs::AudioStreamStruct::Type audioStream;
+    std::string audioName       = "TestAudio";
+    audioStream.audioStreamID   = 1;
+    audioStream.audioStreamName = CharSpan(audioName.data(), audioName.size());
+    transportOptionsStorage.AddAudioStream(audioStream);
+
+    // Verify it was added
+    EXPECT_TRUE(transportOptionsStorage.audioStreams.HasValue());
+    EXPECT_EQ(transportOptionsStorage.audioStreams.Value().size(), (size_t) 1);
+
+    // Clear audio streams
+    transportOptionsStorage.ClearAudioStreams();
+
+    // Verify it was cleared
+    EXPECT_FALSE(transportOptionsStorage.audioStreams.HasValue());
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestUpdateVideoStreamsList)
+{
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Initially no video streams
+    EXPECT_FALSE(transportOptionsStorage.videoStreams.HasValue());
+
+    // Update should keep it cleared
+    transportOptionsStorage.UpdateVideoStreamsList();
+    EXPECT_FALSE(transportOptionsStorage.videoStreams.HasValue());
+
+    // Add a video stream
+    Structs::VideoStreamStruct::Type videoStream;
+    std::string videoName       = "Stream1";
+    videoStream.videoStreamID   = 1;
+    videoStream.videoStreamName = CharSpan(videoName.data(), videoName.size());
+    transportOptionsStorage.AddVideoStream(videoStream);
+
+    // Verify list is updated
+    EXPECT_TRUE(transportOptionsStorage.videoStreams.HasValue());
+    EXPECT_EQ(transportOptionsStorage.videoStreams.Value().size(), (size_t) 1);
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestUpdateAudioStreamsList)
+{
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Initially no audio streams
+    EXPECT_FALSE(transportOptionsStorage.audioStreams.HasValue());
+
+    // Update should keep it cleared
+    transportOptionsStorage.UpdateAudioStreamsList();
+    EXPECT_FALSE(transportOptionsStorage.audioStreams.HasValue());
+
+    // Add an audio stream
+    Structs::AudioStreamStruct::Type audioStream;
+    std::string audioName       = "Audio1";
+    audioStream.audioStreamID   = 1;
+    audioStream.audioStreamName = CharSpan(audioName.data(), audioName.size());
+    transportOptionsStorage.AddAudioStream(audioStream);
+
+    // Verify list is updated
+    EXPECT_TRUE(transportOptionsStorage.audioStreams.HasValue());
+    EXPECT_EQ(transportOptionsStorage.audioStreams.Value().size(), (size_t) 1);
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestMultipleVideoStreamNamesNoCorruption)
+{
+    // Test that multiple video streams with different names don't corrupt each other
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Add multiple video streams with different names
+    for (int i = 0; i < 5; i++)
+    {
+        Structs::VideoStreamStruct::Type videoStream;
+        std::string name            = "VideoStream" + std::to_string(i);
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = CharSpan(name.data(), name.size());
+        transportOptionsStorage.AddVideoStream(videoStream);
+    }
+
+    // Verify all streams are stored correctly without corruption
+    DataModel::List<const Structs::VideoStreamStruct::Type> videoList = transportOptionsStorage.videoStreams.Value();
+    EXPECT_EQ(videoList.size(), (size_t) 5);
+
+    for (size_t i = 0; i < 5; i++)
+    {
+        std::string expectedName = "VideoStream" + std::to_string(i);
+        std::string storedName(videoList[i].videoStreamName.data(), videoList[i].videoStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(videoList[i].videoStreamID, static_cast<uint16_t>(i));
+    }
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestMultipleAudioStreamNamesNoCorruption)
+{
+    // Test that multiple audio streams with different names don't corrupt each other
+    TransportOptionsStorage transportOptionsStorage;
+
+    // Add multiple audio streams with different names
+    for (int i = 0; i < 5; i++)
+    {
+        Structs::AudioStreamStruct::Type audioStream;
+        std::string name            = "AudioStream" + std::to_string(i);
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = CharSpan(name.data(), name.size());
+        transportOptionsStorage.AddAudioStream(audioStream);
+    }
+
+    // Verify all streams are stored correctly without corruption
+    DataModel::List<const Structs::AudioStreamStruct::Type> audioList = transportOptionsStorage.audioStreams.Value();
+    EXPECT_EQ(audioList.size(), (size_t) 5);
+
+    for (size_t i = 0; i < 5; i++)
+    {
+        std::string expectedName = "AudioStream" + std::to_string(i);
+        std::string storedName(audioList[i].audioStreamName.data(), audioList[i].audioStreamName.size());
+        EXPECT_EQ(storedName, expectedName);
+        EXPECT_EQ(audioList[i].audioStreamID, static_cast<uint16_t>(i));
+    }
 }
 
 } // namespace PushAvStreamTransport

@@ -54,5 +54,16 @@
 
 #define CHIP_CONFIG_MAX_FABRICS 5
 
+#if CONFIG_NXP_USE_POWER_DOWN
+// When enabling PowerDown as a low power state we need to increase the default
+// size of the ICD observers pool by one to accommodate the low power states
+// manager
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 4
+#endif // CONFIG_NXP_USE_POWER_DOWN
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (32U) /* sizeof(psa_hash_operation_t) */
+#endif
+
 // Include default nxp platform configurations
 #include "platform/nxp/common/CHIPNXPPlatformDefaultConfig.h"

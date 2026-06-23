@@ -29,7 +29,17 @@
 #include "DiagnosticDataProviderImpl.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
+#if CONFIG_CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
+              "CHIP_CONFIG_SHA256_CONTEXT_SIZE is too small for psa_hash_operation_t");
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "mbedtls/threading.h"
+#include "threading_alt.h"
+#endif
+#else
 #include "ksdk_mbedtls.h"
+#endif
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
@@ -58,6 +68,13 @@
 extern "C" {
 #include "osa.h"
 }
+
+// Helper macro to identify boards that use PLATFORM_InitControllers for firmware initialization
+#if defined(WIFI_IW612_BOARD_MURATA_2EL_M2) || defined(WIFI_IW610_BOARD_MURATA_2LL_M2)
+#define NXP_USE_PLATFORM_INIT_CONTROLLERS 1
+#else
+#define NXP_USE_PLATFORM_INIT_CONTROLLERS 0
+#endif
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -118,7 +135,7 @@ extern "C" void initiateResetInIdle(void);
 Currently only IW612 and K32W0 support controller initialization in the connectivity framework
 * Include should be removed otherwise it will introduce double firmware definition
 */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if !NXP_USE_PLATFORM_INIT_CONTROLLERS
 #include "wlan_bt_fw.h"
 #endif
 
@@ -205,7 +222,14 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     status_t status;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
+#if CONFIG_CHIP_CRYPTO_PSA
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    config_mbedtls_threading_alt();
+#endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+    status = psa_crypto_init();
+#else
     status = CRYPTO_InitHardware();
+#endif /* CONFIG_CHIP_CRYPTO_PSA */
 
     if (status != 0)
     {
@@ -217,8 +241,7 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 }
 
 /* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !NXP_USE_PLATFORM_INIT_CONTROLLERS
 CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 {
     CHIP_ERROR result = CHIP_NO_ERROR;
@@ -269,7 +292,6 @@ CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 
     return result;
 }
-#endif
 #endif
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -346,7 +368,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif
 
 /* Currently only IW612 and K32W0 support controller initialization in the connectivity framework */
-#ifdef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if NXP_USE_PLATFORM_INIT_CONTROLLERS
     /* Init the controller by giving as an arg the connectivity supported */
     PLATFORM_InitControllers(connBle_c
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -380,7 +402,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 /* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if !NXP_USE_PLATFORM_INIT_CONTROLLERS
     err = WiFiInterfaceInit();
 #endif
 

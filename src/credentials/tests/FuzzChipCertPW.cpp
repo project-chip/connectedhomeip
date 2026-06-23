@@ -1,5 +1,7 @@
 #include <cstddef>
 #include <cstdint>
+#include <filesystem>
+#include <system_error>
 
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
@@ -22,10 +24,25 @@ auto isChipRCACFile = [](std::string_view name) { return absl::StrContains(name,
 
 // Lambda that reads certificates from a directory and returns them as a vector of strings, to be used as seeds
 auto seedProvider = [](auto filterFunction) -> std::vector<std::string> {
+    std::vector<std::string> seeds;
+
+    // The seed directory ships in the source tree but is absent in the OSS-Fuzz runner, which
+    // runs fuzzers from a temporary directory without the build tree (check_build does so
+    // deliberately, to reject $OUT-relative dependencies). Skip file-based seeding instead of
+    // aborting when the directory is missing; on OSS-Fuzz the seeds are supplied via the
+    // libFuzzer seed corpus (<target>_seed_corpus.zip) instead.
+    // Non-throwing overload: a permission/I/O error must not abort the harness (the build
+    // disables exceptions), which would defeat the purpose of tolerating a missing directory.
+    std::error_code ec;
+    if (!std::filesystem::is_directory(OpCertsDir, ec))
+    {
+        std::cout << "Seed directory '" << OpCertsDir << "' not found or inaccessible; continuing without file seeds" << std::endl;
+        return seeds;
+    }
+
     // fuzztest::ReadFilesFromDirectory returns a vector of tuples, each tuple contains a file
     // We need to unpack the tuples and then extract file content into a vector of strings.
     std::vector<std::tuple<std::string>> tupleVector = ReadFilesFromDirectory(OpCertsDir, filterFunction);
-    std::vector<std::string> seeds;
 
     if (tupleVector.size() == 0)
     {
@@ -46,13 +63,13 @@ void ChipCertFuzzer(const std::string & fuzzChipCerts)
     {
         NodeId nodeId;
         FabricId fabricId;
-        (void) ExtractFabricIdFromCert(span, &fabricId);
-        (void) ExtractNodeIdFabricIdFromOpCert(span, &nodeId, &fabricId);
+        RETURN_SAFELY_IGNORED ExtractFabricIdFromCert(span, &fabricId);
+        RETURN_SAFELY_IGNORED ExtractNodeIdFabricIdFromOpCert(span, &nodeId, &fabricId);
     }
 
     {
         CATValues cats;
-        (void) ExtractCATsFromOpCert(span, cats);
+        RETURN_SAFELY_IGNORED ExtractCATsFromOpCert(span, cats);
     }
 }
 FUZZ_TEST(FuzzChipCert, ChipCertFuzzer).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isChipFile)));
@@ -69,7 +86,7 @@ void DecodeChipCertFuzzer(const std::string & fuzzChipCerts, BitFlags<CertDecode
         ByteSpan span(reinterpret_cast<const uint8_t *>(fuzzChipCerts.data()), fuzzChipCerts.size());
 
         ChipCertificateData certData;
-        (void) DecodeChipCert(span, certData, aDecodeFlag);
+        RETURN_SAFELY_IGNORED DecodeChipCert(span, certData, aDecodeFlag);
     }
     chip::Platform::MemoryShutdown();
 }
@@ -97,7 +114,7 @@ void ConvertChipCertToX509CertFuzz(const std::string & fuzzChipCerts)
 
     uint8_t outCertBuf[kMaxDERCertLength];
     MutableByteSpan outCert(outCertBuf);
-    (void) ConvertChipCertToX509Cert(span, outCert);
+    RETURN_SAFELY_IGNORED ConvertChipCertToX509Cert(span, outCert);
 }
 FUZZ_TEST(FuzzChipCert, ConvertChipCertToX509CertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isChipFile)));
 
@@ -110,7 +127,7 @@ void ValidateChipRCACFuzz(const std::string & fuzzRcacCerts)
     ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
     {
         ByteSpan span(reinterpret_cast<const uint8_t *>(fuzzRcacCerts.data()), fuzzRcacCerts.size());
-        ValidateChipRCAC(span);
+        RETURN_SAFELY_IGNORED ValidateChipRCAC(span);
     }
     chip::Platform::MemoryShutdown();
 }
@@ -127,7 +144,7 @@ void ConvertX509CertToChipCertFuzz(const std::string & fuzzDerCerts)
     uint8_t outCertBuf[kMaxDERCertLength];
     MutableByteSpan outCert(outCertBuf);
 
-    ConvertX509CertToChipCert(span, outCert);
+    RETURN_SAFELY_IGNORED ConvertX509CertToChipCert(span, outCert);
 }
 FUZZ_TEST(FuzzChipCert, ConvertX509CertToChipCertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
 
@@ -138,7 +155,7 @@ void ExtractSubjectDNFromX509CertFuzz(const std::string & fuzzDerCerts)
 {
     ByteSpan span(reinterpret_cast<const uint8_t *>(fuzzDerCerts.data()), fuzzDerCerts.size());
     ChipDN subjectDN;
-    ExtractSubjectDNFromX509Cert(span, subjectDN);
+    RETURN_SAFELY_IGNORED ExtractSubjectDNFromX509Cert(span, subjectDN);
 }
 FUZZ_TEST(FuzzChipCert, ExtractSubjectDNFromX509CertFuzz).WithDomains(Arbitrary<std::string>().WithSeeds(seedProvider(isDerFile)));
 

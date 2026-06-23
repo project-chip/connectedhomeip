@@ -38,12 +38,18 @@ namespace ele {
 
 static bool add_tlv(uint8_t * buf, size_t buf_size, size_t buf_index, uint8_t tag, size_t len, uint8_t * val)
 {
-    if (buf == nullptr || val == nullptr || (buf_index + 2 + len) > buf_size)
+    if (buf == nullptr || (buf_index + kTlvHeader + len) > buf_size)
+    {
         return false;
+    }
 
     buf[buf_index++] = (uint8_t) tag;
     buf[buf_index++] = (uint8_t) len;
-    memcpy(&buf[buf_index], val, len);
+
+    if (len > 0 && val != nullptr)
+    {
+        memcpy(&buf[buf_index], val, len);
+    }
 
     return true;
 }

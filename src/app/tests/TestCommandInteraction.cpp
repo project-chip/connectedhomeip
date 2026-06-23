@@ -530,6 +530,7 @@ public:
     void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative();
     void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse();
     void TestCommandHandler_ReleaseWithExchangeClosed();
+    void TestCommandHandler_GetExchangeContextWhenAsync();
 
     /**
      * With the introduction of batch invoke commands, CommandHandler keeps track of incoming
@@ -2141,11 +2142,42 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_ReleaseWithExchan
 
     // Mimic closure of the exchange that would happen on a session release and verify that releasing the handle there-after
     // is handled gracefully.
-    asyncCommandHandle.Get()->GetExchangeContext()->GetSessionHolder().Release();
-    asyncCommandHandle.Get()->GetExchangeContext()->OnSessionReleased();
+    asyncCommandHandle.TestOnlyReleaseSession();
     asyncCommandHandle = nullptr;
 }
 #endif
+
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_GetExchangeContextWhenAsync)
+{
+
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    asyncCommandHandle = nullptr;
+    asyncCommand       = true;
+
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    DrainAndServiceIO();
+
+    // Verify that async command handle has been allocated
+    CommandHandler * handler = asyncCommandHandle.Get();
+    ASSERT_NE(handler, nullptr);
+
+    // when gone async: Ensure that GetExchangeContext returns nullptr while TryGetExchangeContextWhenAsync returns a valid pointer
+    ASSERT_EQ(handler->GetExchangeContext(), nullptr);
+
+    // Cast to CommandHandlerImpl to access TryGetExchangeContextWhenAsync, which is not accessible via CommandHandler
+    auto * impl = static_cast<CommandHandlerImpl *>(handler);
+    ASSERT_NE(impl->TryGetExchangeContextWhenAsync(), nullptr);
+
+    asyncCommandHandle = nullptr;
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
 
 } // namespace app
 } // namespace chip

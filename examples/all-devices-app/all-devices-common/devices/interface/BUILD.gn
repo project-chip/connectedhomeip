@@ -22,6 +22,7 @@ source_set("device-interface") {
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/endpoint-id-allocator",
     "${chip_root}/src/app/clusters/descriptor",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
@@ -46,10 +47,5 @@ source_set("single-endpoint-device") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
-  ]
-
-  public_configs = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/:includes",
-    "${chip_root}/src:includes",
   ]
 }

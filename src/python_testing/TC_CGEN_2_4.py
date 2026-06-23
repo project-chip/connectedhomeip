@@ -48,7 +48,9 @@ from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -78,7 +80,7 @@ class TC_CGEN_2_4(MatterBaseTest):
     async def CommissionToStageSendCompleteAndCleanup(
             self, stage: int, expectedErrorPart: matter.native.ErrorSDKPart, expectedErrCode: int):
 
-        log.info("-----------------Fail on step {}-------------------------".format(stage))
+        log.info("-----------------Fail on step %s-------------------------", stage)
         params = await self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
         # This will run the commissioning up to the point where stage x is run and the
@@ -138,8 +140,11 @@ class TC_CGEN_2_4(MatterBaseTest):
         await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
 
         log.info('Step 18 - TH1 reads the location capability')
-        attr = Clusters.GeneralCommissioning.Attributes.LocationCapability
-        cap = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0, attribute=attr)
+        cap = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1,
+            cluster=Clusters.GeneralCommissioning,
+            attribute=Clusters.GeneralCommissioning.Attributes.LocationCapability,
+            endpoint=0)
         if cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor:
             newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kOutdoor
         elif cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kOutdoor:
@@ -147,7 +152,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         else:
             newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.extend_enum_if_value_doesnt_exist(3)
 
-        log.info('Step 19 Send SetRgulatoryConfig with incorrect location newloc = {}'.format(newloc))
+        log.info('Step 19 Send SetRgulatoryConfig with incorrect location newloc = %s', newloc)
         cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
             newRegulatoryConfig=newloc, countryCode="XX", breadcrumb=0)
         ret = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)

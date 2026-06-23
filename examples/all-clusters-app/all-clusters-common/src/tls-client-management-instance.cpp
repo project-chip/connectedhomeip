@@ -17,11 +17,15 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-client-management-server/CodegenIntegration.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
+#include <app/util/af-types.h>
 #include <clusters/TlsClientManagement/Commands.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <tls-client-management-instance.h>
 
@@ -37,8 +41,8 @@ using namespace chip::Platform;
 using namespace chip::TLV;
 using namespace Protocols::InteractionModel;
 
-using EndpointSerializer = DefaultSerializer<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>;
-using InnerIterator      = TableEntryDataConvertingIterator<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>;
+using EndpointSerializer = DefaultSerializer<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>;
+using InnerIterator      = TableEntryDataConvertingIterator<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>;
 
 namespace {
 enum class TagEndpoint : uint8_t
@@ -53,7 +57,7 @@ enum class TagEndpoint : uint8_t
 static constexpr size_t kPersistentBufferNextIdBytes =
     EstimateStructOverhead(sizeof(uint16_t), // mNextId
                            EstimateStructOverhead(sizeof(EndpointId), sizeof(FabricIndex)) *
-                               (kMaxProvisionedEndpoints * CHIP_CONFIG_MAX_FABRICS)); // mEndpointMapping
+                               (static_cast<size_t>(kMaxProvisionedEndpoints) * CHIP_CONFIG_MAX_FABRICS)); // mEndpointMapping
 
 static constexpr size_t kTlsEndpointMaxBytes =
     EstimateStructOverhead(sizeof(chip::FabricIndex),                                    // Fabric ID
@@ -67,13 +71,13 @@ static constexpr size_t kTlsEndpointMaxBytes =
                                                   sizeof(chip::FabricIndex) /* fabricIndex */));
 struct BufferedEndpoint
 {
-    TlsClientManagementDelegate::EndpointStructType mEndpoint;
+    TLSClientManagementDelegate::EndpointStructType mEndpoint;
     PersistenceBuffer<kTlsEndpointMaxBytes> mBuffer;
 };
 
 class GlobalEndpointData : public PersistableData<kPersistentBufferNextIdBytes>
 {
-    IncrementingIdHelper<TlsEndpointId, kMaxProvisionedEndpoints * CHIP_CONFIG_MAX_FABRICS> mEndpoints;
+    IncrementingIdHelper<TlsEndpointId, static_cast<size_t>(kMaxProvisionedEndpoints) * CHIP_CONFIG_MAX_FABRICS> mEndpoints;
     EndpointId mEndpointId = kInvalidEndpointId;
 
 public:
@@ -202,37 +206,37 @@ CHIP_ERROR EndpointSerializer::DeserializeId(TLV::TLVReader & reader, TlsEndpoin
 }
 
 template <>
-CHIP_ERROR EndpointSerializer::SerializeData(TLV::TLVWriter & writer, const TlsClientManagementDelegate::EndpointStructType & data)
+CHIP_ERROR EndpointSerializer::SerializeData(TLV::TLVWriter & writer, const TLSClientManagementDelegate::EndpointStructType & data)
 {
     return data.EncodeForRead(writer, TLV::ContextTag(TagEndpoint::kEndpointPayload), data.GetFabricIndex());
 }
 
 template <>
-CHIP_ERROR EndpointSerializer::DeserializeData(TLV::TLVReader & reader, TlsClientManagementDelegate::EndpointStructType & data)
+CHIP_ERROR EndpointSerializer::DeserializeData(TLV::TLVReader & reader, TLSClientManagementDelegate::EndpointStructType & data)
 {
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TagEndpoint::kEndpointPayload)));
     return data.Decode(reader);
 }
 
 template <>
-void EndpointSerializer::Clear(TlsClientManagementDelegate::EndpointStructType & data)
+void EndpointSerializer::Clear(TLSClientManagementDelegate::EndpointStructType & data)
 {
-    new (&data) TlsClientManagementDelegate::EndpointStructType();
+    new (&data) TLSClientManagementDelegate::EndpointStructType();
 }
 
-template class chip::app::Storage::FabricTableImpl<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>;
+template class chip::app::Storage::FabricTableImpl<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>;
 
 CHIP_ERROR TlsClientManagementCommandDelegate::Init(PersistentStorageDelegate & storage)
 {
     mStorage = &storage;
-    mProvisioned.SetEndpoint(EndpointId(1));
+    mProvisioned.SetEndpoint(EndpointId(kRootEndpointId));
     return mProvisioned.Init(storage);
 }
 
 CHIP_ERROR TlsClientManagementCommandDelegate::ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
                                                                LoadedEndpointCallback callback)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_ERROR_INTERNAL);
 
     BufferedEndpoint endpoint;
     return mProvisioned.IterateEntries(fabric, endpoint.mBuffer, [&](auto & iterator) {
@@ -247,7 +251,7 @@ CHIP_ERROR TlsClientManagementCommandDelegate::ForEachEndpoint(EndpointId matter
 
 CHIP_ERROR TlsClientManagementCommandDelegate::GetEndpointId(FabricIndex fabric, uint16_t & id)
 {
-    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
+    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(kRootEndpointId)));
     VerifyOrReturnError(globalData, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(globalData->Load(mStorage));
     ReturnErrorOnFailure(globalData->GetNextId(fabric, id));
@@ -259,7 +263,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     EndpointId matterEndpoint, FabricIndex fabric,
     const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), ClusterStatusCode(Status::ConstraintError));
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), ClusterStatusCode(Status::ConstraintError));
     VerifyOrReturnError(mStorage != nullptr, ClusterStatusCode(Status::ConstraintError));
 
     // Find existing value to update & check for port/name collisions
@@ -289,7 +293,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 
     if (provisionReq.endpointID.IsNull())
     {
-        VerifyOrReturnError(numInFabric < mTlsClientManagementCluster->GetMaxProvisioned(),
+        VerifyOrReturnError(numInFabric < mTLSClientManagementCluster->GetMaxProvisioned(),
                             ClusterStatusCode(Status::ResourceExhausted));
         EndpointSerializer::Clear(endpoint.mEndpoint);
         auto & endpointStruct = endpoint.mEndpoint;
@@ -326,7 +330,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 CHIP_ERROR TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                            uint16_t endpointID, LoadedEndpointCallback callback)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), CHIP_ERROR_INTERNAL);
 
     TlsEndpointId localId(endpointID);
     BufferedEndpoint endpoint;
@@ -337,7 +341,7 @@ CHIP_ERROR TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(Endpo
 Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                          uint16_t endpointID)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
+    VerifyOrReturnError(matterEndpoint == EndpointId(kRootEndpointId), Status::ConstraintError);
     VerifyOrReturnError(mStorage != nullptr, Status::ConstraintError);
 
     BufferedEndpoint endpoint;
@@ -388,12 +392,19 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 {
     VerifyOrReturn(mStorage != nullptr);
 
-    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(fabric), Zcl, "Failure clearing TLS endpoints for fabric");
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr, ChipLogError(Zcl, "No data model provider on fabric removal."));
 
-    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
+    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(*provider, fabric), Zcl, "Failure clearing TLS endpoints for fabric");
+
+    UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(kRootEndpointId)));
     VerifyOrReturn(globalData);
     ReturnOnFailure(globalData->Load(mStorage));
-    ReturnAndLogOnFailure(globalData->RemoveAll(*mStorage, fabric), Zcl, "Failure clearing TLS endpoint data for fabric");
+
+    // Not having endpoint data for a fabric is not an error; the fabric may never
+    // have had TLS endpoints provisioned.
+    ReturnAndLogOnFailure(globalData->RemoveAll(*mStorage, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND), Zcl,
+                          "Failure clearing TLS endpoint data for fabric");
 }
 
 CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric,
@@ -421,16 +432,17 @@ CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(Endp
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
-static TlsClientManagementCluster gTlsClientManagementClusterInstance = TlsClientManagementCluster(
-    EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisionedEndpoints);
 
-void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
+namespace chip {
+namespace app {
+namespace Clusters {
+
+void InitializeTlsClientManagement()
 {
-    TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Init();
+    MatterTlsClientManagementSetDelegate(TlsClientManagementCommandDelegate::GetInstance());
+    MatterTlsClientManagementSetCertificateTable(gCertificateTableInstance);
 }
 
-void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
-{
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Finish();
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

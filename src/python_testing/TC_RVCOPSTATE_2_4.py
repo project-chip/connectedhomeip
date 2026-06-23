@@ -42,7 +42,10 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+import matter.testing.matchers as matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -92,7 +95,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         self.print_step(step_number, "Read OperationalState")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        log.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s", operational_state)
         asserts.assert_equal(operational_state, expected_state,
                              "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
 

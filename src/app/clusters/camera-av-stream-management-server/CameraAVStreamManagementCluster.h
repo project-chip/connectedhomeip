@@ -15,14 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/StatusResponse.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/CameraAvStreamManagement/Attributes.h>
+#include <clusters/CameraAvStreamManagement/Commands.h>
 
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -332,18 +331,6 @@ public:
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
     /**
-     * @brief Called by transports when they start using the corresponding audio and video streams.
-     *
-     */
-    virtual CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
-
-    /**
-     * @brief Called by transports when they release the corresponding audio and video streams.
-     *
-     */
-    virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
-
-    /**
      * @brief Provides read-only access to the list of currently allocated video streams.
      * This allows other components (like PushAVStreamTransportManager) to query
      * allocated stream parameters (e.g., for bandwidth calculation) without directly
@@ -397,56 +384,94 @@ enum class OptionalAttribute : uint32_t
     kStatusLightBrightness = 0x0080,
 };
 
-class CameraAVStreamManagementCluster : public CommandHandlerInterface, public AttributeAccessInterface
+class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
+    struct Context
+    {
+        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
+    };
+
+    struct InitArguments
+    {
+        /**
+         * Context providing injected dependencies.
+         * Note: the caller must ensure that the SafeAttributePersistenceProvider referenced by the context outlives this instance.
+         */
+        Context context;
+
+        /**
+         * A reference to the delegate to be used by this server.
+         * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+         */
+        CameraAVStreamManagementDelegate & delegate;
+
+        /** The endpoint on which this cluster exists. This must match the zap configuration. */
+        EndpointId endpointId;
+
+        /** The bitflags value that identifies which features are supported by this instance. */
+        BitFlags<Feature> features;
+
+        /** The bitflags value that identifies the optional attributes supported by this instance. */
+        BitFlags<OptionalAttribute> optionalAttrs;
+
+        /** The maximum number of video encoders supported by camera. */
+        uint8_t maxConcurrentEncoders = 0;
+
+        /** The maximum data rate (encoded pixels/sec) supported by camera. */
+        uint32_t maxEncodedPixelRate = 0;
+
+        /** The set of video sensor parameters for the camera. */
+        VideoSensorParamsStruct videoSensorParams;
+
+        /** Indicates whether nightvision mode does or does not use infrared. */
+        bool nightVisionUsesInfrared = false;
+
+        /** Indicates minimum resolution (width/height) in pixels allowed for camera viewport. */
+        VideoResolutionStruct minViewPort;
+
+        /** Indicates the list of rate distortion trade-off points for supported hardware encoders. */
+        std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints;
+
+        /** The maximum size of the content buffer containing data for all streams, including pre-roll. */
+        uint32_t maxContentBufferSize = 0;
+
+        /** Indicates the audio capabilities of the microphone in terms of the codec used, supported sample rates and the number of
+         * channels. */
+        AudioCapabilitiesStruct microphoneCapabilities;
+
+        /** Indicates the audio capabilities of the speaker in terms of the codec used, supported sample rates and the number of
+         * channels. */
+        AudioCapabilitiesStruct spkrCapabilities;
+
+        /** Indicates the type of two-way talk support the device has, e.g., half-duplex, full-duplex, etc. */
+        TwoWayTalkSupportTypeEnum twoWayTalkSupport = TwoWayTalkSupportTypeEnum::kNotSupported;
+
+        /** Indicates the set of supported snapshot capabilities by the device, e.g., the image codec, the resolution and the
+         * maximum frame rate. */
+        std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities;
+
+        /** Indicates the maximum network bandwidth (in bps) that the device would consume for the transmission of its media
+         * streams. */
+        uint32_t maxNetworkBandwidth = 0;
+
+        /** Indicates the possible stream types available. */
+        std::vector<Globals::StreamUsageEnum> supportedStreamUsages;
+
+        /** Indicates the priority ranking of the available streams. */
+        std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
+    };
+
     /**
      * @brief Creates a Camera AV Stream Management cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
      *
-     * @param aDelegate                         A pointer to the delegate to be used by this server.
-     *                                          Note: the caller must ensure that the delegate lives throughout the instance's
-     *                                          lifetime.
-     *
-     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
-     * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
-     *                                          instance.
-     * @param aMaxConcurrentEncoders            The maximum number of video encoders supported by camera.
-     * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/sec) supported by camera.
-     * @param aVideoSensorParams                The set of video sensor parameters for the camera.
-     * @param aNightVisionUsesInfrared          Indicates whether nightvision mode does or does not use infrared
-     * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
-     * @param aRateDistortionTradeOffPoints     Indicates the list of rate distortion trade-off points for supported hardware
-     *                                          encoders.
-     * @param aMaxContentBufferSize             The maximum size of the content buffer containing data for all streams, including
-     *                                          pre-roll.
-     * @param aMicrophoneCapabilities           Indicates the audio capabilities of the speaker in terms of the codec used,
-     *                                          supported sample rates and the number of channels.
-     * @param aSpkrCapabilities                 Indicates the audio capabilities of the speaker in terms of the codec used,
-     *                                          supported sample rates and the number of channels.
-     * @param aTwoWayTalkSupport                Indicates the type of two-way talk support the device has, e.g., half-duplex,
-     *                                          full-duplex, etc.
-     * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
-     *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in bps) that the device would consume
-     * @param aSupportedStreamUsages            Indicates the possible stream types available
-     * @param aStreamUsagePriorities            Indicates the priority ranking of the available streams
-     * for the transmission of its media streams.
+     * @param aArgs                             Initialization arguments.
+     *                                          Note: The caller must ensure that resources referenced in aArgs (like the delegate
+     *                                          and the SafeAttributePersistenceProvider in context) outlive this cluster instance.
      *
      */
-    CameraAVStreamManagementCluster(CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
-                                    const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
-                                    uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
-                                    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
-                                    const VideoResolutionStruct & aMinViewPort,
-                                    const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
-                                    uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
-                                    const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
-                                    const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities,
-                                    uint32_t aMaxNetworkBandwidth,
-                                    const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-                                    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+    CameraAVStreamManagementCluster(InitArguments && aArgs);
 
     ~CameraAVStreamManagementCluster() override;
 
@@ -458,6 +483,23 @@ public:
      * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR Init();
+
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     bool HasFeature(Feature feature) const;
 
@@ -602,22 +644,23 @@ public:
 
     Globals::ThreeLevelAutoEnum GetStatusLightBrightness() const { return mStatusLightBrightness; }
 
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
-
     // Add/Remove Management functions for streams
 
     CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
     /**
-     * Called during the processing of an AllocateVideoStream request. The
-     * handler of the request iterates through the currently allocated video
+     * Called during the processing of an AllocateVideoStream request to find
+     * an existing stream that can be reused given the requested stream args.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     * Returns std::nullopt if there is no such stream, else the id of the stream
+     * that can be reused.
+     * The handler of the request iterates through the currently allocated video
      * streams to check if the allocation request parameters fall within the
      * ranges of an allocated stream so that the latter can be reused.
      * If a match is found, the function returns the StreamID of the reusable
      * stream.
-     *
-     * @param requestedArgs    parameters in the allocation request
-     *
      */
     std::optional<uint16_t> GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const;
 
@@ -633,15 +676,18 @@ public:
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
 
     /**
-     * Called during the processing of an AllocateSnapshotStream request. The
-     * handler of the request iterates through the currently allocated snapshot
+     * Called during the processing of an AllocateSnapshotStream request to find
+     * an existing stream that can be reused given the requested stream args.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     * Returns std::nullopt if there is no such stream, else the id of the stream
+     * that can be reused.
+     * The handler of the request iterates through the currently allocated snapshot
      * streams to check if the allocation request parameters fall within the
      * ranges of an allocated stream so that the latter can be reused.
      * If a match is found, the function returns the StreamID of the reusable
      * stream.
-     *
-     * @param requestedArgs    parameters in the allocation request
-     *
      */
     std::optional<uint16_t>
     GetReusableSnapshotStreamId(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
@@ -685,9 +731,9 @@ private:
     template <AttributeId TAttributeId>
     friend struct StreamTraits;
 
+    Context mContext;
     CameraAVStreamManagementDelegate & mDelegate;
-    EndpointId mEndpointId;
-    const BitFlags<Feature> mFeatures;
+    const BitFlags<Feature> mEnabledFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes
@@ -745,37 +791,36 @@ private:
         if (currentValue != newValue)
         {
             currentValue = newValue;
-            auto path    = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+            auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
-                ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
+                ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, currentValue));
             }
             mDelegate.OnAttributeChanged(attributeId);
-            MatterReportingAttributeChangeCallback(path);
+            NotifyAttributeChanged(attributeId);
         }
         return CHIP_NO_ERROR;
     }
 
     template <typename StreamContainer, typename IdGetter>
-    bool ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID, HandlerContext & ctx,
-                                                 StreamType streamType, IdGetter id_getter, bool isDeallocate)
+    Protocols::InteractionModel::Status ValidateStreamForModifyOrDeallocateImpl(StreamContainer & streams, uint16_t streamID,
+                                                                                StreamType streamType, IdGetter id_getter,
+                                                                                bool isDeallocate)
     {
         auto it = std::find_if(streams.begin(), streams.end(), [&](const auto & stream) { return id_getter(stream) == streamID; });
 
         if (it == streams.end())
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u not found", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
-            return false;
+            return Protocols::InteractionModel::Status::NotFound;
         }
 
         if (isDeallocate && it->referenceCount > 0)
         {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mEndpointId,
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u still in use", mPath.mEndpointId,
                          StreamTypeToString(streamType), streamID);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
-            return false;
+            return Protocols::InteractionModel::Status::InvalidInState;
         }
 
         using StreamValueType = typename StreamContainer::value_type;
@@ -783,10 +828,9 @@ private:
         {
             if (it->streamUsage == Globals::StreamUsageEnum::kInternal)
             {
-                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mEndpointId,
+                ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: %s stream with ID: %u is Internal", mPath.mEndpointId,
                              StreamTypeToString(streamType), streamID);
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
-                return false;
+                return Protocols::InteractionModel::Status::DynamicConstraintError;
             }
         }
 
@@ -812,35 +856,21 @@ private:
                             Zcl,
                             "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
                             "not modifiable",
-                            mEndpointId, streamID);
-                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
-                        return false;
+                            mPath.mEndpointId, streamID);
+                        return Protocols::InteractionModel::Status::InvalidInState;
                     }
                 }
                 else
                 {
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
-                    return false;
+                    return Protocols::InteractionModel::Status::InvalidInState;
                 }
             }
         }
 
-        return true;
+        return Protocols::InteractionModel::Status::Success;
     }
 
     bool IsBitDepthValid(uint8_t bitDepth) { return (bitDepth == 8 || bitDepth == 16 || bitDepth == 24 || bitDepth == 32); }
-
-    /**
-     * IM-level implementation of read
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * IM-level implementation of write
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.
@@ -884,40 +914,49 @@ private:
 
     bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
-    /**
-     * @brief Inherited from CommandHandlerInterface
-     */
-    void InvokeCommand(HandlerContext & ctx) override;
+    std::optional<DataModel::ActionReturnStatus>
+    HandleVideoStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                              const Commands::VideoStreamAllocate::DecodableType & req);
 
-    void HandleVideoStreamAllocate(HandlerContext & ctx, const Commands::VideoStreamAllocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleVideoStreamModify(const Commands::VideoStreamModify::DecodableType & req);
 
-    void HandleVideoStreamModify(HandlerContext & ctx, const Commands::VideoStreamModify::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleVideoStreamDeallocate(const Commands::VideoStreamDeallocate::DecodableType & req);
 
-    void HandleVideoStreamDeallocate(HandlerContext & ctx, const Commands::VideoStreamDeallocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAudioStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                              const Commands::AudioStreamAllocate::DecodableType & req);
 
-    void HandleAudioStreamAllocate(HandlerContext & ctx, const Commands::AudioStreamAllocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAudioStreamDeallocate(const Commands::AudioStreamDeallocate::DecodableType & req);
 
-    void HandleAudioStreamDeallocate(HandlerContext & ctx, const Commands::AudioStreamDeallocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSnapshotStreamAllocate(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                 const Commands::SnapshotStreamAllocate::DecodableType & req);
 
-    void HandleSnapshotStreamAllocate(HandlerContext & ctx, const Commands::SnapshotStreamAllocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSnapshotStreamModify(const Commands::SnapshotStreamModify::DecodableType & req);
 
-    void HandleSnapshotStreamModify(HandlerContext & ctx, const Commands::SnapshotStreamModify::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSnapshotStreamDeallocate(const Commands::SnapshotStreamDeallocate::DecodableType & req);
 
-    void HandleSnapshotStreamDeallocate(HandlerContext & ctx, const Commands::SnapshotStreamDeallocate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetStreamPriorities(const Commands::SetStreamPriorities::DecodableType & req);
 
-    void HandleSetStreamPriorities(HandlerContext & ctx, const Commands::SetStreamPriorities::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleCaptureSnapshot(CommandHandler & handler,
+                                                                       const ConcreteCommandPath & commandPath,
+                                                                       const Commands::CaptureSnapshot::DecodableType & req);
 
-    void HandleCaptureSnapshot(HandlerContext & ctx, const Commands::CaptureSnapshot::DecodableType & req);
+    bool CheckSnapshotStreamsAvailability();
 
-    bool CheckSnapshotStreamsAvailability(HandlerContext & ctx);
+    bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID);
 
-    bool ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID, HandlerContext & ctx);
+    Protocols::InteractionModel::Status ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, bool isDeallocate);
 
-    bool ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx, bool isDeallocate);
+    Protocols::InteractionModel::Status ValidateAudioStreamForDeallocate(const uint16_t audioStreamID);
 
-    bool ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx);
-
-    bool ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx, bool isDeallocate);
+    Protocols::InteractionModel::Status ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID,
+                                                                                    bool isDeallocate);
 };
 
 } // namespace CameraAvStreamManagement

@@ -39,8 +39,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -91,7 +94,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             return attribute_value
         except Exception as e:
             log.error(e)
-            log.info("Error reading attributes,%s" % (attribute))
+            log.info("Error reading attributes,%s", attribute)
 
     def pics_TC_DRLK_2_5(self) -> list[str]:
         return ["DRLK.S", "DRLK.S.F04"]
@@ -204,7 +207,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             number_week_day_schedules_supported_per_user = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                                                                cluster=drlkcluster,
                                                                                                attribute=Clusters.DoorLock.Attributes.NumberOfWeekDaySchedulesSupportedPerUser)
-            log.info("NumberOfWeekDaySchedulesSupportedPerUser %s" % (number_week_day_schedules_supported_per_user))
+            log.info("NumberOfWeekDaySchedulesSupportedPerUser %s", number_week_day_schedules_supported_per_user)
             asserts.assert_in(number_week_day_schedules_supported_per_user, range(
                 0, 255), "NumberOfWeekDaySchedulesSupportedPerUser value is out of range")
         self.step("2a")

@@ -5,14 +5,14 @@ from pathlib import Path
 
 # -- Paths -------------------------------------------------------------------
 
-MATTER_BASE = Path(__file__).resolve().parents[1]
+MATTER_BASE = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 sys.path.insert(0, str(MATTER_BASE / "docs" / "_extensions"))
 
 # -- Project information -----------------------------------------------------
 
 project = "Matter"
-copyright = "2020-2025, Matter Contributors"
+project_copyright = "2020-2025, Matter Contributors"
 author = "Matter Contributors"
 version = "1.0.0"
 
@@ -35,6 +35,9 @@ exclude_patterns = [
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
+    "**/tests/*.md",
+    "examples/tv-casting-app/APK_SIZE_ANALYSIS.md",
+    "examples/tv-casting-app/DARWIN_SIZE_ANALYSIS.md",
 ]
 
 

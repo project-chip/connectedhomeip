@@ -68,10 +68,13 @@ import tempfile
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -190,7 +193,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
             # Check if any of the device types is an AGGREGATOR
             if any(device_type.deviceType == _DEVICE_TYPE_AGGREGATOR for device_type in device_type_list):
                 aggregator_endpoint = endpoint
-                log.info(f"Aggregator endpoint found: {aggregator_endpoint}")
+                log.info("Aggregator endpoint found: %s", aggregator_endpoint)
                 break
 
         asserts.assert_not_equal(aggregator_endpoint, 0, "Invalid aggregator endpoint. Cannot proceed with commissioning.")

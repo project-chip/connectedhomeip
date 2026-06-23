@@ -41,14 +41,14 @@ namespace AmbientContextTypeStruct {
 enum class Fields : uint8_t
 {
     kAmbientContextSensed = 0,
-    kDetectionStartTime   = 1,
+    kDetectionConfidence  = 1,
 };
 
 struct Type
 {
 public:
     DataModel::List<const Globals::Structs::SemanticTagStruct::Type> ambientContextSensed;
-    Optional<uint32_t> detectionStartTime;
+    Optional<DataModel::Nullable<chip::Percent>> detectionConfidence;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -59,7 +59,7 @@ struct DecodableType
 {
 public:
     DataModel::DecodableList<Globals::Structs::SemanticTagStruct::DecodableType> ambientContextSensed;
-    Optional<uint32_t> detectionStartTime;
+    Optional<DataModel::Nullable<chip::Percent>> detectionConfidence;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -92,6 +92,29 @@ public:
 using DecodableType = Type;
 
 } // namespace HoldTimeLimitsStruct
+namespace ObjectCountConfigStruct {
+enum class Fields : uint8_t
+{
+    kCountingObject       = 0,
+    kObjectCountThreshold = 1,
+};
+
+struct Type
+{
+public:
+    Globals::Structs::SemanticTagStruct::Type countingObject;
+    uint16_t objectCountThreshold = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ObjectCountConfigStruct
 namespace PredictedActivityStruct {
 enum class Fields : uint8_t
 {

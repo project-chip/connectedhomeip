@@ -35,6 +35,7 @@
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
+#import "zap-generated/MTRCommandPayloads_Private.h"
 
 #import "app/ConcreteAttributePath.h"
 #import "app/ConcreteCommandPath.h"
@@ -3234,8 +3235,18 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
     }
 
     if (errorCode == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB) {
-        LogStringAndReturnError(@"No known schema for decoding attribute value.", MTRErrorCodeUnknownSchema, error);
-        return nil;
+        decodedValue = MTRPrivateDecodeAttributeValue(attributePath, reader, &errorCode);
+        if (errorCode == CHIP_NO_ERROR) {
+            _path = path;
+            _value = decodedValue;
+            _error = nil;
+            return self;
+        }
+
+        if (errorCode == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB) {
+            LogStringAndReturnError(@"No known schema for decoding attribute value.", MTRErrorCodeUnknownSchema, error);
+            return nil;
+        }
     }
 
     // Treat all other errors as schema errors.
@@ -3469,8 +3480,11 @@ void SubscriptionCallback::OnAttributeData(
         CHIP_ERROR err;
         value = MTRDecodeAttributeValue(aPath, *apData, &err);
         if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB) {
-            // We don't know this attribute; just skip it.
-            return;
+            value = MTRPrivateDecodeAttributeValue(aPath, *apData, &err);
+            if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB) {
+                // We don't know this attribute; just skip it.
+                return;
+            }
         }
 
         if (err != CHIP_NO_ERROR) {

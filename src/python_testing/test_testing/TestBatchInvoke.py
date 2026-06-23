@@ -39,8 +39,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.interaction_model import InteractionModelError
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +55,7 @@ how DUT processes commands.
 
 
 class TestBatchInvoke(MatterBaseTest):
+    requires_dut = False
 
     @async_test_body
     async def test_batch_invoke(self):

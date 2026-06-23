@@ -29,7 +29,16 @@ namespace Clusters {
 class GroupKeyManagementCluster : public DefaultServerCluster
 {
 public:
-    GroupKeyManagementCluster() : DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }) {}
+    struct Context
+    {
+        chip::FabricTable & fabricTable;
+        chip::Credentials::GroupDataProvider & groupDataProvider;
+    };
+
+    // New constructor using Context
+    GroupKeyManagementCluster(Context && context) :
+        DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mContext(std::move(context))
+    {}
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
@@ -50,6 +59,9 @@ public:
 
     // TODO: Once there is MCSP support, this may need to change.
     static constexpr bool IsMCSPSupported() { return false; }
+
+private:
+    Context mContext;
 };
 } // namespace Clusters
 } // namespace app

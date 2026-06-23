@@ -40,10 +40,9 @@ __LOG_LEVELS__ = {
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--image',
     default=[],
@@ -65,11 +64,9 @@ __LOG_LEVELS__ = {
     default=False,
     is_flag=True,
     help='More verbose output')
-def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
+def main(log_level, log_timestamps, image, file_image_list, qemu, verbose):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     image = list(image)

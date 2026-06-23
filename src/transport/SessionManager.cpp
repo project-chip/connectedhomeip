@@ -48,6 +48,7 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TracingStructs.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 
@@ -224,7 +225,11 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-        destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        destination_address = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
 
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
@@ -420,8 +425,14 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         const FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
         VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        auto * groups = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
-        multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        multicastAddress = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
         destination      = &multicastAddress;
     }
     break;
@@ -716,6 +727,7 @@ void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState 
         appTCPConnCbCtxt->connClosedCb(conn, conErr);
     }
     MarkSecureSessionOverTCPForEviction(conn, conErr);
+    mUnauthenticatedSessions.MarkSessionOverTCPForEviction(conn);
 }
 
 CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
@@ -1045,6 +1057,11 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
         // Perform privacy deobfuscation, if applicable.
         uint8_t * privacyHeader = partialPacketHeader.PrivacyHeader(msgCopy->Start());
         size_t privacyLength    = partialPacketHeader.PrivacyHeaderLength();
+
+        // Bounds check: we decrypt in place a privacy header located inside the packet.
+        // Validate that we are still within the packet as the length is based on header flags.
+        VerifyOrReturnValue(privacyHeader + privacyLength <= msgCopy->Start() + msgCopy->DataLength(), false);
+
         if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, partialPacketHeader, mac))
         {
             return false;
@@ -1124,9 +1141,17 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     ReturnOnFailure(mac.Decode(partialPacketHeader, &data[len - footerLen], footerLen, &taglen));
     VerifyOrReturn(taglen == footerLen);
 
-    bool decrypted = false;
+    // Groupcast Testing
+    auto & testing = chip::Groupcast::GetTesting();
+
+    bool decrypted                    = false;
+    bool hasAnyKeysForFabricUnderTest = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            hasAnyKeysForFabricUnderTest = true;
+        }
         CryptoContext context(groupContext.keyContext);
         msgCopy = msg.CloneData();
         if (msgCopy.IsNull())
@@ -1138,23 +1163,30 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         bool privacy = partialPacketHeader.HasPrivacyFlag();
         decrypted =
             GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, privacy, msgCopy, mac, groupContext);
-
-#if CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-        if (privacy && !decrypted)
-        {
-            // Try processing the P=1 message again without privacy as a work-around for invalid early-SVE2 nodes.
-            msgCopy = msg.CloneData();
-            if (msgCopy.IsNull())
-            {
-                ChipLogError(Inet, "Failed to clone Groupcast message buffer. Discarding.");
-                return;
-            }
-            decrypted =
-                GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, false, msgCopy, mac, groupContext);
-        }
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter.Release();
+
+    if (testing.IsEnabled())
+    {
+        if (decrypted)
+        {
+            // We have a valid groupContext from the loop
+            if (testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+            }
+        }
+        else
+        {
+            // FAILURE CASE: No valid groupContext or decryption failed. This can happen
+            // for example, when there is an empty group key map. This means GroupSessions
+            // cannot be iterated over to populate groupContext, and the fabric index cannot be
+            // explicitly checked here.
+            testing.SetTestResult(hasAnyKeysForFabricUnderTest ? chip::Groupcast::Testing::Result::kFailedAuth
+                                                               : chip::Groupcast::Testing::Result::kNoAvailableKey);
+            testing.NotifyDelegate();
+        }
+    }
 
     if (!decrypted)
     {
@@ -1209,6 +1241,18 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
         if (err != CHIP_NO_ERROR)
         {
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kMessageReplay);
+                }
+                else
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+                }
+                testing.NotifyDelegate();
+            }
             // Exit now, since Group Messages don't have acks or responses of any kind.
             ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
             return;
@@ -1216,6 +1260,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     }
     else
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+            testing.NotifyDelegate();
+        }
         ChipLogError(Inet,
                      "Group Counter Tables full or invalid NodeId/FabricIndex after decryption of message, dropping everything");
         return;
@@ -1317,17 +1366,26 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
 {
     // Mark the corresponding secure sessions for eviction
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
+        if (session->GetTCPConnection() == conn)
         {
-            SessionHandle handle(*session);
-            // Notify the SessionConnection delegate of the connection
-            // closure.
-            if (mConnDelegate != nullptr)
+            bool isActive = session->IsActiveSession();
+
+            if (isActive)
             {
-                mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                // Notify the SessionConnection delegate of the connection
+                // closure before session eviction detaches holders and
+                // releases exchanges.
+                if (mConnDelegate != nullptr)
+                {
+                    SessionHandle handle(*session);
+                    mConnDelegate->OnTCPConnectionClosed(conn, handle, conErr);
+                }
             }
 
-            // Mark session for eviction.
+            // Explicitly release the TCP connection handle to ensure the transport resource is reclaimed immediately.
+            session->ReleaseTCPConnection();
+
+            // Mark session for eviction regardless of its current state (Active, Defunct, or Establishing).
             session->MarkForEviction();
         }
 

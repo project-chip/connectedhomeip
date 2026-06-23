@@ -21,10 +21,9 @@
 #include <app/clusters/device-energy-management-server/tests/DeviceEnergyManagementMockDelegate.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
-#include <app/data-model-provider/tests/ReadTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/DeviceEnergyManagement/Attributes.h>
 #include <clusters/DeviceEnergyManagement/Commands.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
@@ -37,6 +36,9 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Commands;
 using namespace chip::Testing;
+
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -81,12 +83,9 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 AbsMaxPower::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        EXPECT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 2: PowerAdjustment feature - PowerAdjustmentCapability and OptOutState attributes
@@ -106,18 +105,13 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 OptOutState::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
-        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
-                      PowerAdjustRequest::kMetadataEntry,
-                      CancelPowerAdjustRequest::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      PowerAdjustRequest::kMetadataEntry,
+                                                      CancelPowerAdjustRequest::kMetadataEntry,
+                                                  }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 3: PowerForecastReporting feature - Forecast attribute
@@ -136,12 +130,9 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 Forecast::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        EXPECT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 4: StateForecastReporting feature - Forecast attribute
@@ -160,12 +151,9 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 Forecast::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        EXPECT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 5: Pausable feature - PauseRequest and ResumeRequest commands, OptOutState attribute
@@ -184,18 +172,13 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 OptOutState::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
-        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
-                      PauseRequest::kMetadataEntry,
-                      ResumeRequest::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      PauseRequest::kMetadataEntry,
+                                                      ResumeRequest::kMetadataEntry,
+                                                  }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 6: ForecastAdjustment feature - ModifyForecastRequest command, OptOutState attribute, CancelRequest command
@@ -214,18 +197,13 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 OptOutState::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
-        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
-                      ModifyForecastRequest::kMetadataEntry,
-                      CancelRequest::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      ModifyForecastRequest::kMetadataEntry,
+                                                      CancelRequest::kMetadataEntry,
+                                                  }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 7: StartTimeAdjustment feature - StartTimeAdjustRequest command, OptOutState attribute, CancelRequest command
@@ -244,18 +222,13 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 OptOutState::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
-        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
-                      StartTimeAdjustRequest::kMetadataEntry,
-                      CancelRequest::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      StartTimeAdjustRequest::kMetadataEntry,
+                                                      CancelRequest::kMetadataEntry,
+                                                  }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 8: ConstraintBasedAdjustment feature - RequestConstraintBasedForecast command, OptOutState attribute, CancelRequest
@@ -274,18 +247,13 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 OptOutState::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
-        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
-                      RequestConstraintBasedForecast::kMetadataEntry,
-                      CancelRequest::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      RequestConstraintBasedForecast::kMetadataEntry,
+                                                      CancelRequest::kMetadataEntry,
+                                                  }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     // Test 9: All features - all optional attributes, all commands
@@ -308,24 +276,19 @@ TEST_F(TestDeviceEnergyManagementCluster, TestFeatures)
                                                 OptOutState::kMetadataEntry,
                                             }));
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedCommandsBuilder;
-        EXPECT_EQ(expectedCommandsBuilder.AppendElements({
-                      PowerAdjustRequest::kMetadataEntry,
-                      CancelPowerAdjustRequest::kMetadataEntry,
-                      StartTimeAdjustRequest::kMetadataEntry,
-                      PauseRequest::kMetadataEntry,
-                      ResumeRequest::kMetadataEntry,
-                      ModifyForecastRequest::kMetadataEntry,
-                      RequestConstraintBasedForecast::kMetadataEntry,
-                      CancelRequest::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        EXPECT_TRUE(EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedCommandsBuilder.TakeBuffer()));
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      PowerAdjustRequest::kMetadataEntry,
+                                                      CancelPowerAdjustRequest::kMetadataEntry,
+                                                      StartTimeAdjustRequest::kMetadataEntry,
+                                                      PauseRequest::kMetadataEntry,
+                                                      ResumeRequest::kMetadataEntry,
+                                                      ModifyForecastRequest::kMetadataEntry,
+                                                      RequestConstraintBasedForecast::kMetadataEntry,
+                                                      CancelRequest::kMetadataEntry,
+                                                  }));
 
-        cluster.Shutdown();
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -369,7 +332,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartupSucceedsWithMatchingEndpoin
     // Startup should succeed because endpoint IDs match
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -407,7 +370,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestMandatoryAttributes)
     ASSERT_EQ(tester.ReadAttribute(AbsMaxPower::Id, absMaxPower), CHIP_NO_ERROR);
     EXPECT_EQ(absMaxPower, DeviceEnergyManagementMockDelegate::kAbsMaxPower);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -439,7 +402,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerAdjustRequest)
     EXPECT_TRUE(tester.Invoke(Commands::PowerAdjustRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kPowerAdjustActive);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -473,7 +436,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelPowerAdjustRequest)
     EXPECT_TRUE(tester.Invoke(Commands::CancelPowerAdjustRequest::Id, cancelCommand).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -506,7 +469,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
     command.requestedStartTime = 1000;
     EXPECT_TRUE(tester.Invoke(Commands::StartTimeAdjustRequest::Id, command).IsSuccess());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -558,7 +521,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPauseRequest)
     EXPECT_FALSE(tester.Invoke(Commands::PauseRequest::Id, command).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kPaused);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -591,7 +554,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestResumeRequest)
     EXPECT_TRUE(tester.Invoke(Commands::ResumeRequest::Id, resumeCommand).IsSuccess());
     EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -619,7 +582,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestModifyForecastRequest)
     command.forecastID = mockDelegate.GetForecast().Value().forecastID;
     EXPECT_TRUE(tester.Invoke(Commands::ModifyForecastRequest::Id, command).IsSuccess());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -647,7 +610,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast)
     auto result = tester.Invoke(Commands::RequestConstraintBasedForecast::Id, command);
     EXPECT_TRUE(result.IsSuccess());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 // =============================================================================
@@ -676,7 +639,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelRequest)
     // Cancel when already InternalOptimization - fails (InvalidInState)
     EXPECT_FALSE(tester.Invoke(Commands::CancelRequest::Id, cancelCommand).IsSuccess());
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

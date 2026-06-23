@@ -20,13 +20,12 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -48,8 +47,10 @@ from TC_EEVSE_Utils import EEVSEBaseTestHelper
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
@@ -174,8 +175,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         soc_reporting_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kSoCReporting) > 0
         charging_preferences_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences) > 0
 
-        log.info(
-            f"Received FeatureMap: {feature_map:#x} = SoCReporting ({soc_reporting_supported}), ChargingPreferences ({charging_preferences_supported})")
+        log.info("Received FeatureMap: %#x = SoCReporting (%s), ChargingPreferences (%s)",
+                 feature_map, soc_reporting_supported, charging_preferences_supported)
 
         self.step("2")
         await self.check_test_event_triggers_enabled()
@@ -294,13 +295,13 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("11a")
         next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
-        log.info(
-            f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
+        log.info("Received NextChargeStartTime: %s = %s",
+                 next_start_time_epoch_s, self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None))
 
         self.step("11b")
         next_target_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeTargetTime")
-        log.info(
-            f"Received NextChargeTargetTime: {next_target_time_epoch_s} = {self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None)}")
+        log.info("Received NextChargeTargetTime: %s = %s",
+                 next_target_time_epoch_s, self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None))
 
         # This should be the next MinutesPastMidnight converted to realtime as epoch_s
         expected_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(

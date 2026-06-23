@@ -41,7 +41,9 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +105,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
 
         self.step(3)
         selectedWattIndex = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.SelectedWattIndex)
-        log.info("SelectedWattIndex is %s" % selectedWattIndex)
+        log.info("SelectedWattIndex is %s", selectedWattIndex)
         asserts.assert_true(selectedWattIndex >= 0 and selectedWattIndex < len(
             supportedWattsList), "SelectedWattIndex is out of range")
 

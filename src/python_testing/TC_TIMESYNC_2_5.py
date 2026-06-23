@@ -35,14 +35,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import typing
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 
@@ -51,10 +52,10 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
-    async def send_set_dst_cmd_expect_error(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct], error: Status) -> None:
+    async def send_set_dst_cmd_expect_error(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct], error: Status) -> None:
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
             asserts.assert_true(False, "Unexpected SetTimeZone command success")

@@ -21,9 +21,9 @@ using namespace chip::app::Clusters;
 namespace chip::app {
 
 CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                              EndpointId parentId)
+                                              EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, *mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -34,17 +34,17 @@ CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDri
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void BooleanStateSensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void BooleanStateSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mBooleanStateCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mBooleanStateCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mBooleanStateCluster.Cluster()));
         mBooleanStateCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mIdentifyCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
 }

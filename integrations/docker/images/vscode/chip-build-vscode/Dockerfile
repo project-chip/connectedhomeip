@@ -43,6 +43,7 @@ COPY --from=telink /opt/telink/zephyr-sdk-0.17.0 /opt/telink/zephyr-sdk-0.17.0
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
 COPY --from=crosscompile /opt/ubuntu-24.04-aarch64-sysroot /opt/ubuntu-24.04-aarch64-sysroot
+COPY --from=crosscompile /opt/ubuntu-24.04-armhf-sysroot /opt/ubuntu-24.04-armhf-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
@@ -50,7 +51,7 @@ COPY --from=realtekzephyr /opt/realtek-zephyr/ /opt/realtek-zephyr/
 
 COPY --from=nxp /opt/nxp /opt/nxp
 
-COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.17.0/ /opt/nxp-zephyr/zephyr-sdk-0.17.0/
+COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.17.4/ /opt/nxp-zephyr/zephyr-sdk-0.17.4/
 COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproject/
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
@@ -115,6 +116,7 @@ ENV OPENOCD_PATH=/opt/openocd/
 ENV QEMU_ESP32=/opt/espressif/qemu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-24.04-aarch64-sysroot
+ENV SYSROOT_ARMHF=/opt/ubuntu-24.04-armhf-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.17.0
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.22.0
@@ -123,7 +125,7 @@ ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk/toolchains/latest
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
-ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.0
+ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.4
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
 ENV NXP_SDK_PATH=/opt/nxp
 ENV ZEPHYR_REALTEK_BASE=/opt/realtek-zephyr/zephyr-rtk-project/zephyr
@@ -133,9 +135,9 @@ ENV ZEPHYR_REALTEK_SDK_INSTALL_DIR=/opt/realtek-zephyr/zephyr-sdk-0.16.8
 # NOTE: This directory is NOT persistent.
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
-ENV TIZEN_VERSION=9.0
+ENV TIZEN_VERSION=10.0
 ENV TIZEN_SDK_ROOT=/opt/tizen-sdk
-ENV TIZEN_SDK_TOOLCHAIN=$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
+ENV TIZEN_SDK_TOOLCHAIN=$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-14.2
 ENV TIZEN_SDK_SYSROOT=$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300

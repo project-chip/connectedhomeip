@@ -33,15 +33,15 @@ class Library(enum.Enum):
     SERVER = "_ChipServer.so"
 
 
-def _AllDirsToRoot(dir):
+def _AllDirsToRoot(p):
     """Return all parent paths of a directory."""
-    dir = os.path.abspath(dir)
+    p = os.path.abspath(p)
     while True:
-        yield dir
-        parent = os.path.dirname(dir)
-        if parent == "" or parent == dir:
+        yield p
+        parent = os.path.dirname(p)
+        if parent == "" or parent == p:
             break
-        dir = parent
+        p = parent
 
 
 class ErrorRange(enum.IntEnum):
@@ -81,6 +81,15 @@ class PyChipError(ctypes.Structure):
         const char * mFile;
     };
     ```
+
+    NOTE: When logging a PyChipError, format it eagerly -- pass ``str(err)``, not ``err``, to the logger::
+
+        LOGGER.warning("Operation failed: %s", str(err))
+
+    ``PyChipError.__str__`` calls into the native library (``pychip_FormatError``), which takes the CHIP stack lock. With lazy
+    ``%s`` formatting that call runs inside ``Handler.emit()``, so the logging handler lock and the CHIP stack lock end up nested.
+    In Matter completion callbacks (e.g. those in ``ChipDeviceCtrl``) the calling thread already holds the CHIP stack lock, and this
+    nesting deadlocks the Matter event loop: the callback never returns and any awaited future hangs forever.
     '''
     _fields_ = [('code', ctypes.c_uint32), ('line', ctypes.c_uint32), ('file', ctypes.c_void_p)]
 
@@ -199,8 +208,8 @@ def FindNativeLibraryPath(library: Library) -> str:
         "src/controller/python/.libs",
         library.value,
     )
-    for dir in _AllDirsToRoot(scriptDir):
-        dmDLLPathGlob = os.path.join(dir, relDMDLLPathGlob)
+    for p in _AllDirsToRoot(scriptDir):
+        dmDLLPathGlob = os.path.join(p, relDMDLLPathGlob)
         for dmDLLPath in glob.glob(dmDLLPathGlob):
             if os.path.exists(dmDLLPath):
                 return dmDLLPath
@@ -227,7 +236,7 @@ class _Handle:
     initialized: bool = False
 
 
-_nativeLibraryHandles: typing.Dict[Library, _Handle] = {}
+_nativeLibraryHandles: dict[Library, _Handle] = {}
 
 
 def _GetLibraryHandle(lib: Library, expectAlreadyInitialized: bool) -> _Handle:

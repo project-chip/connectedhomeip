@@ -108,19 +108,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AmbientContextTypeSupported
-namespace SimultaneousDetectionLimit {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SimultaneousDetectionLimit::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace SimultaneousDetectionLimit
-namespace CountThresholdReached {
+namespace ObjectCountThresholdReached {
 struct TypeInfo
 {
     using Type             = bool;
@@ -128,22 +116,22 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CountThresholdReached::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ObjectCountThresholdReached::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CountThresholdReached
-namespace CountThreshold {
+} // namespace ObjectCountThresholdReached
+namespace ObjectCountConfig {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::Type;
+    using DecodableType    = chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CountThreshold::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ObjectCountConfig::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CountThreshold
+} // namespace ObjectCountConfig
 namespace ObjectCount {
 struct TypeInfo
 {
@@ -156,6 +144,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ObjectCount
+namespace SimultaneousDetectionLimit {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SimultaneousDetectionLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SimultaneousDetectionLimit
 namespace HoldTime {
 struct TypeInfo
 {
@@ -195,18 +195,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PredictedActivity
-namespace PrivacyModeEnabled {
+namespace SensorFusionSupported {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::SemanticTagStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::SemanticTagStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PrivacyModeEnabled::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SensorFusionSupported::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PrivacyModeEnabled
+} // namespace SensorFusionSupported
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -251,14 +253,14 @@ struct TypeInfo
         Attributes::AudioContextDetected::TypeInfo::DecodableType audioContextDetected   = static_cast<bool>(0);
         Attributes::AmbientContextType::TypeInfo::DecodableType ambientContextType;
         Attributes::AmbientContextTypeSupported::TypeInfo::DecodableType ambientContextTypeSupported;
-        Attributes::SimultaneousDetectionLimit::TypeInfo::DecodableType simultaneousDetectionLimit = static_cast<uint8_t>(0);
-        Attributes::CountThresholdReached::TypeInfo::DecodableType countThresholdReached           = static_cast<bool>(0);
-        Attributes::CountThreshold::TypeInfo::DecodableType countThreshold                         = static_cast<uint16_t>(0);
+        Attributes::ObjectCountThresholdReached::TypeInfo::DecodableType objectCountThresholdReached = static_cast<bool>(0);
+        Attributes::ObjectCountConfig::TypeInfo::DecodableType objectCountConfig;
         Attributes::ObjectCount::TypeInfo::DecodableType objectCount                               = static_cast<uint16_t>(0);
+        Attributes::SimultaneousDetectionLimit::TypeInfo::DecodableType simultaneousDetectionLimit = static_cast<uint8_t>(0);
         Attributes::HoldTime::TypeInfo::DecodableType holdTime                                     = static_cast<uint16_t>(0);
         Attributes::HoldTimeLimits::TypeInfo::DecodableType holdTimeLimits;
         Attributes::PredictedActivity::TypeInfo::DecodableType predictedActivity;
-        Attributes::PrivacyModeEnabled::TypeInfo::DecodableType privacyModeEnabled = static_cast<bool>(0);
+        Attributes::SensorFusionSupported::TypeInfo::DecodableType sensorFusionSupported;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

@@ -23,7 +23,6 @@ import queue
 import shlex
 import subprocess
 import threading
-import typing
 
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
@@ -32,7 +31,7 @@ log = logging.getLogger(__name__)
 
 
 class BDXTest:
-    def __init__(self, thread_list: typing.List[threading.Thread], queue: queue.Queue, cmd: [], args: str):
+    def __init__(self, thread_list: list[threading.Thread], queue: queue.Queue, cmd: [], args: str):
         self.thread_list = thread_list
         self.queue = queue
         self.command = cmd
@@ -85,6 +84,6 @@ class BDXTest:
             code = self.TestCmdOnnetworkLongBDXDownloadLog(
                 self.nodeid, self.setup_pin_code, self.discriminator, self.timeout, self.logType, self.fileName)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-downloadLog failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-downloadLog failed with error {code}")
         else:
-            raise Exception(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

@@ -41,7 +41,8 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError as IME
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -116,7 +117,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
 
         self.step(2)
         params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
-        log.info(f"Commissioning window params: {params}")
+        log.info("Commissioning window params: %s", params)
 
         self.step(3)
         # Wait for DNS-SD advertisement with correct CM value and discriminator
@@ -125,7 +126,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
             expected_cm_value=2,
             expected_discriminator=params.randomDiscriminator
         )
-        log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+        log.info("Successfully found service with CM=%s, D=%s", service.txt.get('CM'), service.txt.get('D'))
         log.info("Test will now sleep for 190s while waiting for commissioning window to time out ... ")
         await asyncio.sleep(190)
 

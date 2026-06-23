@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "OtaProviderAppCommandDelegate.h"
 #include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <app/clusters/ota-provider/DefaultOTAProviderUserConsent.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
@@ -58,7 +59,8 @@ constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
 constexpr uint16_t kOptionPollInterval              = 'P';
 
-OTAProviderExample gOtaProvider;
+NamedPipeCommands sChipNamedPipeCommands;
+OtaProviderAppCommandDelegate sOtaProviderAppCommandDelegate;
 chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
@@ -336,7 +338,7 @@ void ApplicationInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    BdxOtaSender * bdxOtaSender = gOtaProvider.GetBdxOtaSender();
+    BdxOtaSender * bdxOtaSender = GetOtaProviderExample().GetBdxOtaSender();
     VerifyOrReturn(bdxOtaSender != nullptr);
     err = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
                                                                                                         bdxOtaSender);
@@ -350,40 +352,40 @@ void ApplicationInit()
 
     if (gOtaFilepath != nullptr)
     {
-        gOtaProvider.SetOTAFilePath(gOtaFilepath);
+        GetOtaProviderExample().SetOTAFilePath(gOtaFilepath);
     }
 
     if (gImageUri != nullptr)
     {
-        gOtaProvider.SetImageUri(gImageUri);
+        GetOtaProviderExample().SetImageUri(gImageUri);
     }
 
-    gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
-    gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
-    gOtaProvider.SetQueryImageStatus(gQueryImageStatus);
-    gOtaProvider.SetApplyUpdateAction(gOptionUpdateAction);
-    gOtaProvider.SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
-    gOtaProvider.SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
+    GetOtaProviderExample().SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
+    GetOtaProviderExample().SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
+    GetOtaProviderExample().SetQueryImageStatus(gQueryImageStatus);
+    GetOtaProviderExample().SetApplyUpdateAction(gOptionUpdateAction);
+    GetOtaProviderExample().SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
+    GetOtaProviderExample().SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {
         gUserConsentProvider.SetGlobalUserConsentState(gUserConsentState);
-        gOtaProvider.SetUserConsentDelegate(&gUserConsentProvider);
+        GetOtaProviderExample().SetUserConsentDelegate(&gUserConsentProvider);
     }
 
     if (gUserConsentNeeded)
     {
-        gOtaProvider.SetUserConsentNeeded(true);
+        GetOtaProviderExample().SetUserConsentNeeded(true);
     }
 
     if (gPollInterval != 0)
     {
-        gOtaProvider.SetPollInterval(gPollInterval);
+        GetOtaProviderExample().SetPollInterval(gPollInterval);
     }
 
     if (gMaxBDXBlockSize)
     {
-        gOtaProvider.SetMaxBDXBlockSize(*gMaxBDXBlockSize);
+        GetOtaProviderExample().SetMaxBDXBlockSize(*gMaxBDXBlockSize);
     }
 
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
@@ -393,7 +395,7 @@ void ApplicationInit()
         // Parse JSON file and load the ota candidates
         std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
         ParseJsonFileAndPopulateCandidates(gOtaImageListFilepath, candidates);
-        gOtaProvider.SetOTACandidates(candidates);
+        GetOtaProviderExample().SetOTACandidates(candidates);
     }
 
     if ((gOtaFilepath == nullptr) && (gOtaImageListFilepath == nullptr))
@@ -402,10 +404,27 @@ void ApplicationInit()
         chipDie();
     }
 
-    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
+    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &GetOtaProviderExample());
+
+    std::string path     = LinuxDeviceOptions::GetInstance().app_pipe;
+    std::string path_out = LinuxDeviceOptions::GetInstance().app_pipe_out;
+
+    if ((!path.empty()) and (!path_out.empty()) and
+        (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
+        LogErrorOnFailure(sChipNamedPipeCommands.Stop());
+    }
+    else
+    {
+        sOtaProviderAppCommandDelegate.SetPipes(&sChipNamedPipeCommands);
+    }
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    SuccessOrDie(sChipNamedPipeCommands.Stop());
+}
 
 namespace {
 class OtaProviderAppMainLoopImplementation : public AppMainLoopImplementation
@@ -417,7 +436,7 @@ public:
         CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
             ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
 
-            gOtaProvider.GetBdxOtaSender()->AbortTransfer();
+            GetOtaProviderExample().GetBdxOtaSender()->AbortTransfer();
 
             SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
         });

@@ -36,14 +36,16 @@
 # === END CI TEST ARGUMENTS ===
 
 import copy
-from typing import Type, Union
+from typing import Union
 
 from mobly import asserts  # type: ignore
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 ROOT_NODE_ENDPOINT_ID = 0
 UNIT_TESTING_ENDPOINT_ID = 1
@@ -86,8 +88,8 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     @staticmethod
     def verify_attribute_exists(res: Union[Clusters.Attribute.SubscriptionTransaction, dict],
-                                cluster:  Type[Clusters.ClusterObjects.Cluster],
-                                attribute: Type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
+                                cluster:  type[Clusters.ClusterObjects.Cluster],
+                                attribute: type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
                                 ep: int = ROOT_NODE_ENDPOINT_ID):
         '''
         This method can be used with the Response of Read Request and Subscribe Requests.
@@ -131,6 +133,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
 
         self.print_step("precondition", "Commissioning - already done")
 
@@ -186,17 +189,12 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
             subject=self.TH2_nodeid
         )
 
-        read_step1b = await self.TH2.ReadAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[AttrViewPrivilegePath],
-        )
-
-        # Verify Valid Attribute was read
-        self.verify_attribute_exists(
-            res=read_step1b,
+        # read_single_attribute_check_success asserts existence and validates against subscription cache.
+        await self.read_single_attribute_check_success(
             cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.VendorID
-        )
+            attribute=Clusters.BasicInformation.Attributes.VendorID,
+            dev_ctrl=self.TH2,
+            endpoint=ROOT_NODE_ENDPOINT_ID)
 
         ####################### Step2: Attribute does not exist; View privilege required to read. ######################################################
         #

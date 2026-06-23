@@ -14,9 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <app/storage/TableEntry.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -64,18 +65,18 @@ enum class CertificateType : uint8_t
     kRoot
 };
 
-static constexpr size_t kPersistentBufferNextIdBytes =
-    EstimateStructOverhead(sizeof(uint16_t), // mNextClientId
-                           sizeof(uint16_t), // mNextRootId,
-                           EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
-                               (kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS), // mRootCertMapping
-                           EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
-                               (kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS)); // mClientCertMapping
+static constexpr size_t kPersistentBufferNextIdBytes = EstimateStructOverhead(
+    sizeof(uint16_t), // mNextClientId
+    sizeof(uint16_t), // mNextRootId,
+    EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
+        (static_cast<size_t>(kMaxRootCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS), // mRootCertMapping
+    EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
+        (static_cast<size_t>(kMaxClientCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS)); // mClientCertMapping
 
 class GlobalCertificateData : public PersistableData<kPersistentBufferNextIdBytes>
 {
-    IncrementingIdHelper<CertificateId, kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mRoot;
-    IncrementingIdHelper<CertificateId, kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mClient;
+    IncrementingIdHelper<CertificateId, static_cast<size_t>(kMaxRootCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS> mRoot;
+    IncrementingIdHelper<CertificateId, static_cast<size_t>(kMaxClientCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS> mClient;
     EndpointId mEndpointId = kInvalidEndpointId;
 
 public:
@@ -269,7 +270,7 @@ CHIP_ERROR RootSerializer::DeserializeData(TLV::TLVReader & reader, CertificateT
 template <>
 void RootSerializer::Clear(CertificateTable::RootCertStruct & data)
 {
-    new (&data) CertificateTable::RootCertStruct();
+    data = {};
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct>;
@@ -363,7 +364,7 @@ CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, Certificat
 template <>
 void ClientSerializer::Clear(CertificateTable::ClientCertWithKey & data)
 {
-    new (&data) CertificateTable::ClientCertWithKey();
+    data.Clear();
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertWithKey>;
@@ -572,8 +573,11 @@ CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
 {
     // We want to release as many resources as possible; if anything fails,
     // hold on to the error until we've had a chance to try to free other resources
-    CHIP_ERROR clientResult = mClientCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
-    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    CHIP_ERROR clientResult = mClientCertificates.RemoveFabric(*provider, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
+    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(*provider, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
 
     GlobalCertificateData globalData(mEndpointId);
     CHIP_ERROR globalDataResult = globalData.Load(mStorage);

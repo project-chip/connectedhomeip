@@ -19,7 +19,7 @@
 /*                                  Includes                                  */
 /* -------------------------------------------------------------------------- */
 
-#include "FactoryDataProviderImpl.h"
+#include <platform/nxp/zephyr/FactoryDataProviderImpl.h>
 
 /* mbedtls */
 #include "mbedtls/aes.h"
@@ -37,8 +37,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
 
 CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                                 uint32_t * contentAddr)
@@ -101,8 +99,8 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digestToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!digestToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
@@ -222,10 +220,13 @@ CHIP_ERROR FactoryDataProviderImpl::ReadEncryptedData(uint8_t * dest, uint8_t * 
     return CHIP_NO_ERROR;
 }
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
-    return FactoryDataProviderImpl::sInstance;
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

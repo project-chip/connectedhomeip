@@ -23,7 +23,6 @@ import queue
 import shlex
 import subprocess
 import threading
-import typing
 
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
@@ -32,7 +31,7 @@ log = logging.getLogger(__name__)
 
 
 class CommissioningTest:
-    def __init__(self, thread_list: typing.List[threading.Thread], queue: queue.Queue, cmd: [], args: str):
+    def __init__(self, thread_list: list[threading.Thread], queue: queue.Queue, cmd: [], args: str):
         self.thread_list = thread_list
         self.queue = queue
         self.command = cmd
@@ -109,22 +108,22 @@ class CommissioningTest:
             log.info("Testing pairing onnetwork-long")
             code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long failed with error {code}")
         elif self.command_name == 'already-discovered':
             log.info("Testing pairing already-discovered")
             code = self.TestCmdAlreadyDiscovered(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing already-discovered failed with error {code}")
+                raise RuntimeError(f"Testing pairing already-discovered failed with error {code}")
         elif self.command_name == 'address-paseonly':
             log.info("Testing pairing address-paseonly")
             code = self.TestCmdAddressPaseOnly(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing address-paseonly failed with error {code}")
+                raise RuntimeError(f"Testing pairing address-paseonly failed with error {code}")
         elif self.command_name == 'code':
             log.info("Testing pairing setup-code")
             code = self.TestCmdCode(self.nodeid, self.setup_payload, self.discover_once,
                                     self.use_only_onnetwork_discovery, self.timeout)
             if code != 0:
-                raise Exception(f"Testing pairing code failed with error {code}")
+                raise RuntimeError(f"Testing pairing code failed with error {code}")
         else:
-            raise Exception(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

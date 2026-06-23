@@ -73,7 +73,7 @@ void MatterBooleanStateClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId)
+void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -84,7 +84,7 @@ void MatterBooleanStateClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kBooleanStateFixedClusterCount,
             .maxClusterInstanceCount   = kBooleanStateMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 namespace chip::app::Clusters::BooleanState {

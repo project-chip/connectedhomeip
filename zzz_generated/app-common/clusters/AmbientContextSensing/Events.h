@@ -42,7 +42,83 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace AmbientContextSensing {
-namespace Events {} // namespace Events
+namespace Events {
+namespace AmbientContextDetectStarted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kAmbientContextDetected      = 0,
+    kObjectCountThresholdReached = 1,
+    kObjectCount                 = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AmbientContextDetectStarted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Optional<Structs::AmbientContextTypeStruct::Type> ambientContextDetected;
+    Optional<bool> objectCountThresholdReached;
+    Optional<uint16_t> objectCount;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AmbientContextDetectStarted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
+
+    Optional<Structs::AmbientContextTypeStruct::DecodableType> ambientContextDetected;
+    Optional<bool> objectCountThresholdReached;
+    Optional<uint16_t> objectCount;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AmbientContextDetectStarted
+namespace AmbientContextDetectEnded {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kEventStartTimePos = 0,
+    kEventStartTimeSys = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AmbientContextDetectEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Optional<uint64_t> eventStartTimePos;
+    Optional<uint64_t> eventStartTimeSys;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AmbientContextDetectEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
+
+    Optional<uint64_t> eventStartTimePos;
+    Optional<uint64_t> eventStartTimeSys;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AmbientContextDetectEnded
+} // namespace Events
 } // namespace AmbientContextSensing
 } // namespace Clusters
 } // namespace app

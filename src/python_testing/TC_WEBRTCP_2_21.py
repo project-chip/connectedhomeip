@@ -44,7 +44,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
@@ -136,7 +138,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
 
         session_id = provide_offer_response.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        log.info(f"DUT allocated WebRTCSessionID: {session_id}")
+        log.info("DUT allocated WebRTCSessionID: %s", session_id)
 
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
@@ -149,7 +151,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_equal(session_id, answer_session_id,
                              f"Answer invoked with wrong session ID. Expected {session_id}, got {answer_session_id}")
         asserts.assert_true(len(answer) > 0, "Invalid answer SDP received - empty string")
-        log.info(f"Received valid Answer for session {answer_session_id}")
+        log.info("Received valid Answer for session %s", answer_session_id)
 
         # Set the remote answer to continue the WebRTC handshake
         webrtc_peer.set_remote_answer(answer)
@@ -160,7 +162,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
 
         # Use an invalid session ID (one that doesn't exist)
         invalid_session_id = 9999
-        log.info(f"Using invalid session ID: {invalid_session_id} (valid session ID is {session_id})")
+        log.info("Using invalid session ID: %s (valid session ID is %s)", invalid_session_id, session_id)
 
         local_candidates = await webrtc_peer.get_local_ice_candidates()
         asserts.assert_true(len(local_candidates) > 0, "No local ICE candidates available")
@@ -185,13 +187,13 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
             # Verify that we got the expected NOT_FOUND status
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Expected NOT_FOUND status for invalid session ID, got {e.status}")
-            log.info(f"Correctly received NOT_FOUND status: {e.status}")
+            log.info("Correctly received NOT_FOUND status: %s", e.status)
 
         log.info("Successfully validated ProvideICECandidates with invalid session ID behavior")
 
         self.step(5)
         # Send EndSession command to terminate the WebRTC session
-        log.info(f"Sending EndSession command for session {session_id}")
+        log.info("Sending EndSession command for session %s", session_id)
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -201,7 +203,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
             endpoint=endpoint,
         )
 
-        log.info(f"Successfully ended WebRTC session {session_id}")
+        log.info("Successfully ended WebRTC session %s", session_id)
 
         self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
@@ -214,7 +216,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info("Successfully deallocated audio stream %s", audio_stream_id)
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -223,7 +225,7 @@ class TC_WEBRTCP_2_21(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info("Successfully deallocated video stream %s", video_stream_id)
 
         # Clean up
         await webrtc_manager.close_all()

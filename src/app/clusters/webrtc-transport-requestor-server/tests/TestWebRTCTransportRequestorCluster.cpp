@@ -16,19 +16,20 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/CommandHandler.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/WebRTCTransportRequestor/Attributes.h>
 #include <clusters/WebRTCTransportRequestor/Commands.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
 #include <clusters/WebRTCTransportRequestor/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace {
@@ -37,16 +38,17 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportRequestor;
-using chip::Testing::IsAcceptedCommandsListEqualTo;
-using chip::Testing::IsAttributesListEqualTo;
+using namespace chip::Testing;
 
-using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
-using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+using chip::app::ClusterShutdownType;
 
-static constexpr chip::EndpointId kTestEndpointId = 1;
+using ICEServerDecodableStruct = Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = Clusters::Globals::WebRTCEndReasonEnum;
+
+static constexpr EndpointId kTestEndpointId = 1;
 
 // Minimal mock delegate for testing
 class MockWebRTCTransportRequestorDelegate : public Delegate
@@ -67,8 +69,8 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestWebRTCTransportRequestorCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestWebRTCTransportRequestorCluster, TestAttributes)
@@ -169,94 +171,58 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestSessionManagement)
 
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadCurrentSessionsAttribute)
 {
+    TestServerClusterContext context;
     MockWebRTCTransportRequestorDelegate mockDelegate;
     WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // Create a mock attribute request for CurrentSessions
-    chip::app::DataModel::ReadAttributeRequest request;
-    request.path.mEndpointId  = kTestEndpointId;
-    request.path.mClusterId   = WebRTCTransportRequestor::Id;
-    request.path.mAttributeId = WebRTCTransportRequestor::Attributes::CurrentSessions::Id;
-
-    // Create a buffer for encoding
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
-    ASSERT_TRUE(buffer.Alloc(1024));
-    chip::TLV::TLVWriter writer;
-    writer.Init(buffer.Get(), buffer.AllocatedSize());
-
-    // Create AttributeReportIBs::Builder for the encoder
-    chip::app::AttributeReportIBs::Builder attributeReportIBsBuilder;
-    chip::TLV::TLVWriter reportWriter;
-    reportWriter.Init(buffer.Get(), buffer.AllocatedSize());
-    CHIP_ERROR err = attributeReportIBsBuilder.Init(&reportWriter);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-
-    chip::app::AttributeValueEncoder encoder(attributeReportIBsBuilder, chip::Access::SubjectDescriptor{}, request.path,
-                                             0 /* dataVersion */);
+    ClusterTester tester(server);
 
     // Test reading empty sessions
-    auto status = server.ReadAttribute(request, encoder);
+    WebRTCTransportRequestor::Attributes::CurrentSessions::TypeInfo::DecodableType sessions;
+    auto status = tester.ReadAttribute(WebRTCTransportRequestor::Attributes::CurrentSessions::Id, sessions);
     EXPECT_TRUE(status.IsSuccess());
+
+    auto iter = sessions.begin();
+    EXPECT_FALSE(iter.Next()); // Should be empty
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadClusterRevisionAttribute)
 {
+    TestServerClusterContext context;
     MockWebRTCTransportRequestorDelegate mockDelegate;
     WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // Create a mock attribute request for ClusterRevision
-    chip::app::DataModel::ReadAttributeRequest request;
-    request.path.mEndpointId  = kTestEndpointId;
-    request.path.mClusterId   = WebRTCTransportRequestor::Id;
-    request.path.mAttributeId = chip::app::Clusters::Globals::Attributes::ClusterRevision::Id;
-
-    // Create a buffer for encoding
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
-    ASSERT_TRUE(buffer.Alloc(1024));
-
-    // Create AttributeReportIBs::Builder for the encoder
-    chip::app::AttributeReportIBs::Builder attributeReportIBsBuilder;
-    chip::TLV::TLVWriter reportWriter;
-    reportWriter.Init(buffer.Get(), buffer.AllocatedSize());
-    CHIP_ERROR err = attributeReportIBsBuilder.Init(&reportWriter);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-
-    chip::app::AttributeValueEncoder encoder(attributeReportIBsBuilder, chip::Access::SubjectDescriptor{}, request.path,
-                                             0 /* dataVersion */);
+    ClusterTester tester(server);
 
     // Test reading cluster revision
-    auto status = server.ReadAttribute(request, encoder);
+    Globals::Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = 0;
+    auto status = tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision);
     EXPECT_TRUE(status.IsSuccess());
+    EXPECT_EQ(clusterRevision, WebRTCTransportRequestor::kRevision);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestWebRTCTransportRequestorCluster, TestReadUnsupportedAttribute)
 {
+    TestServerClusterContext context;
     MockWebRTCTransportRequestorDelegate mockDelegate;
     WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // Create a mock attribute request for an unsupported attribute
-    chip::app::DataModel::ReadAttributeRequest request;
-    request.path.mEndpointId  = kTestEndpointId;
-    request.path.mClusterId   = WebRTCTransportRequestor::Id;
-    request.path.mAttributeId = 0xFFFF; // Invalid attribute ID
-
-    // Create a buffer for encoding
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
-    ASSERT_TRUE(buffer.Alloc(1024));
-
-    // Create AttributeReportIBs::Builder for the encoder
-    chip::app::AttributeReportIBs::Builder attributeReportIBsBuilder;
-    chip::TLV::TLVWriter reportWriter;
-    reportWriter.Init(buffer.Get(), buffer.AllocatedSize());
-    CHIP_ERROR err = attributeReportIBsBuilder.Init(&reportWriter);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-
-    chip::app::AttributeValueEncoder encoder(attributeReportIBsBuilder, chip::Access::SubjectDescriptor{}, request.path,
-                                             0 /* dataVersion */);
+    ClusterTester tester(server);
 
     // Test reading unsupported attribute
-    auto status = server.ReadAttribute(request, encoder);
-    EXPECT_EQ(status, chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
+    uint32_t dummyValue;
+    auto status = tester.ReadAttribute(0xFFFF /* Invalid attribute ID */, dummyValue);
+    EXPECT_FALSE(status.IsSuccess());
+    EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

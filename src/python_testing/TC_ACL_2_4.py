@@ -39,12 +39,17 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
 class TC_ACL_2_4(MatterBaseTest):
+    # ACL entry counts in the test plan assume no framework secondary-controller ACL row.
+    disable_wildcard_subscription = True
+
     def desc_TC_ACL_2_4(self) -> str:
         return "[TC-ACL-2.4] ACL Attribute"
 
@@ -152,7 +157,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=oc_cluster,
             attribute=cfi_attribute
         )
-        log.info(f"CurrentFabricIndex: {f1}")
+        log.info("CurrentFabricIndex: %s", f1)
 
         # Step 3: Read initial ACL attribute
         self.step(3)
@@ -238,7 +243,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read ACL: {read_acl}")
+        log.info("Read ACL: %s", read_acl)
 
         asserts.assert_equal(len(read_acl), 3, "ACL should contain exactly 3 entries")
         asserts.assert_in(new_acl[0], read_acl, "Missing Admin entry")
@@ -309,7 +314,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Modified ACL: {read_modified_acl}")
+        log.info("Read Modified ACL: %s", read_modified_acl)
 
         # Verify modified ACL contents
         asserts.assert_equal(len(read_modified_acl), 3, "ACL should contain exactly 3 entries")
@@ -386,7 +391,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Updated Targets ACL: {read_updated_targets_acl}")
+        log.info("Read Updated Targets ACL: %s", read_updated_targets_acl)
 
         # Verify updated targets ACL contents
         asserts.assert_equal(len(read_updated_targets_acl), 3, "ACL should contain exactly 3 entries")
@@ -459,7 +464,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Null Subjects ACL: {read_null_subjects_acl}")
+        log.info("Read Null Subjects ACL: %s", read_null_subjects_acl)
 
         # Verify null subjects ACL contents
         asserts.assert_equal(len(read_null_subjects_acl), 3, "ACL should contain exactly 3 entries")
@@ -510,7 +515,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Null Targets ACL: {read_null_targets_acl}")
+        log.info("Read Null Targets ACL: %s", read_null_targets_acl)
 
         # Verify null targets ACL contents
         asserts.assert_equal(len(read_null_targets_acl), 3, "ACL should contain exactly 3 entries")
@@ -553,7 +558,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Two Element ACL: {read_two_element_acl}")
+        log.info("Read Two Element ACL: %s", read_two_element_acl)
 
         # Verify two element ACL contents
         asserts.assert_equal(len(read_two_element_acl), 2, "ACL should contain exactly 2 entries")
@@ -595,7 +600,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read ProxyView ACL: {read_proxy_view_acl}")
+        log.info("Read ProxyView ACL: %s", read_proxy_view_acl)
 
         # Verify ProxyView ACL contents
         asserts.assert_equal(len(read_proxy_view_acl), 2, "ACL should contain exactly 2 entries")
@@ -610,7 +615,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=subjects_per_entry_attr
         )
-        log.info(f"SubjectsPerAccessControlEntry value: {max_subjects}")
+        log.info("SubjectsPerAccessControlEntry value: %s", max_subjects)
 
         # Step 19: Write ACL with max subjects
         self.step(19)
@@ -648,7 +653,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Max Subjects ACL: {read_max_subjects_acl}")
+        log.info("Read Max Subjects ACL: %s", read_max_subjects_acl)
 
         # Verify max subjects ACL contents
         asserts.assert_equal(len(read_max_subjects_acl), 2, "ACL should contain exactly 2 entries")
@@ -696,7 +701,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Specific Subjects ACL: {read_specific_subjects_acl}")
+        log.info("Read Specific Subjects ACL: %s", read_specific_subjects_acl)
 
         # Verify specific subjects ACL contents
         asserts.assert_equal(len(read_specific_subjects_acl), 2, "ACL should contain exactly 2 entries")
@@ -711,7 +716,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=targets_per_entry_attr
         )
-        log.info(f"TargetsPerAccessControlEntry value: {max_targets}")
+        log.info("TargetsPerAccessControlEntry value: %s", max_targets)
 
         # Step 24: Write ACL with max targets
         self.step(24)
@@ -774,7 +779,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Max Targets ACL: {read_max_targets_acl}")
+        log.info("Read Max Targets ACL: %s", read_max_targets_acl)
 
         # Verify max targets ACL contents
         asserts.assert_equal(len(read_max_targets_acl), 2, "ACL should contain exactly 2 entries")
@@ -789,7 +794,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=entries_per_fabric_attr
         )
-        log.info(f"AccessControlEntriesPerFabric value: {max_entries}")
+        log.info("AccessControlEntriesPerFabric value: %s", max_entries)
 
         # Step 27: Write ACL with MAXENTRIES elements
         self.step(27)
@@ -829,7 +834,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read Max Entries ACL: {read_max_entries_acl}")
+        log.info("Read Max Entries ACL: %s", read_max_entries_acl)
 
         # Verify max entries ACL contents
         asserts.assert_equal(len(read_max_entries_acl), max_entries,
@@ -903,7 +908,7 @@ class TC_ACL_2_4(MatterBaseTest):
             cluster=acl_cluster,
             attribute=acl_attribute
         )
-        log.info(f"Read ACL after failed PASE write: {read_after_pase_acl}")
+        log.info("Read ACL after failed PASE write: %s", read_after_pase_acl)
 
         # Verify only admin entry remains
         asserts.assert_equal(len(read_after_pase_acl), 1,

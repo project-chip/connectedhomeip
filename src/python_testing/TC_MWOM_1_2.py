@@ -39,7 +39,9 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +110,7 @@ class TC_MWOM_1_2(MatterBaseTest):
         except AttributeError:
             derivedTags = Clusters.MicrowaveOvenMode.Enums.ModeTag
 
-        log.info("Derived tags: %s" % derivedTags)
+        log.info("Derived tags: %s", derivedTags)
 
         for m in supported_modes:
             for t in m.modeTags:
@@ -123,7 +125,7 @@ class TC_MWOM_1_2(MatterBaseTest):
 
         self.step(3)
         current_mode = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
-        log.info("CurrentMode: %s" % current_mode)
+        log.info("CurrentMode: %s", current_mode)
         asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
 
 

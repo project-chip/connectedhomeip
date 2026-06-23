@@ -23,7 +23,6 @@ import queue
 import shlex
 import subprocess
 import threading
-import typing
 
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
@@ -32,7 +31,7 @@ log = logging.getLogger(__name__)
 
 
 class DiscoverTest:
-    def __init__(self, thread_list: typing.List[threading.Thread], queue: queue.Queue, cmd: [], args: str):
+    def __init__(self, thread_list: list[threading.Thread], queue: queue.Queue, cmd: [], args: str):
         self.thread_list = thread_list
         self.queue = queue
         self.command = cmd
@@ -67,6 +66,6 @@ class DiscoverTest:
         if self.command_name == 'commissionables':
             code = self.TestCmdCommissionables()
             if code != 0:
-                raise Exception(f"Testing command commissionables failed with error {code}")
+                raise RuntimeError(f"Testing command commissionables failed with error {code}")
         else:
-            raise Exception(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

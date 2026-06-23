@@ -64,7 +64,9 @@ from mobly import asserts
 
 import matter.discovery
 from matter.setup_payload import SetupPayload
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 # TODO: set the default timeout to be larger because there's a manual step
 # TODO: force the linux app to actually not advertise when it's in user intent mode and add a trigger to start advertising
@@ -108,7 +110,7 @@ class TC_DD_1_16_17(MatterBaseTest):
         self.step(2)
         if parsed.commissioning_flow == 0:
             # Standard commissioning flow - this should be advertising
-            await self.ensure_advertising(filter_type=matter.discovery.FilterType.LONG_DISCRIMINATOR, filter=parsed.long_discriminator)
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.LONG_DISCRIMINATOR, filter_data=parsed.long_discriminator)
         else:
             self.mark_current_step_skipped()
 
@@ -131,8 +133,8 @@ class TC_DD_1_16_17(MatterBaseTest):
                          "Device is advertising as commissionable"),
                 ]
 
-    async def ensure_advertising(self, filter_type: matter.discovery.FilterType, filter: int):
-        responses = await self.default_controller.DiscoverCommissionableNodes(filterType=filter_type, filter=filter, stopOnFirst=True)
+    async def ensure_advertising(self, filter_type: matter.discovery.FilterType, filter_data: int):
+        responses = await self.default_controller.DiscoverCommissionableNodes(filterType=filter_type, filter=filter_data, stopOnFirst=True)
         asserts.assert_greater_equal(len(responses), 1, "Device should be advertising as commissionable")
 
     @async_test_body
@@ -149,7 +151,7 @@ class TC_DD_1_16_17(MatterBaseTest):
         self.step(2)
         if standard_flow:
             # Device should be advertising
-            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter=parsed.short_discriminator)
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter_data=parsed.short_discriminator)
         else:
             self.mark_current_step_skipped()
 
@@ -165,7 +167,7 @@ class TC_DD_1_16_17(MatterBaseTest):
 
         self.step(4)
         if not standard_flow:
-            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter=parsed.short_discriminator)
+            await self.ensure_advertising(filter_type=matter.discovery.FilterType.SHORT_DISCRIMINATOR, filter_data=parsed.short_discriminator)
         else:
             self.mark_current_step_skipped()
 

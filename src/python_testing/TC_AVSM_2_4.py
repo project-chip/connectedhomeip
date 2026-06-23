@@ -42,7 +42,9 @@ from TC_AVSMTestBase import AVSMTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -95,7 +97,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         snpSupport = aFeatureMap & cluster.Bitmaps.Feature.kSnapshot
         asserts.assert_equal(snpSupport, cluster.Bitmaps.Feature.kSnapshot, "Snapshot Feature is not supported.")
 
@@ -103,7 +105,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamIDToDelete = aAllocatedSnapshotStreams[0].snapshotStreamID
 
@@ -134,7 +136,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
 
 

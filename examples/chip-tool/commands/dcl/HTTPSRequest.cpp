@@ -24,8 +24,9 @@
 
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <stdlib.h>
 #include <system/SystemError.h>
 
 #ifdef CONFIG_ENABLE_HTTPS_REQUESTS
@@ -106,6 +107,7 @@ public:
         hints.ai_family                             = AF_INET;
         hints.ai_socktype                           = SOCK_STREAM;
         int err                                     = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &mRes);
+
 #if CHIP_ERROR_LOGGING
         constexpr const char * kErrorGetAddressInfo = "Failed to get address info: ";
         VerifyOrDo(nullptr != mRes, ChipLogError(chipTool, "%s%s", kErrorGetAddressInfo, gai_strerror(err)));
@@ -157,7 +159,7 @@ public:
         int sock;
         VerifyOrReturnError(securityMode == HttpsSecurityMode::kDefault, CHIP_ERROR_NOT_IMPLEMENTED);
         ReturnErrorOnFailure(InitSocket(hostname, port, sock));
-        ReturnErrorOnFailure(InitSSL(sock));
+        ReturnErrorOnFailure(InitSSL(sock, hostname));
         return CHIP_NO_ERROR;
     }
 
@@ -213,7 +215,7 @@ private:
         return CHIP_ERROR_NOT_CONNECTED;
     }
 
-    CHIP_ERROR InitSSL(int sock)
+    CHIP_ERROR InitSSL(int sock, const std::string & hostname)
     {
         SSL_load_error_strings();
         OpenSSL_add_ssl_algorithms();
@@ -225,6 +227,7 @@ private:
         VerifyOrReturnError(nullptr != ssl, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLObjectCreate));
 
         SSL_set_fd(ssl, sock);
+        SSL_set_tlsext_host_name(ssl, hostname.c_str());
         VerifyOrReturnError(SSL_connect(ssl) > 0, CHIP_ERROR_NOT_CONNECTED, ChipLogError(chipTool, "%s", kErrorSSLHandshake));
 
         mContext = context;
@@ -346,7 +349,7 @@ CHIP_ERROR ExtractHostAndPort(const std::string & hostAndPort, std::string & out
     {
         outHostName     = hostAndPort.substr(0, position);
         auto portString = hostAndPort.substr(position + 1);
-        outPort         = static_cast<uint16_t>(std::atoi(portString.c_str()));
+        outPort         = static_cast<uint16_t>(strtol(portString.c_str(), nullptr, 10));
         VerifyOrReturnError(0 != outPort, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(chipTool, "%s", kErrorHTTPSPort));
     }
 

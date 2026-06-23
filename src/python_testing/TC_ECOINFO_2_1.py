@@ -65,11 +65,14 @@ import tempfile
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -140,7 +143,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
         self.dut_fsa_stdin.flush()
         # Wait for the commissioning to complete.
-        await asyncio.sleep(5)
+        await asyncio.sleep(20)
 
     def _validate_device_directory(self, current_fabric_index, device_directory):
         for device in device_directory:

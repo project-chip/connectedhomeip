@@ -28,11 +28,15 @@
 namespace chip {
 namespace scenes {
 
-// Storage index for scenes in nvm
-typedef app::Storage::Data::EntryIndex SceneIndex;
+static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
+static_assert(kMaxScenesPerEndpoint >= 16, "Per spec, kMaxScenesPerEndpoint must be at least 16");
 
-typedef uint32_t TransitionTimeMs;
-typedef uint32_t SceneTransitionTime;
+static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
+
+// Storage index for scenes in nvm
+using SceneIndex          = app::Storage::Data::EntryIndex;
+using TransitionTimeMs    = uint32_t;
+using SceneTransitionTime = uint32_t;
 
 inline constexpr GroupId kGlobalGroupSceneId = 0x0000;
 inline constexpr SceneId kUndefinedSceneId   = 0xff;
@@ -145,11 +149,11 @@ public:
 
     /// @brief struct used to store data held in a scene
     /// Members:
-    /// mName: char buffer holding the name of the scene, only serialized when mNameLenght is greater than 0
-    /// mNameLength: lentgh of the name if a name was provided at scene creation
+    /// mName: char buffer holding the name of the scene, only serialized when mNameLength is greater than 0
+    /// mNameLength: length of the name if a name was provided at scene creation
     /// mSceneTransitionTimeSeconds: Time in seconds it will take a cluster to change to the scene
     /// mExtensionFieldSets: class holding the different field sets of each cluster values to store with the scene
-    /// mTransitionTime100ms: Transition time in tenths of a second, allows for more precise transition when combiened with
+    /// mTransitionTime100ms: Transition time in tenths of a second, allows for more precise transition when combined with
     /// mSceneTransitionTimeSeconds in enhanced scene commands
     struct SceneData
     {
@@ -226,6 +230,9 @@ public:
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel) = 0;
     virtual void Finish()                                                                              = 0;
+
+    // Table size
+    virtual uint16_t GetTableSize() const = 0;
 
     // Global scene count
     virtual CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count)                         = 0;

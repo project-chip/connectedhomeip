@@ -22,7 +22,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 log = logging.getLogger(__name__)
@@ -39,6 +41,8 @@ kConfigureTrustedTimeSource = 19
 
 
 class TestCommissioningTimeSync(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def setup_class(self):
         self.commissioner = None
         self.commissioned = False
@@ -54,10 +58,9 @@ class TestCommissioningTimeSync(MatterBaseTest):
         self.commissioner = None
         self.commissioned = False
 
-    @async_test_body
-    async def teardown_test(self):
-        await self.destroy_current_commissioner()
-        return super().teardown_test()
+    def teardown_test(self):
+        self.event_loop.run_until_complete(self.destroy_current_commissioner())
+        super().teardown_test()
 
     async def commission_and_base_checks(self):
         params = await self.default_controller.OpenCommissioningWindow(
@@ -115,7 +118,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
         await self.create_commissioner()
 
         log.info(
-            f'Running Commissioning test - time_zone: {time_zone}, dst: {dst}, default_ntp: {default_ntp}, trusted_time_source: {trusted_time_source}')
+            'Running Commissioning test - time_zone: %s, dst: %s, default_ntp: %s, trusted_time_source: %s', time_zone, dst, default_ntp, trusted_time_source)
 
         if time_zone:
             self.commissioner.SetTimeZone(offset=3600, validAt=0)

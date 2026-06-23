@@ -20,6 +20,19 @@
  *      PSA Crypto API based implementation of CHIP crypto primitives
  */
 
+// In mbedTLS v4.0, ECP and bignum function declarations moved to private headers.
+// These are only needed for the mbedTLS-based SPAKE2+ fallback. Platforms with a
+// PSA SPAKE2+ driver don't need these private headers.
+// TODO(#71479): Remove once a PSA SPAKE2+ driver is available for all platforms.
+#if !defined(CHIP_CRYPTO_SPAKE2P_PSA) || !CHIP_CRYPTO_SPAKE2P_PSA
+#include <mbedtls/version.h>
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+#include <mbedtls/private/bignum.h>
+#include <mbedtls/private/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#endif // !CHIP_CRYPTO_SPAKE2P_PSA
+
 #include "CHIPCryptoPALPSA.h"
 #include "CHIPCryptoPALmbedTLS.h"
 
@@ -27,7 +40,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -35,8 +47,11 @@
 
 #include <psa/crypto.h>
 
+#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 #include <mbedtls/bignum.h>
 #include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
+
 #include <mbedtls/error.h>
 #include <mbedtls/x509_csr.h>
 
@@ -331,6 +346,9 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
     return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
+static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(psa_hash_operation_t),
+              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying psa_hash_operation_t");
+
 static inline psa_hash_operation_t * toHashOperation(HashSHA256OpaqueContext * context)
 {
     return SafePointerCast<psa_hash_operation_t *>(context);
@@ -539,7 +557,7 @@ exit:
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
@@ -649,7 +667,7 @@ exit:
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR add_entropy_source(entropy_source /* fn_source */, void * /* p_source */, size_t /* threshold */)
@@ -664,11 +682,6 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
     const psa_status_t status = psa_generate_random(out_buffer, out_length);
 
     return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
-}
-
-static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
-{
-    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
@@ -791,7 +804,7 @@ int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
          * This avoids IAR compiler warning:
          * 'the order of volatile accesses is undefined ..' */
         unsigned char x = A[i], y = B[i];
-        diff |= x ^ y;
+        diff = diff | (x ^ y);
     }
 
     return ((int) diff);
@@ -830,6 +843,8 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     {
         ExitNow(error = CHIP_ERROR_UNKNOWN_KEY_TYPE);
     }
+
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
 
     status = psa_generate_key(&attributes, &context.key_id);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
@@ -903,13 +918,20 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
+{
+    // Not implemented for the PSA backend; Direct HKDF to EC key derivation should be used instead.
+    IgnoreUnusedVariable(privateKeyBits);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 void P256Keypair::Clear()
 {
     if (mInitialized)
     {
         PsaP256KeypairContext & context = ToPsaContext(mKeypair);
         psa_destroy_key(context.key_id);
-        memset(&context, 0, sizeof(context));
+        ClearSecretData(reinterpret_cast<uint8_t *>(&context), sizeof(context));
         mInitialized = false;
     }
 }
@@ -931,9 +953,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     return CHIP_NO_ERROR;
 }
 
-// We should compile this SPAKE2P implementation only if the PSA implementation is not in use.
-#if !CHIP_CRYPTO_PSA_SPAKE2P
-
+#if CHIP_CRYPTO_SPAKE2P_MBEDTLS
 typedef struct Spake2p_Context
 {
     mbedtls_ecp_group curve;
@@ -954,6 +974,11 @@ typedef struct Spake2p_Context
 static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
 {
     return SafePointerCast<Spake2p_Context *>(context);
+}
+
+static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
+{
+    return (chip::Crypto::DRBG_get_bytes(out_buffer, out_length) == CHIP_NO_ERROR) ? 0 : 1;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
@@ -1025,6 +1050,10 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
+
+    ClearSecretData(Kcab);
+    ClearSecretData(Kae);
+
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
@@ -1239,7 +1268,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
-#endif // !CHIP_CRYPTO_PSA_SPAKE2P
+#endif // !CHIP_CRYPTO_SPAKE2P_MBEDTLS
 
 } // namespace Crypto
 } // namespace chip

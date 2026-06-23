@@ -44,6 +44,9 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    ThreadMeshcop,
+#endif
 };
 
 enum class PairingNetworkType
@@ -106,6 +109,13 @@ public:
         {
         case PairingMode::None:
             break;
+#if CHIP_SUPPORT_THREAD_MESHCOP
+        case PairingMode::ThreadMeshcop:
+            AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
+            AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
+            FALLTHROUGH;
+#endif
         case PairingMode::Code:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("dcl-hostname", &mDCLHostName,
@@ -270,6 +280,8 @@ private:
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
     CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
+    CHIP_ERROR
+    GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopCommissionParams);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -330,6 +342,11 @@ private:
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    chip::Optional<char *> mThreadBaHost;
+    chip::Optional<uint16_t> mThreadBaPort;
+#endif
 
     std::optional<std::thread> mPrompterThread;
 

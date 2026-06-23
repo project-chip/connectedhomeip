@@ -36,21 +36,21 @@ namespace AmbientContextTypeSupported {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace AmbientContextTypeSupported
 
-namespace SimultaneousDetectionLimit {
+namespace ObjectCountThresholdReached {
 inline constexpr AttributeId Id = 0x00000005;
-} // namespace SimultaneousDetectionLimit
+} // namespace ObjectCountThresholdReached
 
-namespace CountThresholdReached {
+namespace ObjectCountConfig {
 inline constexpr AttributeId Id = 0x00000006;
-} // namespace CountThresholdReached
-
-namespace CountThreshold {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace CountThreshold
+} // namespace ObjectCountConfig
 
 namespace ObjectCount {
-inline constexpr AttributeId Id = 0x00000008;
+inline constexpr AttributeId Id = 0x00000007;
 } // namespace ObjectCount
+
+namespace SimultaneousDetectionLimit {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace SimultaneousDetectionLimit
 
 namespace HoldTime {
 inline constexpr AttributeId Id = 0x00000009;
@@ -64,9 +64,9 @@ namespace PredictedActivity {
 inline constexpr AttributeId Id = 0x0000000B;
 } // namespace PredictedActivity
 
-namespace PrivacyModeEnabled {
+namespace SensorFusionSupported {
 inline constexpr AttributeId Id = 0x0000000C;
-} // namespace PrivacyModeEnabled
+} // namespace SensorFusionSupported
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
