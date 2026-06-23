@@ -29,7 +29,7 @@ from typing import Any
 
 import chiptest
 import click
-from chiptest.concurrency.context import mp_wrapped_spawn_context
+from chiptest.concurrency.context import mp_wrapped_spawn_context, SYNC_MANAGER_PATH
 from chiptest.concurrency.process import ProcessPhase
 from chiptest.concurrency.work_queue import CancellableQueue
 from chiptest.concurrency.worker import WorkerConfig, WorkerJob, WorkerProcessCls
@@ -50,14 +50,6 @@ if sys.platform == 'darwin':
     import chiptest.darwin
 
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
-
-if sys.platform == "linux":
-    # We have a private /run as we're running in unshare, so we can place it in any place under /run. We don't want it in /tmp, as
-    # we remount it to worker-specific scratchpad.
-    SYNC_MANAGER_PATH = "/run/python_pool_manager.sock"
-else:
-    # Other platforms will fall back to their default.
-    SYNC_MANAGER_PATH = None
 
 
 class ManualHandling(enum.Enum):
