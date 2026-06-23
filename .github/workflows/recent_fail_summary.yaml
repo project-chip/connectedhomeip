@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
       - run: pip install pandas python-slugify pyyaml tabulate
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
