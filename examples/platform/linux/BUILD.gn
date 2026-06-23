@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
@@ -311,4 +313,37 @@ source_set("commissioner-main") {
   }
 
   public_configs = [ ":app-main-config" ]
+}
+
+config("pw_rpc_config") {
+  include_dirs = [ "${chip_root}/examples/common" ]
+}
+
+source_set("pw_rpc") {
+  sources = [
+    "Rpc.cpp",
+    "system_rpc_server.cc",
+  ]
+
+  public_deps = [
+    "$dir_pw_hdlc:default_addresses",
+    "$dir_pw_hdlc:rpc_channel_output",
+    "$dir_pw_log",
+    "$dir_pw_rpc:server",
+    "$dir_pw_rpc/system_server:facade",
+    "$dir_pw_rpc/system_server:socket",
+    "$dir_pw_stream:socket_stream",
+    "$dir_pw_stream:sys_io_stream",
+    "$dir_pw_sync:mutex",
+    "$dir_pw_trace",
+    "$dir_pw_trace_tokenized",
+    "$dir_pw_trace_tokenized:trace_rpc_service",
+    "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+    "${chip_root}/examples/common/pigweed:rpc_services",
+  ]
+
+  public_configs = [
+    ":app-main-config",
+    ":pw_rpc_config",
+  ]
 }

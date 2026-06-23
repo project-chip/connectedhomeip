@@ -97,38 +97,19 @@ executable("all-devices-app") {
       "PW_RPC_ATTRIBUTE_SERVICE=1",
     ]
 
-    sources += [
-      "${chip_root}/examples/platform/linux/Rpc.cpp",
-      "${chip_root}/examples/platform/linux/system_rpc_server.cc",
-    ]
-
     deps += [
-      "$dir_pw_hdlc:default_addresses",
-      "$dir_pw_hdlc:rpc_channel_output",
-      "$dir_pw_log",
-      "$dir_pw_rpc:server",
-      "$dir_pw_rpc/system_server:facade",
-      "$dir_pw_rpc/system_server:socket",
-      "$dir_pw_stream:socket_stream",
-      "$dir_pw_stream:sys_io_stream",
-      "$dir_pw_sync:mutex",
-      "$dir_pw_trace",
-      "$dir_pw_trace_tokenized",
-      "$dir_pw_trace_tokenized:trace_rpc_service",
-      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/pigweed:pigweed-accessor",
 
       # We reuse the common attributes service because it already provides a fully functional
       # RPC read/write interface and TLV serialization out-of-the-box.
-      # Note: The ZCL types are used strictly as a hint from the client so the RPC server
-      # knows which Protobuf field type (e.g. uint8, uint16, uint32) to put the TLV data into, and is not coupled with ember.
+      # Note: The ZCL types are used as a hint from the client so the RPC server
+      # knows which Protobuf field type (e.g. uint8, uint16, uint32) to put the TLV data into,
+      # and is not coupled with ember.
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:rpc_services",
-      "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/pigweed:pigweed-accessor",
+      "${chip_root}/examples/platform/linux:pw_rpc",
     ]
 
     deps += pw_build_LINK_DEPS
-
-    include_dirs += [ "${chip_root}/examples/common" ]
   } else {
     defines += [ "PW_RPC_ENABLED=0" ]
   }
