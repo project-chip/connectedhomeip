@@ -271,9 +271,20 @@ def async_test_body(body):
     return async_runner
 
 
+class _CachedWildcardRead:
+    """Minimal stand-in for ReadResponse when endpoints are already cached."""
+
+    def __init__(self, attributes):
+        self.attributes = attributes
+
+
 async def _get_all_matching_endpoints(test_instance, accept_function: EndpointCheckFunction) -> list[int]:
     """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await test_instance.default_controller.Read(test_instance.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+    cached_endpoints = getattr(test_instance, 'endpoints', None)
+    if cached_endpoints:
+        wildcard = _CachedWildcardRead(cached_endpoints)
+    else:
+        wildcard = await test_instance.default_controller.Read(test_instance.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
 

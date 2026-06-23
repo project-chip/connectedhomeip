@@ -190,25 +190,36 @@ class BasicCompositionTests(MatterBaseTest):
 
         node_id = self.dut_node_id
 
-        task_list = []
-        if allow_pase and self.first_setup_code:
-            pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
-            task_list.append(asyncio.create_task(pase_future))
+        # When the harness already commissioned the DUT, use CASE only. Starting PASE here
+        # leaves a stale commissionee entry in the controller; later reads default to PASE
+        # and fail with CHIP_ERROR_NOT_CONNECTED even though CASE is available.
+        harness_commissioned = (
+            self.matter_test_config.commissioning_method is not None
+            or self._dut_confirmed_available
+        )
 
-        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
-        task_list.append(asyncio.create_task(case_future))
+        if harness_commissioned:
+            await dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
+        else:
+            task_list = []
+            if allow_pase and self.first_setup_code:
+                pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
+                task_list.append(asyncio.create_task(pase_future))
 
-        for task in task_list:
-            asyncio.ensure_future(task)
+            case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
+            task_list.append(asyncio.create_task(case_future))
 
-        done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+            for task in task_list:
+                asyncio.ensure_future(task)
 
-        for task in pending:
-            try:
-                task.cancel()
-                await task
-            except asyncio.CancelledError:
-                pass
+            _done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+
+            for task in pending:
+                try:
+                    task.cancel()
+                    await task
+                except asyncio.CancelledError:
+                    pass
 
         wildcard_read = (await dev_ctrl.Read(node_id, [()]))  # type: ignore[list-item]
 
