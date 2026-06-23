@@ -43,10 +43,7 @@ static void pm_observer_state_entry(enum pm_state state)
 void pm_observer_init(void)
 {
 #if CONFIG_PM
-    static struct pm_notifier pm_observer_notifier = {
-        .state_entry = pm_observer_state_entry,
-        .state_exit = NULL
-    };
+    static struct pm_notifier pm_observer_notifier = { .state_entry = pm_observer_state_entry, .state_exit = NULL };
 
     pm_notifier_register(&pm_observer_notifier);
 #endif /* CONFIG_PM */

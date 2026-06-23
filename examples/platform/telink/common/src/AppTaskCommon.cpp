@@ -131,7 +131,7 @@ public:
     void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override
     {
         AppTaskCommon::sIsCommissioningFailed = true;
-        isComissioningStarted = false;
+        isComissioningStarted                 = false;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override
@@ -897,8 +897,7 @@ extern "C" bool __wrap_bt_is_ready(void)
 {
     if (pm_observer_deepsleepped())
     {
-        ChipLogDetail(DeviceLayer,
-            "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
+        ChipLogDetail(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
         Reboot(SoftwareRebootReason::kOther);
     }
     return __real_bt_is_ready();

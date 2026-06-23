@@ -32,4 +32,4 @@ bool pm_observer_deepsleepped(void);
 }
 #endif
 
-#endif  /* ZEPHYR_PM_OBSERVER_H */
+#endif /* ZEPHYR_PM_OBSERVER_H */
