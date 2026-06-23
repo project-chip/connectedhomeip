@@ -4162,6 +4162,56 @@ class ChipClusters:
             },
         },
     }
+    _TEMPERATURE_CONTROLLED_CABINET_TOPOLOGY_CLUSTER_INFO = {
+        "clusterName": "TemperatureControlledCabinetTopology",
+        "clusterId": 0x0000004B,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "DisabledCabinets",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Topology",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _MODE_SELECT_CLUSTER_INFO = {
         "clusterName": "ModeSelect",
         "clusterId": 0x00000050,
@@ -6551,6 +6601,22 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "PowerRangeAdjustRequest",
+                "args": {
+                    "minPower": "int",
+                    "maxPower": "int",
+                    "duration": "int",
+                    "cause": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "CancelPowerRangeAdjustRequest",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -6599,6 +6665,12 @@ class ChipClusters:
                 "attributeName": "OptOutState",
                 "attributeId": 0x00000007,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "PowerRangeAdjustment",
+                "attributeId": 0x00000008,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -12315,6 +12387,7 @@ class ChipClusters:
                 "args": {
                     "networkIdentityIndex": "int",
                     "networkIdentityType": "int",
+                    "clientIndex": "int",
                     "identifier": "bytes",
                 },
             },
@@ -16941,6 +17014,50 @@ class ChipClusters:
             },
         },
     }
+    _TEST_HIDDEN_MANUFACTURER_SPECIFIC_CLUSTER_INFO = {
+        "clusterName": "TestHiddenManufacturerSpecific",
+        "clusterId": 0xFFF1FC21,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "TestAttribute",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
 
     _CLUSTER_ID_DICT = {
         0x00000003: _IDENTIFY_CLUSTER_INFO,
@@ -16984,6 +17101,7 @@ class ChipClusters:
         0x00000048: _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000049: _OVEN_MODE_CLUSTER_INFO,
         0x0000004A: _LAUNDRY_DRYER_CONTROLS_CLUSTER_INFO,
+        0x0000004B: _TEMPERATURE_CONTROLLED_CABINET_TOPOLOGY_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
@@ -17095,6 +17213,7 @@ class ChipClusters:
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
+        0xFFF1FC21: _TEST_HIDDEN_MANUFACTURER_SPECIFIC_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -17139,6 +17258,7 @@ class ChipClusters:
         "OvenCavityOperationalState": _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         "OvenMode": _OVEN_MODE_CLUSTER_INFO,
         "LaundryDryerControls": _LAUNDRY_DRYER_CONTROLS_CLUSTER_INFO,
+        "TemperatureControlledCabinetTopology": _TEMPERATURE_CONTROLLED_CABINET_TOPOLOGY_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
@@ -17250,6 +17370,7 @@ class ChipClusters:
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,
+        "TestHiddenManufacturerSpecific": _TEST_HIDDEN_MANUFACTURER_SPECIFIC_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

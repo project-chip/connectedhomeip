@@ -1861,6 +1861,19 @@ static id _Nullable DecodeEventPayloadForLaundryDryerControlsCluster(EventId aEv
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForTemperatureControlledCabinetTopologyCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TemperatureControlledCabinetTopology;
+    switch (aEventId) {
+    default: {
+        // Not a known TemperatureControlledCabinetTopology event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ModeSelect;
@@ -3327,6 +3340,67 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId a
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.cause)];
             value.cause = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::PowerRangeAdjustStart::Id: {
+        Events::PowerRangeAdjustStart::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerRangeAdjustStartEvent new];
+
+        do {
+            MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct * _Nonnull memberValue;
+            memberValue = [MTRDeviceEnergyManagementClusterPowerRangeAdjustStruct new];
+            if (cppValue.adjustment.minPower.IsNull()) {
+                memberValue.minPower = nil;
+            } else {
+                memberValue.minPower = [NSNumber numberWithLongLong:cppValue.adjustment.minPower.Value()];
+            }
+            if (cppValue.adjustment.maxPower.IsNull()) {
+                memberValue.maxPower = nil;
+            } else {
+                memberValue.maxPower = [NSNumber numberWithLongLong:cppValue.adjustment.maxPower.Value()];
+            }
+            memberValue.cause = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.adjustment.cause)];
+            memberValue.endTime = [NSNumber numberWithUnsignedInt:cppValue.adjustment.endTime];
+            value.adjustment = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.duration];
+            value.duration = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::PowerRangeAdjustEnd::Id: {
+        Events::PowerRangeAdjustEnd::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerRangeAdjustEndEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.cause)];
+            value.cause = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.duration];
+            value.duration = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithLongLong:cppValue.energyUse];
+            value.energyUse = memberValue;
         } while (0);
 
         return value;
@@ -6665,6 +6739,19 @@ static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV:
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForTestHiddenManufacturerSpecificCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TestHiddenManufacturerSpecific;
+    switch (aEventId) {
+    default: {
+        // Not a known TestHiddenManufacturerSpecific event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 
 id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -6782,6 +6869,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::LaundryDryerControls::Id: {
         return DecodeEventPayloadForLaundryDryerControlsCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::TemperatureControlledCabinetTopology::Id: {
+        return DecodeEventPayloadForTemperatureControlledCabinetTopologyCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ModeSelect::Id: {
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);
@@ -7112,6 +7202,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::SampleMei::Id: {
         return DecodeEventPayloadForSampleMEICluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::TestHiddenManufacturerSpecific::Id: {
+        return DecodeEventPayloadForTestHiddenManufacturerSpecificCluster(aPath.mEventId, aReader, aError);
     }
     default: {
         break;

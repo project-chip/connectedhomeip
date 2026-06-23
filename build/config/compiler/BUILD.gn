@@ -524,6 +524,11 @@ config("sanitize_undefined_behavior") {
       "-fsanitize=unsigned-integer-overflow",
       "-fsanitize=implicit-conversion",
       "-fsanitize=nullability",
+
+      # Exclude vendored / stdlib code we don't own (abseil, fuzztest, libc++)
+      # from UBSan; first-party src/ stays instrumented. See ubsan_ignorelist.txt.
+      "-fsanitize-ignorelist=" +
+          rebase_path("ubsan_ignorelist.txt", root_build_dir),
     ]
   }
 
@@ -573,7 +578,19 @@ config("oss_fuzz") {
   cflags = string_split(getenv("CFLAGS"))
   cflags_cc = string_split(getenv("CXXFLAGS"))
   ldflags = string_split(getenv("CXXFLAGS"))
-  ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+
+  # FuzzTest binaries (chip_pw_fuzztest toolchain) provide their own main and link the no-main
+  # libFuzzer runtime, so they must NOT also link $LIB_FUZZING_ENGINE (its main would collide).
+  # Every other (legacy chip_fuzz_target) libFuzzer target still links it.
+  if (current_toolchain != "//build/toolchain/pw_fuzzer:chip_pw_fuzztest") {
+    ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+  } else {
+    # Pigweed modules compile -fno-rtti, incompatible with UBSan's -fsanitize=vptr (in $CFLAGS
+    # when SANITIZER=undefined). Disable just vptr here; appended after $CFLAGS so it wins, and
+    # a no-op for non-UBSan builds.
+    cflags += [ "-fno-sanitize=vptr" ]
+    cflags_cc += [ "-fno-sanitize=vptr" ]
+  }
 }
 
 config("fuzzing_default") {

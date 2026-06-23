@@ -90,6 +90,8 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
         }
     }
 
+    // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     if (index.mSize == CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE)
     {
         // TODO: implement LRU for resumption

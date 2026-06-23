@@ -76,6 +76,7 @@
 | OvenCavityOperationalState                                          | 0x0048 |
 | OvenMode                                                            | 0x0049 |
 | LaundryDryerControls                                                | 0x004A |
+| TemperatureControlledCabinetTopology                                | 0x004B |
 | ModeSelect                                                          | 0x0050 |
 | LaundryWasherMode                                                   | 0x0051 |
 | RefrigeratorAndTemperatureControlledCabinetMode                     | 0x0052 |
@@ -187,6 +188,7 @@
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 | SampleMei                                                           | 0xFFF1FC20|
+| TestHiddenManufacturerSpecific                                      | 0xFFF1FC21|
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -4698,6 +4700,23 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
+| Cluster TemperatureControlledCabinetTopology                        | 0x004B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * DisabledCabinets                                                  | 0x0000 |
+| * Topology                                                          | 0x0001 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
 | Cluster ModeSelect                                                  | 0x0050 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -7081,6 +7100,8 @@ private:
 | * ModifyForecastRequest                                             |   0x05 |
 | * RequestConstraintBasedForecast                                    |   0x06 |
 | * CancelRequest                                                     |   0x07 |
+| * PowerRangeAdjustRequest                                           |   0x08 |
+| * CancelPowerRangeAdjustRequest                                     |   0x09 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ESAType                                                           | 0x0000 |
@@ -7091,6 +7112,7 @@ private:
 | * PowerAdjustmentCapability                                         | 0x0005 |
 | * Forecast                                                          | 0x0006 |
 | * OptOutState                                                       | 0x0007 |
+| * PowerRangeAdjustment                                              | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7102,6 +7124,8 @@ private:
 | * PowerAdjustEnd                                                    | 0x0001 |
 | * Paused                                                            | 0x0002 |
 | * Resumed                                                           | 0x0003 |
+| * PowerRangeAdjustStart                                             | 0x0004 |
+| * PowerRangeAdjustEnd                                               | 0x0005 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -7418,6 +7442,86 @@ public:
 
 private:
     chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Type mRequest;
+};
+
+/*
+ * Command PowerRangeAdjustRequest
+ */
+class DeviceEnergyManagementPowerRangeAdjustRequest : public ClusterCommand
+{
+public:
+    DeviceEnergyManagementPowerRangeAdjustRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("power-range-adjust-request", credsIssuerConfig)
+    {
+        AddArgument("MinPower", INT64_MIN, INT64_MAX, &mRequest.minPower);
+        AddArgument("MaxPower", INT64_MIN, INT64_MAX, &mRequest.maxPower);
+        AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Type mRequest;
+};
+
+/*
+ * Command CancelPowerRangeAdjustRequest
+ */
+class DeviceEnergyManagementCancelPowerRangeAdjustRequest : public ClusterCommand
+{
+public:
+    DeviceEnergyManagementCancelPowerRangeAdjustRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("cancel-power-range-adjust-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::DeviceEnergyManagement::Commands::CancelPowerRangeAdjustRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagement::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::DeviceEnergyManagement::Commands::CancelPowerRangeAdjustRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DeviceEnergyManagement::Commands::CancelPowerRangeAdjustRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -12138,6 +12242,7 @@ public:
     {
         AddArgument("NetworkIdentityIndex", 0, UINT16_MAX, &mRequest.networkIdentityIndex);
         AddArgument("NetworkIdentityType", 0, UINT8_MAX, &mRequest.networkIdentityType);
+        AddArgument("ClientIndex", 0, UINT16_MAX, &mRequest.clientIndex);
         AddArgument("Identifier", &mRequest.identifier);
         ClusterCommand::AddArguments();
     }
@@ -20377,6 +20482,22 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster TestHiddenManufacturerSpecific                              | 0xFFF1FC21 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TestAttribute                                                     | 0x0000 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
 void registerClusterIdentify(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -23892,6 +24013,61 @@ void registerClusterLaundryDryerControls(Commands & commands, CredentialIssuerCo
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterTemperatureControlledCabinetTopology(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TemperatureControlledCabinetTopology;
+
+    const char * clusterName = "TemperatureControlledCabinetTopology";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "disabled-cabinets", Attributes::DisabledCabinets::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "topology", Attributes::Topology::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EndpointId>>>(
+            Id, "disabled-cabinets", Attributes::DisabledCabinets::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TemperatureControlledCabinetTopology::TopologyEnum>>(
+            Id, "topology", 0, UINT8_MAX, Attributes::Topology::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "disabled-cabinets", Attributes::DisabledCabinets::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "topology", Attributes::Topology::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ModeSelect;
@@ -26044,6 +26220,8 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         make_unique<DeviceEnergyManagementModifyForecastRequest>(credsIssuerConfig),          //
         make_unique<DeviceEnergyManagementRequestConstraintBasedForecast>(credsIssuerConfig), //
         make_unique<DeviceEnergyManagementCancelRequest>(credsIssuerConfig),                  //
+        make_unique<DeviceEnergyManagementPowerRangeAdjustRequest>(credsIssuerConfig),        //
+        make_unique<DeviceEnergyManagementCancelPowerRangeAdjustRequest>(credsIssuerConfig),  //
         //
         // Attributes
         //
@@ -26057,6 +26235,7 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "forecast", Attributes::Forecast::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "opt-out-state", Attributes::OptOutState::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "power-range-adjustment", Attributes::PowerRangeAdjustment::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -26082,6 +26261,10 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
             Id, "forecast", Attributes::Forecast::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum>>(
             Id, "opt-out-state", 0, UINT8_MAX, Attributes::OptOutState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type>>>(
+            Id, "power-range-adjustment", Attributes::PowerRangeAdjustment::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -26103,6 +26286,7 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "forecast", Attributes::Forecast::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "opt-out-state", Attributes::OptOutState::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "power-range-adjustment", Attributes::PowerRangeAdjustment::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -26111,16 +26295,20 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                          //
-        make_unique<ReadEvent>(Id, "power-adjust-start", Events::PowerAdjustStart::Id, credsIssuerConfig),      //
-        make_unique<ReadEvent>(Id, "power-adjust-end", Events::PowerAdjustEnd::Id, credsIssuerConfig),          //
-        make_unique<ReadEvent>(Id, "paused", Events::Paused::Id, credsIssuerConfig),                            //
-        make_unique<ReadEvent>(Id, "resumed", Events::Resumed::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                     //
-        make_unique<SubscribeEvent>(Id, "power-adjust-start", Events::PowerAdjustStart::Id, credsIssuerConfig), //
-        make_unique<SubscribeEvent>(Id, "power-adjust-end", Events::PowerAdjustEnd::Id, credsIssuerConfig),     //
-        make_unique<SubscribeEvent>(Id, "paused", Events::Paused::Id, credsIssuerConfig),                       //
-        make_unique<SubscribeEvent>(Id, "resumed", Events::Resumed::Id, credsIssuerConfig),                     //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadEvent>(Id, "power-adjust-start", Events::PowerAdjustStart::Id, credsIssuerConfig),                 //
+        make_unique<ReadEvent>(Id, "power-adjust-end", Events::PowerAdjustEnd::Id, credsIssuerConfig),                     //
+        make_unique<ReadEvent>(Id, "paused", Events::Paused::Id, credsIssuerConfig),                                       //
+        make_unique<ReadEvent>(Id, "resumed", Events::Resumed::Id, credsIssuerConfig),                                     //
+        make_unique<ReadEvent>(Id, "power-range-adjust-start", Events::PowerRangeAdjustStart::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "power-range-adjust-end", Events::PowerRangeAdjustEnd::Id, credsIssuerConfig),          //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeEvent>(Id, "power-adjust-start", Events::PowerAdjustStart::Id, credsIssuerConfig),            //
+        make_unique<SubscribeEvent>(Id, "power-adjust-end", Events::PowerAdjustEnd::Id, credsIssuerConfig),                //
+        make_unique<SubscribeEvent>(Id, "paused", Events::Paused::Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeEvent>(Id, "resumed", Events::Resumed::Id, credsIssuerConfig),                                //
+        make_unique<SubscribeEvent>(Id, "power-range-adjust-start", Events::PowerRangeAdjustStart::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "power-range-adjust-end", Events::PowerRangeAdjustEnd::Id, credsIssuerConfig),     //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -34382,6 +34570,57 @@ void registerClusterSampleMei(Commands & commands, CredentialIssuerCommands * cr
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterTestHiddenManufacturerSpecific(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TestHiddenManufacturerSpecific;
+
+    const char * clusterName = "TestHiddenManufacturerSpecific";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "test-attribute", Attributes::TestAttribute::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<bool>>(Id, "test-attribute", 0, 1, Attributes::TestAttribute::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "test-attribute", Attributes::TestAttribute::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 
 void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -34448,6 +34687,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterOvenCavityOperationalState(commands, credsIssuerConfig);
     registerClusterOvenMode(commands, credsIssuerConfig);
     registerClusterLaundryDryerControls(commands, credsIssuerConfig);
+    registerClusterTemperatureControlledCabinetTopology(commands, credsIssuerConfig);
     registerClusterModeSelect(commands, credsIssuerConfig);
     registerClusterLaundryWasherMode(commands, credsIssuerConfig);
     registerClusterRefrigeratorAndTemperatureControlledCabinetMode(commands, credsIssuerConfig);
@@ -34559,4 +34799,5 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSampleMei(commands, credsIssuerConfig);
+    registerClusterTestHiddenManufacturerSpecific(commands, credsIssuerConfig);
 }

@@ -147,6 +147,7 @@ jobs:
              --target-skip-glob '{TestAccessControlConstraints}' \
              --test-order random \
              run \
+             --value-wait-extra-duration-ms 5000 \
              --iterations 1 \
              --test-timeout-seconds 120 \
              --tool-path darwin-framework-tool:./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \

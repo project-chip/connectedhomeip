@@ -86,20 +86,6 @@ def get_auxiliary_acl_equivalence_set(aux_acl, parts_list) -> set[tuple[int, int
     return equivalence_set
 
 
-def is_groupcast_supporting_cluster(cluster_id: int) -> bool:
-    """
-    Utility method to check if a cluster supports groupcast commands.
-    """
-    # TODO(#42221): Use groupcast conformance when available
-    GROUPCAST_SUPPORTING_CLUSTERS = {
-        Clusters.OnOff.id,
-        Clusters.LevelControl.id,
-        Clusters.ColorControl.id,
-        Clusters.ScenesManagement.id
-    }
-    return cluster_id in GROUPCAST_SUPPORTING_CLUSTERS
-
-
 async def get_feature_map(test) -> tuple:
     """Get supported features."""
     feature_map = await test.read_single_attribute_check_success(
@@ -113,32 +99,24 @@ async def get_feature_map(test) -> tuple:
     asserts.assert_true(sd_enabled or ln_enabled,
                         "At least one of the following features must be enabled: Listener or Sender.")
     logger.info(
-        f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled} | PGA supported: {pga_enabled}")
+        "FeatureMap: %s : LN supported: %s | SD supported: %s | PGA supported: %s", feature_map, ln_enabled, sd_enabled, pga_enabled)
     return ln_enabled, sd_enabled, pga_enabled
 
 
 async def valid_endpoints_list(test, ln_enabled: bool) -> list:
-    """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender."""
-    endpoints_list = []
+    """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender.
+
+    For Senders: return empty list.
+    For Listeners: return the list of non-root endpoints that have at least one cluster exposing
+    one command requiring Operate privilege.
+    """
+    endpoints_list: list = []
     if ln_enabled:
-        device_type_list = await test.read_single_attribute_all_endpoints(
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
-        logger.info(f"Device Type List: {device_type_list}")
-        for endpoint, device_types in device_type_list.items():
-            if endpoint == 0:
-                continue
-            for device_type in device_types:
-                if device_type.deviceType == 14:  # Aggregator
-                    continue
-                server_list = await test.read_single_attribute_check_success(
-                    cluster=Clusters.Descriptor,
-                    attribute=Clusters.Descriptor.Attributes.ServerList,
-                    endpoint=endpoint)
-                logger.info(f"Server List: {server_list}")
-                for cluster in server_list:
-                    if is_groupcast_supporting_cluster(cluster) and endpoint not in endpoints_list:
-                        endpoints_list.append(endpoint)
+        operate_only_commands_dict = await get_operate_only_commands(
+            test.default_controller, test.dut_node_id, exclude_ep0=True)
+        endpoints_list = sorted(operate_only_commands_dict.keys())
+        logger.info(
+            "Endpoints with at least one Operate-privilege command: %s", endpoints_list)
         asserts.assert_greater(len(endpoints_list), 0,
                                "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
     return endpoints_list
@@ -329,7 +307,8 @@ async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int
 
                     except KeyError:
                         logger.warning(
-                            f"Command ID {cmd_id} on cluster {cluster.id} not found in spec XMLs. This may be a manufacturer-specific command.")
+                            "Command ID %s on cluster %s not found in spec XMLs. This may be a manufacturer-specific command.",
+                            cmd_id, cluster.id)
 
     # Main logic
     attributes, spec_version = await get_device_composition_and_spec(dev_ctrl, node_id)

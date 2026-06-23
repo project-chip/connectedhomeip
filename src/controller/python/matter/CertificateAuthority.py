@@ -69,7 +69,7 @@ class CertificateAuthority:
                 persistentStorage:  An optional reference to a PersistentStorage object. If one is provided, it will pick that over
                                     the default PersistentStorage object retrieved from the chipStack.
         '''
-        LOGGER.info(f"New CertificateAuthority at index {caIndex}")
+        LOGGER.info("New CertificateAuthority at index %s", caIndex)
 
         self._chipStack = chipStack
         self._caIndex = caIndex

@@ -87,7 +87,7 @@ static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
 
 // Max size for the TLV-encoded array of CurrentConnection structs
 static constexpr size_t kMaxCurrentConnectionsSerializedSize = 2 /* ArrayTlvOverhead */ +
-    (CHIP_CONFIG_MAX_FABRICS * CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
+    (static_cast<size_t>(CHIP_CONFIG_MAX_FABRICS) * CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
 
 /**
  * @brief Storage implementation for transport trigger options.
@@ -136,6 +136,9 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 
         triggerType = aTransportTriggerOptions.triggerType;
 
+        // Reset before repopulating, as done for video/audio streams.
+        mTransportZoneOptions.clear();
+
         auto & motionZonesList = aTransportTriggerOptions.motionZones;
 
         if (triggerType == TransportTriggerTypeEnum::kMotion && motionZonesList.HasValue())
@@ -157,7 +160,9 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
             }
             else
             {
-                motionZones.Value().SetNull();
+                // The incoming motionZones field is present and explicitly null; SetValue()
+                // makes the stored Optional present with a null Nullable.
+                motionZones.SetValue(DataModel::NullNullable);
             }
         }
         else
