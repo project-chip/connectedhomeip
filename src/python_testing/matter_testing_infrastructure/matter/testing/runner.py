@@ -374,7 +374,6 @@ def read_global_wildcard(event_loop, default_controller, node_id):
                 node_id,
                 [
                     (Clusters.Descriptor),
-                    (Clusters.BasicInformation),
                     Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
                     Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
                     Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
@@ -410,6 +409,7 @@ def run_tests_no_exit(
         bool: True if all tests passed, False otherwise
     """
 
+    from matter.testing.commissioning import _is_device_commissionable_via_dnssd, is_commissioned
     from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.matter_stack_state import MatterStackState
 
@@ -455,9 +455,6 @@ def run_tests_no_exit(
             matter_test_config)
         test_config.user_params["hooks"] = global_stash.stash_globally(hooks)
 
-        # Execute the test class with the config
-        ok = True
-
         test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
             stack.certificate_authority_manager)
 
@@ -482,8 +479,30 @@ def run_tests_no_exit(
             if matter_test_config.commissioning_method is not None:
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
-            if getattr(test_class, 'NEEDS_COMMISSIONING', True):
+            node_id = matter_test_config.dut_node_ids[0]
 
+            # Determine actual commissioning status via DNS-SD
+            try:
+                already_commissioned = event_loop.run_until_complete(
+                    is_commissioned(default_controller, node_id)
+                )
+            except Exception:
+                LOGGER.warning(
+                    "Could not determine commissioning status for node %s, assuming not commissioned",
+                    node_id
+                )
+                already_commissioned = False
+
+            if already_commissioned:
+                # Device is already on this fabric — read via CASE, no side effects.
+                try:
+                    stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
+                    test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                except Exception:
+                    LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
+
+            else:
+                # Device is not commissioned — attempt PASE if credentials are available.
                 setup_code: Optional[str] = None
                 if matter_test_config.manual_code:
                     setup_code = matter_test_config.manual_code[0]
@@ -495,42 +514,73 @@ def run_tests_no_exit(
                         matter_test_config.setup_passcodes[0],
                     )
 
-                node_id = matter_test_config.dut_node_ids[0]
-
-                if matter_test_config.commissioning_method is not None and setup_code is not None:
-                    # Path 1: PASE + commissioning
-                    commissionee = event_loop.run_until_complete(
-                        default_controller.FindOrEstablishPASESession(
-                            setupCode=setup_code, nodeId=node_id
-                        )
-                    )
-                    if commissionee is not None:
-                        stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
-                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
-                    else:
-                        LOGGER.error("FindOrEstablishPASESession returned None")
-
-                elif setup_code is not None:
-                    # Path 2: PASE without commissioning (e.g., manual-code only)
+                if setup_code is not None:
                     try:
                         commissionee = event_loop.run_until_complete(
                             default_controller.FindOrEstablishPASESession(
                                 setupCode=setup_code, nodeId=node_id
                             )
                         )
-                        if commissionee is not None:
+                        if commissionee is None:
+                            LOGGER.error("FindOrEstablishPASESession returned None")
+                        else:
                             stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                             test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
-                    except Exception:
-                        LOGGER.warning("Could not pre-populate global wildcard via PASE")
 
-                else:
-                    # Path 3: CASE (already commissioned, no setup code)
-                    try:
-                        stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
-                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                            if matter_test_config.commissioning_method is None:
+                                # No commissioning will follow — the test owns its own
+                                # PASE session (e.g. TC_SC_7_1, TC_DD). Expire the session
+                                # so the device resumes advertising and the test can
+                                # establish its own PASE cleanly.
+                                default_controller.ExpireSessions(node_id)
+                                LOGGER.info(
+                                    "Expired PASE session after wildcard read — "
+                                    "waiting for device to resume advertising"
+                                )
+
+                                async def _wait_for_device_ready(
+                                        timeout: float = 60.0,
+                                        interval: float = 1.0) -> None:
+                                    deadline = asyncio.get_event_loop().time() + timeout
+                                    while asyncio.get_event_loop().time() < deadline:
+                                        if await is_commissioned(default_controller, node_id):
+                                            LOGGER.info(
+                                                "Device is now commissioned — "
+                                                "CASE will be used by the test"
+                                            )
+                                            return
+                                        if await _is_device_commissionable_via_dnssd(
+                                                discovery_timeout_sec=interval):
+                                            LOGGER.info(
+                                                "Device resumed commissionable advertisement — "
+                                                "test can establish its own PASE"
+                                            )
+                                            return
+                                        await asyncio.sleep(interval)
+                                    LOGGER.warning(
+                                        "Device is neither commissioned nor advertising "
+                                        "after PASE expiry within timeout"
+                                    )
+
+                                event_loop.run_until_complete(_wait_for_device_ready())
+                            else:
+                                # CommissionDeviceTest follows immediately and reuses
+                                # this PASE session via FindOrEstablishPASESession —
+                                # do NOT expire it.
+                                LOGGER.info(
+                                    "Keeping PASE session alive for CommissionDeviceTest to reuse"
+                                )
+
                     except Exception:
-                        LOGGER.warning("Could not pre-populate global wildcard via CASE")
+                        LOGGER.warning(
+                            "Could not pre-populate global wildcard before commissioning",
+                            exc_info=True
+                        )
+                else:
+                    LOGGER.warning(
+                        "Device not commissioned and no setup code available — "
+                        "skipping global wildcard pre-population"
+                    )
 
             # Populate XML data model
             if stored_global_wildcard:
