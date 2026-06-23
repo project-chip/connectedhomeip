@@ -51,9 +51,9 @@ IncreasingHumiditySensorDevice::~IncreasingHumiditySensorDevice()
 }
 
 CHIP_ERROR IncreasingHumiditySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                    EndpointId parentId)
+                                                    EndpointComposition composition)
 {
-    ReturnErrorOnFailure(HumiditySensorDevice::Register(endpoint, provider, parentId));
+    ReturnErrorOnFailure(HumiditySensorDevice::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
     mHumidityMeasuredValue = kDefaultHumidityConfig.minMeasuredValue.Value();

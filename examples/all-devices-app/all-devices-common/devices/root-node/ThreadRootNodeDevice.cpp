@@ -26,9 +26,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-CHIP_ERROR ThreadRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR ThreadRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition)
 {
-    ReturnErrorOnFailure(RootNodeDevice::Register(endpointId, provider, parentId));
+    ReturnErrorOnFailure(RootNodeDevice::Register(endpointId, provider, composition));
 
     mNetworkCommissioningCluster.Create(endpointId, &mThreadContext.threadDriver,
                                         NetworkCommissioningCluster::Context{

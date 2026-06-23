@@ -3641,7 +3641,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
@@ -3963,7 +3963,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflight = 256, version 3;
+  device type ma_onofflight = 256, version 4;
 
 
   server cluster Identify {
