@@ -148,10 +148,22 @@ CHIP_ERROR WiFiPAFEndPoint::HandleConnectComplete()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mState = kState_Connected;
-    // Cancel the connect timer.
-    StopConnectTimer();
+    // Cancel connect and receive-connection timers.
+    if (mRole == kWiFiPafRole_Subscriber)
+    {
+        StopConnectTimer();
+    }
+    else
+    {
+        StopReceiveConnectionTimer();
+    }
+
+    // Arm ongoing idle session supervision to ensure upper-layer commissioning
+    // (Phase 2 PASE handshake) initiates within a reasonable deadline.
+    LogErrorOnFailure(StartAckReceivedTimer());
 
     // We've successfully completed the PAF transport protocol handshake, so let the application know we're open for business.
+
     if (mWiFiPafLayer != nullptr)
     {
         // Indicate connect complete to next-higher layer.
@@ -183,6 +195,10 @@ void WiFiPAFEndPoint::DoClose(uint8_t flags, CHIP_ERROR err)
         if (mRole == kWiFiPafRole_Subscriber)
         {
             StopConnectTimer();
+        }
+        else
+        {
+            StopReceiveConnectionTimer();
         }
 
         // Free the packets in re-order queue if ones exist
@@ -278,7 +294,9 @@ void WiFiPAFEndPoint::Free()
 
     // Cancel all timers.
     StopConnectTimer();
+    StopReceiveConnectionTimer();
     StopAckReceivedTimer();
+
     StopSendAckTimer();
     StopWaitResourceTimer();
 
@@ -1162,6 +1180,16 @@ CHIP_ERROR WiFiPAFEndPoint::StartConnectTimer()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WiFiPAFEndPoint::StartReceiveConnectionTimer()
+{
+    const CHIP_ERROR timerErr = mWiFiPafLayer->mSystemLayer->StartTimer(System::Clock::Milliseconds32(PAFTP_CONN_RSP_TIMEOUT_MS),
+                                                                        HandleReceiveConnectionTimeout, this);
+    ReturnErrorOnFailure(timerErr);
+    mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WiFiPAFEndPoint::StartAckReceivedTimer()
 {
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
@@ -1228,6 +1256,13 @@ void WiFiPAFEndPoint::StopConnectTimer()
     mTimerStateFlags.Clear(TimerStateFlag::kConnectTimerRunning);
 }
 
+void WiFiPAFEndPoint::StopReceiveConnectionTimer()
+{
+    // Cancel any existing receive-connection timer.
+    mWiFiPafLayer->mSystemLayer->CancelTimer(HandleReceiveConnectionTimeout, this);
+    mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
+}
+
 void WiFiPAFEndPoint::StopAckReceivedTimer()
 {
     // Cancel any existing ack-received timer.
@@ -1259,6 +1294,19 @@ void WiFiPAFEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, vo
         ChipLogError(WiFiPAF, "connect handshake timed out, closing ep %p", ep);
         ep->mTimerStateFlags.Clear(TimerStateFlag::kConnectTimerRunning);
         ep->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_CONNECT_TIMED_OUT);
+    }
+}
+
+void WiFiPAFEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState)
+{
+    WiFiPAFEndPoint * ep = static_cast<WiFiPAFEndPoint *>(appState);
+
+    // Check for event-based timer race condition.
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kReceiveConnectionTimerRunning))
+    {
+        ChipLogError(WiFiPAF, "receive handshake timed out, closing ep %p", ep);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
+        ep->DoClose(kWiFiPAFCloseFlag_SuppressCallback | kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_RECEIVE_TIMED_OUT);
     }
 }
 
@@ -1316,8 +1364,37 @@ void WiFiPAFEndPoint::HandleWaitResourceTimeout(chip::System::Layer * systemLaye
 
 void WiFiPAFEndPoint::ClearAll()
 {
-    memset(reinterpret_cast<uint8_t *>(this), 0, sizeof(WiFiPAFEndPoint));
-    return;
+    // Return the end point to the free state the pool relies on (GetFree()/Find() key off
+    // mWiFiPafLayer == nullptr). The endpoint owns ref-counted PacketBufferHandles (mSendQueue,
+    // mAckToSend, ReorderQueue and buffers inside mPafTP); release those explicitly, then reset
+    // the trivially-copyable state. Any owning member added here later must be released too.
+    mSendQueue = nullptr;
+    mAckToSend = nullptr;
+    for (auto & queued : ReorderQueue)
+    {
+        queued = nullptr;
+    }
+    ItemsInReorderQueue = 0;
+    mPafTP.ClearRxPacket();
+    mPafTP.ClearTxPacket();
+
+    mWiFiPafLayer           = nullptr;
+    mOnPafSubscribeComplete = nullptr;
+    mOnPafSubscribeError    = nullptr;
+    mAppState               = nullptr;
+    OnMessageReceived       = nullptr;
+    OnConnectionClosed      = nullptr;
+
+    mState = kState_Closed;
+    mRole  = kWiFiPafRole_Publisher;
+    mRxAck = 0;
+    mConnStateFlags.ClearAll();
+    mTimerStateFlags.ClearAll();
+    mLocalReceiveWindowSize  = 0;
+    mRemoteReceiveWindowSize = 0;
+    mReceiveWindowMaxSize    = 0;
+    mResourceWaitCount       = 0;
+    mSessionInfo             = WiFiPAFSession{};
 }
 
 } /* namespace WiFiPAF */

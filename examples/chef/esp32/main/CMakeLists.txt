@@ -60,6 +60,7 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/mode-select/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
+                      "${CHEF}/common/clusters/smoke-co-alarm/"
                       "${CHEF}/common/clusters/switch/"
                       "${CHEF}/common/clusters/target-navigator/"
                       "${CHEF}/common/clusters/temperature-control/"

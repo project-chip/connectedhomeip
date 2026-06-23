@@ -132,9 +132,10 @@ LoggingIdentifyDelegate & IdentifyDelegate()
 
 } // namespace
 
-CHIP_ERROR LoggingOnOffLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR LoggingOnOffLightDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                             EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&IdentifyDelegate()));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -179,7 +180,7 @@ CHIP_ERROR LoggingOnOffLightDevice::Register(chip::EndpointId endpoint, CodeDriv
 
 void LoggingOnOffLightDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     if (mGroupsCluster.IsConstructed())
     {

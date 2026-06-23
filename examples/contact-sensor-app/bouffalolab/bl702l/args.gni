@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,12 +19,19 @@ import("${chip_root}/src/platform/bouffalolab/BL702L/args.gni")
 
 bl_iot_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-chip_detail_logging = false
 is_debug = false
+
+chip_detail_logging = false
 chip_progress_logging = false
-chip_error_logging = true
+chip_error_logging = false
 
 chip_enable_icd_server = true
 chip_enable_icd_lit = true
 chip_enable_icd_dsls = true
 chip_app_data_model_target = "//:bouffalolab_contact_sensor"
+shell_use_all_clusters_data_model = false
+
+openthread_project_include_dirs = [
+  "${chip_root}/examples/contact-sensor-app/bouffalolab/bl702l",
+  "${bouffalolab_iot_sdk_build_root}/repo/components/network/thread/openthread_port/include",
+]

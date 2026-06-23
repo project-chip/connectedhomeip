@@ -62,6 +62,7 @@ class CommandQuality(enum.Flag):
     NONE = 0
     TIMED_INVOKE = enum.auto()
     FABRIC_SCOPED = enum.auto()
+    OPTIONAL = enum.auto()
 
 
 class AttributeQuality(enum.Flag):
@@ -87,6 +88,7 @@ class EventPriority(enum.Enum):
 class EventQuality(enum.Flag):
     NONE = 0
     FABRIC_SENSITIVE = enum.auto()
+    OPTIONAL = enum.auto()
 
 
 class StructTag(enum.Enum):
@@ -171,6 +173,14 @@ class Attribute:
     def requires_timed_write(self) -> bool:
         return AttributeQuality.TIMED_WRITE in self.qualities
 
+    @property
+    def is_optional(self) -> bool:
+        return self.definition.is_optional
+
+    @property
+    def is_nullable(self) -> bool:
+        return self.definition.is_nullable
+
 
 @dataclass
 class Struct:
@@ -205,6 +215,10 @@ class Event:
     @property
     def is_fabric_sensitive(self) -> bool:
         return EventQuality.FABRIC_SENSITIVE in self.qualities
+
+    @property
+    def is_optional(self) -> bool:
+        return EventQuality.OPTIONAL in self.qualities
 
 
 @dataclass
@@ -265,6 +279,10 @@ class Command:
     @property
     def is_timed_invoke(self) -> bool:
         return CommandQuality.TIMED_INVOKE in self.qualities
+
+    @property
+    def is_optional(self) -> bool:
+        return CommandQuality.OPTIONAL in self.qualities
 
 
 @dataclass

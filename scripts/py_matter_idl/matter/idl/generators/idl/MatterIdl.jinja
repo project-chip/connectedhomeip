@@ -131,8 +131,9 @@ struct {{s.name}} {##}
   {%- for e in cluster.events %}
   {##}  {##}
   {{-e.api_maturity|idltxt}}
-  {%- if e.qualities %}{{e.qualities | idltxt}} {% endif %}
-  {{-e.priority | idltxt}} event {{e | event_access}}{{e.name}} = {{e.code}} {
+  {%- set qualities_txt = e.qualities | idltxt -%}
+  {%- if qualities_txt %}{{qualities_txt}} {% endif %}
+  {{-e.priority | idltxt}} {{e | event_optional}}event {{e | event_access}}{{e.name}} = {{e.code}} {
     {% for field in e.fields %}
     {{render_field(field)}}
     {% endfor %}
@@ -156,7 +157,7 @@ struct {{s.name}} {##}
   {% if c.description %}
   /** {{c.description}} */
   {% endif %}
-  {{c.api_maturity | idltxt}}{{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}(
+  {{c.api_maturity | idltxt}}{{c.qualities | idltxt}}{{c | command_optional}}command {{c | command_access}}{{c.name}}(
      {%- if c.input_param %}{{c.input_param}}{% endif -%}
   ): {{c.output_param}} = {{c.code}};
   {% endfor %}

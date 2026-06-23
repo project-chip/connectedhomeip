@@ -2039,7 +2039,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2078,7 +2078,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -2569,7 +2568,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -2908,7 +2907,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -2943,7 +2942,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -2976,7 +2975,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3009,7 +3008,7 @@ endpoint 3 {
   }
 }
 endpoint 4 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3042,7 +3041,7 @@ endpoint 4 {
   }
 }
 endpoint 5 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3075,7 +3074,7 @@ endpoint 5 {
   }
 }
 endpoint 6 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3108,7 +3107,7 @@ endpoint 6 {
   }
 }
 endpoint 7 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3141,7 +3140,7 @@ endpoint 7 {
   }
 }
 endpoint 8 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3174,7 +3173,7 @@ endpoint 8 {
   }
 }
 endpoint 9 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3247,7 +3246,7 @@ endpoint 10 {
   }
 }
 endpoint 11 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3280,7 +3279,7 @@ endpoint 11 {
   }
 }
 endpoint 12 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
@@ -3313,7 +3312,7 @@ endpoint 12 {
   }
 }
 endpoint 13 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;
