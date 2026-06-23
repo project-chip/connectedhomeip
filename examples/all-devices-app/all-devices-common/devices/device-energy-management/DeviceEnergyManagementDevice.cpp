@@ -17,6 +17,8 @@
 #include <devices/Types.h>
 #include <devices/device-energy-management/DeviceEnergyManagementDevice.h>
 
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+
 namespace chip::app {
 
 DeviceEnergyManagementDevice::DeviceEnergyManagementDevice(TimerDelegate & timerDelegate) :
@@ -27,12 +29,13 @@ DeviceEnergyManagementDevice::DeviceEnergyManagementDevice(TimerDelegate & timer
 CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                   EndpointComposition composition)
 {
+    mProvider = &provider;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    Clusters::DeviceEnergyManagementCluster::Config config(endpoint, BitMask<Clusters::DeviceEnergyManagement::Feature>(), *this);
+    Clusters::DeviceEnergyManagementCluster::Config config(endpoint, BitMask<Feature>(), *this);
     mDemCluster.Create(config);
     ReturnErrorOnFailure(provider.AddCluster(mDemCluster.Registration()));
 
@@ -41,6 +44,7 @@ CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrive
 
 void DeviceEnergyManagementDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    mProvider = nullptr;
     UnregisterDescriptor(provider);
 
     if (mDemCluster.IsConstructed())
@@ -56,9 +60,8 @@ void DeviceEnergyManagementDevice::Unregister(CodeDrivenDataModelProvider & prov
     }
 }
 
-Protocols::InteractionModel::Status
-DeviceEnergyManagementDevice::PowerAdjustRequest(const int64_t power, const uint32_t duration,
-                                                 Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status DeviceEnergyManagementDevice::PowerAdjustRequest(const int64_t power, const uint32_t duration,
+                                                                                     AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
@@ -68,15 +71,13 @@ Protocols::InteractionModel::Status DeviceEnergyManagementDevice::CancelPowerAdj
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status
-DeviceEnergyManagementDevice::StartTimeAdjustRequest(const uint32_t requestedStartTime,
-                                                     Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status DeviceEnergyManagementDevice::StartTimeAdjustRequest(const uint32_t requestedStartTime,
+                                                                                         AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status
-DeviceEnergyManagementDevice::PauseRequest(const uint32_t duration, Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status DeviceEnergyManagementDevice::PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
@@ -87,16 +88,14 @@ Protocols::InteractionModel::Status DeviceEnergyManagementDevice::ResumeRequest(
 }
 
 Protocols::InteractionModel::Status DeviceEnergyManagementDevice::ModifyForecastRequest(
-    const uint32_t forecastID,
-    const DataModel::DecodableList<Clusters::DeviceEnergyManagement::Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
-    Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+    const uint32_t forecastID, const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
+    AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status DeviceEnergyManagementDevice::RequestConstraintBasedForecast(
-    const DataModel::DecodableList<Clusters::DeviceEnergyManagement::Structs::ConstraintsStruct::Type> & constraints,
-    Clusters::DeviceEnergyManagement::AdjustmentCauseEnum cause)
+    const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints, AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
@@ -106,9 +105,9 @@ Protocols::InteractionModel::Status DeviceEnergyManagementDevice::CancelRequest(
     return Protocols::InteractionModel::Status::Success;
 }
 
-Clusters::DeviceEnergyManagement::ESATypeEnum DeviceEnergyManagementDevice::GetESAType()
+ESATypeEnum DeviceEnergyManagementDevice::GetESAType()
 {
-    return Clusters::DeviceEnergyManagement::ESATypeEnum::kEvse;
+    return ESATypeEnum::kEvse;
 }
 
 bool DeviceEnergyManagementDevice::GetESACanGenerate()
@@ -116,7 +115,7 @@ bool DeviceEnergyManagementDevice::GetESACanGenerate()
     return false;
 }
 
-Clusters::DeviceEnergyManagement::ESAStateEnum DeviceEnergyManagementDevice::GetESAState()
+ESAStateEnum DeviceEnergyManagementDevice::GetESAState()
 {
     return mESAState;
 }
@@ -131,26 +130,30 @@ int64_t DeviceEnergyManagementDevice::GetAbsMaxPower()
     return 1000;
 }
 
-Clusters::DeviceEnergyManagement::OptOutStateEnum DeviceEnergyManagementDevice::GetOptOutState()
+OptOutStateEnum DeviceEnergyManagementDevice::GetOptOutState()
 {
-    return Clusters::DeviceEnergyManagement::OptOutStateEnum::kNoOptOut;
+    return OptOutStateEnum::kNoOptOut;
 }
 
-const DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> &
-DeviceEnergyManagementDevice::GetPowerAdjustmentCapability()
+const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & DeviceEnergyManagementDevice::GetPowerAdjustmentCapability()
 {
     return mPowerAdjustmentCapability;
 }
 
-const DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> &
-DeviceEnergyManagementDevice::GetForecast()
+const DataModel::Nullable<Structs::ForecastStruct::Type> & DeviceEnergyManagementDevice::GetForecast()
 {
     return mForecast;
 }
 
-CHIP_ERROR DeviceEnergyManagementDevice::SetESAState(Clusters::DeviceEnergyManagement::ESAStateEnum state)
+CHIP_ERROR DeviceEnergyManagementDevice::SetESAState(ESAStateEnum state)
 {
+    VerifyOrReturnValue(mESAState != state, CHIP_NO_ERROR);
     mESAState = state;
+
+    VerifyOrReturnValue(mProvider != nullptr, CHIP_NO_ERROR);
+    mProvider->NotifyAttributeChanged({ SingleEndpointDevice::GetEndpointId(), Id, Attributes::ESAState::Id },
+                                      DataModel::AttributeChangeType::kReportable);
+
     return CHIP_NO_ERROR;
 }
 

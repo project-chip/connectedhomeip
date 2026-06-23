@@ -64,6 +64,7 @@ public:
 
 private:
     TimerDelegate & mTimerDelegate;
+    CodeDrivenDataModelProvider * mProvider = nullptr;
     Clusters::DeviceEnergyManagement::ESAStateEnum mESAState = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> mForecast;
