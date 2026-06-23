@@ -17716,6 +17716,153 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readCommissioningProxyInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readCommissioningProxyTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyTransportAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readTransportAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyTransportCommandParams
+        );
+        result.put("readTransportAttribute", readCommissioningProxyTransportAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyScanMaxTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyScanMaxTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readScanMaxTimeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyScanMaxTimeCommandParams
+        );
+        result.put("readScanMaxTimeAttribute", readCommissioningProxyScanMaxTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyMaxSessionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyMaxSessionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readMaxSessionsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyMaxSessionsCommandParams
+        );
+        result.put("readMaxSessionsAttribute", readCommissioningProxyMaxSessionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyMaxCachedResultsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyMaxCachedResultsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readMaxCachedResultsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyMaxCachedResultsCommandParams
+        );
+        result.put("readMaxCachedResultsAttribute", readCommissioningProxyMaxCachedResultsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyNumCachedResultsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyNumCachedResultsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readNumCachedResultsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyNumCachedResultsCommandParams
+        );
+        result.put("readNumCachedResultsAttribute", readCommissioningProxyNumCachedResultsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyCacheTimeoutCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyCacheTimeoutAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readCacheTimeoutAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyCacheTimeoutCommandParams
+        );
+        result.put("readCacheTimeoutAttribute", readCommissioningProxyCacheTimeoutAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyCachedResultsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyCachedResultsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readCachedResultsAttribute(
+              (ChipClusters.CommissioningProxyCluster.CachedResultsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterCachedResultsAttributeCallback(),
+          readCommissioningProxyCachedResultsCommandParams
+        );
+        result.put("readCachedResultsAttribute", readCommissioningProxyCachedResultsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyWiFiBandCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyWiFiBandAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readWiFiBandAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyWiFiBandCommandParams
+        );
+        result.put("readWiFiBandAttribute", readCommissioningProxyWiFiBandAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.CommissioningProxyCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterGeneratedCommandListAttributeCallback(),
+          readCommissioningProxyGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readCommissioningProxyGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.CommissioningProxyCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterAcceptedCommandListAttributeCallback(),
+          readCommissioningProxyAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readCommissioningProxyAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.CommissioningProxyCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterAttributeListAttributeCallback(),
+          readCommissioningProxyAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readCommissioningProxyAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readCommissioningProxyFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readCommissioningProxyFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readCommissioningProxyClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readWakeOnLanInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWakeOnLanMACAddressCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWakeOnLanMACAddressAttributeInteractionInfo = new InteractionInfo(
@@ -22500,6 +22647,7 @@ public class ClusterReadMapping {
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
             put("threadBorderRouterManagement", readThreadBorderRouterManagementInteractionInfo());
             put("threadNetworkDirectory", readThreadNetworkDirectoryInteractionInfo());
+            put("commissioningProxy", readCommissioningProxyInteractionInfo());
             put("wakeOnLan", readWakeOnLanInteractionInfo());
             put("channel", readChannelInteractionInfo());
             put("targetNavigator", readTargetNavigatorInteractionInfo());

@@ -21,18 +21,14 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
-#if !CHIP_USE_PLAIN_DAC_KEY
-#include "sss_crypto.h"
-#endif
-
 extern "C" {
 #include "HWParameter.h"
 }
 
-/* This flag should be defined to run SSS_RunApiTest tests.
+/* This flag should be defined to run RunApiTest tests.
  */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
-#define CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST 0
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_API_TEST
+#define CHIP_DEVICE_CONFIG_ENABLE_API_TEST 0
 #endif
 
 namespace chip {
@@ -51,26 +47,24 @@ public:
     ~FactoryDataProviderImpl();
 
     CHIP_ERROR Init() override;
-    CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
+    void UpdateKeyAttributes(psa_key_attributes_t & attrs) override;
 
 private:
-#if !CHIP_USE_PLAIN_DAC_KEY
-
-    CHIP_ERROR SSS_InitContext();
-    CHIP_ERROR SSS_ImportPrivateKeyBlob();
-    CHIP_ERROR SSS_Sign(uint8_t * digest, Crypto::P256ECDSASignature & signature);
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
+    CHIP_ERROR InitContext();
+    CHIP_ERROR ImportPrivateKeyBlob();
     /*!
-     * \brief Convert DAC private key to an SSS encrypted blob and update factory data if not already done
+     * \brief Convert DAC private key to an encrypted blob and update factory data if not already done
      *
      * @note This API should be called in manufacturing process context to replace
-     *       DAC private key with an SSS encrypted blob. The conversion will be a
+     *       DAC private key with an encrypted blob. The conversion will be a
      *       one-time-only operation.
      * @retval #CHIP_NO_ERROR if factory data was updated successfully.
      */
-    CHIP_ERROR SSS_ConvertDacKey();
+    CHIP_ERROR ConvertDacKey();
 
     /*!
-     * \brief Check and export an SSS encrypted blob from the DAC private key found in factory data if needed
+     * \brief Check and export an encrypted blob from the DAC private key found in factory data if needed
      *
      * @param data        Pointer to an allocated buffer
      * @param dataLen     Pointer to a variable that will store the blob length
@@ -79,31 +73,31 @@ private:
      *
      * @retval #CHIP_NO_ERROR if conversion to blob was successful.
      */
-    CHIP_ERROR SSS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset, bool & isNeeded);
+    CHIP_ERROR ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset, bool & isNeeded);
 
     /*!
-     * \brief Replace DAC private key with the specified SSS encrypted blob
+     * \brief Replace DAC private key with the specified encrypted blob
      *
      * @note A new hash has to be computed and written in the factory data header.
      * @param data        Pointer to a RAM buffer that duplicates the current factory data
      * @param blob        Pointer to blob data
      * @param blobLen     Blob length
      * @param offset      Offset of private key from the start of factory data payload address (after header)
-     *                    Extracted with SSS_ConvertToBlob.
+     *                    Extracted with ConvertToBlob.
      *
      * @retval #CHIP_NO_ERROR if conversion to blob was successful.
      */
     CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset);
+#endif // CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
-    void SSS_RunApiTest();
+#if CHIP_DEVICE_CONFIG_ENABLE_API_TEST
+    void RunApiTest();
 #endif
-#endif // CHIP_USE_PLAIN_DAC_KEY
 
 private:
     extendedAppFactoryData_t * mFactoryData = nullptr;
-#if !CHIP_USE_PLAIN_DAC_KEY
-    sss_sscp_object_t mContext;
+#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
+    psa_key_id_t dac_private_key_id = PSA_KEY_ID_NULL;
 #endif
 };
 

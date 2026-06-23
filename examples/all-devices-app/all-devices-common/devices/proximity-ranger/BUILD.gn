@@ -17,13 +17,8 @@ import("//build_overrides/chip.gni")
 
 source_set("proximity-ranger") {
   sources = [
-    "DefaultProximityRangingDriver.cpp",
-    "DefaultProximityRangingDriver.h",
     "ProximityRangerDevice.cpp",
     "ProximityRangerDevice.h",
-    "RangingAdapter.h",
-    "RangingTechnologyController.cpp",
-    "RangingTechnologyController.h",
   ]
 
   public_deps = [

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,17 @@ declare_args() {
                           (current_os == "linux" || current_os == "mac")
 }
 
+# When true, shell_common links the all-clusters-app data model and mode-cluster
+# glue (for standalone chip-shell on Linux/macOS). Embedded apps (Bouffalolab,
+# Chef, etc.) must set this false so they only use their own chip_data_model
+# target and chip_app_data_model_target visibility for required-privileges.
+declare_args() {
+  shell_use_all_clusters_data_model = chip_shell_cmd_server
+}
+
+_shell_enable_cmd_server =
+    chip_shell_cmd_server && shell_use_all_clusters_data_model
+
 config("shell_common_config") {
   include_dirs = [
     ".",
@@ -31,7 +42,7 @@ config("shell_common_config") {
   defines = [
     "ENABLE_CHIP_SHELL",
     "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
-    "CHIP_SHELL_ENABLE_CMD_SERVER=${chip_shell_cmd_server}",
+    "CHIP_SHELL_ENABLE_CMD_SERVER=${_shell_enable_cmd_server}",
   ]
 }
 
@@ -57,16 +68,23 @@ static_library("shell_common") {
     ]
   }
 
-  if (chip_shell_cmd_server) {
+  if (_shell_enable_cmd_server) {
     sources += [ "cmd_server.cpp" ]
 
     import("${chip_root}/src/app/chip_data_model.gni")
 
     sources += [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/test-hidden-manufacturer-specific-stub.cpp",
     ]
 

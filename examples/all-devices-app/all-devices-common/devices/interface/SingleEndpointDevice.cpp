@@ -21,33 +21,19 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-CHIP_ERROR SingleEndpointDevice::SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                            EndpointId parentId)
+CHIP_ERROR SingleEndpointDevice::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                    EndpointComposition composition)
 {
+    VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mEndpointId = endpoint;
-
-    // TODO: This needs to be updated to be more customizable and allow the cluster to be created with
-    //  optional attributes or semantic tags being set.
-    mDescriptorCluster.Create(endpoint, DescriptorCluster::OptionalAttributesSet(0), Span<const SemanticTag>());
-    ReturnErrorOnFailure(provider.AddCluster(mDescriptorCluster.Registration()));
-
-    mEndpointRegistration.endpointEntry = DataModel::EndpointEntry{
-        .id                 = endpoint,
-        .parentId           = parentId,
-        .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
-    };
-    return CHIP_NO_ERROR;
+    return DeviceInterface::RegisterDescriptor(endpoint, provider, composition);
 }
 
-void SingleEndpointDevice::SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider)
+void SingleEndpointDevice::UnregisterDescriptor(CodeDrivenDataModelProvider & provider)
 {
-    LogErrorOnFailure(provider.RemoveEndpoint(mEndpointId, ClusterShutdownType::kClusterShutdown));
-    if (mDescriptorCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mDescriptorCluster.Cluster()));
-        mDescriptorCluster.Destroy();
-    }
+    DeviceInterface::UnregisterDescriptor(mEndpointId, provider);
+    mEndpointId = kInvalidEndpointId;
 }
 
 } // namespace chip::app

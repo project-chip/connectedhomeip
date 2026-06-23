@@ -48,9 +48,9 @@ NetworkInfrastructureManagerDevice::~NetworkInfrastructureManagerDevice()
 }
 
 CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                        EndpointId parentId)
+                                                        EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // 1. Thread Border Router Management
     ThreadBorderRouterManagementCluster::Config tbrConfig(*this, Server::GetInstance().GetFailSafeContext(), mBreadCrumbTracker,
@@ -78,7 +78,7 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoin
 
 void NetworkInfrastructureManagerDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     if (mThreadNetworkDiagnosticsCluster.IsConstructed())
     {
