@@ -375,6 +375,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeThreadNetworkDirectoryID:
         result = @"ThreadNetworkDirectory";
         break;
+    case MTRClusterIDTypeCommissioningProxyID:
+        result = @"CommissioningProxy";
+        break;
     case MTRClusterIDTypeWakeOnLANID:
         result = @"WakeOnLAN";
         break;
@@ -473,6 +476,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeSampleMEIID:
         result = @"SampleMEI";
+        break;
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+        result = @"TestHiddenManufacturerSpecific";
         break;
 
     default:
@@ -8251,6 +8257,70 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (attributeID) {
+
+            // Cluster CommissioningProxy attributes
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeTransportID:
+            result = @"Transport";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeScanMaxTimeID:
+            result = @"ScanMaxTime";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeMaxSessionsID:
+            result = @"MaxSessions";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeMaxCachedResultsID:
+            result = @"MaxCachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeNumCachedResultsID:
+            result = @"NumCachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeCacheTimeoutID:
+            result = @"CacheTimeout";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeCachedResultsID:
+            result = @"CachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeWiFiBandID:
+            result = @"WiFiBand";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known CommissioningProxy attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (attributeID) {
@@ -10342,6 +10412,42 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known SampleMEI attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (attributeID) {
+
+            // Cluster TestHiddenManufacturerSpecific attributes
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeTestAttributeID:
+            result = @"TestAttribute";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known TestHiddenManufacturerSpecific attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -12479,6 +12585,40 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyConnectRequestID:
+            result = @"ProxyConnectRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyDisconnectRequestID:
+            result = @"ProxyDisconnectRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyScanRequestID:
+            result = @"ProxyScanRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyBackGroundScanStartRequestID:
+            result = @"ProxyBackGroundScanStartRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyBackGroundScanStopRequestID:
+            result = @"ProxyBackGroundScanStopRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyMessageRequestID:
+            result = @"ProxyMessageRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (commandID) {
@@ -13482,6 +13622,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         case MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID:
             result = @"AddArguments";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -14939,6 +15089,28 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyConnectResponseID:
+            result = @"ProxyConnectResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyScanResponseID:
+            result = @"ProxyScanResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyMessageResponseID:
+            result = @"ProxyMessageResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (commandID) {
@@ -15466,6 +15638,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         case MTRCommandIDTypeClusterSampleMEICommandAddArgumentsResponseID:
             result = @"AddArgumentsResponse";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -17225,6 +17407,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (eventID) {
@@ -17631,6 +17823,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterSampleMEIEventPingCountEventID:
             result = @"PingCountEvent";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

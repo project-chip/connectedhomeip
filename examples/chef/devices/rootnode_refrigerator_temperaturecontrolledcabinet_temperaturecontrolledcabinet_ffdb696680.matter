@@ -1689,7 +1689,7 @@ cluster TemperatureMeasurement = 1026 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
@@ -2025,7 +2025,7 @@ endpoint 3 {
   }
 }
 endpoint 4 {
-  device type ma_fan = 43, version 4;
+  device type ma_fan = 43, version 5;
 
 
   server cluster Identify {

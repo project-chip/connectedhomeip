@@ -25,9 +25,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                                        EndpointComposition composition)
 {
-    ReturnErrorOnFailure(RootNodeDevice::Register(endpointId, provider, parentId));
+    ReturnErrorOnFailure(RootNodeDevice::Register(endpointId, provider, composition));
 
     mWifiDiagnosticsCluster.Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
                                    WiFiDiagnosticsServerCluster::OptionalAttributeSet{},

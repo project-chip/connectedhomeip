@@ -50,9 +50,10 @@ IncreasingFlowSensorDevice::~IncreasingFlowSensorDevice()
     mTimerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR IncreasingFlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR IncreasingFlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                EndpointComposition composition)
 {
-    ReturnErrorOnFailure(FlowSensorDevice::Register(endpoint, provider, parentId));
+    ReturnErrorOnFailure(FlowSensorDevice::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
     mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();

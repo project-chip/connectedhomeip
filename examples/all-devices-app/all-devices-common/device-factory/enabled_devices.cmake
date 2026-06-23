@@ -48,23 +48,21 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/flow-sensor/impl/IncreasingFlowSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/HumiditySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/LightSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/impl/IncreasingLightSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/LoggingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/BatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/impl/DecreasingBatteryPowerSourceDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/PressureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/pressure-sensor/impl/IncreasingPressureSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/DefaultProximityRangingDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/RangingTechnologyController.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/BleRssiRangingAdapter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingProximityRangerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
@@ -72,6 +70,13 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/TemperatureSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.cpp"
+    # keep-sorted: end
+
+    # Baseline for devices (not real device types)
+    # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
     # keep-sorted: end
 )
 
