@@ -239,8 +239,8 @@
             // 2. gdbserver :9999 --attach <PID>
             // =========================================================================
 
-            "cwd": "${workspaceFolder}/out/tizen-arm64-light-no-thread-no-ble",
-            "program": "${workspaceFolder}/out/tizen-arm64-light-no-thread-no-ble/chip-lighting-app",
+            "cwd": "${workspaceFolder}/out/tizen-arm64-light-no-thread",
+            "program": "${workspaceFolder}/out/tizen-arm64-light-no-thread/chip-lighting-app",
             "targetArchitecture": "arm64",
             "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/aarch64-linux-gnu-gdb-15.1/bin/aarch64-linux-gnu-gdb",
             "miDebuggerServerAddress": "localhost:9999",
