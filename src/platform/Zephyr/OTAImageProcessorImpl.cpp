@@ -59,9 +59,9 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     mParams = {};
 
     const struct device * flash_dev = PARTITION_DEVICE(slot1_partition);
-    if (flash_dev == NULL)
+    if (flash_dev == NULL || !device_is_ready(flash_dev))
     {
-        ChipLogError(SoftwareUpdate, "Failed to get flash device");
+        ChipLogError(SoftwareUpdate, "Failed to get flash device or device not ready");
         return System::MapErrorZephyr(-EFAULT);
     }
 
