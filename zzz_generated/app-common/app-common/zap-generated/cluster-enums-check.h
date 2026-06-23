@@ -149,7 +149,9 @@
 #include <clusters/Switch/EnumsCheck.h>
 #include <clusters/TargetNavigator/EnumsCheck.h>
 #include <clusters/TemperatureControl/EnumsCheck.h>
+#include <clusters/TemperatureControlledCabinetTopology/EnumsCheck.h>
 #include <clusters/TemperatureMeasurement/EnumsCheck.h>
+#include <clusters/TestHiddenManufacturerSpecific/EnumsCheck.h>
 #include <clusters/Thermostat/EnumsCheck.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EnumsCheck.h>
 #include <clusters/ThreadBorderRouterManagement/EnumsCheck.h>

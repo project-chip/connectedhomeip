@@ -264,8 +264,12 @@
 #include <clusters/TargetNavigator/MetadataProvider.h>
 #include <clusters/TemperatureControl/Ids.h>
 #include <clusters/TemperatureControl/MetadataProvider.h>
+#include <clusters/TemperatureControlledCabinetTopology/Ids.h>
+#include <clusters/TemperatureControlledCabinetTopology/MetadataProvider.h>
 #include <clusters/TemperatureMeasurement/Ids.h>
 #include <clusters/TemperatureMeasurement/MetadataProvider.h>
+#include <clusters/TestHiddenManufacturerSpecific/Ids.h>
+#include <clusters/TestHiddenManufacturerSpecific/MetadataProvider.h>
 #include <clusters/Thermostat/Ids.h>
 #include <clusters/Thermostat/MetadataProvider.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Ids.h>
@@ -970,10 +974,21 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == TemperatureControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureControl::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureControlledCabinetTopology::Id) || ...))
+    {
+        if (id == TemperatureControlledCabinetTopology::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureControlledCabinetTopology::Id>::EntryFor(
+                command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureMeasurement::Id) || ...))
     {
         if (id == TemperatureMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TestHiddenManufacturerSpecific::Id) || ...))
+    {
+        if (id == TestHiddenManufacturerSpecific::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TestHiddenManufacturerSpecific::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Thermostat::Id) || ...))
     {

@@ -210,8 +210,6 @@ def main(context: click.Context, log_level: str, log_level_tests: str | None, lo
 
     # Figures out selected test that match the given name(s)
     match runner:
-        case TestRunTime.MATTER_REPL_PYTHON:
-            all_tests = list(chiptest.AllReplYamlTests())
         case TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
             all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
         case TestRunTime.CHIP_TOOL_PYTHON:
@@ -233,9 +231,6 @@ def main(context: click.Context, log_level: str, log_level_tests: str | None, lo
             TestTag.EXTRA_SLOW,
             TestTag.PURPOSEFUL_FAILURE,
         }
-
-        if runner == TestRunTime.MATTER_REPL_PYTHON:
-            exclude_tags_set.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
         tests = []
@@ -345,6 +340,11 @@ def cmd_list(context: click.Context) -> None:
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.option(
+    '--value-wait-extra-duration-ms',
+    default=None,
+    type=int,
+    help='Extra duration in milliseconds to wait for attribute value changes')
+@click.option(
     '--expected-failures',
     type=click.IntRange(min=0),
     default=0,
@@ -418,21 +418,19 @@ def cmd_list(context: click.Context) -> None:
     '--closure-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path closure:<path>',
     help='what closure app to use')
 @click.option(
-    '--matter-repl-yaml-tester', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path matter-repl-yaml-tester:<path>',
-    help='what python script to use for running yaml tests using matter-repl as controller')
-@click.option(
     '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
-            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
+            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
+            value_wait_extra_duration_ms: int | None, expected_failures: int,
             commissioning_method: CommissioningMethod, summary_file: Path | None, periodic_status: int,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None,
             energy_gateway_app: Path | None, water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None,
-            matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None) -> None:
+            chip_tool_with_python: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -469,7 +467,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
-    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)
     handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.TOOL)
     handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.TOOL)
 
@@ -491,9 +488,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     # We use require here as we want to throw an error as these tools are mandatory for any test run.
     try:
 
-        if context.obj.runtime == TestRunTime.MATTER_REPL_PYTHON:
-            subproc_info_repo.require('matter-repl-yaml-tester')
-        elif context.obj.runtime == TestRunTime.CHIP_TOOL_PYTHON:
+        if context.obj.runtime == TestRunTime.CHIP_TOOL_PYTHON:
             subproc_info_repo.require('chip-tool')
             subproc_info_repo.require('chip-tool-with-python', target_name='chiptool.py')
         else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
@@ -512,7 +507,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     # For now, we have only one worker process.
     test_config = TestJobConfig(
-        commissioning_method, dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds, concurrency=1)
+        commissioning_method, dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds,
+        value_wait_extra_duration_ms, concurrency=1)
     worker_config = WorkerConfig.from_test_job_config(context.obj.log_config, test_config).with_formatted_name()
 
     try:
