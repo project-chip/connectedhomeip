@@ -33,7 +33,9 @@ from python_path import PythonPath
 from .accessories import AppsRegister
 from .runner import LogPipe, Runner, SubprocessInfo, SubprocessKind
 
-with PythonPath('../../../../src/python_testing/matter_testing_infrastructure', relative_to=__file__):
+CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+
+with PythonPath(CHIP_ROOT / 'src/python_testing/matter_testing_infrastructure', relative_to=__file__):
     from matter.testing.commissioning_types import CommissioningMethod
 
 log = logging.getLogger(__name__)
