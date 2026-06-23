@@ -329,7 +329,7 @@ void CameraApp::InitCameraDeviceClusters()
 
     Clusters::PushAvStreamTransport::SetTLSCertificateManagementDelegate(
         mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
-        
+
     // Set the WebRTCTransportProvider server in the manager
     mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
 
