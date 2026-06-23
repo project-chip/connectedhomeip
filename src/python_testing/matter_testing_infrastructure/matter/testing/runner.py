@@ -478,9 +478,7 @@ def run_tests_no_exit(
 
             node_id = matter_test_config.dut_node_ids[0]
 
-            # Determine actual commissioning status via DNS-SD rather than
-            # relying solely on command-line args, so the framework can be
-            # more proactive about handling commissioning automatically.
+            # Determine actual commissioning status via DNS-SD
             try:
                 already_commissioned = event_loop.run_until_complete(
                     is_commissioned(default_controller, node_id)
