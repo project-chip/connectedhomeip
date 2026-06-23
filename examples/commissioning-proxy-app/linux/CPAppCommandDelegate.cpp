@@ -105,7 +105,9 @@ void CPAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "UserIntentCommissioningStart")
     {
-        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        // Test-harness helper: any failure is logged by the window manager and the
+        // window simply stays closed, so the result is safely ignored here.
+        RETURN_SAFELY_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else
     {
@@ -129,8 +131,10 @@ void CPAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
-        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
-            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
+        // Reboot path: schedule the event-loop stop. There is no recovery if either
+        // schedule fails (the process is already shutting down), so safely ignored.
+        RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t) { RETURN_SAFELY_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
@@ -231,6 +235,8 @@ void CPAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(CPAppCommandHandler::HandleCommand,
-                                                                           reinterpret_cast<intptr_t>(handler));
+    // ScheduleWork only fails if the work queue is full; in this example test
+    // helper that cannot happen, so the result is safely ignored.
+    RETURN_SAFELY_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(CPAppCommandHandler::HandleCommand,
+                                                                        reinterpret_cast<intptr_t>(handler));
 }

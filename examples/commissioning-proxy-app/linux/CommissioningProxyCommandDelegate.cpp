@@ -30,9 +30,6 @@
 
 #include "CommissioningProxyBgScanCache.h"
 
-#include <algorithm>
-#include <array>
-#include <cstring>
 #include <deque>
 #include <map>
 #include <vector>
@@ -128,13 +125,13 @@ using ScanResultEntry = Structs::ScanResultStruct::Type;
 // ByteSpans dangle after ContributeScanResults returns, so the aggregator owns
 // the backing bytes.  std::deque keeps element addresses stable across growth,
 // so the ScanResultStruct values in `results` can hold spans straight into
-// macStore/extStore — no second rebuild at emit time.
+// addressStore/extStore — no second rebuild at emit time.
 struct ScanAggregator
 {
     chip::app::CommandHandler::Handle handle;
     chip::app::ConcreteCommandPath path;
     uint8_t pending = 0;
-    std::deque<std::array<uint8_t, 6>> macStore;
+    std::deque<std::vector<uint8_t>> addressStore;
     std::deque<std::vector<uint8_t>> extStore;
     std::vector<ScanResultEntry> results;
 };
@@ -276,11 +273,9 @@ void ContributeScanResults(chip::Span<const ScanResultEntry> results)
         if (!e.address.IsNull())
         {
             auto span = e.address.Value();
-            sScanAgg->macStore.emplace_back();
-            auto & mac = sScanAgg->macStore.back();
-            size_t n   = std::min(span.size(), mac.size());
-            memcpy(mac.data(), span.data(), n);
-            r.address.SetNonNull(chip::ByteSpan(mac.data(), n));
+            sScanAgg->addressStore.emplace_back(span.data(), span.data() + span.size());
+            auto & addr = sScanAgg->addressStore.back();
+            r.address.SetNonNull(chip::ByteSpan(addr.data(), addr.size()));
         }
         if (!e.extendedData.IsNull())
         {

@@ -79,7 +79,9 @@ void ApplicationInit()
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sCPAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
+        // Best-effort cleanup after a failed Start(); there is nothing to recover
+        // from if Stop() also fails, so its result is safely ignored.
+        RETURN_SAFELY_IGNORED sChipNamedPipeCommands.Stop();
     }
 
     // Register the Commissioning Proxy Code Driven mechanism
@@ -137,7 +139,9 @@ void ApplicationInit()
     }
     else
     {
-        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnChipDeviceEvent, 0);
+        // Registering the device-event handler can only fail if the static handler
+        // pool is exhausted, which cannot happen this early in init; safely ignored.
+        RETURN_SAFELY_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnChipDeviceEvent, 0);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 

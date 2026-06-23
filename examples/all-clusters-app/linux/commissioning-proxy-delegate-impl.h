@@ -92,6 +92,9 @@ protected:
 private:
     CommissioningProxyCluster * mServer = nullptr;
     chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> mSupportedWiFiBands;
+    // Defaults per CommissioningProxy.adoc (ScanMaxTime / CacheTimeout).
+    uint8_t mScanMaxTime   = 10;
+    uint16_t mCacheTimeout = 30;
 };
 
 } // namespace CommissioningProxy

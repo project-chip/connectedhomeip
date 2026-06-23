@@ -22,8 +22,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
-#include <algorithm>
-#include <cstring>
 #include <map>
 
 namespace chip {
@@ -57,7 +55,7 @@ struct Key
 struct Entry
 {
     bool hasAddress = false;
-    uint8_t mac[6]  = {};
+   std::vector<uint8_t> address;
     chip::BitMask<CapabilitiesBitmap> transport{};
     uint16_t discriminator  = 0;
     chip::VendorId vendorID = static_cast<chip::VendorId>(0);
@@ -119,8 +117,7 @@ Entry EntryFromResult(const ScanResultEntry & r, chip::System::Clock::Timestamp 
     if (!r.address.IsNull())
     {
         auto span = r.address.Value();
-        size_t n  = std::min(span.size(), sizeof(e.mac));
-        memcpy(e.mac, span.data(), n);
+        e.address.assign(span.data(), span.data() + span.size());
         e.hasAddress = true;
     }
     e.transport     = r.transport;
@@ -142,7 +139,7 @@ ScanResultEntry ResultFromEntry(const Entry & e)
 {
     ScanResultEntry r{};
     if (e.hasAddress)
-        r.address.SetNonNull(chip::ByteSpan(e.mac, sizeof(e.mac)));
+        r.address.SetNonNull(chip::ByteSpan(e.address.data(), e.address.size()));
     else
         r.address.SetNull();
     r.transport     = e.transport;

@@ -19,7 +19,6 @@
 #include "commissioning-proxy-delegate-impl.h"
 #include <cstdint>
 #include <lib/support/logging/CHIPLogging.h>
-#include <unordered_map>
 
 namespace chip {
 namespace app {
@@ -28,36 +27,18 @@ namespace CommissioningProxy {
 
 namespace {
 
-constexpr uint8_t kDefaultScanMaxTimeSeconds   = 10;
-constexpr uint16_t kDefaultCacheTimeoutSeconds = 30;
-constexpr uint8_t kMaxCachedResults            = 10;
-
-// Store per-instance state without requiring member fields in the header.
-struct DelegateState
-{
-    uint8_t scanMaxTime   = kDefaultScanMaxTimeSeconds;
-    uint16_t cacheTimeout = kDefaultCacheTimeoutSeconds;
-};
-
-static std::unordered_map<const void *, DelegateState> gState;
-
-static DelegateState & GetState(const void * self)
-{
-    // Creates default state if missing.
-    return gState[self];
-}
+constexpr uint8_t kMaxCachedResults = 10;
 
 } // namespace
 
 uint8_t MyCPDelegate::GetScanMaxTime()
 {
-    return GetState(this).scanMaxTime;
+    return mScanMaxTime;
 }
 
 void MyCPDelegate::SetScanMaxTime(uint8_t seconds)
 {
-    auto & st      = GetState(this);
-    st.scanMaxTime = seconds;
+    mScanMaxTime = seconds;
 }
 
 uint8_t MyCPDelegate::GetMaxCachedResults()
@@ -67,12 +48,12 @@ uint8_t MyCPDelegate::GetMaxCachedResults()
 
 uint16_t MyCPDelegate::GetCacheTimeout()
 {
-    return GetState(this).cacheTimeout;
+    return mCacheTimeout;
 }
 
 void MyCPDelegate::SetCacheTimeout(uint16_t seconds)
 {
-    GetState(this).cacheTimeout = seconds;
+    mCacheTimeout = seconds;
 }
 
 chip::BitMask<WiFiBandBitmap> MyCPDelegate::GetSupportedWiFiBands()
