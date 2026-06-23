@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
+
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceEvent.h>

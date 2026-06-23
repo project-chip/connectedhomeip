@@ -22,34 +22,33 @@
 
 namespace chip {
 
-AppImageProcessor::AppImageProcessor()  = default;
 AppImageProcessor::~AppImageProcessor() = default;
 
 CHIP_ERROR AppImageProcessor::Init(const SubImageHeader & entry)
 {
     mEntry         = entry;
-    mTotalLength   = entry.length;
     mBytesReceived = 0;
     mPartition     = nullptr;
     mOtaHandle     = 0;
-    mState         = DeviceState::kReady;
+    mInitialized   = true;
     return CHIP_NO_ERROR;
 }
 
 bool AppImageProcessor::IsInitialized()
 {
-    return mState != DeviceState::kUnknown;
+    return mInitialized;
 }
 
 CHIP_ERROR AppImageProcessor::IsReadyForOTA(DeviceState & state)
 {
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     state = DeviceState::kReady;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
 {
-    // Lazily open the inactive OTA partition and start hashing on the first chunk.
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     if (mPartition == nullptr)
     {
         mPartition = esp_ota_get_next_update_partition(nullptr);
@@ -62,7 +61,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
         ReturnErrorOnFailure(mHasher.Begin());
     }
 
-    VerifyOrReturnError(mBytesReceived + block.size() <= mTotalLength, CHIP_ERROR_INVALID_ARGUMENT,
+    VerifyOrReturnError(mBytesReceived + block.size() <= mEntry.length, CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(SoftwareUpdate, "App image overflow"));
 
     esp_err_t err = esp_ota_write(mOtaHandle, block.data(), block.size());
@@ -73,7 +72,7 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
     mBytesReceived += block.size();
 
     // Last chunk: verify the SHA-256, then close the staged image.
-    if (mBytesReceived == mTotalLength)
+    if (mBytesReceived == mEntry.length)
     {
         uint8_t digest[Crypto::kSHA256_Hash_Length];
         MutableByteSpan digestSpan(digest);
@@ -95,9 +94,10 @@ CHIP_ERROR AppImageProcessor::Write(ByteSpan & block)
 
 void AppImageProcessor::Abort(AbortContext & context)
 {
+    VerifyOrReturn(mInitialized);
+
     ChipLogProgress(SoftwareUpdate, "AppImageProcessor abort (reason=%u)", static_cast<unsigned>(context.reason));
 
-    // Discard partial state. Clearing mPartition makes a later Apply() a no-op (stays on old firmware).
     if (mOtaHandle != 0)
     {
         esp_ota_abort(mOtaHandle);
@@ -106,11 +106,12 @@ void AppImageProcessor::Abort(AbortContext & context)
     mHasher.Clear();
     mPartition     = nullptr;
     mBytesReceived = 0;
-    mState         = DeviceState::kUnknown;
+    mInitialized   = false;
 }
 
 CHIP_ERROR AppImageProcessor::Apply()
 {
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPartition != nullptr, CHIP_ERROR_INCORRECT_STATE);
     esp_err_t err = esp_ota_set_boot_partition(mPartition);
     VerifyOrReturnError(err == ESP_OK, CHIP_ERROR_INTERNAL,

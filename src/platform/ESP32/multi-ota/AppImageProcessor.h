@@ -18,8 +18,8 @@
 
 #pragma once
 #include "SubImageProcessor.h"
-#include "crypto/CHIPCryptoPAL.h"
-#include "esp_ota_ops.h"
+#include <crypto/CHIPCryptoPAL.h>
+#include <esp_ota_ops.h>
 
 namespace chip {
 
@@ -30,7 +30,6 @@ namespace chip {
 class AppImageProcessor : public SubImageProcessor
 {
 public:
-    AppImageProcessor();
     ~AppImageProcessor();
     CHIP_ERROR Init(const SubImageHeader & entry) override;
     bool IsInitialized() override;
@@ -42,9 +41,8 @@ public:
 private:
     const esp_partition_t * mPartition = nullptr;
     esp_ota_handle_t mOtaHandle        = 0;
-    uint64_t mTotalLength              = 0;
     uint64_t mBytesReceived            = 0;
-    DeviceState mState                 = DeviceState::kUnknown;
+    bool mInitialized                  = false;
     SubImageHeader mEntry;
     Crypto::Hash_SHA256_stream mHasher;
 };
