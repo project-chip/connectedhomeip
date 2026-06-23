@@ -31,7 +31,7 @@ namespace app {
  * NOTE: The aggregated parts/endpoints list (Descriptor PartsList) is handled dynamically
  * by the CodeDrivenDataModelProvider and the DescriptorCluster. Individual child devices
  * establish their parent-child relationship at registration time by specifying this aggregator's
- * endpoint ID as their `parentId` (e.g. via SingleEndpointRegistration). The descriptor cluster's
+ * endpoint ID as their `parentId` (e.g. via RegisterDescriptor). The descriptor cluster's
  * PartsList attribute queries the registered endpoints from the provider at runtime and dynamically
  * includes any descendant endpoints that reference this aggregator as their ancestor.
  * Consequently, the AggregatorDevice class itself does not need to manually maintain a list of parts.
@@ -43,7 +43,7 @@ public:
     ~AggregatorDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 protected:

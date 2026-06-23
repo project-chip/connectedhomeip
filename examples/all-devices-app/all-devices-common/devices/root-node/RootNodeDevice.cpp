@@ -32,9 +32,9 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
-CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpointId, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, composition));
 
     // TODO: This needs to be refactored so the optional attributes, commands and features being set for
     //  the cluster are configurable to allow different settings
@@ -139,7 +139,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
 void RootNodeDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     // De-init in reverse order as init, in case there were data dependencies.
     if (mOperationalCredentialsCluster.IsConstructed())
