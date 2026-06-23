@@ -270,13 +270,14 @@ CONFIG_NVS_LOOKUP_CACHE_SIZE=1024
 ## OTA Software Update
 
 This example supports Matter Over-The-Air (OTA) software updates via the generic
-Zephyr image processor (`src/platform/Zephyr/OTAImageProcessorImpl`) and MCUboot.
+Zephyr image processor (`src/platform/Zephyr/OTAImageProcessorImpl`) and
+MCUboot.
 
 Enabling `CONFIG_CHIP_OTA_REQUESTOR` implies `CONFIG_BOOTLOADER_MCUBOOT`.
 
 The app is signed with the MCUboot ECDSA-P256 development key
-(`CONFIG_MCUBOOT_SIGNATURE_KEY_FILE`, set in `config/silabs/Kconfig`); replace it
-with a private key for production.
+(`CONFIG_MCUBOOT_SIGNATURE_KEY_FILE`, set in `config/silabs/Kconfig`); replace
+it with a private key for production.
 
 ### Build
 
@@ -285,8 +286,8 @@ west build -b xg24_rb4187c -p always examples/lighting-app/silabs/zephyr \
     -- -DCONFIG_CHIP_OTA_REQUESTOR=y -DCONFIG_CHIP_OTA_IMAGE_BUILD=y
 ```
 
-Build the update image with a higher software version so the provider offers
-it as newer version:
+Build the update image with a higher software version so the provider offers it
+as newer version:
 
 ```bash
 west build -b xg24_rb4187c -p always examples/lighting-app/silabs/zephyr \
@@ -295,7 +296,8 @@ west build -b xg24_rb4187c -p always examples/lighting-app/silabs/zephyr \
        -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"
 ```
 
-Outputs in `build/zephyr/` (produced by `config/silabs/app/zephyr-post-build.cmake`):
+Outputs in `build/zephyr/` (produced by
+`config/silabs/app/zephyr-post-build.cmake`):
 
 -   `zephyr_full.bin` — MCUboot + signed application; flash this for the initial
     (factory) image.
@@ -311,10 +313,14 @@ commander flash ./build/zephyr/zephyr_full.bin --address 0x8000000
 
 ### Run an update
 
-The following commands are provided as examples using a [Silicon Labs Matter Hub image.](https://docs.silabs.com/matter/latest/matter-thread/raspi-img) Refer to the [Matter OTA guide](../../../../docs/guides/ota_software_update.md) for detailed instructions on setting up an OTA Provider.
+The following commands are provided as examples using a
+[Silicon Labs Matter Hub image.](https://docs.silabs.com/matter/latest/matter-thread/raspi-img)
+Refer to the [Matter OTA guide](../../../../docs/guides/ota_software_update.md)
+for detailed instructions on setting up an OTA Provider.
 
 1. Flash the base (v1) image and commission the device.
 2. Serve the candidate (v2) image with `chip-ota-provider-app`
+
 ```bash
 ./chip-ota-provider-app \
     --KVS /tmp/chip_kvs_provider \
@@ -325,7 +331,9 @@ The following commands are provided as examples using a [Silicon Labs Matter Hub
     -q updateAvailable
 
 ```
+
 3. Commission the OTA provider and update ACLs
+
 ```bash
 PROVIDER_NODE_ID=1
 LIGHT_NODE_ID=<your-lighting-app-node-id>
@@ -337,13 +345,17 @@ mattertool accesscontrol write acl \
     ${PROVIDER_NODE_ID} 0
 
 ```
+
 3. Announce the provider to the device with `chip-tool`
+
 ```bash
 mattertool otasoftwareupdaterequestor announce-otaprovider \
     ${PROVIDER_NODE_ID} 0 0 0 ${LIGHT_NODE_ID} 0
 ```
+
 4. Device will download and apply the OTA.
 5. Verify the OTA was applied
+
 ```bash
 mattertool basicinformation read software-version ${LIGHT_NODE_ID} 0
 ```
