@@ -45,6 +45,7 @@
 #include <devices/oven/OvenDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
+#include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/refrigerator/RefrigeratorDevice.h>
 #include <devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.h>
@@ -414,8 +415,7 @@ private:
         {
             RegisterCreator("proximity-ranger", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
-                                                               Span<Clusters::ProximityRanging::RangingAdapter * const>());
+                return std::make_unique<LoggingProximityRangerDevice>(mContext->timerDelegate, mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)

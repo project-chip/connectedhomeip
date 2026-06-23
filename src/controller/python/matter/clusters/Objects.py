@@ -157,6 +157,7 @@ __all__ = [
     "WiFiNetworkManagement",
     "ThreadBorderRouterManagement",
     "ThreadNetworkDirectory",
+    "CommissioningProxy",
     "WakeOnLan",
     "Channel",
     "TargetNavigator",
@@ -46777,6 +46778,464 @@ class ThreadNetworkDirectory(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000453
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+
+@dataclass
+class CommissioningProxy(Cluster):
+    id: typing.ClassVar[int] = 0x00000455
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="transport", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="scanMaxTime", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="maxSessions", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="maxCachedResults", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numCachedResults", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="cacheTimeout", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="cachedResults", Tag=0x00000006, Type=typing.Union[None, Nullable, typing.List[CommissioningProxy.Structs.ScanResultStruct]]),
+                ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=0x00000007, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    transport: uint = 0
+    scanMaxTime: uint = 0
+    maxSessions: uint = 0
+    maxCachedResults: typing.Optional[uint] = None
+    numCachedResults: typing.Optional[uint] = None
+    cacheTimeout: typing.Optional[uint] = None
+    cachedResults: typing.Union[None, Nullable, typing.List[CommissioningProxy.Structs.ScanResultStruct]] = None
+    wiFiBand: typing.Optional[uint] = None
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Bitmaps:
+        class CapabilitiesBitmap(IntFlag):
+            kBle = 0x2
+            kWiFiPAF = 0x8
+            kNtl = 0x10
+
+        class Feature(IntFlag):
+            kWiFiNetworkInterface = 0x1
+            kBackgroundScan = 0x2
+
+        class WiFiBandBitmap(IntFlag):
+            k2g4 = 0x1
+            k5g = 0x4
+
+    class Structs:
+        @dataclass
+        class ScanResultStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="address", Tag=0, Type=typing.Union[Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="transport", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="discriminator", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="vendorID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="productID", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="extendedData", Tag=5, Type=typing.Union[Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=6, Type=typing.Optional[uint]),
+                    ])
+
+            address: 'typing.Union[Nullable, bytes]' = NullValue
+            transport: 'uint' = 0
+            discriminator: 'uint' = 0
+            vendorID: 'uint' = 0
+            productID: 'uint' = 0
+            extendedData: 'typing.Union[Nullable, bytes]' = NullValue
+            wiFiBand: 'typing.Optional[uint]' = None
+
+    class Commands:
+        @dataclass
+        class ProxyConnectRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ProxyConnectResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="address", Tag=0, Type=typing.Union[Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="transport", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="discriminator", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="vendorID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="productID", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="timeout", Tag=5, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=6, Type=typing.Optional[uint]),
+                    ])
+
+            address: typing.Union[Nullable, bytes] = NullValue
+            transport: uint = 0
+            discriminator: uint = 0
+            vendorID: uint = 0
+            productID: uint = 0
+            timeout: uint = 0
+            wiFiBand: typing.Optional[uint] = None
+
+        @dataclass
+        class ProxyConnectResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                    ])
+
+            sessionID: uint = 0
+
+        @dataclass
+        class ProxyDisconnectRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            sessionID: typing.Union[Nullable, uint] = NullValue
+
+        @dataclass
+        class ProxyScanRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ProxyScanResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="transport", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="wiFiBands", Tag=1, Type=typing.Optional[uint]),
+                    ])
+
+            transport: uint = 0
+            wiFiBands: typing.Optional[uint] = None
+
+        @dataclass
+        class ProxyScanResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="numberOfResults", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="proxyScanResult", Tag=1, Type=typing.List[CommissioningProxy.Structs.ScanResultStruct]),
+                    ])
+
+            numberOfResults: uint = 0
+            proxyScanResult: typing.List[CommissioningProxy.Structs.ScanResultStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class ProxyBackGroundScanStartRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="transport", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="timeout", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="wiFiBands", Tag=2, Type=typing.Optional[uint]),
+                    ])
+
+            transport: uint = 0
+            timeout: uint = 0
+            wiFiBands: typing.Optional[uint] = None
+
+        @dataclass
+        class ProxyBackGroundScanStopRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="transport", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="wiFiBands", Tag=1, Type=typing.Optional[uint]),
+                    ])
+
+            transport: uint = 0
+            wiFiBands: typing.Optional[uint] = None
+
+        @dataclass
+        class ProxyMessageRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ProxyMessageResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="responseTimeout", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="message", Tag=2, Type=typing.Union[Nullable, bytes]),
+                    ])
+
+            sessionID: uint = 0
+            responseTimeout: uint = 0
+            message: typing.Union[Nullable, bytes] = NullValue
+
+        @dataclass
+        class ProxyMessageResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000455
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="message", Tag=1, Type=typing.Union[Nullable, bytes]),
+                    ])
+
+            sessionID: uint = 0
+            message: typing.Union[Nullable, bytes] = NullValue
+
+    class Attributes:
+        @dataclass
+        class Transport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ScanMaxTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class MaxSessions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class MaxCachedResults(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class NumCachedResults(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class CacheTimeout(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class CachedResults(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[CommissioningProxy.Structs.ScanResultStruct]])
+
+            value: typing.Union[None, Nullable, typing.List[CommissioningProxy.Structs.ScanResultStruct]] = None
+
+        @dataclass
+        class WiFiBand(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000455
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:

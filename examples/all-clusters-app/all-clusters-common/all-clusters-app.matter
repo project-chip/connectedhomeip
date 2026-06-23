@@ -7204,7 +7204,7 @@ internal cluster TestHiddenManufacturerSpecific = 4294048801 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
   device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -7714,7 +7714,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_onofflight = 256, version 3;
+  device type ma_onofflight = 256, version 4;
 
   binding cluster OnOff;
 
@@ -8920,7 +8920,7 @@ endpoint 1 {
 }
 endpoint 2 {
   device type ma_powersource = 17, version 1;
-  device type ma_onofflight = 256, version 3;
+  device type ma_onofflight = 256, version 4;
 
 
   server cluster Identify {
