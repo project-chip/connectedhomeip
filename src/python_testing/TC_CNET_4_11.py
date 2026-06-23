@@ -140,7 +140,7 @@ class MatterServiceListener(ServiceListener):
                             # IPv6 address
                             addresses.append(socket.inet_ntop(socket.AF_INET6, addr))
                     except Exception as addr_e:
-                        logger.debug(f"Failed to parse address: {addr_e}")
+                        logger.debug("Failed to parse address: %s", addr_e)
                         continue
 
                 service_data = {
@@ -176,7 +176,7 @@ class MatterServiceListener(ServiceListener):
                     # No filtering, add all services
                     self.discovered_services.append(service_data)
         except Exception as e:
-            logger.warning(f"MatterServiceListener: Failed to get service info for {name}: {e}")
+            logger.warning("MatterServiceListener: Failed to get service info for %s: %s", name, e)
 
     def remove_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         pass
@@ -219,7 +219,7 @@ async def find_matter_devices_mdns(max_attempts=None):
     attempts = max_attempts if max_attempts is not None else MAX_ATTEMPTS
 
     logger.info(
-        f"find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + target_device_id if target_device_id else ''}")
+        f"find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + target_device_id if target_device_id else ''}")  # noqa: G004
 
     for attempt in range(1, attempts + 1):
         zc = None
@@ -238,24 +238,24 @@ async def find_matter_devices_mdns(max_attempts=None):
 
             if listener.discovered_services:
                 elapsed = time.time() - start_time
-                logger.info(f"Device found on attempt {attempt}/{attempts} after {elapsed:.1f}s")
+                logger.info("Device found on attempt %s/%s after %.1fs", attempt, attempts, elapsed)
                 return listener.discovered_services
 
         except Exception as e:
-            logger.error(f"find_matter_devices_mdns: Discovery attempt {attempt} failed: {e}")
+            logger.error("find_matter_devices_mdns: Discovery attempt %s failed: %s", attempt, e)
 
         finally:
             for browser in browsers:
                 try:
                     browser.cancel()
                 except Exception as e:
-                    logger.debug(f"find_matter_devices_mdns: Error canceling browser: {e}")
+                    logger.debug("find_matter_devices_mdns: Error canceling browser: %s", e)
 
             if zc is not None:
                 try:
                     zc.close()
                 except Exception as e:
-                    logger.debug(f"find_matter_devices_mdns: Error closing Zeroconf: {e}")
+                    logger.debug("find_matter_devices_mdns: Error closing Zeroconf: %s", e)
 
             await asyncio.sleep(0.5)
 
@@ -277,7 +277,7 @@ async def dhclient_renew(interface: str):
     (e.g. in containers where NetworkManager handles DHCP internally via its own client)."""
 
     if not shutil.which("dhclient"):
-        logger.debug(f"dhclient_renew: dhclient not found, skipping DHCP renewal on {interface} (NM handles it)")
+        logger.debug("dhclient_renew: dhclient not found, skipping DHCP renewal on %s (NM handles it)", interface)
         return
     await run_subprocess(privileged_cmd(["dhclient", "-r", interface]))
     await asyncio.sleep(1)
@@ -304,17 +304,17 @@ async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBU
         return proc.returncode == 0
 
     except TimeoutError:
-        logger.warning(f"run_subprocess: Command timed out after {timeout}s: {' '.join(cmd)}")
+        logger.warning("run_subprocess: Command timed out after %ss: %s", timeout, ' '.join(cmd))
         if check:
             raise
         return "" if capture_output else False
     except subprocess.CalledProcessError:
-        logger.warning(f"run_subprocess: Subprocess failed (handled): {' '.join(cmd)}")
+        logger.warning("run_subprocess: Subprocess failed (handled): %s", ' '.join(cmd))
         if check:
             raise
         return "" if capture_output else False
     except Exception as e:
-        logger.error(f"run_subprocess: Subprocess error: {' '.join(cmd)} - {e}")
+        logger.error("run_subprocess: Subprocess error: %s - %s", ' '.join(cmd), e)
         return "" if capture_output else False
 
 
@@ -329,7 +329,7 @@ async def detect_wifi_interface():
             return physical_interfaces[0]
         return None
     except Exception as e:
-        logger.error(f"detect_wifi_interface: Error: {e}")
+        logger.error("detect_wifi_interface: Error: %s", e)
         return None
 
 
@@ -351,10 +351,10 @@ async def wpa_command(iface, cmd):
         resp, _ = sock.recvfrom(4096)
         return resp.decode(errors="ignore").strip()
     except TimeoutError:
-        logger.error(f"wpa_command: Timed out waiting for reply to '{cmd}' on {iface}")
+        logger.error("wpa_command: Timed out waiting for reply to '%s' on %s", cmd, iface)
         raise
     except Exception as e:
-        logger.error(f"wpa_command: Error sending '{cmd}' to {iface}: {e}")
+        logger.error("wpa_command: Error sending '%s' to %s: %s", cmd, iface, e)
         raise
     finally:
         sock.close()
@@ -378,12 +378,12 @@ async def scan_and_find_ssid(interface, target_ssid):
                     return True
 
         except Exception as e:
-            logger.error(f"scan_and_find_ssid: Scan attempt {attempt} failed: {e}")
+            logger.error("scan_and_find_ssid: Scan attempt %s failed: %s", attempt, e)
 
         if attempt < MAX_ATTEMPTS:
             await asyncio.sleep(RETRY_DELAY_SECONDS)
 
-    logger.error(f"scan_and_find_ssid: SSID {target_ssid} not found after {MAX_ATTEMPTS} attempts")
+    logger.error("scan_and_find_ssid: SSID %s not found after %s attempts", target_ssid, MAX_ATTEMPTS)
     return False
 
 
@@ -405,7 +405,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         await asyncio.sleep(1)
 
         if not await scan_and_find_ssid(interface, ssid):
-            logger.error(f"connect_wifi_linux: SSID {ssid} not found in scan")
+            logger.error("connect_wifi_linux: SSID %s not found in scan", ssid)
             return ConnectionResult(1, f"SSID {ssid} not available")
 
         # Disconnect from any current connection
@@ -425,7 +425,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         # Add and configure the target network
         network_id = await wpa_command(interface, "ADD_NETWORK")
         if network_id.startswith("FAIL"):
-            logger.error(f"connect_wifi_linux: Failed to add network: {network_id}")
+            logger.error("connect_wifi_linux: Failed to add network: %s", network_id)
             return ConnectionResult(1, f"Failed to add network: {network_id}")
 
         network_id = network_id.strip()
@@ -442,7 +442,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         for cmd in config_commands:
             result = await wpa_command(interface, cmd)
             if result.startswith("FAIL"):
-                logger.error(f"connect_wifi_linux: Failed to configure network: {cmd} -> {result}")
+                logger.error("connect_wifi_linux: Failed to configure network: %s -> %s", cmd, result)
                 return ConnectionResult(1, f"Failed to configure network: {cmd}")
 
         await wpa_command(interface, f"ENABLE_NETWORK {network_id}")
@@ -469,7 +469,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                     last_state = "DISCONNECTED"
                     if disconnected_count > 5:
                         logger.warning(
-                            f"connect_wifi_linux: Persistent disconnected state after {disconnected_count} checks, attempt {attempt} failed")
+                            "connect_wifi_linux: Persistent disconnected state after %s checks, attempt %s failed", disconnected_count, attempt)
                         break
                     await asyncio.sleep(1)
                 elif "wpa_state=SCANNING" in status or "wpa_state=AUTHENTICATING" in status:
@@ -484,14 +484,14 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             # If connection failed and we have more attempts, reset interface
             if attempt < MAX_ATTEMPTS:
                 logger.warning(
-                    f"connect_wifi_linux: Attempt {attempt} failed after {CONNECTION_TIMEOUT}s (last_state: {last_state}), resetting interface")
+                    "connect_wifi_linux: Attempt %s failed after %ss (last_state: %s), resetting interface", attempt, CONNECTION_TIMEOUT, last_state)
                 await run_subprocess(privileged_cmd(["ip", "link", "set", interface, "down"]))
                 await asyncio.sleep(2)
                 await run_subprocess(privileged_cmd(["ip", "link", "set", interface, "up"]))
                 await asyncio.sleep(3)
 
                 # Re-select and reconnect to the network
-                logger.info(f"connect_wifi_linux: Re-selecting network {network_id} for attempt {attempt + 1}")
+                logger.info("connect_wifi_linux: Re-selecting network %s for attempt %s", network_id, attempt + 1)
                 await wpa_command(interface, f"SELECT_NETWORK {network_id}")
                 await wpa_command(interface, "REASSOCIATE")
                 await asyncio.sleep(2)
@@ -499,7 +499,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         if not connected:
             final_status = await wpa_command(interface, "STATUS")
             logger.error(
-                f"connect_wifi_linux: Connection failed after {MAX_ATTEMPTS} attempts. Final status: {final_status}, Last observed state: {last_state}")
+                "connect_wifi_linux: Connection failed after %s attempts. Final status: %s, Last observed state: %s", MAX_ATTEMPTS, final_status, last_state)
             return ConnectionResult(1, f"Connection failed, last_state: {last_state}")
 
         # Connection successful, get IP address
@@ -551,7 +551,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         return ConnectionResult(1, "No IP address obtained")
 
     except Exception as e:
-        logger.error(f"connect_wifi_linux: Exception during connection: {e}")
+        logger.error("connect_wifi_linux: Exception during connection: %s", e)
         return ConnectionResult(1, str(e))
 
 
@@ -582,7 +582,7 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                 "-setairportnetwork", interface, ssid, password
             ], check=True)
         except Exception as e:
-            logger.error(f" --- connect_wifi_mac: networksetup command failed: {e}")
+            logger.error(" --- connect_wifi_mac: networksetup command failed: %s", e)
             return ConnectionResult(1, str(e))
 
         # Wait for connection to establish
@@ -617,24 +617,24 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                                     break
                     except Exception as ping_e:
                         # Ping verification is optional, don't fail if it doesn't work
-                        logger.debug(f" --- connect_wifi_mac: Gateway ping failed (non-critical): {ping_e}")
+                        logger.debug(" --- connect_wifi_mac: Gateway ping failed (non-critical): %s", ping_e)
 
                     return ConnectionResult(0, "")
-                logger.warning(f" --- connect_wifi_mac: No IP address yet on {interface}")
+                logger.warning(" --- connect_wifi_mac: No IP address yet on %s", interface)
 
                 if verify_attempt < 5:
                     await asyncio.sleep(3)
 
             except Exception as verify_e:
-                logger.warning(f" --- connect_wifi_mac: Verification attempt {verify_attempt}/5 error: {verify_e}")
+                logger.warning(" --- connect_wifi_mac: Verification attempt %s/5 error: %s", verify_attempt, verify_e)
                 if verify_attempt < 5:
                     await asyncio.sleep(3)
 
-        logger.error(f" --- connect_wifi_mac: Failed to verify connection to {ssid_str} after 5 attempts")
+        logger.error(" --- connect_wifi_mac: Failed to verify connection to %s after 5 attempts", ssid_str)
         return ConnectionResult(1, "Connection verification failed")
 
     except Exception as e:
-        logger.error(f" --- connect_wifi_mac: Unexpected exception while trying to connect to {ssid_str}: {e}")
+        logger.error(" --- connect_wifi_mac: Unexpected exception while trying to connect to %s: %s", ssid_str, e)
         return ConnectionResult(1, str(e))
 
 
@@ -651,19 +651,19 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
             elif os_name == "macos":
                 conn = await connect_wifi_mac(ssid, password)
             else:
-                logger.error(f"connect_host_wifi: OS not supported: {os_name}")
+                logger.error("connect_host_wifi: OS not supported: %s", os_name)
                 return ConnectionResult(1, "OS not supported")
 
             if conn and conn.returncode == 0:
                 break
             if conn:
                 logger.warning(
-                    f"connect_host_wifi: Attempt {attempt} failed. Return code: {conn.returncode}, stderr: {conn.stderr}")
+                    "connect_host_wifi: Attempt %s failed. Return code: %s, stderr: %s", attempt, conn.returncode, conn.stderr)
             else:
-                logger.warning(f"connect_host_wifi: No result returned from connection attempt {attempt}")
+                logger.warning("connect_host_wifi: No result returned from connection attempt %s", attempt)
 
         except Exception as e:
-            logger.warning(f"connect_host_wifi: Exception on attempt {attempt}: {e}")
+            logger.warning("connect_host_wifi: Exception on attempt %s: %s", attempt, e)
 
         if attempt < MAX_ATTEMPTS and (not conn or conn.returncode != 0):
             await asyncio.sleep(RETRY_DELAY_SECONDS)
@@ -715,11 +715,11 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 if "timeout" in error_msg or "commandsender.cpp" in error_msg:
                     pass
                 else:
-                    logger.error(f"change_networks: ConnectNetwork command failed: {cmd_e}")
+                    logger.error("change_networks: ConnectNetwork command failed: %s", cmd_e)
                     continue
 
         except Exception as e:
-            logger.error(f"change_networks: Unexpected error on attempt {attempt}: {e}")
+            logger.error("change_networks: Unexpected error on attempt %s: %s", attempt, e)
             continue
 
         # Wait for DUT to change networks
@@ -740,20 +740,20 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                     th_success = True
                     break
                 logger.warning(
-                    f"change_networks: TH connection failed on attempt {th_attempt}: {result.stderr if result else 'Unknown error'}")
+                    "change_networks: TH connection failed on attempt %s: %s", th_attempt, result.stderr if result else 'Unknown error')
 
             except TimeoutError:
                 pass
 
             except Exception as e:
-                logger.warning(f"change_networks: TH connection exception on attempt {th_attempt}: {e}")
+                logger.warning("change_networks: TH connection exception on attempt %s: %s", th_attempt, e)
 
             if th_attempt < MAX_ATTEMPTS:
                 await asyncio.sleep(RETRY_DELAY_SECONDS)
 
         if th_success:
             return  # Success!
-        logger.error(f"change_networks: TH failed to connect to {ssid} after {MAX_ATTEMPTS} attempts")
+        logger.error("change_networks: TH failed to connect to %s after %s attempts", ssid, MAX_ATTEMPTS)
 
         # Try fallback to original network immediately
         try:
@@ -764,9 +764,9 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             if fallback_result and fallback_result.returncode == 0:
                 pass
             else:
-                logger.error(f"change_networks: Fallback to {original_ssid} also failed!")
+                logger.error("change_networks: Fallback to %s also failed!", original_ssid)
         except Exception as fallback_e:
-            logger.error(f"change_networks: Fallback connection failed: {fallback_e}")
+            logger.error("change_networks: Fallback connection failed: %s", fallback_e)
 
         if attempt < MAX_ATTEMPTS:
             pass
@@ -774,17 +774,17 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             logger.error("change_networks: All retry attempts exhausted")
 
     # All attempts failed, ensure we have fallback connectivity
-    logger.error(f"change_networks: Failed to switch networks after {MAX_ATTEMPTS} retries.")
-    logger.info(f"change_networks: Ensuring fallback connectivity to {original_ssid}")
+    logger.error("change_networks: Failed to switch networks after %s retries.", MAX_ATTEMPTS)
+    logger.info("change_networks: Ensuring fallback connectivity to %s", original_ssid)
 
     try:
         fallback_result = await connect_host_wifi(original_ssid, original_password)
         if fallback_result and fallback_result.returncode == 0:
-            logger.info(f"change_networks: Final fallback to {original_ssid} successful")
+            logger.info("change_networks: Final fallback to %s successful", original_ssid)
         else:
-            logger.error(f"change_networks: Final fallback to {original_ssid} failed - WiFi may be disconnected!")
+            logger.error("change_networks: Final fallback to %s failed - WiFi may be disconnected!", original_ssid)
     except Exception as final_e:
-        logger.error(f"change_networks: Final fallback attempt failed: {final_e}")
+        logger.error("change_networks: Final fallback attempt failed: %s", final_e)
 
     raise Exception(f"Failed to switch networks to {ssid} after {MAX_ATTEMPTS} attempts")
 
@@ -823,7 +823,7 @@ async def parse_default_routes():
 
         return routes_info
     except Exception as e:
-        logger.error(f"parse_default_routes: Error parsing routes: {e}")
+        logger.error("parse_default_routes: Error parsing routes: %s", e)
         return []
 
 
@@ -840,12 +840,12 @@ async def remove_lan_routes():
                 gateway = route["gateway"]
                 interface = route["interface"]
 
-                logger.info(f"remove_lan_routes: Removing default route via {gateway} dev {interface}")
+                logger.info("remove_lan_routes: Removing default route via %s dev %s", gateway, interface)
                 try:
                     await run_subprocess(privileged_cmd(["ip", "route", "del", "default", "via", gateway, "dev", interface]), check=True)
                     original_routes.append(route)
                 except subprocess.CalledProcessError as e:
-                    logger.warning(f"remove_lan_routes: Failed to remove route via {gateway}: {e}")
+                    logger.warning("remove_lan_routes: Failed to remove route via %s: %s", gateway, e)
 
         if original_routes:
             pass
@@ -853,7 +853,7 @@ async def remove_lan_routes():
             pass
 
     except Exception as e:
-        logger.error(f"remove_lan_routes: Error removing LAN routes: {e}")
+        logger.error("remove_lan_routes: Error removing LAN routes: %s", e)
 
     return original_routes
 
@@ -875,12 +875,12 @@ async def restore_lan_routes(original_routes):
                 cmd.extend(["metric", metric])
             await run_subprocess(cmd, check=True)
         except subprocess.CalledProcessError as e:
-            logger.warning(f"restore_lan_routes: Failed to restore route via {gateway}: {e}")
+            logger.warning("restore_lan_routes: Failed to restore route via %s: %s", gateway, e)
             # Try to restore using dhclient as fallback
             try:
                 await dhclient_renew(interface)
             except Exception as dhcp_e:
-                logger.warning(f"restore_lan_routes: DHCP fallback failed for {interface}: {dhcp_e}")
+                logger.warning("restore_lan_routes: DHCP fallback failed for %s: %s", interface, dhcp_e)
 
 
 async def restore_original_network():
@@ -894,7 +894,7 @@ async def restore_original_network():
         else:
             logger.error("restore_original_network: Failed to restore TH Wi-Fi to original network")
     except Exception as e:
-        logger.error(f"restore_original_network: Exception during network restoration: {e}")
+        logger.error("restore_original_network: Exception during network restoration: %s", e)
 
 
 async def find_network_and_assert(test, networks, ssid, should_be_connected=True):
@@ -923,9 +923,9 @@ async def verify_operational_network(test, ssid):
         if quick_check_services:
             logger.info("verify_operational_network: Device already reachable (immediate check)")
     except Exception as e:
-        logger.debug(f"verify_operational_network: Immediate check failed (expected): {e}")
+        logger.debug("verify_operational_network: Immediate check failed (expected): %s", e)
 
-    logger.info(f"verify_operational_network: Waiting {NETWORK_STABILIZATION_WAIT}s for network stabilization...")
+    logger.info("verify_operational_network: Waiting %ss for network stabilization...", NETWORK_STABILIZATION_WAIT)
     await asyncio.sleep(NETWORK_STABILIZATION_WAIT)
 
     # Reduced from MAX_ATTEMPTS to 3 to prevent excessive retries that can cause segmentation faults
@@ -954,7 +954,7 @@ async def verify_operational_network(test, ssid):
                 break
 
         except Exception as e:
-            logger.error(f"verify_operational_network: Exception reading networks (attempt {attempt}/{max_read_attempts}): {e}")
+            logger.error("verify_operational_network: Exception reading networks (attempt %s/%s): %s", attempt, max_read_attempts, e)
 
         if attempt == 1:
             retry_delay = 10
@@ -984,7 +984,7 @@ class TC_CNET_4_11(MatterBaseTest):
             try:
                 cls._original_routes = asyncio.run(remove_lan_routes())
             except Exception as e:
-                logger.error(f"setup_class: Failed to setup network environment: {e}")
+                logger.error("setup_class: Failed to setup network environment: %s", e)
                 cls._original_routes = []
                 raise
 
@@ -1000,12 +1000,12 @@ class TC_CNET_4_11(MatterBaseTest):
                 original_routes = getattr(cls, "_original_routes", [])
                 asyncio.run(restore_lan_routes(original_routes))
             except Exception as e:
-                logger.error(f"teardown_class: Failed to teardown network environment: {e}")
+                logger.error("teardown_class: Failed to teardown network environment: %s", e)
         # Always try to restore original Wi-Fi network
         try:
             asyncio.run(restore_original_network())
         except Exception as e:
-            logger.error(f"teardown_class: Failed to restore original Wi-Fi network: {e}")
+            logger.error("teardown_class: Failed to restore original Wi-Fi network: %s", e)
 
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property
@@ -1081,7 +1081,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Set the target device ID for mDNS discovery from DUT node ID
         set_target_device_id(self.dut_node_id)
-        logger.info(f"test_TC_CNET_4_11: Set target device ID for mDNS filtering: {self.dut_node_id}")
+        logger.info("test_TC_CNET_4_11: Set target device ID for mDNS filtering: %s", self.dut_node_id)
 
         asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
                             "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
@@ -1118,12 +1118,12 @@ class TC_CNET_4_11(MatterBaseTest):
             cluster=cnet,
             attribute=cnet.Attributes.Networks
         )
-        logger.info(f" --- Networks by endpoint: {networks_dict}")
+        logger.info(" --- Networks by endpoint: %s", networks_dict)
 
         # Verify that there is a single connected network across ALL network commissioning clusters
         for ep in networks_dict:
             connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
-            logger.info(f" --- Connected networks count by endpoint: {connected_network_count}")
+            logger.info(" --- Connected networks count by endpoint: %s", connected_network_count)
             asserts.assert_equal(sum(connected_network_count.values()), 1,
                                  "Verify that only one entry has connected status as TRUE across ALL endpoints")
 
@@ -1152,7 +1152,7 @@ class TC_CNET_4_11(MatterBaseTest):
             attribute=cnet.Attributes.Networks
         )
         num_networks = len(networks)
-        logger.info(f" --- Step 2: num_networks: {num_networks}")
+        logger.info(" --- Step 2: num_networks: %s", num_networks)
 
         # TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'userwifi_netidx'
         self.step(3)
@@ -1198,13 +1198,13 @@ class TC_CNET_4_11(MatterBaseTest):
         response = None
         for attempt in range(1, MAX_ATTEMPTS + 1):
             try:
-                logger.info(f"Step 5 attempt {attempt}/{MAX_ATTEMPTS}: Sending AddOrUpdateWiFiNetwork command")
+                logger.info("Step 5 attempt %s/%s: Sending AddOrUpdateWiFiNetwork command", attempt, MAX_ATTEMPTS)
                 response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
                 break
             except Exception as e:
-                logger.warning(f"Step 5 attempt {attempt} failed: {e}")
+                logger.warning("Step 5 attempt %s failed: %s", attempt, e)
                 if attempt < MAX_ATTEMPTS:
-                    logger.info(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
+                    logger.info("Retrying in %s seconds...", RETRY_DELAY_SECONDS)
                     await asyncio.sleep(RETRY_DELAY_SECONDS)
                 else:
                     raise Exception(f"Failed to send AddOrUpdateWiFiNetwork after {MAX_ATTEMPTS} attempts: {e}")
@@ -1266,7 +1266,7 @@ class TC_CNET_4_11(MatterBaseTest):
             cluster=cgen,
             attribute=cgen.Attributes.Breadcrumb
         )
-        logger.info(f" --- Step 9: Breadcrumb is: {breadcrumb}")
+        logger.info(" --- Step 9: Breadcrumb is: %s", breadcrumb)
         asserts.assert_equal(breadcrumb, 2, f"Expected breadcrumb to be 2, but got: {breadcrumb}")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0.
@@ -1285,7 +1285,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 "ArmFailSafeResponse error code is not OK.",
             )
         except Exception as e:
-            logger.warning(f"ArmFailSafe(0) command may have succeeded despite timeout: {e}")
+            logger.warning("ArmFailSafe(0) command may have succeeded despite timeout: %s", e)
             logger.info("Proceeding with network change as this is expected behavior")
 
         # Wait for DUT to complete network reversion
@@ -1294,7 +1294,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         self.step(11)
 
-        logger.info(f"Switching TH back to original network: {wifi_1st_ap_ssid}")
+        logger.info("Switching TH back to original network: %s", wifi_1st_ap_ssid)
         await asyncio.wait_for(
             connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials),
             timeout=NETWORK_CHANGE_TIMEOUT
@@ -1313,7 +1313,7 @@ class TC_CNET_4_11(MatterBaseTest):
             await verify_operational_network(self, wifi_1st_ap_ssid)
             logger.info("Successfully reconnected to DUT on original network")
         except Exception as e:
-            logger.error(f"Failed to reconnect to DUT on original network: {e}")
+            logger.error("Failed to reconnect to DUT on original network: %s", e)
             # Try one more time with additional wait
             logger.info("Retrying connection to DUT...")
             await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
@@ -1398,7 +1398,7 @@ class TC_CNET_4_11(MatterBaseTest):
             ),
             timeout=TIMEOUT
         )
-        logger.info(f" --- Step 18: Breadcrumb is: {breadcrumb}")
+        logger.info(" --- Step 18: Breadcrumb is: %s", breadcrumb)
         # Verify that the breadcrumb value is set to 3
         asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 3, but got: {breadcrumb}")
 
