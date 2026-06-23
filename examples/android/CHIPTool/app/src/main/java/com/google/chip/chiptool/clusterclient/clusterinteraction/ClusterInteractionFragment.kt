@@ -17,6 +17,8 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import com.google.chip.chiptool.databinding.ClusterInteractionFragmentBinding
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
