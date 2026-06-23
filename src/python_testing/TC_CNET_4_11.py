@@ -59,7 +59,7 @@ NETWORK_STABILIZATION_WAIT = 25      # Network stabilization wait (25s) - after 
 RETRY_DELAY_SECONDS = 5              # Delay between retry attempts (5s) - delay for DUT recovery
 
 WPA_SOCKET_TIMEOUT_SECONDS = 5       # wpa_supplicant ctrl_interface reply timeout - the socket recv has no
-                                      # default timeout and will block the event loop forever if a reply is lost
+# default timeout and will block the event loop forever if a reply is lost
 
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
@@ -303,7 +303,7 @@ async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBU
             return stdout.decode() if proc.returncode == 0 else ""
         return proc.returncode == 0
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.warning(f"run_subprocess: Command timed out after {timeout}s: {' '.join(cmd)}")
         if check:
             raise
@@ -350,7 +350,7 @@ async def wpa_command(iface, cmd):
         sock.sendto(cmd.encode(), sock_file)
         resp, _ = sock.recvfrom(4096)
         return resp.decode(errors="ignore").strip()
-    except socket.timeout:
+    except TimeoutError:
         logger.error(f"wpa_command: Timed out waiting for reply to '{cmd}' on {iface}")
         raise
     except Exception as e:
@@ -706,7 +706,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                     logger.error("change_networks: ConnectNetwork command indicated failure")
                     continue
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Timeout may be expected when DUT switches networks, but don't assume success
                 pass
             except Exception as cmd_e:
@@ -742,7 +742,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 logger.warning(
                     f"change_networks: TH connection failed on attempt {th_attempt}: {result.stderr if result else 'Unknown error'}")
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             except Exception as e:
