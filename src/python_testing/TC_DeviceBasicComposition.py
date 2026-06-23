@@ -198,6 +198,7 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --device "*"
+#       --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
