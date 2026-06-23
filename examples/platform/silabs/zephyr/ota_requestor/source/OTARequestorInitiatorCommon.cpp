@@ -30,9 +30,9 @@ void chip::Zephyr::App::OTARequestorInitiator::InitOTA(intptr_t context)
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    LogErrorOnFailure(otaRequestorInit->gRequestorCore.Init(
-        chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage, otaRequestorInit->gRequestorUser,
-        otaRequestorInit->gDownloader, GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator()));
+    LogErrorOnFailure(otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage,
+                                                            otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader,
+                                                            GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator()));
     otaRequestorInit->gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
     LogErrorOnFailure(imageProcessor.Init(&otaRequestorInit->gDownloader));
