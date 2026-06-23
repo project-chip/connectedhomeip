@@ -895,10 +895,11 @@ extern "C" bool __real_bt_is_ready(void);
 
 extern "C" bool __wrap_bt_is_ready(void)
 {
-    if (pm_observer_deepsleepped())
+    if (pm_observer_deep_sleep_occurred())
     {
         ChipLogDetail(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
         Reboot(SoftwareRebootReason::kOther);
+        return false;
     }
     return __real_bt_is_ready();
 }

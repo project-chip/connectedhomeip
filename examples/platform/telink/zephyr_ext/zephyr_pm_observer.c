@@ -21,7 +21,7 @@
 #endif /* CONFIG_PM */
 
 static volatile bool pm_observer_suspend_detected;
-static volatile bool pm_observer_deepsleeep_detected;
+static volatile bool pm_observer_deep_sleep_detected;
 
 #if CONFIG_PM
 static void pm_observer_state_entry(enum pm_state state)
@@ -32,7 +32,7 @@ static void pm_observer_state_entry(enum pm_state state)
         pm_observer_suspend_detected = true;
         break;
     case PM_STATE_STANDBY:
-        pm_observer_deepsleeep_detected = true;
+        pm_observer_deep_sleep_detected = true;
         break;
     default:
         break;
@@ -49,12 +49,12 @@ void pm_observer_init(void)
 #endif /* CONFIG_PM */
 }
 
-bool pm_observer_suspended(void)
+bool pm_observer_has_suspended(void)
 {
     return pm_observer_suspend_detected;
 }
 
-bool pm_observer_deepsleepped(void)
+bool pm_observer_deep_sleep_occurred(void)
 {
-    return pm_observer_deepsleeep_detected;
+    return pm_observer_deep_sleep_detected;
 }

@@ -25,8 +25,8 @@ extern "C" {
 #endif
 
 void pm_observer_init(void);
-bool pm_observer_suspended(void);
-bool pm_observer_deepsleepped(void);
+bool pm_observer_has_suspended(void);
+bool pm_observer_deep_sleep_occurred(void);
 
 #ifdef __cplusplus
 }
