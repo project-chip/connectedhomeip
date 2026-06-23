@@ -20,15 +20,9 @@
 
 namespace chip::app {
 
-OvenDevice::OvenDevice(TimerDelegate & timerDelegate) :
+OvenDevice::OvenDevice(TimerDelegate & timerDelegate, const Config & config) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)),
-    mCavity(timerDelegate,
-            TemperatureControlledCabinetPart::Config{
-                .temperatureSetpoint = 18000, // 180.00 °C
-                .minTemperature      = 5000,  // 50.00 °C
-                .maxTemperature      = 25000, // 250.00 °C
-                .step                = 500,   // 5.00 °C
-            }),
+    mCavity(timerDelegate, config.cavityConfig),
     mSurface(timerDelegate)
 {}
 
