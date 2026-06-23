@@ -119,31 +119,31 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
 
   private suspend fun sendStayActive(duration: Long): Long {
     isSendingStayActiveCommand = true
-    val devicePtr =
+    val retDuration =
       try {
-        ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
+        ChipClient.withConnectedDevice(requireContext(), deviceId) { devicePtr ->
+          val cluster = ChipClusters.IcdManagementCluster(devicePtr, 0)
+          suspendCoroutine { cont ->
+            cluster.stayActiveRequest(
+              object : ChipClusters.IcdManagementCluster.StayActiveResponseCallback {
+                override fun onError(error: Exception) {
+                  Log.d(TAG, "onError", error)
+                  cont.resume(0L)
+                }
+
+                override fun onSuccess(promisedActiveDuration: Long) {
+                  cont.resume(promisedActiveDuration)
+                }
+              },
+              duration
+            )
+          }
+        }
       } catch (e: IllegalStateException) {
         Log.d(TAG, "getConnectedDevicePointer exception", e)
         showToastMessage("Get DevicePointer fail!")
         throw e
       }
-
-    val cluster = ChipClusters.IcdManagementCluster(devicePtr, 0)
-    val retDuration = suspendCoroutine { cont ->
-      cluster.stayActiveRequest(
-        object : ChipClusters.IcdManagementCluster.StayActiveResponseCallback {
-          override fun onError(error: Exception) {
-            Log.d(TAG, "onError", error)
-            cont.resume(0L)
-          }
-
-          override fun onSuccess(promisedActiveDuration: Long) {
-            cont.resume(promisedActiveDuration)
-          }
-        },
-        duration
-      )
-    }
     isSendingStayActiveCommand = false
     return retDuration
   }
