@@ -149,9 +149,8 @@ IdentifyCluster * FindIdentifyClusterOnEndpoint(EndpointId endpointId)
     // registry so dependent clusters (e.g. codegen Groups for AddGroupIfIdentifying) can find it.
     ServerClusterInterface * registeredCluster =
         CodegenDataModelProvider::Instance().Registry().Get({ endpointId, Clusters::Identify::Id });
-    if (registeredCluster != nullptr)
+    if (registeredCluster != nullptr && registeredCluster->PathsContains({ endpointId, Clusters::Identify::Id }))
     {
-        VerifyOrDie(registeredCluster->PathsContains({ endpointId, Clusters::Identify::Id }));
         return static_cast<IdentifyCluster *>(registeredCluster);
     }
 
