@@ -39,7 +39,7 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     # Simplicity Commander and imgtool resolve CONFIG_BOOT_SIGNATURE_KEY_FILE from
     # the bootloader build directory, so supply it as an absolute path via overlay.
     get_filename_component(MCUBOOT_SIGNING_KEY
-        "${ZEPHYR_BASE}/../bootloader/mcuboot/root-ec-p256.pem" ABSOLUTE)
+        "${ZEPHYR_BASE}/../${CONFIG_MCUBOOT_SIGNATURE_KEY_FILE}" ABSOLUTE)
     set(MCUBOOT_SIGNING_KEY_CONF "${PROJECT_BINARY_DIR}/mcuboot_signing_key.conf")
     file(GENERATE OUTPUT ${MCUBOOT_SIGNING_KEY_CONF}
         CONTENT "CONFIG_BOOT_SIGNATURE_KEY_FILE=\"${MCUBOOT_SIGNING_KEY}\"\n")
@@ -52,7 +52,7 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
             -- -DOVERLAY_CONFIG="${BOOTLOADER_CONF_OVERLAY_FILES};${MCUBOOT_SIGNING_KEY_CONF}"
             -DEXTRA_DTC_OVERLAY_FILE="${DTC_OVERLAY_FILE};${EXTRA_DTC_OVERLAY_FILE}"
         COMMAND
-        cp ${ZEPHYR_OUTPUT_DIR}/../build_mcuboot/zephyr/zephyr.bin ${ZEPHYR_OUTPUT_DIR}/zephyr.mcuboot.bin
+        ${CMAKE_COMMAND} -E copy ${ZEPHYR_OUTPUT_DIR}/../build_mcuboot/zephyr/zephyr.bin ${ZEPHYR_OUTPUT_DIR}/zephyr.mcuboot.bin
     )
     add_dependencies(build_mcuboot app)
 

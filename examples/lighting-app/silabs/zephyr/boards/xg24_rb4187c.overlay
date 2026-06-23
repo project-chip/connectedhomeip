@@ -24,6 +24,8 @@
     reg = <0x0000c000 DT_SIZE_K(1024)>;
 };
 
+/delete-node/ &factory_partition;
+
 &flash0 {
     partitions {
         factory_partition: partition@10c000 {

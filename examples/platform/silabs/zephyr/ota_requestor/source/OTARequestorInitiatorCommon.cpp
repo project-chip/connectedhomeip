@@ -30,12 +30,12 @@ void chip::Zephyr::App::OTARequestorInitiator::InitOTA(intptr_t context)
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    TEMPORARY_RETURN_IGNORED otaRequestorInit->gRequestorCore.Init(
+    LogErrorOnFailure(otaRequestorInit->gRequestorCore.Init(
         chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage, otaRequestorInit->gRequestorUser,
-        otaRequestorInit->gDownloader, GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
+        otaRequestorInit->gDownloader, GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator()));
     otaRequestorInit->gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
-    TEMPORARY_RETURN_IGNORED imageProcessor.Init(&otaRequestorInit->gDownloader);
+    LogErrorOnFailure(imageProcessor.Init(&otaRequestorInit->gDownloader));
 
     // Set the image processor instance used for handling image being downloaded
     otaRequestorInit->gDownloader.SetImageProcessorDelegate(&imageProcessor);
