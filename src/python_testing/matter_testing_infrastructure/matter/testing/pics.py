@@ -44,22 +44,6 @@ _ROOT_NODE_DEVICE_TYPE_ID = 0x0016
 _ENDPOINT_DIR_PATTERN = re.compile(r'^(?:endpoint|ep)?[\s_-]*(\d+)$', re.IGNORECASE)
 
 
-def _find_endpoint_subdir(root_dir: str, endpoint: int) -> str | None:
-    """
-    Find the subdirectory under root_dir whose name resolves to `endpoint`.
-    Tolerates common conventions: endpoint0, Endpoint_0, EP0, ep 0, 0, etc.
-    Case-insensitive. Returns None if no match.
-    """
-    for name in os.listdir(root_dir):
-        full = os.path.join(root_dir, name)
-        if not os.path.isdir(full):
-            continue
-        match = _ENDPOINT_DIR_PATTERN.match(name)
-        if match and int(match.group(1)) == endpoint:
-            return full
-    return None
-
-
 def event_pics_str(pics_base: str, eid: int) -> str:
     return f'{pics_base}.S.E{eid:02x}'
 
@@ -106,7 +90,15 @@ def parse_pics(lines: list[str]) -> dict[str, bool]:
     return pics
 
 
-def parse_pics_xml(contents: str) -> dict[str, bool]:
+def parse_pics_xml(contents: str, endpoint: int = 0) -> dict[int, dict[str, bool]]:
+    """
+    Parse a single PICSGenerator XML file into an endpoint-keyed PICS tree of
+    the form {endpoint: {pics_code: supported}}.
+
+    The endpoint is not encoded in the XML itself - in a PICSGenerator tree it
+    comes from the directory layout - so it is supplied by the caller. Device-
+    wide files such as Base.xml use endpoint 0 (the default).
+    """
     pics: dict[str, bool] = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
@@ -128,34 +120,54 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
             raise ValueError(f"PICS XML item 'support' element missing text: {ET.tostring(pi, encoding='unicode')}")
 
         pics[name] = int(json.loads(support.lower())) == 1
-    return pics
+    return {endpoint: pics}
 
 
-def read_pics_from_file(path: str, endpoint: int | None = None) -> dict[str, bool]:
+def read_pics_from_file(path: str) -> dict[int, dict[str, bool]]:
     """
-    Reads PICS from a CI-format text file or a directory of PICS XML files.
-    For directory inputs, top-level *.xml files are always loaded (device-wide
-    codes like MCORE.*). If `endpoint` is supplied, the matching per-endpoint
-    subdirectory's *.xml files are loaded too. Common naming conventions are
-    accepted: `endpoint0`, `Endpoint_0`, `EP0`, `ep 0`, `0`, etc. (case-
-    insensitive). Other endpoint subdirs are skipped so per-endpoint test
-    checks don't see foreign clusters.
+    Reads PICS into an endpoint-keyed tree of the form
+    {endpoint: {pics_code: supported}}, preserving the PICSGenerator
+    endpoint layout.
+
+    Two input formats are supported:
+
+    * A CI-format text file (key=0/1 lines). These codes are not endpoint-
+      scoped, so they are all placed under endpoint 0.
+    * A PICSGenerator directory tree. Top-level *.xml files hold device-
+      wide codes (e.g. Base.xml with the MCORE.* codes) and are placed
+      under endpoint 0. Each per-endpoint subdirectory's *.xml files are
+      placed under that endpoint. Common subdir naming conventions are
+      accepted: endpoint0, Endpoint_0, EP0, ep 0, 0, etc.
+      (case-insensitive).
     """
+    pics_tree: dict[int, dict[str, bool]] = {}
+
+    def _merge(file_tree: dict[int, dict[str, bool]]) -> None:
+        for endpoint, codes in file_tree.items():
+            pics_tree.setdefault(endpoint, {}).update(codes)
+
     if os.path.isdir(os.path.abspath(path)):
-        pics_dict: dict[str, bool] = {}
+        # Top-level files carry device-wide codes -> endpoint 0.
         for filename in glob.glob(f'{path}/*.xml'):
             with open(filename) as f:
-                pics_dict.update(parse_pics_xml(f.read()))
-        if endpoint is not None:
-            ep_dir = _find_endpoint_subdir(path, endpoint)
-            if ep_dir is not None:
-                for filename in glob.glob(f'{ep_dir}/*.xml'):
-                    with open(filename) as f:
-                        pics_dict.update(parse_pics_xml(f.read()))
-        return pics_dict
+                _merge(parse_pics_xml(f.read(), endpoint=0))
+        # Each endpoint subdir carries that endpoint's cluster codes.
+        for name in sorted(os.listdir(path)):
+            full = os.path.join(path, name)
+            if not os.path.isdir(full):
+                continue
+            match = _ENDPOINT_DIR_PATTERN.match(name)
+            if match is None:
+                continue
+            endpoint = int(match.group(1))
+            for filename in glob.glob(f'{full}/*.xml'):
+                with open(filename) as f:
+                    _merge(parse_pics_xml(f.read(), endpoint=endpoint))
+        return pics_tree
 
     with open(path) as f:
-        return parse_pics(f.readlines())
+        _merge({0: parse_pics(f.readlines())})
+    return pics_tree
 
 
 @dataclass

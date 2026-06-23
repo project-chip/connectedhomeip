@@ -151,8 +151,10 @@ class TestMatterTestingSupport(MatterBaseTest):
                      ' # comment',
                      ' SPACE.S.A0000 = 1']
         pics = parse_pics(pics_list)
-        # force the parsed pics here to be in the config so we can check the check_pics function
-        self.matter_test_config.pics = pics
+        # force the parsed pics here to be in the config so we can check the check_pics
+        # function. parse_pics returns a flat dict; the config holds an endpoint-keyed
+        # tree, so place these device-wide codes under endpoint 0.
+        self.matter_test_config.pics = {0: pics}
 
         asserts.assert_true(self.check_pics("TEST.S.A0000"), "PICS parsed incorrectly for TEST.S.A0000")
         asserts.assert_false(self.check_pics("TEST.S.A0001"), "PICS parsed incorrectly for TEST.S.A0001")

@@ -146,7 +146,8 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
 
 def _load_baseline_pics() -> dict:
     """Re-read the example PICS file each time so test cases that mutate the
-    dict don't leak state into one another."""
+    tree don't leak state into one another. Returns an endpoint-keyed PICS tree
+    ({endpoint: {code: bool}}); device-wide codes are under endpoint 0."""
     script_dir = Path(__file__).resolve().parent
     with open(script_dir / 'example_pics_xml_basic_info.xml') as f:
         return parse_pics_xml(f.read())
@@ -189,50 +190,50 @@ def main():
         failures.append("Test case failure: MCORE.ROLE.COMMISSIONEE is not included for a root node device - expected failure")
 
     # If we add the MCORE.ROLE.COMMISSIONEE PICS, this should pass again.
-    pics['MCORE.ROLE.COMMISSIONEE'] = True
+    pics[0]['MCORE.ROLE.COMMISSIONEE'] = True
     test_runner.config.pics = pics
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: MCORE.ROLE.COMMISSIONEE is included for a root node device - expected success")
 
     # If we add a QR code PICS with no manual, it should fail
-    pics['MCORE.DD.QR'] = True
+    pics[0]['MCORE.DD.QR'] = True
     test_runner.config.pics = pics
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: QR code with no manual code - expected failure")
 
     # If we add the manual code, it should pass again
-    pics['MCORE.DD.MANUAL_PC'] = True
+    pics[0]['MCORE.DD.MANUAL_PC'] = True
     test_runner.config.pics = pics
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: QR code with manual code - expected success")
 
     # NFC only with no manual should fail
-    pics['MCORE.DD.QR'] = False
-    pics['MCORE.DD.MANUAL_PC'] = False
-    pics['MCORE.DD.NFC'] = True
+    pics[0]['MCORE.DD.QR'] = False
+    pics[0]['MCORE.DD.MANUAL_PC'] = False
+    pics[0]['MCORE.DD.NFC'] = True
     test_runner.config.pics = pics
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: NFC code with no manual code - expected failure")
 
     # If we add the manual code again, it should pass
-    pics['MCORE.DD.MANUAL_PC'] = True
+    pics[0]['MCORE.DD.MANUAL_PC'] = True
     test_runner.config.pics = pics
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: NFC code with manual code - expected success")
 
     # All three should also be fine.
-    pics['MCORE.DD.QR'] = True
+    pics[0]['MCORE.DD.QR'] = True
     test_runner.config.pics = pics
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: NFC and QR code with manual code - expected success")
 
-    pics['PICS_SDK_CI_ONLY'] = True
+    pics[0]['PICS_SDK_CI_ONLY'] = True
     test_runner.config.pics = pics
     # This is a success case for the attributes (as seen above), but the test should fail because the CI PICS is added
     resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
@@ -243,42 +244,49 @@ def main():
     # Reset PICS to the example baseline (which already includes MCORE.IDM.S).
     base_pics = _load_baseline_pics()
 
+    def _baseline_with(**device_codes: bool) -> dict:
+        """Fresh copy of the baseline endpoint-keyed tree with the given
+        device-wide codes added under endpoint 0."""
+        tree = {endpoint: dict(codes) for endpoint, codes in base_pics.items()}
+        tree.setdefault(0, {}).update(device_codes)
+        return tree
+
     # Bridge: aggregator device type on EP1 must require MCORE.BRIDGE=1.
-    test_runner.config.pics = dict(base_pics)
+    test_runner.config.pics = _baseline_with()
     resp = create_read(include_aggregator_ep1=True)
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: Aggregator EP without MCORE.BRIDGE - expected failure")
 
-    test_runner.config.pics = dict(base_pics, **{"MCORE.BRIDGE": True})
+    test_runner.config.pics = _baseline_with(**{"MCORE.BRIDGE": True})
     resp = create_read(include_aggregator_ep1=True)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: Aggregator EP with MCORE.BRIDGE - expected success")
 
     # PICS file claims MCORE.BRIDGE=1 but device does not expose Aggregator
     # device type. Step 10 must catch the lie.
-    test_runner.config.pics = dict(base_pics, **{"MCORE.BRIDGE": True})
+    test_runner.config.pics = _baseline_with(**{"MCORE.BRIDGE": True})
     resp = create_read()
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: MCORE.BRIDGE claimed but device has no Aggregator - expected failure")
 
     # OTA Requestor on EP0 must require MCORE.OTA.Requestor=1.
-    test_runner.config.pics = dict(base_pics)
+    test_runner.config.pics = _baseline_with()
     resp = create_read(include_ota_requestor=True)
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: OTA Requestor cluster without MCORE.OTA.Requestor - expected failure")
 
-    test_runner.config.pics = dict(base_pics, **{"MCORE.OTA.Requestor": True})
+    test_runner.config.pics = _baseline_with(**{"MCORE.OTA.Requestor": True})
     resp = create_read(include_ota_requestor=True)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: OTA Requestor cluster with MCORE.OTA.Requestor - expected success")
 
     # Groups on two endpoints must require MCORE.G.MULTIENDPOINT=1.
-    test_runner.config.pics = dict(base_pics)
+    test_runner.config.pics = _baseline_with()
     resp = create_read(groups_on_two_endpoints=True)
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: Groups on 2 endpoints without MCORE.G.MULTIENDPOINT - expected failure")
 
-    test_runner.config.pics = dict(base_pics, **{"MCORE.G.MULTIENDPOINT": True})
+    test_runner.config.pics = _baseline_with(**{"MCORE.G.MULTIENDPOINT": True})
     resp = create_read(groups_on_two_endpoints=True)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: Groups on 2 endpoints with MCORE.G.MULTIENDPOINT - expected success")

@@ -331,8 +331,8 @@ class TestPicsHelpers(MatterBaseTest):
                 os.makedirs(ep_dir)
                 with open(os.path.join(ep_dir, 'cluster.xml'), 'w') as f:
                     f.write(test_xml)
-                pics = read_pics_from_file(d, endpoint=0)
-                asserts.assert_true(pics.get('TEST.S'), f'Failed for subdir name: {subdir_name}')
+                pics = read_pics_from_file(d)
+                asserts.assert_true(pics.get(0, {}).get('TEST.S'), f'Failed for subdir name: {subdir_name}')
 
 
 if __name__ == "__main__":
