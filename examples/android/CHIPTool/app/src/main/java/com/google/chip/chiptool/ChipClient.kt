@@ -150,6 +150,8 @@ object ChipClient {
               Log.d(TAG, "Got connected device pointer")
               if (continuation.isActive) {
                 continuation.resume(devicePointer)
+              } else {
+                getDeviceController(context).releaseConnectedDevicePointer(devicePointer)
               }
             }
 
