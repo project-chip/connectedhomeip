@@ -275,12 +275,10 @@ const char * sDeviceOptionHelp =
     "  --ble-controller <selector>\n"
     "       BLE controller selector, see example or platform docs for details\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     "\n"
     "  --wifi[=interface]\n"
     "       Enable Wi-Fi management via wpa_supplicant, optionally specifying the interface name.\n"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     "\n"
     "  --wifi-supports-5g\n"
     "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
@@ -563,6 +561,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         break;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case kDeviceOption_WiFi:
         LinuxDeviceOptions::GetInstance().mWiFi = true;
         if (aValue != nullptr && *aValue != 0)
@@ -574,6 +573,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_WiFiSupports5g:
         LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
         break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
