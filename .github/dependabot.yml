@@ -11,7 +11,9 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/**"
     schedule:
       interval: "weekly"
 
@@ -29,7 +31,6 @@ updates:
       - dependency-name: "third_party/android_deps/repo"
       - dependency-name: "third_party/asr/repo"
       - dependency-name: "third_party/boringssl/repo"
-      - dependency-name: "third_party/bouffalolab/repo"
       - dependency-name: "third_party/cirque/repo"
       - dependency-name: "third_party/editline/repo"
       - dependency-name: "third_party/freertos/repo"

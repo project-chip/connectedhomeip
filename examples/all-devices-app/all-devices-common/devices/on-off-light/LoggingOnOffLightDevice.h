@@ -44,8 +44,10 @@ public:
     ~LoggingOnOffLightDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
 
 private:
     class OnOffDelegate : public Clusters::OnOffDelegate

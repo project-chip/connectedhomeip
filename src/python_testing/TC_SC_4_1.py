@@ -260,7 +260,7 @@ class TC_SC_4_1(MatterBaseTest):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
         if log_result:
-            log.info(f"\n\n\tDUT Instance Name: {instance_name}\n")
+            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
         return instance_name
 
     def get_discriminator_subtype(self, is_obcw: bool = False) -> Optional[tuple[str, str]]:
@@ -285,7 +285,7 @@ class TC_SC_4_1(MatterBaseTest):
                 assert_valid_short_discriminator_subtype(discriminator_subtype)
             else:
                 asserts.fail("Setup Code Type must be either QR code or Manual.")
-            log.info(f"\n\n\t** discriminator subtype: {discriminator_subtype}\n")
+            log.info("\n\n\t** discriminator subtype: %s\n", discriminator_subtype)
 
             return discriminator_subtype, discriminator
         asserts.fail("Failed to get the discriminator value from the setup payload info.")
@@ -499,7 +499,7 @@ class TC_SC_4_1(MatterBaseTest):
         #   - supports_icd is False.
         #   - supports_icd is True and supports_lit is True and ICD == '1'
         sit_mode = self.supports_icd and (not self.supports_lit or icd_key == '0')
-        log.info(f"\n\n\t** sit_mode: {sit_mode}\n")
+        log.info("\n\n\t** sit_mode: %s\n", sit_mode)
 
         # *** SII KEY ***
         if sit_mode:
@@ -699,12 +699,12 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
         self.supports_icd = Clusters.IcdManagement.id in ep0_servers
-        log.info(f"\n\n\t** supports_icd: {self.supports_icd}\n")
+        log.info("\n\n\t** supports_icd: %s\n", self.supports_icd)
 
         # Read the ActiveModeThreshold attribute if ICD is supported
         if self.supports_icd:
             self.active_mode_threshold_ms = await self.get_active_mode_threshold_ms()
-            log.info(f"\n\n\t** active_mode_threshold_ms: {self.active_mode_threshold_ms}\n")
+            log.info("\n\n\t** active_mode_threshold_ms: %s\n", self.active_mode_threshold_ms)
 
         # *** STEP 3 ***
         # Check if the LITS feature is supported
@@ -713,7 +713,7 @@ class TC_SC_4_1(MatterBaseTest):
             feature_map = await self.get_icd_feature_map()
             LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
             self.supports_lit = bool(feature_map & LITS == LITS)
-            log.info(f"\n\n\t** supports_lit: {self.supports_lit}\n")
+            log.info("\n\n\t** supports_lit: %s\n", self.supports_lit)
 
         # *** STEP 4 ***
         # Check if the DUT supports TCP
@@ -721,13 +721,13 @@ class TC_SC_4_1(MatterBaseTest):
         instance_name = self.get_dut_instance_name(log_result=True)
         instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
         self.supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
-        log.info(f"\n\n\t** supports_tcp_dut: {self.supports_tcp_dut}\n")
+        log.info("\n\n\t** supports_tcp_dut: %s\n", self.supports_tcp_dut)
 
         # *** STEP 5 ***
         # Check if TCP is supported per PICS
         self.step(5)
         self.supports_tcp_pics = self.check_pics(TCP_PICS_STR)
-        log.info(f"\n\n\t** supports_tcp_pics: {self.supports_tcp_pics}\n")
+        log.info("\n\n\t** supports_tcp_pics: %s\n", self.supports_tcp_pics)
 
         # *** STEP 6 ***
         # Check the setup code type used during commissioning (QR or Manual)
@@ -853,7 +853,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
         extended_discovery_mode = long_discriminator_ptr_instance_name is not None
-        log.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
+        log.info("DUT Extended Discovery mode active: %s", extended_discovery_mode)
 
         if extended_discovery_mode:
             # *** STEP 25 ***

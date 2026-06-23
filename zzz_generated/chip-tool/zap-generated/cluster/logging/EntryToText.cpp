@@ -107,6 +107,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "OvenMode";
     case chip::app::Clusters::LaundryDryerControls::Id:
         return "LaundryDryerControls";
+    case chip::app::Clusters::TemperatureControlledCabinetTopology::Id:
+        return "TemperatureControlledCabinetTopology";
     case chip::app::Clusters::ModeSelect::Id:
         return "ModeSelect";
     case chip::app::Clusters::LaundryWasherMode::Id:
@@ -247,6 +249,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "SoilMeasurement";
     case chip::app::Clusters::AmbientContextSensing::Id:
         return "AmbientContextSensing";
+    case chip::app::Clusters::AmbientSensingUnion::Id:
+        return "AmbientSensingUnion";
     case chip::app::Clusters::ProximityRanging::Id:
         return "ProximityRanging";
     case chip::app::Clusters::SmokeConcentrationMeasurement::Id:
@@ -259,6 +263,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ThreadBorderRouterManagement";
     case chip::app::Clusters::ThreadNetworkDirectory::Id:
         return "ThreadNetworkDirectory";
+    case chip::app::Clusters::CommissioningProxy::Id:
+        return "CommissioningProxy";
     case chip::app::Clusters::WakeOnLan::Id:
         return "WakeOnLan";
     case chip::app::Clusters::Channel::Id:
@@ -327,6 +333,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FaultInjection";
     case chip::app::Clusters::SampleMei::Id:
         return "SampleMei";
+    case chip::app::Clusters::TestHiddenManufacturerSpecific::Id:
+        return "TestHiddenManufacturerSpecific";
     default:
         return "Unknown";
     }
@@ -1645,6 +1653,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::TemperatureControlledCabinetTopology::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::DisabledCabinets::Id:
+            return "DisabledCabinets";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::Topology::Id:
+            return "Topology";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TemperatureControlledCabinetTopology::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ModeSelect::Id: {
         switch (id)
         {
@@ -2444,6 +2473,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Forecast";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::OptOutState::Id:
             return "OptOutState";
+        case chip::app::Clusters::DeviceEnergyManagement::Attributes::PowerRangeAdjustment::Id:
+            return "PowerRangeAdjustment";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::DeviceEnergyManagement::Attributes::AcceptedCommandList::Id:
@@ -4171,6 +4202,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::AmbientSensingUnion::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionName::Id:
+            return "UnionName";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionHealth::Id:
+            return "UnionHealth";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionContributorList::Id:
+            return "UnionContributorList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ProximityRanging::Id: {
         switch (id)
         {
@@ -4332,6 +4386,39 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ThreadNetworkDirectory::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ThreadNetworkDirectory::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommissioningProxy::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommissioningProxy::Attributes::Transport::Id:
+            return "Transport";
+        case chip::app::Clusters::CommissioningProxy::Attributes::ScanMaxTime::Id:
+            return "ScanMaxTime";
+        case chip::app::Clusters::CommissioningProxy::Attributes::MaxSessions::Id:
+            return "MaxSessions";
+        case chip::app::Clusters::CommissioningProxy::Attributes::MaxCachedResults::Id:
+            return "MaxCachedResults";
+        case chip::app::Clusters::CommissioningProxy::Attributes::NumCachedResults::Id:
+            return "NumCachedResults";
+        case chip::app::Clusters::CommissioningProxy::Attributes::CacheTimeout::Id:
+            return "CacheTimeout";
+        case chip::app::Clusters::CommissioningProxy::Attributes::CachedResults::Id:
+            return "CachedResults";
+        case chip::app::Clusters::CommissioningProxy::Attributes::WiFiBand::Id:
+            return "WiFiBand";
+        case chip::app::Clusters::CommissioningProxy::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommissioningProxy::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommissioningProxy::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommissioningProxy::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommissioningProxy::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5435,6 +5522,25 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::TestHiddenManufacturerSpecific::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::TestAttribute::Id:
+            return "TestAttribute";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     default:
         return "Unknown";
     }
@@ -6060,6 +6166,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RequestConstraintBasedForecast";
         case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Id:
             return "CancelRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::PowerRangeAdjustRequest::Id:
+            return "PowerRangeAdjustRequest";
+        case chip::app::Clusters::DeviceEnergyManagement::Commands::CancelPowerRangeAdjustRequest::Id:
+            return "CancelPowerRangeAdjustRequest";
         default:
             return "Unknown";
         }
@@ -6399,6 +6509,25 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RemoveNetwork";
         case chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Id:
             return "GetOperationalDataset";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommissioningProxy::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id:
+            return "ProxyConnectRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id:
+            return "ProxyDisconnectRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::Id:
+            return "ProxyScanRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::Id:
+            return "ProxyBackGroundScanStartRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStopRequest::Id:
+            return "ProxyBackGroundScanStopRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id:
+            return "ProxyMessageRequest";
         default:
             return "Unknown";
         }
@@ -7342,6 +7471,19 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommissioningProxy::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectResponse::Id:
+            return "ProxyConnectResponse";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::Id:
+            return "ProxyScanResponse";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Id:
+            return "ProxyMessageResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Channel::Id: {
         switch (id)
         {
@@ -7688,6 +7830,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Network Infrastructure Manager";
     case 0x00000091:
         return "Thread Border Router";
+    case 0x00000092:
+        return "Commissioning By Proxy";
     case 0x00000100:
         return "On/Off Light";
     case 0x00000101:

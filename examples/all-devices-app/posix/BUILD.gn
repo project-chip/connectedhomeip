@@ -14,26 +14,37 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 executable("all-devices-app") {
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+
   sources = [
-    "PosixBleRssiRangingAdapter.cpp",
+    "AppCommandDelegate.cpp",
+    "ClusterTypeMappings.cpp",
     "PosixChimeDevice.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
 
   deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/bridged-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/flow-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/humidity-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/light-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/pressure-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger/impl:ble-rssi",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
@@ -41,7 +52,9 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",
+    "${chip_root}/examples/platform/linux:commissionable-init",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
+    "${chip_root}/examples/platform/linux:named-pipes",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
@@ -49,6 +62,13 @@ executable("all-devices-app") {
     "${chip_root}/third_party/miniaudio:miniaudio",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+
+  if (chip_enable_transport_trace) {
+    deps += [
+      "${chip_root}/examples/common/tracing:trace_handlers",
+      "${chip_root}/examples/common/tracing:trace_handlers_decoder",
+    ]
+  }
 
   if (chip_device_platform == "darwin") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]

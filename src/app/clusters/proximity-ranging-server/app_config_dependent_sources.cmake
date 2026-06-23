@@ -19,3 +19,8 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
 )
+
+# Note: BleRssiRangingHelpers.{cpp,h} are NOT compiled in by default. They
+# back the optional :ble-rssi-helpers GN target; CMake builds whose adapter
+# implements kBLEBeaconRSSIRanging should add those sources explicitly
+# alongside the cluster sources.
