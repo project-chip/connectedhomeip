@@ -890,8 +890,7 @@ void AppTaskCommon::GetEvent(AppEvent * aEvent)
 }
 
 // deep-sleep platform workaround
-#if (CONFIG_PM && \
-    (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+#if (CONFIG_PM && (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
 extern "C" bool __real_bt_is_ready(void);
 
 extern "C" bool __wrap_bt_is_ready(void)
