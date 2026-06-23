@@ -80,6 +80,12 @@ class LinuxWorkerProcess(WorkerProcess):
         tmp_dir = self._config.tmp_dir_worker_base / str(self._config.id)
         tmp_dir.mkdir(parents=True, exist_ok=True)
 
+        # Check if the directory is empty.
+        with contextlib.suppress(StopIteration):
+            next(tmp_dir.iterdir())
+            log.warning("Worker virtual %s directory (%s) is not empty. The worker will reuse the state from the last run",
+                        tmp_dir_default, tmp_dir)
+
         log.info("Remounting %s as %s for the worker", tmp_dir, tmp_dir_default)
         if subprocess.run(["mount", "-o", "bind", str(tmp_dir), str(tmp_dir_default)]).returncode != 0:
             raise RuntimeError(f"Failed to mount a virtual {tmp_dir_default}")
