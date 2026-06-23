@@ -67,7 +67,7 @@ from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
-from matter.testing.spec_parsing import XmlDataModel
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, XmlDataModel, build_xml_clusters
 from matter.tlv import uint
 
 # TODO: Add utility to commission a device if needed
