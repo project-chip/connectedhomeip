@@ -9776,6 +9776,114 @@ cluster ThreadNetworkDirectory = 1107 {
   command access(invoke: manage) GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
+/** This cluster provides a proxy service allowing a Commissioner to utilize commissioning transports not supported locally, or to extend the commissioning range of the Commissioner. */
+provisional cluster CommissioningProxy = 1109 {
+  revision 1;
+
+  bitmap CapabilitiesBitmap : bitmap8 {
+    kBLE = 0x2 [spec_name = "BLE"];
+    kWiFiPAF = 0x8;
+    kNTL = 0x10 [spec_name = "NTL"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kWiFiNetworkInterface = 0x1;
+    kBackgroundScan = 0x2;
+  }
+
+  bitmap WiFiBandBitmap : bitmap16 {
+    k2G4 = 0x1 [spec_name = "2G4"];
+    k5G = 0x4 [spec_name = "5G"];
+  }
+
+  struct ScanResultStruct {
+    nullable octet_string<100> address = 0;
+    CapabilitiesBitmap transport = 1;
+    int16u discriminator = 2;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    nullable octet_string<128> extendedData = 5;
+    optional WiFiBandBitmap wiFiBand = 6;
+  }
+
+  readonly attribute CapabilitiesBitmap transport = 0;
+  attribute int8u scanMaxTime = 1;
+  readonly attribute int8u maxSessions = 2;
+  readonly attribute optional int8u maxCachedResults = 3;
+  readonly attribute optional int8u numCachedResults = 4;
+  attribute optional int16u cacheTimeout = 5;
+  readonly attribute optional nullable ScanResultStruct cachedResults[] = 6;
+  readonly attribute optional WiFiBandBitmap wiFiBand = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ProxyConnectRequestRequest {
+    nullable octet_string<100> address = 0;
+    CapabilitiesBitmap transport = 1;
+    int16u discriminator = 2;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    int16u timeout = 5;
+    optional WiFiBandBitmap wiFiBand = 6;
+  }
+
+  response struct ProxyConnectResponse = 1 {
+    int16u sessionID = 0;
+  }
+
+  request struct ProxyDisconnectRequestRequest {
+    nullable int16u sessionID = 0;
+  }
+
+  request struct ProxyScanRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    optional WiFiBandBitmap wiFiBands = 1;
+  }
+
+  response struct ProxyScanResponse = 4 {
+    int8u numberOfResults = 0;
+    ScanResultStruct proxyScanResult[] = 1;
+  }
+
+  request struct ProxyBackGroundScanStartRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    int16u timeout = 1;
+    optional WiFiBandBitmap wiFiBands = 2;
+  }
+
+  request struct ProxyBackGroundScanStopRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    optional WiFiBandBitmap wiFiBands = 1;
+  }
+
+  request struct ProxyMessageRequestRequest {
+    int16u sessionID = 0;
+    int8u responseTimeout = 1;
+    nullable long_octet_string<1280> message = 2;
+  }
+
+  response struct ProxyMessageResponse = 8 {
+    int16u sessionID = 0;
+    nullable long_octet_string<1280> message = 1;
+  }
+
+  /** This command serves to establish a transport connection to a commissionable device discovered by the proxy. */
+  fabric command ProxyConnectRequest(ProxyConnectRequestRequest): ProxyConnectResponse = 0;
+  /** This disconnects a transport connection created via the ProxyConnectRequest command. */
+  fabric command ProxyDisconnectRequest(ProxyDisconnectRequestRequest): DefaultSuccess = 2;
+  /** This command requests the proxy to provide a list of all commissionable devices found on the requested transports and bands. */
+  command ProxyScanRequest(ProxyScanRequestRequest): ProxyScanResponse = 3;
+  /** This command requests the proxy to start background scanning for commissionable devices on the selected transports. */
+  command ProxyBackGroundScanStartRequest(ProxyBackGroundScanStartRequestRequest): DefaultSuccess = 5;
+  /** This command requests the proxy to stop background scanning for commissionable devices on the selected transports. */
+  command ProxyBackGroundScanStopRequest(ProxyBackGroundScanStopRequestRequest): DefaultSuccess = 6;
+  /** This command sends a message packet to the proxy. */
+  fabric command ProxyMessageRequest(ProxyMessageRequestRequest): ProxyMessageResponse = 7;
+}
+
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
   revision 1;
