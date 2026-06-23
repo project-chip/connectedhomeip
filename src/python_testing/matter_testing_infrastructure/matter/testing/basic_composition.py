@@ -39,14 +39,8 @@ from matter.testing.conformance import ConformanceException
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
-from matter.testing.spec_parsing import (
-    PrebuiltDataModelDirectory,
-    XmlCluster,
-    XmlDeviceType,
-    build_xml_clusters,
-    build_xml_device_types,
-    dm_from_spec_version,
-)
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlCluster, XmlDeviceType, build_xml_clusters,
+                                         build_xml_device_types, dm_from_spec_version)
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
