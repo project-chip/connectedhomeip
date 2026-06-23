@@ -340,6 +340,7 @@ source_set("pw_rpc") {
     "$dir_pw_trace_tokenized:trace_rpc_service",
     "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
     "${chip_root}/examples/common/pigweed:rpc_services",
+    "${chip_root}/src/platform",
   ]
 
   public_configs = [
