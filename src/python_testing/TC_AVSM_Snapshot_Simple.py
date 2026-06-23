@@ -49,30 +49,40 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
             asserts.skip("SnapshotCapabilities list is empty, skipping snapshot test")
 
         # Allocate Snapshot Stream
-        try:
-            allocate_cmd = commands.SnapshotStreamAllocate(
-                imageCodec=caps[0].imageCodec,
-                maxFrameRate=caps[0].maxFrameRate,
-                minResolution=caps[0].resolution,
-                maxResolution=caps[0].resolution,
-                quality=90
-            )
-            response = await self.send_single_cmd(endpoint=endpoint, cmd=allocate_cmd)
-            stream_id = response.snapshotStreamID
-            log.info("Allocated snapshot stream ID: %s", stream_id)
-        except InteractionModelError as e:
-            asserts.fail(f"Failed to allocate snapshot stream: {e}")
+        stream_id = None
+        selected_cap = None
+        last_error = None
+        for cap in caps:
+            try:
+                allocate_cmd = commands.SnapshotStreamAllocate(
+                    imageCodec=cap.imageCodec,
+                    maxFrameRate=cap.maxFrameRate,
+                    minResolution=cap.resolution,
+                    maxResolution=cap.resolution,
+                    quality=90,
+                )
+                response = await self.send_single_cmd(endpoint=endpoint, cmd=allocate_cmd)
+                stream_id = response.snapshotStreamID
+                selected_cap = cap
+                log.info("Allocated snapshot stream ID: %s", stream_id)
+                break
+            except InteractionModelError as e:
+                last_error = e
+                log.warning("SnapshotStreamAllocate failed for capability %s: %s", cap, e)
+
+        if stream_id is None:
+            asserts.fail(f"Failed to allocate snapshot stream using any advertised capability: {last_error}")
 
         # Capture Snapshot
         try:
             capture_cmd = commands.CaptureSnapshot(
                 snapshotStreamID=stream_id,
-                requestedResolution=caps[0].resolution
+                requestedResolution=selected_cap.resolution,
             )
             capture_response = await self.send_single_cmd(
                 cmd=capture_cmd,
                 endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
             log.info("CaptureSnapshotResponse resolution: %s", capture_response.resolution)
             log.info("CaptureSnapshotResponse codec: %s", capture_response.imageCodec)
@@ -82,11 +92,11 @@ class TC_AVSM_Snapshot_Simple(MatterBaseTest):
             asserts.fail(f"CaptureSnapshot failed: {e}")
         finally:
             # Deallocate Stream
-            if 'stream_id' in locals():
+            if stream_id is not None:
                 try:
                     await self.send_single_cmd(
                         endpoint=endpoint,
-                        cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id)
+                        cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id),
                     )
                 except Exception as e:
                     log.warning("Failed to deallocate snapshot stream %s: %s", stream_id, e)
