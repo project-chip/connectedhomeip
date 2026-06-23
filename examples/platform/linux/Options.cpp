@@ -170,7 +170,12 @@ OptionDef sDeviceOptionDefs[] = {
     { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    // On Linux the interface managed by wpa_supplicant can be selected via --wifi=<interface>.
     { "wifi", kArgumentOptional, kDeviceOption_WiFi },
+#else
+    { "wifi", kNoArgument, kDeviceOption_WiFi },
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
@@ -277,8 +282,13 @@ const char * sDeviceOptionHelp =
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     "\n"
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
     "  --wifi[=interface]\n"
     "       Enable Wi-Fi management via wpa_supplicant, optionally specifying the interface name.\n"
+#else
+    "  --wifi\n"
+    "       Enable Wi-Fi management via wpa_supplicant.\n"
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     "\n"
     "  --wifi-supports-5g\n"
     "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
@@ -564,10 +574,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case kDeviceOption_WiFi:
         LinuxDeviceOptions::GetInstance().mWiFi = true;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
         if (aValue != nullptr && *aValue != 0)
         {
             LinuxDeviceOptions::GetInstance().mWiFiInterface.Emplace(aValue);
         }
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
         break;
 
     case kDeviceOption_WiFiSupports5g:

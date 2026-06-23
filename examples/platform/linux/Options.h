@@ -58,7 +58,9 @@ struct LinuxDeviceOptions
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     bool wifiSupports5g = false;
     bool mWiFi          = false;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
     chip::Optional<std::string> mWiFiInterface; // WiFi interface name override (from --wifi=<interface>)
+#endif
 #endif
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
