@@ -398,8 +398,15 @@ class COMPROBaseTest(MatterBaseTest):
 
     @property
     def cp_endpoint(self) -> int:
-        """Endpoint on which the Commissioning Proxy cluster is exposed."""
-        return COMPRO_ENDPOINT
+        """Endpoint on which the Commissioning Proxy cluster is exposed.
+
+        Honours the ``--endpoint`` argument so the same tests run against the
+        standalone reference app (endpoint 1) and the all-clusters-app, which
+        exposes the cluster on a dedicated endpoint. Falls back to
+        ``COMPRO_ENDPOINT`` when ``--endpoint`` is not supplied.
+        """
+        configured = self.matter_test_config.endpoint
+        return configured if configured is not None else COMPRO_ENDPOINT
 
     # ------------------------------------------------------------------
     # Attribute helpers
