@@ -58,6 +58,9 @@ WIFI_WAIT_SECONDS = 5                # WiFi stabilization wait (5s) - basic netw
 NETWORK_STABILIZATION_WAIT = 25      # Network stabilization wait (25s) - after major network changes
 RETRY_DELAY_SECONDS = 5              # Delay between retry attempts (5s) - delay for DUT recovery
 
+WPA_SOCKET_TIMEOUT_SECONDS = 5       # wpa_supplicant ctrl_interface reply timeout - the socket recv has no
+                                      # default timeout and will block the event loop forever if a reply is lost
+
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
 attr = cnet.Attributes
@@ -263,6 +266,24 @@ async def find_matter_devices_mdns(max_attempts=None):
         f"find_matter_devices_mdns: mDNS discovery failed after {attempts} attempts - No Matter devices found{' for target device ID: ' + target_device_id if target_device_id else ''}")
 
 
+def privileged_cmd(cmd: list) -> list:
+    """Prefixes a command with sudo unless already running as root (sudo may be absent in root-only containers)"""
+
+    return cmd if os.geteuid() == 0 else ["sudo"] + cmd
+
+
+async def dhclient_renew(interface: str):
+    """Releases and renews DHCP lease via dhclient if available; silently skipped when binary absent
+    (e.g. in containers where NetworkManager handles DHCP internally via its own client)."""
+
+    if not shutil.which("dhclient"):
+        logger.debug(f"dhclient_renew: dhclient not found, skipping DHCP renewal on {interface} (NM handles it)")
+        return
+    await run_subprocess(privileged_cmd(["dhclient", "-r", interface]))
+    await asyncio.sleep(1)
+    await run_subprocess(privileged_cmd(["dhclient", interface]))
+
+
 async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBUTE_READ_TIMEOUT):
     """Runs a subprocess command asynchronously with timeout and error handling"""
 
@@ -316,15 +337,22 @@ async def wpa_command(iface, cmd):
     """Send command to wpa_supplicant via Unix socket"""
 
     sock_file = f"/var/run/wpa_supplicant/{iface}"
-    sock_tmp = f"/tmp/wpa_{iface}_sock"
+    # Must live in the same (host-shared) directory as sock_file: wpa_supplicant replies by
+    # sendto()-ing this bind path from its own mount namespace, so a path under a container-local
+    # /tmp (not bind-mounted from the host) is unreachable and replies silently vanish.
+    sock_tmp = f"/var/run/wpa_supplicant/wpa_ctrl_{iface}_{os.getpid()}"
     if os.path.exists(sock_tmp):
         os.remove(sock_tmp)
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+    sock.settimeout(WPA_SOCKET_TIMEOUT_SECONDS)
     try:
         sock.bind(sock_tmp)
         sock.sendto(cmd.encode(), sock_file)
         resp, _ = sock.recvfrom(4096)
         return resp.decode(errors="ignore").strip()
+    except socket.timeout:
+        logger.error(f"wpa_command: Timed out waiting for reply to '{cmd}' on {iface}")
+        raise
     except Exception as e:
         logger.error(f"wpa_command: Error sending '{cmd}' to {iface}: {e}")
         raise
@@ -373,7 +401,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         return ConnectionResult(1, "No WiFi interface found")
 
     try:
-        await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
+        await run_subprocess(privileged_cmd(["ip", "link", "set", interface, "up"]))
         await asyncio.sleep(1)
 
         if not await scan_and_find_ssid(interface, ssid):
@@ -457,9 +485,9 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
             if attempt < MAX_ATTEMPTS:
                 logger.warning(
                     f"connect_wifi_linux: Attempt {attempt} failed after {CONNECTION_TIMEOUT}s (last_state: {last_state}), resetting interface")
-                await run_subprocess(["sudo", "ip", "link", "set", interface, "down"])
+                await run_subprocess(privileged_cmd(["ip", "link", "set", interface, "down"]))
                 await asyncio.sleep(2)
-                await run_subprocess(["sudo", "ip", "link", "set", interface, "up"])
+                await run_subprocess(privileged_cmd(["ip", "link", "set", interface, "up"]))
                 await asyncio.sleep(3)
 
                 # Re-select and reconnect to the network
@@ -476,9 +504,7 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
         # Connection successful, get IP address
         # Release any existing DHCP lease and request new one
-        await run_subprocess(["sudo", "dhclient", "-r", interface])
-        await asyncio.sleep(1)
-        await run_subprocess(["sudo", "dhclient", interface])
+        await dhclient_renew(interface)
 
         # Wait for IP assignment with retry
         ip_start = time.time()
@@ -816,7 +842,7 @@ async def remove_lan_routes():
 
                 logger.info(f"remove_lan_routes: Removing default route via {gateway} dev {interface}")
                 try:
-                    await run_subprocess(["sudo", "ip", "route", "del", "default", "via", gateway, "dev", interface], check=True)
+                    await run_subprocess(privileged_cmd(["ip", "route", "del", "default", "via", gateway, "dev", interface]), check=True)
                     original_routes.append(route)
                 except subprocess.CalledProcessError as e:
                     logger.warning(f"remove_lan_routes: Failed to remove route via {gateway}: {e}")
@@ -844,7 +870,7 @@ async def restore_lan_routes(original_routes):
         metric = route["metric"]
 
         try:
-            cmd = ["sudo", "ip", "route", "add", "default", "via", gateway, "dev", interface]
+            cmd = privileged_cmd(["ip", "route", "add", "default", "via", gateway, "dev", interface])
             if metric:
                 cmd.extend(["metric", metric])
             await run_subprocess(cmd, check=True)
@@ -852,9 +878,7 @@ async def restore_lan_routes(original_routes):
             logger.warning(f"restore_lan_routes: Failed to restore route via {gateway}: {e}")
             # Try to restore using dhclient as fallback
             try:
-                await run_subprocess(["sudo", "dhclient", "-r", interface])
-                await asyncio.sleep(0.5)
-                await run_subprocess(["sudo", "dhclient", interface])
+                await dhclient_renew(interface)
             except Exception as dhcp_e:
                 logger.warning(f"restore_lan_routes: DHCP fallback failed for {interface}: {dhcp_e}")
 
