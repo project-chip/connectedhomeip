@@ -357,6 +357,10 @@ TEST_F(TestModeBaseCluster, StartupAppliesStartUpModeOnBoot)
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
     EXPECT_EQ(currentMode, 1u);
+
+    DataModel::Nullable<uint8_t> startUpMode;
+    ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
+    EXPECT_EQ(startUpMode.Value(), 1u);
 }
 
 TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
@@ -383,6 +387,10 @@ TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
     EXPECT_EQ(currentMode, 0u);
+
+    DataModel::Nullable<uint8_t> startUpMode;
+    ASSERT_EQ(tester.ReadAttribute(StartUpMode::Id, startUpMode), CHIP_NO_ERROR);
+    EXPECT_EQ(startUpMode.Value(), 1u);
 }
 
 TEST_F(TestModeBaseCluster, StartupAppliesOnModeWhenOnOffFeatureEnabled)
@@ -406,6 +414,10 @@ TEST_F(TestModeBaseCluster, StartupAppliesOnModeWhenOnOffFeatureEnabled)
     uint8_t currentMode = 0xFF;
     ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
     EXPECT_EQ(currentMode, 1u);
+
+    DataModel::Nullable<uint8_t> onMode;
+    ASSERT_EQ(tester.ReadAttribute(OnMode::Id, onMode), CHIP_NO_ERROR);
+    EXPECT_EQ(onMode.Value(), 1u);
 }
 
 TEST_F(TestModeBaseCluster, GetModeValueByModeTag)
