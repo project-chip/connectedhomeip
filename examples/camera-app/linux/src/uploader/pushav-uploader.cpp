@@ -418,7 +418,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::filesystem::path filePath(data.first);
     std::filesystem::path extension = filePath.extension();
     // .upload files are modified MPD snapshots - treat as MPD and strip .upload for remote URL
-    bool isUploadMpd = (extension == ".upload");
+    bool isUploadMpd    = (extension == ".upload");
     bool isMpdExtension = (extension == ".mpd");
     if (isUploadMpd)
     {
