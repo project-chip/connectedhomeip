@@ -24,10 +24,15 @@
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
+#include <psa/crypto.h>
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
 #include <cctype>
+
+#ifdef CONFIG_CHIP_NXP_PLATFORM_MCXW72
+#include "mcux_psa_s2xx_key_locations.h"
+#endif
 
 #ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 #define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
@@ -43,10 +48,14 @@ namespace DeviceLayer {
 static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
 static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
-/* Secure subsystem private key blob size is 32 + 24 = 56.
- * DAC private key may be used to store an SSS exported blob instead of the private key.
- */
-static constexpr size_t kDacPrivateKey_MaxLen = Crypto::kP256_PrivateKey_Length + 24;
+
+#ifdef CONFIG_CHIP_NXP_PLATFORM_MCXW72
+static constexpr size_t kDacKeyBlobSize = PSA_S200_NON_EL2GO_BLOB_EXPORT_SIZE(PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1), 256);
+#elif defined(CONFIG_CHIP_NXP_PLATFORM_RW61X)
+static constexpr size_t kDacKeyBlobSize = 48;
+#else 
+#define kDacKeyBlobSize Crypto::kP256_PrivateKey_Length
+#endif
 
 FactoryDataProvider::~FactoryDataProvider() {}
 
@@ -96,9 +105,22 @@ CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, M
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
     Crypto::P256SerializedKeypair serializedKeypair;
-    uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
+    uint8_t keyBuf[kDacKeyBlobSize];
+
     MutableByteSpan dacPrivateKeySpan(keyBuf);
     uint16_t keySize = 0;
+
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t key_id = 0;
+    psa_key_lifetime_t lifetime = PSA_KEY_LIFETIME_VOLATILE;
+    psa_algorithm_t alg = PSA_ALG_ECDSA(PSA_ALG_SHA_256);
+    psa_key_usage_t usage = PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE ;
+    psa_key_type_t key_type = PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1);
+    size_t bits = 256;
+    psa_status_t status;
+    uint8_t digest[Crypto::kSHA256_Hash_Length];
+    unsigned char ecc_signature[PSA_SIGNATURE_MAX_SIZE] = { 0 };
+    size_t signature_length = sizeof(ecc_signature);
 
     VerifyOrExit(!outSignBuffer.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!messageToSign.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -109,22 +131,38 @@ CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, M
     SuccessOrExit(error);
     dacPrivateKeySpan.reduce_size(keySize);
 
-    /* Only the private key is used when signing */
-    error = serializedKeypair.SetLength(Crypto::kP256_PublicKey_Length + dacPrivateKeySpan.size());
-    SuccessOrExit(error);
-    memcpy(serializedKeypair.Bytes() + Crypto::kP256_PublicKey_Length, dacPrivateKeySpan.data(), dacPrivateKeySpan.size());
-
-    error = keypair.Deserialize(serializedKeypair);
+    /* Calculate message HASH to sign */
+    memset(&digest[0], 0, sizeof(digest));
+    error = chip::Crypto::Hash_SHA256(messageToSign.data(), messageToSign.size(), &digest[0]);
     SuccessOrExit(error);
 
-    error = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
-    SuccessOrExit(error);
+    psa_set_key_usage_flags(&attributes, usage);
+    psa_set_key_algorithm(&attributes, alg);
+    psa_set_key_type(&attributes, key_type);
+    psa_set_key_bits(&attributes, bits);
+    psa_set_key_lifetime(&attributes, lifetime);
+    UpdateKeyAttributes(attributes);
 
-    error = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
+    /* Import blob DAC key into PSA */
+    status = psa_import_key(&attributes, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), &key_id);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    status = psa_sign_hash(key_id, alg,
+                                   digest, sizeof(digest),
+                                   ecc_signature, sizeof(ecc_signature),
+                                   &signature_length);
+    
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    /* Generate MutableByteSpan with ECC signature and ECC signature size */
+    error = CopySpanToMutableSpan(ByteSpan{ ecc_signature, signature_length }, outSignBuffer);
 
 exit:
-    /* Sanitize temporary buffer */
-    memset(keyBuf, 0, Crypto::kP256_PrivateKey_Length);
+    psa_destroy_key(key_id);
+    psa_reset_key_attributes(&attributes);
+    memset(keyBuf, 0, sizeof(keyBuf));
+    memset(digest, 0, sizeof(digest));
+    memset(ecc_signature, 0, sizeof(ecc_signature));
     return error;
 }
 
