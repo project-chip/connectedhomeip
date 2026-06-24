@@ -73,9 +73,7 @@ PersistentStorageOpKeystorese05x::ExtractKeyIdFromSerializedKeypair(const Crypto
     // Verify magic number
     if (memcmp(privKeyRef, se05x_magic_no, sizeof(se05x_magic_no)) != 0)
     {
-        /** Check only for Magic Number. Return Success when key not present in SE05x.  */
-        ChipLogDetail(Crypto, "Not a ref key, Key not present in SE05x.");
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     // Extract KeyID (big-endian, 4 bytes)
@@ -268,7 +266,6 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX - 1] = static_cast<uint8_t>((newKeyId >> 8) & 0xFF);
     privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX]     = static_cast<uint8_t>((newKeyId >> 0) & 0xFF);
 
-
     memcpy(serializedKeypair.Bytes(), publickey, pubkey_len);
     memcpy(serializedKeypair.Bytes() + pubkey_len, privatekey, privatekey_len);
     err = serializedKeypair.SetLength(privatekey_len + pubkey_len);
@@ -354,7 +351,6 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::CommitOpKeypairForFabric(FabricInde
     }
 
     // Verify the new key exists in SE05x
-    if (pendingKeyId != 0)
     {
         bool pendingKeyExists = false;
         err                   = se05x_check_object_exists(pendingKeyId, &pendingKeyExists);

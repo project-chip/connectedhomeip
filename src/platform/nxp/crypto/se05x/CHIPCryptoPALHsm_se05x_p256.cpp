@@ -457,7 +457,7 @@ exit:
         se_sss_asymmetric_context_free(&asymm_ctx);
     }
 
-    if (keyObject.keyStore != nullptr && keyObject.keyStore->session != NULL)
+    if (keyObject.keyStore->session != NULL)
     {
         se_sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }
@@ -512,7 +512,7 @@ exit:
         se_sss_asymmetric_context_free(&asymm_ctx);
     }
 
-    if (keyObject.keyStore != nullptr && keyObject.keyStore->session != NULL)
+    if (keyObject.keyStore->session != NULL)
     {
         se_sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }
