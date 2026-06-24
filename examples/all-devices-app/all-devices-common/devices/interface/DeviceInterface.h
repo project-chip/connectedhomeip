@@ -22,8 +22,62 @@
 #include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <devices/endpoint-id-allocator/EndpointIdAllocator.h>
+#include <lib/support/Span.h>
+
+#include <cstdint>
 
 namespace chip::app {
+
+// Constants for semantic tags. Defined in "Matter Standard Namespaces"
+//
+// TODO: Generate standard namespace ID constants from spec and place them in libCHIP.
+//       We need:
+//          - namespace id generation
+//          - tag value generation
+//       Specification describes these in `src/namespaces`
+namespace CommonNamespace {
+
+constexpr uint16_t kCompassDirectionId          = 0x02;
+constexpr uint16_t kCompassLocationId           = 0x03;
+constexpr uint16_t kDirectionId                 = 0x04;
+constexpr uint16_t kLevelId                     = 0x05;
+constexpr uint16_t kLocationId                  = 0x06; // Clusters::Globals::LocationTag
+constexpr uint16_t kNumberId                    = 0x07;
+constexpr uint16_t kPositionId                  = 0x08; // Clusters::Globals::PositionTag
+constexpr uint16_t kElectricalMeasurementId     = 0x0A;
+constexpr uint16_t kCommodityTariffChronologyId = 0x0B;
+constexpr uint16_t kCommodityTariffDirectionId  = 0x0D;
+constexpr uint16_t kLaundryId                   = 0x0E;
+constexpr uint16_t kPowerSourceId               = 0x0F;
+constexpr uint16_t kCommonAreaId                = 0x10; // Clusters::Globals::AreaTypeTag
+constexpr uint16_t kCommonLandmarkId            = 0x11; // Clusters::Globals::LandmarkTag
+constexpr uint16_t kRelativePositionId          = 0x12; // Clusters::Globals::RelativePositionTag
+
+} // namespace CommonNamespace
+
+/// Structural configuration for registering an endpoint within a node hierarchy.
+///
+/// Encapsulates parent-child relationship, family composition pattern, and static semantic tags.
+struct EndpointComposition
+{
+    using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
+
+    EndpointId parentId                           = kInvalidEndpointId;
+    DataModel::EndpointCompositionPattern pattern = DataModel::EndpointCompositionPattern::kFullFamily;
+    Span<const SemanticTag> tagList               = {};
+
+    constexpr EndpointComposition() = default;
+    constexpr EndpointComposition(
+        EndpointId parent,
+        DataModel::EndpointCompositionPattern compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily,
+        Span<const SemanticTag> tags                             = {}) :
+        parentId(parent),
+        pattern(compositionPattern), tagList(tags)
+    {}
+
+    static constexpr EndpointComposition WithParent(EndpointId parent) { return EndpointComposition(parent); }
+};
 
 /// A device is an entity that maintains some cluster functionality.
 class DeviceInterface : public EndpointInterface
@@ -35,9 +89,9 @@ public:
     /// be called once after starting up a device for the first time. This function
     /// will create/instantiate all clusters on the device and complete endpoint registration.
     /// It should return error if there's any failure when adding the device's clusters to the provider.
-    /// A parentId of kInvalidEndpointId represents that there is no parent to this device
-    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                EndpointId parentId = kInvalidEndpointId) = 0;
+    /// An empty or default EndpointComposition represents that there is no parent or static tags.
+    virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                EndpointComposition composition = {}) = 0;
 
     /// Removes a device's clusters from the given provider. This
     /// must only be called when register has succeeded before. Expected
@@ -55,6 +109,15 @@ protected:
     DeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) :
         mDeviceTypes(deviceTypes), mEndpointRegistration(*this, {})
     {}
+
+    /// Internal method to register the descriptor cluster for this device on the given endpoint
+    ///
+    /// virtual in case subclasses want to track extra data (e.g. endpoint id)
+    virtual CHIP_ERROR RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition = {});
+
+    /// Reverse of `RegisterDescrioptor`
+    virtual void UnregisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider);
 
     Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     EndpointInterfaceRegistration mEndpointRegistration;

@@ -19,23 +19,34 @@
 
 #include <app_config/enabled_devices.h>
 #include <devices/Types.h>
+#include <devices/aggregator/AggregatorDevice.h>
 #include <devices/air-quality-sensor/AirQualitySensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
+#include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
+#include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
+#include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
+#include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
-#include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
+#include <devices/occupancy-sensor/impl/LoggingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
+#include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
+#include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
+#include <devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
-#include <functional>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <map>
 #include <platform/DefaultTimerDelegate.h>
+
+#include <functional>
+#include <map>
+#include <oob-accessors/OOBAccessor.h>
+#include <oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 
 namespace chip::app {
 
@@ -50,7 +61,8 @@ namespace chip::app {
 class DeviceFactory
 {
 public:
-    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
+    using DeviceCreator         = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
+    using DeviceAccessorCreator = std::function<std::unique_ptr<OOBAccessor>(DeviceInterface &)>;
 
     struct Context
     {
@@ -77,20 +89,44 @@ public:
         mRegistry[deviceTypeArg] = std::move(creator);
     }
 
+    void RegisterAccessorCreator(const std::string & deviceTypeArg, DeviceAccessorCreator && creator)
+    {
+        mAccessorRegistry[deviceTypeArg] = std::move(creator);
+    }
+    /**
+     * Convenience overload to support making the label optional for creator registrations
+     * that do not care about the label (i.e. most cases).
+     */
+    void RegisterCreator(const std::string & deviceTypeArg, std::function<std::unique_ptr<DeviceInterface>()> && creator)
+    {
+        RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
+    }
+
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 
     bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 
-    std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg)
+    std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg, const std::string & nodeLabel = "")
     {
-        if (IsValidDevice(deviceTypeArg))
+        auto it = mRegistry.find(deviceTypeArg);
+        if (it != mRegistry.end())
         {
-            return mRegistry.find(deviceTypeArg)->second();
+            return it->second(nodeLabel);
         }
         ChipLogError(
             Support,
             "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n",
             deviceTypeArg.c_str());
+        return nullptr;
+    }
+
+    std::unique_ptr<OOBAccessor> CreateAccessor(const std::string & deviceTypeArg, DeviceInterface & device)
+    {
+        if (IsValidDevice(deviceTypeArg) && mAccessorRegistry.find(deviceTypeArg) != mAccessorRegistry.end())
+        {
+            return mAccessorRegistry.find(deviceTypeArg)->second(device);
+        }
+        ChipLogProgress(Support, "No accessor found for device type: %s.\n", deviceTypeArg.c_str());
         return nullptr;
     }
 
@@ -108,12 +144,20 @@ private:
     std::map<std::string, DeviceCreator> mRegistry;
     std::optional<Context> mContext;
     std::string mDefaultDevice;
+    std::map<std::string, DeviceAccessorCreator> mAccessorRegistry;
 
     DeviceFactory()
     {
         // NOTE: context is set in `::Init`, so each lambda checks its
         //       existence separately. `Init` must be called before mRegistry
         //       factories are usable.
+        if constexpr (ALL_DEVICES_ENABLE_AGGREGATOR)
+        {
+            RegisterCreator("aggregator", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<AggregatorDevice>(mContext->timerDelegate);
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
             RegisterCreator("air-quality-sensor", [this]() {
@@ -136,12 +180,26 @@ private:
                     });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
+        {
+            RegisterCreator("bridged-node", [this](const std::string & nodeLabel) {
+                VerifyOrDie(mContext.has_value());
+                static int sBridgedNodeCount = 0;
+                sBridgedNodeCount++;
+                std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
+                return std::make_unique<BridgedNodeDevice>(mContext->timerDelegate,
+                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
             RegisterCreator("contact-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+            });
+            RegisterAccessorCreator("contact-sensor", [](DeviceInterface & device) {
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -151,10 +209,16 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
+            RegisterAccessorCreator("water-leak-detector", [](DeviceInterface & device) {
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
         {
-            RegisterCreator("occupancy-sensor", []() { return std::make_unique<TogglingOccupancySensorDevice>(); });
+            RegisterCreator("occupancy-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingOccupancySensorDevice>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {
@@ -238,8 +302,63 @@ private:
         {
             RegisterCreator("proximity-ranger", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ProximityRangerDevice>(mContext->timerDelegate,
-                                                               Span<Clusters::ProximityRanging::RangingAdapter * const>());
+                return std::make_unique<LoggingProximityRangerDevice>(mContext->timerDelegate, mContext->storageDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
+        {
+            RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
+        {
+            RegisterCreator("smoke-co-alarm", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<LoggingOnlySmokeCoAlarmDevice>(mContext->timerDelegate);
+            });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_RAIN_SENSOR)
+        {
+            RegisterCreator("rain-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<BooleanStateSensorDevice>(
+                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)
+        {
+            RegisterCreator("water-freeze-detector", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<BooleanStateSensorDevice>(
+                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
+        {
+            RegisterCreator("humidity-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingHumiditySensorDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
+        {
+            RegisterCreator("light-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingLightSensorDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
+        {
+            RegisterCreator("pressure-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingPressureSensorDevice>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
+        {
+            RegisterCreator("flow-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<IncreasingFlowSensorDevice>(mContext->timerDelegate);
             });
         }
 
