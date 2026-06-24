@@ -62,6 +62,10 @@ public:
     const DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> & GetForecast() override;
     CHIP_ERROR SetESAState(Clusters::DeviceEnergyManagement::ESAStateEnum state) override;
 
+    // Public getters for programmatic control
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::DeviceEnergyManagementCluster & DeviceEnergyManagementCluster() { return mDemCluster.Cluster(); }
+
 private:
     TimerDelegate & mTimerDelegate;
     CodeDrivenDataModelProvider * mProvider                  = nullptr;

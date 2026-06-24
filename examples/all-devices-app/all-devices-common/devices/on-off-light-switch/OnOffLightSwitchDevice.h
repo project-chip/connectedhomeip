@@ -37,6 +37,10 @@ public:
     // Endpoint interface overrides
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
+    // Public getters for programmatic control
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::BindingCluster & BindingCluster() { return mBindingCluster.Cluster(); }
+
 private:
     TimerDelegate & mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

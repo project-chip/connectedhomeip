@@ -221,7 +221,7 @@ private:
             RegisterCreator("contact-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BooleanStateSensorDevice>(
-                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
             RegisterAccessorCreator("contact-sensor", [](DeviceInterface & device) {
                 return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
@@ -232,7 +232,7 @@ private:
             RegisterCreator("water-leak-detector", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BooleanStateSensorDevice>(
-                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
+                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
             RegisterAccessorCreator("water-leak-detector", [](DeviceInterface & device) {
                 return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
@@ -459,7 +459,7 @@ private:
             RegisterCreator("rain-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BooleanStateSensorDevice>(
-                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)
@@ -467,7 +467,7 @@ private:
             RegisterCreator("water-freeze-detector", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BooleanStateSensorDevice>(
-                    &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
+                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)

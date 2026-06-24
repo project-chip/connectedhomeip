@@ -25,7 +25,7 @@ CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDri
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, *mTimerDelegate));
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mBooleanStateCluster.Create(endpoint);

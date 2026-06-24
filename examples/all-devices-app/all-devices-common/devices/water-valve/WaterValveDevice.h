@@ -34,6 +34,9 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // Public getters for programmatic control
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+
     Clusters::ValveConfigurationAndControlCluster & ValveConfigurationAndControlCluster();
 
     // Clusters::ValveConfigurationAndControl::Delegate implementation
