@@ -14,12 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "LinuxBleRssiRangingAdapter.h"
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixChimeDevice.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
 
 namespace chip {
 namespace app {
@@ -34,17 +32,6 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
                 { 1, "Ring Ring"_span },
             };
             return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
-        });
-    }
-
-    if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
-    {
-        static LinuxBleRssiRangingAdapter sBleAdapter;
-        LogErrorOnFailure(sBleAdapter.Init(storageDelegate));
-        DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
-            static Clusters::ProximityRanging::RangingAdapter * adapters[] = { &sBleAdapter };
-            return std::make_unique<ProximityRangerDevice>(timerDelegate,
-                                                           Span<Clusters::ProximityRanging::RangingAdapter * const>(adapters));
         });
     }
 }

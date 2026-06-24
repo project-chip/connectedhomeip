@@ -4492,6 +4492,20 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace ThreadNetworkDirectory
 
+namespace CommissioningProxy {
+namespace Attributes {
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CommissioningProxy
+
 namespace WakeOnLan {
 namespace Attributes {
 

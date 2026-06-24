@@ -16,27 +16,42 @@
  */
 #include <devices/Types.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
-
-namespace {
-// Global controller shared across all ProximityRangerDevice instances.
-ProximityRanging::RangingTechnologyController & GetRangingController()
-{
-    static ProximityRanging::RangingTechnologyController sRangingController;
-    return sRangingController;
-}
-} // namespace
 
 namespace chip {
 namespace app {
 
-size_t ProximityRangerDevice::sActiveCount = 0;
+BitMask<ProximityRanging::Feature> ProximityRangerDevice::DeriveFeatures() const
+{
+    BitMask<ProximityRanging::Feature> features;
+    for (auto * adapter : mAdapters)
+    {
+        VerifyOrDie(adapter != nullptr);
+        switch (adapter->GetTechnology())
+        {
+        case ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging:
+            features.Set(ProximityRanging::Feature::kBleBeaconRssi);
+            break;
+        case ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging:
+        case ProximityRanging::RangingTechEnum::kWiFiNextGenerationRanging:
+            features.Set(ProximityRanging::Feature::kWiFiUsdProximityDetection);
+            break;
+        case ProximityRanging::RangingTechEnum::kBluetoothChannelSounding:
+            features.Set(ProximityRanging::Feature::kBluetoothChannelSounding);
+            break;
+        default:
+            break;
+        }
+    }
+    return features;
+}
 
 ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
-                                             Span<ProximityRanging::RangingAdapter * const> adapters) :
+                                             std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
-    mRangingDriver(GetRangingController()), mTimerDelegate(timerDelegate), mAdapters(adapters)
+    mTimerDelegate(timerDelegate), mAdapters(std::move(adapters))
 {}
 
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -44,46 +59,43 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
 {
     VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
 
-    // Register adapters with the shared controller, skipping any already registered.
-    for (auto * adapter : mAdapters)
-    {
-        VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(GetRangingController().RegisterAdapter(*adapter).NoErrorIf(CHIP_ERROR_DUPLICATE_KEY_ID));
-    }
-
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-
-    // Configure cluster features based on registered adapters' technologies.
-    BitMask<ProximityRanging::Feature> features;
-    for (auto * adapter : mAdapters)
+    CHIP_ERROR err = provider.AddCluster(mIdentifyCluster.Registration());
+    if (err != CHIP_NO_ERROR)
     {
-        switch (adapter->GetTechnology())
-        {
-        case ProximityRanging::RangingTechEnum::kBluetoothChannelSounding:
-            features.Set(ProximityRanging::Feature::kBluetoothChannelSounding);
-            break;
-        case ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging:
-        case ProximityRanging::RangingTechEnum::kWiFiNextGenerationRanging:
-            features.Set(ProximityRanging::Feature::kWiFiUsdProximityDetection);
-            break;
-        case ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging:
-            features.Set(ProximityRanging::Feature::kBleBeaconRssi);
-            break;
-        default:
-            break;
-        }
+        // AddCluster failed, so the cluster was never registered with the provider; destroy
+        // the constructed object directly rather than going through Unregister (which would
+        // call provider.RemoveCluster on a cluster the provider never accepted).
+        mIdentifyCluster.Destroy();
+        Unregister(provider);
+        return err;
     }
 
-    mProximityRangingCluster.Create(endpoint, ProximityRanging::ProximityRangingCluster::Config().WithFeatures(features));
-    mProximityRangingCluster.Cluster().SetDriver(&mRangingDriver);
-    ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
+    mProximityRangingCluster.Create(
+        endpoint,
+        ProximityRanging::ProximityRangingCluster::Config(mTimerDelegate)
+            .WithFeatures(DeriveFeatures())
+            .WithAdapters(Span<ProximityRanging::RangingAdapter * const>(mAdapters.data(), mAdapters.size())));
+    err = provider.AddCluster(mProximityRangingCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        // See above: AddCluster failed, so destroy this cluster directly. Unregister still
+        // unwinds the previously-registered mIdentifyCluster.
+        mProximityRangingCluster.Destroy();
+        Unregister(provider);
+        return err;
+    }
 
-    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    err = provider.AddEndpoint(mEndpointRegistration);
+    if (err != CHIP_NO_ERROR)
+    {
+        Unregister(provider);
+        return err;
+    }
+
     mRegistered = true;
-    sActiveCount++;
     return CHIP_NO_ERROR;
 }
 
@@ -103,24 +115,7 @@ void ProximityRangerDevice::Unregister(CodeDrivenDataModelProvider & provider)
         mIdentifyCluster.Destroy();
     }
 
-    if (!mRegistered)
-    {
-        return;
-    }
     mRegistered = false;
-
-    if (--sActiveCount != 0)
-    {
-        return;
-    }
-
-    for (auto * adapter : mAdapters)
-    {
-        if (adapter != nullptr)
-        {
-            LogErrorOnFailure(GetRangingController().UnregisterAdapter(*adapter));
-        }
-    }
 }
 
 } // namespace app
