@@ -297,6 +297,10 @@ void ApplicationInit()
                 }
             }
         }
+        // Spec WiFiBand attribute has Fallback: 2G4 — if no valid frequency was parsed,
+        // default to 2.4 GHz rather than leaving the bitmap empty.
+        if (!bands.HasAny())
+            bands.Set(Clusters::CommissioningProxy::WiFiBandBitmap::k2g4);
         gMyCPDelegate.SetSupportedWiFiBands(bands);
     }
 
