@@ -33,9 +33,7 @@
 
 // ==================== Security Adaptations ====================
 
-#ifdef CONFIG_CHIP_CRYPTO_PSA
-#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (312U) /* sizeof(psa_hash_operation_t) */
-#endif
+/* Default NXP Platform security adaptations are used */
 
 // ==================== General Configuration Overrides ====================
 
