@@ -253,23 +253,10 @@ void PlatformManagerImpl::_Shutdown()
 #if CONFIG_NXP_USE_LOW_POWER
 CHIP_ERROR PlatformManagerImpl::EnableOTAStorage(void)
 {
-    switch (otaStorageState) {
-    case OTAStorageEnabled:
-        // OTA storage is already enabled. Do nothing
-        break;
-    case OTAStorageDisabled:
-        PLATFORM_InitExternalFlash();
-        break;
-    case OTAStorageSuspended:
-        // OTA storage is suspended most likely from a previous unsuccessful
-        // OTA, so just re-initialize it
-        PLATFORM_ReinitExternalFlash();
-        break;
-    default:
-        // Should never get here
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
+    // The OTA support from the wireless framework is automatically
+    // initializing the external flash when a new OTA image is started. The
+    // only action remaining here would be just to mark the OTA storage as
+    // enabled
     otaStorageState = OTAStorageEnabled;
     return CHIP_NO_ERROR;
 }
