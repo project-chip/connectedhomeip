@@ -68,11 +68,8 @@ void CookSurfacePart::Unregister(CodeDrivenDataModelProvider & provider)
     }
     if (mOnOffCluster.IsConstructed())
     {
-        if (mOnOffCluster.Cluster().IsInList())
-        {
-            LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
-            mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
-        }
+        LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
+        mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
         mOnOffCluster.Destroy();
     }
 }

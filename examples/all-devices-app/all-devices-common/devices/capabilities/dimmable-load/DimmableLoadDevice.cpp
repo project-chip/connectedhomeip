@@ -121,7 +121,42 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
 
 void DimmableLoadDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    // IMPORTANT: We must strictly separate DISCONNECTION (Phase 1) from DESTRUCTION (Phase 2).
+    // 
+    // Phase 1 (Disconnection): Remove all delegates and unregister from all shared lists/tables
+    // while all cluster objects are still fully constructed and valid. This prevents any
+    // use-after-free or dangling pointer access (e.g. OnOff-Level coupling delegates) during destruction.
+    //
+    // Phase 2 (Destruction): Once fully disconnected, the cluster objects can be safely destroyed
+    // in any order.
+    //
+    // === PHASE 1: DISCONNECTION ===
+
+    // Unregister the endpoint itself from the provider first so we are allowed to remove its clusters.
     UnregisterDescriptor(provider);
+
+    // 1. Unregister all handlers from the Scenes Table
+    if (mOnOffCluster.IsConstructed() && mOnOffCluster.Cluster().IsInList())
+    {
+        Clusters::ScopedSceneTable table(mScenesTableProvider);
+        table->UnregisterHandler(&mOnOffCluster.Cluster());
+        if (mLevelControlCluster.IsConstructed())
+        {
+            table->UnregisterHandler(&mLevelControlCluster.Cluster());
+        }
+    }
+
+    // 2. Remove all delegates from OnOff cluster
+    if (mOnOffCluster.IsConstructed())
+    {
+        mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
+        if (mLevelControlCluster.IsConstructed())
+        {
+            mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
+        }
+    }
+
+    // === PHASE 2: DESTRUCTION ===
 
     if (mGroupsCluster.IsConstructed())
     {
@@ -137,16 +172,7 @@ void DimmableLoadDevice::Unregister(CodeDrivenDataModelProvider & provider)
 
     if (mOnOffCluster.IsConstructed())
     {
-        if (mOnOffCluster.Cluster().IsInList())
-        {
-            Clusters::ScopedSceneTable table(mScenesTableProvider);
-            table->UnregisterHandler(&mOnOffCluster.Cluster());
-            table->UnregisterHandler(&mLevelControlCluster.Cluster());
-        }
-
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
-        mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
-        mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
         mOnOffCluster.Destroy();
     }
 

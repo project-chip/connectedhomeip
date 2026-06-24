@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 
 ESP32DimmableLightDevice::ESP32DimmableLightDevice(const Context & context) :
-    DimmableLightDevice(*this, *this, *this, *this, context)
+    DimmableLightDevice(context, { .onOff = *this, .levelControl = *this, .effect = *this, .identify = *this })
 {
     mLED.Init();
 }

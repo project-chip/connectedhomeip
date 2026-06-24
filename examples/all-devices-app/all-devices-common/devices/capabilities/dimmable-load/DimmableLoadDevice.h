@@ -80,12 +80,13 @@ public:
         /// to satisfy the global CI PICS tests (present with value 0 or null).
         static constexpr LevelControlConfig CiPicsDefaults()
         {
-            LevelControlConfig config;
-            config.onOffTransitionTime = 0;
-            config.onTransitionTime    = DataModel::Nullable<uint16_t>(0);
-            config.offTransitionTime   = DataModel::Nullable<uint16_t>(0);
-            config.startUpCurrentLevel = DataModel::Nullable<uint8_t>(); // Present and Null
-            return config;
+            return LevelControlConfig{
+                0,                                // onOffTransitionTime
+                DataModel::Nullable<uint16_t>(0), // onTransitionTime
+                DataModel::Nullable<uint16_t>(0), // offTransitionTime
+                std::nullopt,                     // defaultMoveRate
+                DataModel::Nullable<uint8_t>()    // startUpCurrentLevel
+            };
         }
     };
 
