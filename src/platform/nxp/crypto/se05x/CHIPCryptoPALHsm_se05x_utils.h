@@ -208,6 +208,14 @@ CHIP_ERROR se05x_disable_nfc_commision();
  */
 CHIP_ERROR se05x_enable_nfc_commision();
 
+/**
+ * @brief Read the size of a secure object in SE05x.
+ * @param[in] objid - Object identifier
+ * @param[out] psize - Pointer to store the object size
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t *psize);
+
 #ifdef __cplusplus
 }
 #endif
