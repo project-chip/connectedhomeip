@@ -101,8 +101,8 @@ public:
         Clusters::IdentifyDelegate & identify;
     };
 
-    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                       const Delegates & delegates, const Config & config);
+    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Delegates & delegates,
+                       const Config & config);
     ~DimmableLoadDevice() override = default;
 
     // Public cluster getters for application and testing
