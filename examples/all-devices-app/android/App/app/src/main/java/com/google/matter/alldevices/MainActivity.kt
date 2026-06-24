@@ -62,19 +62,11 @@ data class EndpointConfig(
 
 class MainActivity : ComponentActivity() {
 
-    private var multicastLock: WifiManager.MulticastLock? = null
     private var androidChipPlatform: AndroidChipPlatform? = null
     private var logcatProcess: Process? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Acquire multicast lock for DNS-SD discovery to function properly on Android
-        val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        multicastLock = wifi.createMulticastLock("AllDevicesAppMulticastLock").apply {
-            setReferenceCounted(true)
-            acquire()
-        }
 
         setContent {
             AppUI()
@@ -83,12 +75,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopServer()
-        multicastLock?.let {
-            if (it.isHeld) {
-                it.release()
-            }
-        }
     }
 
     private fun startServer(
@@ -145,24 +131,28 @@ class MainActivity : ComponentActivity() {
         logcatProcess?.destroy()
         val pid = android.os.Process.myPid()
         thread {
+            var process: Process? = null
             try {
                 // Read from local logcat, filter logs matching our PID
-                val process = Runtime.getRuntime().exec(arrayOf("logcat", "-v", "time", "--pid", pid.toString()))
+                process = Runtime.getRuntime().exec(arrayOf("logcat", "-v", "time", "--pid", pid.toString()))
                 logcatProcess = process
-                val reader = BufferedReader(InputStreamReader(process.inputStream))
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    val logLine = line!!
-                    if (logLine.contains("SVR") ||
-                        logLine.contains("AllDevicesApp") ||
-                        logLine.contains("ChimeDevice") ||
-                        logLine.contains("OccupancySensor") ||
-                        logLine.contains("TogglingOccupancy")) {
-                        onLineReceived(logLine)
+                process.inputStream.bufferedReader().use { reader ->
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        val logLine = line ?: break
+                        if (logLine.contains("SVR") ||
+                            logLine.contains("AllDevicesApp") ||
+                            logLine.contains("ChimeDevice") ||
+                            logLine.contains("OccupancySensor") ||
+                            logLine.contains("TogglingOccupancy")) {
+                            onLineReceived(logLine)
+                        }
                     }
                 }
             } catch (e: Exception) {
                 onLineReceived("Logs closed: ${e.message}")
+            } finally {
+                process?.destroy()
             }
         }
     }
@@ -173,12 +163,15 @@ class MainActivity : ComponentActivity() {
             val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 400, 400)
             val width = bitMatrix.width
             val height = bitMatrix.height
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    bitmap.setPixel(x, y, if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+            val pixels = IntArray(width * height)
+            for (y in 0 until height) {
+                val offset = y * width
+                for (x in 0 until width) {
+                    pixels[offset + x] = if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE
                 }
             }
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
             bitmap
         } catch (e: Exception) {
             null
@@ -636,24 +629,18 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun serializeConfigs(configs: List<EndpointConfig>): String {
-        val sb = StringBuilder()
-        sb.append("[")
-        for (i in configs.indices) {
-            val c = configs[i]
-            sb.append("{")
-            sb.append("\"endpointId\":").append(c.endpointId).append(",")
-            sb.append("\"deviceType\":\"").append(c.deviceType).append("\",")
-            sb.append("\"parentId\":").append(c.parentId).append(",")
-            sb.append("\"bridged\":").append(c.bridged).append(",")
-            val safeLabel = c.nodeLabel.replace("\"", "\\\"")
-            sb.append("\"nodeLabel\":\"").append(safeLabel).append("\"")
-            sb.append("}")
-            if (i < configs.size - 1) {
-                sb.append(",")
+        val jsonArray = org.json.JSONArray()
+        for (c in configs) {
+            val jsonObject = org.json.JSONObject().apply {
+                put("endpointId", c.endpointId)
+                put("deviceType", c.deviceType)
+                put("parentId", c.parentId)
+                put("bridged", c.bridged)
+                put("nodeLabel", c.nodeLabel)
             }
+            jsonArray.put(jsonObject)
         }
-        sb.append("]")
-        return sb.toString()
+        return jsonArray.toString()
     }
 }
 

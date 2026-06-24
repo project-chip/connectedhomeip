@@ -7,6 +7,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.content.Context
+import android.net.wifi.WifiManager
 import android.util.Log
 import chip.platform.AndroidChipPlatform
 import chip.platform.PreferencesConfigurationManager
@@ -27,6 +29,7 @@ import chip.platform.ChipMdnsCallbackImpl
  */
 class MatterServerService : Service() {
     private var androidChipPlatform: AndroidChipPlatform? = null
+    private var multicastLock: WifiManager.MulticastLock? = null
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -34,6 +37,11 @@ class MatterServerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        multicastLock = wifi.createMulticastLock("AllDevicesAppMulticastLock").apply {
+            setReferenceCounted(true)
+            acquire()
+        }
         createNotificationChannel()
     }
 
@@ -81,6 +89,11 @@ class MatterServerService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         App.getInstance().stopApp()
+        multicastLock?.let {
+            if (it.isHeld) {
+                it.release()
+            }
+        }
         Log.i(TAG, "Matter app JNI stopped and service destroyed")
     }
 

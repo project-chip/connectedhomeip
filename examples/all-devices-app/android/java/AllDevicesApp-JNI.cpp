@@ -128,6 +128,20 @@ JNI_METHOD(jboolean, startApp)(JNIEnv * env, jobject self, jstring configuration
 JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
 {
     AllDevicesAppShutdown();
+
+    if (sIOThread != 0)
+    {
+        chip::DeviceLayer::StackLock lock;
+        CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to stop event loop task: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        chip::DeviceLayer::StackUnlock unlock;
+        pthread_join(sIOThread, NULL);
+        sIOThread = 0;
+    }
+
     return JNI_TRUE;
 }
 
