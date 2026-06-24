@@ -18,7 +18,7 @@ from typing import Optional
 from .parser import TestStep
 
 
-class TestParserHooks():
+class TestParserHooks:
     __test__ = False
 
     def parsing_start(self, count: int):
@@ -79,7 +79,7 @@ class TestParserHooks():
         pass
 
 
-class TestRunnerHooks():
+class TestRunnerHooks:
     __test__ = False
 
     def start(self, count: int):
@@ -236,7 +236,7 @@ class TestRunnerHooks():
         pass
 
 
-class WebSocketRunnerHooks():
+class WebSocketRunnerHooks:
     def connecting(self, url: str):
         """
         This method is called when the websocket is attempting to connect to a remote.

@@ -14,8 +14,8 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
             -   [Notes](#notes)
         -   [Cluster control](#cluster-control)
         -   [Factory Reset](#factory-reset)
-    -   [Building with Optiga Trust M as HSM](#building-with-optiga-trust-m-as-hsm)
-        -   [Optiga Trust M Provisioning](#optiga-trust-m-provisioning)
+    -   [Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm)
+        -   [OPTIGA™ Trust M Provisioning](#optiga-trust-m-provisioning)
     -   [OTA Software Update](#ota-software-update)
 
 <hr>
@@ -60,8 +60,8 @@ will then join the network.
 
 _To build with Infineon Hardware Security Module-OPTIGA™ Trust M for Device
 attestation and other security use cases, please refer to the
-[Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm) for
-more instructions_
+[Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm)
+for more instructions_
 
 ## Flashing the Application
 
@@ -140,7 +140,7 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 -   Pressing the button again within 5 seconds will cancel the factory reset of
     the board.
 
-## Building with Optiga Trust M as HSM
+## Building with OPTIGA™ Trust M as HSM
 
 Infineon Hardware Security Module-OPTIGA™ Trust M is a high-end security
 solution that provides an anchor of trust for connecting IoT devices to the
@@ -171,10 +171,10 @@ cloud, giving every IoT device its own unique identity.
 -   Proceed to OPTIGA™ Trust M Provisioning section to complete the credential
     storage into HSM.
 
-### Optiga Trust M Provisioning
+### OPTIGA™ Trust M Provisioning
 
-For the description of OPTIGA™ Trust M Provisioning with test DAC generation and
-PAI and CD storage, please refer to
+For the description of OPTIGA™ Trust M Provisioning with test DAC generation
+and PAI and CD storage, please refer to
 [Infineon OPTIGA™ Trust M Provisioning](../../../../docs/platforms/infineon/infineon_trustm_provisioning.md)
 
 After completing OPTIGA™ Trust M Provisioning, proceed to

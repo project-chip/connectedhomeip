@@ -39,7 +39,7 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from sphinx.application import Sphinx
 
@@ -57,9 +57,9 @@ def adjust_includes(
     fname: Path,
     basepath: Path,
     encoding: str,
-    link_prefixes: List[str],
-    extensions: List[str],
-    targets: List[Path],
+    link_prefixes: list[str],
+    extensions: list[str],
+    targets: list[Path],
     dstpath: Optional[Path] = None,
 ) -> None:
     """Adjust included content paths.
@@ -236,7 +236,7 @@ def sync_contents(app: Sphinx) -> None:
         file.unlink()
 
 
-def setup(app: Sphinx) -> Dict[str, Any]:
+def setup(app: Sphinx) -> dict[str, Any]:
     app.add_config_value("external_content_contents", [], "env")
     app.add_config_value("external_content_keep", [], "")
     app.add_config_value("external_content_link_prefixes", [], "env")

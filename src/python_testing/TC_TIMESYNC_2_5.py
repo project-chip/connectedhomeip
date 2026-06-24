@@ -35,7 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import typing
 
 from mobly import asserts
 
@@ -53,10 +52,10 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
+    async def send_set_dst_cmd(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
 
-    async def send_set_dst_cmd_expect_error(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct], error: Status) -> None:
+    async def send_set_dst_cmd_expect_error(self, dst: list[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct], error: Status) -> None:
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
             asserts.assert_true(False, "Unexpected SetTimeZone command success")

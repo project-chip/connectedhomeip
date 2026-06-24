@@ -21,7 +21,6 @@
 #include <app/server/Server.h>
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
-#include <zephyr/sys/reboot.h>
 #ifdef CONFIG_CHIP_WIFI
 #include "WiFiManager.h"
 #endif
@@ -46,6 +45,13 @@ private:
 
         if (server.GetFabricTable().FabricCount() == 0)
         {
+            // ScheduleFactoryReset in case of failed commissioning
+            if (AppTaskCommon::IsCommissioningFailed())
+            {
+                chip::Server::GetInstance().ScheduleFactoryReset();
+                return;
+            }
+
             if (chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
                 server.GetCommissioningWindowManager().CloseCommissioningWindow();
@@ -63,9 +69,8 @@ private:
         {
             LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
 #ifdef CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
-#ifdef CONFIG_CHIP_WIFI
                 chip::Server::GetInstance().ScheduleFactoryReset();
-#else
+#elif defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY)
                 ChipLogProgress(DeviceLayer, "Erasing settings partition");
                 // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use
                 // FactoryReset
@@ -89,14 +94,7 @@ private:
 #ifdef CONFIG_TFLM_FEATURE
                 AppTask::MicroSpeechProcessStop();
 #endif
-                // Reboot in case of failed commissioning to allow new pairing via BLE
-                if (AppTaskCommon::IsCommissioningFailed())
-                {
-                    ChipLogProgress(DeviceLayer, "Rebooting board");
-                    sys_reboot(SYS_REBOOT_WARM);
-                }
-#endif // CONFIG_CHIP_WIFI
-#elif defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY) || defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START)
+#elif defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
                 LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().ClearAllSrpHostAndServices());
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -112,7 +110,6 @@ private:
                 LogErrorOnFailure(chip::DeviceLayer::WiFiManager::Instance().Disconnect());
                 chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
 #endif
-#ifdef CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
                 LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
                 LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(StartThreadPrescan, 0));
@@ -127,7 +124,6 @@ private:
                 }
                 ChipLogError(FabricProvisioning, "Could not start Bluetooth LE advertising");
 #endif
-#endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 #endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
             }));
         }

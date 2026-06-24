@@ -46,7 +46,7 @@ source_set("headers") {
 
   public_configs = [ "${chip_root}/src/app/common:includes" ]
 
-  # Headers is a workaround for build size optmizations: what we would want is
+  # Headers is a workaround for build size optimizations: what we would want is
   # ":elements" to contain both headers and cpp files. However compiler seems
   # to be able to optimize shared code if we place all structs in one huge
   # CPP file, so "cluster-objects" contains that CPP file.

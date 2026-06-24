@@ -25,6 +25,7 @@
 
 #include <inet/InetInterface.h>
 
+#include <inet/IPAddress.h>
 #include <inet/IPPrefix.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>

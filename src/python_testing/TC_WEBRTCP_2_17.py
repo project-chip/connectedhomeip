@@ -140,12 +140,12 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         session_id = resp.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        log.info(f"DUT allocated WebRTC session ID: {session_id}")
+        log.info("DUT allocated WebRTC session ID: %s", session_id)
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
 
         self.step(3)
         # Wait for incoming Answer command from DUT on WebRTC Requestor cluster
-        log.info(f"Waiting for Answer command from DUT for session {session_id}")
+        log.info("Waiting for Answer command from DUT for session %s", session_id)
 
         # Wait for the Answer command from the DUT
         answer_sessionId, answer_sdp = await webrtc_peer.get_remote_answer()
@@ -153,7 +153,7 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
         # Verify the Answer command contains the same session ID
         asserts.assert_equal(answer_sessionId, session_id,
                              f"Answer session ID {answer_sessionId} does not match expected {session_id}")
-        log.info(f"Received Answer command for session {session_id}")
+        log.info("Received Answer command for session %s", session_id)
 
         self.step(4)
         # Verify the Answer command contains valid SDP answer content
@@ -172,12 +172,12 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_true("m=video" in answer_sdp, "SDP answer missing media description line (m=video)")
         asserts.assert_true("m=audio" in answer_sdp, "SDP answer missing media description line (m=audio)")
 
-        log.info(f"SDP answer validated successfully. Answer length: {len(answer_sdp)} bytes")
-        log.info(f"SDP answer preview: {answer_sdp[:400]}...")
+        log.info("SDP answer validated successfully. Answer length: %s bytes", len(answer_sdp))
+        log.info("SDP answer preview: %s...", answer_sdp[:400])
 
         self.step(5)
         # Send EndSession command to terminate the WebRTC session
-        log.info(f"Sending EndSession command for session {session_id}")
+        log.info("Sending EndSession command for session %s", session_id)
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -187,7 +187,7 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
             endpoint=endpoint,
         )
 
-        log.info(f"Successfully ended WebRTC session {session_id}")
+        log.info("Successfully ended WebRTC session %s", session_id)
 
         self.step(6)
         # Deallocate the Audio and Video streams to return DUT to known state
@@ -200,7 +200,7 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info("Successfully deallocated audio stream %s", audio_stream_id)
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -209,7 +209,7 @@ class TC_WEBRTCP_2_17(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info("Successfully deallocated video stream %s", video_stream_id)
 
         # Clean up
         await webrtc_manager.close_all()

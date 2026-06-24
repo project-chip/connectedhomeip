@@ -18,8 +18,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/closure-dimension-cluster-objects.h"
     "${CLUSTER_DIR}/closure-dimension-delegate.h"
-    "${CLUSTER_DIR}/ClosureDimensionClusterMatterContext.cpp"
-    "${CLUSTER_DIR}/closure-dimension-matter-context.h"
-    "${CLUSTER_DIR}/ClosureDimensionCluster.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/closure-dimension-server.h"
 )

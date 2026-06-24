@@ -16,7 +16,7 @@ import logging
 import typing
 import xml.sax.handler
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from matter.idl.data_model_xml.handlers import Context, DataModelXmlHandler
 from matter.idl.matter_idl_types import Idl
@@ -105,7 +105,7 @@ class ParseSource:
         return self.source  # assume string
 
 
-def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
+def ParseXmls(sources: list[ParseSource], include_meta_data=True) -> Idl:
     """Parse one or more XML inputs and return the resulting Idl data.
 
     Params:

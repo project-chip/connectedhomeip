@@ -128,8 +128,8 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
-        logger.info(f"Mode OK: {self.mode_ok}")
-        logger.info(f"Mode Fail: {self.mode_fail}")
+        logger.info("Mode OK: %s", self.mode_ok)
+        logger.info("Mode Fail: %s", self.mode_fail)
 
         # Commissioning, already done
         self.step(1)
@@ -139,8 +139,8 @@ class TC_DISHM_2_1(MatterBaseTest):
         supported_modes_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=supported_modes_attribute)
         modes = [m.mode for m in supported_modes_dut]
 
-        logger.info(f"SupportedModes: {supported_modes_dut}")
-        logger.info(f"Modes: {modes}")
+        logger.info("SupportedModes: %s", supported_modes_dut)
+        logger.info("Modes: %s", modes)
 
         # Check if the list of supported modes is at least 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
@@ -206,7 +206,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                                 "Unexpected return type for ChangeToMode")
 
-            logger.info(f"response: {change_to_mode_response}")
+            logger.info("response: %s", change_to_mode_response)
 
             st = change_to_mode_response.status
 

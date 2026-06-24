@@ -3,10 +3,12 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} AS build
 
 # Compatible Nordic Connect SDK revision and required tools versions
-ARG NCS_REVISION=v3.1.0
-ARG JLINK_VERSION="JLink_Linux_V842_x86_64"
+ARG NCS_REVISION=v3.3.0
+ARG JLINK_VERSION="JLink_Linux_V924a_x86_64"
 ARG WEST_VERSION=1.4.0
-ARG CMAKE_VERSION=3.25.0
+ARG CMAKE_VERSION=4.2.0
+ARG NRFUTIL_VERSION=8.1.1
+ARG NRFUTIL_DEVICE_VERSION=2.17.5
 
 # Requirements to clone SDKs
 RUN set -x \
@@ -27,8 +29,8 @@ RUN set -x \
     # Get nRF Util
     && curl --location https://files.nordicsemi.com/artifactory/swtools/external/nrfutil/executables/x86_64-unknown-linux-gnu/nrfutil -o nrfutil \
     && chmod +x ./nrfutil \
-    && ./nrfutil self-upgrade \
-    && ./nrfutil install device \
+    && ./nrfutil self-upgrade --to-version ${NRFUTIL_VERSION} \
+    && ./nrfutil install device=${NRFUTIL_DEVICE_VERSION} \
     && ./nrfutil install sdk-manager \
     # Download nRF Connect toolchain
     && ./nrfutil sdk-manager toolchain install --ncs-version "$NCS_REVISION" --install-dir ./zephyr-sdk \
@@ -61,10 +63,11 @@ ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 # Set up Zephyr SDK environment variables
 RUN set -x \
     # Setup Zephyr SDK environment variables
-    && nrfutil sdk-manager toolchain env --as-script --ncs-version "$NCS_REVISION" --install-dir ${NRF5_TOOLS_ROOT}/zephyr-sdk > $ZEPHYR_BASE/zephyr-env.sh \
-    && echo "source $ZEPHYR_BASE/zephyr-env.sh" >> /etc/bash.bashrc \
+    && echo "source $ZEPHYR_BASE/zephyr-env.sh" >> ${ZEPHYR_BASE}/../.zephyrrc \
+    && nrfutil sdk-manager toolchain env --as-script --ncs-version "$NCS_REVISION" --install-dir ${NRF5_TOOLS_ROOT}/zephyr-sdk > ${ZEPHYR_BASE}/../.zephyrrc \
+    && echo "source $ZEPHYR_BASE/../.zephyrrc" >> /etc/bash.bashrc \
     # Create a symlink named "latest" pointing to the toolchain directory to avoid hash in the path
-    && source $ZEPHYR_BASE/zephyr-env.sh \
+    && source $ZEPHYR_BASE/../.zephyrrc \
     && ln -s ${ZEPHYR_SDK_INSTALL_DIR} ${NRF5_TOOLS_ROOT}/zephyr-sdk/toolchains/latest \
     # Remove redundant directory created by nrfutil
     && rm -rf ${NRF5_TOOLS_ROOT}/zephyr-sdk/downloads \
@@ -72,7 +75,7 @@ RUN set -x \
 
 # Install Zephyr and nRF Connect SDK requirements
 RUN set -x \
-    && source $ZEPHYR_BASE/zephyr-env.sh \
+    && source ${ZEPHYR_BASE}/../.zephyrrc \
     && python3 -m pip install -v --no-build-isolation --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/zephyr/scripts/requirements-base.txt \
     && python3 -m pip install -v --no-build-isolation --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/nrf/scripts/requirements-build.txt \
     && python3 -m pip install -v --no-build-isolation --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/bootloader/mcuboot/scripts/requirements.txt \

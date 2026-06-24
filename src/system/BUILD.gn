@@ -287,7 +287,6 @@ static_library("system") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform:platform_config_header",
-    "${nlassert_root}:nlassert",
   ]
 
   allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
@@ -305,6 +304,9 @@ static_library("system") {
       "SystemFaultInjection.cpp",
       "SystemFaultInjection.h",
     ]
-    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+    public_deps += [
+      "${nlassert_root}:nlassert",
+      "${nlfaultinjection_root}:nlfaultinjection",
+    ]
   }
 }

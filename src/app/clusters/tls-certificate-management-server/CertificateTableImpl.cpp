@@ -65,18 +65,18 @@ enum class CertificateType : uint8_t
     kRoot
 };
 
-static constexpr size_t kPersistentBufferNextIdBytes =
-    EstimateStructOverhead(sizeof(uint16_t), // mNextClientId
-                           sizeof(uint16_t), // mNextRootId,
-                           EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
-                               (kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS), // mRootCertMapping
-                           EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
-                               (kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS)); // mClientCertMapping
+static constexpr size_t kPersistentBufferNextIdBytes = EstimateStructOverhead(
+    sizeof(uint16_t), // mNextClientId
+    sizeof(uint16_t), // mNextRootId,
+    EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
+        (static_cast<size_t>(kMaxRootCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS), // mRootCertMapping
+    EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
+        (static_cast<size_t>(kMaxClientCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS)); // mClientCertMapping
 
 class GlobalCertificateData : public PersistableData<kPersistentBufferNextIdBytes>
 {
-    IncrementingIdHelper<CertificateId, kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mRoot;
-    IncrementingIdHelper<CertificateId, kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mClient;
+    IncrementingIdHelper<CertificateId, static_cast<size_t>(kMaxRootCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS> mRoot;
+    IncrementingIdHelper<CertificateId, static_cast<size_t>(kMaxClientCertificatesPerFabric) * CHIP_CONFIG_MAX_FABRICS> mClient;
     EndpointId mEndpointId = kInvalidEndpointId;
 
 public:
@@ -270,7 +270,7 @@ CHIP_ERROR RootSerializer::DeserializeData(TLV::TLVReader & reader, CertificateT
 template <>
 void RootSerializer::Clear(CertificateTable::RootCertStruct & data)
 {
-    new (&data) CertificateTable::RootCertStruct();
+    data = {};
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct>;
@@ -364,7 +364,7 @@ CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, Certificat
 template <>
 void ClientSerializer::Clear(CertificateTable::ClientCertWithKey & data)
 {
-    new (&data) CertificateTable::ClientCertWithKey();
+    data.Clear();
 }
 
 template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertWithKey>;

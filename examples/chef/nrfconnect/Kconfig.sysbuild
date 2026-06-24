@@ -20,10 +20,10 @@ config NRF_DEFAULT_IPC_RADIO
 
 # Enable IEEE802.15.4 serialization to network core
 config NETCORE_IPC_RADIO_IEEE802154
-	default y if SOC_SERIES_NRF53X
+	default y if SOC_SERIES_NRF53
 
 # Enable Bluetooth serialization to network core
 config NETCORE_IPC_RADIO_BT_HCI_IPC
-	default y if SOC_SERIES_NRF53X
+	default y if SOC_SERIES_NRF53
 
 source "${ZEPHYR_BASE}/share/sysbuild/Kconfig"

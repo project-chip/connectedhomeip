@@ -662,17 +662,17 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                             "Input list should not be empty.")
 
         # Select a different input
-        for input in input_list:
-            if current_input == input.index:
+        for inp in input_list:
+            if current_input == inp.index:
                 continue
 
             await self.send_single_cmd(
                 cmd=Clusters.Objects.MediaInput.Commands.SelectInput(
-                    index=input.index),
+                    index=inp.index),
                 endpoint=endpoint,
             )
             current_input = await self._read_media_input_current_input(endpoint)
-            asserts.assert_equal(current_input, input.index)
+            asserts.assert_equal(current_input, inp.index)
             break
 
         # Rename an input
@@ -686,9 +686,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         input_list = await self._read_media_input_input_list(endpoint)
         found = False
-        for input in input_list:
-            if input.index == target_index:
-                asserts.assert_equal(input.name, new_name)
+        for inp in input_list:
+            if inp.index == target_index:
+                asserts.assert_equal(inp.name, new_name)
                 found = True
                 break
         asserts.assert_true(

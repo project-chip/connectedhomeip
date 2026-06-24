@@ -107,11 +107,11 @@ class TC_CNET_4_3(MatterBaseTest):
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        log.info(f"Networks by endpoint: {networks_dict}")
+        log.info("Networks by endpoint: %s", networks_dict)
         connected_network_count = {}
         for ep in networks_dict:
             connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
-        log.info(f"Connected networks count by endpoint: {connected_network_count}")
+        log.info("Connected networks count by endpoint: %s", connected_network_count)
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
         current_cluster_connected = connected_network_count[self.get_endpoint()] == 1

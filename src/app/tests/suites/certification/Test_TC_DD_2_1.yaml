@@ -219,26 +219,8 @@ tests:
            $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
       disabled: true
 
-    - label: "Step 10: TH scans and finds the DUT SSID"
-      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
-      verification: |
-          Out of Scope : SoftAP commissioning is currently not supported.
-      disabled: true
-
-    - label:
-          "Step 11: TH scans and finds the DUT SSID TH sends to DUT a 1st power
-          cycle command (or reset manually) TH sends to DUT a 2nd power cycle
-          command (or reset manually)"
-      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
-      verification: |
-          Out of Scope : SoftAP commissioning is currently not supported.
-      disabled: true
-
-    - label: "Step 12: TH scans and finds the DUT SSID"
-      PICS: MCORE.COM.WIFI && MCORE.DD.IE
-      verification: |
-          Out of Scope : SoftAP commissioning is currently not supported.
-      disabled: true
+    # TODO(https://github.com/project-chip/matter-test-scripts/issues/777):
+    # PAF steps are missing
 
     - label:
           "Step 12: TH and DUT are connected to the same network through

@@ -135,7 +135,7 @@ class PostProcessResponseResult:
 
     There are multiple operations that occur when post processing a response. This contains all the
     results for each operation performed. Note that the number and types of steps performed is
-    dependant on test step itself.
+    dependent on test step itself.
     '''
 
     def __init__(self):
@@ -759,6 +759,9 @@ class TestStep:
     @property
     def step_index(self):
         return self._step_index
+
+    def get_config_value(self, key, default=None):
+        return self._runtime_config_variable_storage.get(key, default)
 
     @property
     def is_enabled(self):
@@ -1510,6 +1513,8 @@ class TestParser:
         # These values are default runtime values (non-legacy)
         self.__apply_legacy_config_if_missing(
             config, 'LastReceivedEventNumber', 0)
+        self.__apply_legacy_config_if_missing(
+            config, 'valueWaitExtraDurationMs', 250)
 
     def __apply_legacy_config_if_missing(self, config, key, value):
         if key not in config:

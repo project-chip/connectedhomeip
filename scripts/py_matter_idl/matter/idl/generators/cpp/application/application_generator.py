@@ -14,7 +14,7 @@
 
 import os
 from dataclasses import dataclass
-from typing import List, Mapping, Optional
+from typing import Mapping, Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.cluster_selection import server_side_clusters
@@ -69,7 +69,7 @@ class ServerClusterConfig:
 
 @dataclass
 class ClusterConfiguration:
-    endpoint_configs: List[ServerClusterConfig]
+    endpoint_configs: list[ServerClusterConfig]
     feature_bitmap_type: Optional[Bitmap]
 
 
@@ -164,7 +164,7 @@ class CppApplicationGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="PluginApplicationCallbacksHeader.jinja",
             output_file_name="app/PluginApplicationCallbacks.h",
-            vars={"clusters": server_side_clusters(self.idl)},
+            template_vars={"clusters": server_side_clusters(self.idl)},
         )
 
         # Source for __attribute__(weak) implementations of all cluster
@@ -172,13 +172,13 @@ class CppApplicationGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="CallbackStubSource.jinja",
             output_file_name="app/callback-stub.cpp",
-            vars={"clusters": server_side_clusters(self.idl)},
+            template_vars={"clusters": server_side_clusters(self.idl)},
         )
 
         self.internal_render_one_output(
             template_path="ClusterCallbacksSource.jinja",
             output_file_name="app/cluster-callbacks.cpp",
-            vars={
+            template_vars={
                 'clusters': server_side_clusters(self.idl)
             }
         )
@@ -201,7 +201,7 @@ class CppApplicationGenerator(CodeGenerator):
             self.internal_render_one_output(
                 template_path="ServerClusterConfig.jinja",
                 output_file_name=f"app/static-cluster-config/{name}.h",
-                vars={
+                template_vars={
                     "cluster_name": name,
                     "config": config,
                     "input_name": self.idl.parse_file_name,

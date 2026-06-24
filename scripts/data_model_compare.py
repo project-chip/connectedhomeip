@@ -240,7 +240,7 @@ def filter_matter(matter, output, filenames):
     if output == "-":
         print(storage.content)
     else:
-        with open(output, "wt", encoding="utf8") as o:
+        with open(output, "w", encoding="utf8") as o:
             o.write(storage.content)
 
 
@@ -304,7 +304,7 @@ def parse(output, filenames):
         if output == "-":
             print(storage.content)
         else:
-            with open(output, "wt", encoding="utf8") as o:
+            with open(output, "w", encoding="utf8") as o:
                 o.write(storage.content)
 
 

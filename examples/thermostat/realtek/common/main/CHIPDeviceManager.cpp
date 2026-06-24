@@ -82,10 +82,12 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    SuccessOrExit(err);
 #endif
 
-    PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    err = PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    SuccessOrExit(err);
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
@@ -113,7 +115,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     SuccessOrExit(err);
 
-    sThreadNetworkDriver.Init();
+    (void) sThreadNetworkDriver.Init();
 
     ChipLogProgress(DeviceLayer, "Start OpenThread task");
     err = ThreadStackMgrImpl().StartThreadTask();

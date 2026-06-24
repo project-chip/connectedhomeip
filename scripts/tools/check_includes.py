@@ -49,7 +49,7 @@ OVERRIDE = 'T' + 'ODO: update check_includes_config.py'
 
 def any_re(res: Iterable[str]) -> Pattern:
     """Given a list of RE strings, return an RE to match any of them."""
-    return re.compile('|'.join((f'({i})' for i in res)))
+    return re.compile('|'.join(f'({i})' for i in res))
 
 
 def main():

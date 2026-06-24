@@ -20,6 +20,7 @@
 
 #include "ToCertificateString.h"
 
+#include <cstdio>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
 

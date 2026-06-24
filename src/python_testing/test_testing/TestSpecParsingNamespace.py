@@ -257,13 +257,13 @@ class TestSpecParsingNamespace(MatterBaseTest):
         # Check changes from 1.3 to 1.4
         # Created issue https://github.com/project-chip/connectedhomeip/issues/40909 to track missing namespace from 1.3 to 1.4
         removed_1_3_to_1_4 = set(one_three.keys()) - set(one_four.keys())
-        removed_names_1_3_to_1_4 = {one_three[id].name for id in removed_1_3_to_1_4}
+        removed_names_1_3_to_1_4 = {one_three[_id].name for _id in removed_1_3_to_1_4}
         expected_removed_1_3_to_1_4 = {"Common Position"}
         asserts.assert_equal(removed_names_1_3_to_1_4, expected_removed_1_3_to_1_4,
                              f"Expected only 'Common Position' to be removed from 1.3 to 1.4, but got: {removed_names_1_3_to_1_4}")
 
         added_1_3_to_1_4 = set(one_four.keys()) - set(one_three.keys())
-        added_names_1_3_to_1_4 = {one_four[id].name for id in added_1_3_to_1_4}
+        added_names_1_3_to_1_4 = {one_four[_id].name for _id in added_1_3_to_1_4}
         expected_added_1_3_to_1_4 = {"Common Area", "Common Landmark", "Common Relative Position"}
         asserts.assert_equal(
             added_names_1_3_to_1_4,
@@ -277,7 +277,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
         # Comprehensive checks: Compare 1.4.2 (latest) against all previous versions
         # 1.4.2 vs 1.3 comparison
         removed_1_4_2_vs_1_3 = set(one_three.keys()) - set(one_four_two.keys())
-        removed_names_1_4_2_vs_1_3 = {one_three[id].name for id in removed_1_4_2_vs_1_3}
+        removed_names_1_4_2_vs_1_3 = {one_three[_id].name for _id in removed_1_4_2_vs_1_3}
         expected_removed_1_4_2_vs_1_3 = set()  # No namespaces should be removed from 1.3 to 1.4.2
         asserts.assert_equal(
             removed_names_1_4_2_vs_1_3,
@@ -285,7 +285,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
             f"Expected no namespaces to be removed from 1.3 to 1.4.2, but got: {removed_names_1_4_2_vs_1_3}")
 
         added_1_4_2_vs_1_3 = set(one_four_two.keys()) - set(one_three.keys())
-        added_names_1_4_2_vs_1_3 = {one_four_two[id].name for id in added_1_4_2_vs_1_3}
+        added_names_1_4_2_vs_1_3 = {one_four_two[_id].name for _id in added_1_4_2_vs_1_3}
         expected_added_1_4_2_vs_1_3 = {"Common Area", "Common Landmark", "Common Relative Position"}
         asserts.assert_equal(
             added_names_1_4_2_vs_1_3,
@@ -294,7 +294,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         # 1.4.2 vs 1.4 comparison
         removed_1_4_2_vs_1_4 = set(one_four.keys()) - set(one_four_two.keys())
-        removed_names_1_4_2_vs_1_4 = {one_four[id].name for id in removed_1_4_2_vs_1_4}
+        removed_names_1_4_2_vs_1_4 = {one_four[_id].name for _id in removed_1_4_2_vs_1_4}
         expected_removed_1_4_2_vs_1_4 = set()  # No namespaces should be removed from 1.4 to 1.4.2
         asserts.assert_equal(
             removed_names_1_4_2_vs_1_4,
@@ -302,14 +302,14 @@ class TestSpecParsingNamespace(MatterBaseTest):
             f"Expected no namespaces to be removed from 1.4 to 1.4.2, but got: {removed_names_1_4_2_vs_1_4}")
 
         added_1_4_2_vs_1_4 = set(one_four_two.keys()) - set(one_four.keys())
-        added_names_1_4_2_vs_1_4 = {one_four_two[id].name for id in added_1_4_2_vs_1_4}
+        added_names_1_4_2_vs_1_4 = {one_four_two[_id].name for _id in added_1_4_2_vs_1_4}
         expected_added_1_4_2_vs_1_4 = {"Common Position"}
         asserts.assert_equal(added_names_1_4_2_vs_1_4, expected_added_1_4_2_vs_1_4,
                              f"Expected only 'Common Position' to be added from 1.4 to 1.4.2, but got: {added_names_1_4_2_vs_1_4}")
 
         # Check changes from 1.4.1 to 1.4.2
         removed_1_4_1_to_1_4_2 = set(one_four_one.keys()) - set(one_four_two.keys())
-        removed_names_1_4_1_to_1_4_2 = {one_four_one[id].name for id in removed_1_4_1_to_1_4_2}
+        removed_names_1_4_1_to_1_4_2 = {one_four_one[_id].name for _id in removed_1_4_1_to_1_4_2}
         expected_removed_1_4_1_to_1_4_2 = set()  # No namespaces should be removed from 1.4.1 to 1.4.2
         asserts.assert_equal(
             removed_names_1_4_1_to_1_4_2,
@@ -317,7 +317,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
             f"Expected no namespaces to be removed from 1.4.1 to 1.4.2, but got: {removed_names_1_4_1_to_1_4_2}")
 
         added_1_4_2_vs_1_4_1 = set(one_four_two.keys()) - set(one_four_one.keys())
-        added_names_1_4_2_vs_1_4_1 = {one_four_two[id].name for id in added_1_4_2_vs_1_4_1}
+        added_names_1_4_2_vs_1_4_1 = {one_four_two[_id].name for _id in added_1_4_2_vs_1_4_1}
         expected_added_1_4_2_vs_1_4_1 = {"Common Position"}
         asserts.assert_equal(
             added_names_1_4_2_vs_1_4_1,
@@ -326,7 +326,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         # Check changes from 1.4 to 1.5
         removed_1_4_to_1_5 = set(one_four.keys()) - set(one_five.keys())
-        removed_names_1_4_to_1_5 = {one_four[id].name for id in removed_1_4_to_1_5}
+        removed_names_1_4_to_1_5 = {one_four[_id].name for _id in removed_1_4_to_1_5}
         expected_removed_1_4_to_1_5 = set()  # No namespaces should be removed from 1.4 to 1.5
         asserts.assert_equal(
             removed_names_1_4_to_1_5,
@@ -334,7 +334,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
             f"Expected no namespaces to be removed from 1.4 to 1.5, but got: {removed_names_1_4_to_1_5}")
 
         added_1_4_to_1_5 = set(one_five.keys()) - set(one_four.keys())
-        added_names_1_4_to_1_5 = {one_five[id].name for id in added_1_4_to_1_5}
+        added_names_1_4_to_1_5 = {one_five[_id].name for _id in added_1_4_to_1_5}
         expected_added_1_4_to_1_5 = {'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity',
                                      'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet'}
         asserts.assert_equal(added_names_1_4_to_1_5, expected_added_1_4_to_1_5,
@@ -342,7 +342,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         # Check changes from 1.4.1 to 1.5
         removed_1_4_1_to_1_5 = set(one_four_one.keys()) - set(one_five.keys())
-        removed_names_1_4_1_to_1_5 = {one_four_one[id].name for id in removed_1_4_1_to_1_5}
+        removed_names_1_4_1_to_1_5 = {one_four_one[_id].name for _id in removed_1_4_1_to_1_5}
         expected_removed_1_4_1_to_1_5 = set()  # No namespaces should be removed from 1.4.1 to 1.5
         asserts.assert_equal(
             removed_names_1_4_1_to_1_5,
@@ -350,7 +350,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
             f"Expected no namespaces to be removed from 1.4.1 to 1.5, but got: {removed_names_1_4_1_to_1_5}")
 
         added_1_4_1_to_1_5 = set(one_five.keys()) - set(one_four_one.keys())
-        added_names_1_4_1_to_1_5 = {one_five[id].name for id in added_1_4_1_to_1_5}
+        added_names_1_4_1_to_1_5 = {one_five[_id].name for _id in added_1_4_1_to_1_5}
         expected_added_1_4_1_to_1_5 = {'Closure', 'Closure Window', 'Closure Covering', 'Commodity Tariff Commodity',
                                        'Closure Panel', 'Commodity Tariff Flow', 'Common Position', 'Commodity Tariff Chronology', 'Closure Cabinet'}
         asserts.assert_equal(added_names_1_4_1_to_1_5, expected_added_1_4_1_to_1_5,
@@ -358,7 +358,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         # Check changes from 1.4.2 to 1.5
         removed_1_4_2_to_1_5 = set(one_four_two.keys()) - set(one_five.keys())
-        removed_names_1_4_2_to_1_5 = {one_four_two[id].name for id in removed_1_4_2_to_1_5}
+        removed_names_1_4_2_to_1_5 = {one_four_two[_id].name for _id in removed_1_4_2_to_1_5}
         expected_removed_1_4_2_to_1_5 = set()  # No namespaces should be removed from 1.4.2 to 1.5
         asserts.assert_equal(
             removed_names_1_4_2_to_1_5,
@@ -366,7 +366,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
             f"Expected no namespaces to be removed from 1.4.2 to 1.5, but got: {removed_names_1_4_2_to_1_5}")
 
         added_1_4_2_to_1_5 = set(one_five.keys()) - set(one_four_two.keys())
-        added_names_1_4_2_to_1_5 = {one_five[id].name for id in added_1_4_2_to_1_5}
+        added_names_1_4_2_to_1_5 = {one_five[_id].name for _id in added_1_4_2_to_1_5}
         expected_added_1_4_2_to_1_5 = {'Closure Window', 'Commodity Tariff Chronology', 'Closure Cabinet',
                                        'Closure', 'Commodity Tariff Commodity', 'Commodity Tariff Flow', 'Closure Covering', 'Closure Panel'}
         asserts.assert_equal(added_names_1_4_2_to_1_5, expected_added_1_4_2_to_1_5,

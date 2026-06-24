@@ -108,7 +108,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-        log.info(f"SupportedModes: {supported_modes}")
+        log.info("SupportedModes: %s", supported_modes)
 
         asserts.assert_greater_equal(len(supported_modes), 2,
                                      "SupportedModes must have at least two entries!")
@@ -117,7 +117,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info(f"CurrentMode: {old_current_mode}")
+        log.info("CurrentMode: %s", old_current_mode)
 
         # pick a value that's not on the list of supported modes
         modes = [m.mode for m in supported_modes]
@@ -126,7 +126,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.step(4)
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
-        log.info(f"ret.status {ret.status}")
+        log.info("ret.status %s", ret.status)
         asserts.assert_equal(ret.status, Status.Success,
                              "Changing the mode to the current mode should be a no-op")
 
@@ -142,7 +142,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info(f"CurrentMode: {old_current_mode}")
+        log.info("CurrentMode: %s", old_current_mode)
 
         self.step(11)
 
@@ -154,7 +154,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info(f"CurrentMode: {current_mode}")
+        log.info("CurrentMode: %s", current_mode)
 
         asserts.assert_true(current_mode == ModeManual,
                             "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
@@ -162,7 +162,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.step(13)
 
         ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
-        log.info(f"ret {ret}")
+        log.info("ret %s", ret)
         asserts.assert_true(ret.status == Status.Failure,
                             f"Attempt to change to invalid mode {invalid_mode} didn't fail as expected")
 
@@ -170,7 +170,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        log.info(f"CurrentMode: {current_mode}")
+        log.info("CurrentMode: %s", current_mode)
 
         asserts.assert_true(current_mode == ModeManual,
                             "CurrentMode changed after failed ChangeToMode command!")

@@ -51,7 +51,8 @@ CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf)
     while (in_buf_len > 0)
     {
         uint32_t value = 0;
-        static_assert((sizeof(value) * CHAR_BIT) >= (kMaxBytesSingleChunkLen * 8), "Type for value is too small for conversions");
+        static_assert((sizeof(value) * CHAR_BIT) >= (static_cast<size_t>(kMaxBytesSingleChunkLen) * 8),
+                      "Type for value is too small for conversions");
 
         size_t bytesInChunk = (in_buf_len >= kMaxBytesSingleChunkLen) ? kMaxBytesSingleChunkLen : in_buf_len;
 

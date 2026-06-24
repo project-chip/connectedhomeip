@@ -16,7 +16,9 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/OperationalStateDelegate.h"
     "${CLUSTER_DIR}/operational-state-cluster-objects.h"
-    "${CLUSTER_DIR}/operational-state-server.cpp"
     "${CLUSTER_DIR}/operational-state-server.h"
 )

@@ -111,8 +111,13 @@ def asyncio_executor(f):
     '--pics-file',
     default=None,
     help='Optional PICS file')
+@click.option(
+    '--value-wait-extra-duration-ms',
+    default=250,
+    type=int,
+    help='Extra timeout duration in milliseconds for WaitForAttributeValue.')
 @asyncio_executor
-async def main(setup_code, yaml_path, node_id, pics_file):
+async def main(setup_code, yaml_path, node_id, pics_file, value_wait_extra_duration_ms):
     # Setting up python environment for running YAML CI tests using python parser.
     with tempfile.NamedTemporaryFile() as chip_stack_storage:
         matter.native.Init()
@@ -149,7 +154,8 @@ async def main(setup_code, yaml_path, node_id, pics_file):
             ])
 
             # Parsing YAML test and setting up matter-repl yamltests runner.
-            parser_config = TestParserConfig(pics_file, clusters_definitions)
+            parser_config = TestParserConfig(pics_file, clusters_definitions, {
+                                             'valueWaitExtraDurationMs': value_wait_extra_duration_ms})
             yaml = TestParser(yaml_path, parser_config)
             runner = ReplTestRunner(
                 clusters_definitions, certificate_authority_manager, dev_ctrl)

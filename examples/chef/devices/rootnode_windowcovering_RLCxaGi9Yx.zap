@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        5
+        4
       ],
       "deviceIdentifiers": [
         22
@@ -2478,7 +2478,7 @@
         }
       ],
       "deviceVersions": [
-        3
+        6
       ],
       "deviceIdentifiers": [
         514

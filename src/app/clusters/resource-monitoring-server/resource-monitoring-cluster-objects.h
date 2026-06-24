@@ -100,6 +100,10 @@ public:
         TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aProductIdentifierValue);
     }
 
+    // Deleted: the default copy ctor would shallow-copy the inherited productIdentifierValue, a span into our own buffer
+    // (use-after-free).
+    ReplacementProductStruct(const ReplacementProductStruct &) = delete;
+
     ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct)
     {
         SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());

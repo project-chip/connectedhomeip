@@ -123,7 +123,7 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted)
     Commands::RetrieveLogsRequest::Type request;
     request.intent                 = DiagnosticLogs::IntentEnum::kEndUserSupport;
     request.requestedProtocol      = DiagnosticLogs::TransferProtocolEnum::kBdx;
-    request.transferFileDesignator = MakeOptional(CharSpan::fromCharString("enduser.log"));
+    request.transferFileDesignator = MakeOptional("enduser.log"_span);
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
@@ -145,7 +145,7 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greate
     Commands::RetrieveLogsRequest::Type request;
     request.intent                 = DiagnosticLogs::IntentEnum::kEndUserSupport;
     request.requestedProtocol      = DiagnosticLogs::TransferProtocolEnum::kBdx;
-    request.transferFileDesignator = MakeOptional(CharSpan::fromCharString("enduser.log"));
+    request.transferFileDesignator = MakeOptional("enduser.log"_span);
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
@@ -197,7 +197,7 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_NoDelegate_NoLogs)
     Commands::RetrieveLogsRequest::Type request;
     request.intent                 = DiagnosticLogs::IntentEnum::kEndUserSupport;
     request.requestedProtocol      = DiagnosticLogs::TransferProtocolEnum::kBdx;
-    request.transferFileDesignator = MakeOptional(CharSpan::fromCharString("enduser.log"));
+    request.transferFileDesignator = MakeOptional("enduser.log"_span);
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());

@@ -17,9 +17,11 @@
  */
 
 #include "AppContentLauncherManager.h"
+
 #include "../../java/ContentAppAttributeDelegate.h"
 #include <app/util/config.h>
 #include <json/json.h>
+#include <lib/support/Span.h>
 
 #include <list>
 #include <string>
@@ -28,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
+using namespace chip::literals;
 using ContentAppAttributeDelegate = chip::AppPlatform::ContentAppAttributeDelegate;
 
 AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate * attributeDelegate,
@@ -66,7 +69,7 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
 
     LaunchResponseType response;
     // TODO: Insert code here
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.data   = chip::MakeOptional("exampleData"_span);
     response.status = ContentLauncher::StatusEnum::kSuccess;
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
@@ -81,7 +84,7 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
 
     // TODO: Insert code here
     LaunchResponseType response;
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("Success"));
+    response.data   = chip::MakeOptional("Success"_span);
     response.status = ContentLauncher::StatusEnum::kSuccess;
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }

@@ -357,8 +357,8 @@ class TestSpecParsingDataType(MatterBaseTest):
         const_field = struct.components[uint(4)]
         asserts.assert_equal(const_field.name, "ConstrainedField", "Name mismatch")
         asserts.assert_true(const_field.constraints is not None, "Should have constraints")
-        asserts.assert_equal(const_field.constraints.get("min"), "1", "Min constraint mismatch")
-        asserts.assert_equal(const_field.constraints.get("max"), "100", "Max constraint mismatch")
+        asserts.assert_equal(const_field.constraints.min_value, 1, "Min constraint mismatch")
+        asserts.assert_equal(const_field.constraints.max_value, 100, "Max constraint mismatch")
 
         # Test bitmap field attributes
         bitmap = cluster.bitmaps["FieldsTestBitmap"]
@@ -593,14 +593,14 @@ class TestSpecParsingDataType(MatterBaseTest):
         # Check min/max constraints on RangeField
         range_field = struct.components[uint(1)]
         asserts.assert_true(range_field.constraints is not None, "RangeField should have constraints")
-        asserts.assert_equal(range_field.constraints.get("min"), "1", "Min constraint incorrect")
-        asserts.assert_equal(range_field.constraints.get("max"), "100", "Max constraint incorrect")
+        asserts.assert_equal(range_field.constraints.min_value, 1, "Min constraint incorrect")
+        asserts.assert_equal(range_field.constraints.max_value, 100, "Max constraint incorrect")
 
         # Check maxCount with attribute reference on MaxCountField
         max_count_field = struct.components[uint(2)]
         asserts.assert_true(max_count_field.constraints is not None, "MaxCountField should have constraints")
-        asserts.assert_true("maxCountAttribute" in max_count_field.constraints, "maxCountAttribute missing")
-        asserts.assert_equal(max_count_field.constraints.get("maxCountAttribute"), "MaxItems", "Attribute reference incorrect")
+        asserts.assert_true(max_count_field.constraints.max_count_ref is not None, "maxCountAttribute missing")
+        asserts.assert_equal(max_count_field.constraints.max_count_ref.attribute, "MaxItems", "Attribute reference incorrect")
 
     def test_XML_clusters_data_types(self):
         """Test data types from clusters in the 1.5 cluster spec XML files"""
@@ -955,9 +955,27 @@ class TestSpecParsingDataType(MatterBaseTest):
             self.print_step("XML Analysis", "Found fields with constraints in XML")
             if example_constrained_field:
                 cluster_name, type_name, field_id, field = example_constrained_field
-                constraint_str = ", ".join([f"{k}={v}" for k, v in field.constraints.items()])
+                # Format Constraints dataclass as string showing non-None fields
+                constraint_parts = []
+                if field.constraints.min_value is not None:
+                    constraint_parts.append(f"min={field.constraints.min_value}")
+                if field.constraints.max_value is not None:
+                    constraint_parts.append(f"max={field.constraints.max_value}")
+                if field.constraints.min_length is not None:
+                    constraint_parts.append(f"minLength={field.constraints.min_length}")
+                if field.constraints.max_length is not None:
+                    constraint_parts.append(f"maxLength={field.constraints.max_length}")
+                if field.constraints.min_count is not None:
+                    constraint_parts.append(f"minCount={field.constraints.min_count}")
+                if field.constraints.max_count is not None:
+                    constraint_parts.append(f"maxCount={field.constraints.max_count}")
+                if field.constraints.max_count_ref is not None:
+                    constraint_parts.append(f"maxCountRef={field.constraints.max_count_ref.attribute}")
+                constraint_str = ", ".join(constraint_parts)
                 self.print_step("Example", f"Field with constraints in {cluster_name}.{type_name}.{field.name}: {constraint_str}")
-                asserts.assert_true(isinstance(field.constraints, dict), "Constraints should be a dictionary")
+                # Verify it's a Constraints object instead of dict
+                from matter.testing.spec_parsing import Constraints
+                asserts.assert_true(isinstance(field.constraints, Constraints), "Constraints should be a Constraints object")
         else:
             self.print_step("XML Analysis", "No fields with constraints found in XML")
 

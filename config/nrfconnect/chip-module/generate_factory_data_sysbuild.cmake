@@ -166,21 +166,16 @@ function(nrfconnect_create_factory_data factory_data_target script_path schema_p
     string(APPEND script_args "--offset $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_ADDRESS>\n")
     string(APPEND script_args "--size $<TARGET_PROPERTY:partition_manager,PM_FACTORY_DATA_OFFSET>\n")
   else()
-    include(${CMAKE_BINARY_DIR}/${DEFAULT_IMAGE}/zephyr/dts.cmake)
+    include(${ZEPHYR_NRF_MODULE_DIR}/cmake/sysbuild/suit_utilities.cmake)
 
-    get_target_property(factory_data_alias devicetree_target "DT_ALIAS|factory-data")
-    get_target_property(factory_data_address devicetree_target "DT_REG|${factory_data_alias}|ADDR")
-    get_target_property(factory_data_size devicetree_target "DT_REG|${factory_data_alias}|SIZE")
-
-    # remove ; from address and size properties
-    string(SUBSTRING ${factory_data_address} 0 -1 factory_data_address)
-    string(SUBSTRING ${factory_data_size} 0 -1 factory_data_size)
-    if(NOT (DEFINED factory_data_alias AND DEFINED factory_data_address AND DEFINED factory_data_size))
-      message(FATAL_ERROR "factory-data alias does not exist in DTS")
-    endif()
-
+    dt_alias(factory_data_alias TARGET ${DEFAULT_IMAGE} PROPERTY "factory-data")
+    dt_reg_addr(factory_data_address TARGET ${DEFAULT_IMAGE} PATH "${factory_data_alias}")
+    dt_reg_size(factory_data_size TARGET ${DEFAULT_IMAGE} PATH "${factory_data_alias}")
     string(APPEND script_args "--offset ${factory_data_address}\n")
     string(APPEND script_args "--size ${factory_data_size}\n")
+    suit_add_merge_hex_file(FILES ${factory_data_output_path}.hex
+                            DEPENDENCIES ${factory_data_target}
+    )
   endif()
 
   # Execute first script to create a JSON file

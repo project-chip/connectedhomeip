@@ -42,6 +42,8 @@ struct PresetStructWithOwnedMembers : protected Structs::PresetStruct::Type
 public:
     PresetStructWithOwnedMembers() = default;
     PresetStructWithOwnedMembers(const Structs::PresetStruct::Type & other);
+    // Copy construction deleted: a defaulted copy ctor would shallow-copy the inherited spans into the source's buffers.
+    PresetStructWithOwnedMembers(const PresetStructWithOwnedMembers & other) = delete;
     PresetStructWithOwnedMembers & operator=(const Structs::PresetStruct::Type & other);
     PresetStructWithOwnedMembers & operator=(const PresetStructWithOwnedMembers & other);
 

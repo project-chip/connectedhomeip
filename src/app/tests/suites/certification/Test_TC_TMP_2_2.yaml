@@ -14,6 +14,13 @@
 
 name: 7.2.2. [TC-TMP-2.2] Primary functionality with server as DUT
 
+CI:
+    - name: "Test against all-devices/temperature-sensor"
+      app: all-devices
+      args:
+          - --device
+          - temperature-sensor
+
 PICS:
     - TMP.S
 

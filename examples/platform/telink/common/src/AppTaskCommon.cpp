@@ -36,10 +36,14 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <data-model-providers/codegen/Instance.h>
 #include <setup_payload/OnboardingCodesUtil.h>
+#ifdef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
+#include "AllDevicesServer.h"
+#else
+#include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
+#endif
 
 #if CONFIG_BOOTLOADER_MCUBOOT
 #include <OTAUtil.h>
@@ -282,7 +286,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-    // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
@@ -295,13 +298,23 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
-    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+#ifdef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
+    // all-devices owns data model provider setup because the concrete device
+    // type is selected at runtime.
+    ReturnErrorOnFailure(chip::app::all_devices::InitAllDevicesServer(initParams));
+#else
+    // ZAP/codegen applications use the generated data model.
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    AppFabricTableDelegate::Init();
+#endif // CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
     // We only have network commissioning on endpoint 0.
@@ -309,6 +322,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
+
 #ifdef CONFIG_MCUMGR_TRANSPORT_BT
     GetDFUOverSMP().Init();
     GetDFUOverSMP().SetFailCallback(HandleDFUFail);
@@ -327,8 +341,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
     LogErrorOnFailure(PlatformMgr().AddEventHandler(ChipEventHandler, 0));
-
-    AppFabricTableDelegate::Init();
 
     return CHIP_NO_ERROR;
 }

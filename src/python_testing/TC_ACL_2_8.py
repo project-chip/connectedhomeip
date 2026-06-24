@@ -113,11 +113,11 @@ class TC_ACL_2_8(MatterBaseTest):
         if hasattr(self, controller_name):
             try:
                 controller = getattr(self, controller_name)
-                log.info(f"Shutting down {controller_name.upper()} controller")
+                log.info("Shutting down %s controller", controller_name.upper())
                 await controller.Shutdown()
                 delattr(self, controller_name)
             except Exception as e:
-                log.warning(f"Error cleaning up {controller_name.upper()}: {e}")
+                log.warning("Error cleaning up %s: %s", controller_name.upper(), e)
 
     def _verify_acl_event(
             self,
@@ -153,7 +153,7 @@ class TC_ACL_2_8(MatterBaseTest):
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered, force_legacy_encoding):
         """Helper method to validate events for a controller"""
-        log.info(f"Found {len(events)} events for {controller_name}")
+        log.info("Found %s events for %s", len(events), controller_name)
 
         # We expect to see two events with the expected fabric index if not using legacy encoding
         # We expect to see one event with the expected fabric index if using legacy encoding
@@ -163,7 +163,7 @@ class TC_ACL_2_8(MatterBaseTest):
         found_other_event = False
 
         for event in events:
-            log.info(f"Examining event: {str(event)}")
+            log.info("Examining event: %s", event)
             if hasattr(event, 'Data') and hasattr(event.Data, 'fabricIndex'):
                 # If this is an event for the expected fabric
                 if event.Data.fabricIndex == expected_fabric_index:
@@ -219,7 +219,7 @@ class TC_ACL_2_8(MatterBaseTest):
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(dev_ctrl=self.th1, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        log.info(f"CurrentFabricIndex F1 {str(f1)}")
+        log.info("CurrentFabricIndex F1 %s", f1)
 
         self.step(3)
         # Open commissioning window with TH1
@@ -239,7 +239,7 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(4)
         # Read CurrentFabricIndex for TH2
         f2 = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
-        log.info(f"CurrentFabricIndex F2 {str(f2)}")
+        log.info("CurrentFabricIndex F2 %s", f2)
 
         self.step(5)
         # TH1 writes ACL attribute

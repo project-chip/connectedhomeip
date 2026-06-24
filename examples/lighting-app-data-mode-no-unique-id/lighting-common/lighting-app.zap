@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        5
+        4
       ],
       "deviceIdentifiers": [
         22
@@ -3918,7 +3918,7 @@
           "mfgCode": null,
           "define": "GROUPCAST_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "apiMaturity": "provisional",
           "commands": [
             {
@@ -4164,7 +4164,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        3
       ],
       "deviceIdentifiers": [
         257

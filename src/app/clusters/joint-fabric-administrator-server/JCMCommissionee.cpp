@@ -298,6 +298,10 @@ TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
         {
             ChipLogError(JointFabric, "Failed to read commissioner info. Error: %" CHIP_ERROR_FORMAT, err.Format());
             OnVendorIdVerificationComplete(err);
+            // OnVendorIdVerificationComplete() synchronously destroys *this
+            // (mOnCompletion -> CleanupAnnounceJFA -> mActiveCommissionee.reset()), so without
+            // this return the code below would use freed storage in VerifyVendorId(&mInfo).
+            return;
         }
 
         chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();

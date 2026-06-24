@@ -204,27 +204,27 @@ void HandleWFXSystemEvent(sl_wfx_generic_message_t * eventData)
     case SL_WFX_STARTUP_IND_ID:
 #endif
     case to_underlying(WifiInterface::WifiEvent::kStartUp):
-        memcpy(&event.Platform.WFXSystemEvent.data.startupEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.startupEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.startupEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.startupEvent));
         // TODO: This is a workaround until we unify the Matter Data structures
-        event.Platform.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiInterface::WifiEvent::kStartUp);
+        event.Platform.event.WFXSystemEvent.data.startupEvent.header.id = to_underlying(WifiInterface::WifiEvent::kStartUp);
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kConnect):
-        memcpy(&event.Platform.WFXSystemEvent.data.connectEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.connectEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.connectEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.connectEvent));
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kDisconnect):
-        memcpy(&event.Platform.WFXSystemEvent.data.disconnectEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.disconnectEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.disconnectEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.disconnectEvent));
         break;
 
     case to_underlying(WifiInterface::WifiEvent::kGotIPv4):
     case to_underlying(WifiInterface::WifiEvent::kLostIP):
     case to_underlying(WifiInterface::WifiEvent::kGotIPv6):
-        memcpy(&event.Platform.WFXSystemEvent.data.genericMsgEvent, eventData,
-               sizeof(event.Platform.WFXSystemEvent.data.genericMsgEvent));
+        memcpy(&event.Platform.event.WFXSystemEvent.data.genericMsgEvent, eventData,
+               sizeof(event.Platform.event.WFXSystemEvent.data.genericMsgEvent));
         break;
 
     default:

@@ -228,7 +228,12 @@ protected:
     SessionHolderWithDelegate mSecureSessionHolder;
     // mSessionManager is set if we actually allocate a secure session, so we
     // can clean it up later as needed.
-    SessionManager * mSessionManager                  = nullptr;
+    SessionManager * mSessionManager = nullptr;
+    // mSystemLayer is captured from the session manager at allocation time and
+    // is intentionally NOT cleared by Clear().  It outlives the session itself
+    // (it is a process-scoped singleton) and is needed by OnSessionReleased()
+    // after Clear() has already nulled mSessionManager.
+    System::Layer * mSystemLayer                      = nullptr;
     Optional<Messaging::ExchangeHandle> mExchangeCtxt = NullOptional;
     SessionEstablishmentDelegate * mDelegate          = nullptr;
 

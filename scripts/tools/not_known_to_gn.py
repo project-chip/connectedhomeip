@@ -33,7 +33,6 @@ import re
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, Set
 
 import click
 import coloredlogs
@@ -45,11 +44,11 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 class OrphanChecker:
     def __init__(self):
-        self.gn_data: Dict[str, str] = defaultdict(str)
-        self.known_failures: Set[str] = set()
+        self.gn_data: dict[str, str] = defaultdict(str)
+        self.known_failures: set[str] = set()
         self.fatal_failures = 0
         self.failures = 0
-        self.found_failures: Set[str] = set()
+        self.found_failures: set[str] = set()
 
     def AppendGnData(self, gn: Path):
         """Adds a GN file to the list of internally known GN data.

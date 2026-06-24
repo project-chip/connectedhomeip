@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 from urllib.parse import parse_qs
 
 from route_configuration import Route
 
 
-def match_route(routing: List[Route], method: str, path: str, query: Optional[Dict[str, Any] | str] = None) -> Optional[Route]:
+def match_route(routing: list[Route], method: str, path: str, query: Optional[dict[str, Any] | str] = None) -> Optional[Route]:
     """
     Finds the best matching route configuration for an incoming HTTP request.
 
@@ -65,7 +65,7 @@ def match_route(routing: List[Route], method: str, path: str, query: Optional[Di
     """
 
     # Filter routes to only those matching the HTTP method
-    method_routes: List[Route] = []
+    method_routes: list[Route] = []
     for route in routing:
         if route.method == method:
             method_routes.append(route)
@@ -73,7 +73,7 @@ def match_route(routing: List[Route], method: str, path: str, query: Optional[Di
         return None
 
     # Filter routes to only those matching the path
-    path_routes: List[Route] = []
+    path_routes: list[Route] = []
     for route in method_routes:
         if route.path == path:
             path_routes.append(route)

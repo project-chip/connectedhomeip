@@ -20,6 +20,7 @@ source_set("groups-server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/access-control-server:access-control-event-helper",
     "${chip_root}/src/app/clusters/identify-server:delegates",
     "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/server-cluster",

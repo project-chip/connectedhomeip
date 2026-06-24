@@ -19,14 +19,14 @@ import abc
 import dataclasses
 import enum
 import os
-from typing import Optional, Set, Tuple, Union
+from typing import Optional, Union
 
 ROOT_ENDPOINT_ID = 0
 
 
 @dataclasses.dataclass
 class CommissioneeInfo:
-    endpoints: Set[int]
+    endpoints: set[int]
     is_thread_device: bool = False
     is_wifi_device: bool = False
     is_ethernet_device: bool = False
@@ -130,7 +130,7 @@ class GetCommissioneeCredentialsResponse:
 
 
 class CredentialProvider:
-    async def get_commissionee_nonces(self) -> Tuple[bytes, bytes]:
+    async def get_commissionee_nonces(self) -> tuple[bytes, bytes]:
         ''' Returns the `attestation_nonce` and `csr_nonce` for the commissionee.
         '''
         return os.urandom(32), os.urandom(32)

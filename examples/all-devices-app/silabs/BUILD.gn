@@ -1,0 +1,176 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
+
+import(
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
+
+assert(current_os == "freertos")
+
+silabs_project_dir = "${chip_root}/examples/all-devices-app/silabs"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+
+assert(!wifi_soc,
+       "Wi-Fi variants are not supported for examples/all-devices-app/silabs.")
+
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+
+import("${examples_common_plat_dir}/args.gni")
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
+if (slc_generate) {
+  # Generate Project Specific config (Board, hardware used etc..)
+  print(exec_script("${chip_root}/third_party/silabs/slc_gen/run_slc.py",
+                    [
+                      rebase_path(chip_root),
+                      "${silabs_board}",
+                      "${disable_lcd}",
+                      "${use_wstk_buttons}",
+                      "${use_wstk_leds}",
+                      "${use_external_flash}",
+                      "${silabs_mcu}",
+                      rebase_path(slc_gen_path),
+                    ],
+                    "list lines"))
+}
+
+efr32_sdk("sdk") {
+  sources = [
+    "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
+    "${silabs_project_dir}/include/CHIPProjectConfig.h",
+  ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/silabs/efr32",
+    "${silabs_project_dir}/include",
+    "${examples_plat_dir}",
+    "${chip_root}/src/lib",
+    "${examples_common_plat_dir}",
+    "${examples_common_plat_dir}/freertos_config",
+  ]
+
+  defines = []
+}
+
+silabs_executable("all_devices_app") {
+  output_name = "matter-silabs-all-devices-example.out"
+  defines = []
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/all-devices-app/all-devices-common",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/data-model-providers",
+  ]
+
+  if (silabs_board == "BRD2704A") {
+    defines += [ "SL_STATUS_LED=0" ]
+  }
+
+  sources = [
+    "include/AppKeys.h",
+    "include/AppTask.h",
+    "src/AppTask.cpp",
+  ]
+
+  if (chip_build_libshell) {
+    sources += [
+      "include/DeviceShellCommands.h",
+      "src/DeviceShellCommands.cpp",
+    ]
+  }
+
+  deps = [
+    ":sdk",
+    "${chip_root}/src/platform/logging:default",
+
+    # Code-driven data model providers
+    "${chip_root}/src/data-model-providers/codedriven",
+
+    # All devices common targets
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/aggregator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
+
+    # Providers
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
+
+    # zzz_generated
+    "${chip_root}/zzz_generated/app-common/devices",
+  ]
+
+  if (chip_enable_wifi) {
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi" ]
+  } else {
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:thread" ]
+  }
+
+  deps += [ "${examples_plat_dir}:efr32-common" ]
+
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("silabs") {
+  deps = [ ":all_devices_app" ]
+}
+
+group("default") {
+  deps = [ ":silabs" ]
+}

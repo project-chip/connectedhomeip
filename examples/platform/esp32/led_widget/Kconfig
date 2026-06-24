@@ -1,0 +1,27 @@
+menu "LED Widget"
+
+    choice LED_TYPE
+        prompt "LED type"
+        default LED_TYPE_RMT if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32H2 || IDF_TARGET_ESP32C6
+        default LED_TYPE_GPIO
+        help
+            Defines the LED driver type.
+            GPIO uses LEDC PWM for brightness control.
+            RMT drives addressable LEDs (e.g., WS2812).
+
+        config LED_TYPE_GPIO
+            bool "GPIO"
+        config LED_TYPE_RMT
+            bool "RMT - Addressable LED"
+    endchoice
+
+    config LED_GPIO
+        int "LED GPIO number"
+        range 0 48
+        default 8 if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32H2 || IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C6
+        default 48 if IDF_TARGET_ESP32S3
+        default 2
+        help
+            GPIO number for the LED output or the RMT signal for addressable LEDs.
+
+endmenu

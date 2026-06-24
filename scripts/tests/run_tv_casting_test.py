@@ -21,7 +21,7 @@ import sys
 import tempfile
 import time
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 import click
 from linux.log_line_processing import ProcessOutputCapture
@@ -216,7 +216,7 @@ def handle_input_cmd(
 def run_test_sequence_steps(
     current_index: int,
     test_sequence_name: str,
-    test_sequence_steps: List[Step],
+    test_sequence_steps: list[Step],
     processes: RunningProcesses,
 ):
     """Run through the test steps from a test sequence starting from the current index and perform actions based on the presence of `output_msg` or `input_cmd`."""

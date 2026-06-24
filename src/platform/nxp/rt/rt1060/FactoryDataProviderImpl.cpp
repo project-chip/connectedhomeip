@@ -66,7 +66,8 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
 
-    while (index < factoryDataSize)
+    /* index will be incremented later, we have to be sure we have enough space for a new TLV entry */
+    while (index + sizeof(type) + sizeof(currentLen) < factoryDataSize)
     {
         /* Read the type */
         memcpy((uint8_t *) &type, factoryDataAddress + index, sizeof(type));

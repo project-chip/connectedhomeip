@@ -30,7 +30,7 @@ uat = c.Bitmaps.UserActiveModeTriggerBitmap
 
 
 @dataclass
-class ICDMData():
+class ICDMData:
     FeatureMap: int
     IdleModeDuration: int
     ActiveModeDuration: int

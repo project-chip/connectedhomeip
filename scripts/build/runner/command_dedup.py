@@ -13,15 +13,18 @@
 # limitations under the License.
 
 import shlex
+import threading
 
 
 class CommandDedup:
     def __init__(self):
         self.commands = set()
+        self._lock = threading.Lock()
 
     def is_duplicate(self, cmd: list) -> bool:
         s = " ".join([shlex.quote(part) for part in cmd])
-        if s in self.commands:
-            return True
-        self.commands.add(s)
+        with self._lock:
+            if s in self.commands:
+                return True
+            self.commands.add(s)
         return False

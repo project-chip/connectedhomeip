@@ -654,8 +654,7 @@ TEST_F(TestEnergyEvseCluster, TestWriteReadOnlyAttributesFails)
     EXPECT_FALSE(tester.WriteAttribute(BatteryCapacity::Id, DataModel::Nullable<int64_t>(80000000)).IsSuccess());
 
     // Test writing to VehicleID (read-only, PlugAndCharge feature)
-    EXPECT_FALSE(
-        tester.WriteAttribute(VehicleID::Id, DataModel::Nullable<CharSpan>(CharSpan::fromCharString("NEW-VIN"))).IsSuccess());
+    EXPECT_FALSE(tester.WriteAttribute(VehicleID::Id, DataModel::Nullable<CharSpan>("NEW-VIN"_span)).IsSuccess());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

@@ -23,7 +23,6 @@ import queue
 import shlex
 import subprocess
 import threading
-import typing
 
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
@@ -37,7 +36,7 @@ log = logging.getLogger(__name__)
 
 
 class OTATest:
-    def __init__(self, thread_list: typing.List[threading.Thread], queue: queue.Queue, cmd: [], args: str):
+    def __init__(self, thread_list: list[threading.Thread], queue: queue.Queue, cmd: [], args: str):
         self.thread_list = thread_list
         self.queue = queue
         self.command = cmd

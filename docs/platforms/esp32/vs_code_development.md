@@ -41,7 +41,7 @@ For Espressif esp32 devices:
 1. Source esp-idf : `source /opt/espressif/esp-idf/export.sh`
 
 1. Activate matter :
-   `cd /workspaces/connectedhomeip && source scripts/bootstrap.sh && source scripts/activate.sh`
+   `cd /workspaces/connectedhomeip && source scripts/bootstrap.sh -p all,esp32 && source scripts/activate.sh`
 
 1. Confirm that the device is accessible : `ls -l /dev/ttyUSB*`
 

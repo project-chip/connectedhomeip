@@ -98,7 +98,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         clusterRevision = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=cluster.Attributes.ClusterRevision, dev_ctrl=self.th1, endpoint=endpoint)
 
-        logger.info(f"ClusterRevision Attribute: {clusterRevision}")
+        logger.info("ClusterRevision Attribute: %s", clusterRevision)
 
         # If the ClusterRevision is < 3, then skip the rest of the test steps.
         if clusterRevision < 3:
@@ -127,7 +127,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         deviceLoadStatus = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=cluster.Attributes.DeviceLoadStatus, dev_ctrl=self.th1, endpoint=endpoint)
 
-        logger.info(f"DeviceLoadStatus Attribute: {deviceLoadStatus}")
+        logger.info("DeviceLoadStatus Attribute: %s", deviceLoadStatus)
 
         initialTotalInteractionModelMessageSent = deviceLoadStatus.totalInteractionModelMessagesSent
         initialTotalInteractionModelMessagesReceived = deviceLoadStatus.totalInteractionModelMessagesReceived
@@ -167,7 +167,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
             deviceLoadStatus2 = await self.read_single_attribute_check_success(
                 cluster=cluster, attribute=cluster.Attributes.DeviceLoadStatus, dev_ctrl=self.th1, endpoint=endpoint)
 
-            logger.info(f"DeviceLoadStatus Attribute: {deviceLoadStatus2}")
+            logger.info("DeviceLoadStatus Attribute: %s", deviceLoadStatus2)
 
             # Verify that the TotalInteractionModelMessagesSent field of the DeviceLoadStatus attribute is higher than the saved initialTotalInteractionModelMessageSent by at least 3 messages
             finalTotalInteractionModelMessageSent = deviceLoadStatus2.totalInteractionModelMessagesSent
@@ -213,8 +213,8 @@ class TC_DGGEN_2_5(MatterBaseTest):
             )
         )
 
-        logger.info(f"TH2 fabric (index {fabricId2}) successfully removed")
-        logger.info(f"Response: {response}")
+        logger.info("TH2 fabric (index %s) successfully removed", fabricId2)
+        logger.info("Response: %s", response)
 
         successfulResponse = Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk
         asserts.assert_equal(response.statusCode, successfulResponse,

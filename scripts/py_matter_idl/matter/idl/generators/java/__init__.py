@@ -17,7 +17,7 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import List, Optional, Set
+from typing import Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.filters import upfirst
@@ -322,7 +322,7 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
     }
 
 
-def NamedFilter(choices: List, name: str):
+def NamedFilter(choices: list, name: str):
     for choice in choices:
         if choice.name == name:
             return choice
@@ -372,7 +372,7 @@ class EncodableValue:
         for the underlying types.
     """
 
-    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
+    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: set[EncodableValueAttr]):
         self.context = context
         self.data_type = data_type
         self.attrs = attrs
@@ -744,7 +744,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterReadMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterReadMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -753,7 +753,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterWriteMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -762,7 +762,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterIDMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterIDMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -771,7 +771,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipClusters_java.jinja",
             output_file_name="java/chip/devicecontroller/ChipClusters.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -780,7 +780,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipStructs_java.jinja",
             output_file_name="java/chip/devicecontroller/ChipStructs.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -789,7 +789,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipEventStructs_java.jinja",
             output_file_name="java/chip/devicecontroller/ChipEventStructs.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -798,7 +798,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterInfoMapping_java.jinja",
             output_file_name="java/chip/devicecontroller/ClusterInfoMapping.java",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -807,7 +807,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ChipStructFiles_gni.jinja",
             output_file_name="java/chip/devicecontroller/cluster/files.gni",
-            vars={
+            template_vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
             }
@@ -826,7 +826,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         struct_name=struct.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'struct': struct,
                         'typeLookup': TypeLookupContext(self.idl, cluster),
@@ -843,7 +843,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
                     output_file_name=output_name.format(
                         cluster_name=cluster.name,
                         event_name=event.name),
-                    vars={
+                    template_vars={
                         'cluster': cluster,
                         'event': event,
                         'typeLookup': TypeLookupContext(self.idl, cluster),

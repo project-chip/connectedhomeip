@@ -497,5 +497,11 @@ CHIP_ERROR OperationalDataset::SetDelayTimer(uint32_t aDelayMillis)
     return CHIP_NO_ERROR;
 }
 
+void OperationalDataset::Clear()
+{
+    memset(mBuffer, 0, sizeof(mBuffer));
+    mData = ByteSpan(mBuffer, 0);
+}
+
 } // namespace Thread
 } // namespace chip

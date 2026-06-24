@@ -16,8 +16,7 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/CommissionerControlCluster.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/Delegate.h"
     "${CLUSTER_DIR}/commissioner-control-server.h"
 )

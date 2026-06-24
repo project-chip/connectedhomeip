@@ -140,7 +140,7 @@ TEST_F(TestInetEndPoint, TestInetInterface)
     InterfaceAddressIterator addrIterator;
     char intName[InterfaceId::kMaxIfNameLength];
     InterfaceId intId;
-    IPAddress addr;
+    IPAddress addr{};
     InterfaceType intType;
     // 64 bit IEEE MAC address
     const uint8_t kMaxHardwareAddressSize = 8;
@@ -252,7 +252,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
 {
     CHIP_ERROR err;
     IPAddress addr_any = IPAddress::Any;
-    IPAddress addr;
+    IPAddress addr{};
 #if INET_CONFIG_ENABLE_IPV4
     IPAddress addr_v4;
 #endif // INET_CONFIG_ENABLE_IPV4

@@ -236,7 +236,7 @@ class CustomGenerator(CodeGenerator):
             self.internal_render_one_output(
                 template_path="matter_cluster_proto.jinja",
                 output_file_name=filename,
-                vars={
+                template_vars={
                     'cluster': cluster,
                     'package': self.package,
                 }

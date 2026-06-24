@@ -31,7 +31,6 @@ Matter example applications are supported on the following NXP platforms :
 | RW61x        | [Matter NXP Guide for RW61x platform](./nxp_rw61x_guide.md)   |
 | RT1170       | [Matter NXP Guide for RT1170 platform](./nxp_rt1170_guide.md) |
 | RT1060       | [Matter NXP Guide for RT1060 platform](./nxp_rt1060_guide.md) |
-| MCXW71       | [Matter NXP Guide for MCXW71 platform](./nxp_mcxw71_guide.md) |
 | MCXW72       | [Matter NXP Guide for MCXW72 platform](./nxp_mcxw72_guide.md) |
 
 <a name="building"></a>

@@ -28,7 +28,7 @@ from matter.testing.runner import MockTestRunner
 
 
 @dataclass
-class TestSpec():
+class TestSpec:
     min: typing.Optional[int]
     max: typing.Optional[int]
     measured: int

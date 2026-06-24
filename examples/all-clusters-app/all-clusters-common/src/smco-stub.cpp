@@ -21,6 +21,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 using namespace chip::DeviceLayer;
 
@@ -28,28 +29,41 @@ namespace {
 
 constexpr const uint16_t kSelfTestingTimeoutSec = 10;
 
-} // namespace
-
 static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> sPriorityOrder = {
     ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,
     ExpressedStateEnum::kCOAlarm,     ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
     ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
 };
 
-void EndSelfTestingEventHandler(System::Layer * systemLayer, void * appState)
+void EndSelfTestingEventHandler(System::Layer *, void *)
 {
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
     SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
-
     ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test complete");
 }
 
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
+class AllClustersSmokeCODelegate : public SmokeCoAlarmDelegate
 {
-    ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test running");
+public:
+    void OnSelfTestRequested() override
+    {
+        ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test running");
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSelfTestingTimeoutSec),
+                                                                       EndSelfTestingEventHandler, nullptr);
+    }
+};
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSelfTestingTimeoutSec),
-                                                                   EndSelfTestingEventHandler, nullptr);
+} // namespace
+
+void MatterSmokeCoAlarmPluginServerInitCallback()
+{
+    static AllClustersSmokeCODelegate sSmokeCODelegate;
+    SmokeCoAlarmCluster::Config config;
+    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(1, config, &sSmokeCODelegate));
+    // utc_time_in_matter_epoch(datetime(2126, 1, 1, tzinfo=timezone.utc)) / 1_000_000
+    SmokeCoAlarmServer::Instance().SetExpiryDate(1, 3976214400);
 }
 
 bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
@@ -106,22 +120,22 @@ bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
         break;
     case SmokeCOTrigger::kForceMalfunction:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force malfunction");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true), true);
+        SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, true);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceLowBatteryWarning:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force low battery (warning)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning), true);
+        SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kWarning);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceLowBatteryCritical:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force low battery (critical)");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical), true);
+        SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kCritical);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceEndOfLife:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force end-of-life");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired), true);
+        SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kExpired);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kForceSilence:
@@ -150,12 +164,12 @@ bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
         break;
     case SmokeCOTrigger::kClearMalfunction:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear malfunction");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false), true);
+        SmokeCoAlarmServer::Instance().SetHardwareFaultAlert(1, false);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearEndOfLife:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear end-of-life");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetEndOfServiceAlert(1, EndOfServiceEnum::kNormal);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearSilence:
@@ -164,7 +178,7 @@ bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
         break;
     case SmokeCOTrigger::kClearBatteryLevelLow:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear low battery");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal), true);
+        SmokeCoAlarmServer::Instance().SetBatteryAlert(1, AlarmStateEnum::kNormal);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearContamination:

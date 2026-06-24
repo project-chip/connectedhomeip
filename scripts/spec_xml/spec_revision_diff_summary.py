@@ -27,8 +27,8 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_cl
 
 
 def get_changes(old, new):
-    added = [e.name for id, e in new.items() if id not in old]
-    removed = [e.name for id, e in old.items() if id not in new]
+    added = [e.name for k, e in new.items() if k not in old]
+    removed = [e.name for k, e in old.items() if k not in new]
     same_ids = set(new.keys()).intersection(set(old.keys()))
 
     return added, removed, same_ids
@@ -45,17 +45,19 @@ def str_changes(element, added, removed, change_ids, old, new):
         ret.append(f'\t{element} removed: {removed}')
     if change_ids:
         ret.append(f'\t{element} changed:')
-    for id in change_ids:
-        name = old[id].name if old[id].name == new[id].name else f'{new[id].name} (previously {old[id].name})'
+    for change_id in change_ids:
+        name = old[change_id].name if old[change_id].name == new[
+            change_id].name else f'{new[change_id].name} (previously {old[change_id].name})'
         ret.append(f'\t\t{name}')
-        ret.append(f'\t\t\t{old[id]}')
-        ret.append(f'\t\t\t{new[id]}')
+        ret.append(f'\t\t\t{old[change_id]}')
+        ret.append(f'\t\t\t{new[change_id]}')
     return ret
 
 
 def str_element_changes(element, old, new):
     added, removed, same_ids = get_changes(old, new)
-    change_ids = [id for id in same_ids if old[id] != new[id] or str(old[id].conformance) != str(new[id].conformance)]
+    change_ids = [change_id for change_id in same_ids if old[change_id] != new[change_id]
+                  or str(old[change_id].conformance) != str(new[change_id].conformance)]
     return str_changes(element, added, removed, change_ids, old, new)
 
 
@@ -143,10 +145,10 @@ def get_provisional_diff(rev1: PrebuiltDataModelDirectory, rev2: PrebuiltDataMod
     print(f'\n\nProvisional clusters in {rev2.dirname} not in {rev1.dirname}')
     print(f'\t{sorted(rev2_additional_provisional_clusters)}')
 
-    for id, c2 in clusters_rev2.items():
-        if id not in clusters_rev1:
+    for k, c2 in clusters_rev2.items():
+        if k not in clusters_rev1:
             continue
-        c1 = clusters_rev1[id]
+        c1 = clusters_rev1[k]
         rev2_provisional_features = _get_provisional(c2.features.values())
         rev1_provisional_features = _get_provisional(c1.features.values())
         features = rev2_provisional_features - rev1_provisional_features

@@ -86,7 +86,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace PresentMessagesRequest.
+} // namespace PresentMessagesRequest
 namespace CancelMessagesRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -114,7 +114,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CancelMessagesRequest.
+} // namespace CancelMessagesRequest
 } // namespace Commands
 } // namespace Messages
 } // namespace Clusters

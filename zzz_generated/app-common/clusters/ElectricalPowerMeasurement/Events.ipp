@@ -60,7 +60,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace MeasurementPeriodRanges.
+} // namespace MeasurementPeriodRanges
 } // namespace Events
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters

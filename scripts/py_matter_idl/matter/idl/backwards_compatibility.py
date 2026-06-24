@@ -16,7 +16,7 @@ import dataclasses
 import enum
 import logging
 import sys
-from typing import Callable, Dict, List, Optional, Protocol, TypeVar
+from typing import Callable, Optional, Protocol, TypeVar
 
 import click
 import coloredlogs
@@ -43,14 +43,14 @@ class HasName(Protocol):
 NAMED = TypeVar('NAMED', bound=HasName)
 
 
-def group_list(items: List[T], get_id: Callable[[T], str]) -> Dict[str, T]:
+def group_list(items: list[T], get_id: Callable[[T], str]) -> dict[str, T]:
     result = {}
     for item in items:
         result[get_id(item)] = item
     return result
 
 
-def group_list_by_name(items: List[NAMED]) -> Dict[str, NAMED]:
+def group_list_by_name(items: list[NAMED]) -> dict[str, NAMED]:
     return group_list(items, lambda x: x.name)
 
 
@@ -71,14 +71,14 @@ class CompatibilityChecker:
         self._original_idl = original
         self._updated_idl = updated
         self.compatible = Compatibility.UNKNOWN
-        self.errors: List[str] = []
+        self.errors: list[str] = []
 
     def _mark_incompatible(self, reason: str):
         log.error(reason)
         self.errors.append(reason)
         self.compatible = Compatibility.INCOMPATIBLE
 
-    def _check_field_lists_are_the_same(self, location: str, original: List[Field], updated: List[Field]):
+    def _check_field_lists_are_the_same(self, location: str, original: list[Field], updated: list[Field]):
         """Validates no compatibility changes in a list of fields.
 
         Specifically no changes are allowed EXCEPT names of fields.
@@ -231,7 +231,7 @@ class CompatibilityChecker:
             self._mark_incompatible(
                 f"Attribute {cluster_name}::{original.definition.name} changed its qualities.")
 
-    def _check_enum_list_compatible(self, cluster_name: str, original: List[Enum], updated: List[Enum]):
+    def _check_enum_list_compatible(self, cluster_name: str, original: list[Enum], updated: list[Enum]):
         updated_enums = group_list_by_name(updated)
 
         for original_enum in original:
@@ -239,7 +239,7 @@ class CompatibilityChecker:
             self._check_enum_compatible(
                 cluster_name, original_enum, updated_enum)
 
-    def _check_bitmap_list_compatible(self, cluster_name: str, original: List[Bitmap], updated: List[Bitmap]):
+    def _check_bitmap_list_compatible(self, cluster_name: str, original: list[Bitmap], updated: list[Bitmap]):
         updated_bitmaps = {}
         for item in updated:
             updated_bitmaps[item.name] = item
@@ -249,14 +249,14 @@ class CompatibilityChecker:
             self._check_bitmap_compatible(
                 cluster_name, original_bitmap, updated_bitmap)
 
-    def _check_struct_list_compatible(self, cluster_name: str, original: List[Struct], updated: List[Struct]):
+    def _check_struct_list_compatible(self, cluster_name: str, original: list[Struct], updated: list[Struct]):
         updated_structs = group_list_by_name(updated)
 
         for struct in original:
             self._check_struct_compatible(
                 cluster_name, struct, updated_structs.get(struct.name))
 
-    def _check_command_list_compatible(self, cluster_name: str, original: List[Command], updated: List[Command]):
+    def _check_command_list_compatible(self, cluster_name: str, original: list[Command], updated: list[Command]):
         updated_commands = group_list_by_name(updated)
 
         for command in original:
@@ -264,21 +264,21 @@ class CompatibilityChecker:
             self._check_command_compatible(
                 cluster_name, command, updated_command)
 
-    def _check_event_list_compatible(self, cluster_name: str, original: List[Event], updated: List[Event]):
+    def _check_event_list_compatible(self, cluster_name: str, original: list[Event], updated: list[Event]):
         updated_events = group_list_by_name(updated)
 
         for event in original:
             updated_event = updated_events.get(event.name)
             self._check_event_compatible(cluster_name, event, updated_event)
 
-    def _check_attribute_list_compatible(self, cluster_name: str, original: List[Attribute], updated: List[Attribute]):
+    def _check_attribute_list_compatible(self, cluster_name: str, original: list[Attribute], updated: list[Attribute]):
         updated_attributes = group_list(updated, attribute_name)
 
         for attribute in original:
             self._check_attribute_compatible(
                 cluster_name, attribute, updated_attributes.get(attribute_name(attribute)))
 
-    def _check_cluster_list_compatible(self, original: List[Cluster], updated: List[Cluster]):
+    def _check_cluster_list_compatible(self, original: list[Cluster], updated: list[Cluster]):
         updated_clusters = group_list(updated, lambda c: c.name)
 
         for original_cluster in original:

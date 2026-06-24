@@ -24,6 +24,13 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
+import(
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
+
+# NOTE: The slim cluster-objects override is NOT set here unconditionally.
+# It is set conditionally in BUILD.gn based on chip_casting_simplified,
+# because the legacy path (main.cpp) needs the full cluster-objects.cpp.
+
 chip_build_libshell = true
 
 chip_enable_additional_data_advertising = true

@@ -103,6 +103,33 @@ public:
                                         Optional<Credentials::AttestationVerificationResult> additionalErrorInfo)
     {}
 
+    /**
+     * @brief
+     *   Called when commissioning fails, with the full structured CompletionStatus from the
+     *   commissioning state machine. Provides access to detailed status that the 4-arg overload
+     *   above drops on the floor.
+     *
+     *   Default implementation forwards to the legacy 4-arg overload above, so existing
+     *   delegates keep working unchanged. The legacy form only carries `err`, `failedStage`,
+     *   and `attestationResult` — the following CompletionStatus fields are silently dropped
+     *   when the default forwarder runs:
+     *
+     *     - commissioningError                (GeneralCommissioning cluster CommissioningErrorEnum)
+     *     - networkCommissioningStatus + connectNetworkErrorValue
+     *     - operationalCertStatus             (OperationalCredentials NOCResponse status)
+     *     - commissioningDebugText            (device-supplied text from ArmFailSafe /
+     *                                          SetRegulatoryConfig / CommissioningComplete)
+     *     - networkCommissioningDebugText     (device-supplied text from NetworkConfig /
+     *                                          ConnectNetwork)
+     *
+     *   Override this overload (instead of the 4-arg one) to receive those fields.
+     */
+    virtual void OnCommissioningFailure(PeerId peerId, const CompletionStatus & completionStatus)
+    {
+        OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(CommissioningStage::kError),
+                               completionStatus.attestationResult);
+    }
+
     virtual void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) {}
 
     /**

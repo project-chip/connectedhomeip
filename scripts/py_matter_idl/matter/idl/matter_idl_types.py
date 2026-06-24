@@ -14,7 +14,7 @@
 
 import enum
 from dataclasses import dataclass, field
-from typing import List, Optional, Set, Union
+from typing import Optional, Union
 
 from lark.tree import Meta
 
@@ -62,6 +62,7 @@ class CommandQuality(enum.Flag):
     NONE = 0
     TIMED_INVOKE = enum.auto()
     FABRIC_SCOPED = enum.auto()
+    OPTIONAL = enum.auto()
 
 
 class AttributeQuality(enum.Flag):
@@ -87,6 +88,7 @@ class EventPriority(enum.Enum):
 class EventQuality(enum.Flag):
     NONE = 0
     FABRIC_SENSITIVE = enum.auto()
+    OPTIONAL = enum.auto()
 
 
 class StructTag(enum.Enum):
@@ -171,11 +173,19 @@ class Attribute:
     def requires_timed_write(self) -> bool:
         return AttributeQuality.TIMED_WRITE in self.qualities
 
+    @property
+    def is_optional(self) -> bool:
+        return self.definition.is_optional
+
+    @property
+    def is_nullable(self) -> bool:
+        return self.definition.is_nullable
+
 
 @dataclass
 class Struct:
     name: str
-    fields: List[Field]
+    fields: list[Field]
     tag: Optional[StructTag] = None
     code: Optional[int] = None  # for responses only
     qualities: StructQuality = StructQuality.NONE
@@ -193,7 +203,7 @@ class Event:
     priority: EventPriority
     name: str
     code: int
-    fields: List[Field]
+    fields: list[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     qualities: EventQuality = EventQuality.NONE
     description: Optional[str] = None
@@ -205,6 +215,10 @@ class Event:
     @property
     def is_fabric_sensitive(self) -> bool:
         return EventQuality.FABRIC_SENSITIVE in self.qualities
+
+    @property
+    def is_optional(self) -> bool:
+        return EventQuality.OPTIONAL in self.qualities
 
 
 @dataclass
@@ -224,7 +238,7 @@ class ConstantEntry:
 class Enum:
     name: str
     base_type: str
-    entries: List[ConstantEntry]
+    entries: list[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
@@ -238,7 +252,7 @@ class Enum:
 class Bitmap:
     name: str
     base_type: str
-    entries: List[ConstantEntry]
+    entries: list[ConstantEntry]
     api_maturity: ApiMaturity = ApiMaturity.STABLE
     is_global: bool = False
     is_shared: bool = False  # shared across multiple clusters (shared by name)
@@ -266,18 +280,22 @@ class Command:
     def is_timed_invoke(self) -> bool:
         return CommandQuality.TIMED_INVOKE in self.qualities
 
+    @property
+    def is_optional(self) -> bool:
+        return CommandQuality.OPTIONAL in self.qualities
+
 
 @dataclass
 class Cluster:
     name: str
     code: int
     revision: int = 1
-    enums: List[Enum] = field(default_factory=list)
-    bitmaps: List[Bitmap] = field(default_factory=list)
-    events: List[Event] = field(default_factory=list)
-    attributes: List[Attribute] = field(default_factory=list)
-    structs: List[Struct] = field(default_factory=list)
-    commands: List[Command] = field(default_factory=list)
+    enums: list[Enum] = field(default_factory=list)
+    bitmaps: list[Bitmap] = field(default_factory=list)
+    events: list[Event] = field(default_factory=list)
+    attributes: list[Attribute] = field(default_factory=list)
+    structs: list[Struct] = field(default_factory=list)
+    commands: list[Command] = field(default_factory=list)
     description: Optional[str] = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
@@ -306,9 +324,9 @@ class CommandInstantiation:
 @dataclass
 class ServerClusterInstantiation:
     name: str
-    commands: List[CommandInstantiation] = field(default_factory=list)
-    attributes: List[AttributeInstantiation] = field(default_factory=list)
-    events_emitted: Set[str] = field(default_factory=set)
+    commands: list[CommandInstantiation] = field(default_factory=list)
+    attributes: list[AttributeInstantiation] = field(default_factory=list)
+    events_emitted: set[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
@@ -324,21 +342,21 @@ class DeviceType:
 @dataclass
 class Endpoint:
     number: int
-    device_types: List[DeviceType] = field(default_factory=list)
-    server_clusters: List[ServerClusterInstantiation] = field(
+    device_types: list[DeviceType] = field(default_factory=list)
+    server_clusters: list[ServerClusterInstantiation] = field(
         default_factory=list)
-    client_bindings: List[str] = field(default_factory=list)
+    client_bindings: list[str] = field(default_factory=list)
 
 
 @dataclass
 class Idl:
-    clusters: List[Cluster] = field(default_factory=list)
-    endpoints: List[Endpoint] = field(default_factory=list)
+    clusters: list[Cluster] = field(default_factory=list)
+    endpoints: list[Endpoint] = field(default_factory=list)
 
     # Global types
-    global_bitmaps: List[Bitmap] = field(default_factory=list)
-    global_enums: List[Enum] = field(default_factory=list)
-    global_structs: List[Struct] = field(default_factory=list)
+    global_bitmaps: list[Bitmap] = field(default_factory=list)
+    global_enums: list[Enum] = field(default_factory=list)
+    global_structs: list[Struct] = field(default_factory=list)
 
     # IDL file name is available only if parsing provides a file name
     parse_file_name: Optional[str] = field(default=None)

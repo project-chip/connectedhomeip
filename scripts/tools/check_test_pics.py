@@ -37,7 +37,7 @@ def main():
     value_defs = sys.argv[1]
     pics_yaml = sys.argv[2]
 
-    with open(value_defs, "r") as stream:
+    with open(value_defs) as stream:
         defined_values = {re.sub(
             value_regexp, "", item.rstrip()) for item in stream.readlines()}
         # Remove Comments w/ # and empty lines
@@ -45,7 +45,7 @@ def main():
             if elem.startswith('#') or (elem == ""):
                 defined_values.discard(elem)
 
-    with open(pics_yaml, "r") as stream:
+    with open(pics_yaml) as stream:
         try:
             yaml_data = yaml.safe_load(stream)
         except yaml.YAMLError as e:

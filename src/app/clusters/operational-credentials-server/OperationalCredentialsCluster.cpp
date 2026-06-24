@@ -1105,7 +1105,7 @@ CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context
 
 void OperationalCredentialsCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    mOpCredsContext.platformManager.RemoveEventHandler(OnPlatformEventHandler);
+    mOpCredsContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     mOpCredsContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }

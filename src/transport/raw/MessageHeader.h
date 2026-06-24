@@ -181,7 +181,7 @@ public:
     /**
      * Gets the message counter set in the header.
      *
-     * Message IDs are expecte to monotonically increase by one for each mesage
+     * Message IDs are expected to monotonically increase by one for each message
      * that has been sent.
      */
     uint32_t GetMessageCounter() const { return mMessageCounter; }

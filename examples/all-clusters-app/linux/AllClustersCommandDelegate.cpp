@@ -70,7 +70,7 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
     // This is why the cluster does not provide a getter for this attribute.
     // We read this via ember (i.e. defaults that were set during codegen startup)
-    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
+    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::GetDefault(endpointId, &numPositions);
 
     return numPositions;
 }

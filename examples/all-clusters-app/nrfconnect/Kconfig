@@ -23,7 +23,7 @@ config STATE_LEDS
 	  the device into a network or the factory reset initiation.
 
 # Sample configuration used for Thread networking
-if NET_L2_OPENTHREAD
+if OPENTHREAD
 
 choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
 	default OPENTHREAD_NORDIC_LIBRARY_MTD
@@ -36,7 +36,7 @@ endchoice
 config CHIP_USE_OPENTHREAD_ENDPOINT
 	default y
 
-endif # NET_L2_OPENTHREAD
+endif # OPENTHREAD
 
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"

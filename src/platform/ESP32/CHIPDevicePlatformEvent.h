@@ -28,6 +28,7 @@
 #include <platform/CHIPDeviceEvent.h>
 
 #include <esp_event.h>
+#include <esp_idf_version.h>
 #include <esp_netif_types.h>
 #include <esp_wifi_types.h>
 
@@ -77,7 +78,11 @@ struct ChipDevicePlatformEvent final
                 ip_event_t EthGotIp;
                 ip_event_got_ip_t IpGotIp;
                 ip_event_got_ip6_t IpGotIp6;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+                ip_event_assigned_ip_to_client_t IpApStaIpAssigned;
+#else
                 ip_event_ap_staipassigned_t IpApStaIpAssigned;
+#endif
                 wifi_event_sta_scan_done_t WiFiStaScanDone;
                 wifi_event_sta_connected_t WiFiStaConnected;
                 wifi_event_sta_disconnected_t WiFiStaDisconnected;

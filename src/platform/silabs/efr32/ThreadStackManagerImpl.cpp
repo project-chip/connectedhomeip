@@ -24,13 +24,11 @@
  *
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <openthread/platform/entropy.h>
 
@@ -48,6 +46,11 @@ otInstance * otGetInstance(void);
 void otAppCliInit(otInstance * aInstance);
 #endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 }
+
+// for compatibility with SLCP
+#ifndef SL_MATTER_OPENTHREAD_NCP_ENABLE
+#define SL_MATTER_OPENTHREAD_NCP_ENABLE 0
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -164,16 +167,6 @@ extern "C" __WEAK void sl_openthread_init(void)
 #include "uart.h"
 #endif
 
-extern "C" otError otPlatUartEnable(void)
-{
-#ifdef PW_RPC_ENABLED
-    return OT_ERROR_NOT_IMPLEMENTED;
-#else
-    // Uart Init is handled in init_efrPlatform.cpp
-    return OT_ERROR_NONE;
-#endif
-}
-
 extern "C" otInstance * otGetInstance(void)
 {
     return sOTInstance;
@@ -201,7 +194,17 @@ extern "C" void sl_ot_cli_init(void)
 #endif
 }
 
-#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI && !SL_MATTER_OPENTHREAD_NCP_ENABLE
+
+extern "C" otError otPlatUartEnable(void)
+{
+#ifdef PW_RPC_ENABLED
+    return OT_ERROR_NOT_IMPLEMENTED;
+#else
+    // Uart Init is handled in init_efrPlatform.cpp
+    return OT_ERROR_NONE;
+#endif
+}
 
 extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
@@ -241,4 +244,4 @@ extern "C" __WEAK otError otPlatUartDisable(void)
     return OT_ERROR_NOT_IMPLEMENTED;
 }
 
-#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI && !SL_MATTER_OPENTHREAD_NCP_ENABLE

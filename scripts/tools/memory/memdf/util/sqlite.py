@@ -17,7 +17,7 @@
 """Wrapper and utility functions around sqlite3"""
 
 import sqlite3
-from typing import List, Optional
+from typing import Optional
 
 import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription
@@ -39,8 +39,8 @@ CONFIG: ConfigDescription = {
 
 class Database:
     """Wrapper and utility functions around sqlite3"""
-    on_open: Optional[List[str]] = None
-    on_writable: Optional[List[str]] = None
+    on_open: Optional[list[str]] = None
+    on_writable: Optional[list[str]] = None
 
     def __init__(self, filename: str, writable: bool = True):
         self.filename = filename
@@ -96,7 +96,7 @@ class Database:
         v = list(kwargs.values())
         self.connection().execute(q, v)
 
-    def get_matching(self, table: str, columns: List[str], **kwargs):
+    def get_matching(self, table: str, columns: list[str], **kwargs):
         q = (f"SELECT {','.join(columns)} FROM {table}"
              f"  WHERE {'=? AND '.join(kwargs.keys())}=?")
         v = list(kwargs.values())

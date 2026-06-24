@@ -105,6 +105,10 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     SetOneShotConnectCallback(nullptr);
     SetOneShotScanCallback(nullptr);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    ReturnErrorOnFailure(WpaSupplicantClient::Init(*this));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);

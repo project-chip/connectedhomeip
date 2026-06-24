@@ -133,6 +133,14 @@ CHIP_ERROR SetupPayloadParseCommand::Print(const SetupPayload & payload)
                     }
                     humanFlags.Add("NFC");
                 }
+                if (payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kThread))
+                {
+                    if (!humanFlags.Empty())
+                    {
+                        humanFlags.Add(", ");
+                    }
+                    humanFlags.Add("Thread");
+                }
             }
             else
             {

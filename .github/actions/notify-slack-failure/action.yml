@@ -1,0 +1,82 @@
+name: 'Notify Slack on Failure'
+description: 'Sends a Slack notification when a post-merge or nightly job fails'
+inputs:
+  slack-webhook:
+    description: 'The Slack Webhook URL'
+    required: false
+  job-name:
+    description: 'The display name of the job'
+    required: false
+    default: ''
+  job-details:
+    description: 'Extra matrix or job details'
+    required: false
+    default: ''
+  extra-details-file:
+    description: 'Path to a file containing additional compact information to append'
+    required: false
+    default: ''
+runs:
+  using: "composite"
+  steps:
+    - name: Send Slack Notification
+      shell: bash
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        REF_NAME: ${{ github.ref_name }}
+        JOB_NAME: ${{ inputs['job-name'] || github.job }}
+        JOB_DETAILS: ${{ inputs['job-details'] }}
+        EXTRA_FILE: ${{ inputs['extra-details-file'] }}
+        SERVER_URL: ${{ github.server_url }}
+        REPOSITORY: ${{ github.repository }}
+        RUN_ID: ${{ github.run_id }}
+        SLACK_WEBHOOK: ${{ inputs['slack-webhook'] }}
+      run: |
+        # 1. Skip gracefully if the Slack webhook is not configured (e.g. on developer forks)
+        if [[ -z "$SLACK_WEBHOOK" ]]; then
+          echo "Slack webhook not configured. Skipping notification."
+          exit 0
+        fi
+
+        # 2. Do not notify on Pull Request / Merge Queue / PR-Target events
+        if [[ "$EVENT_NAME" == "pull_request" || "$EVENT_NAME" == "pull_request_target" || "$EVENT_NAME" == "merge_group" ]]; then
+          echo "Skipping Slack notification: PR/Merge-Queue event ($EVENT_NAME)."
+          exit 0
+        fi
+
+        # 3. Only notify on master or release branches (matching v*-branch)
+        if [[ "$REF_NAME" != "master" && ! "$REF_NAME" == v*-branch ]]; then
+          echo "Skipping Slack notification: Not on master or a release branch ($REF_NAME)."
+          exit 0
+        fi
+
+        # 4. Send the Slack notification
+        RUN_URL="${SERVER_URL}/${REPOSITORY}/actions/runs/${RUN_ID}"
+
+        if [[ -n "$JOB_DETAILS" ]]; then
+          JOB_TEXT="${JOB_NAME} (${JOB_DETAILS})"
+        else
+          JOB_TEXT="${JOB_NAME}"
+        fi
+
+        EXTRA_TEXT=""
+        if [[ -n "$EXTRA_FILE" && -f "$EXTRA_FILE" ]]; then
+          CONTENT=$(head -n 2 "$EXTRA_FILE" | tr '\n' ' ' | sed -e 's/  */ /g' -e 's/^[[:space:]]*//;s/[[:space:]]*$//' -e 's/@//g')
+          if [[ -n "$CONTENT" ]]; then
+            if [[ ${#CONTENT} -gt 300 ]]; then
+              CONTENT="${CONTENT:0:300}..."
+            fi
+            EXTRA_TEXT=" *Failed Tests:* ${CONTENT}"
+          fi
+        fi
+
+        PAYLOAD_TEXT="🚨 *CI Failure Alert* 🚨 *Job:* ${JOB_TEXT} *Run Details:* <${RUN_URL}|View Pipeline Logs>${EXTRA_TEXT:-}"
+
+        JSON_PAYLOAD=$(python3 -c 'import json, sys; print(json.dumps({"text": sys.argv[1]}))' "$PAYLOAD_TEXT")
+
+        curl -sS -X POST -H 'Content-type: application/json' \
+          --connect-timeout 5 \
+          --max-time 10 \
+          --retry 3 \
+          -d "$JSON_PAYLOAD" "$SLACK_WEBHOOK"
+

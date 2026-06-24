@@ -36,8 +36,6 @@ using StreamUsageEnum                         = chip::app::Clusters::Globals::St
 
 static constexpr size_t kMinUrlLength        = 13u;
 static constexpr size_t kMaxUrlLength        = 2000u;
-static constexpr size_t kMaxCENCKeyLength    = 16u;
-static constexpr size_t kMaxCENCKeyIDLength  = 16u;
 static constexpr size_t kMaxTrackNameLength  = 16u;
 static constexpr size_t kMinSegmentDuration  = 500u;
 static constexpr size_t kMaxSegmentDuration  = 65500u;

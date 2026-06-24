@@ -25,6 +25,7 @@
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/TLV.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <protocols/bdx/BdxUri.h>
 
@@ -69,12 +70,12 @@ constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                        
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
-    const uint8_t * tokenData = static_cast<const uint8_t *>(token.data());
-    size_t minLength          = std::min(token.size(), bufSize);
-    for (size_t i = 0; i < (minLength / 2) - 1; ++i)
+    if (buf == nullptr || bufSize == 0)
     {
-        snprintf(&buf[i * 2], bufSize, "%02X", tokenData[i]);
+        return;
     }
+    CHIP_ERROR err = chip::Encoding::BytesToUppercaseHexString(token.data(), token.size(), buf, bufSize);
+    ReturnOnFailure(err, buf[0] = '\0');
 }
 
 void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
@@ -277,7 +278,14 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         // provider supplying the response is not the provider supplying the OTA image.
         FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
         const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-        NodeId nodeId                 = fabricInfo->GetPeerId().GetNodeId();
+        if (fabricInfo == nullptr)
+        {
+            ChipLogError(SoftwareUpdate, "No fabric for index %u, cannot send QueryImageResponse",
+                         static_cast<unsigned>(fabricIndex));
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return;
+        }
+        NodeId nodeId = fabricInfo->GetPeerId().GetNodeId();
 
         // Generate the ImageURI if one is not already preset
         if (strlen(mImageUri) == 0)
@@ -368,14 +376,20 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     mRequestorSoftwareVersion = commandData.softwareVersion;
     mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
 
-    chip::CharSpan loc = commandData.location.Value();
-    if (loc.size() >= sizeof(mLocation))
+    memset(mLocation, 0, sizeof(mLocation));
+    if (commandData.location.HasValue())
     {
-        ChipLogError(AppServer, "Location too long (%u)", static_cast<unsigned>(loc.size()));
-        return;
+        chip::CharSpan loc = commandData.location.Value();
+        // Location attribute SHALL be an ISO 3166-1 alpha-2 code
+        if (loc.size() == 2)
+        {
+            Platform::CopyString(mLocation, sizeof(mLocation), loc);
+        }
+        else
+        {
+            ChipLogError(AppServer, "Location field size=%zu, expected 2; clearing", loc.size());
+        }
     }
-
-    Platform::CopyString(mLocation, sizeof(mLocation), commandData.location.Value());
 
     size_t i  = 0;
     auto iter = commandData.protocolsSupported.begin();

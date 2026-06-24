@@ -19,7 +19,7 @@
 import datetime
 import logging
 import sys
-from typing import Dict, List, Mapping, Optional, Tuple, cast
+from typing import Mapping, Optional, cast
 
 import memdf.report
 import memdf.util.config
@@ -70,7 +70,7 @@ QUERY_CONFIG = {
 }
 
 
-def argsplit(metavar: str, value: str) -> Tuple[Optional[Tuple], Dict]:
+def argsplit(metavar: str, value: str) -> tuple[Optional[tuple], dict]:
     """Given comma-separated metavar and values, match them up."""
     values = tuple(value.split(','))
     names = metavar.split(',')
@@ -308,7 +308,7 @@ QUERY_CONFIG |= {
 }
 
 
-def get_build_sections(db: SizeDatabase, build: str) -> Optional[Tuple]:
+def get_build_sections(db: SizeDatabase, build: str) -> Optional[tuple]:
     """Split a build arg and get its thing_id and sections."""
     values, args = argsplit('PLATFORM,CONFIG,TARGET', build)
     if not values:
@@ -331,7 +331,7 @@ def get_build_sections(db: SizeDatabase, build: str) -> Optional[Tuple]:
 
 
 def make_build_sizes_query(config: Config, thing_id: str,
-                           sections: List[str]) -> Tuple[List[str], str]:
+                           sections: list[str]) -> tuple[list[str], str]:
     """Construct and SQL query for all section sizes for a given thing."""
     # SQLite doesn't have PIVOT so we need to construct a query with
     # a column for each section.

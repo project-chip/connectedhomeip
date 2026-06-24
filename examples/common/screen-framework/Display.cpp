@@ -18,7 +18,6 @@
  */
 #include <string.h>
 
-#include "driver/ledc.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
@@ -28,6 +27,8 @@
 #include "Display.h"
 
 #if CONFIG_HAVE_DISPLAY
+
+#include "driver/ledc.h"
 
 // Brightness picked such that it's easy for cameras to focus on
 #define DEFAULT_BRIGHTNESS_PERCENT 10

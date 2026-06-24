@@ -27,7 +27,6 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/AppDelegate.h>
 #include <app/util/config.h>
 #include <ble/Ble.h>

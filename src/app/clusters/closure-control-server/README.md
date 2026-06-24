@@ -35,23 +35,28 @@ class MyClosureControlDelegate : public chip::app::Clusters::ClosureControl::Clo
 };
 ```
 
-### 2. Configure Cluster Conformance
+### 2. Build a Config with the cluster's features
 
-Configure the cluster's feature map and optional attributes based on your device
-capabilities. The conformance must be valid before cluster creation (see
-"Conformance Validation" below).
+Configure the cluster's feature map, optional attributes and initial state using
+the builder-style `ClosureControlCluster::Config`. The resulting configuration
+must be valid before cluster creation (see "Conformance Validation" below).
 
 ```cpp
 #include "app/clusters/closure-control-server/ClosureControlCluster.h"
 
-chip::app::Clusters::ClosureControl::ClusterConformance conformance;
-conformance.FeatureMap().Set(chip::app::Clusters::ClosureControl::Feature::kPositioning);
-conformance.FeatureMap().Set(chip::app::Clusters::ClosureControl::Feature::kCalibration);
-// Add other features as needed
+using namespace chip::app::Clusters::ClosureControl;
 
-// Optional: Configure initial state
-chip::app::Clusters::ClosureControl::ClusterInitParameters initParams;
-initParams.mMainState = chip::app::Clusters::ClosureControl::MainStateEnum::kStopped;
+auto config = ClosureControlCluster::Config(/* endpoint */ 1, gMyDelegate, gTimerDelegate)
+                  .WithPositioning()
+                  .WithCalibration()
+                  // Add other features as needed via WithSpeed(), WithVentilation(),
+                  // WithPedestrian(), WithProtection(), WithManuallyOperable(),
+                  // WithInstantaneous()...
+                  .WithMotionLatching(chip::BitFlags<LatchControlModesBitmap>()
+                                          .Set(LatchControlModesBitmap::kRemoteLatching)
+                                          .Set(LatchControlModesBitmap::kRemoteUnlatching))
+                  .WithCountdownTime()
+                  .WithInitialMainState(MainStateEnum::kStopped);
 ```
 
 ### 3. Instantiate Delegates and Cluster
@@ -68,15 +73,8 @@ registration.
 MyClosureControlDelegate gMyDelegate;
 chip::support::DefaultTimerDelegate gTimerDelegate;
 
-chip::app::Clusters::ClosureControl::ClosureControlCluster::Context clusterContext{
-    .delegate = gMyDelegate,
-    .timerDelegate = gTimerDelegate,
-    .conformance = conformance,
-    .initParams = initParams
-};
-
-chip::app::RegisteredServerCluster<chip::app::Clusters::ClosureControl::ClosureControlCluster> gClosureControlCluster(
-    chip::EndpointId{ 1 }, clusterContext);
+chip::app::RegisteredServerCluster<chip::app::Clusters::ClosureControl::ClosureControlCluster>
+    gClosureControlCluster(config);
 ```
 
 ### 4. Register the Cluster
@@ -101,6 +99,9 @@ void ApplicationInit()
 }
 ```
 
+All cluster setters/getters are then invoked directly on
+`gClosureControlCluster.Cluster()`.
+
 ## Initialization Sequence
 
 ### Code-Driven Cluster Usage (Recommended)
@@ -109,46 +110,43 @@ For new applications using the code-driven cluster pattern:
 
 1. **Before Server Startup:**
 
-    - Configure `ClusterConformance` with valid feature map
-    - Configure `ClusterInitParameters` with initial state
+    - Build a `ClosureControlCluster::Config` with the desired features and
+      initial state via `With*` builder methods
     - Instantiate delegate and cluster
     - Register cluster with `CodegenDataModelProvider`
 
 2. **After Startup:**
-    - All getter/setter methods are safe to use via Cluster Instance
+    - All getter/setter methods are safe to use directly on the cluster instance
 
-### Legacy API Usage
+### Interface (Legacy / backward-compatible) Usage
 
 For backwards compatibility with applications using the legacy ZAP-generated
 patterns:
 
-1. **Before Server Startup:**
+```cpp
+#include "app/clusters/closure-control-server/CodegenIntegration.h"
 
-    ```cpp
-    // Set delegate (must be called before server starts)
-    MatterClosureControlSetDelegate(endpointId, delegate);
+using namespace chip::app::Clusters::ClosureControl;
 
-    // Set conformance (must be called before server starts)
-    MatterClosureControlSetConformance(endpointId, conformance);
+MyClosureControlDelegate gMyDelegate;
+Interface gClosureControlInterface(/* endpoint */ 1, gMyDelegate);
 
-    // Set init parameters (must be called before server starts)
-    MatterClosureControlSetInitParams(endpointId, initParams);
-    ```
+CHIP_ERROR ApplicationInit()
+{
+    ClusterConformance conformance;
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kCalibration);
 
-2. **After Startup:**
-    ```cpp
-    // Access cluster instance
-    ClosureControlCluster * cluster = GetInstance(endpointId);
-    // Use cluster methods...
-    ```
+    ClusterInitParameters initParams;
+    initParams.mMainState = MainStateEnum::kStopped;
+    initParams.mLatchControlModes.Set(LatchControlModesBitmap::kRemoteLatching)
+        .Set(LatchControlModesBitmap::kRemoteUnlatching);
 
-**Critical:** For legacy usage, ensure `MatterClosureControlSetDelegate()`,
-`MatterClosureControlSetConformance()`, and
-`MatterClosureControlSetInitParams()` are called **before** `ServerInit()`. The
-`GetInstance()` should be called after the Server Created. The cluster instance
-**must not** be used before `ServerInit()` is called. Accessing the cluster
-before initialization (e.g., wrong app init order) may result in reading
-uninitialized state. Ensure your application initialization order is correct.
+    return gClosureControlInterface.Init(conformance, initParams);
+}
+```
+
+After `Init()` succeeds, access the cluster via
+`gClosureControlInterface.Cluster()`.
 
 ## Conformance Validation
 

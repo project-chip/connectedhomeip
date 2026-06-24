@@ -6,19 +6,16 @@ import json
 import os
 import pathlib
 import sys
-import typing
 
 
-def get_cluster_sources(clusters: typing.Set[str],
-                        source_map: typing.Dict[str,
-                                                typing.List[str]], side: str):
+def get_cluster_sources(clusters: set[str], source_map: dict[str, list[str]], side: str):
     """Returns a list of cluster source directories for the given clusters.
 
     Returns:
       The set of source directories to build.
     """
 
-    cluster_sources: typing.Set[str] = set()
+    cluster_sources: set[str] = set()
 
     for cluster in clusters:
         if cluster not in source_map:
@@ -32,7 +29,7 @@ def get_cluster_sources(clusters: typing.Set[str],
 
 def dump_zapfile_clusters(zap_file_path: pathlib.Path,
                           implementation_data_path: pathlib.Path,
-                          external_clusters: typing.List[str]):
+                          external_clusters: list[str]):
     """Prints all of the source directories to build for a given ZAP file.
 
     Arguments:
@@ -40,20 +37,20 @@ def dump_zapfile_clusters(zap_file_path: pathlib.Path,
     """
 
     # List of directories in src/app/clusters to build for server clusters.
-    SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {}
+    SERVER_CLUSTERS: dict[str, list[str]] = {}
 
     # List of directories in src/app/clusters to build for client clusters.
-    CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {}
+    CLIENT_CLUSTERS: dict[str, list[str]] = {}
 
-    with open(implementation_data_path, "r") as implementation_data_file:
+    with open(implementation_data_path) as implementation_data_file:
         implementation_data = json.load(implementation_data_file)
         SERVER_CLUSTERS = implementation_data["ServerDirectories"]
         CLIENT_CLUSTERS = implementation_data["ClientDirectories"]
 
-    client_clusters: typing.Set[str] = set()
-    server_clusters: typing.Set[str] = set()
+    client_clusters: set[str] = set()
+    server_clusters: set[str] = set()
 
-    with open(zap_file_path, "r") as zap_file:
+    with open(zap_file_path) as zap_file:
         zap_json = json.loads(zap_file.read())
 
         for endpoint_type in zap_json.get('endpointTypes'):
@@ -71,7 +68,7 @@ def dump_zapfile_clusters(zap_file_path: pathlib.Path,
                 if cluster.get('enabled') == 1:
                     clusters_set.add(cluster.get('define'))
 
-    cluster_sources: typing.Set[str] = set()
+    cluster_sources: set[str] = set()
 
     cluster_sources.update(
         get_cluster_sources(server_clusters, SERVER_CLUSTERS, 'server'))

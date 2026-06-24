@@ -21,13 +21,12 @@
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
-#include "QRCodeScreen.h"
 #include "ShellCommands.h"
 #include "WiFiWidget.h"
+#include "esp_flash.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
-#include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
@@ -73,7 +72,7 @@ using namespace ::chip::Credentials;
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-extern const char TAG[] = "all-clusters-app";
+static constexpr char TAG[] = "all-clusters-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;

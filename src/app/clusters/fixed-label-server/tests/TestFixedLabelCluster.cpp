@@ -45,8 +45,8 @@ class MockFixedLabelIterator : public DeviceLayer::DeviceInfoProvider::FixedLabe
 public:
     MockFixedLabelIterator()
     {
-        mLabels[0].label = chip::CharSpan::fromCharString("test_label1");
-        mLabels[0].value = chip::CharSpan::fromCharString("test_value1");
+        mLabels[0].label = "test_label1"_span;
+        mLabels[0].value = "test_value1"_span;
     }
 
     size_t Count() override { return 1; }
@@ -129,7 +129,7 @@ TEST_F(TestFixedLabelCluster, ReadAttributeTest)
     auto it = labelList.begin();
     ASSERT_TRUE(it.Next());
     auto label = it.GetValue();
-    ASSERT_TRUE(label.label.data_equal(chip::CharSpan::fromCharString("test_label1")));
-    ASSERT_TRUE(label.value.data_equal(chip::CharSpan::fromCharString("test_value1")));
+    ASSERT_TRUE(label.label.data_equal("test_label1"_span));
+    ASSERT_TRUE(label.value.data_equal("test_value1"_span));
     ASSERT_FALSE(it.Next());
 }

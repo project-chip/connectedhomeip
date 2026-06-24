@@ -13,7 +13,7 @@ namespace DeviceEnergyManagement {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 8;
+inline constexpr uint32_t kAcceptedCommandsCount = 10;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 0;
@@ -49,6 +49,14 @@ inline constexpr CommandId Id = 0x00000006;
 namespace CancelRequest {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace CancelRequest
+
+namespace PowerRangeAdjustRequest {
+inline constexpr CommandId Id = 0x00000008;
+} // namespace PowerRangeAdjustRequest
+
+namespace CancelPowerRangeAdjustRequest {
+inline constexpr CommandId Id = 0x00000009;
+} // namespace CancelPowerRangeAdjustRequest
 
 } // namespace Commands
 } // namespace DeviceEnergyManagement

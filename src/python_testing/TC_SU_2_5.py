@@ -97,7 +97,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
         # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
-        logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
+        logger.info("Image download timeout is set to %s seconds", self.ota_image_download_timeout)
 
         if not self.provider_kvs_path.startswith('/tmp'):
             asserts.fail("Provider KVS path must be placed in the /tmp directory.")
@@ -415,7 +415,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.ota_image_download_timeout)
-        logger.info(f"Waiting the time of DelayedApplyAction of {delayed_apply_action_time} seconds.")
+        logger.info("Waiting the time of DelayedApplyAction of %s seconds.", delayed_apply_action_time)
 
         # Device should stay in ApplyingState and not apply the update during the 180 seconds. Only after this timeframe.
         software_version_match = AttributeMatcher.from_callable(
@@ -477,7 +477,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             # Verify the default download path and the file size
             # Read file for /tmp/test.bin should exists and greater than 0
             ota_file_data = self.get_downloaded_ota_image_info()
-            logger.info(f"Downloaded ota image data {str(ota_file_data)}")
+            logger.info("Downloaded ota image data %s", ota_file_data)
             asserts.assert_equal(True, ota_file_data['exists'], f"File is was not downloaded  at {ota_file_data['path']}")
             asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
 
@@ -524,13 +524,13 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state is not idle")
         ota_file_data = self.get_downloaded_ota_image_info()
-        logger.info(f"Downloaded ota image data {str(ota_file_data)}")
+        logger.info("Downloaded ota image data %s", ota_file_data)
         asserts.assert_equal(ota_file_data['exists'], False, f"Downloaded file is still present {ota_file_data['path']}")
         asserts.assert_equal(ota_file_data['size'], 0, "File size is greater than 0")
         update_state_progress = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state_progress, NullValue, "Progress is not Null")
-        logger.info(f"Progress is {update_state_progress}")
+        logger.info("Progress is %s", update_state_progress)
         # Verify version is the same as when it  started
         await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, current_sw_version)
 

@@ -87,11 +87,10 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         start_time = time.time()
         # Wait for the expiration time (fail-safe will expire after this time), plus buffer for latency
-        log.info(f'Waiting for {expiration_time_seconds} seconds.')
+        log.info('Waiting for %s seconds.', expiration_time_seconds)
         await asyncio.sleep(expiration_time_seconds)
         elapsed_time = time.time() - start_time
-        log.info(
-            f'Failsafe timer expired after: {elapsed_time:.2f} seconds.')
+        log.info('Failsafe timer expired after: %.2f seconds.', elapsed_time)
 
         return resp
 
@@ -129,9 +128,9 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
         if is_first_run:
-            log.info(f'Step #3: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+            log.info('Step #3: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
         else:
-            log.info(f'Step #10 - Repeated Step #3: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+            log.info('Step #10 - Repeated Step #3: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         if is_first_run:
             self.step(4)
@@ -141,9 +140,9 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_equal(breadcrumb_info, 1,
                              "The Breadcrumb attribute is not 1")
         if is_first_run:
-            log.info(f'Step #4: The Breadcrumb attribute: {breadcrumb_info}')
+            log.info('Step #4: The Breadcrumb attribute: %s', breadcrumb_info)
         else:
-            log.info(f'Step #10 - Repeated Step #4: The Breadcrumb attribute: {breadcrumb_info}')
+            log.info('Step #10 - Repeated Step #4: The Breadcrumb attribute: %s', breadcrumb_info)
 
         if is_first_run:
             self.step(5)
@@ -198,10 +197,10 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "Unexpected number of entries in the TrustedRootCertificates table after wait")
         if is_first_run:
             log.info(
-                f'Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: {trusted_root_list_original_size_after_wait}')
+                'Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: %s', trusted_root_list_original_size_after_wait)
         else:
             log.info(
-                f'Step #12 - Repeated Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: {trusted_root_list_original_size_after_wait}')
+                'Step #12 - Repeated Step #8: The size of the num_trusted_roots_original list after waiting for failsafe timeout: %s', trusted_root_list_original_size_after_wait)
 
         if is_first_run:
             self.step(9)
@@ -210,10 +209,10 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_cgen.Attributes.Breadcrumb)
         asserts.assert_equal(breadcrumb_info, 0, "Breadcrumb value is not 0 after waiting for failsafe timer")
         if is_first_run:
-            log.info(f'Step #9: After waiting for failsafe timeout the Breadcrumb attribute: {breadcrumb_info}')
+            log.info('Step #9: After waiting for failsafe timeout the Breadcrumb attribute: %s', breadcrumb_info)
         else:
             log.info(
-                f'Step #12 - Repeated Step #9: After waiting for failsafe timeout the Breadcrumb attribute: {breadcrumb_info}')
+                'Step #12 - Repeated Step #9: After waiting for failsafe timeout the Breadcrumb attribute: %s', breadcrumb_info)
 
     def desc_TC_CGEN_2_2(self) -> str:
         return '[TC-CGEN-2.2] ArmFailSafe command verification [DUT - Server]'
@@ -306,14 +305,14 @@ class TC_CGEN_2_2(MatterBaseTest):
             cluster=self.cluster_opcreds,
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_root_list_original_size = len(trusted_root_list_original)
-        log.info(f'Step #1: The size of the original num_trusted_roots_original list: {trusted_root_list_original_size}')
+        log.info('Step #1: The size of the original num_trusted_roots_original list: %s', trusted_root_list_original_size)
 
         self.step(2)
         basic_commissioning_info = await self.read_single_attribute_check_success(
             cluster=self.cluster_cgen,
             attribute=self.cluster_cgen.Attributes.BasicCommissioningInfo)
         maxFailsafe = basic_commissioning_info.maxCumulativeFailsafeSeconds
-        log.info(f'Step #2: The MaxCumulativeFailsafeSeconds (max_fail_safe): {maxFailsafe}')
+        log.info('Step #2: The MaxCumulativeFailsafeSeconds (max_fail_safe): %s', maxFailsafe)
 
         self.step('2a')
         # Configure the failsafe timer. For both CI and Cert, using PIXIT.CGEN.FailsafeExpiryLengthSeconds.
@@ -329,7 +328,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Timeout used in test steps to verify failsafe. Must be less than DUT MaxCumulativeFailsafeSeconds
         asserts.assert_less(failsafe_expiration_seconds, maxFailsafe,
                             "failsafe_expiration_seconds should be less than MaxCumulativeFailsafeSeconds.")
-        log.info(f'Step #2a: {run_type} - Value of FailsafeExpiryLengthSeconds: {failsafe_expiration_seconds}')
+        log.info('Step #2a: %s - Value of FailsafeExpiryLengthSeconds: %s', run_type, failsafe_expiration_seconds)
 
         # TH1 steps #3 through #5 using the function run_steps_3_to_5
         self.step('3-5')
@@ -351,7 +350,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_in(new_root_cert, trusted_root_list_original_updated,
                           "New root certificate was not added to the trusted root list.")
 
-        log.info(f'Step #6: The updated size of the num_trusted_roots_original list: {trusted_root_list_original_size_updated}')
+        log.info('Step #6: The updated size of the num_trusted_roots_original list: %s', trusted_root_list_original_size_updated)
 
         self.step(7)
         # Step 7 - 'set_failsafe_timer' function is used to force the failsafe timer to expire,
@@ -361,8 +360,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # the configuration parameter 'PIXIT.CGEN.FailsafeExpiryLengthSeconds'. If not specified, the default is used.
 
         log.info(
-            f'Step #7: {run_type} - Forcing failsafe expiration by sending an ArmFailSafe command to '
-            f'the DUT with ExpiryLengthSeconds set to {failsafe_expiration_seconds} seconds.'
+            'Step #7: %s - Forcing failsafe expiration by sending an ArmFailSafe command to the DUT with ExpiryLengthSeconds set to %s seconds.', run_type, failsafe_expiration_seconds
         )
 
         resp = await self.set_failsafe_timer(
@@ -371,8 +369,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             expiration_time_seconds=1)
 
         log.info(
-            f'Step #7: {run_type} - Failsafe timer expired after sending ArmFailSafe command. '
-            f'ExpiryLengthSeconds was set to {failsafe_expiration_seconds} seconds.'
+            'Step #7: %s - Failsafe timer expired after sending ArmFailSafe command. ExpiryLengthSeconds was set to %s seconds.', run_type, failsafe_expiration_seconds
         )
 
         # TH1 steps #8 through #9 using the function run_steps_8_to_9
@@ -397,7 +394,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         debug_text = resp.debugText
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
-        log.info(f'Step #11: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #11: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(12)
         # Repeat TH1 steps #8 through #9 using the function run_steps_8_to_9
@@ -408,7 +405,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         setup_pin_code = params.commissioningParameters.setupPinCode
         longDiscriminator = params.randomDiscriminator
         setup_qr_code = params.commissioningParameters.setupQRCode
-        log.info(f'Step #13: Open Commissioning Window params with vars: {vars(params)}')
+        log.info('Step #13: Open Commissioning Window params with vars: %s', vars(params))
 
         self.step(14)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=failsafe_expiration_seconds)
@@ -419,7 +416,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'BusyWithOtherAdmin'(4)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #14: ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin ({resp.errorCode})')
+        log.info('Step #14: ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin (%s)', resp.errorCode)
 
         self.step(15)
         # Create TH2
@@ -452,7 +449,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         debug_text = resp.debugText
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
-        log.info(f'Step #17 - ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #17 - ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(18)
         nocs = await self.read_single_attribute_check_success(
@@ -462,7 +459,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_opcreds.Attributes.NOCs,
             fabric_filtered=False)
         nocs_original_size = len(nocs)
-        log.info(f'Step #18 - TH1 Original size of the nocs list: {nocs_original_size}')
+        log.info('Step #18 - TH1 Original size of the nocs list: %s', nocs_original_size)
 
         self.step(19)
         fabrics = await self.read_single_attribute_check_success(
@@ -472,7 +469,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_opcreds.Attributes.Fabrics,
             fabric_filtered=False)
         fabrics_original_size = len(fabrics)
-        log.info(f'Step #19 - TH1 Original size of the fabrics list: {fabrics_original_size}')
+        log.info('Step #19 - TH1 Original size of the fabrics list: %s', fabrics_original_size)
 
         self.step(20)
         trusted_roots_list = await self.read_single_attribute_check_success(
@@ -481,7 +478,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             cluster=self.cluster_opcreds,
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_roots_list_size = len(trusted_roots_list)
-        log.info(f'Step #20 - TH1 Original size of the trusted_root list: {trusted_roots_list_size}')
+        log.info('Step #20 - TH1 Original size of the trusted_root list: %s', trusted_roots_list_size)
 
         self.step(21)
         # Commissioning stage numbers - we should find a better way to match these to the C++ code
@@ -489,7 +486,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # TODO: https://github.com/project-chip/connectedhomeip/issues/36629
         kFindOperationalForCommissioningComplete = 30
         log.info(
-            f'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: {kFindOperationalForCommissioningComplete}')
+            'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: %s', kFindOperationalForCommissioningComplete)
 
         resp = TH2.SetTestCommissionerPrematureCompleteAfter(kFindOperationalForCommissioningComplete)
         log.info('Step #21 - TH2 Commissioning DOES NOT send the CommissioningComplete command')
@@ -512,7 +509,7 @@ class TC_CGEN_2_2(MatterBaseTest):
                 cmd=cmd)
         except ChipStackException as e:
             # Expected behavior and proceeding to next step.
-            log.info(f"Step #22 - ArmFailSafe command failed as expected: {str(e)}. Proceeding to next step.")
+            log.info("Step #22 - ArmFailSafe command failed as expected: %s. Proceeding to next step.", e)
             pass
         else:
             # If no exception is raised, log that the device response before closing the connection is acceptable.
@@ -526,7 +523,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_opcreds.Attributes.NOCs,
             fabric_filtered=False)
         nocs_updated_size = len(nocs_updated)
-        log.info(f'Step #23 - TH1 nocs_updated: {nocs_updated_size}')
+        log.info('Step #23 - TH1 nocs_updated: %s', nocs_updated_size)
         asserts.assert_equal(nocs_updated_size, nocs_original_size,
                              "The nocs list size should match the original nocs list size.")
 
@@ -538,7 +535,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_opcreds.Attributes.Fabrics,
             fabric_filtered=False)
         fabrics_updated_size = len(fabrics_updated)
-        log.info(f'Step #24 - TH1 fabrics_original_size2: {fabrics_updated_size}')
+        log.info('Step #24 - TH1 fabrics_original_size2: %s', fabrics_updated_size)
         asserts.assert_equal(fabrics_updated_size, fabrics_original_size,
                              "The fabrics list size should match the original fabrics list size.")
 
@@ -549,7 +546,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             cluster=self.cluster_opcreds,
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_roots_list_updated_size = len(trusted_roots_list_updated)
-        log.info(f'Step #25 - TH1 the size of the trusted_roots_list_size_updated: {trusted_roots_list_updated_size}')
+        log.info('Step #25 - TH1 the size of the trusted_roots_list_size_updated: %s', trusted_roots_list_updated_size)
         asserts.assert_equal(trusted_roots_list_updated_size, trusted_roots_list_size,
                              "The trusted_roots list size should match the original trusted_roots list size.")
 
@@ -558,7 +555,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         resp = await TH2.CommissionOnNetwork(
             nodeId=newNodeId+1, setupPinCode=setup_pin_code,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=longDiscriminator)
-        log.info(f'Step #26 - Fully commissioned done: {resp}')
+        log.info('Step #26 - Fully commissioned done: %s', resp)
 
         self.step(27)
         # TH2 TrustedRootCertificate response with FAILSAFE_REQUIRED
@@ -570,7 +567,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_in('FailsafeRequired (0xca)',
                               str(e), f'Expected FailsafeRequired error, but got {str(e)}')
-            log.info(f'Step #27 - Expected error occurred: {str(e)}. Proceeding to next step.')
+            log.info('Step #27 - Expected error occurred: %s. Proceeding to next step.', e)
         else:
             asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
@@ -582,7 +579,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_opcreds.Attributes.Fabrics,
             fabric_filtered=False)
         fabrics_updated_size = len(fabrics_updated)
-        log.info(f'Step #28 - TH1 fabrics updated with additional entry for TH2: {fabrics_updated_size}')
+        log.info('Step #28 - TH1 fabrics updated with additional entry for TH2: %s', fabrics_updated_size)
         asserts.assert_equal(fabrics_updated_size, fabrics_original_size + 1,
                              "The fabrics list size should match the original fabrics list size + 1.")
 
@@ -599,7 +596,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         debug_text = resp.debugText
         asserts.assert_true(debug_text == '' or len(debug_text) <= 512,
                             "debugText must be empty or have a maximum length of 512 characters.")
-        log.info(f'Step #29: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #29: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(30)
         # Re-use TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate
@@ -613,13 +610,13 @@ class TC_CGEN_2_2(MatterBaseTest):
             cluster=self.cluster_opcreds,
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
-        log.info(f'Step #31 - The updated num_trusted_roots_original: {trusted_root_list_original_size_updated}')
+        log.info('Step #31 - The updated num_trusted_roots_original: %s', trusted_root_list_original_size_updated)
         # Verify that the trusted root list size has increased by 1, the trusted root list size is numTrustedRootsOriginal + 2
         asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 2,
                              "Unexpected number of entries in the TrustedRootCertificates table after update")
 
         self.step(32)
-        log.info(f'Step #32: - The maxFailsafe (max_fail_safe): {maxFailsafe}')
+        log.info('Step #32: - The maxFailsafe (max_fail_safe): %s', maxFailsafe)
 
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe)
         resp = await self.send_single_cmd(
@@ -632,7 +629,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that DebugText is empty or has a maximum length of 512 characters
         debug_text = resp.debugText
         assert debug_text == '' or len(debug_text) <= 512, "debugText must be empty or have a maximum length of 512 characters"
-        log.info(f'Step #32: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #32: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(33)
         # Set the failsafe expiration timeout to 1s, must be less than maxFailsafe (max_fail_safe).
@@ -641,8 +638,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         asserts.assert_less(failsafe_timeout_less_than_max, maxFailsafe)
 
         log.info(
-            f'Step #33: {run_type} - Waiting for the failsafe timer to approach expiration, '
-            f'but not allowing it to fully expire. Waiting for: {failsafe_timeout_less_than_max} seconds.')
+            'Step #33: %s - Waiting for the failsafe timer to approach expiration, but not allowing it to fully expire. Waiting for: %s seconds.', run_type, failsafe_timeout_less_than_max)
         await asyncio.sleep(failsafe_timeout_less_than_max)
 
         self.step(34)
@@ -652,7 +648,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             cluster=self.cluster_opcreds,
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
-        log.info(f'Step #34 - The updated num_trusted_roots_original: {trusted_root_list_original_size_updated}')
+        log.info('Step #34 - The updated num_trusted_roots_original: %s', trusted_root_list_original_size_updated)
         # Verify that the trusted root list size is numTrustedRootsOriginal + 2
         asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 2,
                              "Step #34 - Unexpected number of entries in the TrustedRootCertificates table after update")
@@ -664,7 +660,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             node_id=newNodeId+1,
             cmd=cmd)
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'BusyWithOtherAdmin'(4)
-        log.info(f'Step #35 - TH2 ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin ({resp.errorCode})')
+        log.info('Step #35 - TH2 ArmFailSafeResponse with ErrorCode as BusyWithOtherAdmin (%s)', resp.errorCode)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin,
                              "Failure status returned from arm failsafe")
 
@@ -677,7 +673,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #36: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #36: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(37)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=maxFailsafe)
@@ -688,18 +684,18 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #37: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #37: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(38)
         if self.is_pics_sdk_ci_only:
             # In CI environment, bypass the wait for the failsafe expiration to avoid unnecessary delays.
-            log.info(f'Step #38: {run_type} - Bypass steps from #38 onward ONLY in CI.')
+            log.info('Step #38: %s - Bypass steps from #38 onward ONLY in CI.', run_type)
             self.mark_all_remaining_steps_skipped(39)
             return
         t_start = time.time()
 
         # Get the current time and format it for logging
-        log.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start')
+        log.info('Step #38: %s - TH1 saves the Current time as t_start', run_type)
 
         self.step(39)
         # Reused TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate
@@ -714,7 +710,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
         log.info(
-            f'Step #40: The updated size of the num_trusted_roots_original list is {trusted_root_list_original_size_updated}')
+            'Step #40: The updated size of the num_trusted_roots_original list is %s', trusted_root_list_original_size_updated)
         # Verify that the trusted root list size is numTrustedRootsOriginal + 2
         asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size + 2,
                              "Unexpected number of entries in the TrustedRootCertificates table after update")
@@ -726,7 +722,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             # In CI environment, bypass the wait for the failsafe expiration to avoid unnecessary delays.
             log.info(
-                f'Step #41: {run_type} - Bypassing due to failsafe expiration workaround to avoid unnecessary delays in CI environment.')
+                'Step #41: %s - Bypassing due to failsafe expiration workaround to avoid unnecessary delays in CI environment.', run_type)
         else:
             # Make TH1 wait until the target_time is greater than or equal to half of the maxFailsafe time.
             target_time = maxFailsafe/2
@@ -737,10 +733,9 @@ class TC_CGEN_2_2(MatterBaseTest):
 
             # Verify that at least half of the maxFailsafe time has passed, allowing TH1 to proceed.
             log.info(
-                f'Step #41: {run_type} - - MaxFailsafe is {maxFailsafe}. '
-                f'TH1 can proceed. Elapsed time: {elapsed_time:.2f} ms.'
-                f'The target time ({target_time} seconds) has passed. '
-                f'Confirmation that ArmFailSafe has not expired yet.'
+                'Step #41: %s - - MaxFailsafe is %s. TH1 can proceed. Elapsed time: %.2f ms.'
+                'The target time (%s seconds) has passed. Confirmation that ArmFailSafe has not expired yet.',
+                run_type, maxFailsafe, elapsed_time, target_time
             )
 
         self.step(42)
@@ -752,14 +747,14 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Verify that the DUT responds with ArmFailSafeResponse with ErrorCode as 'OK'(0)
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
-        log.info(f'Step #42: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
+        log.info('Step #42: ArmFailSafeResponse with ErrorCode as OK(%s)', resp.errorCode)
 
         self.step(43)
         if self.is_pics_sdk_ci_only:
             # Step 43 - In CI environments, the 'set_failsafe_timer' function is used to force the failsafe timer to expire,
             # avoiding the original wait time defined in PIXIT.CGEN.FailsafeExpiryLengthSeconds, and speeding up test execution
             log.info(
-                f'Step #43: {run_type} - Bypassing due to failsafe expiration workaround to avoid unnecessary delays in CI environment.')
+                'Step #43: %s - Bypassing due to failsafe expiration workaround to avoid unnecessary delays in CI environment.', run_type)
 
             # Force the failsafe timer to expire immediately for TH1, avoiding unnecessary delays in CI environments
             resp = await self.set_failsafe_timer(
@@ -767,9 +762,7 @@ class TC_CGEN_2_2(MatterBaseTest):
                 node_id=self.dut_node_id,
                 expiration_time_seconds=failsafe_expiration_seconds)
             log.info(
-                f'Step #43 {run_type} - Failsafe timer expiration bypassed for TH1 by setting '
-                f'expiration time to {failsafe_expiration_seconds} seconds. '
-                f'Test continues without the original wait.'
+                'Step #43 %s - Failsafe timer expiration bypassed for TH1 by setting expiration time to %s seconds. Test continues without the original wait.', run_type, failsafe_expiration_seconds
             )
         else:
             # Calculate the target time (Tstart + maxFailsafe)
@@ -784,17 +777,16 @@ class TC_CGEN_2_2(MatterBaseTest):
             # Checks if the elapsed time from start_time has met or exceeded maxFailsafe
             # TH1 process can proceed
             log.info(
-                f'Step #43: {run_type} - MaxFailsafe is {maxFailsafe}. '
-                f'TH1 can proceed. Elapsed time: {elapsed_time:.2f} ms. '
-                f'The target time ({maxFailsafe} seconds) has passed '
-                f'Confirmation that ArmFailSafe has not expired yet.'
+                'Step #43: %s - MaxFailsafe is %s. TH1 can proceed. Elapsed time: %.2f ms. '
+                'The target time (%s seconds) has passed Confirmation that ArmFailSafe has not expired yet.',
+                run_type, maxFailsafe, elapsed_time, maxFailsafe
             )
 
         self.step(44)
         # Remove Fabric from TH2  to ensure it is correctly cleaned up and that the root certificates are aligned with expectations.
         # Read the CurrentFabricIndex attribute from TH2 (the second controller)
         fabric_idx = await self.read_single_attribute_check_success(dev_ctrl=TH2, node_id=newNodeId+1, cluster=self.cluster_opcreds, attribute=self.cluster_opcreds.Attributes.CurrentFabricIndex)
-        log.info(f'Step #44: TH2 CurrentFabricIndex attribute: {fabric_idx}')
+        log.info('Step #44: TH2 CurrentFabricIndex attribute: %s', fabric_idx)
         # Remove the fabric from TH2 (second controller)
         cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric_idx)
         await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId+1, cmd=cmd)
@@ -807,7 +799,7 @@ class TC_CGEN_2_2(MatterBaseTest):
             attribute=self.cluster_opcreds.Attributes.TrustedRootCertificates)
         trusted_root_list_original_size_updated = len(trusted_root_list_original_updated)
         log.info(
-            f'Step #44: he updated size of the num_trusted_roots_original list: {trusted_root_list_original_size_updated}')
+            'Step #44: he updated size of the num_trusted_roots_original list: %s', trusted_root_list_original_size_updated)
         # Verify that the trusted root list size from oririnal trusted root list is 1
         asserts.assert_equal(trusted_root_list_original_size_updated, trusted_root_list_original_size,
                              "Unexpected number of entries in the TrustedRootCertificates table after update")

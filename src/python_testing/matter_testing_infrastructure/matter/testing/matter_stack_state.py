@@ -60,7 +60,7 @@ class MatterStackState:
             self._chip_stack = builtins.chipStack
             LOGGER.warning(
                 "Re-using existing ChipStack object found in current interpreter: "
-                "storage path %s will be ignored!" % (self._config.storage_path)
+                "storage path %s will be ignored!", self._config.storage_path
             )
             # TODO: Warn that storage will not follow what we set in config
         else:

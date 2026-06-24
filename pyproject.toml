@@ -22,12 +22,17 @@ exclude = [
     "examples/common/QRCode/repo",
     "examples/common/m5stack-tft/repo",
     "third_party",
+    "examples/tv-casting-app/tests/",
     # TODO(#37698)
     "docs/development_controllers/matter-repl/*.ipynb",
+    # Generated files
+    "src/controller/python/matter/clusters/CHIPClusters.py",
+    "src/controller/python/matter/clusters/Objects.py",
 ]
 
 [tool.pyright]
 reportMissingTypeStubs = "warning"
+extraPaths = ["./src/python_testing/matter_testing_infrastructure"]
 
 [tool.ruff.lint]
 select = [
@@ -44,13 +49,21 @@ select = [
     # Check for common exception issues
     "RSE",
     # Check for common logging issues
-    "LOG",
+    "G", "LOG",
     # Check for common optimization issues
     "SLOT",
+    # Check for builtin symbols aliasing
+    "A",
+    # pyupgrade rules to update syntax to the new preferred variant
+    "UP001", "UP003", "UP004", "UP005", "UP006", "UP008", "UP009", "UP010", "UP011", "UP012", "UP013", "UP014", "UP015", "UP017",
+    "UP018", "UP019", "UP020", "UP021", "UP022", "UP023", "UP024", "UP025", "UP026", "UP028", "UP029", "UP030", "UP033", "UP034",
+    "UP036", "UP037", "UP039", "UP040", "UP041", "UP042",
 ]
 ignore = [
     "ASYNC109", # Sometimes we use "timeout" argument in async functions
     "ASYNC230", # Allow open() calls in async functions
+    "ASYNC240", # Do not force 3rd party library to handle os.path.exists()
+    "ASYNC250", # TODO: Refactor the usage of input() in async functions
     "COM812", # Do not enforce trailing commas in multi-line collections for now
     "SIM102", # Nested if statements can be more readable in some cases
     "SIM108", # Do not enforce ternary operator in place of if/else blocks

@@ -36,7 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import copy
-from typing import Type, Union
+from typing import Union
 
 from mobly import asserts  # type: ignore
 
@@ -88,8 +88,8 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     @staticmethod
     def verify_attribute_exists(res: Union[Clusters.Attribute.SubscriptionTransaction, dict],
-                                cluster:  Type[Clusters.ClusterObjects.Cluster],
-                                attribute: Type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
+                                cluster:  type[Clusters.ClusterObjects.Cluster],
+                                attribute: type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
                                 ep: int = ROOT_NODE_ENDPOINT_ID):
         '''
         This method can be used with the Response of Read Request and Subscribe Requests.

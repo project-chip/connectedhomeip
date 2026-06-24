@@ -110,7 +110,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         # TH loops through the number of supported sensitivity levels
         self.step(6)
         for sens_level in range(numberOfSupportedLevels):
-            log.info(f"Write sensitivity level ({sens_level}) to CurrentSensitivityLevel)")
+            log.info("Write sensitivity level (%s) to CurrentSensitivityLevel)", sens_level)
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(sens_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
@@ -118,14 +118,14 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         self.step(7)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
             selected_non_default_level = choice([i for i in range(numberOfSupportedLevels) if i not in [default_level]])
-            log.info(f"Write non-default sensitivity level ({selected_non_default_level}) to CurrentSensitivityLevel)")
+            log.info("Write non-default sensitivity level (%s) to CurrentSensitivityLevel)", selected_non_default_level)
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(selected_non_default_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
         # Write CurrentSensitivityLevel attribute to default value
         self.step(8)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
-            log.info(f"Write default sensitivity level ({default_level}) to CurrentSensitivityLevel)")
+            log.info("Write default sensitivity level (%s) to CurrentSensitivityLevel)", default_level)
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(default_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 

@@ -40,7 +40,7 @@ class AsyncEventQueue(asyncio.Queue):
         if not self._loop.is_closed():
             self._loop.call_soon_threadsafe(self.put_nowait, value)
         else:
-            LOGGER.error(f"Ignoring value {value} because event loop is not running")
+            LOGGER.error("Ignoring value %s because event loop is not running", value)
 
     async def get(self, timeout: Optional[int] = None):
         """

@@ -802,6 +802,17 @@ void DiscoveredTxtFieldICDoperatesAsLIT()
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_FALSE(nodeData.Get<NodeData>().isICDOperatingAsLIT.has_value());
+
+    // Invalid value, empty
+    strcpy(key, "ICD");
+    strcpy(val, "");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().isICDOperatingAsLIT.has_value());
+
+    // Invalid value: missing
+    strcpy(key, "ICD");
+    FillNodeDataFromTxt(GetSpan(key), {}, resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().isICDOperatingAsLIT.has_value());
 }
 
 // Test IsDeviceTreatedAsSleepy() with CRI

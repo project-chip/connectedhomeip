@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2023-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,34 +34,23 @@
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 
 class TC_ACL_2_2(MatterBaseTest):
 
-    def desc_TC_ACL_2_2(self) -> str:
-        return "[TC-ACL-2.2] Cluster endpoint"
-
-    def pics_TC_ACL_2_2(self) -> list[str]:
-        return ['ACL.S']
-
-    def steps_TC_ACL_2_2(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0"),
-            TestStep(3, "TH1 reads DUT Descriptor cluster ServerList attribute from every Endpoint except 0"),
-        ]
-
+    @pics('ACL.S')
     @async_test_body
     async def test_TC_ACL_2_2(self):
-        self.step(1)
-        self.step(2)
+        """[TC-ACL-2.2] Cluster endpoint"""
+        self.step(1, "Commissioning, already done", is_commissioning=True)
+        self.step(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0")
         data = await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
         asserts.assert_true(Clusters.AccessControl.id in data[0][Clusters.Descriptor]
                             [Clusters.Descriptor.Attributes.ServerList], "ACL cluster not on EP0")
-        self.step(3)
+        self.step(3, "TH1 reads DUT Descriptor cluster ServerList attribute from every Endpoint except 0")
         for endpoint, ep_data in data.items():
             if endpoint == 0:
                 continue

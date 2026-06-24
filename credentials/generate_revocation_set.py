@@ -180,8 +180,8 @@ def is_self_signed_certificate(cert: x509.Certificate) -> bool:
     result = verify_cert(cert, cert)
     if result == CertVerificationResult.SUCCESS:
         return True
-    log.debug(
-        f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
+    log.debug("Certificate with subject: %s is not a valid self-signed certificate. Result: %s",
+              cert.subject.rfc4514_string(), result.name)
     return False
 
 
@@ -198,28 +198,28 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
     if crl_signer_delegator:
         result_signer = verify_cert(crl_signer, crl_signer_delegator)
         if result_signer != CertVerificationResult.SUCCESS:
-            log.debug(
-                f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {crl_signer_delegator.subject.rfc4514_string()}. Result: {result_signer.name}")
+            log.debug("Cannot verify certificate subject: %s issued by certificate subject: %s. Result: %s",
+                      crl_signer.subject.rfc4514_string(), crl_signer_delegator.subject.rfc4514_string(), result_signer.name)
             return False
 
         result_delegator = verify_cert(crl_signer_delegator, paa)
         if result_delegator != CertVerificationResult.SUCCESS:
-            log.debug(
-                f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result_delegator.name}")
+            log.debug("Cannot verify certificate subject: %s issued by certificate subject: %s. Result: %s",
+                      crl_signer_delegator.subject.rfc4514_string(), paa.subject.rfc4514_string(), result_delegator.name)
             return False
         return True
     result = verify_cert(crl_signer, paa)
     if result != CertVerificationResult.SUCCESS:
-        log.debug(
-            f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+        log.debug("Cannot verify certificate subject: %s issued by certificate subject: %s. Result: %s",
+                  crl_signer.subject.rfc4514_string(), paa.subject.rfc4514_string(), result.name)
         return False
     return True
 
 
 def validate_vid_pid(revocation_point: RevocationPoint, crl_signer_certificate: x509.Certificate, crl_signer_delegator_certificate: x509.Certificate) -> bool:
     crl_signer_vid, crl_signer_pid = parse_vid_pid_from_distinguished_name(crl_signer_certificate.subject)
-    log.debug(f"vid: {revocation_point.vid})")
-    log.debug(f"crl_signer_vid: {crl_signer_vid})")
+    log.debug("vid: %s)", revocation_point.vid)
+    log.debug("crl_signer_vid: %s)", crl_signer_vid)
     if revocation_point.isPAA:
         if crl_signer_vid is not None:
             if revocation_point.vid != crl_signer_vid:
@@ -232,8 +232,8 @@ def validate_vid_pid(revocation_point: RevocationPoint, crl_signer_certificate: 
         # if the CRL Signer is delegated then match the VID and PID of the CRL Signer Delegator
         if crl_signer_delegator_certificate:
             vid_to_match, pid_to_match = parse_vid_pid_from_distinguished_name(crl_signer_delegator_certificate.subject)
-        log.debug(f"vid_to_match: {vid_to_match})")
-        log.debug(f"pid_to_match: {pid_to_match})")
+        log.debug("vid_to_match: %s)", vid_to_match)
+        log.debug("pid_to_match: %s)", pid_to_match)
         if vid_to_match is None or revocation_point.vid != vid_to_match:
             log.warning("VID in CRL Signer Certificate does not match with VID in revocation point, continue...")
             return False
@@ -335,8 +335,8 @@ def get_certificate_authority_details(crl_signer_certificate: x509.Certificate,
     certificate_authority_name = cert_for_details.subject
     try:
         certificate_akid = get_skid(cert_for_details)
-        log.debug(f"Certificate Authority Name: {certificate_authority_name}")
-        log.debug(f"Certificate AKID: {certificate_akid}")
+        log.debug("Certificate Authority Name: %s", certificate_authority_name)
+        log.debug("Certificate AKID: %s", certificate_akid)
 
         return certificate_authority_name, certificate_akid
     except ExtensionNotFound:
@@ -351,11 +351,11 @@ def get_b64_name(name: x509.name.Name) -> str:
 
 
 def fetch_crl_from_url(url: str, timeout: int) -> x509.CertificateRevocationList:
-    log.debug(f"Fetching CRL from {url}")
+    log.debug("Fetching CRL from %s", url)
 
     try:
         r = requests.get(url, timeout=timeout)
-        log.debug(f"Fetched CRL: {r.content}")
+        log.debug("Fetched CRL: %s", r.content)
         return x509.load_der_x509_crl(r.content)
     except Exception as e:
         log.error("Failed to fetch a valid CRL: %s", e)
@@ -373,7 +373,7 @@ class DclClientInterface:
         try:
             return requests.get(url).json()
         except Exception as e:
-            log.error(f"Failed to fetch {url}: {e}")
+            log.error("Failed to fetch %s: %s", url, e)
             return None
 
     def get_revocation_points(self) -> list[RevocationPoint]:
@@ -441,13 +441,13 @@ class DclClientInterface:
             except Exception as e:
                 log.error("Failed to get PAA certificate: %s", e)
                 return None
-            log.debug(f"issuer_name: {issuer_certificate.subject.rfc4514_string()}")
+            log.debug("issuer_name: %s", issuer_certificate.subject.rfc4514_string())
             issuer_name = issuer_certificate.issuer
             try:
                 akid = get_akid(issuer_certificate)
             except ExtensionNotFound:
                 log.warning('Issuer Certificate AKID not found.')
-            log.debug(f"akid: {akid}")
+            log.debug("akid: %s", akid)
         if paa_certificate is None:
             log.warning("PAA Certificate not found, continue...")
         return paa_certificate
@@ -458,10 +458,10 @@ class DclClientInterface:
         """Obtain the CRL."""
         try:
             r = requests.get(revocation_point.dataURL, timeout=5)
-            log.debug(f"Fetched CRL: {r.content}")
+            log.debug("Fetched CRL: %s", r.content)
             return x509.load_der_x509_crl(r.content)
         except Exception:
-            log.warning(f"Failed to fetch a valid CRL for': {crl_signer_certificate.subject.rfc4514_string()}")
+            log.warning("Failed to fetch a valid CRL for': %s", crl_signer_certificate.subject.rfc4514_string())
 
     def get_formatted_hex_skid(self, skid_hex: str) -> str:
         return ':'.join([skid_hex[i:i+2] for i in range(0, len(skid_hex), 2)])
@@ -554,7 +554,7 @@ class NodeDclClient(DclClientInterface):
 
         response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
                                                   '--issuer-subject-key-id', issuer_subject_key_id])
-        log.debug(f"Response revocation points: {response}")
+        log.debug("Response revocation points: %s", response)
         return [RevocationPoint(**r) for r in response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]]
 
     def get_approved_certificate(self, subject_name: x509.name.Name, skid_hex: str) -> tuple[bool, x509.Certificate]:
@@ -575,8 +575,7 @@ class NodeDclClient(DclClientInterface):
         '''
         subject_name_b64 = get_b64_name(subject_name)
         query_cmd_list = ['query', 'pki', 'x509-cert', '-u', subject_name_b64, '-k', skid_hex]
-        log.debug(
-            f"Fetching issuer from dcl query{' '.join(query_cmd_list)}")
+        log.debug("Fetching issuer from dcl query%s", ' '.join(query_cmd_list))
         response = self.get_dcld_cmd_output_json(query_cmd_list)
         return self.get_only_approved_certificate(response, skid_hex)
 
@@ -642,11 +641,11 @@ class RestDclClient(DclClientInterface):
         tuple[bool, x509.Certificate]
             Tuple of is_paa and the certificate from the DCL.
         '''
-        log.debug(
-            f"Fetching issuer from:{self.rest_node_url}/dcl/pki/certificates/{get_b64_name(subject_name)}/{self.get_formatted_hex_skid(skid_hex)}")
+        log.debug("Fetching issuer from:%s/dcl/pki/certificates/%s/%s",
+                  self.rest_node_url, get_b64_name(subject_name), self.get_formatted_hex_skid(skid_hex))
         response = self.send_get_request(
             f"{self.rest_node_url}/dcl/pki/certificates/{get_b64_name(subject_name)}/{self.get_formatted_hex_skid(skid_hex)}")
-        log.debug(f"Response certificate: {response}")
+        log.debug("Response certificate: %s", response)
         return self.get_only_approved_certificate(response, skid_hex)
 
 
@@ -669,9 +668,9 @@ class LocalFilesDclClient(DclClientInterface):
             Path to the get-revocation-points response json file.
         '''
 
-        log.debug(f"Loading certificates from {dcl_certificates}")
-        log.debug(f"Loading crls from {crls}")
-        log.debug(f"Loading revocation points response from {revocation_points_response_file}")
+        log.debug("Loading certificates from %s", dcl_certificates)
+        log.debug("Loading crls from %s", crls)
+        log.debug("Loading revocation points response from %s", revocation_points_response_file)
         self.crls = self.get_crls(crls)
         self.revocation_points = [RevocationPoint(**r)
                                   for r in json.load(revocation_points_response_file)["PkiRevocationDistributionPoint"]]
@@ -754,10 +753,10 @@ class LocalFilesDclClient(DclClientInterface):
             Dictionary of certificates, keyed by lookup key.
         '''
         certificates = {}
-        log.debug(f"Loading certificates from {dcl_certificates}")
+        log.debug("Loading certificates from %s", dcl_certificates)
         if dcl_certificates:
             for file in dcl_certificates:
-                log.debug(f"Loading certificate from {file}")
+                log.debug("Loading certificate from %s", file)
                 # with open(file, "r") as f:
                 certificate = x509.load_pem_x509_certificate(file.read())
                 certificates[self.get_lookup_key(certificate)] = certificate
@@ -846,7 +845,7 @@ class LocalFilesDclClient(DclClientInterface):
         '''
         for crl in self.crls:
             if crl.issuer.public_bytes() == crl_signer_certificate.subject.public_bytes():
-                log.debug(f"Found CRL for issuer: {crl.issuer.rfc4514_string()}")
+                log.debug("Found CRL for issuer: %s", crl.issuer.rfc4514_string())
                 return crl
         return None
 
@@ -908,7 +907,7 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
         crl_signer_delegator_cert = None
         if revocation_point.crlSignerDelegator:
             crl_signer_delegator_cert_pem = revocation_point.crlSignerDelegator
-            log.debug(f"CRLSignerDelegator: {crl_signer_delegator_cert_pem}")
+            log.debug("CRLSignerDelegator: %s", crl_signer_delegator_cert_pem)
             try:
                 crl_signer_delegator_cert = x509.load_pem_x509_certificate(bytes(crl_signer_delegator_cert_pem, 'utf-8'))
             except Exception:
@@ -979,7 +978,7 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
             crl_signer_certificate, crl_signer_delegator_cert, paa_certificate_object, revocation_point.isPAA)
 
         # validate issuer skid matchces with the one in revocation points
-        log.debug(f"revocation_point.issuerSubjectKeyID: {revocation_point.issuerSubjectKeyID}")
+        log.debug("revocation_point.issuerSubjectKeyID: %s", revocation_point.issuerSubjectKeyID)
 
         if revocation_point.issuerSubjectKeyID != certificate_akid_hex:
             log.warning("CRL Issuer Subject Key ID is not CRL Signer Subject Key ID, continue...")
@@ -988,7 +987,7 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
         # 10. Iterate through the Revoked Certificates List
         entry = generate_revocation_set_from_crl(crl_file, crl_signer_certificate,
                                                  certificate_authority_name, certificate_akid_hex, crl_signer_delegator_cert)
-        log.debug(f"Entry to append: {entry}")
+        log.debug("Entry to append: %s", entry)
         revocation_set.append(entry)
 
     with open(output, 'w+') as outfile:
@@ -1006,7 +1005,7 @@ class TestRevocationSetGeneration(unittest.TestCase):
         return os.path.join(self.test_base_dir, 'test', filename)
 
     def get_expected_revocation_set(self, idx):
-        with open(os.path.join(self.test_base_dir, 'test/revoked-attestation-certificates/revocation-sets/revocation-set.json'), 'r') as f:
+        with open(os.path.join(self.test_base_dir, 'test/revoked-attestation-certificates/revocation-sets/revocation-set.json')) as f:
             return RevocationSet(**json.load(f)[idx])
 
     def compare_revocation_sets(self, generated_set, expected):

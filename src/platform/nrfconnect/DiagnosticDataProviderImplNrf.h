@@ -50,7 +50,7 @@ public:
 
     static DiagnosticDataProviderImplNrf & GetDefaultInstance();
 
-private:
+protected:
     DiagnosticDataProviderImplNrf() = default;
 };
 

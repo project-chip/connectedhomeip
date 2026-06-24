@@ -122,7 +122,7 @@ class TC_EPREF_2_1(MatterBaseTest):
         self.step("2")
         feature_map = await self.read_feature_map(endpoint=endpoint)
         # Logging the FeatureMap Attribute output responses from the DUT:
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
         if Clusters.EnergyPreference.Bitmaps.Feature.kEnergyBalance & feature_map:
 
             self.step("3")
@@ -130,12 +130,12 @@ class TC_EPREF_2_1(MatterBaseTest):
 
             # Logging the EnergyBalances Attribute output responses from the DUT:
             energy_balances_entries = len(energy_balances)
-            log.info(f"EnergyBalances: {energy_balances_entries} entries")
+            log.info("EnergyBalances: %s entries", energy_balances_entries)
             for index, balance_struct in enumerate(energy_balances, start=1):
-                log.info(f"[{index}]: {{")
-                log.info(f"Step: {balance_struct.step}")
+                log.info("[%s]: {", index)
+                log.info("Step: %s", balance_struct.step)
                 if hasattr(balance_struct, 'label') and balance_struct.label is not None:
-                    log.info(f"Label: {balance_struct.label}")
+                    log.info("Label: %s", balance_struct.label)
                 log.info("}")
 
             # Verify the DUT response contains a list of BalanceStruct Type
@@ -167,7 +167,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             self.step("4")
             existing_current_energy_balance = await self.read_current_energy_balances(endpoint=endpoint)
             # Logging the CurrentEnergyBalance Attribute output responses from the DUT:
-            log.info(f"CurrentEnergyBalance: {existing_current_energy_balance}")
+            log.info("CurrentEnergyBalance: %s", existing_current_energy_balance)
             # Verify that the DUT response is of uint8 type
             assert_valid_uint8(existing_current_energy_balance, "CurrentEnergyBalance")
 
@@ -180,7 +180,7 @@ class TC_EPREF_2_1(MatterBaseTest):
 
                 new_current_energy_balance = await self.read_current_energy_balances(endpoint=endpoint)
                 # Logging the CurrentEnergyBalance Attribute output responses from the DUT:
-                log.info(f"CurrentEnergyBalance: {new_current_energy_balance}")
+                log.info("CurrentEnergyBalance: %s", new_current_energy_balance)
                 asserts.assert_equal(new_current_energy_balance, energy_balances_entries - 1, "CurrentEnergyBalance value mismatch")
             else:
                 log.error("EnergyBalances list is empty. Cannot write CurrentEnergyBalance.")
@@ -200,9 +200,9 @@ class TC_EPREF_2_1(MatterBaseTest):
 
             # Logging the EnergyPriorities Attribute output responses from the DUT:
             priority_entries = len(energy_priorities)
-            log.info(f"\nEnergyPriorities: {priority_entries} entries")
+            log.info("\nEnergyPriorities: %s entries", priority_entries)
             for index, priority in enumerate(energy_priorities, start=1):
-                log.info(f"[{index}]: {priority}")
+                log.info("[%s]: %s", index, priority)
 
             # Verify the DUT response contains a list of EnergyPriorityEnum
             asserts.assert_true(isinstance(energy_priorities, list),
@@ -241,12 +241,12 @@ class TC_EPREF_2_1(MatterBaseTest):
 
             # Logging the LowPowerModeSensitivities Attribute output responses from the DUT:
             num_of_entries = len(low_power_mode_sensitivities)
-            log.info(f"LowPowerModeSensitivities: {num_of_entries} entries")
+            log.info("LowPowerModeSensitivities: %s entries", num_of_entries)
             for index, balance_struct in enumerate(low_power_mode_sensitivities, start=1):
-                log.info(f"[{index}]: {{")
-                log.info(f"  Step: {balance_struct.step}")
+                log.info("[%s]: {", index)
+                log.info("  Step: %s", balance_struct.step)
                 if hasattr(balance_struct, 'label') and balance_struct.label is not None:
-                    log.info(f"  Label: {balance_struct.label}")
+                    log.info("  Label: %s", balance_struct.label)
                 log.info("}")
 
             # Verify the DUT response contains a list of BalanceStruct Type
@@ -272,7 +272,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             current_low_power_mode_sensitivity = await self.read_current_low_power_mode_sensitivity(endpoint=endpoint)
 
             # Logging the CurrentLowPowerModeSensitivity Attribute output responses from the DUT:
-            log.info(f"CurrentLowPowerModeSensitivity: {current_low_power_mode_sensitivity}")
+            log.info("CurrentLowPowerModeSensitivity: %s", current_low_power_mode_sensitivity)
 
             # Verify that the DUT response is of uint8 type
             assert_valid_uint8(current_low_power_mode_sensitivity, "CurrentLowPowerModeSensitivity")
@@ -288,7 +288,7 @@ class TC_EPREF_2_1(MatterBaseTest):
                 new_current_low_power_mode_sensitivity = await self.read_current_low_power_mode_sensitivity(endpoint=endpoint)
 
                 # Logging the CurrentLowPowerModeSensitivity Attribute output responses from the DUT:
-                log.info(f"CurrentLowPowerModeSensitivity: {new_current_low_power_mode_sensitivity}")
+                log.info("CurrentLowPowerModeSensitivity: %s", new_current_low_power_mode_sensitivity)
                 asserts.assert_equal(new_current_low_power_mode_sensitivity, low_power_mode_sensitivity_entries - 1,
                                      "CurrentLowPowerModeSensitivity value mismatch")
             else:

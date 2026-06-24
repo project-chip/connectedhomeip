@@ -97,7 +97,7 @@ class TC_AVSM_2_6(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         adoSupport = aFeatureMap & cluster.Bitmaps.Feature.kAudio
         asserts.assert_equal(adoSupport, cluster.Bitmaps.Feature.kAudio, "Audio Feature is not supported.")
 
@@ -105,7 +105,7 @@ class TC_AVSM_2_6(MatterBaseTest, AVSMTestBase):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1")
         aStreamIDToDelete = aAllocatedAudioStreams[0].audioStreamID
 
@@ -132,7 +132,7 @@ class TC_AVSM_2_6(MatterBaseTest, AVSMTestBase):
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         asserts.assert_equal(len(aAllocatedAudioStreams), 0, "The number of allocated audio streams in the list is not 0")
 
 

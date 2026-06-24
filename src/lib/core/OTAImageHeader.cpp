@@ -80,6 +80,13 @@ CHIP_ERROR OTAImageHeaderParser::AccumulateAndDecode(ByteSpan & buffer, OTAImage
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
+    // Init() may have left mBuffer null on alloc failure.
+    if (mState != State::kNotInitialized && mBuffer.Get() == nullptr)
+    {
+        Clear();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     if (mState == State::kInitialized)
     {
         Append(buffer, kFixedHeaderSize - mBufferOffset);

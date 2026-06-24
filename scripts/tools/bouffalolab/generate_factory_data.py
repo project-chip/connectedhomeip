@@ -448,11 +448,11 @@ def main():
             raise Exception("chip-cert should be built before and is specified.")
         log.info("chip-cert path: '%s'", args.chip_cert)
 
-    def to_bytes(input):
-        if isinstance(input, str):
-            return bytearray.fromhex(input)
-        if isinstance(input, bytes):
-            return input
+    def to_bytes(data):
+        if isinstance(data, str):
+            return bytearray.fromhex(data)
+        if isinstance(data, bytes):
+            return data
         return None
 
     def hex_to_int(hex_string):

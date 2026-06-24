@@ -35,7 +35,7 @@ import json
 import os
 import re
 import uuid
-from typing import Dict, List, Optional, Sequence, TypedDict, Union
+from typing import Optional, Sequence, TypedDict, Union
 
 try:
     import yaml
@@ -55,13 +55,13 @@ _MATTER_DEVICE_LIST = os.path.join(_HERE, "matter_device_types.json")
 
 
 class ClusterType(TypedDict):
-    commands: List[str]
-    attributes: Dict[str, str]
+    commands: list[str]
+    attributes: dict[str, str]
 
 
 class EndpointType(TypedDict):
-    client_clusters: Dict[str, ClusterType]
-    server_clusters: Dict[str, ClusterType]
+    client_clusters: dict[str, ClusterType]
+    server_clusters: dict[str, ClusterType]
 
 
 def _convert_metadata_name(name: str, code: Union[int, str]) -> str:
@@ -77,7 +77,7 @@ def _convert_filename(name: str) -> str:
     return re.sub(r"[^a-zA-Z]+", "", name).lower()
 
 
-def _load_matter_device_types() -> Dict[Union[int, str], Union[int, str]]:
+def _load_matter_device_types() -> dict[Union[int, str], Union[int, str]]:
     """Load matter device type reversible mapping.
 
     This function should be updated to pull from the Matter spec once it is available publicly.
@@ -110,7 +110,7 @@ def _read_value(input_string: str) -> str:
     return str(ret_val)
 
 
-def _convert_metadata_to_hashable_digest(metadata_input: Sequence[Dict[str, EndpointType]]) -> str:
+def _convert_metadata_to_hashable_digest(metadata_input: Sequence[dict[str, EndpointType]]) -> str:
     """Converts metadata input into a hashable digest.
 
     Note that the output produced here is consistent across runs. Lists are sorted and dictionaries
@@ -177,7 +177,7 @@ def generate_metadata(
         zap_file_path: str,
         attribute_allow_list: Optional[Sequence[str]] = _ATTRIBUTE_ALLOW_LIST,
         include_commands: bool = False,
-        include_platform_specific_info: bool = False) -> List[Dict[str, EndpointType]]:
+        include_platform_specific_info: bool = False) -> list[dict[str, EndpointType]]:
     """Parses a zap_file and returns structure containing minimal content.
 
     The lists provided in the returned objects are sorted except for the top level list of endpoints.
@@ -216,18 +216,18 @@ def generate_metadata(
     with open(zap_file_path) as f:
         app_data = json.loads(f.read())
 
-    return_obj: List[Dict[str, EndpointType]] = []
+    return_obj: list[dict[str, EndpointType]] = []
 
     for endpoint in app_data["endpointTypes"]:
         device_type_id = endpoint["deviceTypeCode"]
         device_type_name = endpoint_names[device_type_id]
 
         endpoint_ref = _convert_metadata_name(device_type_name, device_type_id)
-        endpoint_obj: Dict[str, EndpointType] = {endpoint_ref: {}}
+        endpoint_obj: dict[str, EndpointType] = {endpoint_ref: {}}
         return_obj.append(endpoint_obj)
 
-        client_clusters: Dict[str, ClusterType] = {}
-        server_clusters: Dict[str, ClusterType] = {}
+        client_clusters: dict[str, ClusterType] = {}
+        server_clusters: dict[str, ClusterType] = {}
 
         endpoint_obj[endpoint_ref]["client_clusters"] = client_clusters
         endpoint_obj[endpoint_ref]["server_clusters"] = server_clusters

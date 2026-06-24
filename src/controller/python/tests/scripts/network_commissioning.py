@@ -75,13 +75,10 @@ class NetworkCommissioningTests:
         return self._last_breadcrumb
 
     def log_interface_basic_info(self, values):
-        logger.info(f"The interface supports {values.maxNetworks} networks.")
-        logger.info(
-            f"ScanNetworks should take no more than {values.scanMaxTimeSeconds} seconds.")
-        logger.info(
-            f"ConnectNetwork should take no more than {values.connectMaxTimeSeconds} seconds.")
-        logger.info(
-            f"The feature map of this endpoint is {values.featureMap}.")
+        logger.info("The interface supports %s networks.", values.maxNetworks)
+        logger.info("ScanNetworks should take no more than %s seconds.", values.scanMaxTimeSeconds)
+        logger.info("ConnectNetwork should take no more than %s seconds.", values.connectMaxTimeSeconds)
+        logger.info("The feature map of this endpoint is %s.", values.featureMap)
 
     async def readLastNetworkingStateAttributes(self, endpointId):
         res = await self._devCtrl.ReadAttribute(
@@ -92,12 +89,12 @@ class NetworkCommissioningTests:
             returnClusterObject=True
         )
         values = res[endpointId][Clusters.NetworkCommissioning]
-        logger.info(f"Got values: {values}")
+        logger.info("Got values: %s", values)
         return values
 
     async def test_negative(self, endpointId):
         logger.info(
-            f"Running negative test cases for NetworkCommissioning cluster on endpoint {endpointId}")
+            "Running negative test cases for NetworkCommissioning cluster on endpoint %s", endpointId)
 
         try:
             logger.info(
@@ -107,7 +104,7 @@ class NetworkCommissioningTests:
             res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
             raise AssertionError(f"Failure expected but got response {res}")
         except matter.interaction_model.InteractionModelError as ex:
-            logger.info(f"Received {ex} from server.")
+            logger.info("Received %s from server.", ex)
 
         logger.info("Finished negative test cases.")
 
@@ -152,14 +149,14 @@ class NetworkCommissioningTests:
         logger.info("Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
         interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
-        logger.info(f"Request: {req}")
+        logger.info("Request: %s", req)
         res = await self._devCtrl.SendCommand(
             nodeId=self._nodeid,
             endpoint=endpointId,
             payload=req,
             interactionTimeoutMs=interactionTimeoutMs
         )
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         await self.must_verify_breadcrumb()
@@ -168,7 +165,7 @@ class NetworkCommissioningTests:
         logger.info("Arming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
         res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
 
         # Remove existing network
         logger.info("Check network list")
@@ -178,13 +175,13 @@ class NetworkCommissioningTests:
             returnClusterObject=True
         )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
-        logger.info(f"Got network list: {networkList}")
+        logger.info("Got network list: %s", networkList)
         if len(networkList) != 0:
             logger.info("Removing existing network")
             req = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
                 networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-            logger.info(f"Received response: {res}")
+            logger.info("Received response: %s", res)
             if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
@@ -195,7 +192,7 @@ class NetworkCommissioningTests:
         req = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(
             ssid=TEST_WIFI_SSID.encode(), credentials=TEST_WIFI_PASS.encode(), breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         if res.networkIndex != 0:
@@ -210,7 +207,7 @@ class NetworkCommissioningTests:
             returnClusterObject=True
         )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
-        logger.info(f"Got network list: {networkList}")
+        logger.info("Got network list: %s", networkList)
         if len(networkList) != 1:
             raise AssertionError(
                 f"Unexpected result: expect 1 networks, but {len(networkList)} networks received")
@@ -228,7 +225,7 @@ class NetworkCommissioningTests:
             payload=req,
             interactionTimeoutMs=interactionTimeoutMs
         )
-        logger.info(f"Got response: {res}")
+        logger.info("Got response: %s", res)
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info("Device connected to a network.")
@@ -238,7 +235,7 @@ class NetworkCommissioningTests:
         logger.info("Disarming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
 
         # Note: On Linux, when connecting to a connected network, it will return immediately, however, it will try a reconnect.
         # This will make the below attribute read return false negative values.
@@ -251,7 +248,7 @@ class NetworkCommissioningTests:
             returnClusterObject=True
         )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
-        logger.info(f"Got network list: {networkList}")
+        logger.info("Got network list: %s", networkList)
         if len(networkList) != 1:
             raise AssertionError(
                 f"Unexpected result: expect 1 networks, but {len(networkList)} networks received")
@@ -311,13 +308,13 @@ class NetworkCommissioningTests:
         # Scan networks
         logger.info("Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
-        logger.info(f"Request: {req}")
+        logger.info("Request: %s", req)
         interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
         res = await self._devCtrl.SendCommand(nodeId=self._nodeid,
                                               endpoint=endpointId,
                                               payload=req,
                                               interactionTimeoutMs=interactionTimeoutMs)
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         await self.must_verify_breadcrumb()
@@ -326,7 +323,7 @@ class NetworkCommissioningTests:
         logger.info("Arming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
         res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
 
         # Remove existing network
         logger.info("Check network list")
@@ -336,13 +333,13 @@ class NetworkCommissioningTests:
             returnClusterObject=True
         )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
-        logger.info(f"Got network list: {networkList}")
+        logger.info("Got network list: %s", networkList)
         if len(networkList) != 0:
             logger.info("Removing existing network")
             req = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
                 networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-            logger.info(f"Received response: {res}")
+            logger.info("Received response: %s", res)
             if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
@@ -353,7 +350,7 @@ class NetworkCommissioningTests:
         req = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
             operationalDataset=TEST_THREAD_NETWORK_DATASET_TLVS[0], breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         if res.networkIndex != 0:
@@ -368,7 +365,7 @@ class NetworkCommissioningTests:
             returnClusterObject=True
         )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
-        logger.info(f"Got network list: {networkList}")
+        logger.info("Got network list: %s", networkList)
         if len(networkList) != 1:
             raise AssertionError(
                 f"Unexpected result: expect 1 networks, but {len(networkList.Data.value)} networks received")
@@ -384,7 +381,7 @@ class NetworkCommissioningTests:
                                               endpoint=endpointId,
                                               payload=req,
                                               interactionTimeoutMs=interactionTimeoutMs)
-        logger.info(f"Got response: {res}")
+        logger.info("Got response: %s", res)
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info("Device connected to a network.")
@@ -394,7 +391,7 @@ class NetworkCommissioningTests:
         logger.info("Disarming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         res = await self._devCtrl.SendCommand(nodeId=self._nodeid, endpoint=endpointId, payload=req)
-        logger.info(f"Received response: {res}")
+        logger.info("Received response: %s", res)
 
         # Verify Last* attributes
         logger.info("Read Last* attributes")
@@ -411,7 +408,7 @@ class NetworkCommissioningTests:
             returnClusterObject=True
         )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
-        logger.info(f"Got network list: {networkList}")
+        logger.info("Got network list: %s", networkList)
         if len(networkList) != 1:
             raise AssertionError(
                 f"Unexpected result: expect 1 networks, but {len(networkList.Data.value)} networks received")
@@ -443,17 +440,17 @@ class NetworkCommissioningTests:
             clus = obj[Clusters.NetworkCommissioning]
             if clus.featureMap == WIFI_NETWORK_FEATURE_MAP:
                 logger.info(
-                    f"Endpoint {endpoint} is configured as WiFi network, run WiFi commissioning test.")
+                    "Endpoint %s is configured as WiFi network, run WiFi commissioning test.", endpoint)
                 await self.test_negative(endpoint)
                 await self.test_wifi(endpoint)
             elif clus.featureMap == THREAD_NETWORK_FEATURE_MAP:
                 logger.info(
-                    f"Endpoint {endpoint} is configured as Thread network, run Thread commissioning test.")
+                    "Endpoint %s is configured as Thread network, run Thread commissioning test.", endpoint)
                 await self.test_negative(endpoint)
                 await self.test_thread(endpoint)
             else:
                 logger.info(
-                    f"Skip endpoint {endpoint} with featureMap {clus.featureMap}")
+                    "Skip endpoint %s with featureMap %s", endpoint, clus.featureMap)
 
     async def run(self):
         try:

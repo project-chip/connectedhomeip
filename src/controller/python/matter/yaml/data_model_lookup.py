@@ -20,10 +20,10 @@ from abc import ABC, abstractmethod
 from .. import clusters as Clusters
 
 
-def _case_insensitive_getattr(object, attr_name, default):
-    for attr in dir(object):
+def _case_insensitive_getattr(obj, attr_name, default):
+    for attr in dir(obj):
         if attr.lower() == attr_name.lower():
-            return getattr(object, attr)
+            return getattr(obj, attr)
     return default
 
 

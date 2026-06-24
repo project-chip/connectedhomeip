@@ -18,4 +18,23 @@ if SOC_FAMILY_NXP_RW
 
 rsource "../cmake/Kconfig.matter.nxp"
 
+config CHIP_APP_OPERATIONAL_KEYSTORE
+	bool "Use custom implementation of operational keystore"
+	default y if CHIP_SE05X
+	help
+		Use custom implementation of operational keystore.
+
+if CHIP_APP_OPERATIONAL_KEYSTORE
+	choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+		prompt "Select Operation Keystore Implementation"
+		default CHIP_APP_OPERATIONAL_KEYSTORE_SE05X if CHIP_SE05X
+
+	config CHIP_APP_OPERATIONAL_KEYSTORE_SE05X
+	bool "Operation Keystore SE05X"
+	help
+		Enable application Operational keystore SE05X implementation.
+
+	endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+endif # CHIP_APP_OPERATIONAL_KEYSTORE
+
 endif # SOC_FAMILY_NXP_RW

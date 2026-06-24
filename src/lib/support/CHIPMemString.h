@@ -54,7 +54,7 @@ inline void CopyString(char * dest, size_t destLength, const char * source)
 {
     if (dest && destLength)
     {
-        strncpy(dest, source, destLength);
+        strncpy(dest, source, destLength); // NOLINT(bugprone-unsafe-functions)
         dest[destLength - 1] = 0;
     }
 }

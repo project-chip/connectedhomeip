@@ -15,6 +15,7 @@
  */
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 #include <tracing/esp32_diagnostics/DiagnosticEntry.h>
@@ -32,8 +33,8 @@ namespace {
 TEST(DiagnosticEntryTest, EncodeDecode)
 {
     DiagnosticEntry original;
-    strncpy(original.label, "TestLabel", kMaxStringValueSize);
-    strncpy(original.stringValue, "TestValue", kMaxStringValueSize);
+    chip::Platform::CopyString(original.label, "TestLabel");
+    chip::Platform::CopyString(original.stringValue, "TestValue");
     original.type                     = ValueType::kCharString;
     original.timestamps_ms_since_boot = 12345;
 
@@ -66,8 +67,8 @@ TEST(DiagnosticStorageTest, StoreRetrieve)
     CircularDiagnosticBuffer circularBuffer(buffer, sizeof(buffer));
 
     DiagnosticEntry entry1;
-    strncpy(entry1.label, "Entry1", kMaxStringValueSize);
-    strncpy(entry1.stringValue, "Value1", kMaxStringValueSize);
+    chip::Platform::CopyString(entry1.label, "Entry1");
+    chip::Platform::CopyString(entry1.stringValue, "Value1");
     entry1.type                     = ValueType::kCharString;
     entry1.timestamps_ms_since_boot = 1000U;
 
@@ -90,31 +91,31 @@ TEST(DiagnosticStorageTest, StoreRetrieveMultipleEntries)
     CircularDiagnosticBuffer circularBuffer(buffer, sizeof(buffer));
 
     DiagnosticEntry entries[5];
-    strncpy(entries[0].label, "TestCharStringValue", kMaxStringValueSize);
-    strncpy(entries[0].stringValue, "TestValue1", kMaxStringValueSize);
+    chip::Platform::CopyString(entries[0].label, "TestCharStringValue");
+    chip::Platform::CopyString(entries[0].stringValue, "TestValue1");
     entries[0].type                     = ValueType::kCharString;
     entries[0].timestamps_ms_since_boot = 1000U;
 
-    strncpy(entries[1].label, "TestNegativeSignedIntegerValue", kMaxStringValueSize);
+    chip::Platform::CopyString(entries[1].label, "TestNegativeSignedIntegerValue");
     entries[1].intValue                 = -123456;
     entries[1].type                     = ValueType::kSignedInteger;
     entries[1].timestamps_ms_since_boot = 2000U;
 
-    strncpy(entries[2].label, "TestSignedIntegerValue", kMaxStringValueSize);
+    chip::Platform::CopyString(entries[2].label, "TestSignedIntegerValue");
     entries[2].intValue                 = 123456;
     entries[2].type                     = ValueType::kSignedInteger;
     entries[2].timestamps_ms_since_boot = 3000U;
 
-    strncpy(entries[3].label, "TestUnsignedIntegerValue", kMaxStringValueSize);
+    chip::Platform::CopyString(entries[3].label, "TestUnsignedIntegerValue");
     entries[3].uintValue                = 100U;
     entries[3].type                     = ValueType::kUnsignedInteger;
     entries[3].timestamps_ms_since_boot = 4000U;
 
-    strncpy(entries[4].label, "MaxLengthLabel", kMaxStringValueSize);
+    chip::Platform::CopyString(entries[4].label, "MaxLengthLabel");
     char longString[kMaxStringValueSize + 1];
     memset(longString, 'A', kMaxStringValueSize - 1);
     longString[kMaxStringValueSize - 1] = '\0';
-    strncpy(entries[4].stringValue, longString, kMaxStringValueSize);
+    chip::Platform::CopyString(entries[4].stringValue, longString);
     entries[4].type                     = ValueType::kCharString;
     entries[4].timestamps_ms_since_boot = 5000U;
 

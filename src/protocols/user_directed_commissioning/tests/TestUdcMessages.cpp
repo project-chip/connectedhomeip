@@ -48,7 +48,7 @@ public:
 
     void OnCommissionerPasscodeReady(UDCClientState state) {}
 
-    void FindCommissionableNode(char * instanceName)
+    void FindCommissionableNode(const char * instanceName)
     {
         mFindCommissionableNodeCalled = true;
         mInstanceName                 = instanceName;
@@ -56,7 +56,7 @@ public:
 
     // virtual ~UserConfirmationProvider() = default;
     UDCClientState mState;
-    char * mInstanceName;
+    const char * mInstanceName = nullptr;
 
     bool mOnUserDirectedCommissioningRequestCalled = false;
     bool mFindCommissionableNodeCalled             = false;
@@ -288,7 +288,7 @@ TEST_F(TestUdcMessages, TestUDCClients)
     EXPECT_EQ(nullptr, mUdcClients.FindUDCClientState(instanceName4));
 
     // test re-activation
-    EXPECT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
+    ASSERT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
     System::Clock::Timestamp expirationTime = state->GetExpirationTime();
     state->SetExpirationTime(expirationTime - System::Clock::Milliseconds64(1));
     EXPECT_EQ((expirationTime - System::Clock::Milliseconds64(1)), state->GetExpirationTime());

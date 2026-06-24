@@ -103,6 +103,7 @@ public:
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
         AddArgument("anchor", 0, 1, &mAnchor, "If set to true then a NOC with Anchor and Administrator CAT is issued");
         AddArgument("jcm", 0, 1, &mJCM, "Set it to true in order to commission a Joint Fabric Administrator");
+        AddArgument("regular", 0, 1, &mRegularDevice, "Set it to true to commission a regular device");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -296,6 +297,7 @@ private:
     chip::Optional<bool> mSkipCommissioningComplete;
     chip::Optional<bool> mAnchor;
     chip::Optional<bool> mJCM;
+    chip::Optional<bool> mRegularDevice;
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;

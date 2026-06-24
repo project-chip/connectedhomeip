@@ -117,8 +117,8 @@ the top Matter directory:
 ./scripts/build/build_examples.py --target android-arm64-tv-casting-app build
 ```
 
-(To build this app with no debugging hooks, use the
-`android-arm64-tv-casting-app-no-debug` target)
+To build this app with no debugging hooks, use the `--build-profile=release` or
+`--build-profile=release-size` option.
 
 See the table above for other values of `TARGET_CPU`.
 

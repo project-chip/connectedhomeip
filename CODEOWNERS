@@ -29,10 +29,10 @@ chip-build-infineon/             @ifyall
 /src/platform/NuttX/             @zhhyu7
 chip-build-nuttx/                @zhhyu7
 
-/src/platform/Tizen/             @arkq
-tizen/                           @arkq
-chip-build-tizen/                @arkq
-chip-build-tizen-qemu/           @arkq
+/src/platform/Tizen/             @enkiusz
+tizen/                           @enkiusz
+chip-build-tizen/                @enkiusz
+chip-build-tizen-qemu/           @enkiusz
 
 *.java                           @project-chip/reviewers-google
 *.kt                             @project-chip/reviewers-google

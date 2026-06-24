@@ -37,6 +37,7 @@
 #include <platform/internal/NFCCommissioningManager.h>
 
 #include <android/log.h>
+#include <matter/tracing/build_config.h> // nogncheck
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
@@ -45,7 +46,10 @@
 #include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
 #include "NFCCommissioningManagerImpl.h"
+
+#if MATTER_TRACING_ENABLED
 #include "tracing.h"
+#endif
 
 using namespace chip;
 
@@ -106,7 +110,9 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
     err = BleConnectCallbackJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
 
+#if MATTER_TRACING_ENABLED
     chip::Android::InitializeTracing();
+#endif
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -119,7 +125,9 @@ exit:
 
 void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 {
+#if MATTER_TRACING_ENABLED
     chip::Android::ShutdownTracing();
+#endif
 
     ChipLogProgress(DeviceLayer, "AndroidChipPlatform JNI_OnUnload() called");
     BleConnectCallbackJNI_OnUnload(jvm, reserved);

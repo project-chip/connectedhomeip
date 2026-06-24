@@ -36,6 +36,8 @@
 # === END CI TEST ARGUMENTS ===
 #
 
+import logging
+
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
@@ -46,6 +48,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
@@ -81,6 +85,7 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S",              # CameraAVStreamManagement Server
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
+            "PS.S.F01",            # Battery feature
         ]
 
     @property
@@ -92,6 +97,12 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
+
+        # Only run the test script if the camera is battery powered, and so subject to standby flows
+        if not await self.is_battery_powered():
+            self.mark_all_remaining_steps_skipped("precondition")
+            log.info("WebRTCP 2_1 skipped as the device is not battery powered.")
+            return
 
         self.step("precondition")
         # Commission DUT - already done

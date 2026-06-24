@@ -75,6 +75,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
+    f = click.option('--value-wait-extra-duration-ms', 'valueWaitExtraDurationMs', type=int, default=250, show_default=True,
+                     help='Extra timeout duration in milliseconds for WaitForAttributeValue.')(f)
     return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
                         help='Path to a directory containing additional pseudo clusters.')(f)
 
@@ -250,7 +252,7 @@ CONTEXT_SETTINGS = {
 @click.argument('test_name')
 @test_parser_options
 @click.pass_context
-def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, additional_pseudo_clusters_directory: str, **kwargs):
+def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, additional_pseudo_clusters_directory: str, valueWaitExtraDurationMs: int, **kwargs):
     pseudo_clusters = get_custom_pseudo_clusters(
         additional_pseudo_clusters_directory) if use_default_pseudo_clusters else PseudoClusters([])
     specifications = SpecDefinitionsFromPaths(specifications_paths.split(','), pseudo_clusters)
@@ -260,6 +262,7 @@ def runner_base(ctx, configuration_directory: str, test_name: str, configuration
     if len(test_list) == 0:
         raise ValueError(f"No tests found for test name '{test_name}'")
 
+    kwargs['valueWaitExtraDurationMs'] = valueWaitExtraDurationMs
     parser_config = TestParserConfig(pics, specifications, kwargs)
     parser_builder_config = TestParserBuilderConfig(test_list, parser_config, hooks=TestParserLogger())
     parser_builder_config.options.stop_on_error = stop_on_error

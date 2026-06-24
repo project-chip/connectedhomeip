@@ -29,6 +29,8 @@
 #include <clusters/ValveConfigurationAndControl/Commands.h>
 #include <clusters/ValveConfigurationAndControl/Events.h>
 #include <clusters/ValveConfigurationAndControl/Metadata.h>
+#include <lib/support/TimeUtils.h>
+#include <system/RAIIMockClock.h>
 
 namespace {
 
@@ -75,6 +77,11 @@ class DummyTimeSyncTracker : public TimeSyncTracker
 {
 public:
     bool IsValidUTCTime() override { return false; }
+};
+class ValidTimeSyncTracker : public TimeSyncTracker
+{
+public:
+    bool IsValidUTCTime() override { return true; }
 };
 
 struct TestValveConfigurationAndControlCluster : public ::testing::Test
@@ -403,6 +410,98 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestTimeSync)
     AutoCloseTime::TypeInfo::DecodableType autoCloseTime;
     ASSERT_EQ(tester.ReadAttribute(AutoCloseTime::Id, autoCloseTime), CHIP_NO_ERROR);
     EXPECT_EQ(autoCloseTime, DataModel::NullNullable);
+
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Regression test: RemainingDuration * kMicrosecondsPerSecond (1000000) must be computed in 64-bit.
+// RemainingDuration is uint32_t and kMicrosecondsPerSecond is int, so the product is evaluated in
+// 32-bit arithmetic and wraps for RemainingDuration > ~4294 s, corrupting AutoCloseTime.
+TEST_F(TestValveConfigurationAndControlCluster, UpdateAutoCloseTimeNoIntegerOverflow)
+{
+    const BitFlags<Feature> features{ Feature::kTimeSync };
+    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
+                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
+    ValveConfigurationAndControlCluster::ValveContext context = {
+        .features             = features,
+        .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(),
+        .config               = config,
+        .tsTracker            = &timeSyncTracker,
+        .delegate             = &delegate,
+    };
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, context);
+    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(valveCluster);
+
+    // Open with a duration whose microsecond conversion exceeds UINT32_MAX (> ~4294 s).
+    Commands::Open::Type request;
+    request.openDuration = MakeOptional(DataModel::Nullable<uint32_t>(5000));
+    ASSERT_TRUE(tester.Invoke(request).IsSuccess());
+
+    RemainingDuration::TypeInfo::DecodableType remaining;
+    ASSERT_EQ(tester.ReadAttribute(RemainingDuration::Id, remaining), CHIP_NO_ERROR);
+    ASSERT_FALSE(remaining.IsNull());
+    const uint32_t rd = remaining.Value();
+    ASSERT_GT(rd, 4294u); // ensure a 32-bit product would overflow
+
+    // Arbitrary chip-epoch timestamp (microseconds) standing in for "now"; not a unit conversion.
+    constexpr uint64_t kEpochMicros = 1700000000000000ULL;
+    valveCluster.UpdateAutoCloseTime(kEpochMicros);
+
+    AutoCloseTime::TypeInfo::DecodableType autoCloseTime;
+    ASSERT_EQ(tester.ReadAttribute(AutoCloseTime::Id, autoCloseTime), CHIP_NO_ERROR);
+    ASSERT_FALSE(autoCloseTime.IsNull());
+
+    const uint64_t expected = static_cast<uint64_t>(rd) * kMicrosecondsPerSecond + kEpochMicros;
+    EXPECT_EQ(autoCloseTime.Value(), expected);
+
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Regression test for the same 32-bit overflow on the Open path: SetAutoCloseTime() computes
+// OpenDuration * kMicrosecondsPerSecond, which must be done in 64-bit. This path requires a
+// synchronized UTC time, so the real-time clock is mocked to a fixed value.
+TEST_F(TestValveConfigurationAndControlCluster, SetAutoCloseTimeNoIntegerOverflow)
+{
+    System::Clock::Internal::RAIIMockClock mockClock;
+    // Fixed UTC time well after the CHIP epoch (~2023-11-14) so UnixEpochToChipEpochMicros succeeds.
+    constexpr uint64_t kMockUnixMicros = 1700000000000000ULL;
+    ASSERT_EQ(mockClock.SetClock_RealTime(System::Clock::Microseconds64(kMockUnixMicros)), CHIP_NO_ERROR);
+
+    uint64_t chipEpochMicros = 0;
+    ASSERT_TRUE(UnixEpochToChipEpochMicros(kMockUnixMicros, chipEpochMicros));
+
+    ValidTimeSyncTracker validTracker;
+    const BitFlags<Feature> features{ Feature::kTimeSync };
+    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
+                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
+    ValveConfigurationAndControlCluster::ValveContext context = {
+        .features             = features,
+        .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(),
+        .config               = config,
+        .tsTracker            = &validTracker,
+        .delegate             = &delegate,
+    };
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, context);
+    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(valveCluster);
+
+    // OpenDuration whose microsecond conversion exceeds UINT32_MAX (> ~4294 s).
+    constexpr uint32_t kOpenDurationSeconds = 5000;
+    Commands::Open::Type request;
+    request.openDuration = MakeOptional(DataModel::Nullable<uint32_t>(kOpenDurationSeconds));
+    ASSERT_TRUE(tester.Invoke(request).IsSuccess());
+
+    AutoCloseTime::TypeInfo::DecodableType autoCloseTime;
+    ASSERT_EQ(tester.ReadAttribute(AutoCloseTime::Id, autoCloseTime), CHIP_NO_ERROR);
+    ASSERT_FALSE(autoCloseTime.IsNull());
+
+    const uint64_t expected = static_cast<uint64_t>(kOpenDurationSeconds) * kMicrosecondsPerSecond + chipEpochMicros;
+    EXPECT_EQ(autoCloseTime.Value(), expected);
 
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

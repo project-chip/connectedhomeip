@@ -36,9 +36,13 @@ template("gdbus_library") {
   }
 
   config("${library_name}_compile_config") {
-    # D-Bus code generation may generate some code detected as unreachable
-    # by recent enough clang.
-    cflags = [ "-Wno-unreachable-code" ]
+    # clang-specific supressions that are detected by recent enough clang:
+    #  - Unreachable code is generated
+    #  - Unused global variables (e.g. 'variable 'bluez_object_proxy_parent_class' set but not used')
+    cflags = [
+      "-Wno-unreachable-code",
+      "-Wno-unused-but-set-global",
+    ]
   }
 
   dbus_sources = []

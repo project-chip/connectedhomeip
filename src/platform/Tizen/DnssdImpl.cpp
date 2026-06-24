@@ -570,7 +570,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
     for (size_t i = 0; i < service.mTextEntrySize; ++i)
     {
         TextEntry entry = service.mTextEntries[i];
-        VerifyOrReturnError(chip::CanCastTo<unsigned short>(entry.mDataSize), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(chip::CanCastTo<unsigned short>(entry.mDataSize), err = CHIP_ERROR_INVALID_ARGUMENT);
         ret = dnssd_service_add_txt_record(serviceHandle, entry.mKey, static_cast<unsigned short>(entry.mDataSize), entry.mData);
         VerifyOrExit(ret == DNSSD_ERROR_NONE,
                      ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed: %s", get_error_message(ret));

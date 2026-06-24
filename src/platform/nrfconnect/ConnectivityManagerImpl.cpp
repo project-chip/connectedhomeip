@@ -83,7 +83,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // The following code should also be valid for other interface types, such as Ethernet,
     // but they are not officially supported, so for now enable it for Wi-Fi only.
-    const in6_addr in6Addr = InetUtils::ToZephyrAddr(address);
+    const InetUtils::ZephyrIn6Addr in6Addr = InetUtils::ToZephyrAddr(address);
     int status;
 
     if (operation == UDPEndPointImplSockets::MulticastOperation::kJoin)

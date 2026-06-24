@@ -19,19 +19,11 @@ import argparse
 import json
 import os
 import subprocess
-import sys
 
 from zap_execution import ZapTool
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
-
-
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
 
 
 def checkFileExists(path):
@@ -101,7 +93,6 @@ def runConversion(zap_file):
 
 
 def main():
-    checkPythonVersion()
     zap_file, run_bootstrap = runArgumentsParser()
 
     if run_bootstrap:

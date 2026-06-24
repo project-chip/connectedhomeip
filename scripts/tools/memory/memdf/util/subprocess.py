@@ -18,14 +18,13 @@
 import logging
 import shlex
 import subprocess
-from typing import List
 
 from memdf.util.config import Config
 
 log = logging.getLogger(__name__)
 
 
-def run_tool_pipe(config: Config, command: List[str]) -> subprocess.Popen:
+def run_tool_pipe(config: Config, command: list[str]) -> subprocess.Popen:
     """Run a command."""
     if tool := config.getl(['tool', command[0]]):
         command[0] = tool

@@ -18,10 +18,12 @@ source_set("electrical-energy-measurement-server") {
   sources = [
     "ElectricalEnergyMeasurementCluster.cpp",
     "ElectricalEnergyMeasurementCluster.h",
+    "ElectricalEnergyMeasurementDelegate.h",
     "EnergyReportingTestEventTriggerHandler.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app/cluster-building-blocks",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",

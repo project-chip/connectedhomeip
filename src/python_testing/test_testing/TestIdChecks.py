@@ -39,58 +39,58 @@ class TestIdChecks(MatterBaseTest):
 
         prefix_bad = [0xFFF5_0000, 0xFFF5_BFFFF, 0xFFF5_C000]
 
-        def check_standard(id):
-            id_type = device_type_id_type(id)
-            msg = f"Incorrect device type range assessment, expecting standard {id:08x}, type = {id_type}"
-            asserts.assert_equal(device_type_id_type(id), DeviceTypeIdType.kStandard, msg)
-            asserts.assert_true(is_valid_device_type_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_device_type_id(id, allow_test=False), msg)
-            asserts.assert_true(is_standard_device_type_id(id), msg)
+        def check_standard(tid):
+            id_type = device_type_id_type(tid)
+            msg = f"Incorrect device type range assessment, expecting standard {tid:08x}, type = {id_type}"
+            asserts.assert_equal(device_type_id_type(tid), DeviceTypeIdType.kStandard, msg)
+            asserts.assert_true(is_valid_device_type_id(tid, allow_test=True), msg)
+            asserts.assert_true(is_valid_device_type_id(tid, allow_test=False), msg)
+            asserts.assert_true(is_standard_device_type_id(tid), msg)
 
-        def check_manufacturer(id):
-            id_type = device_type_id_type(id)
-            msg = f"Incorrect device type range assessment, expecting manufacturer {id:08x}, type = {id_type}"
-            asserts.assert_equal(device_type_id_type(id), DeviceTypeIdType.kManufacturer, msg)
-            asserts.assert_true(is_valid_device_type_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_device_type_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_device_type_id(id), msg)
+        def check_manufacturer(tid):
+            id_type = device_type_id_type(tid)
+            msg = f"Incorrect device type range assessment, expecting manufacturer {tid:08x}, type = {id_type}"
+            asserts.assert_equal(device_type_id_type(tid), DeviceTypeIdType.kManufacturer, msg)
+            asserts.assert_true(is_valid_device_type_id(tid, allow_test=True), msg)
+            asserts.assert_true(is_valid_device_type_id(tid, allow_test=False), msg)
+            asserts.assert_false(is_standard_device_type_id(tid), msg)
 
-        def check_test(id):
-            id_type = device_type_id_type(id)
-            msg = f"Incorrect device type range assessment, expecting test {id:08x}, type = {id_type}"
-            asserts.assert_equal(device_type_id_type(id), DeviceTypeIdType.kTest, msg)
-            asserts.assert_true(is_valid_device_type_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_device_type_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_device_type_id(id), msg)
+        def check_test(tid):
+            id_type = device_type_id_type(tid)
+            msg = f"Incorrect device type range assessment, expecting test {tid:08x}, type = {id_type}"
+            asserts.assert_equal(device_type_id_type(tid), DeviceTypeIdType.kTest, msg)
+            asserts.assert_true(is_valid_device_type_id(tid, allow_test=True), msg)
+            asserts.assert_false(is_valid_device_type_id(tid, allow_test=False), msg)
+            asserts.assert_false(is_standard_device_type_id(tid), msg)
 
-        def check_all_bad(id):
-            id_type = device_type_id_type(id)
-            msg = f"Incorrect device type range assessment, expecting invalid {id:08x}, type = {id_type}"
-            asserts.assert_equal(device_type_id_type(id), DeviceTypeIdType.kInvalid, msg)
-            asserts.assert_false(is_valid_device_type_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_device_type_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_device_type_id(id), msg)
+        def check_all_bad(tid):
+            id_type = device_type_id_type(tid)
+            msg = f"Incorrect device type range assessment, expecting invalid {tid:08x}, type = {id_type}"
+            asserts.assert_equal(device_type_id_type(tid), DeviceTypeIdType.kInvalid, msg)
+            asserts.assert_false(is_valid_device_type_id(tid, allow_test=True), msg)
+            asserts.assert_false(is_valid_device_type_id(tid, allow_test=False), msg)
+            asserts.assert_false(is_standard_device_type_id(tid), msg)
 
-        for id in standard_good:
-            check_standard(id)
+        for tid in standard_good:
+            check_standard(tid)
 
-        for id in standard_bad:
-            check_all_bad(id)
+        for tid in standard_bad:
+            check_all_bad(tid)
 
-        for id in manufacturer_good:
-            check_manufacturer(id)
+        for tid in manufacturer_good:
+            check_manufacturer(tid)
 
-        for id in manufacturer_bad:
-            check_all_bad(id)
+        for tid in manufacturer_bad:
+            check_all_bad(tid)
 
-        for id in test_good:
-            check_test(id)
+        for tid in test_good:
+            check_test(tid)
 
-        for id in test_bad:
-            check_all_bad(id)
+        for tid in test_bad:
+            check_all_bad(tid)
 
-        for id in prefix_bad:
-            check_all_bad(id)
+        for tid in prefix_bad:
+            check_all_bad(tid)
 
     def test_cluster_ids(self):
         standard_good = [0x0000_0000, 0x0000_7FFF]
@@ -104,58 +104,58 @@ class TestIdChecks(MatterBaseTest):
 
         prefix_bad = [0xFFF5_0000, 0xFFF5_FC00, 0xFFF5_FFFF]
 
-        def check_standard(id):
-            id_type = cluster_id_type(id)
-            msg = f"Incorrect cluster range assessment, expecting standard {id:08x}, type = {id_type}"
+        def check_standard(cid):
+            id_type = cluster_id_type(cid)
+            msg = f"Incorrect cluster range assessment, expecting standard {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, ClusterIdType.kStandard, msg)
-            asserts.assert_true(is_valid_cluster_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_cluster_id(id, allow_test=False), msg)
-            asserts.assert_true(is_standard_cluster_id(id), msg)
+            asserts.assert_true(is_valid_cluster_id(cid, allow_test=True), msg)
+            asserts.assert_true(is_valid_cluster_id(cid, allow_test=False), msg)
+            asserts.assert_true(is_standard_cluster_id(cid), msg)
 
-        def check_manufacturer(id):
-            id_type = cluster_id_type(id)
-            msg = f"Incorrect cluster range assessment, expecting manufacturer {id:08x}, type = {id_type}"
+        def check_manufacturer(cid):
+            id_type = cluster_id_type(cid)
+            msg = f"Incorrect cluster range assessment, expecting manufacturer {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, ClusterIdType.kManufacturer, msg)
-            asserts.assert_true(is_valid_cluster_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_cluster_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_cluster_id(id), msg)
+            asserts.assert_true(is_valid_cluster_id(cid, allow_test=True), msg)
+            asserts.assert_true(is_valid_cluster_id(cid, allow_test=False), msg)
+            asserts.assert_false(is_standard_cluster_id(cid), msg)
 
-        def check_test(id):
-            id_type = cluster_id_type(id)
-            msg = f"Incorrect cluster range assessment, expecting test {id:08x}, type = {id_type}"
+        def check_test(cid):
+            id_type = cluster_id_type(cid)
+            msg = f"Incorrect cluster range assessment, expecting test {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, ClusterIdType.kTest, msg)
-            asserts.assert_true(is_valid_cluster_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_cluster_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_cluster_id(id), msg)
+            asserts.assert_true(is_valid_cluster_id(cid, allow_test=True), msg)
+            asserts.assert_false(is_valid_cluster_id(cid, allow_test=False), msg)
+            asserts.assert_false(is_standard_cluster_id(cid), msg)
 
-        def check_all_bad(id):
-            id_type = cluster_id_type(id)
-            msg = f"Incorrect cluster range assessment, expecting invalid {id:08x}, type = {id_type}"
+        def check_all_bad(cid):
+            id_type = cluster_id_type(cid)
+            msg = f"Incorrect cluster range assessment, expecting invalid {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, ClusterIdType.kInvalid, msg)
-            asserts.assert_false(is_valid_cluster_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_cluster_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_cluster_id(id), msg)
+            asserts.assert_false(is_valid_cluster_id(cid, allow_test=True), msg)
+            asserts.assert_false(is_valid_cluster_id(cid, allow_test=False), msg)
+            asserts.assert_false(is_standard_cluster_id(cid), msg)
 
-        for id in standard_good:
-            check_standard(id)
+        for cid in standard_good:
+            check_standard(cid)
 
-        for id in standard_bad:
-            check_all_bad(id)
+        for cid in standard_bad:
+            check_all_bad(cid)
 
-        for id in manufacturer_good:
-            check_manufacturer(id)
+        for cid in manufacturer_good:
+            check_manufacturer(cid)
 
-        for id in manufacturer_bad:
-            check_all_bad(id)
+        for cid in manufacturer_bad:
+            check_all_bad(cid)
 
-        for id in test_good:
-            check_test(id)
+        for cid in test_good:
+            check_test(cid)
 
-        for id in test_bad:
-            check_all_bad(id)
+        for cid in test_bad:
+            check_all_bad(cid)
 
-        for id in prefix_bad:
-            check_all_bad(id)
+        for cid in prefix_bad:
+            check_all_bad(cid)
 
     def test_attribute_ids(self):
         standard_global_good = [0x0000_F000, 0x0000_FFFE]
@@ -168,64 +168,64 @@ class TestIdChecks(MatterBaseTest):
         test_bad = [0xFFF1_5000, 0xFFF1_F000, 0xFFF1_FFFFF, 0xFFF4_5000, 0xFFF4_F000, 0xFFF4_FFFF]
         prefix_bad = [0xFFF5_0000, 0xFFF5_4FFF, 0xFFF5_5000, 0xFFF5_F000, 0xFFF5_FFFF]
 
-        def check_standard_global(id):
-            id_type = attribute_id_type(id)
-            msg = f"Incorrect attribute range assessment, expecting standard global {id:08x}, type = {id_type}"
+        def check_standard_global(aid):
+            id_type = attribute_id_type(aid)
+            msg = f"Incorrect attribute range assessment, expecting standard global {aid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, AttributeIdType.kStandardGlobal, msg)
-            asserts.assert_true(is_valid_attribute_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_attribute_id(id, allow_test=False), msg)
-            asserts.assert_true(is_standard_attribute_id(id), msg)
+            asserts.assert_true(is_valid_attribute_id(aid, allow_test=True), msg)
+            asserts.assert_true(is_valid_attribute_id(aid, allow_test=False), msg)
+            asserts.assert_true(is_standard_attribute_id(aid), msg)
 
-        def check_standard_non_global(id):
-            id_type = attribute_id_type(id)
-            msg = f"Incorrect attribute range assessment, expecting standard non-global {id:08x}, type = {id_type}"
+        def check_standard_non_global(aid):
+            id_type = attribute_id_type(aid)
+            msg = f"Incorrect attribute range assessment, expecting standard non-global {aid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, AttributeIdType.kStandardNonGlobal, msg)
-            asserts.assert_true(is_valid_attribute_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_attribute_id(id, allow_test=False), msg)
-            asserts.assert_true(is_standard_attribute_id(id), msg)
+            asserts.assert_true(is_valid_attribute_id(aid, allow_test=True), msg)
+            asserts.assert_true(is_valid_attribute_id(aid, allow_test=False), msg)
+            asserts.assert_true(is_standard_attribute_id(aid), msg)
 
-        def check_manufacturer(id):
-            id_type = attribute_id_type(id)
-            msg = f"Incorrect attribute range assessment, expecting manufacturer {id:08x}, type = {id_type}"
+        def check_manufacturer(aid):
+            id_type = attribute_id_type(aid)
+            msg = f"Incorrect attribute range assessment, expecting manufacturer {aid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, AttributeIdType.kManufacturer, msg)
-            asserts.assert_true(is_valid_attribute_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_attribute_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_attribute_id(id), msg)
+            asserts.assert_true(is_valid_attribute_id(aid, allow_test=True), msg)
+            asserts.assert_true(is_valid_attribute_id(aid, allow_test=False), msg)
+            asserts.assert_false(is_standard_attribute_id(aid), msg)
 
-        def check_test(id):
-            id_type = attribute_id_type(id)
-            msg = f"Incorrect attribute range assessment, expecting test {id:08x}, type = {id_type}"
+        def check_test(aid):
+            id_type = attribute_id_type(aid)
+            msg = f"Incorrect attribute range assessment, expecting test {aid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, AttributeIdType.kTest, msg)
-            asserts.assert_true(is_valid_attribute_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_attribute_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_attribute_id(id), msg)
+            asserts.assert_true(is_valid_attribute_id(aid, allow_test=True), msg)
+            asserts.assert_false(is_valid_attribute_id(aid, allow_test=False), msg)
+            asserts.assert_false(is_standard_attribute_id(aid), msg)
 
-        def check_all_bad(id):
-            id_type = attribute_id_type(id)
-            msg = f"Incorrect attribute range assessment, expecting invalid {id:08x}, type = {id_type}"
+        def check_all_bad(aid):
+            id_type = attribute_id_type(aid)
+            msg = f"Incorrect attribute range assessment, expecting invalid {aid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, AttributeIdType.kInvalid, msg)
-            asserts.assert_false(is_valid_attribute_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_attribute_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_attribute_id(id), msg)
+            asserts.assert_false(is_valid_attribute_id(aid, allow_test=True), msg)
+            asserts.assert_false(is_valid_attribute_id(aid, allow_test=False), msg)
+            asserts.assert_false(is_standard_attribute_id(aid), msg)
 
-        for id in standard_global_good:
-            check_standard_global(id)
-        for id in standard_global_bad:
-            check_all_bad(id)
-        for id in standard_non_global_good:
-            check_standard_non_global(id)
-        for id in standard_non_global_bad:
-            check_all_bad(id)
-        for id in manufacturer_good:
-            check_manufacturer(id)
-        for id in manufacturer_bad:
-            check_all_bad(id)
-        for id in test_good:
-            check_test(id)
-        for id in test_bad:
-            check_all_bad(id)
-        for id in prefix_bad:
-            check_all_bad(id)
+        for aid in standard_global_good:
+            check_standard_global(aid)
+        for aid in standard_global_bad:
+            check_all_bad(aid)
+        for aid in standard_non_global_good:
+            check_standard_non_global(aid)
+        for aid in standard_non_global_bad:
+            check_all_bad(aid)
+        for aid in manufacturer_good:
+            check_manufacturer(aid)
+        for aid in manufacturer_bad:
+            check_all_bad(aid)
+        for aid in test_good:
+            check_test(aid)
+        for aid in test_bad:
+            check_all_bad(aid)
+        for aid in prefix_bad:
+            check_all_bad(aid)
 
     def test_command_ids(self):
         standard_global_good = [0x0000_00E0, 0x0000_00FF, 0x0000_00E1, 0x0000_00FE]
@@ -238,64 +238,64 @@ class TestIdChecks(MatterBaseTest):
         test_bad = [0xFFF1_5000, 0xFFF1_F000, 0xFFF1_FFFF, 0xFFF4_5000, 0xFFF4_F000, 0xFFF4_FFFF]
         prefix_bad = [0xFFF5_0000, 0xFFF5_4FFF, 0xFFF5_5000, 0xFFF5_F000, 0xFFF5_FFFF]
 
-        def check_standard_global(id):
-            id_type = command_id_type(id)
-            msg = f"Incorrect command range assessment, expecting standard global {id:08x}, type = {id_type}"
+        def check_standard_global(cid):
+            id_type = command_id_type(cid)
+            msg = f"Incorrect command range assessment, expecting standard global {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, CommandIdType.kStandardGlobal, msg)
-            asserts.assert_true(is_valid_command_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_command_id(id, allow_test=False), msg)
-            asserts.assert_true(is_standard_command_id(id), msg)
+            asserts.assert_true(is_valid_command_id(cid, allow_test=True), msg)
+            asserts.assert_true(is_valid_command_id(cid, allow_test=False), msg)
+            asserts.assert_true(is_standard_command_id(cid), msg)
 
-        def check_scoped_non_global(id):
-            id_type = command_id_type(id)
-            msg = f"Incorrect command range assessment, expecting scoped non-global {id:08x}, type = {id_type}"
+        def check_scoped_non_global(cid):
+            id_type = command_id_type(cid)
+            msg = f"Incorrect command range assessment, expecting scoped non-global {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, CommandIdType.kScopedNonGlobal, msg)
-            asserts.assert_true(is_valid_command_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_command_id(id, allow_test=False), msg)
-            asserts.assert_true(is_standard_command_id(id), msg)
+            asserts.assert_true(is_valid_command_id(cid, allow_test=True), msg)
+            asserts.assert_true(is_valid_command_id(cid, allow_test=False), msg)
+            asserts.assert_true(is_standard_command_id(cid), msg)
 
-        def check_manufacturer(id):
-            id_type = command_id_type(id)
-            msg = f"Incorrect command range assessment, expecting manufacturer {id:08x}, type = {id_type}"
+        def check_manufacturer(cid):
+            id_type = command_id_type(cid)
+            msg = f"Incorrect command range assessment, expecting manufacturer {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, CommandIdType.kManufacturer, msg)
-            asserts.assert_true(is_valid_command_id(id, allow_test=True), msg)
-            asserts.assert_true(is_valid_command_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_command_id(id), msg)
+            asserts.assert_true(is_valid_command_id(cid, allow_test=True), msg)
+            asserts.assert_true(is_valid_command_id(cid, allow_test=False), msg)
+            asserts.assert_false(is_standard_command_id(cid), msg)
 
-        def check_test(id):
-            id_type = command_id_type(id)
-            msg = f"Incorrect command range assessment, expecting test {id:08x}, type = {id_type}"
+        def check_test(cid):
+            id_type = command_id_type(cid)
+            msg = f"Incorrect command range assessment, expecting test {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, CommandIdType.kTest, msg)
-            asserts.assert_true(is_valid_command_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_command_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_command_id(id), msg)
+            asserts.assert_true(is_valid_command_id(cid, allow_test=True), msg)
+            asserts.assert_false(is_valid_command_id(cid, allow_test=False), msg)
+            asserts.assert_false(is_standard_command_id(cid), msg)
 
-        def check_all_bad(id):
-            id_type = command_id_type(id)
-            msg = f"Incorrect command range assessment, expecting invalid {id:08x}, type = {id_type}"
+        def check_all_bad(cid):
+            id_type = command_id_type(cid)
+            msg = f"Incorrect command range assessment, expecting invalid {cid:08x}, type = {id_type}"
             asserts.assert_equal(id_type, CommandIdType.kInvalid, msg)
-            asserts.assert_false(is_valid_command_id(id, allow_test=True), msg)
-            asserts.assert_false(is_valid_command_id(id, allow_test=False), msg)
-            asserts.assert_false(is_standard_command_id(id), msg)
+            asserts.assert_false(is_valid_command_id(cid, allow_test=True), msg)
+            asserts.assert_false(is_valid_command_id(cid, allow_test=False), msg)
+            asserts.assert_false(is_standard_command_id(cid), msg)
 
-        for id in standard_global_good:
-            check_standard_global(id)
-        for id in standard_global_bad:
-            check_all_bad(id)
-        for id in scoped_non_global_good:
-            check_scoped_non_global(id)
-        for id in scoped_non_global_bad:
-            check_all_bad(id)
-        for id in manufacturer_good:
-            check_manufacturer(id)
-        for id in manufacturer_bad:
-            check_all_bad(id)
-        for id in test_good:
-            check_test(id)
-        for id in test_bad:
-            check_all_bad(id)
-        for id in prefix_bad:
-            check_all_bad(id)
+        for cid in standard_global_good:
+            check_standard_global(cid)
+        for cid in standard_global_bad:
+            check_all_bad(cid)
+        for cid in scoped_non_global_good:
+            check_scoped_non_global(cid)
+        for cid in scoped_non_global_bad:
+            check_all_bad(cid)
+        for cid in manufacturer_good:
+            check_manufacturer(cid)
+        for cid in manufacturer_bad:
+            check_all_bad(cid)
+        for cid in test_good:
+            check_test(cid)
+        for cid in test_bad:
+            check_all_bad(cid)
+        for cid in prefix_bad:
+            check_all_bad(cid)
 
 
 if __name__ == "__main__":

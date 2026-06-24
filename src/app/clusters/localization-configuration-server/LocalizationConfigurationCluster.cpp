@@ -72,7 +72,7 @@ LocalizationConfigurationCluster::LocalizationConfigurationCluster(DeviceLayer::
     {
         char tempBuf[kActiveLocaleMaxLength];
         MutableCharSpan validLocale(tempBuf);
-        if (GetDefaultLocale(validLocale))
+        if (LocalizationConfigurationCluster::GetDefaultLocale(validLocale))
         {
             status = SetActiveLocale(validLocale);
             if (status != Protocols::InteractionModel::Status::Success)
@@ -124,7 +124,12 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::ReadAttribute(co
 DataModel::ActionReturnStatus LocalizationConfigurationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                                AttributeValueDecoder & aDecoder)
 {
-    AttributePersistence persistence(mContext->attributeStorage);
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, aDecoder));
+}
+
+DataModel::ActionReturnStatus LocalizationConfigurationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                          AttributeValueDecoder & aDecoder)
+{
     switch (request.path.mAttributeId)
     {
     case ActiveLocale::Id: {
@@ -149,6 +154,9 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::SetActiveLocale(
     {
         return Status::ConstraintError;
     }
+
+    VerifyOrReturnValue(!mActiveLocale.Content().data_equal(activeLocale),
+                        DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     VerifyOrReturnError(mActiveLocale.SetContent(activeLocale), Status::ConstraintError);
     if (mContext != nullptr)

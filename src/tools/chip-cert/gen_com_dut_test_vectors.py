@@ -838,7 +838,7 @@ def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_
         der_key_filename = os.path.join(test_case_out_dir, "dac-Key.der")
         add_raw_ec_keypair_to_dict_from_der(der_key_filename, json_dict)
 
-    with open(output_json_filename, "wt+") as outfile:
+    with open(output_json_filename, "w+") as outfile:
         json.dump(json_dict, outfile, indent=4)
         outfile.write('\n')
 

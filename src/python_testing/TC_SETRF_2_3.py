@@ -41,7 +41,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
 
 from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
@@ -165,10 +164,10 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         currentDayEntryDayofWeekValue: int = None
         dateCurrentValue: int = None
         dayTypeCurrentValue: cluster.Enums.DayTypeEnum = None
-        dayEntryIDsCurrentValue: List[int] = []
-        tariffComponentIDsCurrentValue: List[int] = []
-        tariffComponentsCurrentValue: List[cluster.Structs.TariffComponentStruct] = []
-        dayPatternIDsCurrentValue: List[int] = []
+        dayEntryIDsCurrentValue: list[int] = []
+        tariffComponentIDsCurrentValue: list[int] = []
+        tariffComponentsCurrentValue: list[cluster.Structs.TariffComponentStruct] = []
+        dayPatternIDsCurrentValue: list[int] = []
 
         self.step("1")
         # Commissioning
@@ -216,7 +215,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
             self.step("7a")
             self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
             await self.check_calendar_periods_attribute(endpoint, self.calendarPeriodsValue)
-            dayPatternIDsCurrentValue = await self.get_day_pattern_IDs_for_active_calendar_period(next=False)
+            dayPatternIDsCurrentValue = await self.get_day_pattern_IDs_for_active_calendar_period(next_day=False)
 
             self.step("7b")
             # we search DayPattern that corresponds to day of week defined on step 4 and compare DayEntryIDs from CurrentDay and found DayPattern

@@ -29,6 +29,3 @@
 
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
-
-// Enable groupcast
-#define CHIP_CONFIG_ENABLE_GROUPCAST 1

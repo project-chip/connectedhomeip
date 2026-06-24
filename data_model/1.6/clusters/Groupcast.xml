@@ -69,13 +69,22 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="utility" picsCode="GC" scope="Node"/>
   <features>
     <feature bit="0" code="LN" name="Listener" summary="Supports joining a multicast group of nodes as a listener.">
-      <optionalConform choice="a" more="true" min="1"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="a" more="true" min="1"/>
+      </otherwiseConform>
     </feature>
     <feature bit="1" code="SD" name="Sender" summary="Supports sending multicast message to a targeted group of nodes.">
-      <optionalConform choice="a" more="true" min="1"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="a" more="true" min="1"/>
+      </otherwiseConform>
     </feature>
     <feature bit="2" code="PGA" name="PerGroup" summary="Supports PerGroup multicast addresses.">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -143,6 +152,9 @@ Davis, CA 95616, USA
       <field id="2" name="KeySetID" type="uint16">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="3" name="HasAuxiliaryACL" type="bool">
         <mandatoryConform>
@@ -228,6 +240,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="KeySetID" type="uint16">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="3" name="Key" type="octstr">
         <optionalConform/>
@@ -300,6 +315,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="KeySetID" type="uint16">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="2" name="Key" type="octstr">
         <optionalConform/>

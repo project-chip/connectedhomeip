@@ -151,6 +151,17 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
         return false;
     }
 
+    // Reject packets with unreasonable record counts to prevent CPU exhaustion.
+    // An mDNS packet is at most ~9000 bytes; the smallest record is ~12 bytes,
+    // so 256 is a generous upper bound for any single section.
+    static constexpr uint16_t kMaxRecordCount = 256;
+
+    if (header.GetQueryCount() > kMaxRecordCount || header.GetAnswerCount() > kMaxRecordCount ||
+        header.GetAuthorityCount() > kMaxRecordCount || header.GetAdditionalCount() > kMaxRecordCount)
+    {
+        return false;
+    }
+
     delegate->OnHeader(header);
 
     const uint8_t * data = packetData.Start() + HeaderRef::kSizeBytes;

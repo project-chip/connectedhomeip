@@ -71,6 +71,20 @@ namespace {
     return CHIP_NO_ERROR;
 }
 
+class DeviceDiscoveryDelegateRegistry
+{
+public:
+    DeviceDiscoveryDelegateRegistry() = delete;
+    DeviceDiscoveryDelegateRegistry(DeviceController & controller, DeviceDiscoveryDelegate * delegate) : mController(controller)
+    {
+        mController.RegisterDeviceDiscoveryDelegate(delegate);
+    }
+    ~DeviceDiscoveryDelegateRegistry() { mController.RegisterDeviceDiscoveryDelegate(nullptr); }
+
+private:
+    DeviceController & mController;
+};
+
 } // namespace
 
 CHIP_ERROR PairingCommand::RunCommand()
@@ -230,8 +244,9 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
-                                                            sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -275,6 +290,22 @@ CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
     }
 
     return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, discoveryType);
+}
+
+CHIP_ERROR
+PairingCommand::GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopParams)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    Inet::IPAddress ipAddr;
+    VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
+    meshcopParams.mBorderAgentAddress = PeerAddress::ThreadMeshcop(ipAddr, mThreadBaPort.Value());
+    Thread::OperationalDatasetView dataset;
+    ReturnErrorOnFailure(dataset.Init(mOperationalDataset));
+    ReturnErrorOnFailure(dataset.GetPSKc(meshcopParams.mPSKcBuffer));
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 }
 
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
@@ -326,30 +357,26 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
         }
     }
 
-#if CHIP_SUPPORT_THREAD_MESHCOP
-    if (address.GetTransportType() == Transport::Type::kThreadMeshcop)
+    if (address.GetTransportType() == Transport::Type::kThreadMeshcop && mOnboardingPayload)
     {
-        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
-        CommissioningParameters commissioningParams = GetCommissioningParameters();
-
-        commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
-        auto error = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
-        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
-        return error;
+        SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
+        DeviceDiscoveryDelegateRegistry registry(CurrentCommissioner(), this);
+        ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
+        if (mPaseOnly.ValueOr(false))
+        {
+            return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kAll, NullOptional,
+                                                                 MakeOptional(meshcopParams));
+        }
+        auto commissioningParams = GetCommissioningParameters();
+        return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, DiscoveryType::kAll,
+                                                NullOptional, MakeOptional(meshcopParams));
     }
-#endif // CHIP_SUPPORT_THREAD_MESHCOP
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
     {
-        err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
+        return CurrentCommissioner().EstablishPASEConnection(remoteId, params);
     }
-    else
-    {
-        auto commissioningParams = GetCommissioningParameters();
-        err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
-    }
-    return err;
+    auto commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index)

@@ -70,7 +70,7 @@
       "deviceVersions": [
         3,
         1,
-        5
+        4
       ],
       "deviceIdentifiers": [
         18,

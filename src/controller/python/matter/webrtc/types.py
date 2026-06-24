@@ -16,11 +16,11 @@
 #
 from ctypes import CFUNCTYPE, POINTER, Structure, c_char_p, c_int, c_uint8, c_uint16, c_void_p
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import Enum, StrEnum, auto
 from typing import Any, Optional
 
 
-class PeerConnectionState(str, Enum):
+class PeerConnectionState(StrEnum):
     NEW = "new"
     CONNECTING = "connecting"
     CONNECTED = "connected"

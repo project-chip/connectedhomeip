@@ -17,7 +17,6 @@
 
 import io
 import re
-from typing import Dict, List
 
 import elftools.elf.constants  # type: ignore
 import memdf.name
@@ -149,7 +148,7 @@ def read_segments(text: io.TextIOWrapper) -> SegmentDF:
     return SegmentDF(rows, columns=columns)
 
 
-def read_section_to_segment(text: io.TextIOWrapper) -> Dict[str, int]:
+def read_section_to_segment(text: io.TextIOWrapper) -> dict[str, int]:
     """Read a section-to-segment map from readelf output."""
     section_to_segment = {}
     while line := text.readline().strip():
@@ -227,9 +226,9 @@ def read_file(config: Config, filename: str, method: str = None) -> DFs:
     ])
     if not process or not process.stdout:
         return SegmentDF()
-    segment_frames: List[SegmentDF] = []
-    section_frames: List[SectionDF] = []
-    symbol_frames: List[SymbolDF] = []
+    segment_frames: list[SegmentDF] = []
+    section_frames: list[SectionDF] = []
+    symbol_frames: list[SymbolDF] = []
     section_to_segment = {}
     text = io.TextIOWrapper(process.stdout)
     while line := text.readline():

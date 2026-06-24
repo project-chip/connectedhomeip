@@ -17,7 +17,6 @@
 import relative_importer  # isort: split # noqa: F401
 
 import sys
-from typing import List
 
 import click
 from paths_finder import PathsFinder
@@ -65,7 +64,7 @@ def maybe_update_stop_on_error(ctx):
 @click.argument('commands', nargs=-1)
 @darwinframeworktool_runner_options
 @click.pass_context
-def darwinframeworktool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, delay_in_ms: int, continueonfailure: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str):
+def darwinframeworktool_py(ctx, commands: list[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, delay_in_ms: int, continueonfailure: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str):
     success = False
 
     server_arguments = ctx.params['server_arguments']

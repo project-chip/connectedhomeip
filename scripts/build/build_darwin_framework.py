@@ -17,11 +17,12 @@ import contextlib
 import glob
 import os
 import platform
+from pathlib import Path
 from subprocess import PIPE, Popen
 
 
 def get_file_from_pigweed(name):
-    CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
     PIGWEED = os.path.join(CHIP_ROOT, ".environment/cipd/packages/pigweed")
 
     pattern = os.path.join(PIGWEED, '**', name)

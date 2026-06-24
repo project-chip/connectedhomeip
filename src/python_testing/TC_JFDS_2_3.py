@@ -28,6 +28,7 @@
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -90,29 +91,51 @@ class TC_JFDS_2_3(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
         self.jfadmin_fabric_a_node_id = 1
-
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            jfa_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=10)
+        self.fabric_a_admin = None
+        # If test is executed in CI environment, start JFA app for Fabric B
+        if self.is_pics_sdk_ci_only:
+            self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            self.dut_rpc_server_ip = "127.0.0.1"
+            self.dut_rpc_server_port = str(self.get_random_port())
+            # Start Fabric A JF-Administrator App
+            self.fabric_a_admin = AppServerSubprocess(
+                jfa_server_app,
+                storage_dir=self.storage_fabric_a,
+                port=self.get_random_port(),
+                discriminator=self.jfadmin_fabric_a_discriminator,
+                passcode=self.jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", self.dut_rpc_server_port])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=10)
+        else:
+            self.dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not self.dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            self.dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not self.dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            self.jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
+            if not self.jfadmin_fabric_a_passcode:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
+            self.jfadmin_fabric_a_discriminator = self.matter_test_config.discriminators[0]
+            if not self.jfadmin_fabric_a_discriminator:
+                asserts.fail(
+                    "JF-Administrator passcode and discriminator must be specified via --passcode:<passcode> --discriminator:<discriminator>")
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             jfc_server_app,
             "JFC_A",  # Name of the controller instance, used for logging purposes in the JF-Controller app:w
-            rpc_server_port=33033,
+            rpc_server_port=self.dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", self.dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=10)
@@ -226,7 +249,7 @@ class TC_JFDS_2_3(MatterBaseTest):
         for endpoint_id, endpoint_data in descriptor_response.items():
             if Clusters.JointFabricDatastore.id in endpoint_data[Clusters.Descriptor].serverList:
                 jfds_endpoint = endpoint_id
-                log.info(f"Found JointFabricDatastore cluster on endpoint {jfds_endpoint}")
+                log.info("Found JointFabricDatastore cluster on endpoint %s", jfds_endpoint)
                 break
 
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
@@ -240,7 +263,7 @@ class TC_JFDS_2_3(MatterBaseTest):
 
         # Note the number of entries returned
         num_entries = len(groupList)
-        log.info(f"GroupList contains {num_entries} entries")
+        log.info("GroupList contains %s entries", num_entries)
 
         # Variables to track found entries
         admin_cat_group_id = None
@@ -248,7 +271,7 @@ class TC_JFDS_2_3(MatterBaseTest):
 
         # Look for entries matching Admin CAT and Anchor CAT
         for entry in groupList:
-            log.info(f"GroupList entry: GroupID={entry.groupID}, CAT={entry.groupCAT}")
+            log.info("GroupList entry: GroupID=%s, CAT=%s", entry.groupID, entry.groupCAT)
 
             # Check if this entry's CAT matches our controller's CAT tags
             # Admin CAT should be present (commissioned with --anchor true)
@@ -257,18 +280,18 @@ class TC_JFDS_2_3(MatterBaseTest):
                 # If CAT matches and we haven't found admin yet, consider it admin
                 if admin_cat_group_id is None and entry.groupCAT == 0xFFFF:
                     admin_cat_group_id = entry.groupID
-                    log.info(f"Found Admin CAT entry with GroupID: {admin_cat_group_id}")
+                    log.info("Found Admin CAT entry with GroupID: %s", admin_cat_group_id)
                 # If CAT matches and admin already found, consider it anchor
                 elif anchor_cat_group_id is None and entry.groupCAT == 0xFFFE:
                     anchor_cat_group_id = entry.groupID
-                    log.info(f"Found Anchor CAT entry with GroupID: {anchor_cat_group_id}")
+                    log.info("Found Anchor CAT entry with GroupID: %s", anchor_cat_group_id)
 
         # Verify that both Admin CAT and Anchor CAT entries were found
         asserts.assert_is_not_none(admin_cat_group_id, "Admin CAT entry must exist in GroupList")
         asserts.assert_is_not_none(anchor_cat_group_id, "Anchor CAT entry must exist in GroupList")
 
-        log.info(f"Admin CAT GroupID: {admin_cat_group_id}")
-        log.info(f"Anchor CAT GroupID: {anchor_cat_group_id}")
+        log.info("Admin CAT GroupID: %s", admin_cat_group_id)
+        log.info("Anchor CAT GroupID: %s", anchor_cat_group_id)
 
         # Store these for potential use in future steps
         self.admin_cat_group_id = admin_cat_group_id

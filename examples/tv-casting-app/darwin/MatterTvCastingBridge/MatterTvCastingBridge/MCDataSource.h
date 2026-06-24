@@ -17,6 +17,7 @@
 
 #import "MCCommissionableData.h"
 #import "MCDeviceAttestationCredentials.h"
+#import "MCDeviceInstanceInfo.h"
 #import "MatterError.h"
 
 #ifndef MCDataSource_h
@@ -53,6 +54,19 @@
  * @returns MATTER_NO_ERROR on success. Otherwise, a MATTER_ERROR with a code corresponding to the underlying failure
  */
 - (MatterError * _Nonnull)castingApp:(id _Nonnull)sender didReceiveRequestToSignCertificateRequest:(NSData * _Nonnull)csrData outRawSignature:(NSData * _Nonnull * _Nonnull)outRawSignature;
+
+@optional
+
+/**
+ * @brief Provides an object conforming to MCDeviceInstanceInfoProvider that the platform
+ * will query at runtime for device instance info fields (vendorName, productName, etc.)
+ * used during Matter commissioning.
+ *
+ * The platform pulls values from the returned provider each time they are needed,
+ * allowing the app to return dynamic data. Methods not implemented or returning nil
+ * will fall back to compile-time defaults.
+ */
+- (id<MCDeviceInstanceInfoProvider> _Nullable)castingAppDidReceiveRequestForDeviceInstanceInfoProvider:(id _Nonnull)sender;
 
 @end
 

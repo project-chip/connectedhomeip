@@ -66,28 +66,6 @@ constexpr Protocols::InteractionModel::Status ResponseStatus(CHIP_ERROR err)
     return StatusIB(err).mStatus;
 }
 
-/// RAII for a scenes management table provider:
-///    - does a `Take()` on a scene at creation
-///    - ensures `Release()` is called on destruction
-class ScopedSceneTable
-{
-public:
-    ScopedSceneTable(const ScopedSceneTable &)             = delete;
-    ScopedSceneTable & operator=(const ScopedSceneTable &) = delete;
-
-    ScopedSceneTable(ScenesManagementTableProvider & provider) : mProvider(provider), mTable(provider.Take()) {}
-    ~ScopedSceneTable() { mProvider.Release(mTable); }
-
-    SceneTable * operator->() { return mTable; }
-    const SceneTable * operator->() const { return mTable; }
-
-    operator bool() const { return mTable != nullptr; }
-
-private:
-    ScenesManagementTableProvider & mProvider;
-    SceneTable * mTable;
-};
-
 /// A very common pattern of:
 ///   - if error (i.e. NOT CHIP_NO_ERROR), then set response status and return response
 #define SuccessOrReturnWithFailureStatus(err_expr, response)                                                                       \

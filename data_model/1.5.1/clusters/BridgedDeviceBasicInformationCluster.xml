@@ -171,7 +171,7 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="3"/>
-            <to value="1000"/>
+            <to value="10000"/>
           </between>
         </constraint>
       </field>
@@ -180,7 +180,7 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="3"/>
-            <to value="1000"/>
+            <to value="10000"/>
           </between>
         </constraint>
       </field>

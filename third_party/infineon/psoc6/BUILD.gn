@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/psoc6.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${psoc6_sdk_build_root}/psoc6_sdk.gni")
 
 declare_args() {
@@ -64,6 +66,10 @@ config("psoc6_sdk_config") {
   foreach(def, mtb_json_local.defines) {
     # Strip off leading -D part
     defines += [ string_replace(def, "-D", "", 1) ]
+  }
+
+  if (chip_crypto == "platform") {
+    defines += [ "CHIP_TRUSTM_DA=1" ]
   }
 
   # Pull out static libs (.a files) from generated json

@@ -18,8 +18,8 @@
 import json
 import logging
 import time
-from asyncio import Event, Semaphore, TimeoutError, create_task, gather, sleep, wait_for
-from typing import Dict, List, Optional
+from asyncio import Event, Semaphore, create_task, gather, sleep, wait_for
+from typing import Optional
 
 from mdns_discovery.data_classes.aaaa_record import AaaaRecord
 from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
@@ -83,7 +83,7 @@ class MdnsDiscovery:
     # Public methods
     async def get_commissioner_services(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                        ) -> List[MdnsServiceInfo]:
+                                        ) -> list[MdnsServiceInfo]:
         """
         Asynchronously discovers commissioner mDNS services on the network.
 
@@ -106,7 +106,7 @@ class MdnsDiscovery:
 
     async def get_commissionable_services(self, log_output: bool = False,
                                           discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                          ) -> List[MdnsServiceInfo]:
+                                          ) -> list[MdnsServiceInfo]:
         """
         Asynchronously discovers commissionable mDNS services on the network.
 
@@ -129,7 +129,7 @@ class MdnsDiscovery:
 
     async def get_operational_services(self, log_output: bool = False,
                                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                       ) -> List[MdnsServiceInfo]:
+                                       ) -> list[MdnsServiceInfo]:
         """
         Asynchronously discovers operational mDNS services on the network.
 
@@ -152,7 +152,7 @@ class MdnsDiscovery:
 
     async def get_border_router_services(self, log_output: bool = False,
                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                                         ) -> List[MdnsServiceInfo]:
+                                         ) -> list[MdnsServiceInfo]:
         """
         Asynchronously discovers border router mDNS services on the network.
 
@@ -175,7 +175,7 @@ class MdnsDiscovery:
 
     async def get_all_services(self, log_output: bool = False,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                               ) -> Dict[str, List[MdnsServiceInfo]]:
+                               ) -> dict[str, list[MdnsServiceInfo]]:
         """
         Asynchronously discovers all available mDNS services within the network.
 
@@ -296,7 +296,7 @@ class MdnsDiscovery:
         Returns:
             list[AaaaRecord]: A list of discovered AaaaRecord objects.
         """
-        log.info(f"Service record information lookup (AAAA) for '{hostname}' in progress...")
+        log.info("Service record information lookup (AAAA) for '%s' in progress...", hostname)
 
         async with AsyncZeroconf(interfaces=self.interfaces) as azc:
             # Perform AAAA query
@@ -307,7 +307,7 @@ class MdnsDiscovery:
                 timeout_ms=query_timeout_sec * 1000)
 
             if is_discovered:
-                log.info(f"Service record information (AAAA) for '{hostname}' discovered.")
+                log.info("Service record information (AAAA) for '%s' discovered.", hostname)
 
                 # Get IPv6 addresses and convert to AaaaRecord objects
                 ipv6_addresses = addr_resolver.ip_addresses_by_version(IPVersion.V6Only)
@@ -324,7 +324,7 @@ class MdnsDiscovery:
 
                 return quada_records
 
-            log.error(f"Service record information (AAAA) for '{hostname}' not found.")
+            log.error("Service record information (AAAA) for '%s' not found.", hostname)
             return []
 
     async def get_ptr_records(self,
@@ -345,7 +345,7 @@ class MdnsDiscovery:
         Returns:
             list[PtrRecord]: A list of discovered PtrRecord objects.
         """
-        log.info(f"Service record information lookup (PTR) for '{service_types}' in progress...")
+        log.info("Service record information lookup (PTR) for '%s' in progress...", service_types)
         await self.discover(
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=log_output,
@@ -353,7 +353,7 @@ class MdnsDiscovery:
         )
 
         if self._discovered_services:
-            log.info(f"Service record information (PTR) for '{service_types}' discovered.")
+            log.info("Service record information (PTR) for '%s' discovered.", service_types)
 
             return [
                 record
@@ -361,10 +361,10 @@ class MdnsDiscovery:
                 for record in record_list
             ]
 
-        log.error(f"Service record information (PTR) for '{service_types}' not found.")
+        log.error("Service record information (PTR) for '%s' not found.", service_types)
         return []
 
-    async def get_all_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> List[str]:
+    async def get_all_service_types(self, log_output: bool = False, discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> list[str]:
         """
         Asynchronously discovers all available mDNS service types within the network and returns a list
         of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
@@ -386,7 +386,7 @@ class MdnsDiscovery:
             try:
                 service_types = list(set(await wait_for(AsyncZeroconfServiceTypes.async_find(aiozc=azc, interfaces=self.interfaces), timeout=discovery_timeout_sec)))
             except TimeoutError:
-                log.info(f"mDNS service types discovery timed out after {discovery_timeout_sec} seconds.")
+                log.info("mDNS service types discovery timed out after %s seconds.", discovery_timeout_sec)
                 service_types = []
 
             if log_output:
@@ -427,7 +427,7 @@ class MdnsDiscovery:
         return sub_types
 
     async def discover(self,
-                       service_types: Optional[List[str]] = None,
+                       service_types: Optional[list[str]] = None,
                        all_services: bool = False,
                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                        query_service: bool = False,
@@ -483,7 +483,7 @@ class MdnsDiscovery:
             if all_services else service_types
         )
 
-        log.info(f"Browsing for mDNS service(s) of type: {types}")
+        log.info("Browsing for mDNS service(s) of type: %s", types)
 
         # Setup fresh discovery
         self._event.clear()
@@ -513,7 +513,7 @@ class MdnsDiscovery:
             # Log discovered services stats found during the browse
             services_count = sum(len(ptr_list) for ptr_list in self._discovered_services.values())
             types_count = len(self._discovered_services)
-            log.info(f"Discovered {services_count} mDNS service(s) across {types_count} service type(s)")
+            log.info("Discovered %s mDNS service(s) across %s service type(s)", services_count, types_count)
             if log_output:
                 self._log_output()
 
@@ -573,7 +573,7 @@ class MdnsDiscovery:
         if state_change != ServiceStateChange.Added:
             return
 
-        log.info(f"Service info added. Service name: '{name}', Service Type: '{service_type}'")
+        log.info("Service info added. Service name: '%s', Service Type: '%s'", name, service_type)
 
         # Used by the _monitor_discovery_silence function
         self._last_discovery_time = time.time()
@@ -629,7 +629,7 @@ class MdnsDiscovery:
             await azc.async_remove_service_listener(service_listener)
 
             if is_discovered:
-                log.info(f"Service record information {rec_types} for '{service_name}' / '{service_type}' discovered.")
+                log.info("Service record information %s for '%s' / '%s' discovered.", rec_types, service_name, service_type)
 
                 # Convert discovered service info into MdnsServiceInfo object
                 mdns_service_info = MdnsServiceInfo(service_info)
@@ -647,7 +647,7 @@ class MdnsDiscovery:
 
                 return mdns_service_info
 
-            log.error(f"Service record information {rec_types} for '{service_name}' not found.")
+            log.error("Service record information %s for '%s' not found.", rec_types, service_name)
             return None
 
     async def _monitor_discovery_silence(self, silence_threshold: float) -> None:
@@ -678,7 +678,7 @@ class MdnsDiscovery:
             # If the time since the last discovered service exceeds the silence threshold,
             # we assume discovery is complete and signal to stop the browsing process.
             if self._discovered_services and time_since_last_discovery >= silence_threshold:
-                log.info(f"No new mDNS services discovered after {silence_threshold:.1f} seconds, stopping browse")
+                log.info("No new mDNS services discovered after %.1f seconds, stopping browse", silence_threshold)
                 self._event.set()
                 break
 

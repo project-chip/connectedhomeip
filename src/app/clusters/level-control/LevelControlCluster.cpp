@@ -573,10 +573,9 @@ CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode rep
                                                 chip::System::Clock::Milliseconds64(1000)));
     }
 
-    if (dirtyState == AttributeDirtyState::kMustReport)
-    {
-        NotifyAttributeChanged(Attributes::CurrentLevel::Id);
-    }
+    NotifyAttributeChanged(Attributes::CurrentLevel::Id,
+                           (dirtyState == AttributeDirtyState::kMustReport) ? DataModel::AttributeChangeType::kReportable
+                                                                            : DataModel::AttributeChangeType::kQuiet);
     StoreCurrentLevel(mCurrentLevel.value());
     mDelegate.OnLevelChanged(level);
 
@@ -665,6 +664,7 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
 
     // Convert ms to ds (rounding up)
     uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
+    VerifyOrReturn(mRemainingTime.value() != DataModel::MakeNullable(remainingTimeDs));
 
     auto now = System::SystemClock().GetMonotonicMilliseconds64();
 
@@ -672,25 +672,26 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
     // - When it changes from 0 to any value higher than 10, or
     // - When it changes, with a delta larger than 10, caused by the invoke of a command, or
     // - When it changes to 0."
-    if (mRemainingTime.SetValue(DataModel::MakeNullable(remainingTimeDs), now, [this, mode](const auto & candidate) {
-            // "As this attribute is not being reported during a regular countdown..."
-            if (mode == ReportingMode::kQuietReport)
-            {
-                return candidate.newValue.ValueOr(0) == 0 && candidate.lastDirtyValue.ValueOr(0) != 0;
-            }
+    auto dirtyState = mRemainingTime.SetValue(DataModel::MakeNullable(remainingTimeDs), now, [this, mode](const auto & candidate) {
+        // "As this attribute is not being reported during a regular countdown..."
+        if (mode == ReportingMode::kQuietReport)
+        {
+            return candidate.newValue.ValueOr(0) == 0 && candidate.lastDirtyValue.ValueOr(0) != 0;
+        }
 
-            // Transitions shorter than 1 second (10ds) will never satisfy the "higher than 10" requirement for the initial report,
-            // so we filter them out early to avoid unnecessary processing.
-            VerifyOrReturnValue(mTransitionHandler.GetTransitionTimeMs() >= 1000, false);
+        // Transitions shorter than 1 second (10ds) will never satisfy the "higher than 10" requirement for the initial report,
+        // so we filter them out early to avoid unnecessary processing.
+        VerifyOrReturnValue(mTransitionHandler.GetTransitionTimeMs() >= 1000, false);
 
-            auto lastDirty = candidate.lastDirtyValue.ValueOr(0);
-            auto newValue  = candidate.newValue.ValueOr(0);
+        auto lastDirty = candidate.lastDirtyValue.ValueOr(0);
+        auto newValue  = candidate.newValue.ValueOr(0);
 
-            return ((newValue == 0 && lastDirty != 0) || (newValue > lastDirty ? newValue - lastDirty : lastDirty - newValue) > 10);
-        }) == AttributeDirtyState::kMustReport)
-    {
-        NotifyAttributeChanged(Attributes::RemainingTime::Id);
-    }
+        return ((newValue == 0 && lastDirty != 0) || (newValue > lastDirty ? newValue - lastDirty : lastDirty - newValue) > 10);
+    });
+
+    NotifyAttributeChanged(Attributes::RemainingTime::Id,
+                           (dirtyState == AttributeDirtyState::kMustReport) ? DataModel::AttributeChangeType::kReportable
+                                                                            : DataModel::AttributeChangeType::kQuiet);
 }
 
 void LevelControlCluster::TransitionHandler::StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel,

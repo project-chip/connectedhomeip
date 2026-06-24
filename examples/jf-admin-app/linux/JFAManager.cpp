@@ -24,6 +24,10 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/server/Server.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <CommissionerMain.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 #include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -178,7 +182,7 @@ void JFAManager::HandleCommissioningCompleteEvent()
                 // Uses internal method that bypasses CAT restrictions since JFA setup needs both Admin and Anchor CATs
                 Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addGroupCommandData;
                 addGroupCommandData.groupID       = 0;
-                addGroupCommandData.friendlyName  = CharSpan::fromCharString("Default JFA Group");
+                addGroupCommandData.friendlyName  = "Default JFA Group"_span;
                 addGroupCommandData.groupKeySetID = 0;
                 addGroupCommandData.groupCAT      = kAdminCATIdentifier; // Use Admin CAT for default group
                 addGroupCommandData.groupCATVersion.SetNonNull(1);
@@ -191,11 +195,28 @@ void JFAManager::HandleCommissioningCompleteEvent()
 
                 Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type newAdmin;
                 newAdmin.nodeID       = nodeId;
-                newAdmin.friendlyName = CharSpan::fromCharString("Default JFA Admin");
+                newAdmin.friendlyName = "Default JFA Admin"_span;
                 newAdmin.vendorID     = vendorId;
                 newAdmin.icac         = ByteSpan(mICACBuffer, mICACBufferLen);
 
                 LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddAdmin(newAdmin));
+
+                if (!mCommissionerInitialized)
+                {
+                    CHIP_ERROR err = InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
+                                                      LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort, fb.GetFabricId(),
+                                                      fabricIndex);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        mCommissionerInitialized = true;
+                        ChipLogProgress(JointFabric, "Commissioner mode initialized on commissioned fabric index %u",
+                                        static_cast<unsigned>(fabricIndex));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to initialize commissioner mode: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
+                }
 
                 ChipLogProgress(JointFabric, "Joint Fabric Administrator commissioned on fabric index %d", fabricIndex);
             }
@@ -374,7 +395,9 @@ void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICA
 
     ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse");
 
-    if ((CHIP_NO_ERROR == VerifyCertificateSigningRequest(icaccsr.icaccsr.data(), icaccsr.icaccsr.size(), pubKey)) &&
+    if (icaccsr.icaccsr.HasValue() &&
+        (CHIP_NO_ERROR ==
+         VerifyCertificateSigningRequest(icaccsr.icaccsr.Value().data(), icaccsr.icaccsr.Value().size(), pubKey)) &&
         jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
     {
         ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");

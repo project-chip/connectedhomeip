@@ -60,7 +60,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ChimeStartedPlaying.
+} // namespace ChimeStartedPlaying
 } // namespace Events
 } // namespace Chime
 } // namespace Clusters

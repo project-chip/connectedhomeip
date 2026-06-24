@@ -14,7 +14,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, MutableMapping, Optional, Union
+from typing import MutableMapping, Optional, Union
 
 from matter.idl.matter_idl_types import Idl, ParseMetaData
 
@@ -60,7 +60,7 @@ class LintRule(ABC):
         self.name = name
 
     @abstractmethod
-    def LintIdl(self, idl: Idl) -> List[LintError]:
+    def LintIdl(self, idl: Idl) -> list[LintError]:
         """Runs the linter on the given IDL and returns back any errors it may find"""
         pass
 
@@ -92,7 +92,7 @@ class ErrorAccumulatingRule(LintRule):
     """Contains a lint error list and helps helpers to add to such a list of rules."""
 
     def __init__(self, name):
-        super(ErrorAccumulatingRule, self).__init__(name)
+        super().__init__(name)
         self._lint_errors = []
         self._idl = None
 
@@ -106,7 +106,7 @@ class ErrorAccumulatingRule(LintRule):
             return None
         return LocationInFile(self._idl.parse_file_name, meta)
 
-    def LintIdl(self, idl: Idl) -> List[LintError]:
+    def LintIdl(self, idl: Idl) -> list[LintError]:
         self._idl = idl
         self._lint_errors = []
         self._LintImpl()
@@ -124,8 +124,8 @@ class ErrorAccumulatingRule(LintRule):
 class ClusterValidationRule(ErrorAccumulatingRule):
     def __init__(self, name):
         super().__init__(name)
-        self._mandatory_clusters: List[ClusterRequirement] = []
-        self._rejected_clusters: List[ClusterRequirement] = []
+        self._mandatory_clusters: list[ClusterRequirement] = []
+        self._rejected_clusters: list[ClusterRequirement] = []
 
     def __repr__(self):
         result = "ClusterValidationRule{\n"
@@ -205,8 +205,8 @@ class ClusterValidationRule(ErrorAccumulatingRule):
 class RequiredAttributesRule(ErrorAccumulatingRule):
     def __init__(self, name):
         super().__init__(name)
-        self._mandatory_attributes: List[AttributeRequirement] = []
-        self._deny_attributes: List[ClusterAttributeDeny] = []
+        self._mandatory_attributes: list[AttributeRequirement] = []
+        self._deny_attributes: list[ClusterAttributeDeny] = []
 
     def __repr__(self):
         result = "RequiredAttributesRule{\n"
@@ -329,11 +329,11 @@ class ClusterCommandRequirement:
 
 class RequiredCommandsRule(ErrorAccumulatingRule):
     def __init__(self, name):
-        super(RequiredCommandsRule, self).__init__(name)
+        super().__init__(name)
 
         # Maps cluster id to mandatory cluster requirement
         self._mandatory_commands: MutableMapping[int,
-                                                 List[ClusterCommandRequirement]] = {}
+                                                 list[ClusterCommandRequirement]] = {}
 
     def __repr__(self):
         result = "RequiredCommandsRule{\n"

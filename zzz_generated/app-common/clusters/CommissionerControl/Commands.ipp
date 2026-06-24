@@ -71,7 +71,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace RequestCommissioningApproval.
+} // namespace RequestCommissioningApproval
 namespace CommissionNode {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -104,7 +104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CommissionNode.
+} // namespace CommissionNode
 namespace ReverseOpenCommissioningWindow {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -152,7 +152,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ReverseOpenCommissioningWindow.
+} // namespace ReverseOpenCommissioningWindow
 } // namespace Commands
 } // namespace CommissionerControl
 } // namespace Clusters

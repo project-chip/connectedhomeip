@@ -39,6 +39,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DeviceEnergy
             return Forecast::kMetadataEntry;
         case OptOutState::Id:
             return OptOutState::kMetadataEntry;
+        case PowerRangeAdjustment::Id:
+            return PowerRangeAdjustment::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -69,6 +71,10 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Device
             return RequestConstraintBasedForecast::kMetadataEntry;
         case CancelRequest::Id:
             return CancelRequest::kMetadataEntry;
+        case PowerRangeAdjustRequest::Id:
+            return PowerRangeAdjustRequest::kMetadataEntry;
+        case CancelPowerRangeAdjustRequest::Id:
+            return CancelPowerRangeAdjustRequest::kMetadataEntry;
 
         default:
             return std::nullopt;

@@ -39,7 +39,7 @@ public:
 class PowerTopologyInstance : public Instance
 {
 public:
-    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, Feature aFeature) :
+    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, BitMask<Feature> aFeature) :
         PowerTopology::Instance(aEndpointId, aDelegate, aFeature)
     {
         mDelegate = &aDelegate;
@@ -70,7 +70,7 @@ private:
  * @return CHIP_NO_ERROR if the PowerTopology cluster is initialized successfully, otherwise an error code
  */
 CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId, std::unique_ptr<PowerTopologyDelegate> & aDelegate,
-                             std::unique_ptr<PowerTopologyInstance> & aInstance);
+                             std::unique_ptr<PowerTopologyInstance> & aInstance, BitMask<Feature> aFeature);
 
 CHIP_ERROR PowerTopologyShutdown(std::unique_ptr<PowerTopologyInstance> & aInstance,
                                  std::unique_ptr<PowerTopologyDelegate> & aDelegate);

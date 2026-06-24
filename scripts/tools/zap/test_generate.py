@@ -20,7 +20,7 @@ import subprocess
 import sys
 import unittest
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional
 
 import yaml
 
@@ -48,7 +48,7 @@ class ExpectedOutput:
 @dataclass
 class GeneratorTestCase:
     template: str
-    outputs: List[ExpectedOutput] = field(default_factory=list)
+    outputs: list[ExpectedOutput] = field(default_factory=list)
 
     def add_outputs(self, yaml_outputs_dict):
         for file_name, golden_path in yaml_outputs_dict.items():
@@ -60,7 +60,7 @@ class GeneratorTestCase:
 class GeneratorTest:
     zap: str
     context: ProgramArguments
-    test_cases: List[GeneratorTestCase] = field(default_factory=list)
+    test_cases: list[GeneratorTestCase] = field(default_factory=list)
 
     def add_test_cases(self, yaml_test_case_dict):
         for json, outputs in yaml_test_case_dict.items():
@@ -131,7 +131,7 @@ class GeneratorTest:
                             raise
 
 
-def build_tests(yaml_data, context: ProgramArguments) -> List[GeneratorTest]:
+def build_tests(yaml_data, context: ProgramArguments) -> list[GeneratorTest]:
     """
     Transforms the YAML dictonary (Dict[str, Dict[str, Dict[str,str]]]) into
     a generator test structure.

@@ -161,7 +161,7 @@ if (is_libfuzzer) {
 
   if (chip_device_platform == "darwin") {
     action("codesign") {
-      script = "entitlements/codesign.py"
+      script = "${chip_root}/examples/common/darwin/entitlements/codesign.py"
       public_deps = [ ":chip-all-clusters-app" ]
 
       args = [

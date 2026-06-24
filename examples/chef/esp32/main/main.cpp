@@ -44,9 +44,11 @@
 #include <app/server/Dnssd.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
+#if CONFIG_HAVE_DISPLAY
 #include "Display.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
+#endif // CONFIG_HAVE_DISPLAY
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -160,10 +162,12 @@ void InitServer(intptr_t)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    LogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
     sWiFiNetworkCommissioningInstance.Init();
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 

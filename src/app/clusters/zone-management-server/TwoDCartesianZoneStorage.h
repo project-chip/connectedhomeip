@@ -17,7 +17,9 @@
  */
 
 #pragma once
-#include <app-common/zap-generated/cluster-objects.h>
+
+#include <clusters/ZoneManagement/Commands.h>
+#include <clusters/ZoneManagement/Events.h>
 #include <string>
 #include <vector>
 

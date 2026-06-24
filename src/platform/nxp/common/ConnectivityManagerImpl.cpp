@@ -591,24 +591,28 @@ void ConnectivityManagerImpl::_NetifExtCallback(struct netif * netif, netif_nsc_
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-    struct netif * netif = nullptr;
-    int32_t result;
-
-    LOCK_TCPIP_CORE();
-    netif = static_cast<struct netif *>(net_get_mlan_handle());
-    if (netif != nullptr)
+    if (!mWifiManagerInit)
     {
-        memset(&ConnectivityManagerImpl::sNetifCallback, 0, sizeof(ConnectivityManagerImpl::sNetifCallback));
-        netif_add_ext_callback(&ConnectivityManagerImpl::sNetifCallback, &_NetifExtCallback);
-    }
-    UNLOCK_TCPIP_CORE();
+        struct netif * netif = nullptr;
+        int32_t result;
 
-    result = wlan_start(_WlanEventCallback);
+        LOCK_TCPIP_CORE();
+        netif = static_cast<struct netif *>(net_get_mlan_handle());
+        if (netif != nullptr)
+        {
+            memset(&ConnectivityManagerImpl::sNetifCallback, 0, sizeof(ConnectivityManagerImpl::sNetifCallback));
+            netif_add_ext_callback(&ConnectivityManagerImpl::sNetifCallback, &_NetifExtCallback);
+        }
+        UNLOCK_TCPIP_CORE();
 
-    if (result != WM_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "Failed to start WLAN Connection Manager");
-        chipDie();
+        result = wlan_start(_WlanEventCallback);
+
+        if (result != WM_SUCCESS)
+        {
+            ChipLogError(DeviceLayer, "Failed to start WLAN Connection Manager");
+            chipDie();
+        }
+        mWifiManagerInit = true;
     }
 }
 #if CHIP_ENABLE_OPENTHREAD
@@ -683,11 +687,8 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
     // Need to enable the WIFI interface here when Thread is enabled as a secondary network interface. We don't want to enable
     // WIFI from the init phase anymore and we will only do it in case the commissioner is provisioning the device with
     // the WIFI credentials.
-    if (mWifiManagerInit == false)
-    {
-        StartWiFiManagement();
-        mWifiManagerInit = true;
-    }
+    // If already done, will do nothing
+    StartWiFiManagement();
 
     memset(pNetworkData, 0, sizeof(struct wlan_network));
 

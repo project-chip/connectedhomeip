@@ -150,7 +150,7 @@ def version_update(log_level, update, new_version):
             if need_replace:
                 log.info("Replacing with version '%s' in '%s'", new_version, name)
 
-                with open(os.path.join(CHIP_ROOT_DIR, name), 'wt') as f:
+                with open(os.path.join(CHIP_ROOT_DIR, name), 'w') as f:
                     f.write(file_data)
 
     # Finally, check zap_execution for any version update
@@ -166,7 +166,7 @@ def version_update(log_level, update, new_version):
                 new_min_version + m.group(3) + file_data[m.end():]
             log.info("Updating min version to '%s' in '%s'", new_min_version, ZAP_EXECUTION_SCRIPT)
 
-            with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'wt') as f:
+            with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'w') as f:
                 f.write(file_data)
 
 

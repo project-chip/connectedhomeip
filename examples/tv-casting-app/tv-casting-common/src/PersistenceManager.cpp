@@ -348,8 +348,9 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
         if (videoPlayersContainerTagNum == kVideoPlayerMACAddressTag)
         {
             MACAddressLength = reader.GetLength();
-            ReturnErrorOnFailure(reader.GetBytes(reinterpret_cast<uint8_t *>(MACAddressBuf),
-                                                 2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength));
+            ReturnErrorOnFailure(
+                reader.GetBytes(reinterpret_cast<uint8_t *>(MACAddressBuf),
+                                2 * static_cast<size_t>(chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength)));
             continue;
         }
 

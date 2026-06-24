@@ -51,7 +51,7 @@ import re
 import subprocess
 from dataclasses import dataclass, replace
 from enum import Enum, auto
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional
 
 import click
 import coloredlogs
@@ -729,7 +729,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
     return symbols
 
 
-def fetch_symbols(elf_file: str, fetch: FetchStyle, glob_filter: Optional[str]) -> Tuple[list[Symbol], str]:
+def fetch_symbols(elf_file: str, fetch: FetchStyle, glob_filter: Optional[str]) -> tuple[list[Symbol], str]:
     """Returns the sumbol list and the separator used to split symbols
     """
     match fetch:

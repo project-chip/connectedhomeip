@@ -469,12 +469,10 @@ bool emberAfJointFabricDatastoreClusterUpdateAdminCallback(
     const JointFabricDatastoreCluster::Commands::UpdateAdmin::DecodableType & commandData)
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
-    auto nodeId                                      = commandData.nodeID.Value();
-    auto friendlyName                                = commandData.friendlyName.Value();
-    auto icac                                        = commandData.icac.Value();
+    auto nodeId                                      = commandData.nodeID;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    SuccessOrExit(err = jointFabricDatastore.UpdateAdmin(nodeId, friendlyName, icac));
+    SuccessOrExit(err = jointFabricDatastore.UpdateAdmin(nodeId, commandData.friendlyName, commandData.icac));
 
 exit:
     if (err == CHIP_NO_ERROR)

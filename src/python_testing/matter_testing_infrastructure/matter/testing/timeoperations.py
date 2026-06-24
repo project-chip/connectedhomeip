@@ -26,7 +26,7 @@ Examples:
     $ python3 timeoperations.py
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Optional
 
 from mobly import asserts
@@ -56,11 +56,11 @@ def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
         1
     """
     if desired_datetime is None:
-        utc_native = datetime.now(tz=timezone.utc)
+        utc_native = datetime.now(tz=UTC)
     else:
         utc_native = desired_datetime
     # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
-    utc_th_delta = utc_native - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+    utc_th_delta = utc_native - datetime(2000, 1, 1, 0, 0, 0, 0, UTC)
     return int(utc_th_delta.total_seconds() * 1000000)
 
 
@@ -84,7 +84,7 @@ def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
         datetime.datetime(2000, 1, 1, 0, 2, 3, 456789, tzinfo=datetime.timezone.utc)
     """
     delta_from_epoch = timedelta(microseconds=matter_epoch_us)
-    matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+    matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, UTC)
 
     return matter_epoch + delta_from_epoch
 
@@ -109,7 +109,7 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
     """
     millis = posix_time_ms % 1000
     seconds = posix_time_ms // 1000
-    return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
+    return datetime.fromtimestamp(seconds, UTC) + timedelta(milliseconds=millis)
 
 
 def compare_time(received: int, offset: timedelta = timedelta(), utc: Optional[int] = None, tolerance: timedelta = timedelta(seconds=5)) -> None:

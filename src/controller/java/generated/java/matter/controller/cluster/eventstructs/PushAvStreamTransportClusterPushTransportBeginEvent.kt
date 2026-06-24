@@ -27,7 +27,7 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
   val connectionID: UShort,
   val triggerType: UByte,
   val activationReason: Optional<UByte>,
-  val containerType: UByte,
+  val containerType: Optional<UByte>,
   val CMAFSessionNumber: Optional<ULong>,
 ) {
   override fun toString(): String = buildString {
@@ -49,7 +49,10 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         val optactivationReason = activationReason.get()
         put(ContextSpecificTag(TAG_ACTIVATION_REASON), optactivationReason)
       }
-      put(ContextSpecificTag(TAG_CONTAINER_TYPE), containerType)
+      if (containerType.isPresent) {
+        val optcontainerType = containerType.get()
+        put(ContextSpecificTag(TAG_CONTAINER_TYPE), optcontainerType)
+      }
       if (CMAFSessionNumber.isPresent) {
         val optCMAFSessionNumber = CMAFSessionNumber.get()
         put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
@@ -78,7 +81,12 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         } else {
           Optional.empty()
         }
-      val containerType = tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_TYPE))
+      val containerType =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CONTAINER_TYPE))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_TYPE)))
+        } else {
+          Optional.empty()
+        }
       val CMAFSessionNumber =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
           Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))

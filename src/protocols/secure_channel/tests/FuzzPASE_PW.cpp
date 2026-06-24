@@ -17,6 +17,13 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 namespace chip {
 namespace Testing {
 
@@ -51,6 +58,11 @@ public:
     {
         // Initialize memory.
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        // The PSA backend must be initialized before any crypto runs; fuzz
+        // binaries use gmock_main, so they don't get the unit-test main's init.
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
+#endif
         // Instantiate the LoopbackTransportManager.
         ASSERT_EQ(spLoopbackTransportManager, nullptr);
         spLoopbackTransportManager = new chip::Testing::LoopbackTransportManager();
@@ -214,9 +226,6 @@ void PASESession_Bounded(const uint32_t fuzzedSetupPasscode, const vector<uint8_
     Spake2pVerifier fuzzedSpake2pVerifier;
     ByteSpan fuzzedSaltSpan{ fuzzedSalt.data(), fuzzedSalt.size() };
 
-    // Generating the Spake2+ verifier from the fuzzed inputs
-    EXPECT_EQ(fuzzedSpake2pVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode), CHIP_NO_ERROR);
-
     // TODO: #35369 Move this to a Fixture once Errors related to FuzzTest Fixtures are resolved
     TestPASESession PASELoopBack;
     TemporarySessionManager sessionManager(PASELoopBack);
@@ -225,6 +234,9 @@ void PASESession_Bounded(const uint32_t fuzzedSetupPasscode, const vector<uint8_
 
     TestSecurePairingDelegate delegateCommissioner;
     TestSecurePairingDelegate delegateCommissionee;
+
+    // Generating the Spake2+ verifier from the fuzzed inputs
+    EXPECT_EQ(fuzzedSpake2pVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode), CHIP_NO_ERROR);
 
     PASELoopBack.SecurePairingHandshake(sessionManager, pairingCommissioner, delegateCommissioner, delegateCommissionee,
                                         fuzzedSpake2pVerifier, fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
@@ -254,9 +266,6 @@ void PASESession_Unbounded(const uint32_t fuzzedSetupPasscode, const vector<uint
     Spake2pVerifier fuzzedSpake2pVerifier;
     ByteSpan fuzzedSaltSpan{ fuzzedSalt.data(), fuzzedSalt.size() };
 
-    // Generating the Spake2+ verifier from fuzzed inputs
-    RETURN_SAFELY_IGNORED fuzzedSpake2pVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
-
     TestPASESession PASELoopBack;
     TemporarySessionManager sessionManager(PASELoopBack);
 
@@ -264,6 +273,9 @@ void PASESession_Unbounded(const uint32_t fuzzedSetupPasscode, const vector<uint
 
     TestSecurePairingDelegate delegateCommissioner;
     TestSecurePairingDelegate delegateCommissionee;
+
+    // Generating the Spake2+ verifier from fuzzed inputs
+    RETURN_SAFELY_IGNORED fuzzedSpake2pVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
     PASELoopBack.SecurePairingHandshake(sessionManager, pairingCommissioner, delegateCommissioner, delegateCommissionee,
                                         fuzzedSpake2pVerifier, fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);

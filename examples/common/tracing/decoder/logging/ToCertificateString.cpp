@@ -18,6 +18,7 @@
 
 #include "ToCertificateString.h"
 
+#include <cstdio>
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedMemoryBuffer.h>

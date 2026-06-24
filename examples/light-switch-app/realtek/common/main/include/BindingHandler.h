@@ -29,12 +29,21 @@
 class BindingHandler
 {
 public:
+    struct ColorXYData
+    {
+        uint16_t x;
+        uint16_t y;
+    };
+
     struct BindingData
     {
         chip::EndpointId EndpointId;
         chip::CommandId CommandId;
         chip::ClusterId ClusterId;
+        uint8_t Value;
         bool IsGroup{ false };
+        ColorXYData ColorXY;
+        uint16_t ColorTemperatureMireds;
     };
 
     struct SubscribeCommandData
@@ -60,6 +69,10 @@ public:
 private:
     static void OnOffProcessCommand(chip::CommandId, const chip::app::Clusters::Binding::TableEntry &,
                                     chip::OperationalDeviceProxy *, void *);
+    static void LevelControlProcessCommand(chip::CommandId, const chip::app::Clusters::Binding::TableEntry &,
+                                           chip::OperationalDeviceProxy *, void *);
+    static void ColorControlProcessCommand(chip::CommandId, const chip::app::Clusters::Binding::TableEntry &,
+                                           chip::OperationalDeviceProxy *, void *);
     static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry &, chip::OperationalDeviceProxy *, void *);
     static void LightSwitchContextReleaseHandler(void * context);
     static void InitInternal(intptr_t);

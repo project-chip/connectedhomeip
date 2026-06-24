@@ -56,7 +56,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SuppressAlarm.
+} // namespace SuppressAlarm
 namespace EnableDisableAlarm {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -84,7 +84,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace EnableDisableAlarm.
+} // namespace EnableDisableAlarm
 } // namespace Commands
 } // namespace BooleanStateConfiguration
 } // namespace Clusters

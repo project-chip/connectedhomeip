@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlassert.gni")
 
 action("gen_asn1oid") {
   script = "gen_asn1oid.py"
@@ -49,7 +48,6 @@ static_library("asn1") {
     ":asn1oid_header",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${nlassert_root}:nlassert",
   ]
 
   public_configs = [

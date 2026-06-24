@@ -136,7 +136,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             )
             asserts.fail("Expected DynamicConstraintError for unsupported cipher suite, but command succeeded")
         except InteractionModelError as e:
-            log.info(f"Received expected error for unsupported cipher suite: {e}")
+            log.info("Received expected error for unsupported cipher suite: %s", e)
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
         self.step(3)
@@ -163,7 +163,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             )
             asserts.fail("Expected DynamicConstraintError for incorrect key length, but command succeeded")
         except InteractionModelError as e:
-            log.info(f"Received expected error for incorrect AES-128 key length: {e}")
+            log.info("Received expected error for incorrect AES-128 key length: %s", e)
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
         self.step(4)
@@ -198,14 +198,14 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         session_id_128 = resp.webRTCSessionID
         asserts.assert_true(session_id_128 >= 0, f"Invalid session ID: {session_id_128}")
-        log.info(f"DUT allocated WebRTC session ID with AES-128 SFrame: {session_id_128}")
+        log.info("DUT allocated WebRTC session ID with AES-128 SFrame: %s", session_id_128)
 
         # Register the session ID with the WebRTC manager
         webrtc_manager.session_id_created(session_id_128, self.dut_node_id)
 
         self.step(5)
         # End the session from step 5
-        log.info(f"Ending WebRTC session {session_id_128}")
+        log.info("Ending WebRTC session %s", session_id_128)
 
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
@@ -214,7 +214,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully ended WebRTC session {session_id_128}")
+        log.info("Successfully ended WebRTC session %s", session_id_128)
 
         # Clean up the WebRTC manager for step 5
         await webrtc_manager.close_all()
@@ -230,7 +230,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info("Successfully deallocated audio stream %s", audio_stream_id)
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -239,7 +239,7 @@ class TC_WEBRTCP_2_24(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info("Successfully deallocated video stream %s", video_stream_id)
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@
 
 import logging
 import xml.sax.xmlreader
-from typing import List, Optional
+from typing import Optional
 
 from matter.idl.matter_idl_types import Cluster, Idl, ParseMetaData
 
@@ -41,7 +41,7 @@ class ProcessingPath:
     and in general to report things like 'this path found but was not handled'.
     """
 
-    def __init__(self, paths: Optional[List[str]] = None):
+    def __init__(self, paths: Optional[list[str]] = None):
         if paths is None:
             paths = []
         self.paths = paths

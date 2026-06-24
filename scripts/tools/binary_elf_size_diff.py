@@ -50,7 +50,7 @@ import sys
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 import click
 import coloredlogs
@@ -175,7 +175,7 @@ class RuleTransformer(Transformer):
             color=color.value if color else None,
         )
 
-    def start(self, rules) -> List[SankeyGroupingRule]:
+    def start(self, rules) -> list[SankeyGroupingRule]:
         return rules
 
     def ESCAPED_STRING(self, s):
@@ -183,7 +183,7 @@ class RuleTransformer(Transformer):
         return s.value[1:-1].encode("utf-8").decode("unicode-escape")
 
 
-def ParseRules(rules: str) -> List[SankeyGroupingRule]:
+def ParseRules(rules: str) -> list[SankeyGroupingRule]:
     grammar = Lark(
         """
        start: rule*
@@ -213,7 +213,7 @@ class SankeyData:
         self.labels = []
         self.colors = []
         self.links = []
-        self.rules: List[SankeyGroupingRule] = []
+        self.rules: list[SankeyGroupingRule] = []
 
     def add_grouping_rules(self, rules_definition: str):
         self.rules.extend(ParseRules(rules_definition))
@@ -275,7 +275,7 @@ def name_transform(name: str) -> str:
     return name
 
 
-def sankey_diagram(input_list: List, sankey_rules: Optional[Any], skip_name_transform: bool):
+def sankey_diagram(input_list: list, sankey_rules: Optional[Any], skip_name_transform: bool):
     """
     Generates a sankey diagram based on the input list. The input list is expected
     to contain values of (change_type, delta, name, size_in_1, size_in_2)

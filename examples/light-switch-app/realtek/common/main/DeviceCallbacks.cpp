@@ -35,9 +35,11 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Dnssd.h>
 #include <assert.h>
+#include <diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -265,4 +267,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
                                         value);
     }
+}
+
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    ChipLogProgress(NotSpecified, "Setting log provider.");
+
+    auto & logProvider = DiagnosticLogs::LogProvider::GetInstance();
+    DiagnosticLogs::DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }

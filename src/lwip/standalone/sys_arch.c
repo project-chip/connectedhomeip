@@ -478,7 +478,7 @@ static u32_t cond_wait(pthread_cond_t * cond, pthread_mutex_t * mutex, u32_t tim
         gettimeofday(&rtime1, NULL);
         sec  = rtime1.tv_sec;
         usec = rtime1.tv_usec;
-        usec += timeout % 1000 * 1000;
+        usec += (time_t) (timeout % 1000) * 1000;
         sec += (int) (timeout / 1000) + (int) (usec / 1000000);
         usec       = usec % 1000000;
         ts.tv_nsec = usec * 1000;

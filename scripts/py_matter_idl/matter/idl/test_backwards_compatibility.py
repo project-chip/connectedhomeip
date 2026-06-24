@@ -35,7 +35,7 @@ class Compatibility(Flag):
     BACKWARD_FAIL = auto()  # new -> old is wrong
 
 
-class DisableLogger():
+class DisableLogger:
     def __enter__(self):
         logging.disable(logging.CRITICAL)
 

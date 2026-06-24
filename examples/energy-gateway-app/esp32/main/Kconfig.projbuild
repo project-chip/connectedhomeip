@@ -64,41 +64,6 @@ menu "Demo"
         string "CHIP Project Configuration file"
         default "main/include/CHIPProjectConfig.h"
 
-    choice LED_TYPE
-        prompt "LED type"
-        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC
-        default LED_TYPE_GPIO
-        help
-            Defines the default LED type used in the example
-
-        config LED_TYPE_GPIO
-            bool "GPIO"
-        config LED_TYPE_RMT
-            bool "RMT - Addressable LED"
-    endchoice
-
-    config LED_RMT_CHANNEL
-        depends on LED_TYPE_RMT
-        int "RMT Channel"
-        range 0 7
-        default 0
-        help
-            Set the RMT peripheral channel.
-            ESP32 RMT channel from 0 to 7
-            ESP32-S3 RMT channel from 0 to 3
-            ESP32-C3 RMT channel from 0 to 1
-
-    config LED_GPIO
-        int "LED GPIO number"
-        range 0 48
-        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
-        default 48 if DEVICE_TYPE_ESP32_S3_DEVKITM
-        default 5 if DEVICE_TYPE_M5STACK
-        default 5
-        help
-            GPIO number (IOxx) to blink on and off or the RMT signal for the addressable LED.
-
     choice
       prompt "Rendezvous Mode"
       default RENDEZVOUS_MODE_BLE
@@ -115,22 +80,6 @@ menu "Demo"
           bool "Ethernet"
     endchoice
 
-    # NOTE: This config is not displayed as a input in the Kconfig menu, as its value is
-    # entirely derived from the Device Type choice.  However the CONFIG_EXAMPLE_DISPLAY_TYPE
-    # define that is produced is needed to configure the TFT library correctly.
-    config TFT_PREDEFINED_DISPLAY_TYPE
-        int
-        range 0 5
-        default 0 if DEVICE_TYPE_ESP32_DEVKITC
-        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC
-        default 3 if DEVICE_TYPE_M5STACK
-        default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
-
-    config HAVE_DISPLAY
-        bool
-        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT
-        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT)
-
     config RENDEZVOUS_MODE
        int
        range 0 8
@@ -138,13 +87,6 @@ menu "Demo"
        default 2 if RENDEZVOUS_MODE_BLE
        default 4 if RENDEZVOUS_MODE_THREAD
        default 8 if RENDEZVOUS_MODE_ETHERNET
-
-    config DISPLAY_AUTO_OFF
-        bool "Automatically turn off the M5Stack's Display after a few seconds"
-        default "y"
-        depends on DEVICE_TYPE_M5STACK
-        help
-            To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
 endmenu
 

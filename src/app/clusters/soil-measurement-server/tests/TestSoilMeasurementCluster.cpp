@@ -13,7 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
@@ -118,10 +117,10 @@ TEST_F(TestSoilMeasurementCluster, SoilMoistureMeasuredValue)
     ASSERT_EQ(soilMeasurement.GetSoilMoistureMeasuredValue(), measuredValue);
 
     measuredValue = 101;
-    ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     measuredValue = -1;
-    ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     measuredValue.SetNull();
     ASSERT_EQ(soilMeasurement.SetSoilMoistureMeasuredValue(measuredValue), CHIP_NO_ERROR);

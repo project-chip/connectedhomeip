@@ -43,7 +43,7 @@ TEST(TestPeerAddress, TestPeerAddressMulticast)
 {
     constexpr chip::FabricId fabric = 0xa1a2a4a8b1b2b4b8;
     constexpr chip::GroupId group   = 0xe10f;
-    PeerAddress addr                = PeerAddress::Multicast(fabric, group);
+    PeerAddress addr                = PeerAddress::BuildMatterPerGroupMulticastAddress(fabric, group);
     EXPECT_EQ(chip::Transport::Type::kUdp, addr.GetTransportType());
     EXPECT_TRUE(addr.IsMulticast());
 

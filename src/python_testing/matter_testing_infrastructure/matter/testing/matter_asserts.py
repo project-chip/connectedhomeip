@@ -1,10 +1,11 @@
 """
 Matter-specific assertions building on top of Mobly asserts.
 """
-
-from typing import Any, Callable, List, Optional, Type, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
 from mobly import asserts
+
+from matter.testing.commissioning_types import PaseParams
 
 T = TypeVar('T')
 
@@ -158,7 +159,7 @@ def assert_list(value: Any, description: str, min_length: Optional[int] = None, 
                                   f"{description} must not exceed {max_length} elements")
 
 
-def assert_all(value: List[T], condition: Callable[[T], bool], description: str) -> None:
+def assert_all(value: list[T], condition: Callable[[T], bool], description: str) -> None:
     """
     Asserts that all elements in the list satisfy the provided condition.
 
@@ -175,7 +176,7 @@ def assert_all(value: List[T], condition: Callable[[T], bool], description: str)
         asserts.assert_true(condition(item), f"Element at index {i} does not satisfy the condition: {description}")
 
 
-def assert_list_element_type(value: List[Any], expected_type: Type[T], description: str, allow_empty: bool = False) -> None:
+def assert_list_element_type(value: list[Any], expected_type: type[T], description: str, allow_empty: bool = False) -> None:
     """
     Asserts that all elements in the list are of the expected type.
 
@@ -288,66 +289,66 @@ def assert_string_matches_pattern(value: str, description: str, pattern: str) ->
                         f"{description} must match pattern: {pattern}")
 
 
-def assert_valid_attribute_id(id: int, allow_test: bool = False) -> None:
+def assert_valid_attribute_id(aid: int, allow_test: bool = False) -> None:
     """
     Asserts that the given ID is a valid attribute ID.
 
     Args:
-        id: The attribute ID to validate
+        aid: The attribute ID to validate
         allow_test: Whether to allow test attribute IDs
 
     Raises:
         AssertionError: If the ID is not a valid attribute ID
     """
     from matter.testing.global_attribute_ids import is_valid_attribute_id
-    asserts.assert_true(is_valid_attribute_id(id, allow_test),
-                        f"Invalid attribute ID: {hex(id)}")
+    asserts.assert_true(is_valid_attribute_id(aid, allow_test),
+                        f"Invalid attribute ID: {hex(aid)}")
 
 
-def assert_standard_attribute_id(id: int) -> None:
+def assert_standard_attribute_id(aid: int) -> None:
     """
     Asserts that the given ID is a standard attribute ID.
 
     Args:
-        id: The attribute ID to validate
+        aid: The attribute ID to validate
 
     Raises:
         AssertionError: If the ID is not a standard attribute ID
     """
     from matter.testing.global_attribute_ids import is_standard_attribute_id
-    asserts.assert_true(is_standard_attribute_id(id),
-                        f"Not a standard attribute ID: {hex(id)}")
+    asserts.assert_true(is_standard_attribute_id(aid),
+                        f"Not a standard attribute ID: {hex(aid)}")
 
 
-def assert_valid_command_id(id: int, allow_test: bool = False) -> None:
+def assert_valid_command_id(cid: int, allow_test: bool = False) -> None:
     """
     Asserts that the given ID is a valid command ID.
 
     Args:
-        id: The command ID to validate
+        cid: The command ID to validate
         allow_test: Whether to allow test command IDs
 
     Raises:
         AssertionError: If the ID is not a valid command ID
     """
     from matter.testing.global_attribute_ids import is_valid_command_id
-    asserts.assert_true(is_valid_command_id(id, allow_test),
-                        f"Invalid command ID: {hex(id)}")
+    asserts.assert_true(is_valid_command_id(cid, allow_test),
+                        f"Invalid command ID: {hex(cid)}")
 
 
-def assert_standard_command_id(id: int) -> None:
+def assert_standard_command_id(cid: int) -> None:
     """
     Asserts that the given ID is a standard command ID.
 
     Args:
-        id: The command ID to validate
+        cid: The command ID to validate
 
     Raises:
         AssertionError: If the ID is not a standard command ID
     """
     from matter.testing.global_attribute_ids import is_standard_command_id
-    asserts.assert_true(is_standard_command_id(id),
-                        f"Not a standard command ID: {hex(id)}")
+    asserts.assert_true(is_standard_command_id(cid),
+                        f"Not a standard command ID: {hex(cid)}")
 
 
 def assert_valid_enum(value: Any, description: str, enum_type: type) -> None:
@@ -368,3 +369,107 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
                         f"{description} must be an integer")
     asserts.assert_true(0 <= value <= 0xFF,
                         f"{description} must be between 0 and 255 (inclusive)")
+
+
+# Commissioning-related assertions
+
+async def assert_factory_fresh(
+    dev_ctrl,
+    node_id: int,
+    description: str = "Device",
+    pase_params: Optional[PaseParams] = None
+) -> None:
+    """
+    Asserts that the device has NO commissioned fabrics (factory fresh state).
+
+    Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
+    and verifies that the list is empty. A non-empty list indicates the device has fabrics.
+
+    This assertion works over PASE (before a CASE session is established) or CASE.
+
+    Useful for tests that require factory-default state, such as discriminator uniqueness
+    tests or device attestation tests.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        description: User-defined description for error messages (default: "Device")
+        pase_params: Optional parameters for establishing PASE if needed.
+                    See get_commissioned_fabric_count() for format details.
+
+    Raises:
+        AssertionError: If device has any commissioned fabrics
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
+
+    Example:
+        # Verify device is factory reset before running test
+        await assert_factory_fresh(controller, node_id=1234, description="DUT")
+
+        # Verify factory-fresh device (establishes PASE if needed)
+        pase_params = PaseParams(discriminator=1234, passcode=20202021)
+        await assert_factory_fresh(controller, node_id=1234, description="DUT", pase_params=pase_params)
+    """
+    from matter.testing.commissioning import get_commissioned_fabric_count
+
+    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    asserts.assert_equal(
+        fabric_count,
+        0,
+        f"{description} must be factory fresh (no commissioned fabrics). "
+        "TrustedRootCertificates list is not empty. "
+        "Please factory reset the device before running this test."
+    )
+
+
+async def assert_fabric_count(
+    dev_ctrl,
+    node_id: int,
+    expected_count: int,
+    description: str = "Device",
+    pase_params: Optional[PaseParams] = None
+) -> None:
+    """
+    Asserts that the device has exactly the expected number of commissioned fabrics.
+
+    Reads the TrustedRootCertificates attribute from the OperationalCredentials cluster
+    and compares the count to the expected value. Each trusted root certificate
+    corresponds to one commissioned fabric.
+
+    This assertion works over PASE (before a CASE session is established) or CASE.
+
+    Useful for multi-fabric tests where you need to verify the exact number of fabrics
+    at different stages of the test.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        expected_count: Expected number of commissioned fabrics
+        description: User-defined description for error messages (default: "Device")
+        pase_params: Optional parameters for establishing PASE if needed.
+                    Same as for get_commissioned_fabric_count().
+
+    Raises:
+        AssertionError: If actual fabric count doesn't match expected count
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
+
+    Example:
+        # Verify device has exactly 1 fabric before adding second
+        await assert_fabric_count(controller, node_id=1234, expected_count=1, description="DUT")
+
+        # Verify factory-fresh device has 0 fabrics (establishes PASE if needed)
+        pase_params = PaseParams(discriminator=1234, passcode=20202021)
+        await assert_fabric_count(controller, node_id=1234, expected_count=0, description="DUT", pase_params=pase_params)
+    """
+    from matter.testing.commissioning import get_commissioned_fabric_count
+
+    actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    asserts.assert_equal(
+        actual_count,
+        expected_count,
+        f"{description} must have exactly {expected_count} commissioned fabric(s), "
+        f"but has {actual_count} (based on TrustedRootCertificates count)"
+    )

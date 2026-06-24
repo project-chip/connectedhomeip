@@ -21,7 +21,7 @@ import logging
 import sqlite3
 import zipfile
 from pathlib import Path
-from typing import IO, Dict, Iterable, List, Optional, Union
+from typing import IO, Iterable, Optional, Union
 
 import memdf.util.sqlite
 
@@ -98,7 +98,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
             for d in kwargs['sizes']:
                 self.store('size', build_id=build, **d)
 
-    def add_sizes_from_json(self, s: Union[bytes, str], origin: Dict):
+    def add_sizes_from_json(self, s: Union[bytes, str], origin: dict):
         """Add sizes from a JSON size report."""
         r = origin.copy()
         r.update(json.loads(s))
@@ -113,7 +113,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
                 })
         self.add_sizes(**r)
 
-    def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: Dict):
+    def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: dict):
         """Add size reports from a zip."""
         with zipfile.ZipFile(f, 'r') as zip_file:
             for i in zip_file.namelist():
@@ -144,7 +144,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         row = cur.fetchone()
         return row[0] if row else None
 
-    def select_sections_for_thing(self, thing: str) -> List[str]:
+    def select_sections_for_thing(self, thing: str) -> list[str]:
         cur = self.execute(
             '''
             SELECT DISTINCT name FROM size WHERE build_id = (

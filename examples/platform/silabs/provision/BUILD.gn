@@ -35,16 +35,26 @@ source_set("storage") {
 
   if (wifi_soc) {
     if (sl_si91x_crypto_flavor == "psa") {
-      libs = [ "${sl_provision_root}/libs/libProvisionPSA_si917.a" ]
+      libs = [ "${sl_provision_root}/libs/libProvisionPSA-si917.a" ]
     } else {
-      libs = [ "${sl_provision_root}/libs/libProvision_si917.a" ]
+      libs = [ "${sl_provision_root}/libs/libProvision-si917.a" ]
     }
   } else {
     if (use_provision_flash_storage) {
-      libs =
-          [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
+      if (is_clang) {
+        libs = [ "${sl_provision_root}/libs/libProvisionFlash-${silabs_family}-clang.a" ]
+      } else {
+        libs =
+            [ "${sl_provision_root}/libs/libProvisionFlash-${silabs_family}.a" ]
+      }
     } else {
-      libs = [ "${sl_provision_root}/libs/libProvision_${silabs_family}.a" ]
+      if (is_clang) {
+        libs = [
+          "${sl_provision_root}/libs/libProvision-${silabs_family}-clang.a",
+        ]
+      } else {
+        libs = [ "${sl_provision_root}/libs/libProvision-${silabs_family}.a" ]
+      }
     }
   }
 

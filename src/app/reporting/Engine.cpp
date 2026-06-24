@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
@@ -1253,12 +1254,23 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-void Engine::MarkDirty(const AttributePathParams & path)
+void Engine::OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type)
 {
-    CHIP_ERROR err = SetDirty(path);
+    VerifyOrReturn(type == DataModel::AttributeChangeType::kReportable);
+
+    CHIP_ERROR err = SetDirty({ path.mEndpointId, path.mClusterId, path.mAttributeId });
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void Engine::OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type)
+{
+    CHIP_ERROR err = SetDirty(AttributePathParams(endpointId));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to set endpoint %u dirty: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
 }
 

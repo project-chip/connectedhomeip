@@ -73,17 +73,17 @@ endfunction()
 # Format: MY_CUSTOM_CLUSTER'.
 # ZCL_PATH          [OPTIONAL] Path to a custom ZCL JSON file.
 #                   This maps to the '--zcl' argument in the "scripts/tools/zap/generate.py" script.
-#                   By default, generate.py attempts to autodetect the ZCL path from the .zap 
+#                   By default, generate.py attempts to autodetect the ZCL path from the .zap
 #                   file which is often a relative path. When the .zap file is relocated or symlinked,
 #                   these relative paths become invalid, causing the build to fail.
 #                   Passing ZCL_PATH explicitly via CMake ensures the build remains robust and portable.
 #                   If ZCL_PATH is not provided, the default behavior is preserved unless CHIP_ENABLE_ZCL_ARG
-#                   is enabled, in which case the default path "src/app/zap-templates/zcl/zcl.json" is 
+#                   is enabled, in which case the default path "src/app/zap-templates/zcl/zcl.json" is
 #                   automatically injected to simplify usage.
 #
 # Example usage:
 # chip_configure_data_model(
-#     APP_TARGET app
+#     app
 #     ZAP_FILE "some_file.zap"
 #     ZCL_PATH "path/to/custom/zcl.json"  # Optional: override default ZCL path
 # )

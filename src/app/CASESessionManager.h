@@ -50,6 +50,11 @@ struct CASESessionManagerConfig
 class CASESessionManager : public OperationalSessionReleaseDelegate, public SessionUpdateDelegate
 {
 public:
+    // Grants tests access to the private mConfig so they can install a
+    // session-setup pool without standing up a full CASE stack, in order to
+    // exercise ReleaseSession(peerId) behavior directly.
+    friend class TestCASESessionManagerAccess;
+
     CASESessionManager() = default;
     virtual ~CASESessionManager()
     {

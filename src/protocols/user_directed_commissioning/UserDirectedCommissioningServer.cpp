@@ -120,7 +120,7 @@ void UserDirectedCommissioningServer::HandleNewUDC(const Transport::PeerAddress 
         // Call the registered InstanceNameResolver, if any.
         if (mInstanceNameResolver != nullptr)
         {
-            mInstanceNameResolver->FindCommissionableNode(instanceName);
+            mInstanceNameResolver->FindCommissionableNode(client->GetInstanceName());
         }
         else
         {

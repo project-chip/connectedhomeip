@@ -1805,8 +1805,7 @@ JNI_METHOD(jboolean, addKeySet)
         static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(jKeyPolicy);
     chip::JniByteArray jniEpochKey(env, epochKey);
     size_t epochKeySize = static_cast<size_t>(jniEpochKey.size());
-    if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
-         keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
+    if (keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst ||
         epochKeySize != chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes)
     {
         return JNI_FALSE;

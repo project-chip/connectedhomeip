@@ -39,12 +39,7 @@
         "TestColorControl_9_1",
         "TestColorControl_9_2"
     ],
-    "DeviceManagement": [
-        "Test_TC_OPCREDS_3_7",
-        "Test_TC_BINFO_2_1",
-        "Test_TC_BINFO_2_2",
-        "Test_TC_CNET_1_3"
-    ],
+    "DeviceManagement": ["Test_TC_OPCREDS_3_7", "Test_TC_CNET_1_3"],
     "Descriptor": [],
     "DeviceEnergyManagementMode": ["Test_TC_DEMM_2_1"],
     "EthernetNetworkDiagnostics": ["Test_TC_DGETH_2_1", "Test_TC_DGETH_2_2"],
@@ -247,7 +242,8 @@
         "TestOperationalState",
         "TestRVCOperationalState",
         "TestDishwasherAlarm",
-        "Test_AddNewFabricFromExistingFabric"
+        "Test_AddNewFabricFromExistingFabric",
+        "Test_WaitForAttributeValue"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": [],

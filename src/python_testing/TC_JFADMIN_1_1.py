@@ -62,6 +62,9 @@ class TC_JFADMIN_1_1(MatterBaseTest):
         self.fabric_a_ctrl = None
         self.fabric_a_admin = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
+        self.fabric_a_persistent_storage = None
+        self.cert_authority_manager_a = None
+        self.dev_ctrl_eco_a = None
 
         self.jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not self.jfc_server_app:
@@ -88,6 +91,16 @@ class TC_JFADMIN_1_1(MatterBaseTest):
         if self.fabric_a_ctrl is not None:
             self.fabric_a_ctrl.terminate()
 
+        if self.dev_ctrl_eco_a is not None:
+            self.dev_ctrl_eco_a.Shutdown()
+            self.dev_ctrl_eco_a = None
+        if self.cert_authority_manager_a is not None:
+            self.cert_authority_manager_a.Shutdown()
+            self.cert_authority_manager_a = None
+        if self.fabric_a_persistent_storage is not None:
+            self.fabric_a_persistent_storage.Shutdown()
+            self.fabric_a_persistent_storage = None
+
         super().teardown_class()
 
     def steps_TC_JFADMIN_1_1(self) -> list[TestStep]:
@@ -106,35 +119,54 @@ class TC_JFADMIN_1_1(MatterBaseTest):
     @async_test_body
     async def test_TC_JFADMIN_1_1(self):
         self.step("1")
-        self.JFADMIN_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
+        dut_rpc_server_port = None
+        dut_rpc_server_ip = None
+        jfadmin_fabric_a_discriminator = None
 
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            self.jfa_server_app,
-            storage_dir=self.storage_fabric_a,
-            port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
-            passcode=self.JFADMIN_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
-            expected_output="Server initialization complete",
-            timeout=20)
+        if self.is_pics_sdk_ci_only:
+            dut_rpc_server_ip = "127.0.0.1"
+            jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+            dut_rpc_server_port = str(self.get_random_port())
+            # Start Fabric A JF-Administrator App
+            self.fabric_a_admin = AppServerSubprocess(
+                self.jfa_server_app,
+                storage_dir=self.storage_fabric_a,
+                port=self.get_random_port(),
+                discriminator=jfadmin_fabric_a_discriminator,
+                passcode=jfadmin_fabric_a_passcode,
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", dut_rpc_server_port])
+            self.fabric_a_admin.start(
+                expected_output="Server initialization complete",
+                timeout=20)
+        else:
+            # We have a DUT that is already running, connect to it via RPC
+            dut_rpc_server_ip = self.user_params.get("dut_rpc_server_ip", None)
+            if not dut_rpc_server_ip:
+                asserts.fail("DUT RPC server IP must be specified via --string-arg dut_rpc_server_ip:<ip_address>")
+            dut_rpc_server_port = self.user_params.get("dut_rpc_server_port", None)
+            if not dut_rpc_server_port:
+                asserts.fail("DUT RPC server PORT must be specified via --string-arg dut_rpc_server_port:<port>")
+            if not self.matter_test_config.setup_passcodes:
+                asserts.fail("JF-Administrator passcode must be specified via --passcode:<passcode>")
+            jfadmin_fabric_a_passcode = self.matter_test_config.setup_passcodes[0]
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             "JFC-A",
-            rpc_server_port=33033,
+            rpc_server_port=dut_rpc_server_port,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid)
+            vendor_id=self.jfctrl_fabric_a_vid,
+            extra_args=["--rpc-server-ip", dut_rpc_server_ip])
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
             timeout=20)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.JFADMIN_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork 1 {jfadmin_fabric_a_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
             timeout=20)
 
@@ -163,20 +195,20 @@ class TC_JFADMIN_1_1(MatterBaseTest):
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+        self.fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
-        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
+        self.cert_authority_manager_a = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_a_persistent_storage)
-        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+            persistentStorage=self.fabric_a_persistent_storage)
+        self.cert_authority_manager_a.LoadAuthoritiesFromStorage()
+        self.dev_ctrl_eco_a = self.cert_authority_manager_a.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
         if self.pics_guard(self.check_pics("JFADMIN.S.A0000")):
             self.step("2")
-            response = await devCtrlEcoA.ReadAttribute(
+            response = await self.dev_ctrl_eco_a.ReadAttribute(
                 nodeId=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
                 returnClusterObject=True)
             attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
@@ -185,21 +217,18 @@ class TC_JFADMIN_1_1(MatterBaseTest):
 
             # Step 3 is under same PICS guard as Step 2 becasue it relies on attributeAdminFabricIndex
             self.step("3")
-            response = await devCtrlEcoA.ReadAttribute(
+            response = await self.dev_ctrl_eco_a.ReadAttribute(
                 nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
                 returnClusterObject=True)
             fabricid_found = False
             for fabric in response[0][Clusters.OperationalCredentials].fabrics:
-                log.info(f"Checking fabricIndex from fabricID={fabric.fabricID}")
+                log.info("Checking fabricIndex from fabricID=%s", fabric.fabricID)
                 if fabric.fabricIndex == attributeAdminFabricIndex:
                     fabricid_found = True
-                    log.info(f"Found matching fabricIndex={attributeAdminFabricIndex} on fabricID={fabric.fabricID}")
+                    log.info("Found matching fabricIndex=%s on fabricID=%s", attributeAdminFabricIndex, fabric.fabricID)
                     break
             asserts.assert_true(fabricid_found,
                                 "No FabricDescriptorStruct with fabricIndex = AdministratorFabricIndex found in Operational Cluster Fabrics attribute on EP0")
-
-        # Shutdown the Python Controllers started at the beginning of this script
-        devCtrlEcoA.Shutdown()
 
 
 if __name__ == "__main__":

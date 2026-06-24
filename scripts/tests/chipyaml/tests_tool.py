@@ -16,7 +16,6 @@ import relative_importer  # isort: split # noqa: F401
 
 import asyncio
 import json
-from typing import List
 
 import click
 from chipyaml.adapters.chiptool.decoder import MatterLog
@@ -27,7 +26,7 @@ from matter.yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerCo
 
 
 @click.pass_context
-def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str, commands: List[str]):
+def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str, commands: list[str]):
     kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'specifications_paths': specifications_paths, 'pics': pics,
               'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
 

@@ -98,8 +98,10 @@ class TC_CGEN_2_7(MatterBaseTest):
 
         # Step 2: Read TCMinRequiredVersion
         self.step(2)
-        response = await commissioner.ReadAttribute(nodeId=self.dut_node_id, attributes=[(ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion)])
-        min_version = response[ROOT_ENDPOINT_ID][Clusters.GeneralCommissioning][Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion]
+        min_version = await self.read_single_attribute_check_success(
+            cluster=Clusters.GeneralCommissioning,
+            attribute=Clusters.GeneralCommissioning.Attributes.TCMinRequiredVersion,
+            endpoint=ROOT_ENDPOINT_ID)
 
         # Step 3: Send SetTCAcknowledgements with invalid response
         self.step(3)

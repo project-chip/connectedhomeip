@@ -121,6 +121,7 @@ matter_add_gn_arg_bool  ("chip_automation_logging"                FALSE)
 matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 matter_add_gn_arg_bool  ("chip_enable_wifi"                       FALSE)
+matter_add_gn_arg_bool  ("chip_config_enable_groupcast"                  CONFIG_CHIP_ENABLE_GROUPCAST)
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                      CONFIG_CHIP_ICD_LIT_SUPPORT)

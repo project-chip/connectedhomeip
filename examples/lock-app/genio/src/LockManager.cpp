@@ -24,6 +24,7 @@
 #include <FreeRTOS.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 LockManager LockManager::sLock;
@@ -366,7 +367,8 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         return false;
     }
 
-    strncpy(mUserNames[userIndex], userName.data(), userName.size());
+    // Note: userName is a CharSpan (ByteSpan), using CopyString overload for ByteSpan
+    chip::Platform::CopyString(mUserNames[userIndex], userName);
     userInStorage.userName       = chip::CharSpan(mUserNames[userIndex], userName.size());
     userInStorage.userUniqueId   = uniqueId;
     userInStorage.userStatus     = userStatus;

@@ -170,7 +170,7 @@ class TC_CC_2_1(MatterBaseTest):
                 numberofprimaries += 1
             else:
                 # Don't break to count all
-                log.warning(f"PrimaryN<X,Y,Intensity> with index {pindex} was not found in the cluster.")
+                log.warning("PrimaryN<X,Y,Intensity> with index %s was not found in the cluster.", pindex)
         return numberofprimaries
 
     async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None, nullable: bool = False):
@@ -184,12 +184,12 @@ class TC_CC_2_1(MatterBaseTest):
             max_len (int, optional): If present verify the high range of the attribute.
         """
         # If attribute_guard return false it set the current step as skipped so we can finish the step here.
-        log.info(f"Verifying the attribute :  {attribute}")
+        log.info("Verifying the attribute :  %s", attribute)
         # Verify if the attribute is implemented in the current cluster.
         if await self.attribute_guard(endpoint=self.endpoint, attribute=attribute):
             # it is so retrieve the value to check the type.
             attr_val = await self.read_single_attribute_check_success(cluster=self.cluster, attribute=attribute, endpoint=self.endpoint)
-            log.info(f"Current value for {attribute} is {attr_val}")
+            log.info("Current value for %s is %s", attribute, attr_val)
             if nullable and attr_val is NullValue:
                 log.info("Value is NULL (ok)")
                 return attr_val
@@ -204,13 +204,13 @@ class TC_CC_2_1(MatterBaseTest):
                 matter_asserts.assert_valid_uint32(attr_val, "Is not uint32")
             elif data_type == ValueTypesEnum.ENUM:
                 if len(enum_range) >= 0:
-                    log.info(f"Checking for enum with range {enum_range}")
+                    log.info("Checking for enum with range %s", enum_range)
                     asserts.assert_in(attr_val, enum_range, f"Value is not in range for enum with range {enum_range}")
                 else:
                     asserts.fail("Range list is empty")
             elif data_type == ValueTypesEnum.STRING and isinstance(attr_val, str):
                 if max_len > 0:
-                    log.info(f"Validating string with a max len of {max_len}")
+                    log.info("Validating string with a max len of %s", max_len)
                     asserts.assert_true((len(attr_val) <= max_len), "String len is out of range.")
                 else:
                     asserts.fail("Invalid String range provided.")
@@ -221,11 +221,11 @@ class TC_CC_2_1(MatterBaseTest):
             # Check if string has uint and verify is we need to compare against a min or max value_verify_first_4bits
             if 'uint' in data_type.name.lower() and (max_len is not None or min_len is not None):
                 if isinstance(min_len, int):
-                    log.info(f"Min len defined validation max range for uint {min_len}")
+                    log.info("Min len defined validation max range for uint %s", min_len)
                     asserts.assert_true((attr_val >= min_len),
                                         f"Attribute {attribute} with value {attr_val} is out of range (min): {min_len}")
                 if isinstance(max_len, int):
-                    log.info(f"Max len defined validation max range for uint {max_len}")
+                    log.info("Max len defined validation max range for uint %s", max_len)
                     asserts.assert_true((attr_val <= max_len),
                                         f"Attribute {attribute} with value {attr_val} is out of range (max): {max_len}")
             return attr_val
@@ -236,8 +236,8 @@ class TC_CC_2_1(MatterBaseTest):
         tmp_a = numa & (2**4-1)
         tmp_b = numb & (2**4-1)
         log.info("Verifying if lower 4 bits are equal.")
-        log.info(f"Num a : {bin(tmp_a)}")
-        log.info(f"Num b : {bin(tmp_b)}")
+        log.info("Num a : %s", bin(tmp_a))
+        log.info("Num b : %s", bin(tmp_b))
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
     @property
@@ -341,7 +341,7 @@ class TC_CC_2_1(MatterBaseTest):
                 self.skip_step(i)
         else:
             primariesfound = await self._get_totalnumberofprimaries(primaries=number_of_primaries_value)
-            log.info(f"Fetched Primaries attributes {primariesfound}")
+            log.info("Fetched Primaries attributes %s", primariesfound)
             asserts.assert_equal(number_of_primaries_value, primariesfound,
                                  "NumberOfPrimaries does not match with the Primaries attributes found in the cluster.")
             # Verify for NumberOfPrimaries section
@@ -350,10 +350,10 @@ class TC_CC_2_1(MatterBaseTest):
             # Range is defined from 1-6
             for primariesindex in range(1, 7):
                 log.info(
-                    f"Skip if the test index {primariesindex} is graeter than NumberOfPrimaries {number_of_primaries_value} ?")
+                    "Skip if the test index %s is graeter than NumberOfPrimaries %s ?", primariesindex, number_of_primaries_value)
                 if primariesindex > number_of_primaries_value:
                     # Skip the 3 steps
-                    log.info(f"Skipping for NumberOfPrimaries {primariesindex}")
+                    log.info("Skipping for NumberOfPrimaries %s", primariesindex)
                     for i in range(1, 4):
                         current_step += 1
                         self.skip_step(current_step)

@@ -56,6 +56,8 @@ public:
     CharSpan GetActiveLocale();
 
 private:
+    DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & aDecoder);
+
     /*
      * Read the supported locales.
      *

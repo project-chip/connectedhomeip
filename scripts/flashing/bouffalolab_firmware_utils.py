@@ -398,7 +398,7 @@ class Flasher(firmware_utils.Flasher):
             return boot2_images[0]
 
         def get_mfd_addr():
-            with open(self.args["pt"], 'r') as file:
+            with open(self.args["pt"]) as file:
                 partition_config = toml.load(file)
 
             mfd_addr = None
@@ -611,7 +611,7 @@ class Flasher(firmware_utils.Flasher):
                 raise Exception("No partition file or one more partition file found.")
 
             partition_file = partition_file[0]
-            with open(partition_file, 'r') as file:
+            with open(partition_file) as file:
                 partition_config = toml.load(file)
 
             part_addr0 = partition_config["pt_table"]["address0"]

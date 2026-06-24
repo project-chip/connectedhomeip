@@ -54,12 +54,12 @@ from matter.testing.runner import default_matter_test_main
 # --string-arg PIXIT.ACE.APPCLUSTER:<cluster_name> --string-arg PIXIT.ACE.APPATTRIBUTE:<attribute_name>
 
 
-def str_to_cluster(str):
-    return getattr(sys.modules["matter.clusters.Objects"], str)
+def str_to_cluster(s):
+    return getattr(sys.modules["matter.clusters.Objects"], s)
 
 
-def str_to_attribute(cluster, str):
-    return getattr(cluster.Attributes, str)
+def str_to_attribute(cluster, s):
+    return getattr(cluster.Attributes, s)
 
 
 class TC_ACE_1_4(MatterBaseTest):

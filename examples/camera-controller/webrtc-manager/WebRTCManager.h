@@ -26,13 +26,6 @@
 #include <webrtc-manager/WebRTCProviderClient.h>
 #include <webrtc-manager/WebRTCRequestorDelegate.h>
 
-struct ICECandidateInfo
-{
-    std::string candidate;
-    std::string mid;
-    int mlineIndex;
-};
-
 class WebRTCManager
 {
 public:
@@ -62,7 +55,7 @@ public:
 
     CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session, const std::vector<ICECandidateStruct> & candidates);
 
-    CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
+    CHIP_ERROR Connect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 
     CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
@@ -70,6 +63,7 @@ public:
 
     CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
+
     CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
 
     CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
@@ -84,6 +78,16 @@ private:
     WebRTCManager();
     ~WebRTCManager();
 
+    // Close and reset the RTP sockets
+    void CloseRTPSockets();
+
+    // PeerConnection callback handlers. The handlers are executed on the Matter thread.
+    void OnLocalDescriptionGenerated(const std::shared_ptr<rtc::PeerConnection> & connection, const rtc::Description & desc);
+    void OnLocalCandidateGathered(const std::shared_ptr<rtc::PeerConnection> & connection, const rtc::Candidate & candidate);
+    void OnConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection, rtc::PeerConnection::State state);
+    void OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                 rtc::PeerConnection::GatheringState state);
+
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster>
         mWebRTCRegisteredServerCluster;
 
@@ -92,14 +96,32 @@ private:
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
 
-    uint16_t mPendingSessionId = 0;
-    std::string mLocalDescription;
+    enum class LocalSdpState
+    {
+        Idle,
+        PendingOffer,
+        PendingAnswer
+    };
+
+    struct PendingSdpContext
+    {
+        LocalSdpState state = LocalSdpState::Idle;
+        uint16_t sessionId  = 0;
+        chip::app::DataModel::Nullable<uint16_t> nullableSessionId;
+        StreamUsageEnum streamUsage = {};
+        chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId;
+        chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId;
+
+        void Reset() { *this = PendingSdpContext{}; }
+    };
+    PendingSdpContext mPendingSdpContext;
 
     // Local vector to store the ICE Candidate info coming from the WebRTC stack
     std::vector<ICECandidateInfo> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
     std::shared_ptr<rtc::Track> mAudioTrack;
+    std::shared_ptr<rtc::DataChannel> mDataChannel;
 
     // Callback to notify when session is established
     SessionEstablishedCallback mSessionEstablishedCallback;
@@ -110,7 +132,4 @@ private:
     // UDP socket for RTP forwarding
     int mRTPSocket      = -1;
     int mAudioRTPSocket = -1;
-
-    // Close and reset the RTP socket
-    void CloseRTPSocket();
 };

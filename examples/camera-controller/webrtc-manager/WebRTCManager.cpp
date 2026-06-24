@@ -26,6 +26,7 @@
 
 #include <arpa/inet.h>
 #include <cstdio>
+#include <memory>
 #include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
@@ -89,6 +90,26 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
     return "N/A";
 }
 
+void ScheduleOnMatterThread(const std::weak_ptr<rtc::PeerConnection> & weakPeerConnection,
+                            std::function<void(const std::shared_ptr<rtc::PeerConnection> &)> && callback)
+{
+    struct CallbackState
+    {
+        std::weak_ptr<rtc::PeerConnection> weakPeerConnection;
+        std::function<void(const std::shared_ptr<rtc::PeerConnection> &)> callback;
+    };
+
+    auto * callbackState = new CallbackState{ weakPeerConnection, std::move(callback) };
+    SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([callbackState]() {
+        std::unique_ptr<CallbackState> guard(callbackState);
+        auto peerConnection = guard->weakPeerConnection.lock();
+        if (peerConnection)
+        {
+            guard->callback(peerConnection);
+        }
+    }));
+}
+
 } // namespace
 
 WebRTCManager::WebRTCManager() {}
@@ -123,25 +144,14 @@ CHIP_ERROR WebRTCManager::HandleOffer(const WebRTCSessionStruct & session, const
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    VerifyOrReturnError(mPendingSdpContext.state == LocalSdpState::Idle, CHIP_ERROR_INCORRECT_STATE);
+
+    // Store session context for the listener callback
+    mPendingSdpContext.sessionId = session.id;
+    mPendingSdpContext.state     = LocalSdpState::PendingAnswer;
+
     mPeerConnection->setRemoteDescription(rtc::Description{ args.sdp, "offer" });
-
-    if (mLocalDescription.empty())
-    {
-        ChipLogError(Camera, "No local SDP to send");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    // Store sessionId for the delayed callback
-    mPendingSessionId = session.id;
-
-    // Schedule the ProvideAnswer() call to run with a small delay to ensure the response is sent first
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(300),
-        [](chip::System::Layer * systemLayer, void * appState) {
-            auto * self = static_cast<WebRTCManager *>(appState);
-            TEMPORARY_RETURN_IGNORED self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
-        },
-        this);
+    mPeerConnection->setLocalDescription();
 
     return CHIP_NO_ERROR;
 }
@@ -158,20 +168,20 @@ CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, cons
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    VerifyOrReturnError(mPendingSdpContext.state == LocalSdpState::Idle, CHIP_ERROR_INCORRECT_STATE);
+
     rtc::Description answerDesc(sdp, rtc::Description::Type::Answer);
     mPeerConnection->setRemoteDescription(answerDesc);
 
-    // Store sessionId for the delayed callback
-    mPendingSessionId = session.id;
+    // Schedule ProvideICECandidates() to run in a subsequent event loop iteration.
+    // Since the transport is TCP, this guarantees that the StatusResponse for the Answer command
+    // is transmitted and processed by the peer before the ProvideICECandidates command is received.
+    SuccessOrDie(DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+        if (!mPeerConnection)
+            return;
 
-    // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(300),
-        [](chip::System::Layer * systemLayer, void * appState) {
-            auto * self = static_cast<WebRTCManager *>(appState);
-            TEMPORARY_RETURN_IGNORED self->ProvideICECandidates(self->mPendingSessionId);
-        },
-        this);
+        LogErrorOnFailure(ProvideICECandidates(mPendingSdpContext.sessionId));
+    }));
 
     return CHIP_NO_ERROR;
 }
@@ -213,13 +223,19 @@ CHIP_ERROR WebRTCManager::HandleICECandidates(const WebRTCSessionStruct & sessio
     return CHIP_NO_ERROR;
 }
 
-void WebRTCManager::CloseRTPSocket()
+void WebRTCManager::CloseRTPSockets()
 {
     if (mRTPSocket != -1)
     {
         ChipLogProgress(Camera, "Closing RTP socket");
         close(mRTPSocket);
         mRTPSocket = -1;
+    }
+    if (mAudioRTPSocket != -1)
+    {
+        ChipLogProgress(Camera, "Closing RTP Audio socket");
+        close(mAudioRTPSocket);
+        mAudioRTPSocket = -1;
     }
 }
 
@@ -235,20 +251,20 @@ void WebRTCManager::Disconnect()
     }
 
     // Close the RTP socket
-    CloseRTPSocket();
+    CloseRTPSockets();
 
     // Reset track
     mTrack.reset();
     mAudioTrack.reset();
+    mDataChannel.reset();
 
     // Clear state
     mCurrentVideoStreamId = 0;
-    mPendingSessionId     = 0;
-    mLocalDescription.clear();
+    mPendingSdpContext.Reset();
     mLocalCandidates.clear();
 }
 
-CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
+CHIP_ERROR WebRTCManager::Connect(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
 {
     ChipLogProgress(Camera, "Attempting to establish WebRTC connection to node 0x" ChipLogFormatX64 " on endpoint 0x%x",
                     ChipLogValueX64(nodeId), endpointId);
@@ -271,68 +287,30 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     // Create the peer connection
     rtc::Configuration config;
+    config.disableAutoNegotiation = true;
     config.iceServers.emplace_back("stun:stun.l.google.com:19302");
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
-    mPeerConnection->onLocalDescription([this](rtc::Description desc) {
-        mLocalDescription = std::string(desc);
-        ChipLogProgress(Camera, "Local Description:");
-        ChipLogProgress(Camera, "%s", mLocalDescription.c_str());
-
-        // Extract any candidates embedded in the SDP description
-        std::vector<rtc::Candidate> candidates = desc.candidates();
-        ChipLogProgress(Camera, "Extracted %zu candidates from SDP description", candidates.size());
-
-        for (const auto & candidate : candidates)
-        {
-            ICECandidateInfo candidateInfo;
-            candidateInfo.candidate  = std::string(candidate);
-            candidateInfo.mid        = candidate.mid();
-            candidateInfo.mlineIndex = -1; // libdatachannel doesn't provide mlineIndex
-
-            ChipLogProgress(Camera, "[From SDP] Candidate: %s, mid: %s", candidateInfo.candidate.c_str(),
-                            candidateInfo.mid.c_str());
-
-            mLocalCandidates.push_back(candidateInfo);
-        }
+    std::weak_ptr<rtc::PeerConnection> weakPeerConnection = mPeerConnection;
+    mPeerConnection->onLocalDescription([this, weakPeerConnection](rtc::Description desc) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, desc](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnLocalDescriptionGenerated(connection, desc);
+        });
     });
-
-    mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        ICECandidateInfo candidateInfo;
-        candidateInfo.candidate = std::string(candidate);
-        candidateInfo.mid       = candidate.mid();
-
-        // Note: libdatachannel doesn't directly provide mlineIndex, so we use -1 to indicate it is not present.
-        candidateInfo.mlineIndex = -1;
-
-        ChipLogProgress(Camera, "Local Candidate:");
-        ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
-        ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
-
-        mLocalCandidates.push_back(candidateInfo);
+    mPeerConnection->onLocalCandidate([this, weakPeerConnection](rtc::Candidate candidate) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, candidate](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnLocalCandidateGathered(connection, candidate);
+        });
     });
-
-    mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
-        ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
-
-        // Check if the session is now established (connected)
-        if (state == rtc::PeerConnection::State::Connected)
-        {
-            // Call the callback to notify DeviceManager
-            if (mSessionEstablishedCallback && mCurrentVideoStreamId != 0)
-            {
-                mSessionEstablishedCallback(mCurrentVideoStreamId);
-            }
-        }
-        else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
-        {
-            // Limit the clearup to Failed and Closed only to avoid prematurely ending sessions.
-            Disconnect();
-        }
+    mPeerConnection->onStateChange([this, weakPeerConnection](rtc::PeerConnection::State state) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, state](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnConnectionStateChanged(connection, state);
+        });
     });
-
-    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-        ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
+    mPeerConnection->onGatheringStateChange([this, weakPeerConnection](rtc::PeerConnection::GatheringState state) {
+        ScheduleOnMatterThread(weakPeerConnection, [this, state](const std::shared_ptr<rtc::PeerConnection> & connection) {
+            OnGatheringStateChanged(connection, state);
+        });
     });
 
     // Create UDP socket for RTP forwarding
@@ -393,8 +371,16 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         },
         nullptr);
 
-    ChipLogProgress(Camera, "Generate and set the SDP");
-    mPeerConnection->setLocalDescription();
+    mDataChannel = mPeerConnection->createDataChannel("data");
+    mDataChannel->onMessage([](std::variant<rtc::binary, rtc::string> message) {
+        if (std::holds_alternative<rtc::string>(message))
+        {
+            std::string message_content = std::get<rtc::string>(message);
+            ChipLogProgress(Camera, "DataChannel message: %s", message_content.c_str());
+        }
+    });
+
+    // Local description generation is deferred to ProvideOffer or HandleOffer
 
     return CHIP_NO_ERROR;
 }
@@ -405,16 +391,18 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
 {
     ChipLogProgress(Camera, "Sending ProvideOffer command to the peer device");
 
-    if (mLocalDescription.empty())
+    if (!mPeerConnection)
     {
-        ChipLogError(Camera, "No local SDP to send");
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        ChipLogError(Camera, "Cannot set local description: mPeerConnection is null");
+        return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    VerifyOrReturnError(mPendingSdpContext.state == LocalSdpState::Idle, CHIP_ERROR_INCORRECT_STATE);
 
     // At least one of Video Stream ID and Audio Stream ID has to be present
     if (!videoStreamId.HasValue() && !audioStreamId.HasValue())
     {
-        ChipLogError(Zcl, "One of VideoStreamID or AudioStreamID must be present");
+        ChipLogError(Camera, "One of VideoStreamID or AudioStreamID must be present");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -425,15 +413,17 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> sessionId, 
         ChipLogProgress(Camera, "Tracking stream ID %u for WebRTC session", mCurrentVideoStreamId);
     }
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(sessionId, mLocalDescription, streamUsage,
-                                                        kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId);
+    // Store context for the listener callback
+    mPendingSdpContext.nullableSessionId = sessionId;
+    mPendingSdpContext.streamUsage       = streamUsage;
+    mPendingSdpContext.videoStreamId     = videoStreamId;
+    mPendingSdpContext.audioStreamId     = audioStreamId;
+    mPendingSdpContext.state             = LocalSdpState::PendingOffer;
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Camera, "Failed to send ProvideOffer: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    ChipLogProgress(Camera, "Generate and set the local SDP Offer");
+    mPeerConnection->setLocalDescription();
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage, Optional<app::DataModel::Nullable<uint16_t>> videoStreamId,
@@ -444,7 +434,7 @@ CHIP_ERROR WebRTCManager::SolicitOffer(StreamUsageEnum streamUsage, Optional<app
     // At least one of Video Stream ID and Audio Stream ID has to be present
     if (!videoStreamId.HasValue() && !audioStreamId.HasValue())
     {
-        ChipLogError(Zcl, "One of VideoStreamID or AudioStreamID must be present");
+        ChipLogError(Camera, "One of VideoStreamID or AudioStreamID must be present");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -483,12 +473,7 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Make a copy of candidates to send to avoid race condition with onLocalCandidate callback
-    // which can asynchronously add new candidates while we're sending
-    std::vector<ICECandidateInfo> candidatesToSend = mLocalCandidates;
-    size_t candidateCount                          = candidatesToSend.size();
-
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, candidatesToSend);
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(sessionId, mLocalCandidates);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -496,25 +481,125 @@ CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t sessionId)
     }
     else
     {
-        ChipLogProgress(Camera, "Sent %zu ICE candidate(s)", candidateCount);
-
-        // Remove only the candidates that were successfully sent
-        // New candidates may have arrived during transmission, so we remove from the front
-        if (mLocalCandidates.size() > candidateCount)
-        {
-            mLocalCandidates.erase(mLocalCandidates.begin(), mLocalCandidates.begin() + candidateCount);
-            if (!mLocalCandidates.empty())
-            {
-                ChipLogProgress(Camera, "%zu new candidate(s) arrived during transmission, keeping for next batch",
-                                mLocalCandidates.size());
-            }
-        }
-        else
-        {
-            ChipLogProgress(Camera, "Sent %zu ICE candidate(s), clearing list", mLocalCandidates.size());
-            mLocalCandidates.clear();
-        }
+        ChipLogProgress(Camera, "Sent %zu ICE candidate(s), clearing list", mLocalCandidates.size());
+        mLocalCandidates.clear();
     }
 
     return err;
+}
+
+void WebRTCManager::OnLocalDescriptionGenerated(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                                const rtc::Description & desc)
+{
+    if (connection != mPeerConnection)
+    {
+        ChipLogDetail(Camera, "OnLocalDescriptionGenerated: ignoring stale callback for previous WebRTC session");
+        return;
+    }
+
+    std::string sdpStr = std::string(desc);
+    ChipLogProgress(Camera, "Local Description:");
+    ChipLogProgress(Camera, "%s", sdpStr.c_str());
+
+    // Extract any candidates embedded in the SDP description directly on the main thread
+    std::vector<rtc::Candidate> candidates = desc.candidates();
+    ChipLogProgress(Camera, "Extracted %zu candidates from SDP description", candidates.size());
+
+    for (const auto & candidate : candidates)
+    {
+        ICECandidateInfo candidateInfo;
+        candidateInfo.candidate  = std::string(candidate);
+        candidateInfo.mid        = candidate.mid();
+        candidateInfo.mlineIndex = -1; // libdatachannel doesn't provide mlineIndex
+
+        ChipLogProgress(Camera, "[From SDP] Candidate: %s, mid: %s", candidateInfo.candidate.c_str(), candidateInfo.mid.c_str());
+
+        mLocalCandidates.push_back(candidateInfo);
+    }
+
+    if (mPendingSdpContext.state == LocalSdpState::PendingAnswer)
+    {
+        uint16_t sessionId = mPendingSdpContext.sessionId;
+        mPendingSdpContext.Reset();
+        LogErrorOnFailure(ProvideAnswer(sessionId, sdpStr));
+    }
+    else if (mPendingSdpContext.state == LocalSdpState::PendingOffer)
+    {
+        // Cache local copies before resetting context
+        auto nullableSessionId = mPendingSdpContext.nullableSessionId;
+        auto streamUsage       = mPendingSdpContext.streamUsage;
+        auto videoStreamId     = mPendingSdpContext.videoStreamId;
+        auto audioStreamId     = mPendingSdpContext.audioStreamId;
+        mPendingSdpContext.Reset();
+
+        CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(nullableSessionId, sdpStr, streamUsage,
+                                                            kWebRTCRequesterDynamicEndpointId, videoStreamId, audioStreamId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Camera, "Failed to send ProvideOffer: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+    else
+    {
+        ChipLogError(Camera, "OnLocalDescriptionGenerated called while in LocalSdpState::Idle");
+    }
+}
+
+void WebRTCManager::OnLocalCandidateGathered(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                             const rtc::Candidate & candidate)
+{
+    if (connection != mPeerConnection)
+    {
+        ChipLogDetail(Camera, "OnLocalCandidateGathered: ignoring stale callback for previous WebRTC session");
+        return;
+    }
+
+    ICECandidateInfo candidateInfo;
+    candidateInfo.candidate  = std::string(candidate);
+    candidateInfo.mid        = candidate.mid();
+    candidateInfo.mlineIndex = -1;
+
+    ChipLogProgress(Camera, "Local Candidate:");
+    ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
+    ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
+
+    mLocalCandidates.push_back(candidateInfo);
+}
+
+void WebRTCManager::OnConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                             rtc::PeerConnection::State state)
+{
+    if (connection != mPeerConnection)
+    {
+        ChipLogDetail(Camera, "OnConnectionStateChanged: ignoring stale callback for previous WebRTC session");
+        return;
+    }
+
+    ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
+
+    // Check if the session is now established (connected)
+    if (state == rtc::PeerConnection::State::Connected)
+    {
+        // Call the callback to notify DeviceManager
+        if (mSessionEstablishedCallback && mCurrentVideoStreamId != 0)
+        {
+            mSessionEstablishedCallback(mCurrentVideoStreamId);
+        }
+    }
+    else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
+    {
+        // Limit the clearup to Failed and Closed only to avoid prematurely ending sessions.
+        Disconnect();
+    }
+}
+
+void WebRTCManager::OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
+                                            rtc::PeerConnection::GatheringState state)
+{
+    if (connection != mPeerConnection)
+    {
+        ChipLogDetail(Camera, "OnGatheringStateChanged: ignoring stale callback for previous WebRTC session");
+        return;
+    }
+    ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
 }

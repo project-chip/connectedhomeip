@@ -52,3 +52,15 @@ source_set("wifi") {
     "${chip_root}/src/app/clusters/wifi-network-diagnostics-server",
   ]
 }
+
+source_set("thread") {
+  sources = [
+    "ThreadRootNodeDevice.cpp",
+    "ThreadRootNodeDevice.h",
+  ]
+
+  public_deps = [
+    ":root-node",
+    "${chip_root}/src/app/clusters/network-commissioning",
+  ]
+}

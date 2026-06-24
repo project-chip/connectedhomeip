@@ -19,7 +19,16 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
+#include <zephyr/bluetooth/conn.h>
+
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
+#include <version.h>
+#else
+#include <zephyr/random/random.h>
+#include <zephyr/version.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,6 +40,10 @@ sys_slist_t sRequests;
 
 bool sIsInitialized = false;
 uint8_t sBtId       = 0;
+
+#if KERNEL_VERSION_MAJOR >= 4
+bool sWasDisconnection = false;
+#endif // KERNEL_VERSION_MAJOR >= 4
 
 // Cast an intrusive list node to the containing request object
 const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
@@ -64,6 +77,11 @@ CHIP_ERROR RestartAdvertising()
     const int result = bt_le_adv_start(&params, top.advertisingData.data(), top.advertisingData.size(), top.scanResponseData.data(),
                                        top.scanResponseData.size());
 
+    if (result == -ENOMEM)
+    {
+        ChipLogProgress(DeviceLayer, "Advertising start failed, will retry once connection is released");
+    }
+
     if (top.onStarted != nullptr)
     {
         top.onStarted(result);
@@ -72,6 +90,35 @@ CHIP_ERROR RestartAdvertising()
     return System::MapErrorZephyr(result);
 }
 
+#if KERNEL_VERSION_MAJOR >= 4
+BT_CONN_CB_DEFINE(conn_callbacks) = {
+    .disconnected =
+        [](struct bt_conn * conn, uint8_t reason) {
+            (void) conn;
+            (void) reason;
+            sWasDisconnection = true;
+        },
+    .recycled =
+        []() {
+            // In this callback the connection object was returned to the pool and we can try to re-start connectable
+            // advertising, but only if the disconnection was detected.
+            if (sWasDisconnection)
+            {
+                TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([] {
+                    if (!sys_slist_is_empty(&sRequests))
+                    {
+                        // Starting from Zephyr 4.0 Automatic advertiser resumption is deprecated,
+                        // so the BLE Advertising Arbiter has to take over the responsibility of restarting the advertiser.
+                        // Restart advertising in this callback if there are pending requests after the connection is released.
+                        TEMPORARY_RETURN_IGNORED RestartAdvertising();
+                    }
+                });
+                // Reset the disconnection flag to avoid restarting advertising multiple times
+                sWasDisconnection = false;
+            }
+        },
+};
+#endif // KERNEL_VERSION_MAJOR >= 4
 } // namespace
 
 CHIP_ERROR Init(uint8_t btId)

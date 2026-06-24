@@ -30,6 +30,7 @@ extern "C" {
 #endif
 
 #include "uart.h"
+#include <cinttypes>
 #include <stddef.h>
 #include <string.h>
 
@@ -95,7 +96,7 @@ extern "C" {
 
 #define HELPER4(x) HELPER3(x)
 
-// On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
+// On MG24 boards VCOM runs on the EUSART device
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
@@ -188,7 +189,7 @@ static uint32_t sMissedLogCount = 0; // Count of logs that were not sent to the 
 
 namespace SilabsCoreLogs = chip::Logging::Platform;
 // sizeof struct on arm is 4+8 +sizeof(data) so 12 + number of character in the string
-typedef struct
+typedef struct UartTxStruct_t
 {
     uint8_t data[UART_TX_MAX_BUF_LEN];
     uint64_t timestamp                   = 0;
@@ -209,6 +210,18 @@ constexpr osMessageQueueAttr_t kUartTxQueueAttr = { .cb_mem  = &sUartTxQueueStru
 // Rx buffer for the receive Fifo
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
+
+// Force transmit logs by default during the Init sequence
+static bool sSendLogImmediately = true;
+
+void sendLogImmediately(bool force)
+{
+    taskENTER_CRITICAL();
+    sSendLogImmediately = force;
+    taskEXIT_CRITICAL();
+}
+
+static int16_t formatAndSendLog(UartTxStruct_t & logStruct, bool forceTransmit);
 
 #if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 0
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
@@ -528,6 +541,11 @@ int16_t uartLogWrite(const char * log, uint8_t length, uint8_t category, uint64_
     workBuffer.category  = SilabsCoreLogs::LogCategory(category);
     workBuffer.timestamp = timestamp;
 
+    if (sSendLogImmediately)
+    {
+        return formatAndSendLog(workBuffer, true);
+    }
+
     // Don't wait when queue is full. Drop the log and return UART_CONSOLE_ERR
     if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, 0) == osOK)
     {
@@ -573,16 +591,41 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);
 }
 
-void uartMainLoop(void * args)
+static int16_t formatAndSendLog(UartTxStruct_t & logStruct, bool forceTransmit)
 {
-    UartTxStruct_t workBuffer;
 #if defined(SILABS_LOG_ENABLED) && SILABS_LOG_ENABLED
     uint8_t timeStampString[SilabsCoreLogs::kTimeStampStringSize];
     uint8_t logWorkBuffer[kHeaderSize + SilabsCoreLogs::kTimeStampStringSize + SilabsCoreLogs::kMaxCategoryStrLen +
                           UART_TX_MAX_BUF_LEN + kEndOfLineSize +
                           kFooterSize]; // Header + Timestamp + Category + Data + \r\n + Footer
-#endif                                  // SILABS_LOG_ENABLED
+    SilabsCoreLogs::FormatTimestamp(reinterpret_cast<char *>(timeStampString), sizeof(timeStampString), logStruct.timestamp);
+    int32_t len =
+        snprintf(reinterpret_cast<char *>(logWorkBuffer), sizeof(logWorkBuffer), "%c%s%s%.*s\r\n%c", kLogHeader, timeStampString,
+                 SilabsCoreLogs::GetCategoryString(logStruct.category), logStruct.length, logStruct.data, kLogFooter);
+    if (len > 0)
+    {
+        if (forceTransmit)
+        {
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+            Board_UARTPutSTR(logWorkBuffer);
+#else
+            UARTDRV_ForceTransmit(vcom_handle, logWorkBuffer, static_cast<uint16_t>(len));
+#endif
+        }
+        else
+        {
+            uartSendBytes(logWorkBuffer, static_cast<uint16_t>(len));
+        }
+    }
+    return static_cast<int16_t>(len);
+#else
+    return 0;
+#endif // SILABS_LOG_ENABLED
+}
 
+void uartMainLoop(void * args)
+{
+    UartTxStruct_t workBuffer;
     while (1)
     {
         osStatus_t eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, osWaitForever);
@@ -591,15 +634,7 @@ void uartMainLoop(void * args)
             if (workBuffer.isLog)
             {
 #if defined(SILABS_LOG_ENABLED) && SILABS_LOG_ENABLED
-                SilabsCoreLogs::FormatTimestamp(reinterpret_cast<char *>(timeStampString), sizeof(timeStampString),
-                                                workBuffer.timestamp);
-                int32_t len = snprintf(reinterpret_cast<char *>(logWorkBuffer), sizeof(logWorkBuffer), "%c%s%s%.*s\r\n%c",
-                                       kLogHeader, timeStampString, SilabsCoreLogs::GetCategoryString(workBuffer.category),
-                                       workBuffer.length, workBuffer.data, kLogFooter);
-                if (len > 0)
-                {
-                    uartSendBytes(logWorkBuffer, static_cast<uint16_t>(len));
-                }
+                formatAndSendLog(workBuffer, false);
 #endif // SILABS_LOG_ENABLED
             }
             else
@@ -610,8 +645,9 @@ void uartMainLoop(void * args)
             {
                 // If there are missed logs, log the count
 
-                workBuffer.length = sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %lu\r\n", sMissedLogCount);
-                sMissedLogCount   = 0; // Reset the count after logging
+                workBuffer.length =
+                    sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %" PRIu32 "\r\n", sMissedLogCount);
+                sMissedLogCount = 0; // Reset the count after logging
                 uartSendBytes(workBuffer.data, workBuffer.length);
             }
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);

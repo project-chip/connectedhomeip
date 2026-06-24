@@ -413,8 +413,12 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         if (!isOTAInitialized)
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                        InitOTARequestorHandler, nullptr);
+            CHIP_ERROR startTimerErr = chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
+            if (startTimerErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "StartTimer failed: %" CHIP_ERROR_FORMAT, startTimerErr.Format());
+            }
             isOTAInitialized = true;
         }
 #endif

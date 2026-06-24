@@ -79,10 +79,6 @@ chip_configure_data_model(${COMPONENT_LIB}
     ZAP_FILE ${ENERGY_GATEWAY_DIR}/energy-gateway-common/energy-gateway-app.zap
 )
 
-if(CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  target_add_binary_data(${COMPONENT_TARGET} "insights_auth_key.txt" TEXT)
-endif()
-
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
   "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"

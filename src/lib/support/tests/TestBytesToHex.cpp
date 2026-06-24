@@ -413,11 +413,15 @@ TEST(TestBytesToHex, TestLogBufferAsHex)
 
     for (auto testCase : kTestCases)
     {
+        // this assumes logging works
+        auto filterLevel = Logging::GetLogFilter();
+        Logging::SetLogFilter(Logging::kLogCategory_Max);
         chip::Logging::SetLogRedirectCallback(&AccumulateLogLineCallback);
         gRedirectedLogLines.clear();
         {
             LogBufferAsHex(testCase.label, testCase.buffer);
         }
+        Logging::SetLogFilter(filterLevel);
         chip::Logging::SetLogRedirectCallback(nullptr);
         ValidateTextMatches(testCase.expectedText, testCase.numLines, gRedirectedLogLines);
     }

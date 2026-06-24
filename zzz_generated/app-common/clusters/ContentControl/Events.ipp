@@ -51,7 +51,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace RemainingScreenTimeExpired.
+} // namespace RemainingScreenTimeExpired
 namespace EnteringBlockContentTimeWindow {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -73,7 +73,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace EnteringBlockContentTimeWindow.
+} // namespace EnteringBlockContentTimeWindow
 } // namespace Events
 } // namespace ContentControl
 } // namespace Clusters

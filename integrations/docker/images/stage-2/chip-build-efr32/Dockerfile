@@ -3,13 +3,13 @@ FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 # Copy SLT manifests and Simplicity SDK keep-list from files-slt (build context: Dockerfile folder)
-COPY files-slt/sisdk-pkg.lock files-slt/wiseconnect-pkg.slt /tmp/
+COPY files-slt/sisdk-pkg.slt files-slt/wiseconnect-pkg.slt /tmp/
 COPY files-slt/simplicity_sdk_keep_folders.txt /tmp/keep_folders.txt
 
 # Setup SLT CLI (same as scripts/setup/silabs/install-packages.py)
 RUN set -x \
     && mkdir -p /tmp/slt_install \
-    && wget -q https://www.silabs.com/documents/public/software/slt-cli-1.0.1-linux-x64.zip -O /tmp/slt.zip \
+    && wget -q https://www.silabs.com/documents/public/software/slt-cli-1.1.1-linux-x64.zip -O /tmp/slt.zip \
     && unzip -q /tmp/slt.zip -d /tmp/slt_install \
     && rm /tmp/slt.zip \
     && chmod +x /tmp/slt_install/slt \
@@ -21,9 +21,9 @@ RUN set -x \
     && /tmp/slt_install/slt install slc-cli \
     && cp -a $(/tmp/slt_install/slt where wiseconnect) /tmp/wifi_sdk \
     && cp -a $(/tmp/slt_install/slt where slc-cli) /tmp/slc_cli \
-    && /tmp/slt_install/slt install -f /tmp/sisdk-pkg.lock \
-    && cp -a $(/tmp/slt_install/slt where simplicity-sdk/2025.12.1-alpha) /tmp/simplicity_sdk \
-    && rm -rf /tmp/slt_install /tmp/sisdk-pkg.lock /tmp/wiseconnect-pkg.slt \
+    && /tmp/slt_install/slt install -f /tmp/sisdk-pkg.slt \
+    && cp -a $(/tmp/slt_install/slt where simplicity-sdk) /tmp/simplicity_sdk \
+    && rm -rf /tmp/slt_install /tmp/sisdk-pkg.slt /tmp/wiseconnect-pkg.slt \
     && : # last line
 
 # Trim Simplicity SDK: keep only folders and .a libs from simplicity_sdk_keep_folders.txt

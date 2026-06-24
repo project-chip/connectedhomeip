@@ -112,13 +112,22 @@ Davis, CA 95616, USA
     </enum>
     <enum name="NetworkRecoveryReasonEnum">
       <item value="0" name="Unspecified" summary="Unspecified / unknown reason of network failure">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
       <item value="1" name="Auth" summary="Credentials for the configured operational network are not valid">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
       <item value="2" name="Visibility" summary="Configured network cannot be found (e.g. the device cannot see the configured Wi-Fi SSID, Thread end-node is unable to find a parent router on the PAN)">
-        <mandatoryConform/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
       </item>
     </enum>
     <enum name="RegulatoryLocationTypeEnum">
