@@ -52,13 +52,21 @@ public:
 };
 
 namespace {
+// WARNING: This is just an example for using key for decrypting the encrypted OTA image
+// Please do not use it as is for production use cases
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
+extern const char sOTADecryptionKeyStart[] asm("_binary_esp_image_encryption_key_pem_start");
+extern const char sOTADecryptionKeyEnd[] asm("_binary_esp_image_encryption_key_pem_end");
+
+CharSpan sOTADecryptionKey(sOTADecryptionKeyStart, sOTADecryptionKeyEnd - sOTADecryptionKeyStart);
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 CustomOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
-#if CONFIG_ENABLE_MULTI_IMAGE_OTA
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
 MultiImageOTAProcessorImpl gImageProcessor;
-// Default sub-processor for the primary application firmware.
 AppImageProcessor gAppImageProcessor;
 ImageProcessorEntry gAppImageEntry{ kAppImageProcessorTag, &gAppImageProcessor };
 #else
@@ -137,15 +145,6 @@ esp_err_t OTARcpProcessorImpl::OnOtaRcpAbort()
 OTARcpProcessorImpl gOtaRcpDelegate;
 #endif
 
-// WARNING: This is just an example for using key for decrypting the encrypted OTA image
-// Please do not use it as is for production use cases
-#if CONFIG_ENABLE_ENCRYPTED_OTA
-extern const char sOTADecryptionKeyStart[] asm("_binary_esp_image_encryption_key_pem_start");
-extern const char sOTADecryptionKeyEnd[] asm("_binary_esp_image_encryption_key_pem_end");
-
-CharSpan sOTADecryptionKey(sOTADecryptionKeyStart, sOTADecryptionKeyEnd - sOTADecryptionKeyStart);
-#endif // CONFIG_ENABLE_ENCRYPTED_OTA
-
 } // namespace
 
 bool CustomOTARequestorDriver::CanConsent()
@@ -157,7 +156,7 @@ void OTAHelpers::InitOTARequestor()
 {
     if (!GetRequestorInstance())
     {
-#if CONFIG_ENABLE_MULTI_IMAGE_OTA
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
         // Register the application-firmware sub-processor before the requestor is initialised.
         // Without this the dispatcher finds no processor for the app image and skips it.
         LogErrorOnFailure(gImageProcessor.RegisterProcessor(gAppImageEntry));
@@ -173,8 +172,14 @@ void OTAHelpers::InitOTARequestor()
         gDownloader.SetImageProcessorDelegate(&gImageProcessor);
         gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+        // Configure decryption the same way for single- and multi-image OTA: in multi-image mode the
+        // app sub-processor owns it, in single-image mode the monolithic processor does.
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+        LogErrorOnFailure(gAppImageProcessor.InitEncryptedOTA(sOTADecryptionKey));
+#else
         gImageProcessor.InitEncryptedOTA(sOTADecryptionKey);
+#endif
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
         if (gUserConsentState != chip::ota::UserConsentState::kUnknown)

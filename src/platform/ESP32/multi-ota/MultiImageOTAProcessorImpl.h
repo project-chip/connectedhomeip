@@ -19,6 +19,7 @@
 #include "MultiOTAImageHeader.h"
 #include "SubImageProcessor.h"
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <include/platform/OTAImageProcessor.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/OTAImageHeader.h>
@@ -88,6 +89,7 @@ private:
     uint32_t mCurrentSubImageCursor      = 0;
     bool mCurrentEntryStarted            = false;   // readiness for the active entry already decided
     SubImageProcessor * mActiveProcessor = nullptr; // processor for the active (kReady) entry
+    Crypto::Hash_SHA256_stream mActiveHasher;       // SHA-256 over the active sub-image's wire bytes
 
     // Per-sub-image result table, reported to ShouldApplyUpdate() callback.
     Platform::ScopedMemoryBuffer<SubImageResult> mSubImageResults;

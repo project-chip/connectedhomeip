@@ -39,6 +39,11 @@ declare_args() {
   # AppImageProcessor replace the standard single-image OTAImageProcessorImpl.
   # Requires chip_enable_ota_requestor = true.
   chip_enable_multi_ota_requestor = false
+
+  # Build the reusable encryption helper for multi-image OTA. Only meaningful when
+  # chip_enable_multi_ota_requestor is true; pulls in the espressif__esp_encrypted_img component.
+  # (Delta OTA is built into AppImageProcessor and gated directly by CONFIG_ENABLE_DELTA_OTA.)
+  chip_enable_encrypted_ota = false
 }
 
 defines = [
@@ -102,12 +107,18 @@ static_library("ESP32") {
       sources += [
         "multi-ota/AppImageProcessor.cpp",
         "multi-ota/AppImageProcessor.h",
-        "multi-ota/MultiOTAImageHeader.h",
-        "multi-ota/MultiOTAImageHeader.cpp",
         "multi-ota/MultiImageOTAProcessorImpl.cpp",
         "multi-ota/MultiImageOTAProcessorImpl.h",
+        "multi-ota/MultiOTAImageHeader.cpp",
+        "multi-ota/MultiOTAImageHeader.h",
         "multi-ota/SubImageProcessor.h",
       ]
+      if (chip_enable_encrypted_ota) {
+        sources += [
+          "multi-ota/EncryptedOTAHelper.cpp",
+          "multi-ota/EncryptedOTAHelper.h",
+        ]
+      }
     } else {
       sources += [
         "OTAImageProcessorImpl.cpp",

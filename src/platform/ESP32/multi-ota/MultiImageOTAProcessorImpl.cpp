@@ -294,11 +294,23 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
 
             imageProcessor->mActiveProcessor     = processor;
             imageProcessor->mCurrentEntryStarted = true;
+
+            // Begin hashing this sub-image's on-wire bytes for the integrity check.
+            imageProcessor->mLastErr = imageProcessor->mActiveHasher.Begin();
+            VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
+                           imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
+                           PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
         }
 
         // kReady: stream this entry's bytes to its processor.
         const uint32_t bytesToDeliver = std::min(bytesLeftInSubImage, static_cast<uint32_t>(remainingBlock.size()));
         ByteSpan chunk                = remainingBlock.SubSpan(0, bytesToDeliver);
+
+        // Hash the on-wire bytes, then hand them to the processor (which may decrypt/patch them).
+        imageProcessor->mLastErr = imageProcessor->mActiveHasher.AddData(chunk);
+        VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
+                       imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
+                       PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
 
         imageProcessor->mLastErr = imageProcessor->mActiveProcessor->Write(chunk);
         VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
@@ -309,9 +321,30 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
         imageProcessor->mCurrentSubImageCursor += bytesToDeliver;
         remainingBlock = remainingBlock.SubSpan(bytesToDeliver);
 
-        // Entry fully delivered: record it and advance to the next.
+        // Entry fully delivered: verify its integrity, close it, then advance to the next.
         if (imageProcessor->mCurrentSubImageCursor == subImageEnd)
         {
+            uint8_t digest[Crypto::kSHA256_Hash_Length];
+            MutableByteSpan digestSpan(digest);
+            imageProcessor->mLastErr = imageProcessor->mActiveHasher.Finish(digestSpan);
+            VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
+                           imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
+                           PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
+
+            if (!digestSpan.data_equal(ByteSpan(activeSubImage->sha256)))
+            {
+                imageProcessor->mLastErr = CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+                ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " SHA-256 mismatch", activeSubImage->imageId);
+                imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
+                PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+                return;
+            }
+
+            imageProcessor->mLastErr = imageProcessor->mActiveProcessor->Finish();
+            VerifyOrReturn(imageProcessor->mLastErr == CHIP_NO_ERROR,
+                           imageProcessor->mDownloader->EndDownload(imageProcessor->mLastErr);
+                           PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
+
             imageProcessor->RecordSubImageResult(activeSubImage->imageId, activeSubImage->version, SubImageStatus::kWritten);
             imageProcessor->mCurrentEntryStarted = false;
             imageProcessor->mActiveProcessor     = nullptr;

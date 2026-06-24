@@ -76,13 +76,24 @@ public:
     virtual CHIP_ERROR IsReadyForOTA(DeviceState & state) = 0;
 
     /**
-     * @brief Consume one ordered chunk of the sub-image's binary.
+     * @brief Consume one ordered chunk of this sub-image's binary.
      *
-     * @param block  Raw binary bytes (no header); valid only for the duration of the call.
-     *               Chunks total exactly entry.length bytes across all calls.
+     * The bytes are ready to write to the component: the dispatcher has already verified the
+     * on-wire integrity, and any transform helper layered in front (decryption, delta patching)
+     * has already run, so an implementation only writes them to its target.
+     *
+     * @param block  Binary bytes for this component; valid only for the duration of the call.
      * @retval CHIP_NO_ERROR if the chunk was accepted; other error code otherwise.
      */
     virtual CHIP_ERROR Write(ByteSpan & block) = 0;
+
+    /**
+     * @brief Close the component's image after the final chunk. Called once by the dispatcher when
+     *        all of this sub-image's bytes have been delivered and its integrity has been verified.
+     *
+     * @retval CHIP_NO_ERROR if the image was closed successfully; other error code otherwise.
+     */
+    virtual CHIP_ERROR Finish() { return CHIP_NO_ERROR; }
 
     /**
      * @brief Tear down an aborted session. Called on every Initialized processor.
