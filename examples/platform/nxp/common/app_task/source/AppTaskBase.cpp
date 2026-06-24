@@ -280,17 +280,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     /* Initialize Matter factory data before initializing the Matter stack */
     err = AppFactoryData_PreMatterStackInit();
 
-
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Pre Factory Data Provider init failed");
         goto exit;
     }
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    /* BLEApplicationManager implemented per platform or left blank */
-    chip::NXP::App::BleAppMgr().PreMatterStackInit();
 #endif
 
     /*
@@ -366,11 +360,6 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 #if CONFIG_CHIP_SE05X
     err = chip::NXP::App::Se05x::Init();
     SuccessOrExit(err);
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    /* BLEApplicationManager implemented per platform or left blank */
-    chip::NXP::App::BleAppMgr().PostMatterStackInit();
 #endif
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA

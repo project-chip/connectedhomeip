@@ -54,8 +54,7 @@ void app_gatt_callback(deviceId_t id, gattServerEvent_t * event)
     }
 }
 
-/* This function have to be called before Matter init in order to register callbacks */
-void BLEApplicationManager::PreMatterStackInit(void)
+void BLEApplicationManager::Init(void)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     auto * bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
@@ -72,12 +71,6 @@ void BLEApplicationManager::PreMatterStackInit(void)
     btSettingsInit();
 #endif
 }
-
-void BLEApplicationManager::PostMatterStackInit(void)
-{
-    /*Empty implementation. Intentionally left blank */
-}
-
 
 void BLEApplicationManager::EnableMultipleConnectionsHandler(void)
 {
