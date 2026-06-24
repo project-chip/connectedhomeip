@@ -43,7 +43,6 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
-#ifdef ENABLE_CHIP_SHELL
 static CHIP_ERROR cliLightSwitch(int argc, char * argv[])
 {
     if ((argc != 1) && (argc != 2))
@@ -76,7 +75,7 @@ static CHIP_ERROR cliLightSwitch(int argc, char * argv[])
     }
     return CHIP_NO_ERROR;
 }
-#endif
+
 
 void LightSwitchApp::AppTask::PreInitMatterStack()
 {
