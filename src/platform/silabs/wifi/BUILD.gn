@@ -80,8 +80,10 @@ config("wifi-platform-config") {
     defines += [ "DISPLAY_ENABLED" ]
   }
   if (use_SiWx917 || wifi_soc) {
+    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
     include_dirs += [
       "${chip_root}/src/platform/silabs/SiWx/ble",
+      "${chip_root}/src/platform/silabs/wifi/SiWx",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
       "${wifi_sdk_root}/components/protocol/wifi/inc",
     ]
@@ -115,12 +117,16 @@ source_set("wifi-platform") {
 
   if (use_SiWx917 && !wifi_soc) {
     public_deps += [ "${silabs_platform_dir}/wifi/SiWx/ncp:siwx-ncp" ]
-    sources += [ "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp" ]
+    sources += [
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${silabs_platform_dir}/wifi/SiWx/wifi_config.cpp",
+    ]
   }
 
   if (wifi_soc) {
     sources += [
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${silabs_platform_dir}/wifi/SiWx/wifi_config.cpp",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
     ]
