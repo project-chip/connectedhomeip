@@ -12,11 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# These files depend on ZAP-generated headers / Ember APIs, or are backward-compat
-# shims; they must be compiled as part of the application, not the core library.
-# The core cluster sources are pulled in via src/app/clusters/BUILD.gn.
-app_config_dependent_sources = [
-  "CodegenIntegration.cpp",
-  "CodegenIntegration.h",
-  "operational-state-server.h",
-]
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestOperationalStateCluster"
+
+  test_sources = [ "TestOperationalStateCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/operational-state-server",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}

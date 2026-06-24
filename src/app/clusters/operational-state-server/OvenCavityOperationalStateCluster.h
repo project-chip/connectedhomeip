@@ -18,12 +18,24 @@
 
 #pragma once
 
-// Backward-compat umbrella header for the OperationalState cluster.
-// New code may include OperationalStateCluster.h (cluster only),
-// OperationalStateDelegate.h (codegen delegate base), or CodegenIntegration.h
-// (Instance wrappers) directly as needed.
-#include "CodegenIntegration.h"
 #include "OperationalStateCluster.h"
-#include "OperationalStateDelegate.h"
-#include "OvenCavityOperationalStateCluster.h"
-#include "RvcOperationalStateCluster.h"
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace OvenCavityOperationalState {
+
+class OvenCavityOperationalStateCluster : public OperationalState::OperationalStateCluster
+{
+public:
+    OvenCavityOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
+                                      const OperationalState::OperationalStateCluster::Config & config = {});
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+};
+
+} // namespace OvenCavityOperationalState
+} // namespace Clusters
+} // namespace app
+} // namespace chip
