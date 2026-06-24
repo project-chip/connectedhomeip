@@ -57,7 +57,7 @@ public:
             auto result = accessor.HandleAction(actionName, tlvBuffer);
             if (result.has_value())
             {
-                return *result;
+                return std::move(*result);
             }
         }
         return { CHIP_ERROR_NOT_FOUND, ReadOnlyBuffer<uint8_t>() };
