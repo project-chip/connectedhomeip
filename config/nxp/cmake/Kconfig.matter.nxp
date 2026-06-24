@@ -65,6 +65,12 @@ config CHIP_DEVICE_USE_TEST_PAIRING_CODE
 		Use a default pairing code if one hasn't been provisioned in flash.
 		(Macro value is in quotes.)
 
+config CHIP_SE05X
+	bool "Enable Secure Element support"
+	select SE05X_LIB
+	help
+		Enable SE05x Secure element for offloading crypto operations.
+
 config CHIP_NXP_CRYPTO_IMPL
 	string "NXP Crypto Implementation chosen"
 	default "se05x" if CHIP_SE05X
