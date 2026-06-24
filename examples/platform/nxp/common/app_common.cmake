@@ -316,7 +316,7 @@ set_source_files_properties(
 
 set_source_files_properties(
      ${CHIP_ROOT}/src/app/clusters/door-lock-server/door-lock-server.cpp
-     PROPERTIES COMPILE_FLAGS "-Wno-error=maybe-uninitialized"
+      PROPERTIES COMPILE_FLAGS "-Wno-error=maybe-uninitialized"
 )
 
 # Use MCUX post-build function to convert the executable to binary format
