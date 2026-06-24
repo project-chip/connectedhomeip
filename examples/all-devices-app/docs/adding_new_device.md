@@ -47,36 +47,68 @@ build targets, and executing certification tests.
 
 ## Architectural Best Practices
 
-When implementing your device, keep these key architectural patterns in mind to make your code compile-time safe, highly reusable across different platforms, and easy to test:
+When implementing your device, keep these key architectural patterns in mind to
+make your code compile-time safe, highly reusable across different platforms,
+and easy to test:
 
 1. **Abstract Hardware Interactions**:
-    * Build your core device class so it doesn't depend on specific RTOS or platform-specific libraries.
-    * Abstract hardware-specific actions (like toggling LED pins or playing sound) behind pure virtual delegate interfaces. This allows contributors to reuse your exact device behavior on their specific target boards.
+
+    - Build your core device class so it doesn't depend on specific RTOS or
+      platform-specific libraries.
+    - Abstract hardware-specific actions (like toggling LED pins or playing
+      sound) behind pure virtual delegate interfaces. This allows contributors
+      to reuse your exact device behavior on their specific target boards.
 
 2. **Prefer References (`Delegate &`) for Mandatory Delegates**:
-    * If a delegate is mandatory for a cluster's core functionality (e.g., `OnOffDelegate` for a light, or `IdentifyDelegate` for a device), always require it as a **C++ reference (`&`)** in the constructor.
-    * This enforces at compile-time that a valid, functional handler must be provided, completely eliminating the risk of runtime null-pointer crashes or devices that silently ignore commands.
-    * Use optional pointers (`Delegate *` defaulting to `nullptr`) only for clusters that are optional based on feature flags or configuration.
+
+    - If a delegate is mandatory for a cluster's core functionality (e.g.,
+      `OnOffDelegate` for a light, or `IdentifyDelegate` for a device), always
+      require it as a **C++ reference (`&`)** in the constructor.
+    - This enforces at compile-time that a valid, functional handler must be
+      provided, completely eliminating the risk of runtime null-pointer crashes
+      or devices that silently ignore commands.
+    - Use optional pointers (`Delegate *` defaulting to `nullptr`) only for
+      clusters that are optional based on feature flags or configuration.
 
 3. **Expose Public Cluster Getters**:
-    * Always provide public C++ getter methods (e.g., `OnOffCluster()`, `IdentifyCluster()`) to expose the underlying cluster instances.
-    * This allows local application code (such as physical button drivers, platform leaf classes, shell commands, or Out-of-Band accessors) to programmatically read, write, or modify the device state.
+
+    - Always provide public C++ getter methods (e.g., `OnOffCluster()`,
+      `IdentifyCluster()`) to expose the underlying cluster instances.
+    - This allows local application code (such as physical button drivers,
+      platform leaf classes, shell commands, or Out-of-Band accessors) to
+      programmatically read, write, or modify the device state.
 
 4. **Symmetrical Logging Mocks (`impl/` subfolder)**:
-    * For every base device class, implement a corresponding "logging-by-default" mock subclass in a dedicated `impl/` subfolder (e.g., `LoggingMySensorDevice`).
-    * Use the **self-delegate pattern** where the mock subclass inherits from both the base device class and the delegate interfaces, implements the callbacks to log to the console, and passes `*this` to the base constructor.
-    * This makes the mock completely self-contained and ready to be instantiated by `DeviceFactory` or unit tests without requiring external wiring.
+
+    - For every base device class, implement a corresponding
+      "logging-by-default" mock subclass in a dedicated `impl/` subfolder (e.g.,
+      `LoggingMySensorDevice`).
+    - Use the **self-delegate pattern** where the mock subclass inherits from
+      both the base device class and the delegate interfaces, implements the
+      callbacks to log to the console, and passes `*this` to the base
+      constructor.
+    - This makes the mock completely self-contained and ready to be instantiated
+      by `DeviceFactory` or unit tests without requiring external wiring.
 
 5. **Spec-Pure Directory Layout & Extracted Capabilities**:
-    * Keep the root of the `devices/` directory pure: it should contain *only* real, spec-defined Matter Device Types (like `dimmable-light`, `fan`, `air-purifier`).
-    * **Avoid non-spec inheritance** (such as making a plug-in unit inherit from a light) just to reuse code.
-    * If multiple device types share a common capability (like dimming or air circulation), extract it into an abstract capability base class under `devices/capabilities/<capability-name>/` (e.g., `devices/capabilities/dimmable-load/`). Concrete leaf devices then inherit publicly from this capability base.
+    - Keep the root of the `devices/` directory pure: it should contain _only_
+      real, spec-defined Matter Device Types (like `dimmable-light`, `fan`,
+      `air-purifier`).
+    - **Avoid non-spec inheritance** (such as making a plug-in unit inherit from
+      a light) just to reuse code.
+    - If multiple device types share a common capability (like dimming or air
+      circulation), extract it into an abstract capability base class under
+      `devices/capabilities/<capability-name>/` (e.g.,
+      `devices/capabilities/dimmable-load/`). Concrete leaf devices then inherit
+      publicly from this capability base.
 
 ---
 
 ### The Header (`MySensorDevice.h`)
 
-Derive your class from `SingleEndpointDevice` (or `EndpointDevice` if managing sub-endpoints). Require all mandatory delegates as references in the constructor and declare public getters to expose the underlying clusters:
+Derive your class from `SingleEndpointDevice` (or `EndpointDevice` if managing
+sub-endpoints). Require all mandatory delegates as references in the constructor
+and declare public getters to expose the underlying clusters:
 
 ```cpp
 #pragma once
@@ -117,7 +149,8 @@ private:
 
 ### The Source (`MySensorDevice.cpp`)
 
-In `Register()`, wire up your mandatory delegates using the `.WithDelegate()` helper when creating the cluster instances:
+In `Register()`, wire up your mandatory delegates using the `.WithDelegate()`
+helper when creating the cluster instances:
 
 ```cpp
 #include "MySensorDevice.h"
@@ -167,9 +200,11 @@ void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 
 ### The Symmetrical Logging Mock (`impl/LoggingMySensorDevice.h` & `.cpp`)
 
-To provide a self-contained simulator variant ready for `DeviceFactory`, implement the self-delegate logging mock under the `impl/` subfolder:
+To provide a self-contained simulator variant ready for `DeviceFactory`,
+implement the self-delegate logging mock under the `impl/` subfolder:
 
 #### Header (`impl/LoggingMySensorDevice.h`)
+
 ```cpp
 #pragma once
 
@@ -247,9 +282,12 @@ source_set("my-sensor") {
 
 ## Step 2: Register the Device Type in `DeviceFactory`
 
-To enable runtime initialization via the `--device my-sensor` CLI flag, register your self-contained **logging mock** in `all-devices-common/device-factory/DeviceFactory.h`.
+To enable runtime initialization via the `--device my-sensor` CLI flag, register
+your self-contained **logging mock** in
+`all-devices-common/device-factory/DeviceFactory.h`.
 
-1. **Include your Logging Mock Header** (keep the include list sorted alphabetically):
+1. **Include your Logging Mock Header** (keep the include list sorted
+   alphabetically):
 
     ```cpp
     #include <devices/my-sensor/impl/LoggingMySensorDevice.h>
@@ -265,7 +303,9 @@ To enable runtime initialization via the `--device my-sensor` CLI flag, register
         });
     }
     ```
-    _Note: We instantiate the Logging mock version in the factory so it runs completely out-of-the-box with self-contained console logging, keeping the platform main clean._
+    _Note: We instantiate the Logging mock version in the factory so it runs
+    completely out-of-the-box with self-contained console logging, keeping the
+    platform main clean._
 
 ---
 
