@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 Project CHIP Authors
+# Copyright (c) 2020-2022, 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ config("openthread_rt1170_config") {
       "OPENTHREAD_CONFIG_RADIO_LINK_TREL_ENABLE=1",
       "OPENTHREAD_CONFIG_DNS_UPSTREAM_QUERY_ENABLE=1",
       "OPENTHREAD_CONFIG_NAT64_TRANSLATOR_ENABLE=1",
-      "OPENTHREAD_CONFIG_NAT64_IDLE_TIMEOUT_SECONDS=60",
+      "OPENTHREAD_CONFIG_NAT64_IDLE_TIMEOUT_SECONDS=120",
       "OPENTHREAD_CONFIG_NAT64_PORT_TRANSLATION_ENABLE=1",
       "OPENTHREAD_CONFIG_NAT64_BORDER_ROUTING_ENABLE=1",
       "DISABLE_TCPIP_INIT=1",
@@ -114,6 +114,13 @@ source_set("libopenthread-rt1170") {
     "${openthread_root}/src/lib/url/url.cpp",
   ]
 
+  cflags = [
+# avoid defined but not used error like for static void otPlatLogImpl
+    "-Wno-unused-function",
+# avoid ot-nxp debug_cli.c error due to type format
+    "-Wno-error=format",
+  ]
+
   if (chip_enable_wifi && chip_enable_thread) {
     sources += [
       "${openthread_nxp_root}/src/common/br/border_agent.c",
@@ -154,7 +161,7 @@ source_set("libopenthread-rt1170") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
   }
 
-  defines = [ "OPENTHREAD_FTD=1" ]
+  defines = [ ]
 
   if (nxp_ot_spinel_interface_link == "hci_spinel_single_uart") {
     defines += [ "OT_PLAT_SPINEL_HCI_OVER_HDLC" ]
@@ -171,9 +178,15 @@ source_set("libopenthread-rt1170") {
 
   deps += [
     "${nxp_sdk_build_root}:nxp_mbedtls",
-    "${openthread_root}:libopenthread-spinel-rcp",
     "../../..:libopenthread-platform-utils",
   ]
+  deps += [ "${openthread_root}:libopenthread-radio-spinel" ]
+  if(chip_openthread_ftd){
+    public_configs += [ "${openthread_root}:openthread_ftd_config" ]
+  }
+  else{
+    public_configs += [ "${openthread_root}:openthread_mtd_config" ]
+  }
 
   if (!nxp_external_sdk) {
     deps += [ nxp_sdk_target ]
