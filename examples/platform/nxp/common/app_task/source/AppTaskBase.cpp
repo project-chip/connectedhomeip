@@ -276,6 +276,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     TEMPORARY_RETURN_IGNORED chip::NXP::App::LowPower::Init();
 #endif
 
+#if CONFIG_CHIP_APP_FACTORY_DATA
     /* Initialize Matter factory data before initializing the Matter stack */
     err = AppFactoryData_PreMatterStackInit();
 
@@ -285,6 +286,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Pre Factory Data Provider init failed");
         goto exit;
     }
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     /* BLEApplicationManager implemented per platform or left blank */
@@ -302,6 +304,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         goto exit;
     }
 
+#if CONFIG_CHIP_APP_FACTORY_DATA
     /* Initialize Matter factory data after initializing the Matter stack */
     err = AppFactoryData_PostMatterStackInit();
     if (err != CHIP_NO_ERROR)
@@ -309,6 +312,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Post Factory Data Provider init failed");
         goto exit;
     }
+#endif
 
     /*
      * Register all application callbacks allowing to be informed of stack events
