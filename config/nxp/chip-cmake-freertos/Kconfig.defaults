@@ -25,8 +25,7 @@ config CHIP_DEVICE_VENDOR_NAME
 	default "NXP Semiconductors"
 
 choice CHIP_CRYPTO
-	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_SE05X
-	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
+	default CHIP_CRYPTO_PSA
 endchoice
 
 choice CHIP_CRYPTO_SPAKE2P
@@ -196,6 +195,10 @@ config CHIP_OTA_IMAGE_BUILD
 	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
 
 endif # CHIP_OTA_REQUESTOR
+
+# Multi AEAD operation are not HW accelerated by S200, enable single operation for all platform
+config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+	default y
 
 # Include defaults for SDK Kconfig
 rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig.defconfig"
