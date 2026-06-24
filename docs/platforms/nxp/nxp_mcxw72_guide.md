@@ -225,35 +225,9 @@ Connect OM-SE051ARD board on the arduino connector of MCXW72 board.
 
 ### Provision SE05x with required keys (One time step)
 
-Build the provision example as -
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d <out_dir> -b frdmmcxw72 third_party/simw-top-mini/repo/demos/se051h_nfc_comm_prov/mcu/ -Dcore_id=cm33_core0 -DCONFIG_CHIP_SE05X=y
-```
-
-**NOTE**: By default, the provision example will provision for nfc-wifi interface. Build the example with `-DCONFIG_SE05X_DEVICE_NETWORK_TYPE_THREAD=y` for thread interface.
-
-Refer [SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/readme.md) for more details on provisioning SE05x with required keys for powered and unpowered commissioning.
+Refer [SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/readme.md) to provision SE05x with required keys for powered and unpowered commissioning.
 
 **NOTE** For ease of use, the provision example can also be used from Linux machine. Refer [SE051H Provision Example on Linux](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/vcom_prov_readme.md)
-
-By default some objects in SE05x are trust provisioned with secure messaging policy enabled (Meaning - the objects can be accessed only in a session with SE05x).
-The secure messaging policies can be removed using the following steps for ease of use / testing (Not recommended for product deployment). Build and run provision example in the below sequence -
-
-Provision AES session Key ==>
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d <out_dir> -b frdmmcxw72 third_party/simw-top-mini/repo/demos/se051h_nfc_comm_prov/mcu/ -Dcore_id=cm33_core0 -DCONFIG_CHIP_SE05X=y -DCONFIG_SE05X_DO_AES_KEY_PROVISION=y
-```
-Open AES session and delete all objects ==>
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d <out_dir> -b frdmmcxw72 third_party/simw-top-mini/repo/demos/se051h_nfc_comm_prov/mcu/ -Dcore_id=cm33_core0 -DCONFIG_CHIP_SE05X=y -DCONFIG_SE05X_AES_KEY=y -DCONFIG_SE05X_DO_RESET=y
-```
-Open Plain session and re-provision all objects ==>
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d <out_dir> -b frdmmcxw72 third_party/simw-top-mini/repo/demos/se051h_nfc_comm_prov/mcu/ -Dcore_id=cm33_core0 -DCONFIG_CHIP_SE05X=y
-```
-
-**NOTE : REMOVING SECURE MESSAGING POLICY IS NOT RECOMMENDED FOR PRODUCT DEPLOYMENT.**
 
 ### Build options for example
 
@@ -278,7 +252,8 @@ west build -d bin/lighting-app/ftd -b frdmmcxw72 examples/lighting-app/nxp -Dcor
 > enable pin as required.
 >
 > 2.  If the SE05x has crypto objects that are enabled with secure
-> messaging policy, the example needs to be built with secure session support enabled.
+> messaging, the example needs to be built with secure session support enabled.
 > For example to build with AES applet session support, build with -DCONFIG_SE05X_AES_KEY=y.
+
 
 Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.
