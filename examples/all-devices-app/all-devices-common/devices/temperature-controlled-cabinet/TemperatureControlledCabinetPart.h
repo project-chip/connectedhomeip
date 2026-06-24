@@ -37,8 +37,7 @@ public:
     };
 
     TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate);
-    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
-                                     Clusters::IdentifyDelegate & identifyDelegate);
+    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config, Clusters::IdentifyDelegate & identifyDelegate);
     ~TemperatureControlledCabinetPart() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;

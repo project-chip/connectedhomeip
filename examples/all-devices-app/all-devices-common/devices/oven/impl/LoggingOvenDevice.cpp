@@ -18,9 +18,7 @@
 
 namespace chip::app {
 
-LoggingOvenDevice::LoggingOvenDevice(TimerDelegate & timerDelegate) :
-    LoggingOvenDevice(timerDelegate, Config::Default())
-{}
+LoggingOvenDevice::LoggingOvenDevice(TimerDelegate & timerDelegate) : LoggingOvenDevice(timerDelegate, Config::Default()) {}
 
 LoggingOvenDevice::LoggingOvenDevice(TimerDelegate & timerDelegate, Config config) :
     OvenDevice(timerDelegate, mLoggingSurface, mLoggingCavity, mLoggingSurface, config),

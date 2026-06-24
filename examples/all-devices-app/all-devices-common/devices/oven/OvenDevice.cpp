@@ -20,14 +20,11 @@
 
 namespace chip::app {
 
-OvenDevice::OvenDevice(TimerDelegate & timerDelegate,
-                       Clusters::OnOffDelegate & surfaceOnOff,
-                       Clusters::IdentifyDelegate & cavityIdentify,
-                       Clusters::IdentifyDelegate & surfaceIdentify,
+OvenDevice::OvenDevice(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff,
+                       Clusters::IdentifyDelegate & cavityIdentify, Clusters::IdentifyDelegate & surfaceIdentify,
                        const Config & config) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)),
-    mCavity(timerDelegate, config.cavityConfig, cavityIdentify),
-    mSurface(timerDelegate, surfaceOnOff, surfaceIdentify)
+    mCavity(timerDelegate, config.cavityConfig, cavityIdentify), mSurface(timerDelegate, surfaceOnOff, surfaceIdentify)
 {}
 
 CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

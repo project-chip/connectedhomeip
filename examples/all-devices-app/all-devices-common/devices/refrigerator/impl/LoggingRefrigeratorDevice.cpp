@@ -23,8 +23,7 @@ LoggingRefrigeratorDevice::LoggingRefrigeratorDevice(TimerDelegate & timerDelega
 {}
 
 LoggingRefrigeratorDevice::LoggingRefrigeratorDevice(TimerDelegate & timerDelegate, Config config) :
-    RefrigeratorDevice(timerDelegate, mLoggingCabinet, config),
-    mLoggingCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
+    RefrigeratorDevice(timerDelegate, mLoggingCabinet, config), mLoggingCabinet(timerDelegate, config.cabinetConfig, "Cabinet")
 {}
 
 } // namespace chip::app

@@ -18,14 +18,14 @@
 
 namespace chip::app {
 
-LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate,
-                                                                                 const char * name) :
+LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, const char * name) :
     LoggingTemperatureControlledCabinetPart(timerDelegate, Config{}, name)
 {}
 
 LoggingTemperatureControlledCabinetPart::LoggingTemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
                                                                                  const char * name) :
-    TemperatureControlledCabinetPart(timerDelegate, config, *this), mName(name)
+    TemperatureControlledCabinetPart(timerDelegate, config, *this),
+    mName(name)
 {}
 
 void LoggingTemperatureControlledCabinetPart::OnIdentifyStart(Clusters::IdentifyCluster & cluster)

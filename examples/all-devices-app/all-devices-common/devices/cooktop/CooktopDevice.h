@@ -54,11 +54,8 @@ private:
 class CooktopDevice : public DeviceInterface
 {
 public:
-    CooktopDevice(TimerDelegate & timerDelegate,
-                  Clusters::OnOffDelegate & surface1OnOff,
-                  Clusters::OnOffDelegate & surface2OnOff,
-                  Clusters::IdentifyDelegate & surface1Identify,
-                  Clusters::IdentifyDelegate & surface2Identify);
+    CooktopDevice(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surface1OnOff, Clusters::OnOffDelegate & surface2OnOff,
+                  Clusters::IdentifyDelegate & surface1Identify, Clusters::IdentifyDelegate & surface2Identify);
     ~CooktopDevice() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

@@ -79,14 +79,11 @@ void CookSurfacePart::Unregister(CodeDrivenDataModelProvider & provider)
 
 // CooktopDevice
 
-CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate,
-                             Clusters::OnOffDelegate & surface1OnOff,
-                             Clusters::OnOffDelegate & surface2OnOff,
-                             Clusters::IdentifyDelegate & surface1Identify,
+CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surface1OnOff,
+                             Clusters::OnOffDelegate & surface2OnOff, Clusters::IdentifyDelegate & surface1Identify,
                              Clusters::IdentifyDelegate & surface2Identify) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCooktop, 1)),
-    mSurface1(timerDelegate, surface1OnOff, surface1Identify),
-    mSurface2(timerDelegate, surface2OnOff, surface2Identify)
+    mSurface1(timerDelegate, surface1OnOff, surface1Identify), mSurface2(timerDelegate, surface2OnOff, surface2Identify)
 {}
 
 CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

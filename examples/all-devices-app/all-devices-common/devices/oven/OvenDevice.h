@@ -45,11 +45,8 @@ public:
         }
     };
 
-    OvenDevice(TimerDelegate & timerDelegate,
-               Clusters::OnOffDelegate & surfaceOnOff,
-               Clusters::IdentifyDelegate & cavityIdentify,
-               Clusters::IdentifyDelegate & surfaceIdentify,
-               const Config & config = Config::Default());
+    OvenDevice(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff, Clusters::IdentifyDelegate & cavityIdentify,
+               Clusters::IdentifyDelegate & surfaceIdentify, const Config & config = Config::Default());
     ~OvenDevice() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
