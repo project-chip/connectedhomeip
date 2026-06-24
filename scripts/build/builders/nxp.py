@@ -51,6 +51,7 @@ class NxpBoard(Enum):
     RT1060 = auto()
     RT1170 = auto()
     RW61X = auto()
+    MCXW71 = auto()
     MCXW72 = auto()
 
     def Name(self, os_env):
@@ -62,6 +63,8 @@ class NxpBoard(Enum):
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'frdm_rw612'
             return 'rw61x'
+        if self == NxpBoard.MCXW71:
+            return 'mcxw71'
         if self == NxpBoard.MCXW72:
             return 'mcxw72'
         raise Exception('Unknown board type: %r' % self)
@@ -75,6 +78,8 @@ class NxpBoard(Enum):
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'zephyr'
             return 'rt/rw61x'
+        if self == NxpBoard.MCXW71:
+            return 'mcxw71'
         if self == NxpBoard.MCXW72:
             return 'mcxw72'
         raise Exception('Unknown board type: %r' % self)
@@ -155,7 +160,7 @@ class NxpBuilder(GnBuilder):
                  root,
                  runner,
                  app: NxpApp = NxpApp.LIGHTING,
-                 board: NxpBoard = NxpBoard.MCXW72,
+                 board: NxpBoard = NxpBoard.MCXW71,
                  board_variant: NxpBoardVariant = None,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
                  build_system: NxpBuildSystem = NxpBuildSystem.CMAKE,
@@ -233,6 +238,10 @@ class NxpBuilder(GnBuilder):
                 return "evkbmimxrt1060"
             case NxpBoard.RT1170:
                 return "evkbmimxrt1170"
+            case NxpBoard.MCXW71:
+                if board_variant is NxpBoardVariant.FRDM:
+                    return "frdmmcxw71"
+                return "mcxw71evk"
             case NxpBoard.MCXW72:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw72"
@@ -364,8 +373,10 @@ class NxpBuilder(GnBuilder):
         if self.se05x_enable:
             flags.append('-DCONFIG_CHIP_SE05X=y')
 
-        if self.board == NxpBoard.MCXW72:
+        if self.board in (NxpBoard.MCXW71, NxpBoard.MCXW72):
             flags.append('-DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n')
+
+        if self.board == NxpBoard.MCXW72:
             flags.append('-Dcore_id=cm33_core0')
 
         return " ".join(flags)
