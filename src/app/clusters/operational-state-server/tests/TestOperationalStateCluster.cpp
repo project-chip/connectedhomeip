@@ -319,7 +319,7 @@ TEST_F(OperationalStateClusterTest, SetOperationalState_PausedReportsCountdownTi
     // Change state to Paused. This should trigger UpdateCountdownTimeFromClusterLogic.
     EXPECT_EQ(clusterWithCountdown.SetOperationalState(to_underlying(OperationalStateEnum::kPaused)), CHIP_NO_ERROR);
 
-    auto & dirty = tester.GetDirtyList();
+    auto & dirty        = tester.GetDirtyList();
     bool countdownDirty = false;
     for (auto & path : dirty)
     {
