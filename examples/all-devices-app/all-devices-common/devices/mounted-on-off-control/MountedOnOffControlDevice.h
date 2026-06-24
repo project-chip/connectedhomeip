@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/on-off-load/impl/LoggingOnOffLoadDevice.h>
 
 namespace chip::app {
 
-class MountedOnOffControlDevice : public LoggingOnOffLightDevice
+class MountedOnOffControlDevice : public LoggingOnOffLoadDevice
 {
 public:
     MountedOnOffControlDevice(const Context & context);

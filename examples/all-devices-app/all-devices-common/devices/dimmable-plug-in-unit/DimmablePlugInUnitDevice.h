@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/dimmable-load/impl/LoggingDimmableLoadDevice.h>
 
 namespace chip::app {
 
-class DimmablePlugInUnitDevice : public LoggingDimmableLightDevice
+class DimmablePlugInUnitDevice : public LoggingDimmableLoadDevice
 {
 public:
     explicit DimmablePlugInUnitDevice(const Context & context);

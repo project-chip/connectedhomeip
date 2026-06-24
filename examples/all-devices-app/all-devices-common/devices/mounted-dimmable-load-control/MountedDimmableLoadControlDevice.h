@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <devices/dimmable-load/impl/LoggingDimmableLoadDevice.h>
 
 namespace chip {
 namespace app {
 
-class MountedDimmableLoadControlDevice : public LoggingDimmableLightDevice
+class MountedDimmableLoadControlDevice : public LoggingDimmableLoadDevice
 {
 public:
     explicit MountedDimmableLoadControlDevice(const Context & context);

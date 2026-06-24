@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,16 +15,17 @@
  *    limitations under the License.
  */
 
-#include "MountedDimmableLoadControlDevice.h"
+#pragma once
 
-#include <devices/Types.h>
+#include <devices/on-off-load/impl/LoggingOnOffLoadDevice.h>
 
-namespace chip {
-namespace app {
+namespace chip::app {
 
-MountedDimmableLoadControlDevice::MountedDimmableLoadControlDevice(const Context & context) :
-    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMountedDimmableLoadControl, 1), context)
-{}
+class LoggingOnOffLightDevice : public LoggingOnOffLoadDevice
+{
+public:
+    LoggingOnOffLightDevice(const Context & context);
+    ~LoggingOnOffLightDevice() override = default;
+};
 
-} // namespace app
-} // namespace chip
+} // namespace chip::app

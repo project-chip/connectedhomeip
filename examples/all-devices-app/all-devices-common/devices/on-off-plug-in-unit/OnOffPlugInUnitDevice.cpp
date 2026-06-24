@@ -21,7 +21,7 @@
 namespace chip::app {
 
 OnOffPlugInUnitDevice::OnOffPlugInUnitDevice(const Context & context) :
-    LoggingOnOffLightDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffPlugInUnit, 1), context)
+    LoggingOnOffLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffPlugInUnit, 1), context)
 {}
 
 } // namespace chip::app

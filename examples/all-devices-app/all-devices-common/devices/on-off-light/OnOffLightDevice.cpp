@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,18 +16,17 @@
  */
 
 #include <devices/Types.h>
-#include <devices/dimmable-light/DimmableLightDevice.h>
+#include <devices/on-off-light/OnOffLightDevice.h>
 
 namespace chip {
 namespace app {
 
-DimmableLightDevice::DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate,
-                                         Clusters::LevelControlDelegate & levelControlDelegate,
-                                         Clusters::OnOffEffectDelegate & effectDelegate,
-                                         Clusters::IdentifyDelegate & identifyDelegate,
-                                         const Context & context) :
-    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1),
-                       onOffDelegate, levelControlDelegate, effectDelegate, identifyDelegate, context)
+OnOffLightDevice::OnOffLightDevice(Clusters::OnOffDelegate & onOffDelegate,
+                                   Clusters::OnOffEffectDelegate & effectDelegate,
+                                   Clusters::IdentifyDelegate & identifyDelegate,
+                                   const Context & context) :
+    OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1),
+                    onOffDelegate, effectDelegate, identifyDelegate, context)
 {}
 
 } // namespace app

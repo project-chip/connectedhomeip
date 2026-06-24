@@ -51,7 +51,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/impl:logging",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/oven",

@@ -21,7 +21,7 @@
 namespace chip::app {
 
 MountedOnOffControlDevice::MountedOnOffControlDevice(const Context & context) :
-    LoggingOnOffLightDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMountedOnOffControl, 1), context)
+    LoggingOnOffLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMountedOnOffControl, 1), context)
 {}
 
 } // namespace chip::app
