@@ -48,6 +48,7 @@
 #include <clusters/ClosureDimension/CommandIds.h>
 #include <clusters/ColorControl/CommandIds.h>
 #include <clusters/CommissionerControl/CommandIds.h>
+#include <clusters/CommissioningProxy/CommandIds.h>
 #include <clusters/CommodityMetering/CommandIds.h>
 #include <clusters/CommodityPrice/CommandIds.h>
 #include <clusters/CommodityTariff/CommandIds.h>
@@ -147,7 +148,9 @@
 #include <clusters/Switch/CommandIds.h>
 #include <clusters/TargetNavigator/CommandIds.h>
 #include <clusters/TemperatureControl/CommandIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/CommandIds.h>
 #include <clusters/TemperatureMeasurement/CommandIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/CommandIds.h>
 #include <clusters/Thermostat/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
 #include <clusters/ThreadBorderRouterManagement/CommandIds.h>

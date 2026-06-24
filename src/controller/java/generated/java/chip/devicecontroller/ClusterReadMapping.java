@@ -5689,6 +5689,87 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readTemperatureControlledCabinetTopologyInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyDisabledCabinetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyDisabledCabinetsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readDisabledCabinetsAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.DisabledCabinetsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterDisabledCabinetsAttributeCallback(),
+          readTemperatureControlledCabinetTopologyDisabledCabinetsCommandParams
+        );
+        result.put("readDisabledCabinetsAttribute", readTemperatureControlledCabinetTopologyDisabledCabinetsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyTopologyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyTopologyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readTopologyAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTemperatureControlledCabinetTopologyTopologyCommandParams
+        );
+        result.put("readTopologyAttribute", readTemperatureControlledCabinetTopologyTopologyAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterGeneratedCommandListAttributeCallback(),
+          readTemperatureControlledCabinetTopologyGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readTemperatureControlledCabinetTopologyGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterAcceptedCommandListAttributeCallback(),
+          readTemperatureControlledCabinetTopologyAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readTemperatureControlledCabinetTopologyAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.TemperatureControlledCabinetTopologyCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTemperatureControlledCabinetTopologyClusterAttributeListAttributeCallback(),
+          readTemperatureControlledCabinetTopologyAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readTemperatureControlledCabinetTopologyAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readTemperatureControlledCabinetTopologyFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readTemperatureControlledCabinetTopologyFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTemperatureControlledCabinetTopologyClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTemperatureControlledCabinetTopologyClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TemperatureControlledCabinetTopologyCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTemperatureControlledCabinetTopologyClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readTemperatureControlledCabinetTopologyClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readModeSelectInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readModeSelectDescriptionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readModeSelectDescriptionAttributeInteractionInfo = new InteractionInfo(
@@ -17635,6 +17716,153 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readCommissioningProxyInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readCommissioningProxyTransportCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyTransportAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readTransportAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyTransportCommandParams
+        );
+        result.put("readTransportAttribute", readCommissioningProxyTransportAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyScanMaxTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyScanMaxTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readScanMaxTimeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyScanMaxTimeCommandParams
+        );
+        result.put("readScanMaxTimeAttribute", readCommissioningProxyScanMaxTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyMaxSessionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyMaxSessionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readMaxSessionsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyMaxSessionsCommandParams
+        );
+        result.put("readMaxSessionsAttribute", readCommissioningProxyMaxSessionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyMaxCachedResultsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyMaxCachedResultsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readMaxCachedResultsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyMaxCachedResultsCommandParams
+        );
+        result.put("readMaxCachedResultsAttribute", readCommissioningProxyMaxCachedResultsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyNumCachedResultsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyNumCachedResultsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readNumCachedResultsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyNumCachedResultsCommandParams
+        );
+        result.put("readNumCachedResultsAttribute", readCommissioningProxyNumCachedResultsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyCacheTimeoutCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyCacheTimeoutAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readCacheTimeoutAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyCacheTimeoutCommandParams
+        );
+        result.put("readCacheTimeoutAttribute", readCommissioningProxyCacheTimeoutAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyCachedResultsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyCachedResultsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readCachedResultsAttribute(
+              (ChipClusters.CommissioningProxyCluster.CachedResultsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterCachedResultsAttributeCallback(),
+          readCommissioningProxyCachedResultsCommandParams
+        );
+        result.put("readCachedResultsAttribute", readCommissioningProxyCachedResultsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyWiFiBandCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyWiFiBandAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readWiFiBandAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyWiFiBandCommandParams
+        );
+        result.put("readWiFiBandAttribute", readCommissioningProxyWiFiBandAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.CommissioningProxyCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterGeneratedCommandListAttributeCallback(),
+          readCommissioningProxyGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readCommissioningProxyGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.CommissioningProxyCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterAcceptedCommandListAttributeCallback(),
+          readCommissioningProxyAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readCommissioningProxyAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.CommissioningProxyCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommissioningProxyClusterAttributeListAttributeCallback(),
+          readCommissioningProxyAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readCommissioningProxyAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readCommissioningProxyFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readCommissioningProxyFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommissioningProxyClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommissioningProxyClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommissioningProxyCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCommissioningProxyClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readCommissioningProxyClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readWakeOnLanInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWakeOnLanMACAddressCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWakeOnLanMACAddressAttributeInteractionInfo = new InteractionInfo(
@@ -22226,6 +22454,76 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readTestHiddenManufacturerSpecificInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificTestAttributeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificTestAttributeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readTestAttributeAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readTestHiddenManufacturerSpecificTestAttributeCommandParams
+        );
+        result.put("readTestAttributeAttribute", readTestHiddenManufacturerSpecificTestAttributeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.TestHiddenManufacturerSpecificCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTestHiddenManufacturerSpecificClusterGeneratedCommandListAttributeCallback(),
+          readTestHiddenManufacturerSpecificGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readTestHiddenManufacturerSpecificGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.TestHiddenManufacturerSpecificCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTestHiddenManufacturerSpecificClusterAcceptedCommandListAttributeCallback(),
+          readTestHiddenManufacturerSpecificAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readTestHiddenManufacturerSpecificAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.TestHiddenManufacturerSpecificCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTestHiddenManufacturerSpecificClusterAttributeListAttributeCallback(),
+          readTestHiddenManufacturerSpecificAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readTestHiddenManufacturerSpecificAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readTestHiddenManufacturerSpecificFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readTestHiddenManufacturerSpecificFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTestHiddenManufacturerSpecificClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readTestHiddenManufacturerSpecificClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     @SuppressWarnings("serial")
     public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
 
@@ -22271,6 +22569,7 @@ public class ClusterReadMapping {
             put("ovenCavityOperationalState", readOvenCavityOperationalStateInteractionInfo());
             put("ovenMode", readOvenModeInteractionInfo());
             put("laundryDryerControls", readLaundryDryerControlsInteractionInfo());
+            put("temperatureControlledCabinetTopology", readTemperatureControlledCabinetTopologyInteractionInfo());
             put("modeSelect", readModeSelectInteractionInfo());
             put("laundryWasherMode", readLaundryWasherModeInteractionInfo());
             put("refrigeratorAndTemperatureControlledCabinetMode", readRefrigeratorAndTemperatureControlledCabinetModeInteractionInfo());
@@ -22348,6 +22647,7 @@ public class ClusterReadMapping {
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
             put("threadBorderRouterManagement", readThreadBorderRouterManagementInteractionInfo());
             put("threadNetworkDirectory", readThreadNetworkDirectoryInteractionInfo());
+            put("commissioningProxy", readCommissioningProxyInteractionInfo());
             put("wakeOnLan", readWakeOnLanInteractionInfo());
             put("channel", readChannelInteractionInfo());
             put("targetNavigator", readTargetNavigatorInteractionInfo());
@@ -22381,7 +22681,8 @@ public class ClusterReadMapping {
             put("commodityMetering", readCommodityMeteringInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());
-            put("sampleMei", readSampleMeiInteractionInfo());}};
+            put("sampleMei", readSampleMeiInteractionInfo());
+            put("testHiddenManufacturerSpecific", readTestHiddenManufacturerSpecificInteractionInfo());}};
     }
 }
 

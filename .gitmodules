@@ -56,7 +56,7 @@
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
-	branch  = int/CHIPSE_Release
+	branch  = matter_1_6_se05x
 	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp

@@ -130,7 +130,6 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    TaskHandle_t taskHandle;
 
 #if CONFIG_ENABLE_PW_RPC
     chip::NXP::App::Rpc::Init();
@@ -156,6 +155,7 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
      */
     AppTaskFreeRTOS::AppTaskMain(this);
 #else
+    TaskHandle_t taskHandle;
     /* AppTaskMain function will loss actual object instance, give it as parameter */
     if (xTaskCreate(&AppTaskFreeRTOS::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE, this, APP_TASK_PRIORITY, &taskHandle) !=
         pdPASS)

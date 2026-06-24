@@ -53,6 +53,7 @@ Generally regenerate using one of:
 |         72 |       0x48 | OvenCavityOperationalState                              |
 |         73 |       0x49 | OvenMode                                                |
 |         74 |       0x4A | LaundryDryerControls                                    |
+|         75 |       0x4B | TemperatureControlledCabinetTopology                    |
 |         80 |       0x50 | ModeSelect                                              |
 |         81 |       0x51 | LaundryWasherMode                                       |
 |         82 |       0x52 | RefrigeratorAndTemperatureControlledCabinetMode         |
@@ -130,6 +131,7 @@ Generally regenerate using one of:
 |       1105 |      0x451 | WiFiNetworkManagement                                   |
 |       1106 |      0x452 | ThreadBorderRouterManagement                            |
 |       1107 |      0x453 | ThreadNetworkDirectory                                  |
+|       1109 |      0x455 | CommissioningProxy                                      |
 |       1283 |      0x503 | WakeOnLan                                               |
 |       1284 |      0x504 | Channel                                                 |
 |       1285 |      0x505 | TargetNavigator                                         |
@@ -164,3 +166,4 @@ Generally regenerate using one of:
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |
+| 4294048801 | 0xFFF1FC21 | TestHiddenManufacturerSpecific                          |

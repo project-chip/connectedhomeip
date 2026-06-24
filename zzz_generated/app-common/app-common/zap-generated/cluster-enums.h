@@ -50,6 +50,7 @@
 #include <clusters/ClosureDimension/Enums.h>
 #include <clusters/ColorControl/Enums.h>
 #include <clusters/CommissionerControl/Enums.h>
+#include <clusters/CommissioningProxy/Enums.h>
 #include <clusters/CommodityMetering/Enums.h>
 #include <clusters/CommodityPrice/Enums.h>
 #include <clusters/CommodityTariff/Enums.h>
@@ -149,7 +150,9 @@
 #include <clusters/Switch/Enums.h>
 #include <clusters/TargetNavigator/Enums.h>
 #include <clusters/TemperatureControl/Enums.h>
+#include <clusters/TemperatureControlledCabinetTopology/Enums.h>
 #include <clusters/TemperatureMeasurement/Enums.h>
+#include <clusters/TestHiddenManufacturerSpecific/Enums.h>
 #include <clusters/Thermostat/Enums.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
 #include <clusters/ThreadBorderRouterManagement/Enums.h>
