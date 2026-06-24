@@ -18201,6 +18201,161 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedCommissioningProxyClusterProxyConnectResponseCallback implements ChipClusters.CommissioningProxyCluster.ProxyConnectResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer sessionID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo sessionIDResponseValue = new CommandResponseInfo("sessionID", "Integer");
+      responseValues.put(sessionIDResponseValue, sessionID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedCommissioningProxyClusterProxyScanResponseCallback implements ChipClusters.CommissioningProxyCluster.ProxyScanResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer numberOfResults, ArrayList<ChipStructs.CommissioningProxyClusterScanResultStruct> proxyScanResult) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo numberOfResultsResponseValue = new CommandResponseInfo("numberOfResults", "Integer");
+      responseValues.put(numberOfResultsResponseValue, numberOfResults);
+      // proxyScanResult: ScanResultStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedCommissioningProxyClusterProxyMessageResponseCallback implements ChipClusters.CommissioningProxyCluster.ProxyMessageResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer sessionID, @Nullable byte[] message) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo sessionIDResponseValue = new CommandResponseInfo("sessionID", "Integer");
+      responseValues.put(sessionIDResponseValue, sessionID);
+      CommandResponseInfo messageResponseValue = new CommandResponseInfo("message", "byte[]");
+      responseValues.put(messageResponseValue, message);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedCommissioningProxyClusterCachedResultsAttributeCallback implements ChipClusters.CommissioningProxyCluster.CachedResultsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.CommissioningProxyClusterScanResultStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.CommissioningProxyClusterScanResultStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommissioningProxyClusterGeneratedCommandListAttributeCallback implements ChipClusters.CommissioningProxyCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommissioningProxyClusterAcceptedCommandListAttributeCallback implements ChipClusters.CommissioningProxyCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommissioningProxyClusterAttributeListAttributeCallback implements ChipClusters.CommissioningProxyCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedWakeOnLanClusterGeneratedCommandListAttributeCallback implements ChipClusters.WakeOnLanCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -25054,6 +25209,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ThreadNetworkDirectoryCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("threadNetworkDirectory", threadNetworkDirectoryClusterInfo);
 
+    ClusterInfo commissioningProxyClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.CommissioningProxyCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("commissioningProxy", commissioningProxyClusterInfo);
+
     ClusterInfo wakeOnLanClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.WakeOnLanCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("wakeOnLan", wakeOnLanClusterInfo);
@@ -25317,6 +25476,7 @@ public class ClusterInfoMapping {
     destination.get("wiFiNetworkManagement").combineCommands(source.get("wiFiNetworkManagement"));
     destination.get("threadBorderRouterManagement").combineCommands(source.get("threadBorderRouterManagement"));
     destination.get("threadNetworkDirectory").combineCommands(source.get("threadNetworkDirectory"));
+    destination.get("commissioningProxy").combineCommands(source.get("commissioningProxy"));
     destination.get("wakeOnLan").combineCommands(source.get("wakeOnLan"));
     destination.get("channel").combineCommands(source.get("channel"));
     destination.get("targetNavigator").combineCommands(source.get("targetNavigator"));
@@ -31261,6 +31421,184 @@ public class ClusterInfoMapping {
     threadNetworkDirectoryClusterInteractionInfoMap.put("getOperationalDataset", threadNetworkDirectorygetOperationalDatasetInteractionInfo);
 
     commandMap.put("threadNetworkDirectory", threadNetworkDirectoryClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> commissioningProxyClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> commissioningProxyproxyConnectRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissioningProxyproxyConnectRequestaddressCommandParameterInfo = new CommandParameterInfo("address", byte[].class, byte[].class);
+    commissioningProxyproxyConnectRequestCommandParams.put("address",commissioningProxyproxyConnectRequestaddressCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyConnectRequesttransportCommandParameterInfo = new CommandParameterInfo("transport", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("transport",commissioningProxyproxyConnectRequesttransportCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyConnectRequestdiscriminatorCommandParameterInfo = new CommandParameterInfo("discriminator", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("discriminator",commissioningProxyproxyConnectRequestdiscriminatorCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyConnectRequestvendorIDCommandParameterInfo = new CommandParameterInfo("vendorID", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("vendorID",commissioningProxyproxyConnectRequestvendorIDCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyConnectRequestproductIDCommandParameterInfo = new CommandParameterInfo("productID", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("productID",commissioningProxyproxyConnectRequestproductIDCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyConnectRequesttimeoutCommandParameterInfo = new CommandParameterInfo("timeout", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("timeout",commissioningProxyproxyConnectRequesttimeoutCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyConnectRequestwiFiBandCommandParameterInfo = new CommandParameterInfo("wiFiBand", Optional.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("wiFiBand",commissioningProxyproxyConnectRequestwiFiBandCommandParameterInfo);
+    InteractionInfo commissioningProxyproxyConnectRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster)
+          .proxyConnectRequest((ChipClusters.CommissioningProxyCluster.ProxyConnectResponseCallback) callback
+           , (byte[])
+             commandArguments.get("address")
+
+           , (Integer)
+             commandArguments.get("transport")
+
+           , (Integer)
+             commandArguments.get("discriminator")
+
+           , (Integer)
+             commandArguments.get("vendorID")
+
+           , (Integer)
+             commandArguments.get("productID")
+
+           , (Integer)
+             commandArguments.get("timeout")
+
+           , (Optional<Integer>)
+             commandArguments.get("wiFiBand")
+
+            );
+        },
+        () -> new DelegatedCommissioningProxyClusterProxyConnectResponseCallback(),
+        commissioningProxyproxyConnectRequestCommandParams
+      );
+    commissioningProxyClusterInteractionInfoMap.put("proxyConnectRequest", commissioningProxyproxyConnectRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> commissioningProxyproxyDisconnectRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissioningProxyproxyDisconnectRequestsessionIDCommandParameterInfo = new CommandParameterInfo("sessionID", Integer.class, Integer.class);
+    commissioningProxyproxyDisconnectRequestCommandParams.put("sessionID",commissioningProxyproxyDisconnectRequestsessionIDCommandParameterInfo);
+    InteractionInfo commissioningProxyproxyDisconnectRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster)
+        .proxyDisconnectRequest((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("sessionID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        commissioningProxyproxyDisconnectRequestCommandParams
+    );
+    commissioningProxyClusterInteractionInfoMap.put("proxyDisconnectRequest", commissioningProxyproxyDisconnectRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> commissioningProxyproxyScanRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissioningProxyproxyScanRequesttransportCommandParameterInfo = new CommandParameterInfo("transport", Integer.class, Integer.class);
+    commissioningProxyproxyScanRequestCommandParams.put("transport",commissioningProxyproxyScanRequesttransportCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyScanRequestwiFiBandsCommandParameterInfo = new CommandParameterInfo("wiFiBands", Optional.class, Integer.class);
+    commissioningProxyproxyScanRequestCommandParams.put("wiFiBands",commissioningProxyproxyScanRequestwiFiBandsCommandParameterInfo);
+    InteractionInfo commissioningProxyproxyScanRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster)
+          .proxyScanRequest((ChipClusters.CommissioningProxyCluster.ProxyScanResponseCallback) callback
+           , (Integer)
+             commandArguments.get("transport")
+
+           , (Optional<Integer>)
+             commandArguments.get("wiFiBands")
+
+            );
+        },
+        () -> new DelegatedCommissioningProxyClusterProxyScanResponseCallback(),
+        commissioningProxyproxyScanRequestCommandParams
+      );
+    commissioningProxyClusterInteractionInfoMap.put("proxyScanRequest", commissioningProxyproxyScanRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> commissioningProxyproxyBackGroundScanStartRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissioningProxyproxyBackGroundScanStartRequesttransportCommandParameterInfo = new CommandParameterInfo("transport", Integer.class, Integer.class);
+    commissioningProxyproxyBackGroundScanStartRequestCommandParams.put("transport",commissioningProxyproxyBackGroundScanStartRequesttransportCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyBackGroundScanStartRequesttimeoutCommandParameterInfo = new CommandParameterInfo("timeout", Integer.class, Integer.class);
+    commissioningProxyproxyBackGroundScanStartRequestCommandParams.put("timeout",commissioningProxyproxyBackGroundScanStartRequesttimeoutCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyBackGroundScanStartRequestwiFiBandsCommandParameterInfo = new CommandParameterInfo("wiFiBands", Optional.class, Integer.class);
+    commissioningProxyproxyBackGroundScanStartRequestCommandParams.put("wiFiBands",commissioningProxyproxyBackGroundScanStartRequestwiFiBandsCommandParameterInfo);
+    InteractionInfo commissioningProxyproxyBackGroundScanStartRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster)
+        .proxyBackGroundScanStartRequest((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("transport")
+        , (Integer)
+        commandArguments.get("timeout")
+        , (Optional<Integer>)
+        commandArguments.get("wiFiBands")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        commissioningProxyproxyBackGroundScanStartRequestCommandParams
+    );
+    commissioningProxyClusterInteractionInfoMap.put("proxyBackGroundScanStartRequest", commissioningProxyproxyBackGroundScanStartRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> commissioningProxyproxyBackGroundScanStopRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissioningProxyproxyBackGroundScanStopRequesttransportCommandParameterInfo = new CommandParameterInfo("transport", Integer.class, Integer.class);
+    commissioningProxyproxyBackGroundScanStopRequestCommandParams.put("transport",commissioningProxyproxyBackGroundScanStopRequesttransportCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyBackGroundScanStopRequestwiFiBandsCommandParameterInfo = new CommandParameterInfo("wiFiBands", Optional.class, Integer.class);
+    commissioningProxyproxyBackGroundScanStopRequestCommandParams.put("wiFiBands",commissioningProxyproxyBackGroundScanStopRequestwiFiBandsCommandParameterInfo);
+    InteractionInfo commissioningProxyproxyBackGroundScanStopRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster)
+        .proxyBackGroundScanStopRequest((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("transport")
+        , (Optional<Integer>)
+        commandArguments.get("wiFiBands")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        commissioningProxyproxyBackGroundScanStopRequestCommandParams
+    );
+    commissioningProxyClusterInteractionInfoMap.put("proxyBackGroundScanStopRequest", commissioningProxyproxyBackGroundScanStopRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> commissioningProxyproxyMessageRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo commissioningProxyproxyMessageRequestsessionIDCommandParameterInfo = new CommandParameterInfo("sessionID", Integer.class, Integer.class);
+    commissioningProxyproxyMessageRequestCommandParams.put("sessionID",commissioningProxyproxyMessageRequestsessionIDCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyMessageRequestresponseTimeoutCommandParameterInfo = new CommandParameterInfo("responseTimeout", Integer.class, Integer.class);
+    commissioningProxyproxyMessageRequestCommandParams.put("responseTimeout",commissioningProxyproxyMessageRequestresponseTimeoutCommandParameterInfo);
+
+    CommandParameterInfo commissioningProxyproxyMessageRequestmessageCommandParameterInfo = new CommandParameterInfo("message", byte[].class, byte[].class);
+    commissioningProxyproxyMessageRequestCommandParams.put("message",commissioningProxyproxyMessageRequestmessageCommandParameterInfo);
+    InteractionInfo commissioningProxyproxyMessageRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CommissioningProxyCluster) cluster)
+          .proxyMessageRequest((ChipClusters.CommissioningProxyCluster.ProxyMessageResponseCallback) callback
+           , (Integer)
+             commandArguments.get("sessionID")
+
+           , (Integer)
+             commandArguments.get("responseTimeout")
+
+           , (byte[])
+             commandArguments.get("message")
+
+            );
+        },
+        () -> new DelegatedCommissioningProxyClusterProxyMessageResponseCallback(),
+        commissioningProxyproxyMessageRequestCommandParams
+      );
+    commissioningProxyClusterInteractionInfoMap.put("proxyMessageRequest", commissioningProxyproxyMessageRequestInteractionInfo);
+
+    commandMap.put("commissioningProxy", commissioningProxyClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> wakeOnLanClusterInteractionInfoMap = new LinkedHashMap<>();
 

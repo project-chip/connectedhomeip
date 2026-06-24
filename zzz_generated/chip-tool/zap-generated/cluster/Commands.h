@@ -154,6 +154,7 @@
 | WiFiNetworkManagement                                               | 0x0451 |
 | ThreadBorderRouterManagement                                        | 0x0452 |
 | ThreadNetworkDirectory                                              | 0x0453 |
+| CommissioningProxy                                                  | 0x0455 |
 | WakeOnLan                                                           | 0x0503 |
 | Channel                                                             | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
@@ -12719,6 +12720,277 @@ public:
 
 private:
     chip::app::Clusters::ThreadNetworkDirectory::Commands::GetOperationalDataset::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster CommissioningProxy                                          | 0x0455 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ProxyConnectRequest                                               |   0x00 |
+| * ProxyDisconnectRequest                                            |   0x02 |
+| * ProxyScanRequest                                                  |   0x03 |
+| * ProxyBackGroundScanStartRequest                                   |   0x05 |
+| * ProxyBackGroundScanStopRequest                                    |   0x06 |
+| * ProxyMessageRequest                                               |   0x07 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Transport                                                         | 0x0000 |
+| * ScanMaxTime                                                       | 0x0001 |
+| * MaxSessions                                                       | 0x0002 |
+| * MaxCachedResults                                                  | 0x0003 |
+| * NumCachedResults                                                  | 0x0004 |
+| * CacheTimeout                                                      | 0x0005 |
+| * CachedResults                                                     | 0x0006 |
+| * WiFiBand                                                          | 0x0007 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ProxyConnectRequest
+ */
+class CommissioningProxyProxyConnectRequest : public ClusterCommand
+{
+public:
+    CommissioningProxyProxyConnectRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("proxy-connect-request", credsIssuerConfig)
+    {
+        AddArgument("Address", &mRequest.address);
+        AddArgument("Transport", 0, UINT8_MAX, &mRequest.transport);
+        AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator);
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
+        AddArgument("ProductID", 0, UINT16_MAX, &mRequest.productID);
+        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
+        AddArgument("WiFiBand", 0, UINT16_MAX, &mRequest.wiFiBand);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Type mRequest;
+};
+
+/*
+ * Command ProxyDisconnectRequest
+ */
+class CommissioningProxyProxyDisconnectRequest : public ClusterCommand
+{
+public:
+    CommissioningProxyProxyDisconnectRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("proxy-disconnect-request", credsIssuerConfig)
+    {
+        AddArgument("SessionID", 0, UINT16_MAX, &mRequest.sessionID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Type mRequest;
+};
+
+/*
+ * Command ProxyScanRequest
+ */
+class CommissioningProxyProxyScanRequest : public ClusterCommand
+{
+public:
+    CommissioningProxyProxyScanRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("proxy-scan-request", credsIssuerConfig)
+    {
+        AddArgument("Transport", 0, UINT8_MAX, &mRequest.transport);
+        AddArgument("WiFiBands", 0, UINT16_MAX, &mRequest.wiFiBands);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::Type mRequest;
+};
+
+/*
+ * Command ProxyBackGroundScanStartRequest
+ */
+class CommissioningProxyProxyBackGroundScanStartRequest : public ClusterCommand
+{
+public:
+    CommissioningProxyProxyBackGroundScanStartRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("proxy-back-ground-scan-start-request", credsIssuerConfig)
+    {
+        AddArgument("Transport", 0, UINT8_MAX, &mRequest.transport);
+        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
+        AddArgument("WiFiBands", 0, UINT16_MAX, &mRequest.wiFiBands);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId =
+            chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::Type mRequest;
+};
+
+/*
+ * Command ProxyBackGroundScanStopRequest
+ */
+class CommissioningProxyProxyBackGroundScanStopRequest : public ClusterCommand
+{
+public:
+    CommissioningProxyProxyBackGroundScanStopRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("proxy-back-ground-scan-stop-request", credsIssuerConfig)
+    {
+        AddArgument("Transport", 0, UINT8_MAX, &mRequest.transport);
+        AddArgument("WiFiBands", 0, UINT16_MAX, &mRequest.wiFiBands);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStopRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStopRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStopRequest::Type mRequest;
+};
+
+/*
+ * Command ProxyMessageRequest
+ */
+class CommissioningProxyProxyMessageRequest : public ClusterCommand
+{
+public:
+    CommissioningProxyProxyMessageRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("proxy-message-request", credsIssuerConfig)
+    {
+        AddArgument("SessionID", 0, UINT16_MAX, &mRequest.sessionID);
+        AddArgument("ResponseTimeout", 0, UINT8_MAX, &mRequest.responseTimeout);
+        AddArgument("Message", &mRequest.message);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommissioningProxy::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -31523,6 +31795,92 @@ void registerClusterThreadNetworkDirectory(Commands & commands, CredentialIssuer
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterCommissioningProxy(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CommissioningProxy;
+
+    const char * clusterName = "CommissioningProxy";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                //
+        make_unique<CommissioningProxyProxyConnectRequest>(credsIssuerConfig),             //
+        make_unique<CommissioningProxyProxyDisconnectRequest>(credsIssuerConfig),          //
+        make_unique<CommissioningProxyProxyScanRequest>(credsIssuerConfig),                //
+        make_unique<CommissioningProxyProxyBackGroundScanStartRequest>(credsIssuerConfig), //
+        make_unique<CommissioningProxyProxyBackGroundScanStopRequest>(credsIssuerConfig),  //
+        make_unique<CommissioningProxyProxyMessageRequest>(credsIssuerConfig),             //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "transport", Attributes::Transport::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "scan-max-time", Attributes::ScanMaxTime::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "max-sessions", Attributes::MaxSessions::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "max-cached-results", Attributes::MaxCachedResults::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "num-cached-results", Attributes::NumCachedResults::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "cache-timeout", Attributes::CacheTimeout::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "cached-results", Attributes::CachedResults::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "wi-fi-band", Attributes::WiFiBand::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>>>(
+            Id, "transport", 0, UINT8_MAX, Attributes::Transport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "scan-max-time", 0, UINT8_MAX, Attributes::ScanMaxTime::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-sessions", 0, UINT8_MAX, Attributes::MaxSessions::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-cached-results", 0, UINT8_MAX, Attributes::MaxCachedResults::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "num-cached-results", 0, UINT8_MAX, Attributes::NumCachedResults::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cache-timeout", 0, UINT16_MAX, Attributes::CacheTimeout::Id,
+                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type>>>>(
+            Id, "cached-results", Attributes::CachedResults::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>>>(
+            Id, "wi-fi-band", 0, UINT16_MAX, Attributes::WiFiBand::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "transport", Attributes::Transport::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "scan-max-time", Attributes::ScanMaxTime::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "max-sessions", Attributes::MaxSessions::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "max-cached-results", Attributes::MaxCachedResults::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "num-cached-results", Attributes::NumCachedResults::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "cache-timeout", Attributes::CacheTimeout::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "cached-results", Attributes::CachedResults::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "wi-fi-band", Attributes::WiFiBand::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::WakeOnLan;
@@ -34765,6 +35123,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterWiFiNetworkManagement(commands, credsIssuerConfig);
     registerClusterThreadBorderRouterManagement(commands, credsIssuerConfig);
     registerClusterThreadNetworkDirectory(commands, credsIssuerConfig);
+    registerClusterCommissioningProxy(commands, credsIssuerConfig);
     registerClusterWakeOnLan(commands, credsIssuerConfig);
     registerClusterChannel(commands, credsIssuerConfig);
     registerClusterTargetNavigator(commands, credsIssuerConfig);

@@ -263,6 +263,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ThreadBorderRouterManagement";
     case chip::app::Clusters::ThreadNetworkDirectory::Id:
         return "ThreadNetworkDirectory";
+    case chip::app::Clusters::CommissioningProxy::Id:
+        return "CommissioningProxy";
     case chip::app::Clusters::WakeOnLan::Id:
         return "WakeOnLan";
     case chip::app::Clusters::Channel::Id:
@@ -4389,6 +4391,39 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommissioningProxy::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommissioningProxy::Attributes::Transport::Id:
+            return "Transport";
+        case chip::app::Clusters::CommissioningProxy::Attributes::ScanMaxTime::Id:
+            return "ScanMaxTime";
+        case chip::app::Clusters::CommissioningProxy::Attributes::MaxSessions::Id:
+            return "MaxSessions";
+        case chip::app::Clusters::CommissioningProxy::Attributes::MaxCachedResults::Id:
+            return "MaxCachedResults";
+        case chip::app::Clusters::CommissioningProxy::Attributes::NumCachedResults::Id:
+            return "NumCachedResults";
+        case chip::app::Clusters::CommissioningProxy::Attributes::CacheTimeout::Id:
+            return "CacheTimeout";
+        case chip::app::Clusters::CommissioningProxy::Attributes::CachedResults::Id:
+            return "CachedResults";
+        case chip::app::Clusters::CommissioningProxy::Attributes::WiFiBand::Id:
+            return "WiFiBand";
+        case chip::app::Clusters::CommissioningProxy::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommissioningProxy::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommissioningProxy::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommissioningProxy::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommissioningProxy::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WakeOnLan::Id: {
         switch (id)
         {
@@ -6478,6 +6513,25 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommissioningProxy::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id:
+            return "ProxyConnectRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id:
+            return "ProxyDisconnectRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::Id:
+            return "ProxyScanRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::Id:
+            return "ProxyBackGroundScanStartRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStopRequest::Id:
+            return "ProxyBackGroundScanStopRequest";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id:
+            return "ProxyMessageRequest";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Channel::Id: {
         switch (id)
         {
@@ -7417,6 +7471,19 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommissioningProxy::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectResponse::Id:
+            return "ProxyConnectResponse";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::Id:
+            return "ProxyScanResponse";
+        case chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Id:
+            return "ProxyMessageResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::Channel::Id: {
         switch (id)
         {
@@ -7763,6 +7830,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Network Infrastructure Manager";
     case 0x00000091:
         return "Thread Border Router";
+    case 0x00000092:
+        return "Commissioning By Proxy";
     case 0x00000100:
         return "On/Off Light";
     case 0x00000101:

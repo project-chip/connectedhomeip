@@ -5959,6 +5959,55 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDirectoryCluster(AttributeId aAtt
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCommissioningProxyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommissioningProxy;
+    switch (aAttributeId) {
+    case Attributes::Transport::Id: {
+        return YES;
+    }
+    case Attributes::ScanMaxTime::Id: {
+        return YES;
+    }
+    case Attributes::MaxSessions::Id: {
+        return YES;
+    }
+    case Attributes::MaxCachedResults::Id: {
+        return YES;
+    }
+    case Attributes::NumCachedResults::Id: {
+        return YES;
+    }
+    case Attributes::CacheTimeout::Id: {
+        return YES;
+    }
+    case Attributes::CachedResults::Id: {
+        return YES;
+    }
+    case Attributes::WiFiBand::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known CommissioningProxy attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -7943,6 +7992,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ThreadNetworkDirectory::Id: {
         return AttributeIsSpecifiedInThreadNetworkDirectoryCluster(aAttributeId);
+    }
+    case Clusters::CommissioningProxy::Id: {
+        return AttributeIsSpecifiedInCommissioningProxyCluster(aAttributeId);
     }
     case Clusters::WakeOnLan::Id: {
         return AttributeIsSpecifiedInWakeOnLANCluster(aAttributeId);

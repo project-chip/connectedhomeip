@@ -24,7 +24,6 @@ executable("all-devices-app") {
   sources = [
     "AppCommandDelegate.cpp",
     "ClusterTypeMappings.cpp",
-    "PosixBleRssiRangingAdapter.cpp",
     "PosixChimeDevice.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
@@ -43,7 +42,6 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/pressure-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger/impl:ble-rssi",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/smoke-co-alarm",

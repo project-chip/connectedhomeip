@@ -139,10 +139,16 @@ gcc_toolchain("chip_pw_fuzztest") {
     # to every target via chip's global fuzzing_default -> oss_fuzz config). Drop pigweed's
     # local ASan + -fsanitize=fuzzer-no-link instrumentation here so they don't conflict
     # (pigweed's ASan requires a field-padding-instrumented libc++ that OSS-Fuzz does not use).
+    #
+    # Also drop pigweed's relative_paths config: its -ffile-prefix-map rewrites source paths to
+    # repo-relative (src/..., out/...), but OSS-Fuzz's coverage report resolves only absolute
+    # paths (llvm-cov -path-equivalence=/,$OUT), so the rewritten paths break report generation.
+    # Keep absolute paths here, matching the legacy (non-pigweed) chip fuzz toolchain.
     if (oss_fuzz) {
       remove_default_configs += [
         "$dir_pw_fuzzer:instrumentation",
         "$dir_pw_toolchain/host_clang:sanitize_address",
+        "$dir_pw_build:relative_paths",
       ]
     } else {
       # Local builds keep pigweed's base -fsanitize=address. Optional UBSan on top via the
