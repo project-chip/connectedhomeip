@@ -40,10 +40,7 @@ public:
      *        the length to the length of the copied data.
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of spin speeds.
      */
-    virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed)
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
+    virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) { return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; }
 
     /**
      * Get the supported rinses value at the given index in the list.

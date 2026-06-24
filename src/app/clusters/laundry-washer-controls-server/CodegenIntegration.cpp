@@ -37,8 +37,9 @@ constexpr size_t kLaundryWasherControlsMaxClusterCount =
 LazyRegisteredServerCluster<LaundryWasherControlsCluster> gServers[kLaundryWasherControlsMaxClusterCount];
 
 // We will use this to be able to set some values got from `Accessors::GetDefault` functions without failing, since the cluster will
-// check the values to be valid using the delegate. After this the delegate will be set to the default delegate, which will make all subsequent `.Set*()` calls and write requests on the cluster to fail.
-// Which will enforces the user to set a custom delegate before using the cluster.
+// check the values to be valid using the delegate. After this the delegate will be set to the default delegate, which will make all
+// subsequent `.Set*()` calls and write requests on the cluster to fail. Which will enforces the user to set a custom delegate
+// before using the cluster.
 struct AlwaysSuccessDelegate : public LaundryWasherControls::Delegate
 {
     CHIP_ERROR GetSpinSpeedAtIndex(size_t, MutableCharSpan & spinSpeed) override

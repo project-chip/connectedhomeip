@@ -41,7 +41,9 @@ public:
         {
             VerifyOrDie(mFeatures.HasAny()); // At least one feature must be set.
         }
-        explicit Config(BitFlags<LaundryWasherControls::Feature> features) : Config(features, LaundryWasherControls::Delegate::DefaultInstance()) {}
+        explicit Config(BitFlags<LaundryWasherControls::Feature> features) :
+            Config(features, LaundryWasherControls::Delegate::DefaultInstance())
+        {}
 
         BitFlags<LaundryWasherControls::Feature> GetFeatures() const { return mFeatures; }
         LaundryWasherControls::Delegate * GetDelegate() const { return mDelegate; }
