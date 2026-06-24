@@ -40,7 +40,7 @@ CHIP_ERROR RvcRunModeDelegate::Init()
 
 void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = GetInstance()->GetCurrentMode();
+    uint8_t currentMode = mInstance->GetCurrentMode();
 
     if (!gRvcRunModeInstance->HasFeature(static_cast<ModeBase::Feature>(RvcRunMode::Feature::kDirectModeChange)))
     {
@@ -56,13 +56,11 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     auto rvcOpStateInstance = RvcOperationalState::GetRvcOperationalStateInstance();
     if (NewMode == RvcRunMode::ModeIdle)
     {
-        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
-            to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else
     {
-        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
-            to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
@@ -129,20 +127,9 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
-    gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id,
-                                                 chip::to_underlying(RvcRunMode::Feature::kDirectModeChange));
-    TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
+    gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, 0);
+    gRvcRunModeInstance->Init();
 }
-
-void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId)
-{
-    if (gRvcRunModeInstance)
-    {
-        gRvcRunModeInstance->Shutdown();
-    }
-    RvcRunMode::Shutdown();
-}
-
 
 // RVC Clean
 static RvcCleanModeDelegate * gRvcCleanModeDelegate = nullptr;
@@ -232,16 +219,6 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
-    gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id,
-                                                   chip::to_underlying(RvcCleanMode::Feature::kDirectModeChange));
-    TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
-}
-
-void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId)
-{
-    if (gRvcCleanModeInstance)
-    {
-        gRvcCleanModeInstance->Shutdown();
-    }
-    RvcCleanMode::Shutdown();
+    gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, 0);
+    gRvcCleanModeInstance->Init();
 }

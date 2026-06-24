@@ -135,7 +135,7 @@ void PumpApp::AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aA
 
     if (mSyncClusterToButtonAction)
     {
-        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateClusterState, 0);
+        PlatformMgr().ScheduleWork(UpdateClusterState, 0);
         mSyncClusterToButtonAction = false;
     }
 }

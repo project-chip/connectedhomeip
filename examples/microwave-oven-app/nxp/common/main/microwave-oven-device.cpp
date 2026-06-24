@@ -33,10 +33,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
 void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 {
-    TEMPORARY_RETURN_IGNORED mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    TEMPORARY_RETURN_IGNORED mOperationalStateInstance.Init();
-    TEMPORARY_RETURN_IGNORED mMicrowaveOvenModeInstance.Init();
-    TEMPORARY_RETURN_IGNORED mMicrowaveOvenControlInstance.Init();
+    mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    mOperationalStateInstance.Init();
+    mMicrowaveOvenModeInstance.Init();
+    mMicrowaveOvenControlInstance.Init();
 
     // set default value for attribute SelectedWattIndex and WattRating
     if (mMicrowaveOvenControlInstance.HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
@@ -88,7 +88,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
 
     if (startAfterSetting)
     {
-        TEMPORARY_RETURN_IGNORED mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     }
     return Status::Success;
 }

@@ -26,7 +26,7 @@ get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/pla
 # This must be called before find_package(Zephyr)
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nxp/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
@@ -41,11 +41,6 @@ project(chip-nxp-all-clusters-app-example)
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
-# This is required to include Mbedtls user config file for NXP platform.
-# We use zephyr_include_directories to ensure the include is propagated to
-# the Zephyr Mbedtls module.
-zephyr_include_directories(${CHIP_ROOT}/src)
-
 target_include_directories(app
     PRIVATE
     ${COOKSURFACE_NXP_COMMON_DIR}/main/include
@@ -58,7 +53,6 @@ target_include_directories(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
-    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
 )
 
 target_sources(app
@@ -75,15 +69,9 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
 )
 
-if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
-    target_sources(app PRIVATE
-                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
-    )
-else()
-    target_sources(app PRIVATE
-                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BLEApplicationManagerEmpty.cpp
-    )
-endif()
+target_compile_definitions(app PUBLIC
+    "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
+)
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
@@ -92,13 +80,6 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     )
     target_include_directories(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/include/
-    )
-endif()
-
-if (CONFIG_CHIP_FACTORY_DATA)
-    target_sources(app PRIVATE
-        ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
-        ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
     )
 endif()
 
@@ -128,6 +109,3 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
-
-# Post-build steps
-include(${CHIP_ROOT}/config/nxp/app/zephyr-post-build.cmake)

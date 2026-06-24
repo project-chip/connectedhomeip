@@ -43,5 +43,5 @@ void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
     chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kModerate, Feature::kFair, Feature::kVeryPoor,
                                                         Feature::kExtremelyPoor);
     gAirQualityCluster = new Instance(1, airQualityFeatures);
-    TEMPORARY_RETURN_IGNORED gAirQualityCluster->Init();
+    gAirQualityCluster->Init();
 }

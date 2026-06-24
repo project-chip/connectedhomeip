@@ -45,13 +45,13 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 extern "C" void main_task(void const * argument)
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    TEMPORARY_RETURN_IGNORED chip::NXP::App::GetAppTask().Start();
+    chip::NXP::App::GetAppTask().Start();
 }
 #else
 extern "C" int main(int argc, char * argv[])
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    TEMPORARY_RETURN_IGNORED chip::NXP::App::GetAppTask().Start();
+    chip::NXP::App::GetAppTask().Start();
     vTaskStartScheduler();
 }
 #endif

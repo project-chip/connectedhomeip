@@ -101,5 +101,5 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
     gLaundryWasherModeDelegate = new LaundryWasherMode::LaundryWasherModeDelegate;
     gLaundryWasherModeInstance =
         new ModeBase::Instance(gLaundryWasherModeDelegate, 0x1, LaundryWasherMode::Id, 0);
-    TEMPORARY_RETURN_IGNORED gLaundryWasherModeInstance->Init();
+    gLaundryWasherModeInstance->Init();
 }
