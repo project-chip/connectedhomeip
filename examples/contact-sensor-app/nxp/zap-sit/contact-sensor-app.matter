@@ -2333,8 +2333,6 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
-    callback attribute totalOperationalHours;
-    callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
@@ -2497,7 +2495,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_contactsensor = 21, version 2;
+  device type ma_contactsensor = 21, version 1;
 
 
   server cluster Identify {

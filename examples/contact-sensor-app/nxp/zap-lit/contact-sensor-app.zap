@@ -2117,38 +2117,6 @@
               "reportableChange": 0
             },
             {
-              "name": "TotalOperationalHours",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int32u",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "BootReason",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "type": "BootReasonEnum",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "TestEventTriggersEnabled",
               "code": 8,
               "mfgCode": null,
@@ -4445,7 +4413,7 @@
         }
       ],
       "deviceVersions": [
-        2
+        1
       ],
       "deviceIdentifiers": [
         21
