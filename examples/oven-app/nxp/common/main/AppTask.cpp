@@ -26,6 +26,10 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
+#endif
+
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
 #include <map>
@@ -90,6 +94,8 @@ void OvenApp::AppTask::PostInitMatterStack()
 #ifdef APP_BT_DEVICE_NAME
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(APP_BT_DEVICE_NAME);
 #endif
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().Init();
 #endif
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 }

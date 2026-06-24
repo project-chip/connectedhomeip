@@ -26,6 +26,10 @@
 
 #include <app/clusters/bindings/BindingManager.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
+#endif
+
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
 #include <map>
@@ -77,6 +81,10 @@ static CHIP_ERROR cliLightSwitch(int argc, char * argv[])
 void LightSwitchApp::AppTask::PreInitMatterStack()
 {
     ChipLogProgress(DeviceLayer, "Welcome to NXP OnOff Light Switch Demo App");
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().Init();
+#endif
 }
 
 void LightSwitchApp::AppTask::PostInitMatterStack()
