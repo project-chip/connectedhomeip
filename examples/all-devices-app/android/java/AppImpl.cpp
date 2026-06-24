@@ -18,7 +18,6 @@
 
 #include "AppImpl.h"
 #include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <platform/CommissionableDataProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -28,13 +27,14 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/root-node/RootNodeDevice.h>
 #include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-#include <setup_payload/OnboardingCodesUtil.h>
+#include <devices/root-node/RootNodeDevice.h>
 #include <json/json.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/PlatformManager.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -104,28 +104,27 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gRootNodeDevice = std::make_unique<RootNodeDevice>(
-        RootNodeDevice::Context {
-            .commissioningWindowManager           = Server::GetInstance().GetCommissioningWindowManager(),
-            .configurationManager             = DeviceLayer::ConfigurationMgr(),
-            .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-            .fabricTable                      = Server::GetInstance().GetFabricTable(),
-            .accessControl                    = Server::GetInstance().GetAccessControl(),
-            .persistentStorage                = Server::GetInstance().GetPersistentStorage(),
-            .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),
-            .deviceInstanceInfoProvider       = *provider,
-            .platformManager                  = DeviceLayer::PlatformMgr(),
-            .groupDataProvider                = gGroupDataProvider,
-            .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),
-            .dnssdServer                      = DnssdServer::Instance(),
-            .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),
-            .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),
-            .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,
-            .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(),
-            .eventManagement                  = EventManagement::GetInstance(),
-            .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,
-            .timerDelegate                    = gTimerDelegate,
-        });
+    gRootNodeDevice = std::make_unique<RootNodeDevice>(RootNodeDevice::Context{
+        .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager             = DeviceLayer::ConfigurationMgr(),
+        .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .fabricTable                      = Server::GetInstance().GetFabricTable(),
+        .accessControl                    = Server::GetInstance().GetAccessControl(),
+        .persistentStorage                = Server::GetInstance().GetPersistentStorage(),
+        .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),
+        .deviceInstanceInfoProvider       = *provider,
+        .platformManager                  = DeviceLayer::PlatformMgr(),
+        .groupDataProvider                = gGroupDataProvider,
+        .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                      = DnssdServer::Instance(),
+        .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),
+        .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),
+        .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,
+        .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(),
+        .eventManagement                  = EventManagement::GetInstance(),
+        .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,
+        .timerDelegate                    = gTimerDelegate,
+    });
 
     ReturnErrorOnFailure(gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId));
 
@@ -144,12 +143,12 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
     {
         for (unsigned int i = 0; i < root.size(); i++)
         {
-            Json::Value item = root[i];
+            Json::Value item       = root[i];
             std::string deviceType = item.get("deviceType", "").asString();
-            int endpointId = item.get("endpointId", 0).asInt();
-            int parentId = item.get("parentId", 0).asInt();
-            std::string nodeLabel = item.get("nodeLabel", "").asString();
-            bool bridged = item.get("bridged", false).asBool();
+            int endpointId         = item.get("endpointId", 0).asInt();
+            int parentId           = item.get("parentId", 0).asInt();
+            std::string nodeLabel  = item.get("nodeLabel", "").asString();
+            bool bridged           = item.get("bridged", false).asBool();
 
             if (deviceType.empty() || endpointId <= 0)
             {
@@ -167,9 +166,11 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
                     continue;
                 }
 
-                ChipLogProgress(AppServer, "Registering intermediate bridged-node on endpoint %u (parent: %d)", endpointId, parentId);
+                ChipLogProgress(AppServer, "Registering intermediate bridged-node on endpoint %u (parent: %d)", endpointId,
+                                parentId);
                 endpointIdAllocator.ForceNext(static_cast<EndpointId>(endpointId));
-                ReturnErrorOnFailure(bridgedNode->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(static_cast<EndpointId>(parentId))));
+                ReturnErrorOnFailure(bridgedNode->Register(endpointIdAllocator, dataModelProvider,
+                                                           EndpointComposition::WithParent(static_cast<EndpointId>(parentId))));
                 gConstructedDevices.push_back(std::move(bridgedNode));
 
                 // Create leaf device parented to the bridged-node endpoint
@@ -180,9 +181,11 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
                     continue;
                 }
 
-                ChipLogProgress(AppServer, "Registering bridged leaf device %s on endpoint %u (parent: %u)", deviceType.c_str(), endpointId + 1, endpointId);
+                ChipLogProgress(AppServer, "Registering bridged leaf device %s on endpoint %u (parent: %u)", deviceType.c_str(),
+                                endpointId + 1, endpointId);
                 endpointIdAllocator.ForceNext(static_cast<EndpointId>(endpointId + 1));
-                ReturnErrorOnFailure(leafDevice->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(static_cast<EndpointId>(endpointId))));
+                ReturnErrorOnFailure(leafDevice->Register(endpointIdAllocator, dataModelProvider,
+                                                          EndpointComposition::WithParent(static_cast<EndpointId>(endpointId))));
                 gConstructedDevices.push_back(std::move(leafDevice));
             }
             else
@@ -194,17 +197,19 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
                     continue;
                 }
 
-                ChipLogProgress(AppServer, "Registering device %s on endpoint %u (parent: %d)", deviceType.c_str(), endpointId, parentId);
+                ChipLogProgress(AppServer, "Registering device %s on endpoint %u (parent: %d)", deviceType.c_str(), endpointId,
+                                parentId);
                 endpointIdAllocator.ForceNext(static_cast<EndpointId>(endpointId));
-                ReturnErrorOnFailure(device->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(static_cast<EndpointId>(parentId))));
+                ReturnErrorOnFailure(device->Register(endpointIdAllocator, dataModelProvider,
+                                                      EndpointComposition::WithParent(static_cast<EndpointId>(parentId))));
                 gConstructedDevices.push_back(std::move(device));
             }
         }
     }
 
-    initParams.dataModelProvider = gDataModelProvider;
-    initParams.groupDataProvider = &gGroupDataProvider;
-    initParams.operationalServicePort = CHIP_PORT;
+    initParams.dataModelProvider             = gDataModelProvider;
+    initParams.groupDataProvider             = &gGroupDataProvider;
+    initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
     // Start Server
@@ -212,7 +217,7 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
 
     // Print setup payload and codes
     ConfigurationMgr().LogDeviceConfig();
-    
+
     chip::PayloadContents payload;
     payload.version = 0;
     payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
@@ -238,13 +243,15 @@ void AllDevicesAppShutdown()
     chip::DeviceLayer::StackLock lock;
     for (auto & device : gConstructedDevices)
     {
-        if (gDataModelProvider) {
+        if (gDataModelProvider)
+        {
             device->Unregister(*gDataModelProvider);
         }
     }
     gConstructedDevices.clear();
-    
-    if (gRootNodeDevice && gDataModelProvider) {
+
+    if (gRootNodeDevice && gDataModelProvider)
+    {
         gRootNodeDevice->Unregister(*gDataModelProvider);
     }
     gRootNodeDevice.reset();

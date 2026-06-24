@@ -20,8 +20,6 @@
 #include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <device-factory/DeviceFactory.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -29,6 +27,8 @@
 #include <lib/support/JniTypeWrappers.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pthread.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -155,7 +155,7 @@ JNI_METHOD(jobjectArray, getOnboardingCodes)(JNIEnv * env, jobject self, jint di
     }
     else
     {
-        payload.vendorID = 65521; // fallback test VID
+        payload.vendorID  = 65521; // fallback test VID
         payload.productID = 32768; // fallback test PID
     }
 
