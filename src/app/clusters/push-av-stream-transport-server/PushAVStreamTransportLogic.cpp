@@ -817,7 +817,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newVideoStream.videoStreamID   = finalVideoStreamID;
 
             // Add to storage and update the list
-            TEMPORARY_RETURN_IGNORED transportOptionsPtr->AddVideoStream(newVideoStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddVideoStream(newVideoStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add video stream", mEndpointId));
         }
 
         if (transportOptions.audioStreamID.HasValue())
@@ -859,7 +860,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newAudioStream.audioStreamID   = finalAudioStreamID;
 
             // Add to storage and update the list
-            TEMPORARY_RETURN_IGNORED transportOptionsPtr->AddAudioStream(newAudioStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddAudioStream(newAudioStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add audio stream", mEndpointId));
         }
     }
 
