@@ -40,9 +40,9 @@ CommissioningProxyDevice::CommissioningProxyDevice() :
 {}
 
 CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                              EndpointId parentId)
+                                              EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     BitMask<Feature> features(Feature::kBackgroundScan
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -102,7 +102,7 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
 
 void CommissioningProxyDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
 
     if (mCluster.IsConstructed())
     {
