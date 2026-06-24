@@ -25,38 +25,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/identify-server/identify-server.h>
-
-using namespace chip::app;
-void OnTriggerEffect(::Identify * identify)
-{
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-        ChipLogProgress(Zcl, "EP2 - Clusters::Identify::EffectIdentifierEnum::kBlink");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-        ChipLogProgress(Zcl, "EP2 - Clusters::Identify::EffectIdentifierEnum::kBreathe");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-        ChipLogProgress(Zcl, "EP2 - Clusters::Identify::EffectIdentifierEnum::kOkay");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        ChipLogProgress(Zcl, "EP2 - Clusters::Identify::EffectIdentifierEnum::kChannelChange");
-        break;
-    default:
-        ChipLogProgress(Zcl, "EP2 - No identifier effect");
-        return;
-    }
-}
-
-Identify gIdentify2 = {
-    chip::EndpointId{ 2 },
-    [](Identify *) { ChipLogProgress(Zcl, "EP2 - onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "EP2 - onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
-    OnTriggerEffect,
-};
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
