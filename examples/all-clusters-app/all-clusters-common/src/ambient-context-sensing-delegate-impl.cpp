@@ -17,14 +17,13 @@
 
 #include "ambient-context-sensing-delegate-impl.h"
 #include <lib/support/logging/CHIPLogging.h>
+#include <memory>
 #include <system/SystemClock.h>
 #include <vector>
-#include <memory>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-
 
 AmbientContextSensingDelegate & AmbientContextSensingDelegate::AllocateInstance()
 {
