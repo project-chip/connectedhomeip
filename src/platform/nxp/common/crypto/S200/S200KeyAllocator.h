@@ -48,7 +48,7 @@ public:
             return;
         }
 
-        /* NON_EL2GO storage for CASE Ephemeral Keys and pending operational keys */
+        /* use NON_EL2GO storage for CASE Ephemeral Keys Keys */
         if ((lifetime == PSA_KEY_LIFETIME_VOLATILE) &&
             PSA_KEY_TYPE_IS_ECC_KEY_PAIR(keyType) &&
             (PSA_ECC_FAMILY_SECP_R1 == PSA_KEY_TYPE_ECC_GET_FAMILY(keyType)) &&
