@@ -310,27 +310,27 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
         cover->TiltGoToTarget();
         break;
     /* RO OperationalStatus */
-    case Attributes::OperationalStatus::Id:
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
+    case Attributes::OperationalStatus::Id: {
+        chip::DeviceLayer::StackLock lock;
         opStatus = OperationalStatusGet(endpoint);
         OperationalStatusPrint(opStatus);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
+    }
     /* RW Mode */
-    case Attributes::Mode::Id:
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
+    case Attributes::Mode::Id: {
+        chip::DeviceLayer::StackLock lock;
         mode = ModeGet(endpoint);
         ModePrint(mode);
-        ModeSet(endpoint, mode); // refilter mode if needed
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        ModeSet(endpoint, mode);
         break;
+    }
     /* RO ConfigStatus: set by WC server */
-    case Attributes::ConfigStatus::Id:
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
+    case Attributes::ConfigStatus::Id: {
+        chip::DeviceLayer::StackLock lock;
         configStatus = ConfigStatusGet(endpoint);
         ConfigStatusPrint(configStatus);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
+    }
     /* ### ATTRIBUTEs CHANGEs IGNORED ### */
     /* RO Type: not supposed to dynamically change */
     case Attributes::Type::Id:
@@ -458,15 +458,12 @@ void WindowApp::Cover::LiftStepToward(OperationalState direction)
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    auto wc = FindClusterOnEndpoint(mEndpoint);
-    if (wc == nullptr)
     {
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-        return;
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
+        current = wc->GetCurrentPositionLiftPercent100ths();
     }
-    current = wc->GetCurrentPositionLiftPercent100ths();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (!current.IsNull())
     {
@@ -482,18 +479,18 @@ void WindowApp::Cover::LiftStepToward(OperationalState direction)
 
 void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
-    auto wc = FindClusterOnEndpoint(mEndpoint);
-    VerifyOrReturn(wc != nullptr);
     NPercent100ths current, target;
+    OperationalState opState;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
 
-    target  = wc->GetTargetPositionLiftPercent100ths();
-    current = wc->GetCurrentPositionLiftPercent100ths();
-
-    OperationalState opState = ComputeOperationalState(target, current);
-
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        target  = wc->GetTargetPositionLiftPercent100ths();
+        current = wc->GetCurrentPositionLiftPercent100ths();
+        opState = ComputeOperationalState(target, current);
+    }
 
     /* If Triggered by a TARGET update */
     if (newTarget)
@@ -526,14 +523,15 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
 
 void WindowApp::Cover::TiltStepToward(OperationalState direction)
 {
-    auto wc = FindClusterOnEndpoint(mEndpoint);
-    VerifyOrReturn(wc != nullptr);
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    current = wc->GetCurrentPositionTiltPercent100ths();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
+        current = wc->GetCurrentPositionTiltPercent100ths();
+    }
 
     if (!current.IsNull())
     {
@@ -549,18 +547,18 @@ void WindowApp::Cover::TiltStepToward(OperationalState direction)
 
 void WindowApp::Cover::TiltUpdate(bool newTarget)
 {
-    auto wc = FindClusterOnEndpoint(mEndpoint);
-    VerifyOrReturn(wc != nullptr);
     NPercent100ths current, target;
+    OperationalState opState;
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto wc = FindClusterOnEndpoint(mEndpoint);
+        VerifyOrReturn(wc != nullptr);
 
-    target  = wc->GetTargetPositionTiltPercent100ths();
-    current = wc->GetCurrentPositionTiltPercent100ths();
-
-    OperationalState opState = ComputeOperationalState(target, current);
-
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        target  = wc->GetTargetPositionTiltPercent100ths();
+        current = wc->GetCurrentPositionTiltPercent100ths();
+        opState = ComputeOperationalState(target, current);
+    }
 
     /* If Triggered by a TARGET update */
     if (newTarget)
@@ -605,12 +603,11 @@ void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
 
 void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isTilt)
 {
+    chip::DeviceLayer::StackLock lock;
     auto wc = FindClusterOnEndpoint(mEndpoint);
     VerifyOrReturn(wc != nullptr);
     NPercent100ths current;
     chip::Percent100ths target;
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     if (isTilt)
     {
@@ -630,14 +627,12 @@ void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isT
             wc->SetTargetPositionLiftPercent100ths(DataModel::MakeNullable(target));
         }
     }
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
 Type WindowApp::Cover::CycleType()
 {
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    chip::DeviceLayer::StackLock lock;
     Type type = TypeGet(mEndpoint);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     switch (type)
     {
@@ -656,9 +651,7 @@ Type WindowApp::Cover::CycleType()
         type = Type::kTiltBlindLiftAndTilt;
     }
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
     TypeSet(mEndpoint, type);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return type;
 }
