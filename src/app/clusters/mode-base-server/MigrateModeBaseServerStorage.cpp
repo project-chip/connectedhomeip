@@ -44,10 +44,11 @@ CHIP_ERROR MigrateModeBaseServerStorage(EndpointId endpointId, ClusterId cluster
         ReturnErrorOnFailure(
             dstProvider.WriteValue({ endpointId, clusterId, Attributes::StartUpMode::Id },
                                    ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+        ReturnErrorOnFailure(safeProvider.SafeDeleteValue({ endpointId, clusterId, Attributes::StartUpMode::Id }));
     }
     else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        return err;
+        ReturnErrorOnFailure(err);
     }
 
     DataModel::Nullable<uint8_t> onMode;
@@ -59,10 +60,11 @@ CHIP_ERROR MigrateModeBaseServerStorage(EndpointId endpointId, ClusterId cluster
         ReturnErrorOnFailure(
             dstProvider.WriteValue({ endpointId, clusterId, Attributes::OnMode::Id },
                                    ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+        ReturnErrorOnFailure(safeProvider.SafeDeleteValue({ endpointId, clusterId, Attributes::OnMode::Id }));
     }
     else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        return err;
+        ReturnErrorOnFailure(err);
     }
 
     return CHIP_NO_ERROR;
