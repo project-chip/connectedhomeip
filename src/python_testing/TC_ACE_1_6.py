@@ -152,7 +152,7 @@ class TC_ACE_1_6(MatterBaseTest):
             TestStep(32, "TH sends GroupcastTesting command with TestOperation DisableTesting"),
 
             # --- 4. Shared Cleanup (Steps 33 - 36) ---
-            TestStep(33, "TH verifies it has not received any GroupKeyMap attribute change notifications and then resets GroupKeyMap attribute list on GroupKeyManagement cluster with empty list"),
+            TestStep(33, "TH verifies it has not received any GroupKeyMap attribute change notifications (if ClusterRevision is >= 4) and then resets GroupKeyMap attribute list on GroupKeyManagement cluster with empty list"),
             TestStep(34, "TH resets key set 0x01a3 by sending KeySetRemove command"),
             TestStep(35, "TH resets key set 0x01a1 by sending KeySetRemove command"),
             TestStep(36, "TH writes wildcard ACL attribute in Access Control cluster to restore full admin access"),
@@ -702,7 +702,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
         # If ClusterRevision is >= 4, verify that there have been NO attribute change notifications for GroupKeyMap across the entire test run.
         if group_key_management_revision >= 4:
-            group_key_map_reports = group_key_map_sub.attribute_report_counts[Clusters.GroupKeyManagement.Attributes.GroupKeyMap]
+            group_key_map_reports = group_key_map_sub.attribute_report_counts.get(Clusters.GroupKeyManagement.Attributes.GroupKeyMap, 0)
             asserts.assert_equal(group_key_map_reports, 0, f"Expected 0 GroupKeyMap change notifications, but received {group_key_map_reports}")
 
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
