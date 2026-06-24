@@ -223,10 +223,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = ServiceInit();
     SuccessOrExit(err);
 
-#if CONFIG_CHIP_CRYPTO_PSA
-    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
 #endif
 
+#if CONFIG_CHIP_CRYPTO_PSA
+    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
 #endif
 
     /*
