@@ -244,7 +244,7 @@
             "targetArchitecture": "arm64",
             "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/aarch64-linux-gnu-gdb-15.1/bin/aarch64-linux-gnu-gdb",
             "miDebuggerServerAddress": "localhost:9999",
-            "additionalSOLibSearchPath": "${workspaceFolder}/out/tizen-arm64-light-no-thread-no-ble;${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/lib64;${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/usr/lib64",
+            "additionalSOLibSearchPath": "${workspaceFolder}/out/tizen-arm64-light-no-thread;${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/lib64;${env:TIZEN_SDK_ROOT}/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device64.core/usr/lib64",
             "linux": {
                 "MIMode": "gdb"
             },
