@@ -180,7 +180,6 @@ CHIP_ERROR Se05xDataProviderImpl::SignWithDeviceAttestationKey(const ByteSpan & 
                                                                MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
-    Crypto::P256KeypairSE05x keypair;
     Crypto::P256SerializedKeypair serialized_keypair;
     uint8_t magic_bytes[] = NXP_CRYPTO_KEY_MAGIC;
 
@@ -205,6 +204,7 @@ CHIP_ERROR Se05xDataProviderImpl::SignWithDeviceAttestationKey(const ByteSpan & 
     *(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length + sizeof(magic_bytes) + 3) =
         (DEV_ATTESTATION_KEY_SE05X_ID & 0x000000FF) >> (8 * 0);
 
+    Crypto::P256KeypairSE05x keypair;
     ReturnErrorOnFailure(keypair.Deserialize(serialized_keypair));
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
