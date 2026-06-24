@@ -41,14 +41,14 @@ public:
         }
 
         auto & buffer     = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        CHIP_ERROR result = OOBAccessorRegistry::Instance().HandleAction("SetAttribute"_span, buffer);
-        if (result != CHIP_ERROR_NOT_FOUND)
+        auto result = OOBAccessorRegistry::Instance().HandleAction("SetAttribute"_span, buffer);
+        if (result.first != CHIP_ERROR_NOT_FOUND)
         {
-            if (result == CHIP_NO_ERROR)
+            if (result.first == CHIP_NO_ERROR)
             {
                 return ::pw::OkStatus();
             }
-            ChipLogError(Support, "OOB Accessor failed to write attribute: %" CHIP_ERROR_FORMAT, result.Format());
+            ChipLogError(Support, "OOB Accessor failed to write attribute: %" CHIP_ERROR_FORMAT, result.first.Format());
             return ::pw::Status::Internal();
         }
 

@@ -23,7 +23,7 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
+std::optional<OOBAccessor::ActionResponse> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
 {
     if (!actionName.data_equal("SetAttribute"_span))
     {
@@ -35,7 +35,7 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan acti
     {
         CHIP_ERROR err = std::get<CHIP_ERROR>(parseResult);
         ChipLogError(Support, "Failed to parse attribute request: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        return ActionResponse(err, ReadOnlyBuffer<uint8_t>());
     }
 
     auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
@@ -47,7 +47,12 @@ std::optional<CHIP_ERROR> BooleanStateSensorAccessor::HandleAction(CharSpan acti
     Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternalDeviceAccess };
     AttributeValueDecoder decoder(request.value, subjectDescriptor);
 
-    return SetAttribute(request.path, decoder);
+    auto result = SetAttribute(request.path, decoder);
+    if (!result.has_value())
+    {
+        return std::nullopt;
+    }
+    return ActionResponse(*result, ReadOnlyBuffer<uint8_t>());
 }
 
 std::optional<CHIP_ERROR> BooleanStateSensorAccessor::SetAttribute(const ConcreteDataAttributePath & path,

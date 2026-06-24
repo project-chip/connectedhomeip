@@ -17,11 +17,13 @@
 #pragma once
 
 #include <optional>
+#include <utility>
 
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <lib/support/IntrusiveList.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
@@ -32,6 +34,8 @@ class OOBAccessor : public chip::IntrusiveListNodeBase<chip::IntrusiveMode::Auto
 public:
     virtual ~OOBAccessor() = default;
 
+    using ActionResponse = std::pair<CHIP_ERROR, ReadOnlyBuffer<uint8_t>>;
+
     /**
      * @brief Handles a generic out-of-band action.
      *
@@ -39,14 +43,16 @@ public:
      * @param tlvBuffer Buffer containing TLV data for the action request.
      * @return std::nullopt if the action is not handled/supported by this accessor.
      *         A non-null optional containing:
-     *           - CHIP_NO_ERROR on success.
-     *           - Other CHIP_ERROR codes except CHIP_ERROR_NOT_FOUND on failure.
+     *           - CHIP_ERROR:
+     *               - CHIP_NO_ERROR on success.
+     *               - Other CHIP_ERROR codes except CHIP_ERROR_NOT_FOUND on failure.
+     *           - A ReadOnlyBuffer<uint8_t> containing response TLV data (empty if no data is returned).
      *
      * @note **Asynchronous Safety Warning:** The `tlvBuffer` parameter is a non-owning,
      *       temporary view whose underlying memory is only guaranteed to be valid during the
      *       synchronous execution of this function call.
      */
-    virtual std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) = 0;
+    virtual std::optional<ActionResponse> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) = 0;
 };
 
 } // namespace chip::app

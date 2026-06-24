@@ -50,7 +50,7 @@ public:
      *
      * @return CHIP_ERROR_NOT_FOUND if no accessor handles this action; otherwise, the result of the action.
      */
-    CHIP_ERROR HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
+    OOBAccessor::ActionResponse HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
     {
         for (auto & accessor : mAccessors)
         {
@@ -60,7 +60,7 @@ public:
                 return *result;
             }
         }
-        return CHIP_ERROR_NOT_FOUND;
+        return { CHIP_ERROR_NOT_FOUND, ReadOnlyBuffer<uint8_t>() };
     }
 
 private:
