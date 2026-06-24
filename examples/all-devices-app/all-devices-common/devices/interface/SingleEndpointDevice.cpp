@@ -26,7 +26,7 @@ CHIP_ERROR SingleEndpointDevice::RegisterDescriptor(EndpointId endpoint, CodeDri
 {
     VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-    mEndpointId = endpoint;
+    mEndpointId    = endpoint;
     CHIP_ERROR err = DeviceInterface::RegisterDescriptor(endpoint, provider, composition);
     if (err != CHIP_NO_ERROR)
     {

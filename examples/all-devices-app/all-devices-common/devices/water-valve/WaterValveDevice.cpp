@@ -52,7 +52,7 @@ CHIP_ERROR WaterValveDevice::Register(chip::EndpointId endpoint, CodeDrivenDataM
     mValveCluster.Create(endpoint, valveContext);
     ReturnErrorOnFailure(provider.AddCluster(mValveCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

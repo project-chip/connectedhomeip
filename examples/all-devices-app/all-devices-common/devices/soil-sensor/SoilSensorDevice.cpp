@@ -52,7 +52,7 @@ CHIP_ERROR SoilSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataM
     mSoilMeasurementCluster.Create(endpoint, mMoistureLimits);
     ReturnErrorOnFailure(provider.AddCluster(mSoilMeasurementCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

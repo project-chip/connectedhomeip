@@ -41,7 +41,7 @@ CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelPr
     mFlowMeasurementCluster.Create(endpoint, mFlowConfig);
     ReturnErrorOnFailure(provider.AddCluster(mFlowMeasurementCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

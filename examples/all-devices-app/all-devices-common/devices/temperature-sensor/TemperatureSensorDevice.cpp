@@ -46,7 +46,7 @@ CHIP_ERROR TemperatureSensorDevice::Register(EndpointId endpoint, CodeDrivenData
     mTemperatureMeasurementCluster.Create(endpoint, optionalAttributeSet, mTempConfig);
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureMeasurementCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

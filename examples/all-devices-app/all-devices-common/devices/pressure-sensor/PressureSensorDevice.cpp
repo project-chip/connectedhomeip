@@ -42,7 +42,7 @@ CHIP_ERROR PressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataMod
     mPressureMeasurementCluster.Create(endpoint, mPressureConfig);
     ReturnErrorOnFailure(provider.AddCluster(mPressureMeasurementCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

@@ -47,7 +47,7 @@ CHIP_ERROR OccupancySensorDevice::Register(chip::EndpointId endpoint, CodeDriven
     mOccupancySensingCluster.Create(mConfig);
     ReturnErrorOnFailure(provider.AddCluster(mOccupancySensingCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

@@ -42,7 +42,7 @@ CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrive
     mDemCluster.Create(config);
     ReturnErrorOnFailure(provider.AddCluster(mDemCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

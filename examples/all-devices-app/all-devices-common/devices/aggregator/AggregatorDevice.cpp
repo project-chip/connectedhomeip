@@ -111,7 +111,7 @@ CHIP_ERROR AggregatorDevice::Register(EndpointId endpoint, CodeDrivenDataModelPr
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&GetIdentifyDelegate()));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

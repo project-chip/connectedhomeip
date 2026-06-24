@@ -40,7 +40,7 @@ CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
                           SwitchCluster::StartupConfiguration{ .numberOfPositions = 2 });
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

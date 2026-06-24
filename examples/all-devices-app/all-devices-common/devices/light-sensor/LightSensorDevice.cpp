@@ -42,7 +42,7 @@ CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
     mIlluminanceMeasurementCluster.Create(endpoint, mOptionalAttributes, mLightConfig);
     ReturnErrorOnFailure(provider.AddCluster(mIlluminanceMeasurementCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

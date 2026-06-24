@@ -56,7 +56,7 @@ CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrive
         endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

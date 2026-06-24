@@ -34,7 +34,7 @@ CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDri
     mBooleanStateCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBooleanStateCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

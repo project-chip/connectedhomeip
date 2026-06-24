@@ -38,8 +38,7 @@ LoggingDimmableLoadDevice::LoggingDimmableLoadDevice(Span<const DataModel::Devic
                                                      Clusters::OnOffDelegate * customOnOff,
                                                      Clusters::LevelControlDelegate * customLevel,
                                                      Clusters::OnOffEffectDelegate * customEffect,
-                                                     Clusters::IdentifyDelegate * customIdentify,
-                                                     const Config & config) :
+                                                     Clusters::IdentifyDelegate * customIdentify, const Config & config) :
     DimmableLoadDevice(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
                        customLevel ? *customLevel : static_cast<Clusters::LevelControlDelegate &>(*this),
                        customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),

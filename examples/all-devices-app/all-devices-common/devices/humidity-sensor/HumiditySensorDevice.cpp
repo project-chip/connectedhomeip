@@ -43,7 +43,7 @@ CHIP_ERROR HumiditySensorDevice::Register(EndpointId endpoint, CodeDrivenDataMod
     mRelativeHumidityMeasurementCluster.Create(endpoint, mHumidityConfig);
     ReturnErrorOnFailure(provider.AddCluster(mRelativeHumidityMeasurementCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

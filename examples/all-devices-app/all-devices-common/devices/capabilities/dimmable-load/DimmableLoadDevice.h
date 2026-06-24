@@ -66,10 +66,10 @@ public:
         // We use std::optional to represent support (presence of the attribute on the endpoint).
         // For nullable attributes, we wrap DataModel::Nullable.
         // Defaults are set to match the global CI PICS (present with value 0 or null) out-of-the-box.
-        std::optional<uint16_t> onOffTransitionTime = 0;
-        std::optional<DataModel::Nullable<uint16_t>> onTransitionTime = DataModel::Nullable<uint16_t>(0);
+        std::optional<uint16_t> onOffTransitionTime                    = 0;
+        std::optional<DataModel::Nullable<uint16_t>> onTransitionTime  = DataModel::Nullable<uint16_t>(0);
         std::optional<DataModel::Nullable<uint16_t>> offTransitionTime = DataModel::Nullable<uint16_t>(0);
-        std::optional<DataModel::Nullable<uint8_t>> defaultMoveRate = DataModel::Nullable<uint8_t>(); // Null by default
+        std::optional<DataModel::Nullable<uint8_t>> defaultMoveRate    = DataModel::Nullable<uint8_t>(); // Null by default
 
         // Optional LevelControl bounds and startup settings.
         // Default startup level is present and null, which enables the Lighting feature by default (spec compliant).

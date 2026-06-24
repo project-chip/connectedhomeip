@@ -55,7 +55,7 @@ CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
 
     ReturnErrorOnFailure(provider.AddCluster(mBridgedDeviceBasicInformationCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }

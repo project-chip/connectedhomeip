@@ -25,7 +25,8 @@ namespace chip {
 namespace app {
 
 DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
-                                       Clusters::LevelControlDelegate & levelControlDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                                       Clusters::LevelControlDelegate & levelControlDelegate,
+                                       Clusters::OnOffEffectDelegate & effectDelegate,
                                        Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
     DimmableLoadDevice(deviceTypes, onOffDelegate, levelControlDelegate, effectDelegate, identifyDelegate, context, Config{})
 {}
@@ -33,7 +34,8 @@ DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> de
 DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
                                        Clusters::LevelControlDelegate & levelControlDelegate,
                                        Clusters::OnOffEffectDelegate & effectDelegate,
-                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context, const Config & config) :
+                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context,
+                                       const Config & config) :
     SingleEndpointDevice(deviceTypes),
     mOnOffDelegate(onOffDelegate), mLevelControlDelegate(levelControlDelegate), mEffectDelegate(effectDelegate),
     mIdentifyDelegate(identifyDelegate), mContext(context), mConfig(config)

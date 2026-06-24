@@ -76,7 +76,7 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoin
                                             mThreadDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
 
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }
