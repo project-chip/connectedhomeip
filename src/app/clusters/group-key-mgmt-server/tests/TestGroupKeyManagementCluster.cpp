@@ -170,11 +170,10 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 {
     std::vector<app::DataModel::AttributeEntry> expectedAttributes = {
-        DataModel::AttributeEntry(
-            GroupKeyManagement::Attributes::GroupKeyMap::Id,
-            BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
-                                                       DataModel::AttributeQualityFlags::kChangesOmitted),
-            Access::Privilege::kView, Access::Privilege::kManage),
+        DataModel::AttributeEntry(GroupKeyManagement::Attributes::GroupKeyMap::Id,
+                                  BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                                             DataModel::AttributeQualityFlags::kChangesOmitted),
+                                  Access::Privilege::kView, Access::Privilege::kManage),
         GroupKeyManagement::Attributes::GroupTable::kMetadataEntry,
         GroupKeyManagement::Attributes::MaxGroupsPerFabric::kMetadataEntry,
         GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::kMetadataEntry,
