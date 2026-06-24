@@ -39,11 +39,15 @@ class TC_PICS_Checker(BasicCompositionTests):
         self.build_spec_xmls()
 
     def _check_and_record_errors(self, location, required, pics):
-        if required and not self.check_pics(pics):
+        # Scope the lookup to the endpoint under test: PICS are an endpoint-keyed
+        # tree, and the same cluster code (e.g. SWTCH.S) can legitimately be true
+        # on another endpoint's slice. Using the endpoint-agnostic check here
+        # would let those foreign codes leak into this endpoint's check.
+        if required and not self.check_pics(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location,
                               problem=f"An element found on the device, but the corresponding PICS {pics} was not found in pics list")
             self.success = False
-        elif not required and self.check_pics(pics):
+        elif not required and self.check_pics(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
             self.success = False
 
@@ -261,6 +265,7 @@ class TC_PICS_Checker(BasicCompositionTests):
                         endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
                     self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
 
+        self.print_step("PICS", self.pics)
         self.step(12)
         if not self.success:
             self.fail_current_test("At least one PICS error was found for this endpoint")
