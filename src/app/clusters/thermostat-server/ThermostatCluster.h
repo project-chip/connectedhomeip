@@ -99,6 +99,24 @@ public:
 
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
+    // Setters for device-set read-only attributes. Each notifies subscribers and, when the Events
+    // feature is enabled, emits the corresponding Matter event — matching the behaviour of the legacy
+    // MatterThermostatClusterServerAttributeChangedCallback / GenerateEvents path.
+    void SetLocalTemperature(DataModel::Nullable<int16_t> value);
+    void SetOccupancy(BitMask<OccupancyBitmap> value);
+    void SetThermostatRunningState(BitMask<RelayStateBitmap> value);
+    void SetThermostatRunningMode(ThermostatRunningModeEnum value);
+
+    // Setters for device-set read-only attributes that do not generate events.
+    void SetOutdoorTemperature(DataModel::Nullable<int16_t> value);
+    void SetSetpointChangeSource(SetpointChangeSourceEnum value);
+    void SetSetpointChangeAmount(DataModel::Nullable<int16_t> value);
+    void SetSetpointChangeSourceTimestamp(uint32_t value);
+    void SetACCoilTemperature(DataModel::Nullable<int16_t> value);
+    // Handle setters also persist their values across reboots.
+    void SetActivePresetHandle(DataModel::Nullable<ByteSpan> value);
+    void SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> value);
+
     // ServerClusterInterface
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -198,6 +216,7 @@ private:
 
     // Emits the relevant change event for a just-written scalar attribute, if the Events feature is supported.
     void GenerateScalarChangeEvent(AttributeId attributeId);
+    void LoadPersistentAttributes();
 
     Context mContext;
     Thermostat::Delegate * mDelegate = nullptr;
@@ -267,6 +286,11 @@ private:
     Attributes::NumberOfSchedules::TypeInfo::Type mNumberOfSchedules{};
     Attributes::NumberOfScheduleTransitions::TypeInfo::Type mNumberOfScheduleTransitions{};
     Attributes::NumberOfScheduleTransitionPerDay::TypeInfo::Type mNumberOfScheduleTransitionPerDay{};
+    // mActivePresetHandle and mActiveScheduleHandle hold non-owning ByteSpans; the backing
+    // buffers below own the bytes so the spans remain valid for the lifetime of the cluster.
+    uint8_t mActivePresetHandleBuffer[kPresetHandleSize]{};
+    uint8_t mActiveScheduleHandleBuffer[kPresetHandleSize]{};
+    Attributes::ActivePresetHandle::TypeInfo::Type mActivePresetHandle{};
     Attributes::ActiveScheduleHandle::TypeInfo::Type mActiveScheduleHandle{};
     Attributes::SetpointHoldExpiryTimestamp::TypeInfo::Type mSetpointHoldExpiryTimestamp{};
 };

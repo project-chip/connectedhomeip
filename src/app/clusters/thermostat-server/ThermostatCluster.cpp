@@ -29,6 +29,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
 #include <clusters/Thermostat/Metadata.h>
@@ -102,7 +103,63 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     {
         ChipLogError(Zcl, "Thermostat: failed to register fabric delegate: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    LoadPersistentAttributes();
     return CHIP_NO_ERROR;
+}
+
+void ThermostatCluster::LoadPersistentAttributes()
+{
+    AttributePersistence attrPersistence{ DefaultServerCluster::mContext->attributeStorage };
+
+    const auto defaultLocalTempCalib    = mLocalTemperatureCalibration;
+    const auto defaultTsph              = mTemperatureSetpointHold;
+    const auto defaultTsphDuration      = mTemperatureSetpointHoldDuration;
+    const auto defaultEhd               = mEmergencyHeatDelta;
+    const auto defaultACType            = mACType;
+    const auto defaultACCapacity        = mACCapacity;
+    const auto defaultACRefrigerantType = mACRefrigerantType;
+    const auto defaultACCompressorType  = mACCompressorType;
+    const auto defaultACLouverPos       = mACLouverPosition;
+    const auto defaultACCapacityFmt     = mACCapacityformat;
+
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
+                                          mLocalTemperatureCalibration, defaultLocalTempCalib);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
+                                          mTemperatureSetpointHold, defaultTsph);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
+                                          mTemperatureSetpointHoldDuration, defaultTsphDuration);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, EmergencyHeatDelta::Id },
+                                          mEmergencyHeatDelta, defaultEhd);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACType::Id }, mACType, defaultACType);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCapacity::Id }, mACCapacity, defaultACCapacity);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id },
+                                          mACRefrigerantType, defaultACRefrigerantType);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id },
+                                          mACCompressorType, defaultACCompressorType);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
+                                          mACLouverPosition, defaultACLouverPos);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
+                                          mACCapacityformat, defaultACCapacityFmt);
+
+    // Load binary handle attributes using raw ReadValue (ByteSpan is not an arithmetic/enum type).
+    {
+        MutableByteSpan buf(mActivePresetHandleBuffer);
+        if (DefaultServerCluster::mContext->attributeStorage.ReadValue(
+                { mPath.mEndpointId, Thermostat::Id, ActivePresetHandle::Id }, buf) == CHIP_NO_ERROR &&
+            buf.size() > 0)
+        {
+            mActivePresetHandle.SetNonNull(ByteSpan(mActivePresetHandleBuffer, buf.size()));
+        }
+    }
+    {
+        MutableByteSpan buf(mActiveScheduleHandleBuffer);
+        if (DefaultServerCluster::mContext->attributeStorage.ReadValue(
+                { mPath.mEndpointId, Thermostat::Id, ActiveScheduleHandle::Id }, buf) == CHIP_NO_ERROR &&
+            buf.size() > 0)
+        {
+            mActiveScheduleHandle.SetNonNull(ByteSpan(mActiveScheduleHandleBuffer, buf.size()));
+        }
+    }
 }
 
 void ThermostatCluster::Shutdown(ClusterShutdownType type)
@@ -492,13 +549,14 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mNumberOfScheduleTransitionPerDay);
     case ActiveScheduleHandle::Id:
         return encoder.Encode(mActiveScheduleHandle);
+    case ActivePresetHandle::Id:
+        return encoder.Encode(mActivePresetHandle);
     case SetpointHoldExpiryTimestamp::Id:
         return encoder.Encode(mSetpointHoldExpiryTimestamp);
     // Delegate-backed list / preset / schedule / suggestion attributes are still served by the retained helper.
     case PresetTypes::Id:
     case NumberOfPresets::Id:
     case Presets::Id:
-    case ActivePresetHandle::Id:
     case ScheduleTypes::Id:
     case Schedules::Id:
     case MaxThermostatSuggestions::Id:
@@ -546,6 +604,125 @@ void ThermostatCluster::GenerateScalarChangeEvent(AttributeId attributeId)
     default:
         break;
     }
+}
+
+void ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> value)
+{
+    if (SetAttributeValue(mLocalTemperature, value, LocalTemperature::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateLocalTemperatureChangeEvent(GetEndpointId(), mLocalTemperature);
+    }
+}
+
+void ThermostatCluster::SetOccupancy(BitMask<OccupancyBitmap> value)
+{
+    if (SetAttributeValue(mOccupancy, value, Occupancy::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateOccupancyChangeEvent(GetEndpointId(), NullOptional, mOccupancy);
+    }
+}
+
+void ThermostatCluster::SetThermostatRunningState(BitMask<RelayStateBitmap> value)
+{
+    if (SetAttributeValue(mThermostatRunningState, value, ThermostatRunningState::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateRunningStateChangeEvent(GetEndpointId(), NullOptional, mThermostatRunningState);
+    }
+}
+
+void ThermostatCluster::SetThermostatRunningMode(ThermostatRunningModeEnum value)
+{
+    if (SetAttributeValue(mThermostatRunningMode, value, ThermostatRunningMode::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateRunningModeChangeEvent(GetEndpointId(), NullOptional, mThermostatRunningMode);
+    }
+}
+
+void ThermostatCluster::SetOutdoorTemperature(DataModel::Nullable<int16_t> value)
+{
+    SetAttributeValue(mOutdoorTemperature, value, OutdoorTemperature::Id);
+}
+
+void ThermostatCluster::SetSetpointChangeSource(SetpointChangeSourceEnum value)
+{
+    SetAttributeValue(mSetpointChangeSource, value, SetpointChangeSource::Id);
+}
+
+void ThermostatCluster::SetSetpointChangeAmount(DataModel::Nullable<int16_t> value)
+{
+    SetAttributeValue(mSetpointChangeAmount, value, SetpointChangeAmount::Id);
+}
+
+void ThermostatCluster::SetSetpointChangeSourceTimestamp(uint32_t value)
+{
+    SetAttributeValue(mSetpointChangeSourceTimestamp, value, SetpointChangeSourceTimestamp::Id);
+}
+
+void ThermostatCluster::SetACCoilTemperature(DataModel::Nullable<int16_t> value)
+{
+    SetAttributeValue(mACCoilTemperature, value, ACCoilTemperature::Id);
+}
+
+void ThermostatCluster::SetActivePresetHandle(DataModel::Nullable<ByteSpan> value)
+{
+    VerifyOrReturn(DefaultServerCluster::mContext != nullptr);
+
+    if (value.IsNull())
+    {
+        if (mActivePresetHandle.IsNull())
+        {
+            return; // no-op
+        }
+        mActivePresetHandle.SetNull();
+    }
+    else
+    {
+        VerifyOrReturn(value.Value().size() <= kPresetHandleSize,
+                       ChipLogError(Zcl, "SetActivePresetHandle: handle too large (%u bytes)", (unsigned) value.Value().size()));
+        if (!mActivePresetHandle.IsNull() && mActivePresetHandle.Value().data_equal(value.Value()))
+        {
+            return; // no-op: same bytes
+        }
+        memcpy(mActivePresetHandleBuffer, value.Value().data(), value.Value().size());
+        mActivePresetHandle.SetNonNull(ByteSpan(mActivePresetHandleBuffer, value.Value().size()));
+    }
+
+    NotifyAttributeChanged(ActivePresetHandle::Id);
+
+    const ByteSpan toStore = mActivePresetHandle.IsNull() ? ByteSpan{} : mActivePresetHandle.Value();
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ActivePresetHandle::Id }, toStore));
+}
+
+void ThermostatCluster::SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> value)
+{
+    VerifyOrReturn(DefaultServerCluster::mContext != nullptr);
+
+    if (value.IsNull())
+    {
+        if (mActiveScheduleHandle.IsNull())
+        {
+            return; // no-op
+        }
+        mActiveScheduleHandle.SetNull();
+    }
+    else
+    {
+        VerifyOrReturn(value.Value().size() <= kPresetHandleSize,
+                       ChipLogError(Zcl, "SetActiveScheduleHandle: handle too large (%u bytes)", (unsigned) value.Value().size()));
+        if (!mActiveScheduleHandle.IsNull() && mActiveScheduleHandle.Value().data_equal(value.Value()))
+        {
+            return; // no-op: same bytes
+        }
+        memcpy(mActiveScheduleHandleBuffer, value.Value().data(), value.Value().size());
+        mActiveScheduleHandle.SetNonNull(ByteSpan(mActiveScheduleHandleBuffer, value.Value().size()));
+    }
+
+    NotifyAttributeChanged(ActiveScheduleHandle::Id);
+
+    const ByteSpan toStore = mActiveScheduleHandle.IsNull() ? ByteSpan{} : mActiveScheduleHandle.Value();
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ActiveScheduleHandle::Id }, toStore));
 }
 
 void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
@@ -630,6 +807,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
                                                                 AttributeValueDecoder & decoder)
 {
     const AttributeId attributeId = request.path.mAttributeId;
+    AttributePersistence persistence{ DefaultServerCluster::mContext->attributeStorage };
 
     // Preset / Schedule writes (and their atomic-write semantics) are still owned by the retained helper.
     if (attributeId == Presets::Id || attributeId == Schedules::Id)
@@ -796,73 +974,43 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         SetAttributeValue(mRemoteSensing, requested, RemoteSensing::Id);
         return CHIP_NO_ERROR;
     }
-    // Writable attributes without cross-attribute validation.
-    case LocalTemperatureCalibration::Id: {
-        Attributes::LocalTemperatureCalibration::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mLocalTemperatureCalibration, requested, LocalTemperatureCalibration::Id);
-        return CHIP_NO_ERROR;
-    }
-    case TemperatureSetpointHold::Id: {
-        Attributes::TemperatureSetpointHold::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mTemperatureSetpointHold, requested, TemperatureSetpointHold::Id);
-        return CHIP_NO_ERROR;
-    }
-    case TemperatureSetpointHoldDuration::Id: {
-        Attributes::TemperatureSetpointHoldDuration::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mTemperatureSetpointHoldDuration, requested, TemperatureSetpointHoldDuration::Id);
-        return CHIP_NO_ERROR;
-    }
-    case EmergencyHeatDelta::Id: {
-        Attributes::EmergencyHeatDelta::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mEmergencyHeatDelta, requested, EmergencyHeatDelta::Id);
-        return CHIP_NO_ERROR;
-    }
-    case ACType::Id: {
-        Attributes::ACType::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mACType, requested, ACType::Id);
-        return CHIP_NO_ERROR;
-    }
-    case ACCapacity::Id: {
-        Attributes::ACCapacity::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mACCapacity, requested, ACCapacity::Id);
-        return CHIP_NO_ERROR;
-    }
-    case ACRefrigerantType::Id: {
-        Attributes::ACRefrigerantType::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mACRefrigerantType, requested, ACRefrigerantType::Id);
-        return CHIP_NO_ERROR;
-    }
-    case ACCompressorType::Id: {
-        Attributes::ACCompressorType::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mACCompressorType, requested, ACCompressorType::Id);
-        return CHIP_NO_ERROR;
-    }
+    // Writable attributes without cross-attribute validation — decode, persist, and notify in one step.
+    case LocalTemperatureCalibration::Id:
+        return NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalTemperatureCalibration));
+    case TemperatureSetpointHold::Id:
+        return NotifyAttributeChangedIfSuccess(TemperatureSetpointHold::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mTemperatureSetpointHold));
+    case TemperatureSetpointHoldDuration::Id:
+        return NotifyAttributeChangedIfSuccess(TemperatureSetpointHoldDuration::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mTemperatureSetpointHoldDuration));
+    case EmergencyHeatDelta::Id:
+        return NotifyAttributeChangedIfSuccess(EmergencyHeatDelta::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mEmergencyHeatDelta));
+    case ACType::Id:
+        return NotifyAttributeChangedIfSuccess(ACType::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACType));
+    case ACCapacity::Id:
+        return NotifyAttributeChangedIfSuccess(ACCapacity::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacity));
+    case ACRefrigerantType::Id:
+        return NotifyAttributeChangedIfSuccess(ACRefrigerantType::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACRefrigerantType));
+    case ACCompressorType::Id:
+        return NotifyAttributeChangedIfSuccess(ACCompressorType::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCompressorType));
     case ACErrorCode::Id: {
         Attributes::ACErrorCode::TypeInfo::Type requested;
         ReturnErrorOnFailure(decoder.Decode(requested));
         SetAttributeValue(mACErrorCode, requested, ACErrorCode::Id);
         return CHIP_NO_ERROR;
     }
-    case ACLouverPosition::Id: {
-        Attributes::ACLouverPosition::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mACLouverPosition, requested, ACLouverPosition::Id);
-        return CHIP_NO_ERROR;
-    }
-    case ACCapacityformat::Id: {
-        Attributes::ACCapacityformat::TypeInfo::Type requested;
-        ReturnErrorOnFailure(decoder.Decode(requested));
-        SetAttributeValue(mACCapacityformat, requested, ACCapacityformat::Id);
-        return CHIP_NO_ERROR;
-    }
+    case ACLouverPosition::Id:
+        return NotifyAttributeChangedIfSuccess(ACLouverPosition::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACLouverPosition));
+    case ACCapacityformat::Id:
+        return NotifyAttributeChangedIfSuccess(ACCapacityformat::Id,
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacityformat));
     default:
         return Status::UnsupportedWrite;
     }
