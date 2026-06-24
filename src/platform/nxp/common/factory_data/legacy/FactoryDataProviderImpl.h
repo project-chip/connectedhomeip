@@ -20,9 +20,6 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
-#if CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
-#include <psa/crypto.h>
-#endif
 
 extern "C" {
 #include "HWParameter.h"
