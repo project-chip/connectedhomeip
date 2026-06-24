@@ -67,8 +67,8 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         return System::MapErrorZephyr(-EFAULT);
     }
 
-    int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), PARTITION_OFFSET(slot1_partition),
-                                PARTITION_SIZE(slot1_partition), NULL);
+    int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
+                                FIXED_PARTITION_SIZE(slot1_partition), NULL);
 
     if (err)
     {
