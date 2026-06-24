@@ -23,6 +23,6 @@ source_set("on-off-plug-in-unit") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-load/impl:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/on-off-load/impl:logging",
   ]
 }

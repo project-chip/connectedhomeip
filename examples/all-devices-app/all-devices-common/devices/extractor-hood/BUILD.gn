@@ -20,5 +20,8 @@ source_set("extractor-hood") {
     "ExtractorHoodDevice.h",
   ]
 
-  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/fan/impl:logging" ]
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/fan-load/impl:logging",
+    "${chip_root}/zzz_generated/app-common/devices",
+  ]
 }

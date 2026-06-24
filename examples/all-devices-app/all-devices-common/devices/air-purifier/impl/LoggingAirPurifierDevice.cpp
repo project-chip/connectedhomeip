@@ -21,7 +21,7 @@ namespace chip {
 namespace app {
 
 LoggingAirPurifierDevice::LoggingAirPurifierDevice(const Context & context) :
-    LoggingFanDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirPurifier, 1), context)
+    LoggingFanLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirPurifier, 1), context)
 {}
 
 } // namespace app

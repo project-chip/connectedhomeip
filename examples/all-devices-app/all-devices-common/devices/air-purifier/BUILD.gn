@@ -21,7 +21,7 @@ source_set("air-purifier") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/fan",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/fan-load",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 }

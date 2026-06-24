@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <devices/dimmable-load/impl/LoggingDimmableLoadDevice.h>
+#include <devices/capabilities/dimmable-load/impl/LoggingDimmableLoadDevice.h>
 
 namespace chip::app {
 

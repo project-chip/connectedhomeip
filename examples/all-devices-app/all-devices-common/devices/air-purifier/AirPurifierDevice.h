@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include <devices/fan/FanDevice.h>
+#include <devices/capabilities/fan-load/FanLoadDevice.h>
 
 namespace chip {
 namespace app {
 
-class AirPurifierDevice : public FanDevice
+class AirPurifierDevice : public FanLoadDevice
 {
 public:
     AirPurifierDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,

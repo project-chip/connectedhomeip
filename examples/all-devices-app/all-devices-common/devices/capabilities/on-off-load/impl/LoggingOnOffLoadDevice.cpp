@@ -16,7 +16,7 @@
  */
 
 #include <devices/Types.h>
-#include <devices/on-off-load/impl/LoggingOnOffLoadDevice.h>
+#include <devices/capabilities/on-off-load/impl/LoggingOnOffLoadDevice.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 

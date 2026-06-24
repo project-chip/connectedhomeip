@@ -22,7 +22,7 @@ namespace app {
 
 AirPurifierDevice::AirPurifierDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,
                                      const Context & context) :
-    FanDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirPurifier, 1), fanDelegate, onOffDelegate, context)
+    FanLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirPurifier, 1), fanDelegate, onOffDelegate, context)
 {}
 
 } // namespace app

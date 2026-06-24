@@ -24,7 +24,7 @@ source_set("logging") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-load",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/dimmable-load",
     "${chip_root}/src/lib/support",
   ]
 }

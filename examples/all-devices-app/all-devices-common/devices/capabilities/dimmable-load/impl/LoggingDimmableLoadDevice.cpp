@@ -16,7 +16,7 @@
  */
 
 #include <devices/Types.h>
-#include <devices/dimmable-load/impl/LoggingDimmableLoadDevice.h>
+#include <devices/capabilities/dimmable-load/impl/LoggingDimmableLoadDevice.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 

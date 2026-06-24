@@ -16,7 +16,7 @@
  */
 
 #include <devices/Types.h>
-#include <devices/dimmable-load/DimmableLoadDevice.h>
+#include <devices/capabilities/on-off-load/OnOffLoadDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -24,18 +24,16 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                                       Clusters::OnOffDelegate & onOffDelegate,
-                                       Clusters::LevelControlDelegate & levelControlDelegate,
-                                       Clusters::OnOffEffectDelegate & effectDelegate,
-                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+OnOffLoadDevice::OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
+                                 Clusters::OnOffDelegate & onOffDelegate,
+                                 Clusters::OnOffEffectDelegate & effectDelegate,
+                                 Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
     SingleEndpointDevice(deviceTypes),
-    mOnOffDelegate(onOffDelegate), mLevelControlDelegate(levelControlDelegate), mEffectDelegate(effectDelegate),
-    mIdentifyDelegate(identifyDelegate), mContext(context)
+    mOnOffDelegate(onOffDelegate), mEffectDelegate(effectDelegate), mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
-CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                         EndpointComposition composition)
+CHIP_ERROR OnOffLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                      EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
@@ -62,18 +60,6 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    // Optional LevelControl transition attributes enabled in CI PICS (ci-pics-values).
-    // Initialize with demo defaults (0 transition, null move rate) to pass Test_TC_LVL_2_1.
-    mLevelControlCluster.Create(LevelControlCluster::Config(endpoint, mContext.timerDelegate, mLevelControlDelegate)
-                                    .WithOnOff(mOnOffCluster.Cluster())
-                                    .WithLighting(DataModel::NullNullable)
-                                    .WithOnOffTransitionTime(0)
-                                    .WithOnTransitionTime(0)
-                                    .WithOffTransitionTime(0)
-                                    .WithDefaultMoveRate(DataModel::NullNullable));
-    mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
-    ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
-
     mGroupsCluster.Create(endpoint,
                           GroupsCluster::Context{
                               .groupDataProvider   = mContext.groupDataProvider,
@@ -87,13 +73,12 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     {
         Clusters::ScopedSceneTable table(mScenesTableProvider);
         table->RegisterHandler(&mOnOffCluster.Cluster());
-        table->RegisterHandler(&mLevelControlCluster.Cluster());
     }
 
     return CHIP_NO_ERROR;
 }
 
-void DimmableLoadDevice::Unregister(CodeDrivenDataModelProvider & provider)
+void OnOffLoadDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
 
@@ -103,24 +88,16 @@ void DimmableLoadDevice::Unregister(CodeDrivenDataModelProvider & provider)
         mGroupsCluster.Destroy();
     }
 
-    if (mLevelControlCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mLevelControlCluster.Cluster()));
-        mLevelControlCluster.Destroy();
-    }
-
     if (mOnOffCluster.IsConstructed())
     {
         if (mOnOffCluster.Cluster().IsInList())
         {
             Clusters::ScopedSceneTable table(mScenesTableProvider);
             table->UnregisterHandler(&mOnOffCluster.Cluster());
-            table->UnregisterHandler(&mLevelControlCluster.Cluster());
         }
 
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
-        mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
         mOnOffCluster.Destroy();
     }
 

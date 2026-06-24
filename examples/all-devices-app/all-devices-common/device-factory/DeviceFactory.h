@@ -48,7 +48,7 @@
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
 #include <devices/refrigerator/RefrigeratorDevice.h>
-#include <devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.h>
+#include <devices/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
@@ -176,7 +176,7 @@ private:
         {
             RegisterCreator("air-purifier", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingAirPurifierDevice>(FanDevice::Context{
+                return std::make_unique<LoggingAirPurifierDevice>(FanLoadDevice::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -384,7 +384,7 @@ private:
         {
             RegisterCreator("extractor-hood", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ExtractorHoodDevice>(LoggingFanDevice::Context{
+                return std::make_unique<ExtractorHoodDevice>(FanLoadDevice::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
@@ -402,7 +402,7 @@ private:
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
-                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                return std::make_unique<LoggingFanDevice>(FanLoadDevice::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
@@ -418,7 +418,7 @@ private:
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
-                return std::make_unique<LoggingFanDevice>(LoggingFanDevice::Context{
+                return std::make_unique<LoggingFanDevice>(FanLoadDevice::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,

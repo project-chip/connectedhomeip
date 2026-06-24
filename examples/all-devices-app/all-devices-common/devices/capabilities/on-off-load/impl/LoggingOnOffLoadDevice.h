@@ -20,7 +20,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffEffectDelegate.h>
-#include <devices/on-off-load/OnOffLoadDevice.h>
+#include <devices/capabilities/on-off-load/OnOffLoadDevice.h>
 
 namespace chip {
 namespace app {

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <devices/on-off-load/impl/LoggingOnOffLoadDevice.h>
+#include <devices/capabilities/on-off-load/impl/LoggingOnOffLoadDevice.h>
 
 namespace chip::app {
 

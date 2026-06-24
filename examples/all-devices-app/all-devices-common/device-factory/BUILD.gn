@@ -60,7 +60,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/refrigerator",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/smoke-co-alarm",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/smoke-co-alarm/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor/impl:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor/impl:increasing",

@@ -64,7 +64,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/LoggingOccupancySensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/impl/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light-switch/OnOffLightSwitchDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/oven/OvenDevice.cpp"
@@ -77,7 +77,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingProximityRangerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/LoggingOnlySmokeCoAlarmDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/smoke-co-alarm/SmokeCoAlarmDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/SoilSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.cpp"
@@ -91,9 +91,15 @@ set(ALL_DEVICES_DEVICE_SOURCES
 
     # Baseline for devices (not real device types)
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/DimmableLoadDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/impl/LoggingDimmableLoadDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/FanLoadDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/impl/LoggingFanLoadDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/OnOffLoadDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/impl/LoggingOnOffLoadDevice.cpp"
     # keep-sorted: end
 )
 

@@ -21,7 +21,7 @@
 #include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffEffectDelegate.h>
-#include <devices/dimmable-load/DimmableLoadDevice.h>
+#include <devices/capabilities/dimmable-load/DimmableLoadDevice.h>
 
 namespace chip {
 namespace app {

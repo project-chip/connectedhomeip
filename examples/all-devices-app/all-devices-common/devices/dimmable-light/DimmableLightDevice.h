@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <devices/dimmable-load/DimmableLoadDevice.h>
+#include <devices/capabilities/dimmable-load/DimmableLoadDevice.h>
 
 namespace chip {
 namespace app {

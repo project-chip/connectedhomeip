@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <devices/on-off-load/OnOffLoadDevice.h>
+#include <devices/capabilities/on-off-load/OnOffLoadDevice.h>
 
 namespace chip {
 namespace app {

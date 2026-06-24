@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include <devices/fan/impl/LoggingFanDevice.h>
+#include <devices/capabilities/fan-load/impl/LoggingFanLoadDevice.h>
 
 namespace chip {
 namespace app {
 
-class ExtractorHoodDevice : public LoggingFanDevice
+class ExtractorHoodDevice : public LoggingFanLoadDevice
 {
 public:
     explicit ExtractorHoodDevice(const Context & context);

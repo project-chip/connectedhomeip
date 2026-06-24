@@ -21,7 +21,7 @@ namespace chip {
 namespace app {
 
 ExtractorHoodDevice::ExtractorHoodDevice(const Context & context) :
-    LoggingFanDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtractorHood, 1), context)
+    LoggingFanLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtractorHood, 1), context)
 {}
 
 } // namespace app
