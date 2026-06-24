@@ -513,9 +513,25 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::StringSplitter splitter(data_string.c_str(), '\n');
 
         chip::CharSpan line;
+        constexpr size_t kMaxLogLineLength = 256;
         while (splitter.Next(line))
         {
-            ChipLogProgress(Automation, "%s", NullTerminated(line).c_str());
+            // if the line is longer than 256 characters and would be truncated,
+            // instead loop over 256-char long slices and log each separately
+            if (line.size() > kMaxLogLineLength)
+            {
+                size_t offset = 0;
+                while (offset < line.size())
+                {
+                    size_t slice_size = std::min(kMaxLogLineLength, static_cast<size_t>(line.size() - offset));
+                    ChipLogProgress(Automation, "%s", StringBuilder<kMaxLogLineLength+1>(line.SubSpan(offset, slice_size)).c_str());
+                    offset += slice_size;
+                }
+            }
+            else
+            {
+                ChipLogProgress(Automation, "%s", StringBuilder<kMaxLogLineLength>(line).c_str());
+            }
         }
     }
 }
