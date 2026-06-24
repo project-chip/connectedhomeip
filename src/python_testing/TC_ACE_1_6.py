@@ -685,7 +685,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 31e: Verify AuxiliaryAccessUpdated event
             self.step("31e")
-            event_data = access_control_event_handler.wait_for_event_report(Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=30)
+            event_data = access_control_event_handler.wait_for_event_report(
+                Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=30)
             asserts.assert_equal(event_data.fabricIndex, fabric_index, "Incorrect fabric index in event")
             asserts.assert_equal(event_data.adminNodeID, th1_nodeid, "Incorrect adminNodeID in event")
 
