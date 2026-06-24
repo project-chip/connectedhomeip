@@ -20,13 +20,15 @@
 
 namespace chip::app {
 
-TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate & timerDelegate) :
-    TemperatureControlledCabinetPart(timerDelegate, Config{})
+TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate & timerDelegate,
+                                                                   Clusters::IdentifyDelegate & identifyDelegate) :
+    TemperatureControlledCabinetPart(timerDelegate, Config{}, identifyDelegate)
 {}
 
-TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config) :
+TemperatureControlledCabinetPart::TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
+                                                                   Clusters::IdentifyDelegate & identifyDelegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureControlledCabinet, 1)),
-    mTimerDelegate(timerDelegate), mConfig(config)
+    mTimerDelegate(timerDelegate), mConfig(config), mIdentifyDelegate(identifyDelegate)
 {}
 
 CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -34,7 +36,7 @@ CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeD
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     mTemperatureControlCluster.Create(
         endpoint, BitFlags<Clusters::TemperatureControl::Feature>(Clusters::TemperatureControl::Feature::kTemperatureNumber),
         Clusters::TemperatureControlCluster::StartupConfiguration{

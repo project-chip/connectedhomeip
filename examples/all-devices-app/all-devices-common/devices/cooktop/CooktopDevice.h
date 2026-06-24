@@ -18,6 +18,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <devices/Types.h>
 #include <devices/interface/DeviceInterface.h>
 #include <devices/interface/SingleEndpointDevice.h>
@@ -30,38 +31,22 @@ class CookSurfacePart : public SingleEndpointDevice
 public:
     using SingleEndpointDevice::Register;
 
-    explicit CookSurfacePart(TimerDelegate & timerDelegate) :
-        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)), mTimerDelegate(timerDelegate)
-    {}
+    CookSurfacePart(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & onOffDelegate,
+                    Clusters::IdentifyDelegate & identifyDelegate);
     ~CookSurfacePart() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override
-    {
-        ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-        mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
-        mOnOffCluster.Create(endpoint, Clusters::OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
-        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-        ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
-        return provider.AddEndpoint(mEndpointRegistration);
-    }
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    void Unregister(CodeDrivenDataModelProvider & provider) override
-    {
-        UnregisterDescriptor(provider);
-        if (mIdentifyCluster.IsConstructed())
-        {
-            LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
-            mIdentifyCluster.Destroy();
-        }
-        if (mOnOffCluster.IsConstructed())
-        {
-            LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
-            mOnOffCluster.Destroy();
-        }
-    }
+    // Public cluster getters for programmatic control
+    Clusters::OnOffCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
 private:
     TimerDelegate & mTimerDelegate;
+    Clusters::OnOffDelegate & mOnOffDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
+
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
 };
@@ -69,12 +54,20 @@ private:
 class CooktopDevice : public DeviceInterface
 {
 public:
-    explicit CooktopDevice(TimerDelegate & timerDelegate);
+    CooktopDevice(TimerDelegate & timerDelegate,
+                  Clusters::OnOffDelegate & surface1OnOff,
+                  Clusters::OnOffDelegate & surface2OnOff,
+                  Clusters::IdentifyDelegate & surface1Identify,
+                  Clusters::IdentifyDelegate & surface2Identify);
     ~CooktopDevice() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    // Composition getters to expose child endpoints
+    CookSurfacePart & Surface1() { return mSurface1; }
+    CookSurfacePart & Surface2() { return mSurface2; }
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;

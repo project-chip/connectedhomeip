@@ -19,6 +19,8 @@ source_set("oven") {
   sources = [
     "OvenDevice.cpp",
     "OvenDevice.h",
+    "impl/LoggingOvenDevice.cpp",
+    "impl/LoggingOvenDevice.h",
   ]
 
   public_deps = [

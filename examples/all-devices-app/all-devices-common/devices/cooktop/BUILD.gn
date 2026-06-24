@@ -19,6 +19,8 @@ source_set("cooktop") {
   sources = [
     "CooktopDevice.cpp",
     "CooktopDevice.h",
+    "impl/LoggingCooktopDevice.cpp",
+    "impl/LoggingCooktopDevice.h",
   ]
 
   public_deps = [

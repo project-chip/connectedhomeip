@@ -25,7 +25,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
-#include <devices/cooktop/CooktopDevice.h>
+#include <devices/cooktop/impl/LoggingCooktopDevice.h>
 #include <devices/device-energy-management/DeviceEnergyManagementDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.h>
@@ -42,12 +42,12 @@
 #include <devices/on-off-light-switch/OnOffLightSwitchDevice.h>
 #include <devices/on-off-light/impl/LoggingOnOffLightDevice.h>
 #include <devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.h>
-#include <devices/oven/OvenDevice.h>
+#include <devices/oven/impl/LoggingOvenDevice.h>
 #include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
 #include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
-#include <devices/refrigerator/RefrigeratorDevice.h>
+#include <devices/refrigerator/impl/LoggingRefrigeratorDevice.h>
 #include <devices/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
@@ -260,7 +260,7 @@ private:
         {
             RegisterCreator("cooktop", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<CooktopDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingCooktopDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DEVICE_ENERGY_MANAGEMENT)
@@ -362,14 +362,14 @@ private:
         {
             RegisterCreator("oven", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<OvenDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingOvenDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_REFRIGERATOR)
         {
             RegisterCreator("refrigerator", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<RefrigeratorDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingRefrigeratorDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)

@@ -36,16 +36,22 @@ public:
         int16_t step                = 10;  // 0.10 °C
     };
 
-    explicit TemperatureControlledCabinetPart(TimerDelegate & timerDelegate);
-    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config);
+    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate);
+    TemperatureControlledCabinetPart(TimerDelegate & timerDelegate, Config config,
+                                     Clusters::IdentifyDelegate & identifyDelegate);
     ~TemperatureControlledCabinetPart() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // Public cluster getters for programmatic control
+    Clusters::TemperatureControlCluster & TemperatureControlCluster() { return mTemperatureControlCluster.Cluster(); }
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+
 private:
     TimerDelegate & mTimerDelegate;
     const Config mConfig;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureControlCluster> mTemperatureControlCluster;

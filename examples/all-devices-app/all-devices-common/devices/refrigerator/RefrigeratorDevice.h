@@ -44,12 +44,16 @@ public:
         }
     };
 
-    explicit RefrigeratorDevice(TimerDelegate & timerDelegate, const Config & config = Config::Default());
+    RefrigeratorDevice(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify,
+                       const Config & config = Config::Default());
     ~RefrigeratorDevice() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    // Composition getters to expose child endpoints
+    TemperatureControlledCabinetPart & Cabinet() { return mCabinet; }
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;

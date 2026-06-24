@@ -19,6 +19,8 @@ source_set("temperature-controlled-cabinet") {
   sources = [
     "TemperatureControlledCabinetPart.cpp",
     "TemperatureControlledCabinetPart.h",
+    "impl/LoggingTemperatureControlledCabinetPart.cpp",
+    "impl/LoggingTemperatureControlledCabinetPart.h",
   ]
 
   public_deps = [

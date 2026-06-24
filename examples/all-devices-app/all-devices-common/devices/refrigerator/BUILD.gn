@@ -19,6 +19,8 @@ source_set("refrigerator") {
   sources = [
     "RefrigeratorDevice.cpp",
     "RefrigeratorDevice.h",
+    "impl/LoggingRefrigeratorDevice.cpp",
+    "impl/LoggingRefrigeratorDevice.h",
   ]
 
   public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-controlled-cabinet" ]

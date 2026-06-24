@@ -20,9 +20,10 @@
 
 namespace chip::app {
 
-RefrigeratorDevice::RefrigeratorDevice(TimerDelegate & timerDelegate, const Config & config) :
+RefrigeratorDevice::RefrigeratorDevice(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify,
+                                       const Config & config) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRefrigerator, 1)),
-    mCabinet(timerDelegate, config.cabinetConfig)
+    mCabinet(timerDelegate, config.cabinetConfig, cabinetIdentify)
 {}
 
 CHIP_ERROR RefrigeratorDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

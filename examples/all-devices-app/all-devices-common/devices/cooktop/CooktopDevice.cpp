@@ -35,9 +35,58 @@ const Clusters::Globals::Structs::SemanticTagStruct::Type kSurface2Tag = {
 
 } // namespace
 
-CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCooktop, 1)), mSurface1(timerDelegate),
-    mSurface2(timerDelegate)
+// CookSurfacePart
+
+CookSurfacePart::CookSurfacePart(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & onOffDelegate,
+                                 Clusters::IdentifyDelegate & identifyDelegate) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCookSurface, 1)),
+    mTimerDelegate(timerDelegate), mOnOffDelegate(onOffDelegate), mIdentifyDelegate(identifyDelegate)
+{}
+
+CHIP_ERROR CookSurfacePart::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+{
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
+    mOnOffCluster.Create(endpoint, Clusters::OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
+    mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
+
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+    ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
+
+    return provider.AddEndpoint(mEndpointRegistration);
+}
+
+void CookSurfacePart::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    UnregisterDescriptor(provider);
+
+    if (mIdentifyCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
+        mIdentifyCluster.Destroy();
+    }
+    if (mOnOffCluster.IsConstructed())
+    {
+        if (mOnOffCluster.Cluster().IsInList())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
+            mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
+        }
+        mOnOffCluster.Destroy();
+    }
+}
+
+// CooktopDevice
+
+CooktopDevice::CooktopDevice(TimerDelegate & timerDelegate,
+                             Clusters::OnOffDelegate & surface1OnOff,
+                             Clusters::OnOffDelegate & surface2OnOff,
+                             Clusters::IdentifyDelegate & surface1Identify,
+                             Clusters::IdentifyDelegate & surface2Identify) :
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kCooktop, 1)),
+    mSurface1(timerDelegate, surface1OnOff, surface1Identify),
+    mSurface2(timerDelegate, surface2OnOff, surface2Identify)
 {}
 
 CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
