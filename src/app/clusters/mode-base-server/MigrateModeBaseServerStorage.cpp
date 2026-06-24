@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/mode-base-server/MigrateModeBaseServerStorage.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip::app::Clusters::ModeBase {
 
@@ -25,16 +26,46 @@ CHIP_ERROR MigrateModeBaseServerStorage(EndpointId endpointId, ClusterId cluster
 {
     static constexpr AttrMigrationData attributesToUpdate[] = {
         { Attributes::CurrentMode::Id, sizeof(uint8_t), true /* isScalar */ },
-        { Attributes::StartUpMode::Id, sizeof(uint8_t), true /* isScalar */ },
-        { Attributes::OnMode::Id, sizeof(uint8_t), true /* isScalar */ },
     };
     // We need to provide a buffer with enough space for the attributes that will be migrated.
     static constexpr size_t kBufferSize = MaxAttrMigrationValueSize(attributesToUpdate);
     static_assert(kBufferSize > 0, "All migration attributes have zero valueSize");
     uint8_t attributeBuffer[kBufferSize] = {};
     MutableByteSpan buffer(attributeBuffer);
-    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, clusterId },
-                                                         Span(attributesToUpdate), buffer);
+    ReturnErrorOnFailure(MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, clusterId },
+                                                                       Span(attributesToUpdate), buffer));
+
+    DataModel::Nullable<uint8_t> startUpMode;
+    CHIP_ERROR err = safeProvider.ReadScalarValue({ endpointId, clusterId, Attributes::StartUpMode::Id }, startUpMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        NumericAttributeTraits<uint8_t>::StorageType storageValue;
+        DataModel::NullableToStorage(startUpMode, storageValue);
+        ReturnErrorOnFailure(
+            dstProvider.WriteValue({ endpointId, clusterId, Attributes::StartUpMode::Id },
+                                   ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    }
+    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return err;
+    }
+
+    DataModel::Nullable<uint8_t> onMode;
+    err = safeProvider.ReadScalarValue({ endpointId, clusterId, Attributes::OnMode::Id }, onMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        NumericAttributeTraits<uint8_t>::StorageType storageValue;
+        DataModel::NullableToStorage(onMode, storageValue);
+        ReturnErrorOnFailure(
+            dstProvider.WriteValue({ endpointId, clusterId, Attributes::OnMode::Id },
+                                   ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    }
+    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::Clusters::ModeBase
