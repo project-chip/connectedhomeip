@@ -40,6 +40,7 @@ AES
 AFL
 AIDL
 algs
+aliased
 alloc
 allocator
 allocators
@@ -126,6 +127,7 @@ backend
 backends
 backticks
 backtrace
+backwards
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
@@ -160,6 +162,7 @@ bluetoothd
 bluez
 Bonjour
 BOOL
+boolean
 booleans
 BooleanState
 bootable
@@ -191,6 +194,8 @@ bzip
 CACACACA
 cacerts
 CAfile
+callsite
+callsites
 cancelled
 capacitive
 CarbonDioxideConcentrationMeasurement
@@ -312,8 +317,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 contrib
@@ -400,6 +405,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+dep
 Depacketization
 deployable
 depottools
@@ -409,6 +415,8 @@ dereference
 dereferencing
 desc
 descheduled
+destructor
+destructors
 detokenization
 detokenizer
 dev
@@ -533,6 +541,7 @@ endian
 EndpointId
 eno
 entrypoint
+Entrypoints
 enum
 Enums
 env
@@ -562,6 +571,7 @@ EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
+Excludable
 exe
 ExecStart
 executables
@@ -584,6 +594,7 @@ FDDE
 fddead
 fde
 fdx
+featuremap
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -605,8 +616,10 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+FormaldehydeConcentrationMeasurement
 formatter
 formatters
+forwarding
 FOTA
 framerate
 FRDM
@@ -626,6 +639,7 @@ fvisibility
 FW
 Fxx
 gbl
+gc
 gcloud
 GDB
 gdbgui
@@ -636,6 +650,7 @@ generalised
 GenericConfigurationManagerImpl
 GenericConnectivityManagerImpl
 GenericImpl
+Genericity
 GenericPlatformManagerImpl
 GenericThreadConfigurationManagerImpl
 GenericThreadStackManagerImpl
@@ -666,6 +681,7 @@ googleapis
 googlesource
 GPG
 GPIO
+GPIOs
 GPL
 GPLv
 Gradle
@@ -683,7 +699,9 @@ gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
+Hardcode
 hardcoded
+hardcodes
 hardknott
 hardwarever
 HardwareVersion
@@ -753,6 +771,9 @@ Infineon
 ini
 init
 InitArgs
+initialize
+initializer
+initializers
 inlined
 inlining
 InputLoop
@@ -762,6 +783,7 @@ integrations
 IntelliSense
 InteractionModelEngine
 InteractionModelVersion
+interop
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -802,6 +824,7 @@ jre
 js
 json
 jsoncpp
+jsontlv
 JTAG
 Jupyter
 jupyterlab
@@ -867,6 +890,7 @@ lightin
 LightingApp
 LightingColor
 LightingState
+linker's
 LinkSoftwareAndDocumentationPack
 linter
 linters
@@ -1168,7 +1192,11 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+pluggable
 PluginServerCallback
+Pm10ConcentrationMeasurement
+Pm1ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 png
 Podman
 PollControl
@@ -1181,6 +1209,7 @@ PowerConfiguration
 PowerProfile
 PowerSource
 PowerSourceConfiguration
+ppm
 pre
 PrebuiltDataModelDirectory
 prepends
@@ -1242,6 +1271,7 @@ QueryImageResponse
 queryImageStatus
 Quickstart
 qvCHIP
+RadonConcentrationMeasurement
 RADVD
 raspberryPi
 RasPi
@@ -1268,6 +1298,9 @@ refrigeratoralarm
 regen
 registerAttributeAccessOverride
 RegisterCommandHandler
+registration
+registrations
+registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1280,8 +1313,8 @@ repo
 repos
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1291,6 +1324,7 @@ reviwed
 rfid
 rfids
 RGB
+ripgrep
 riscv
 rloc
 rmw
@@ -1345,8 +1379,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1442,6 +1476,7 @@ subcommand
 subcommands
 subdirectories
 subdirectory
+subflag
 subfolder
 submodule
 submodules
@@ -1484,6 +1519,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+templated
 templating
 Tera
 testability
@@ -1545,6 +1581,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
@@ -1599,6 +1636,7 @@ unlinking
 unpair
 unprovisioned
 unreferenced
+unregister
 unregistration
 Unsecure
 Unselect
@@ -1653,6 +1691,7 @@ vous
 VPN
 VSC
 VSCode
+vtable
 WaitNewInputEvent
 WakeOnLan
 Walkthrough
@@ -1692,9 +1731,9 @@ xbef
 xc
 xcd
 Xcode
+Xcode's
 xcodebuild
 xcodeproj
-Xcode's
 xcworkspace
 xd
 xds

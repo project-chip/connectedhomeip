@@ -65,9 +65,9 @@ log = logging.getLogger(__name__)
 nest_asyncio.apply()
 
 
-def to_octet_string(input: bytes) -> str:
-    """Takes `input` bytes and convert to a colon-separated hex octet string representation."""
-    return ":".join(["%02x" % b for b in input])
+def to_octet_string(data: bytes) -> str:
+    """Takes `data` bytes and convert to a colon-separated hex octet string representation."""
+    return hexlify(data, ":")
 
 
 class MatterCertParser:
@@ -114,12 +114,12 @@ class MappingsV1(enum.IntEnum):
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
-def bytes_from_hex(hex: str) -> bytes:
-    """Converts any `hex` string representation including `01:ab:cd` to bytes
+def bytes_from_hex(s: str) -> bytes:
+    """Converts any `s` string representation including `01:ab:cd` to bytes
 
     Handles any whitespace including newlines, which are all stripped.
     """
-    return unhexlify(re.sub(r'(\s|:)', "", hex))
+    return unhexlify(re.sub(r'(\s|:)', "", s))
 
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
@@ -226,7 +226,7 @@ class TestStepBlockPassException(Exception):
     pass
 
 
-class test_step(object):
+class test_step:
     """Context manager for `with test_tesp(...) as step` that allows for aggregating step descriptions automatically.
 
     Use like:
@@ -247,21 +247,21 @@ class test_step(object):
     TODO: Port back to matter_testing.py once this whole test suite is complete.
     """
 
-    def __init__(self, id=None, description="", verification=None, is_commissioning=False):
+    def __init__(self, step_id=None, description="", verification=None, is_commissioning=False):
         caller = inspect.currentframe().f_back.f_locals.get('self', None)
         if isinstance(caller, MatterBaseTest):
             self._test_instance = caller
         else:
             raise RuntimeError("Can only use `test_step` inside a MatterBaseTest-derived class")
 
-        if id is None:
-            id = self._test_instance.current_step_id
+        if step_id is None:
+            step_id = self._test_instance.current_step_id
             next_step_id = self._test_instance.get_next_step_id(self._test_instance.current_step_id)
             self._test_instance.current_step_id = next_step_id
         else:
-            self._test_instance.current_step_id = id
+            self._test_instance.current_step_id = step_id
 
-        self._id = id
+        self._id = step_id
         self._description = description
         self._verification = verification
         self._is_commissioning = is_commissioning
@@ -398,7 +398,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH1's fabric: {str(e)}")
             log.info("Parsed TH1's RCAC successfully.")
-            log.info(f"  -> Root public key bytes: {to_octet_string(th1_root_public_key)}")
+            log.info("  -> Root public key bytes: %s", to_octet_string(th1_root_public_key))
 
         with test_step(1, description="Commission DUT in TH2's fabric. Cert chain must NOT include ICAC"):
             new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -429,7 +429,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             except (ValueError, IndexError, KeyError, TypeError) as e:
                 asserts.fail(f"Failed to parse root certificate for TH2's fabric: {str(e)}")
             log.info("Parsed TH2's RCAC successfully.")
-            log.info(f"  -> Root public key bytes: {to_octet_string(th2_root_public_key)}")
+            log.info("  -> Root public key bytes: %s", to_octet_string(th2_root_public_key))
 
         # Read NOCs and validate that both the entry for TH1 and TH2 are readable
         # and have the right expected fabricId
@@ -467,7 +467,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                         noc_struct.noc) > 0, "`noc` field in NOCs attribute entry not found for fabric index {fabric_index}! Ensure you are running a Matter stack for >= 1.4.2 where NOCStruct fields are not fabric-sensitive.")
 
                     try:
-                        log.info(f"Trying to parse NOC for fabric index {fabric_index}")
+                        log.info("Trying to parse NOC for fabric index %s", fabric_index)
                         noc_cert = MatterCertParser(noc_struct.noc)
                         for tag, value in noc_cert.get_subject_names().items():
                             if tag == noc_cert.SUBJECT_FABRIC_ID_TAG:
@@ -476,10 +476,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                     except (ValueError, IndexError, KeyError, TypeError) as e:
                         asserts.fail(f"Failed to parse NOC for fabric index {fabric_index}: {str(e)}")
 
-                    log.info(f"Succeeded in parsing NOC for fabric index {fabric_index}.")
-                    log.info(f"  -> NOC public key bytes: {to_octet_string(noc_public_keys_from_certs[controller_name])}")
+                    log.info("Succeeded in parsing NOC for fabric index %s.", fabric_index)
+                    log.info("  -> NOC public key bytes: %s", to_octet_string(noc_public_keys_from_certs[controller_name]))
 
-            log.info(f"Fabric IDs found: {fabric_ids_from_certs}")
+            log.info("Fabric IDs found: %s", fabric_ids_from_certs)
 
             asserts.assert_true(th1_fabric_index in found_fabric_indices,
                                 f"Expected to have seen entry for TH1's fabric (fabric Index {th1_fabric_index}) in NOCs attribute, but did not find it!")

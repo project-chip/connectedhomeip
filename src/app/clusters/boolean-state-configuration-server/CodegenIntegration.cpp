@@ -71,19 +71,19 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         uint8_t supportedSensitivityLevels{};
-        if (SupportedSensitivityLevels::Get(endpointId, &supportedSensitivityLevels) != Status::Success)
+        if (SupportedSensitivityLevels::GetDefault(endpointId, &supportedSensitivityLevels) != Status::Success)
         {
             supportedSensitivityLevels = BooleanStateConfigurationCluster::kMinSupportedSensitivityLevels;
         }
         uint8_t defaultSensitivityLevel{};
-        if (DefaultSensitivityLevel::Get(endpointId, &defaultSensitivityLevel) != Status::Success)
+        if (DefaultSensitivityLevel::GetDefault(endpointId, &defaultSensitivityLevel) != Status::Success)
         {
             // this assumes min is at least 2
             defaultSensitivityLevel = static_cast<uint8_t>(supportedSensitivityLevels - 1);
         }
 
         BooleanStateConfigurationCluster::AlarmModeBitMask alarmsSupported{};
-        if (AlarmsSupported::Get(endpointId, &alarmsSupported) != Status::Success)
+        if (AlarmsSupported::GetDefault(endpointId, &alarmsSupported) != Status::Success)
         {
             alarmsSupported.ClearAll();
         }

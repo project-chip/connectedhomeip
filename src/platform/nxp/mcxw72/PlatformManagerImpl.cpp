@@ -47,9 +47,20 @@
 #include "fwk_platform_ot.h"
 #endif
 
+#if CHIP_CRYPTO_PSA
+#include "crypto/S200/S200KeyAllocator.h"
+#include "psa/crypto.h"
+#include <crypto/PSAKeyAllocator.h>
+static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
+              "CHIP_CONFIG_SHA256_CONTEXT_SIZE is too small for psa_hash_operation_t");
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "mbedtls/threading.h"
+#include "threading_alt.h"
+#endif
+#endif
+
 extern "C" status_t CRYPTO_InitHardware(void);
 extern "C" void BOARD_InitAppConsole();
-extern "C" int mbedtls_platform_set_calloc_free(void * (*calloc_func)(size_t, size_t), void (*free_func)(void *));
 
 extern "C" void vApplicationMallocFailedHook(void)
 {
@@ -84,23 +95,36 @@ static int plat_entropy_source(void * data, unsigned char * output, size_t len, 
 void PlatformManagerImpl::HardwareInit(void)
 {
     SysTick_Config(SystemCoreClock / configTICK_RATE_HZ);
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
 
+#if CHIP_CRYPTO_PSA
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    config_mbedtls_threading_alt();
+#endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+    psa_crypto_init();
+#else
     CRYPTO_InitHardware();
+#endif /* CHIP_CRYPTO_PSA */
 
     BOARD_InitAppConsole();
 }
 
 CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 {
-    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     SecLib_Init();
 
+#if CHIP_CRYPTO_PSA
+    static chip::DeviceLayer::S200KeyAllocator s200KeyAllocator;
+    chip::Crypto::SetPSAKeyAllocator(&s200KeyAllocator);
+#endif
+
+#if !CHIP_CRYPTO_PSA
     err = chip::Crypto::add_entropy_source(plat_entropy_source, NULL, 16);
     SuccessOrExit(err);
+#endif
 
 exit:
     return err;

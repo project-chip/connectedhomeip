@@ -86,6 +86,45 @@ static std::vector<StreamUsageEnum> & GetSupportedStreamUsages()
     return supportedStreamUsage;
 }
 
+static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAVStreamManagementDelegate & delegate,
+                                                                        SafeAttributePersistenceProvider & persistenceProvider)
+{
+    CameraAVStreamManagementCluster::InitArguments args{
+        .context    = { persistenceProvider },
+        .delegate   = delegate,
+        .endpointId = kTestEndpointId,
+        .features   = chip::BitFlags<CameraAvStreamManagement::Feature>(
+            CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
+            CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
+            CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
+            CameraAvStreamManagement::Feature::kWatermark, CameraAvStreamManagement::Feature::kHighDynamicRange,
+            CameraAvStreamManagement::Feature::kNightVision),
+        .optionalAttrs = chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
+            CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
+            CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
+            CameraAvStreamManagement::OptionalAttribute::kImageRotation,
+            CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
+            CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
+            CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
+            CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
+        .maxConcurrentEncoders        = 1,
+        .maxEncodedPixelRate          = 248832000 /*1920*1080*120 */,
+        .videoSensorParams            = GetVideoSensorParams(),
+        .nightVisionUsesInfrared      = false,
+        .minViewPort                  = { 640, 480 },
+        .rateDistortionTradeOffPoints = GetRateDistortionTradeOffPoints(),
+        .maxContentBufferSize         = 4096,
+        .microphoneCapabilities       = GetAudioCapabilities(),
+        .spkrCapabilities             = GetAudioCapabilities(),
+        .twoWayTalkSupport            = TwoWayTalkSupportTypeEnum::kFullDuplex,
+        .snapshotCapabilities         = GetSnapshotCapabilities(),
+        .maxNetworkBandwidth          = 128000000,
+        .supportedStreamUsages        = GetSupportedStreamUsages(),
+        .streamUsagePriorities        = GetSupportedStreamUsages()
+    };
+    return args;
+}
+
 // Mock delegate for testing CameraAVStreamManagement
 class MockCameraAVStreamManagementDelegate : public CameraAVStreamManagementDelegate
 {
@@ -281,26 +320,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(CameraAvStreamManagement::CameraAVStreamManagementCluster::Context{ mPersistenceProvider }, mMockDelegate,
-                kTestEndpointId,
-                chip::BitFlags<CameraAvStreamManagement::Feature>(
-                    CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
-                    CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
-                    CameraAvStreamManagement::Feature::kImageControl, CameraAvStreamManagement::Feature::kPrivacy,
-                    CameraAvStreamManagement::Feature::kWatermark, CameraAvStreamManagement::Feature::kHighDynamicRange,
-                    CameraAvStreamManagement::Feature::kNightVision),
-                chip::BitFlags<CameraAvStreamManagement::OptionalAttribute>(
-                    CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn,
-                    CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled,
-                    CameraAvStreamManagement::OptionalAttribute::kImageRotation,
-                    CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
-                    CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
-                    CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
-                    CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
-                1, 248832000 /*1920*1080*120 */, GetVideoSensorParams(), false, { 640, 480 }, GetRateDistortionTradeOffPoints(),
-                4096, GetAudioCapabilities(), GetAudioCapabilities(), TwoWayTalkSupportTypeEnum::kFullDuplex,
-                GetSnapshotCapabilities(), 128000000, GetSupportedStreamUsages(), GetSupportedStreamUsages()),
-        mClusterTester(mServer)
+        mServer(MakeInitArguments(mMockDelegate, mPersistenceProvider)), mClusterTester(mServer)
     {}
 
     void SetUp() override
@@ -1726,6 +1746,40 @@ TEST_F(TestCameraAVStreamManagementCluster, TestUpdateSnapshotStreamRefCount)
 
     // Non-existent ID
     EXPECT_EQ(mServer.UpdateSnapshotStreamRefCount(999, true), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestReferenceCountResetOnBoot)
+{
+    // 1. Prepare data with non-zero referenceCount
+    VideoStreamStruct stream{};
+    stream.videoStreamID  = 1;
+    stream.referenceCount = 5; // Non-zero
+
+    uint8_t buffer[kMaxAllocatedVideoStreamsSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), stream), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+    size_t len = writer.GetLengthWritten();
+
+    // 2. Write to persistence
+    ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
+    ASSERT_EQ(mPersistenceProvider.SafeWriteValue(path, ByteSpan(buffer, len)), CHIP_NO_ERROR);
+
+    // 3. Trigger Init to load from persistence
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    // 4. Verify in-memory state has reset refCount
+    Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
+
+    auto it = allocatedVideoStreams.begin();
+    ASSERT_TRUE(it.Next());
+    EXPECT_EQ(it.GetValue().referenceCount, 0);
 }
 
 } // namespace

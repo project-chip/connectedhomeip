@@ -236,7 +236,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.CurrentConnections,
         )
-        log.info(f"Rx'd CurrentConnections: {currentConnections}")
+        log.info("Rx'd CurrentConnections: %s", currentConnections)
         if len(currentConnections) > 0:
             for connectionId in currentConnections:
                 await self.send_single_cmd(
@@ -252,16 +252,16 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.SupportedFormats,
         )
-        log.info(f"Rx'd SupportedFormats: {supportedFormats}")
+        log.info("Rx'd SupportedFormats: %s", supportedFormats)
         asserts.assert_greater_equal(
             len(supportedFormats), 1, "SupportedFormats must not be empty"
         )
-        for format in supportedFormats:
+        for fmt in supportedFormats:
             validContainerformat = (
-                format.containerFormat == pushavCluster.Enums.ContainerFormatEnum.kCmaf
+                fmt.containerFormat == pushavCluster.Enums.ContainerFormatEnum.kCmaf
             )
             isValidIngestMethod = (
-                format.ingestMethod == pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest
+                fmt.ingestMethod == pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest
             )
             asserts.assert_true(
                 (validContainerformat and isValidIngestMethod),
@@ -274,7 +274,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedVideoStreams,
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {allocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", allocatedVideoStreams)
         asserts.assert_true(
             len(allocatedVideoStreams) != 0, "AllocatedVideoStreams must not be empty"
         )
@@ -287,7 +287,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedAudioStreams,
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {allocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", allocatedAudioStreams)
         asserts.assert_true(
             len(allocatedAudioStreams) != 0, "AllocatedAudioStreams must not be empty"
         )
@@ -318,7 +318,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             endpoint=endpoint,
         )
         log.info(
-            f"Rx'd allocatePushTransportResponse = {allocatePushTransportResponse}"
+            "Rx'd allocatePushTransportResponse = %s", allocatePushTransportResponse
         )
 
         self.step(6)
@@ -510,7 +510,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(19)
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportBegin, timeout_sec=5)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
         asserts.assert_equal(event_data.triggerType, pushavCluster.Enums.TransportTriggerTypeEnum.kCommand,
                              "Unexpected value for TriggerType returned")
@@ -564,7 +564,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         self.step(23)
         # Verify event received
         event_data = event_callback.wait_for_event_report(pushavCluster.Events.PushTransportEnd, timeout_sec=5)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
 

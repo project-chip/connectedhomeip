@@ -174,7 +174,11 @@ silabs_executable("lock_app") {
     ]
   }
 
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
 
   inputs = [ ldscript ]
 

@@ -17,12 +17,12 @@
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixChimeDevice.h>
 #include <app_config/enabled_devices.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
 {
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {

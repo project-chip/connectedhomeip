@@ -40,6 +40,10 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#ifdef SL_MATTER_ENABLE_AWS
+#include "MatterAws.h"
+#endif // SL_MATTER_ENABLE_AWS
+
 #include <app/ConcreteAttributePath.h>
 
 #include <assert.h>
@@ -73,7 +77,7 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
-CustomerAppTask & appInstance()
+CustomerAppTask & AppInstance()
 {
     return CustomerAppTask::GetAppTask();
 }
@@ -86,6 +90,20 @@ LEDWidget sLightLED;
 
 bool sLightOn           = false;
 osTimerId_t sLightTimer = nullptr;
+bool sOffEffectArmed    = false;
+
+void DisarmOffWithEffectTimer()
+{
+    sOffEffectArmed = false;
+    if (osTimerIsRunning(sLightTimer))
+    {
+        if (osTimerStop(sLightTimer) == osError)
+        {
+            SILABS_LOG("sLightTimer stop() failed");
+            appError(APP_ERROR_STOP_TIMER_FAILED);
+        }
+    }
+}
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 uint8_t sCurrentLevel      = 254;
@@ -113,12 +131,15 @@ void PostLightControlColorEvent(ColorAction_t action, const RGBLEDWidget::ColorD
     light_event.LightControlEvent.Action = static_cast<uint8_t>(action);
     light_event.LightControlEvent.Value  = colorData;
     light_event.Handler                  = &CustomerAppTask::LightControlEventHandler;
-    appInstance().PostEvent(&light_event);
+    AppInstance().PostEvent(&light_event);
 }
 #endif
 
 void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 {
+    VerifyOrReturn(sOffEffectArmed);
+    DisarmOffWithEffectTimer();
+
     sLightOn = false;
     sLightLED.Set(false);
 #ifdef DISPLAY_ENABLED
@@ -152,7 +173,7 @@ void AppTask::LightTimerEventHandler(void * /* timerCbArg */)
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = nullptr;
     event.Handler            = &OffEffectTimerEventHandler;
-    appInstance().PostEvent(&event);
+    AppInstance().PostEvent(&event);
 }
 
 void AppTask::LightActionEventHandler(AppEvent * aEvent)
@@ -165,14 +186,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     sLightOn = !sLightOn;
     sLightLED.Set(sLightOn);
 
-    if (osTimerIsRunning(sLightTimer))
-    {
-        if (osTimerStop(sLightTimer) == osError)
-        {
-            SILABS_LOG("sLightTimer stop() failed");
-            appError(APP_ERROR_STOP_TIMER_FAILED);
-        }
-    }
+    DisarmOffWithEffectTimer();
 
 #ifdef DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(sLightOn);
@@ -225,7 +239,7 @@ CHIP_ERROR AppTask::AppInit()
 {
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
 
-    CHIP_ERROR err = appInstance().InitLight();
+    CHIP_ERROR err = AppInstance().InitLight();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("InitLight() failed");
@@ -357,12 +371,12 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     if (button == APP_LIGHT_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = &CustomerAppTask::LightActionEventHandler;
-        appInstance().PostEvent(&button_event);
+        AppInstance().PostEvent(&button_event);
     }
     else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
-        appInstance().PostEvent(&button_event);
+        AppInstance().PostEvent(&button_event);
     }
 }
 
@@ -401,8 +415,17 @@ void AppTask::OnTriggerOffWithEffect(OnOffEffect * effect)
         }
     }
 
+    else
+    {
+        ChipLogDetail(Zcl, "OffWithEffect: unsupported effect, completing immediately");
+        DisarmOffWithEffectTimer();
+        return;
+    }
+
+    sOffEffectArmed = true;
     if (osTimerStart(sLightTimer, pdMS_TO_TICKS(offEffectDuration)) != osOK)
     {
+        sOffEffectArmed = false;
         SILABS_LOG("sLightTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
@@ -424,19 +447,21 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
             ChipLogProgress(Zcl, "sending light state update");
             MatterAwsSendMsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
 #endif // SL_MATTER_ENABLE_AWS
-            sLightOn = (*value != 0);
+            const bool lightOn = (*value != 0);
+            if (lightOn)
+            {
+                DisarmOffWithEffectTimer();
+            }
+            else if (sOffEffectArmed)
+            {
+                break;
+            }
+
+            sLightOn = lightOn;
             sLightLED.Set(sLightOn);
 #ifdef DISPLAY_ENABLED
             BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
-            if (sLightOn && osTimerIsRunning(sLightTimer))
-            {
-                if (osTimerStop(sLightTimer) == osError)
-                {
-                    SILABS_LOG("sLightTimer stop() failed");
-                    appError(APP_ERROR_STOP_TIMER_FAILED);
-                }
-            }
         }
         break;
 
@@ -524,7 +549,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 #endif // SL_MATTER_RGB_LED_ENABLED
         break;
 
-    case Identify::Id:
+    case Clusters::Identify::Id:
         if (value != nullptr && size == sizeof(uint8_t))
         {
             ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",

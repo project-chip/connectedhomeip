@@ -228,8 +228,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         Credentials::GroupDataProvider::GroupInfo info;
         ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
         destination_address = (info.UsePerGroupAddress())
-            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
-            : Transport::PeerAddress::Groupcast();
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
 
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
@@ -431,8 +431,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         Credentials::GroupDataProvider::GroupInfo info;
         ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
         multicastAddress = (info.UsePerGroupAddress())
-            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
-            : Transport::PeerAddress::Groupcast();
+            ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
         destination      = &multicastAddress;
     }
     break;
@@ -1141,9 +1141,17 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     ReturnOnFailure(mac.Decode(partialPacketHeader, &data[len - footerLen], footerLen, &taglen));
     VerifyOrReturn(taglen == footerLen);
 
-    bool decrypted = false;
+    // Groupcast Testing
+    auto & testing = chip::Groupcast::GetTesting();
+
+    bool decrypted                    = false;
+    bool hasAnyKeysForFabricUnderTest = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            hasAnyKeysForFabricUnderTest = true;
+        }
         CryptoContext context(groupContext.keyContext);
         msgCopy = msg.CloneData();
         if (msgCopy.IsNull())
@@ -1155,33 +1163,31 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         bool privacy = partialPacketHeader.HasPrivacyFlag();
         decrypted =
             GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, privacy, msgCopy, mac, groupContext);
-
-#if CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-        if (privacy && !decrypted)
-        {
-            // Try processing the P=1 message again without privacy as a work-around for invalid early-SVE2 nodes.
-            msgCopy = msg.CloneData();
-            if (msgCopy.IsNull())
-            {
-                ChipLogError(Inet, "Failed to clone Groupcast message buffer. Discarding.");
-                return;
-            }
-            decrypted =
-                GroupKeyDecryptAttempt(partialPacketHeader, packetHeaderCopy, payloadHeader, false, msgCopy, mac, groupContext);
-        }
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter.Release();
-    // Groupcast Testing
-    auto & testing = chip::Groupcast::GetTesting();
-    if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+
+    if (testing.IsEnabled())
     {
-        testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
-        if (!decrypted)
+        if (decrypted)
         {
-            testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+            // We have a valid groupContext from the loop
+            if (testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+            }
+        }
+        else
+        {
+            // FAILURE CASE: No valid groupContext or decryption failed. This can happen
+            // for example, when there is an empty group key map. This means GroupSessions
+            // cannot be iterated over to populate groupContext, and the fabric index cannot be
+            // explicitly checked here.
+            testing.SetTestResult(hasAnyKeysForFabricUnderTest ? chip::Groupcast::Testing::Result::kFailedAuth
+                                                               : chip::Groupcast::Testing::Result::kNoAvailableKey);
+            testing.NotifyDelegate();
         }
     }
+
     if (!decrypted)
     {
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");
@@ -1235,6 +1241,18 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
         if (err != CHIP_NO_ERROR)
         {
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+            {
+                if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kMessageReplay);
+                }
+                else
+                {
+                    testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+                }
+                testing.NotifyDelegate();
+            }
             // Exit now, since Group Messages don't have acks or responses of any kind.
             ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
             return;
@@ -1242,6 +1260,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     }
     else
     {
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+        {
+            testing.SetTestResult(chip::Groupcast::Testing::Result::kGeneralError);
+            testing.NotifyDelegate();
+        }
         ChipLogError(Inet,
                      "Group Counter Tables full or invalid NodeId/FabricIndex after decryption of message, dropping everything");
         return;

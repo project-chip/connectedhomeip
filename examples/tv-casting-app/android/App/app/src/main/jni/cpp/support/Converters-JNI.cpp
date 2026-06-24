@@ -515,8 +515,7 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     if (jInstanceName != nullptr)
     {
         const char * instanceNameCStr = env->GetStringUTFChars(jInstanceName, nullptr);
-        strncpy(cppIdOptions->mCommissioneeInstanceName, instanceNameCStr, sizeof(cppIdOptions->mCommissioneeInstanceName) - 1);
-        cppIdOptions->mCommissioneeInstanceName[sizeof(cppIdOptions->mCommissioneeInstanceName) - 1] = '\0';
+        chip::Platform::CopyString(cppIdOptions->mCommissioneeInstanceName, instanceNameCStr);
         env->ReleaseStringUTFChars(jInstanceName, instanceNameCStr);
     }
 

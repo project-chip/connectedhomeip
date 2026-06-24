@@ -23,8 +23,8 @@ def _encode_and_then_decode_to_native(data: ClusterObjects.ClusterObject):
     return TLVReader(tlv).get()['Any']
 
 
-def _encode_attribute_and_then_decode_to_native(data, type: ClusterObjects.ClusterAttributeDescriptor):
-    return TLVReader(type.ToTLV(None, data)).get()['Any']
+def _encode_attribute_and_then_decode_to_native(data, data_type: ClusterObjects.ClusterAttributeDescriptor):
+    return TLVReader(data_type.ToTLV(None, data)).get()['Any']
 
 
 def _encode_from_native_and_then_decode(data,
@@ -67,12 +67,12 @@ class TestClusterObjects(unittest.TestCase):
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="X", Tag=0, Type=typing.List[uint]),
+                        Label="X", Tag=0, Type=list[uint]),
                     ClusterObjects.ClusterObjectFieldDescriptor(
                         Label="Y", Tag=1, Type=int),
                 ])
 
-        X: typing.List['uint'] = None
+        X: list['uint'] = None
         Y: int = None
 
     def test_struct_w_array_encode(self):
@@ -126,20 +126,20 @@ class TestClusterObjects(unittest.TestCase):
             return ClusterObjects.ClusterObjectDescriptor(
                 Fields=[
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="X", Tag=0, Type=typing.List[str]),
+                        Label="X", Tag=0, Type=list[str]),
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="Y", Tag=1, Type=typing.List[TestClusterObjects.C]),
+                        Label="Y", Tag=1, Type=list[TestClusterObjects.C]),
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="Z", Tag=2, Type=typing.List[TestClusterObjects.StructWithArray]),
+                        Label="Z", Tag=2, Type=list[TestClusterObjects.StructWithArray]),
                     # Recursive!
                     ClusterObjects.ClusterObjectFieldDescriptor(
-                        Label="W", Tag=3, Type=typing.List[TestClusterObjects.StructWithArrayOfStructWithArray]),
+                        Label="W", Tag=3, Type=list[TestClusterObjects.StructWithArrayOfStructWithArray]),
                 ])
 
-        X: typing.List['str'] = None
-        Y: typing.List['TestClusterObjects.C'] = None
-        Z: typing.List['TestClusterObjects.StructWithArray'] = None
-        W: typing.List['TestClusterObjects.StructWithArrayOfStructWithArray'] = None
+        X: list['str'] = None
+        Y: list['TestClusterObjects.C'] = None
+        Z: list['TestClusterObjects.StructWithArray'] = None
+        W: list['TestClusterObjects.StructWithArrayOfStructWithArray'] = None
 
     def test_struct_with_array_of_struct_with_array_encode(self):
         C = TestClusterObjects.C
@@ -237,7 +237,7 @@ class TestAttributeDescriptor(unittest.TestCase):
     class ArrayAttribute(ClusterObjects.ClusterAttributeDescriptor):
         @matter.ChipUtility.classproperty
         def attribute_type(cls) -> ClusterObjects.ClusterObjectFieldDescriptor:
-            return ClusterObjects.ClusterObjectFieldDescriptor(Type=typing.List[int])
+            return ClusterObjects.ClusterObjectFieldDescriptor(Type=list[int])
 
         @matter.ChipUtility.classproperty
         def cluster_id(cls) -> int:

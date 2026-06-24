@@ -40,6 +40,7 @@ void WriteClient::Close()
     }
 
     MoveToState(State::AwaitingDestruction);
+    mExchangeCtx.Release();
 
     if (mpCallback)
     {
@@ -478,7 +479,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 
     if (timeout == System::Clock::kZero)
     {
-        mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {
@@ -557,10 +558,10 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::AwaitingResponse &&
-        // We had sent the last chunk of data, and received all responses
-        mChunks.IsNull())
+    if (mState == State::AwaitingResponse)
     {
+        // NOTE: if we have more chunks (i.e. `!mChunks.IsNull()`), then the
+        //       SendWriteRequest() call below will move back to an AwaitingResponse state
         MoveToState(State::ResponseReceived);
     }
 
