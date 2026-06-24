@@ -40,12 +40,12 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if defined(MATTER_DM_PLUGIN_USER_LABEL) || defined(MATTER_DM_PLUGIN_FIXED_LABEL)
-#ifndef CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-#define CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER 1
+#ifndef CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#define CONFIG_DEVICE_INFO_PROVIDER_IMPL 1
 #endif
 #endif
 
-#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
 #include <DeviceInfoProviderImpl.h>
 #endif
 
@@ -133,7 +133,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
-#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
@@ -209,7 +209,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
