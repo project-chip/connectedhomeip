@@ -1227,6 +1227,16 @@ void emberAfThreadNetworkDirectoryClusterShutdownCallback(chip::EndpointId endpo
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfCommissioningProxyClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCommissioningProxyClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -6171,6 +6181,44 @@ chip::Protocols::InteractionModel::Status MatterThreadNetworkDirectoryClusterSer
  * @param endpoint  Endpoint that is being served
  */
 void emberAfThreadNetworkDirectoryClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Commissioning Proxy Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommissioningProxyClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterCommissioningProxyClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommissioningProxyClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterCommissioningProxyClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterCommissioningProxyClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCommissioningProxyClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Wake on LAN Cluster

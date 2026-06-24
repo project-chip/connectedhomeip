@@ -158,6 +158,9 @@ constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 2;
 constexpr DeviceTypeId kThreadBorderRouterDeviceTypeId  = 0x00000091;
 constexpr uint8_t kThreadBorderRouterDeviceTypeRevision = 1;
 
+constexpr DeviceTypeId kCommissioningByProxyDeviceTypeId  = 0x00000092;
+constexpr uint8_t kCommissioningByProxyDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kOnOffLightDeviceTypeId  = 0x00000100;
 constexpr uint8_t kOnOffLightDeviceTypeRevision = 4;
 

@@ -50,6 +50,7 @@
 #include <clusters/ClosureDimension/Enums.h>
 #include <clusters/ColorControl/Enums.h>
 #include <clusters/CommissionerControl/Enums.h>
+#include <clusters/CommissioningProxy/Enums.h>
 #include <clusters/CommodityMetering/Enums.h>
 #include <clusters/CommodityPrice/Enums.h>
 #include <clusters/CommodityTariff/Enums.h>

@@ -17,17 +17,17 @@
 #pragma once
 
 #include <app/clusters/proximity-ranging-server/ProximityRangingDriver.h>
+#include <app/clusters/proximity-ranging-server/RangingAdapter.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/ProximityRanging/AttributeIds.h>
 #include <clusters/ProximityRanging/ClusterId.h>
-#include <clusters/ProximityRanging/CommandIds.h>
 #include <clusters/ProximityRanging/Commands.h>
 #include <clusters/ProximityRanging/Enums.h>
-#include <clusters/ProximityRanging/Events.h>
 #include <clusters/ProximityRanging/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/Span.h>
+#include <lib/support/TimerDelegate.h>
 
 #include <optional>
 
@@ -39,8 +39,17 @@ namespace ProximityRanging {
 /**
  * Proximity Ranging Cluster server implementation.
  *
- * Combined DefaultServerCluster implementation. Delegates technology-specific
- * operations to a ProximityRangingDriver provided at construction.
+ * Owns its ProximityRangingDriver as a private member, constructed from the
+ * adapter set and TimerDelegate supplied via Config. This makes each cluster
+ * instance independent — there is no shared driver across endpoints, so
+ * multi-endpoint Proximity Ranging deployments are well-defined: each
+ * endpoint has its own session pool, its own callback wiring, and its own
+ * (exclusive) set of adapters.
+ *
+ * Adapter exclusivity: each RangingAdapter is registered as a callback
+ * recipient with exactly ONE driver instance. The application is therefore
+ * responsible for assigning each adapter to at most one cluster instance.
+ *
  * All methods must be called from the Matter main thread.
  */
 class ProximityRangingCluster : public DefaultServerCluster, public ProximityRangingDriver::Callback
@@ -48,10 +57,22 @@ class ProximityRangingCluster : public DefaultServerCluster, public ProximityRan
 public:
     /**
      * Configuration builder for ProximityRangingCluster.
+     *
+     * Mandatory inputs:
+     *   - TimerDelegate &: drives the per-session StartTime / EndTime /
+     *     RangingInstanceInterval scheduling owned by the cluster's
+     *     internal driver. Must outlive the cluster.
+     *
+     * Optional builders:
+     *   - WithFeatures(): sets the cluster's feature map. Defaults to empty.
+     *   - WithAdapters(): supplies the technology adapter set the cluster's
+     *     driver routes ranging operations to. The backing array must outlive
+     *     the cluster. Defaults to an empty span (cluster reads attributes
+     *     and reports capabilities, but cannot start any ranging session).
      */
     struct Config
     {
-        Config() = default;
+        Config(TimerDelegate & timerDelegate) : mTimerDelegate(timerDelegate) {}
 
         Config & WithFeatures(BitMask<Feature> features)
         {
@@ -59,15 +80,21 @@ public:
             return *this;
         }
 
+        Config & WithAdapters(Span<RangingAdapter * const> adapters)
+        {
+            mAdapters = adapters;
+            return *this;
+        }
+
+        TimerDelegate & mTimerDelegate;
         BitMask<Feature> mFeatureMap;
+        Span<RangingAdapter * const> mAdapters;
     };
 
     ProximityRangingCluster(EndpointId endpoint, const Config & config) :
-        DefaultServerCluster({ endpoint, ProximityRanging::Id }), mFeatureMap(config.mFeatureMap)
+        DefaultServerCluster({ endpoint, ProximityRanging::Id }), mDriver(config.mAdapters, config.mTimerDelegate),
+        mFeatureMap(config.mFeatureMap)
     {}
-
-    void SetDriver(ProximityRangingDriver * driver) { mDriver = driver; }
-    ProximityRangingDriver * GetDriver() const { return mDriver; }
 
     // DefaultServerCluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -97,8 +124,13 @@ private:
     // Session ID generation
     uint8_t GenerateSessionId();
 
+    // Spec preflight: reject before touching the driver if the requested technology
+    // is not in FeatureMap or its matching DeviceRoleConfig field is missing/inconsistent.
+    ResultCodeEnum ValidateStartRangingRequest(const Commands::StartRangingRequest::DecodableType & request) const;
+
     // Members
-    ProximityRangingDriver * mDriver = nullptr;
+    ProximityRangingDriver mDriver;
+    bool mDriverInitialized = false;
     const BitMask<Feature> mFeatureMap;
 
     uint8_t mNextSessionId = 0;
