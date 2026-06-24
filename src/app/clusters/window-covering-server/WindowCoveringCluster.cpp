@@ -337,7 +337,7 @@ DataModel::ActionReturnStatus WindowCoveringCluster::WriteAttribute(const DataMo
         chip::BitMask<Mode> mode;
         ReturnErrorOnFailure(decoder.Decode(mode));
         VerifyOrReturnValue(mode.Raw() <= 0x0F, Status::ConstraintError);
-        VerifyOrReturnValue(!mMode.Has(Mode::kCalibrationMode) || mode.Has(Mode::kCalibrationMode), Status::Failure);
+        // VerifyOrReturnValue(!mMode.Has(Mode::kCalibrationMode) || mode.Has(Mode::kCalibrationMode), Status::Failure);
         SetMode(mode);
         return Status::Success;
     }
