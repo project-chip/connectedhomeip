@@ -102,15 +102,36 @@ enum class ListWritingPattern
 class ClusterTester
 {
 public:
-    ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster), mFabricTestFixture(nullptr) {}
+    ClusterTester(app::ServerClusterInterface & cluster, TestServerClusterContext * testServerClusterContext = nullptr) :
+        mCluster(cluster), mTestServerClusterContext(testServerClusterContext)
+    {
+        if (mTestServerClusterContext == nullptr)
+        {
+            mTestServerClusterContext      = new TestServerClusterContext();
+            mTestServerClusterContextOwned = true;
+        }
+    }
 
-    // Constructor with FabricHelper
     ClusterTester(app::ServerClusterInterface & cluster, FabricTestFixture * fabricHelper) :
         mCluster(cluster), mFabricTestFixture(fabricHelper)
-    {}
+    {
+        if (mTestServerClusterContext == nullptr)
+        {
+            mTestServerClusterContext      = new TestServerClusterContext();
+            mTestServerClusterContextOwned = true;
+        }
+    }
 
-    TestServerClusterContext & GetTestContext() { return mTestServerClusterContext; }
-    app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
+    ~ClusterTester()
+    {
+        if (mTestServerClusterContextOwned)
+        {
+            delete mTestServerClusterContext;
+        }
+    }
+
+    TestServerClusterContext & GetTestContext() { return *mTestServerClusterContext; }
+    app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext->Get(); }
 
     // Read attribute into `out` parameter.
     // The `out` parameter must be of the correct type for the attribute being read.
@@ -396,11 +417,11 @@ public:
     // Returns the next generated event from the event generator in the test server cluster context
     std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
     {
-        return mTestServerClusterContext.EventsGenerator().GetNextEvent();
+        return mTestServerClusterContext->EventsGenerator().GetNextEvent();
     }
 
     // TODO: Add methods to test AttributeChangeListener notifications.
-    std::vector<app::ConcreteAttributePath> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
+    std::vector<app::ConcreteAttributePath> & GetDirtyList() { return mTestServerClusterContext->ChangeListener().DirtyList(); }
 
     // Returns true if the given attribute appears in the dirty list.
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster
@@ -475,8 +496,9 @@ private:
                            [&](const app::DataModel::AcceptedCommandEntry & entry) { return entry.commandId == commandId; });
     }
 
-    TestServerClusterContext mTestServerClusterContext{};
     app::ServerClusterInterface & mCluster;
+    TestServerClusterContext * mTestServerClusterContext = nullptr;
+    bool mTestServerClusterContextOwned                  = false;
 
     // Buffer size for TLV encoding/decoding of command payloads.
     // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
@@ -489,7 +511,7 @@ private:
     uint8_t mTlvBuffer[kTlvBufferSize];
     std::vector<std::unique_ptr<ReadOperation>> mReadOperations;
 
-    FabricTestFixture * mFabricTestFixture;
+    FabricTestFixture * mFabricTestFixture = nullptr;
 };
 
 } // namespace Testing

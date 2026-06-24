@@ -339,15 +339,19 @@ TEST_F(TestModeBaseCluster, StartupAppliesStartUpModeOnBoot)
     optionalAttributeSet.Set<StartUpMode::Id>();
     diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kPowerOnReboot;
 
+    {
+        ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+        ClusterTester tester(cluster, &testContext);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        DataModel::Nullable<uint8_t> startUpMode(1);
+        ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
     ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint8_t> startUpMode(1);
-    ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-
+    ClusterTester tester(cluster, &testContext);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
@@ -360,16 +364,20 @@ TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
     optionalAttributeSet.Set<StartUpMode::Id>();
     diagnosticDataProvider.mBootReason = GeneralDiagnostics::BootReasonEnum::kSoftwareUpdateCompleted;
 
+    {
+        ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
+        ClusterTester tester(cluster, &testContext);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        DataModel::Nullable<uint8_t> startUpMode(1);
+        ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
+        ASSERT_TRUE(cluster.UpdateCurrentMode(0) == Status::Success);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
     ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint8_t> startUpMode(1);
-    ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
-    ASSERT_TRUE(cluster.UpdateCurrentMode(0) == Status::Success);
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-
+    ClusterTester tester(cluster, &testContext);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
@@ -379,15 +387,20 @@ TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
 
 TEST_F(TestModeBaseCluster, StartupAppliesOnModeWhenOnOffFeatureEnabled)
 {
+
+    {
+        ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
+        ClusterTester tester(cluster, &testContext);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        DataModel::Nullable<uint8_t> onMode(1);
+        ASSERT_TRUE(tester.WriteAttribute(OnMode::Id, onMode).IsSuccess());
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
     ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint8_t> onMode(1);
-    ASSERT_TRUE(tester.WriteAttribute(OnMode::Id, onMode).IsSuccess());
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-
+    ClusterTester tester(cluster, &testContext);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
