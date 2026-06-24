@@ -84,7 +84,7 @@ public:
                 0,                                // onOffTransitionTime
                 DataModel::Nullable<uint16_t>(0), // onTransitionTime
                 DataModel::Nullable<uint16_t>(0), // offTransitionTime
-                std::nullopt,                     // defaultMoveRate
+                DataModel::Nullable<uint8_t>(),   // defaultMoveRate
                 DataModel::Nullable<uint8_t>()    // startUpCurrentLevel
             };
         }
