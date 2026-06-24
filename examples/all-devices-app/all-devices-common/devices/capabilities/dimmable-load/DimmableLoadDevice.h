@@ -65,17 +65,28 @@ public:
         // Optional LevelControl transition attributes.
         // We use std::optional to represent support (presence of the attribute on the endpoint).
         // For nullable attributes, we wrap DataModel::Nullable.
-        // Defaults are set to match the global CI PICS (present with value 0 or null) out-of-the-box.
-        std::optional<uint16_t> onOffTransitionTime                    = 0;
-        std::optional<DataModel::Nullable<uint16_t>> onTransitionTime  = DataModel::Nullable<uint16_t>(0);
-        std::optional<DataModel::Nullable<uint16_t>> offTransitionTime = DataModel::Nullable<uint16_t>(0);
-        std::optional<DataModel::Nullable<uint8_t>> defaultMoveRate    = DataModel::Nullable<uint8_t>(); // Null by default
+        // By default, a default-constructed LevelControlConfig has all optionals set to std::nullopt (unsupported).
+        std::optional<uint16_t> onOffTransitionTime;
+        std::optional<DataModel::Nullable<uint16_t>> onTransitionTime;
+        std::optional<DataModel::Nullable<uint16_t>> offTransitionTime;
+        std::optional<DataModel::Nullable<uint8_t>> defaultMoveRate;
 
         // Optional LevelControl bounds and startup settings.
-        // Default startup level is present and null, which enables the Lighting feature by default (spec compliant).
-        std::optional<DataModel::Nullable<uint8_t>> startUpCurrentLevel = DataModel::Nullable<uint8_t>(); // Null by default
+        std::optional<DataModel::Nullable<uint8_t>> startUpCurrentLevel;
         std::optional<uint8_t> minLevel;
         std::optional<uint8_t> maxLevel;
+
+        /// Returns a LevelControlConfig populated with the specific overrides required
+        /// to satisfy the global CI PICS tests (present with value 0 or null).
+        static constexpr LevelControlConfig CiPicsDefaults()
+        {
+            LevelControlConfig config;
+            config.onOffTransitionTime = 0;
+            config.onTransitionTime    = DataModel::Nullable<uint16_t>(0);
+            config.offTransitionTime   = DataModel::Nullable<uint16_t>(0);
+            config.startUpCurrentLevel = DataModel::Nullable<uint8_t>(); // Present and Null
+            return config;
+        }
     };
 
     struct Config

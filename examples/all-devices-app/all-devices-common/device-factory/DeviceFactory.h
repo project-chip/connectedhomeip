@@ -274,33 +274,45 @@ private:
         {
             RegisterCreator("dimmable-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingDimmableLightDevice>(LoggingDimmableLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                return std::make_unique<LoggingDimmableLightDevice>(
+                    LoggingDimmableLightDevice::Context{
+                        .groupDataProvider = mContext->groupDataProvider,
+                        .fabricTable       = mContext->fabricTable,
+                        .timerDelegate     = mContext->timerDelegate,
+                    },
+                    DimmableLoadDevice::Config{
+                        .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults()
+                    });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_PLUG_IN_UNIT)
         {
             RegisterCreator("dimmable-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<DimmablePlugInUnitDevice>(LoggingDimmableLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                return std::make_unique<DimmablePlugInUnitDevice>(
+                    LoggingDimmableLightDevice::Context{
+                        .groupDataProvider = mContext->groupDataProvider,
+                        .fabricTable       = mContext->fabricTable,
+                        .timerDelegate     = mContext->timerDelegate,
+                    },
+                    DimmableLoadDevice::Config{
+                        .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults()
+                    });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
         {
             RegisterCreator("mounted-dimmable-load-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<MountedDimmableLoadControlDevice>(LoggingDimmableLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                return std::make_unique<MountedDimmableLoadControlDevice>(
+                    LoggingDimmableLightDevice::Context{
+                        .groupDataProvider = mContext->groupDataProvider,
+                        .fabricTable       = mContext->fabricTable,
+                        .timerDelegate     = mContext->timerDelegate,
+                    },
+                    DimmableLoadDevice::Config{
+                        .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults()
+                    });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
