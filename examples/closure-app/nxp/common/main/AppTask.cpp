@@ -89,6 +89,11 @@ void ClosureApp::AppTask::PreInitMatterStack()
 
 void ClosureApp::AppTask::PostInitMatterStack()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#ifdef APP_BT_DEVICE_NAME
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(APP_BT_DEVICE_NAME);
+#endif
+#endif
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 }
 
