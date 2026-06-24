@@ -207,9 +207,9 @@ device types. When an endpoint is specified, it represents the starting number.
 
 ## Commissioning Proxy cluster
 
-This example supports the Commissioning Proxy cluster
-as the `commissioning-proxy` device type, with the `MA-commissioning-by-proxy`
-device type. It is enabled by `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY` in
+This example supports the Commissioning Proxy cluster as the
+`commissioning-proxy` device type, with the `MA-commissioning-by-proxy` device
+type. It is enabled by `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY` in
 `posix/include/CHIPProjectAppConfig.h` and lets the app act as a commissioning
 proxy over WiFi-PAF and/or BLE.
 
@@ -224,7 +224,6 @@ The compiled in transport(s) follow this build configuration:
 
 `ProxyScanRequest` and the proxy connect/message/disconnect flow work over
 whichever transport(s) are compiled in.
-
 
 The `-no-ble` build variants disables the BLE transport. To build with both BLE
 and WiFi-PAF on Linux x86-64 run:

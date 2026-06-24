@@ -198,8 +198,8 @@ Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
 
 BitMask<Clusters::CommissioningProxy::Feature> gCPFeatures(Clusters::CommissioningProxy::Feature::kBackgroundScan
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                          ,
-                                                          Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
+                                                           ,
+                                                           Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 );
 

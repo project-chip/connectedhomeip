@@ -26,8 +26,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <app_options/AppOptions.h>
-#include <platform/Linux/ConnectivityManagerImpl.h>
 #include <cstring>
+#include <platform/Linux/ConnectivityManagerImpl.h>
 #endif
 
 using namespace chip::app::Clusters::CommissioningProxy;

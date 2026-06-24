@@ -55,7 +55,7 @@ struct Key
 struct Entry
 {
     bool hasAddress = false;
-   std::vector<uint8_t> address;
+    std::vector<uint8_t> address;
     chip::BitMask<CapabilitiesBitmap> transport{};
     uint16_t discriminator  = 0;
     chip::VendorId vendorID = static_cast<chip::VendorId>(0);

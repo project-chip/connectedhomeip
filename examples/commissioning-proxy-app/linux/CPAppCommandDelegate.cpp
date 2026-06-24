@@ -133,8 +133,7 @@ void CPAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
         Server::GetInstance().GenerateShutDownEvent();
         // Reboot path: schedule the event-loop stop. There is no recovery if either
         // schedule fails (the process is already shutting down), so safely ignored.
-        RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork(
-            [](intptr_t) { RETURN_SAFELY_IGNORED PlatformMgr().StopEventLoopTask(); });
+        RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { RETURN_SAFELY_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
