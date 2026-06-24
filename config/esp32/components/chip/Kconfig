@@ -917,19 +917,24 @@ menu "CHIP Device Layer"
                 then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
 
-        config USE_ESP32_TEE_SECURE_STORAGE
-            bool "Use ESP32 TEE Secure Storage"
-            depends on SEC_CERT_DAC_PROVIDER && SECURE_ENABLE_TEE && !ESP_SECURE_CERT_DS_PERIPHERAL
-            select MBEDTLS_TEE_SEC_STG_ECDSA_SIGN
+        config USE_ESP32_TEE_DAC_KEY_PBKDF2
+            bool "Derive and sign with the DAC key inside ESP-TEE (HMAC + PBKDF2)"
+            depends on SEC_CERT_DAC_PROVIDER && SECURE_ENABLE_TEE && SOC_HMAC_SUPPORTED
             default n
             help
-                Enable this to store the Device Attestation Certificate (DAC) private key in the
-                ESP-TEE secure storage and perform all signing operations that use the DAC private
-                key (e.g. signing the attestation challenge during commissioning) inside the TEE.
-                The private key never leaves the secure world and is not exposed to the application.
+                On SoCs with an HMAC peripheral (e.g. ESP32-C6/H2/C5), derive the Device
+                Attestation Certificate (DAC) private key at runtime inside ESP-TEE using
+                PBKDF2-HMAC-SHA256 (the HMAC peripheral together with the eFuse HMAC key
+                selected by the TEE) and perform the attestation signing entirely within
+                the secure world. The private key is never stored in flash and is never
+                exposed to the application (REE).
 
-                The DAC and PAI certificates are still read from the esp_secure_cert partition.
-                ESP_SECURE_CERT_DS_PERIPHERAL must be disabled for this option to take effect.
+                The PBKDF2 salt is the device's Spake2p salt read from the factory
+                partition, so the manufacturing tool must derive the matching DAC public
+                key using the same salt. The DAC and PAI certificates are still read from
+                the esp_secure_cert partition.
+
+                When this is enabled, disable USE_ESP32_ECDSA_PERIPHERAL.
 
         config ENABLE_SET_CERT_DECLARATION_API
             depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER || SEC_CERT_DAC_PROVIDER
