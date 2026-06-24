@@ -524,7 +524,8 @@ void JsonBackend::OutputValue(::Json::Value & value)
                 while (offset < line.size())
                 {
                     size_t slice_size = std::min(kMaxLogLineLength, static_cast<size_t>(line.size() - offset));
-                    ChipLogProgress(Automation, "%s", StringBuilder<kMaxLogLineLength+1>(line.SubSpan(offset, slice_size)).c_str());
+                    ChipLogProgress(Automation, "%s",
+                                    StringBuilder<kMaxLogLineLength + 1>(line.SubSpan(offset, slice_size)).c_str());
                     offset += slice_size;
                 }
             }
