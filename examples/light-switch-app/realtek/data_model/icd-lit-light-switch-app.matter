@@ -2394,7 +2394,7 @@ cluster IcdManagement = 70 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2739,7 +2739,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflightswitch = 259, version 3;
+  device type ma_onofflightswitch = 259, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;

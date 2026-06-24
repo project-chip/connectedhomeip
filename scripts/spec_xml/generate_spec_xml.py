@@ -47,6 +47,8 @@ except ModuleNotFoundError:
 
 CURRENT_IN_PROGRESS_DEFINES = [
     "groupcast",
+    "ambientcontextsensing_161",
+    "chime-speaker-tcr",
 ]
 
 
