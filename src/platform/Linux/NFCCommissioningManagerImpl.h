@@ -122,8 +122,8 @@ struct SyncWorkContext
 // Work types handled by the processing thread
 enum class NfcWorkType
 {
-    kScan,      // Scan every NFC Readers
-    kSend,      // Send NFC commands to a Card
+    kScan, // Scan every NFC Readers
+    kSend, // Send NFC commands to a Card
 };
 
 // Work item processed by the NFC worker thread.
@@ -168,8 +168,7 @@ public:
 
     bool FindTagMatchingIdentifier(const Nfc::NFCTag::Identifier & tagIdentifier) override;
 
-    CHIP_ERROR SendMessage(System::PacketBufferHandle && message,
-                           const Nfc::NFCTag::Identifier & tagIdentifier,
+    CHIP_ERROR SendMessage(System::PacketBufferHandle && message, const Nfc::NFCTag::Identifier & tagIdentifier,
                            std::function<void(System::PacketBufferHandle &&, CHIP_ERROR)> onResponse) override
     {
         static_cast<void>(message);
@@ -229,7 +228,7 @@ private:
     // its initialization, including PC/SC context creation.
     std::mutex mWorkerInitMutex;
     std::condition_variable mWorkerInitCondition;
-    bool mWorkerInitCompleted = false;
+    bool mWorkerInitCompleted    = false;
     CHIP_ERROR mWorkerInitResult = CHIP_ERROR_INCORRECT_STATE;
 
     // NFCReaderTransport state

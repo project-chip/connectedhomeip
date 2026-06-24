@@ -59,8 +59,8 @@ from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
-from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
-                                          commission_device, get_setup_payload_info_config)
+from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_device,
+                                          commission_devices, get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
@@ -2155,7 +2155,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self._dut_confirmed_available = True
         return result
 
-    async def commission_ntl_device(self, setup_payload:SetupPayload) -> bool:
+    async def commission_ntl_device(self, setup_payload: SetupPayload) -> bool:
         """Commission a single DUT devices over NTL.
         The discovery_cap_bitmask is patched to keep only the NTL bit ON.
 
