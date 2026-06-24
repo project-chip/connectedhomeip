@@ -22,6 +22,7 @@
 #include <devices/aggregator/AggregatorDevice.h>
 #include <devices/air-purifier/impl/LoggingAirPurifierDevice.h>
 #include <devices/air-quality-sensor/AirQualitySensorDevice.h>
+#include <devices/ambient-context-sensor/impl/LoggingAmbientContextSensorDevice.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/bridged-node/BridgedNodeDevice.h>
 #include <devices/chime/ChimeDevice.h>
@@ -203,6 +204,13 @@ private:
                                 .unit      = MeasurementUnitEnum::kPpm,
                             },
                     });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)
+        {
+            RegisterCreator("ambient-context-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return std::make_unique<Clusters::AmbientContextSensing::LoggingAmbientContextSensorDevice>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
