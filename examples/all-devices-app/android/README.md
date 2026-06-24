@@ -143,17 +143,15 @@ the target leaf device to endpoint ID `n + 1`.
 
 ## Testing and Commissioning
 
-You can commission and test the simulator application in two ways:
+You can commission and test the simulator application natively:
 
-1. **In-Device Commissioning (Recommended):** Run both the simulator app and the
+1. **In-Device Commissioning:** Run both the simulator app and the
    Android `CHIPTool` controller app together on the emulator, communicating
    natively via loopback.
-2. **Host-to-Device Commissioning:** Run the simulator on the emulator, and
-   commission it from your Linux host terminal using the C++ `chip-tool` binary.
 
 ---
 
-### Option A: In-Device Commissioning (Recommended)
+### In-Device Commissioning
 
 Since both the controller (`CHIPTool`) and responder (`AllDevicesApp`) run
 within the same emulator system, they can communicate directly over loopback
@@ -199,46 +197,3 @@ adb install -r out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk
     ```
     ChimeDevice: Playing sound Ring Ring
     ```
-
----
-
-### Option B: Host-to-Device Commissioning
-
-To pair the simulator running inside the emulator from a `chip-tool` binary
-running on your host machine, you must configure port redirection.
-
-#### 1. Build host `chip-tool`
-
-```bash
-./scripts/build/build_examples.py --target linux-x64-chip-tool-clang build
-```
-
-#### 2. Set Up Port Redirection
-
-Forward the UDP port `5540` from your host to the emulator instance:
-
-```bash
-# Get emulator auth token:
-cat ~/.emulator_console_auth_token
-
-# Connect to emulator console and add redirection:
-telnet localhost 5554
-auth <auth_token>
-redir add udp:5540:5540
-exit
-```
-
-#### 3. Pair the Simulator
-
-Run the simulator app, check **chime**, and tap **Start Server**. Then run:
-
-```bash
-CHIP_TOOL_ADDRESS_OVERRIDE=127.0.0.1:5540 ./out/linux-x64-chip-tool-clang/chip-tool pairing already-discovered 1234 20202021 127.0.0.1 5540
-```
-
-#### 4. Send Commands
-
-```bash
-# Non-Bridged Mode (Endpoint 1):
-CHIP_TOOL_ADDRESS_OVERRIDE=127.0.0.1:5540 ./out/linux-x64-chip-tool-clang/chip-tool chime play-chime-sound 1234 1
-```
