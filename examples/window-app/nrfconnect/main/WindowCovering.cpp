@@ -64,7 +64,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     current = wc->GetCurrentPositionLiftPercent100ths();
     target  = wc->GetTargetPositionLiftPercent100ths();
 
-    OperationalState state = wc->ComputeOperationalState(target, current);
+    OperationalState state = ComputeOperationalState(target, current);
     UpdateOperationalStatus(MoveType::LIFT, state);
 
     chip::Percent100ths position = CalculateNextPosition(MoveType::LIFT);
@@ -97,7 +97,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     else
     {
         // the OperationalStatus should indicate no-lift-movement after the target is completed
-        UpdateOperationalStatus(MoveType::LIFT, wc->ComputeOperationalState(target, current));
+        UpdateOperationalStatus(MoveType::LIFT, ComputeOperationalState(target, current));
     }
 }
 
@@ -185,7 +185,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     current = wc->GetCurrentPositionTiltPercent100ths();
     target  = wc->GetTargetPositionTiltPercent100ths();
 
-    OperationalState state = wc->ComputeOperationalState(target, current);
+    OperationalState state = ComputeOperationalState(target, current);
     UpdateOperationalStatus(MoveType::TILT, state);
 
     chip::Percent100ths position = CalculateNextPosition(MoveType::TILT);
@@ -223,7 +223,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     else
     {
         // the OperationalStatus should indicate no-tilt-movement after the target is completed
-        UpdateOperationalStatus(MoveType::TILT, wc->ComputeOperationalState(target, current));
+        UpdateOperationalStatus(MoveType::TILT, ComputeOperationalState(target, current));
     }
 }
 

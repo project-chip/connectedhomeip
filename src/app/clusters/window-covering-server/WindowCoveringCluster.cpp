@@ -511,63 +511,6 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
     return true;
 }
 
-OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
-{
-    OperationalState opState = OperationalState::Stall;
-
-    if (current != target)
-    {
-        opState = (current < target) ? OperationalState::MovingDownOrClose : OperationalState::MovingUpOrOpen;
-    }
-    return opState;
-}
-
-OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current)
-{
-    if (!current.IsNull() && !target.IsNull())
-    {
-        return ComputeOperationalState(target.Value(), current.Value());
-    }
-    return OperationalState::Stall;
-}
-
-Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta)
-{
-    Percent100ths percent100ths = previous;
-
-    switch (direction)
-    {
-    case OperationalState::MovingDownOrClose:
-        if (percent100ths < (kWcPercent100thsMaxClosed - delta))
-        {
-            percent100ths = static_cast<Percent100ths>(percent100ths + delta);
-        }
-        else
-        {
-            percent100ths = kWcPercent100thsMaxClosed;
-        }
-        break;
-    case OperationalState::MovingUpOrOpen:
-        if (percent100ths > (kWcPercent100thsMinOpen + delta))
-        {
-            percent100ths = static_cast<Percent100ths>(percent100ths - delta);
-        }
-        else
-        {
-            percent100ths = kWcPercent100thsMinOpen;
-        }
-        break;
-    default:
-        // nothing to do we keep previous value, simple passthrought
-        break;
-    }
-
-    if (percent100ths > kWcPercent100thsMaxClosed)
-        return kWcPercent100thsMaxClosed;
-
-    return percent100ths;
-}
-
 std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOpen()
 {
     ChipLogProgress(Zcl, "UpOrOpen command received");
