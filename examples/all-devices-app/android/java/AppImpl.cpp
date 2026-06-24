@@ -29,6 +29,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <devices/root-node/RootNodeDevice.h>
+#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -137,6 +138,8 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    DynamicEndpointIdAllocator endpointIdAllocator;
+
     if (root.isArray())
     {
         for (unsigned int i = 0; i < root.size(); i++)
@@ -154,8 +157,6 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
                 continue;
             }
 
-            EndpointId parentEndpoint = (parentId > 0) ? static_cast<EndpointId>(parentId) : kInvalidEndpointId;
-
             if (bridged && deviceType != "bridged-node")
             {
                 // Create intermediate bridged-node parent
@@ -167,7 +168,8 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
                 }
 
                 ChipLogProgress(AppServer, "Registering intermediate bridged-node on endpoint %u (parent: %d)", endpointId, parentId);
-                ReturnErrorOnFailure(bridgedNode->Register(static_cast<EndpointId>(endpointId), dataModelProvider, parentEndpoint));
+                endpointIdAllocator.ForceNext(static_cast<EndpointId>(endpointId));
+                ReturnErrorOnFailure(bridgedNode->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(static_cast<EndpointId>(parentId))));
                 gConstructedDevices.push_back(std::move(bridgedNode));
 
                 // Create leaf device parented to the bridged-node endpoint
@@ -179,7 +181,8 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
                 }
 
                 ChipLogProgress(AppServer, "Registering bridged leaf device %s on endpoint %u (parent: %u)", deviceType.c_str(), endpointId + 1, endpointId);
-                ReturnErrorOnFailure(leafDevice->Register(static_cast<EndpointId>(endpointId + 1), dataModelProvider, static_cast<EndpointId>(endpointId)));
+                endpointIdAllocator.ForceNext(static_cast<EndpointId>(endpointId + 1));
+                ReturnErrorOnFailure(leafDevice->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(static_cast<EndpointId>(endpointId))));
                 gConstructedDevices.push_back(std::move(leafDevice));
             }
             else
@@ -192,7 +195,8 @@ CHIP_ERROR AllDevicesAppStart(const std::string & configurationJson)
                 }
 
                 ChipLogProgress(AppServer, "Registering device %s on endpoint %u (parent: %d)", deviceType.c_str(), endpointId, parentId);
-                ReturnErrorOnFailure(device->Register(static_cast<EndpointId>(endpointId), dataModelProvider, parentEndpoint));
+                endpointIdAllocator.ForceNext(static_cast<EndpointId>(endpointId));
+                ReturnErrorOnFailure(device->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(static_cast<EndpointId>(parentId))));
                 gConstructedDevices.push_back(std::move(device));
             }
         }

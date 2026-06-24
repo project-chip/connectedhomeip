@@ -113,6 +113,7 @@ JNI_METHOD(jboolean, startApp)(JNIEnv * env, jobject self, jstring configuration
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to start AllDevicesApp: %" CHIP_ERROR_FORMAT, err.Format());
+        AllDevicesAppShutdown();
         return JNI_FALSE;
     }
 

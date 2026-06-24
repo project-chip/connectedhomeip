@@ -18,6 +18,8 @@
 package com.google.matter.alldevices;
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.widget.Toast
@@ -95,40 +97,22 @@ class MainActivity : ComponentActivity() {
         onLogsUpdated: (String) -> Unit
     ): Pair<String, String>? {
         try {
-            // 1. Initialize Android platform managers
-            androidChipPlatform = AndroidChipPlatform(
-                null, // BLE manager disabled
-                null, // NFC manager disabled
-                PreferencesKeyValueStoreManager(applicationContext),
-                PreferencesConfigurationManager(applicationContext),
-                NsdManagerServiceResolver(applicationContext),
-                NsdManagerServiceBrowser(applicationContext),
-                ChipMdnsCallbackImpl(),
-                DiagnosticDataProviderImpl(applicationContext)
-            )
-
-            // 2. Set passcode (20202021) and custom discriminator
-            androidChipPlatform?.updateCommissionableDataProviderData(
-                null, // Use default Spake2p verifier
-                null, // Use default Spake2p salt
-                0,    // Use default Spake2p iteration count
-                20202021L,
-                discriminator
-            )
-
-            // 3. Start C++ Matter stack and register chosen code-driven devices
-            val success = App.getInstance().startApp(configurationJson)
-            if (!success) {
-                Toast.makeText(this, "Failed to start Matter app", Toast.LENGTH_LONG).show()
-                return null
+            val intent = Intent(this, MatterServerService::class.java).apply {
+                putExtra("discriminator", discriminator)
+                putExtra("configurationJson", configurationJson)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
             }
 
-            // 4. Generate Manual Setup Code and QR Code payloads via JNI
+            // Generate Manual Setup Code and QR Code payloads via JNI
             val codes = App.getInstance().getOnboardingCodes(discriminator)
             val manualCode = codes[0]
             val qrCode = codes[1]
 
-            // 5. Start streaming logs in real time
+            // Start streaming logs in real time
             startLogging(onLogsUpdated)
 
             return Pair(manualCode, qrCode)
@@ -141,7 +125,8 @@ class MainActivity : ComponentActivity() {
     private fun stopServer() {
         logcatProcess?.destroy()
         logcatProcess = null
-        App.getInstance().stopApp()
+        val intent = Intent(this, MatterServerService::class.java)
+        stopService(intent)
     }
 
     private fun factoryReset() {

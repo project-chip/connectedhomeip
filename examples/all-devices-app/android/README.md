@@ -105,52 +105,83 @@ The native parser parses this payload and registers intermediate `bridged-node` 
 
 ---
 
-## Testing with `chip-tool`
+## Testing and Commissioning
 
-You can commission and test the simulator application against the Matter interactive command-line tool `chip-tool`.
+You can commission and test the simulator application in two ways:
+1. **In-Device Commissioning (Recommended):** Run both the simulator app and the Android `CHIPTool` controller app together on the emulator, communicating natively via loopback.
+2. **Host-to-Device Commissioning:** Run the simulator on the emulator, and commission it from your Linux host terminal using the C++ `chip-tool` binary.
 
-### 1. Build `chip-tool`
-If you haven't built `chip-tool` on your host platform yet, compile it:
+---
 
+### Option A: In-Device Commissioning (Recommended)
+
+Since both the controller (`CHIPTool`) and responder (`AllDevicesApp`) run within the same emulator system, they can communicate directly over loopback (`127.0.0.1`) without any network bridging or port forwarding workarounds.
+
+#### 1. Build and Install CHIPTool
+Compile the Android `CHIPTool` app and install it on your emulator:
+```bash
+# Build CHIPTool APK inside container:
+./scripts/build/build_examples.py --target android-x64-chip-tool build
+
+# Install on emulator:
+adb install -r out/android-x64-chip-tool/outputs/apk/debug/app-debug.apk
+```
+
+#### 2. Pair the Devices
+1. Start the **AllDevicesApp** simulator. Check the desired device types (e.g. **chime**) and tap **Start Server**.
+2. Open the **CHIPTool** app.
+3. Tap **PROVISION CHIP DEVICE WITH WI-FI**.
+4. Tap **INPUT DEVICE ADDRESS** (in the top right).
+5. Type `127.0.0.1` into the **Device address** field. Leave other default settings (Discriminator: `3840`, Pincode: `20202021`, Port: `5540`) as they are.
+6. Tap **COMMISSION**. Once pairing finishes, you will be redirected back to the main menu.
+
+#### 3. Send Commands
+1. In **CHIPTool**, tap **CLUSTER INTERACTION TOOL**.
+2. Select the commissioned Node ID (typically `6`) from the **Commissioned Device ID** dropdown.
+3. Tap **RETRIEVE ENDPOINT LIST**.
+4. Tap **Endpoint 1** (our chime endpoint).
+5. In the **Select a cluster** dropdown, select **chime**.
+6. In the **Select a command** dropdown, select **playChimeSound**.
+7. Enter `1` (or desired index) in the **chimeID** parameter field, and tap **INVOKE**.
+8. Verify the simulator log view or `adb logcat` output:
+   ```
+   ChimeDevice: Playing sound Ring Ring
+   ```
+
+---
+
+### Option B: Host-to-Device Commissioning
+
+To pair the simulator running inside the emulator from a `chip-tool` binary running on your host machine, you must configure port redirection.
+
+#### 1. Build host `chip-tool`
 ```bash
 ./scripts/build/build_examples.py --target linux-x64-chip-tool-clang build
 ```
 
-### 2. Commission the Android Simulator
-1. Start the simulator on the emulator or device.
-2. Select the devices you wish to simulate and optionally check **Bridge Mode**.
-3. Tap **Start Server** and navigate to the **Onboarding** tab to get the **Manual Pairing Code** (e.g., `34970112332`).
-4. Commission the device from your host using the `pairing code` command:
-
+#### 2. Set Up Port Redirection
+Forward the UDP port `5540` from your host to the emulator instance:
 ```bash
-# Node ID: 1234, Pairing Code: 34970112332
-./out/linux-x64-chip-tool-clang/chip-tool pairing code 1234 34970112332
+# Get emulator auth token:
+cat ~/.emulator_console_auth_token
+
+# Connect to emulator console and add redirection:
+telnet localhost 5554
+auth <auth_token>
+redir add udp:5540:5540
+exit
 ```
 
-### 3. Send Commands (e.g. Chime Device)
-If you simulated a **Chime** device:
-
-* **Non-Bridged Mode:**
-  The chime device will be registered directly under Endpoint 1:
-
-  ```bash
-  # Send play-chime-sound to chime on Node 1234, Endpoint 1
-  ./out/linux-x64-chip-tool-clang/chip-tool chime play-chime-sound 1234 1
-  ```
-
-* **Bridge Mode:**
-  The aggregator resides on Endpoint 1, the intermediate `bridged-node` on Endpoint 2, and the chime device is nested under Endpoint 3:
-
-  ```bash
-  # Send play-chime-sound to chime on Node 1234, Endpoint 3
-  ./out/linux-x64-chip-tool-clang/chip-tool chime play-chime-sound 1234 3
-  ```
-
-### 4. Verify Logs
-Navigate to the **Logs** tab on the running server screen. You should see incoming Interaction Model commands and action logs (such as chime sound ding-dong feedback):
-
+#### 3. Pair the Simulator
+Run the simulator app, check **chime**, and tap **Start Server**. Then run:
+```bash
+CHIP_TOOL_ADDRESS_OVERRIDE=127.0.0.1:5540 ./out/linux-x64-chip-tool-clang/chip-tool pairing already-discovered 1234 20202021 127.0.0.1 5540
 ```
-06-23 22:50:00.123 I/SVR: PlayChimeSound command received
-06-23 22:50:00.124 I/SVR: Ding Dong! Play chime sound command received...
+
+#### 4. Send Commands
+```bash
+# Non-Bridged Mode (Endpoint 1):
+CHIP_TOOL_ADDRESS_OVERRIDE=127.0.0.1:5540 ./out/linux-x64-chip-tool-clang/chip-tool chime play-chime-sound 1234 1
 ```
+
 
