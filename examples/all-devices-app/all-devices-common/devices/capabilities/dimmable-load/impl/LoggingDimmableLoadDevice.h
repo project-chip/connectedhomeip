@@ -27,23 +27,8 @@ namespace chip {
 namespace app {
 
 /**
- * A simulator-friendly implementation of a DimmableLoadDevice that provides
- * automatic terminal logging for all cluster state transitions and operations.
- *
- * Beyond logging, this class implements the "Delegate Injection" pattern. It allows
- * the simulator or test harness to intercept and customize specific cluster behaviors
- * by passing custom delegate pointers in the constructor. If a custom delegate is
- * provided, cluster actions are forwarded to it; otherwise, they fall back to the
- * internal logging implementations.
- *
- * This enables:
- *   1. Out-of-the-box visibility into device state changes via terminal logs.
- *   2. Easy integration with hardware drivers or automated test mocks by injecting
- *      custom delegates for only the clusters of interest, without having to re-implement
- *      the entire device.
- *
- * It is intended as a base class for logging leaf simulator devices like
- * LoggingDimmableLightDevice, DimmablePlugInUnitDevice, and MountedDimmableLoadControlDevice.
+ * Concrete implementation of DimmableLoadDevice that logs all cluster state transitions
+ * and operations, with support for custom delegate injection.
  */
 class LoggingDimmableLoadDevice : public DimmableLoadDevice,
                                   public Clusters::OnOffDelegate,

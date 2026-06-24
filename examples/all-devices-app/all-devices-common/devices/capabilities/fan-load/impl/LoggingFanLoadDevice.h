@@ -24,16 +24,8 @@ namespace chip {
 namespace app {
 
 /**
- * A simulator-friendly implementation of a FanLoadDevice that provides
- * automatic terminal logging for all fan and power state transitions.
- *
- * Supports the "Delegate Injection" pattern, allowing the simulator or test harness
- * to inject custom delegate pointers (FanControl, OnOff) in the constructor
- * to override default behaviors, falling back to internal logging for any delegates
- * left as nullptr.
- *
- * This is intended as a base class for logging leaf simulator devices like
- * LoggingFanDevice, AirPurifierDevice, and ExtractorHoodDevice.
+ * Concrete implementation of FanLoadDevice that logs all fan and power state
+ * transitions, with support for custom delegate injection.
  */
 class LoggingFanLoadDevice : public FanLoadDevice, public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate
 {
