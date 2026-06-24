@@ -26,6 +26,18 @@ class S200KeyAllocator : public chip::Crypto::DefaultPSAKeyAllocator
 public:
     void UpdateKeyAttributes(psa_key_attributes_t & attrs) override
     {
+
+        using namespace chip::Crypto;
+
+        if (psa_get_key_id(&attrs) >= to_underlying(KeyIdBase::ICDKeyRangeStart) &&
+            psa_get_key_id(&attrs) < to_underlying(KeyIdBase::ICDKeyRangeStart) + kMaxICDClientKeys)
+        {
+            /* workaround until https://jira.sw.nxp.com/browse/MATTER4002 is fixed
+             * for now, do not use NON_EL2GO storage for ICD keys,
+             * otherwise psa_copy_key will fail */
+            return;
+        }
+
         if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
         {
             psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
