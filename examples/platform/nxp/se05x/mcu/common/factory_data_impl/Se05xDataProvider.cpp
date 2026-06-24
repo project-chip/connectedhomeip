@@ -69,10 +69,7 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(uint8_t * buf, uint16_t b
         size_t buflen = sizeof(cert);
 
         err = se05x_get_certificate(kSpake2p_Pwd_Salt_Bin_File_id, cert, &buflen);
-        if (se05x_close_session() != CHIP_NO_ERROR)
-        {
-            ChipLogError(Crypto, "SE05x: Error in closing session");
-        }
+        se05x_close_session();
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         certLen = buflen;
