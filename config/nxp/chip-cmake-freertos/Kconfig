@@ -76,6 +76,7 @@ config CHIP_NXP_PLATFORM_FAMILY
 config CHIP_NXP_CRYPTO_IMPL
 	string "NXP Crypto Implementation chosen"
 	default "se05x" if CHIP_SE05X
+	default "psa" if CHIP_CRYPTO_PSA
 	default ""
 	help
 		Defines crypto implementation to be used

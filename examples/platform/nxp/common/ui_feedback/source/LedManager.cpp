@@ -93,6 +93,7 @@ void LedManager::RestoreState()
     /* restore initial state for the LED indicating Lighting state */
     lightLed.Set(false);
 
+    TEMPORARY_RETURN_IGNORED
     chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t arg) {
         bool val = false;
         val      = chip::NXP::App::GetAppTask().CheckStateClusterHandler();
