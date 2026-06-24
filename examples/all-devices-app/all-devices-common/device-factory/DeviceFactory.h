@@ -280,9 +280,7 @@ private:
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                     },
-                    DimmableLoadDevice::Config{
-                        .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults()
-                    });
+                    DimmableLoadDevice::Config{ .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_PLUG_IN_UNIT)
@@ -295,9 +293,7 @@ private:
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                     },
-                    DimmableLoadDevice::Config{
-                        .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults()
-                    });
+                    DimmableLoadDevice::Config{ .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
@@ -310,9 +306,7 @@ private:
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                     },
-                    DimmableLoadDevice::Config{
-                        .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults()
-                    });
+                    DimmableLoadDevice::Config{ .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
