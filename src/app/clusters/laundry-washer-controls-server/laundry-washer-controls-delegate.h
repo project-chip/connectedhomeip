@@ -40,7 +40,10 @@ public:
      *        the length to the length of the copied data.
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of spin speeds.
      */
-    virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) = 0;
+    virtual CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed)
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
 
     /**
      * Get the supported rinses value at the given index in the list.
@@ -48,19 +51,15 @@ public:
      * @param supportedRinse The supported rinse at the given index
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of supported rinses.
      */
-    virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
-};
-
-class DefaultDelegate : public Delegate
-{
-public:
-    CHIP_ERROR GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed) override
+    virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse)
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) override
+
+    static Delegate & DefaultInstance()
     {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        static Delegate defaultDelegate;
+        return defaultDelegate;
     }
 };
 

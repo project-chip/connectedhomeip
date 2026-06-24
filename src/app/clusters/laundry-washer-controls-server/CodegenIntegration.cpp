@@ -36,18 +36,23 @@ constexpr size_t kLaundryWasherControlsMaxClusterCount =
 
 LazyRegisteredServerCluster<LaundryWasherControlsCluster> gServers[kLaundryWasherControlsMaxClusterCount];
 
+// We will use this to be able to set some values got from `Accessors::GetDefault` functions without failing, since the cluster will
+// check the values to be valid using the delegate. After this the delegate will be set to the default delegate, which will make all subsequent `.Set*()` calls and write requests on the cluster to fail.
+// Which will enforces the user to set a custom delegate before using the cluster.
 struct AlwaysSuccessDelegate : public LaundryWasherControls::Delegate
 {
-    CHIP_ERROR GetSpinSpeedAtIndex(size_t, MutableCharSpan &) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetSupportedRinseAtIndex(size_t, NumberOfRinsesEnum &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetSpinSpeedAtIndex(size_t, MutableCharSpan & spinSpeed) override
+    {
+        spinSpeed.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetSupportedRinseAtIndex(size_t, NumberOfRinsesEnum & numberOfRinses) override
+    {
+        numberOfRinses = NumberOfRinsesEnum::kNone;
+        return CHIP_NO_ERROR;
+    }
 };
-
-// We will use this to be able to set some values got from `Accessors::GetDefault` functions without failing, since the cluster will
-// check the values to be valid using the delegate.
 AlwaysSuccessDelegate gAlwaysSuccessDelegate;
-
-// After the cluster is created, we will set the actual delegate back to the default one.
-DefaultDelegate gDefaultDelegate;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -55,8 +60,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         BitFlags<Feature> features(featureMap);
-        LaundryWasherControlsCluster::Config config(LaundryWasherControlsCluster::SupportFeatures(featureMap),
-                                                    gAlwaysSuccessDelegate);
+        LaundryWasherControlsCluster::Config config(features, gAlwaysSuccessDelegate);
 
         auto & server = gServers[clusterInstanceIndex];
         server.Create(endpointId, config);
@@ -82,7 +86,7 @@ class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 
         // Set the delegate to a default delegate, which will make all `.Set*()` calls and write requests on the cluster to fail.
         // This enforces the user to set a custom delegate before using the cluster.
-        server.Cluster().SetDelegate(gDefaultDelegate);
+        server.Cluster().SetDelegate(LaundryWasherControls::Delegate::DefaultInstance());
 
         return server.Registration();
     }
@@ -152,7 +156,9 @@ CHIP_ERROR SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_
 CHIP_ERROR GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
 {
     auto cluster = FindClusterOnEndpoint(endpointId);
-    return cluster != nullptr ? cluster->GetSpinSpeedCurrent(spinSpeedCurrent) : CHIP_ERROR_INVALID_ARGUMENT;
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    spinSpeedCurrent = cluster->GetSpinSpeedCurrent();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
@@ -164,7 +170,9 @@ CHIP_ERROR SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumber
 CHIP_ERROR GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
 {
     auto cluster = FindClusterOnEndpoint(endpointId);
-    return cluster != nullptr ? cluster->GetNumberOfRinses(numberOfRinses) : CHIP_ERROR_INVALID_ARGUMENT;
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    numberOfRinses = cluster->GetNumberOfRinses();
+    return CHIP_NO_ERROR;
 }
 
 } // namespace LaundryWasherControlsServer

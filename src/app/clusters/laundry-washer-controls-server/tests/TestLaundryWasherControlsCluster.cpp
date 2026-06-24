@@ -71,7 +71,7 @@ struct TestLaundryWasherControlsCluster : public ::testing::Test
     TestLaundryWasherControlsCluster() {}
 
     TestServerClusterContext testContext;
-    LaundryWasherControlsCluster::Config defaultConfig{ LaundryWasherControlsCluster::SupportFeatures::kSpinAndRinse, gDelegate };
+    LaundryWasherControlsCluster::Config testConfig{ BitFlags<Feature>(Feature::kSpin, Feature::kRinse), gDelegate };
     EndpointId kTestEndpointId = 1;
 };
 
@@ -80,7 +80,7 @@ struct TestLaundryWasherControlsCluster : public ::testing::Test
 TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
 {
     {
-        LaundryWasherControlsCluster cluster(kTestEndpointId, defaultConfig);
+        LaundryWasherControlsCluster cluster(kTestEndpointId, testConfig);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -95,7 +95,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
     }
 
     {
-        LaundryWasherControlsCluster::Config configOnlySpin{ LaundryWasherControlsCluster::SupportFeatures::kSpin, gDelegate };
+        LaundryWasherControlsCluster::Config configOnlySpin{ BitFlags<Feature>(Feature::kSpin), gDelegate };
         LaundryWasherControlsCluster cluster(kTestEndpointId, configOnlySpin);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -109,7 +109,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
     }
 
     {
-        LaundryWasherControlsCluster::Config configOnlyRinse{ LaundryWasherControlsCluster::SupportFeatures::kRinse, gDelegate };
+        LaundryWasherControlsCluster::Config configOnlyRinse{ BitFlags<Feature>(Feature::kRinse), gDelegate };
         LaundryWasherControlsCluster cluster(kTestEndpointId, configOnlyRinse);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -121,7 +121,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestAttributes)
 
 TEST_F(TestLaundryWasherControlsCluster, TestReadAttribute)
 {
-    LaundryWasherControlsCluster cluster(kTestEndpointId, defaultConfig);
+    LaundryWasherControlsCluster cluster(kTestEndpointId, testConfig);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -149,7 +149,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestReadAttribute)
 
 TEST_F(TestLaundryWasherControlsCluster, TestListAttributesRead)
 {
-    LaundryWasherControlsCluster cluster(kTestEndpointId, defaultConfig);
+    LaundryWasherControlsCluster cluster(kTestEndpointId, testConfig);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -195,7 +195,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestListAttributesRead)
 
 TEST_F(TestLaundryWasherControlsCluster, TestReadWriteAttributeAndBounds)
 {
-    LaundryWasherControlsCluster cluster(kTestEndpointId, defaultConfig);
+    LaundryWasherControlsCluster cluster(kTestEndpointId, testConfig);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -250,7 +250,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestReadWriteAttributeAndBounds)
 
 TEST_F(TestLaundryWasherControlsCluster, TestSettersAndGetters)
 {
-    LaundryWasherControlsCluster cluster(kTestEndpointId, defaultConfig);
+    LaundryWasherControlsCluster cluster(kTestEndpointId, testConfig);
 
     // spinSpeedCurrent
     for (size_t i = 0; i < MATTER_ARRAY_SIZE(kSpinSpeedOptions); ++i)
@@ -258,8 +258,7 @@ TEST_F(TestLaundryWasherControlsCluster, TestSettersAndGetters)
         EXPECT_EQ(cluster.SetSpinSpeedCurrent(i), CHIP_NO_ERROR);
     }
 
-    SpinSpeedCurrent::TypeInfo::DecodableType spinSpeedCurrent{};
-    EXPECT_EQ(cluster.GetSpinSpeedCurrent(spinSpeedCurrent), CHIP_NO_ERROR);
+    SpinSpeedCurrent::TypeInfo::DecodableType spinSpeedCurrent = cluster.GetSpinSpeedCurrent();
     EXPECT_EQ(spinSpeedCurrent, static_cast<uint8_t>(MATTER_ARRAY_SIZE(kSpinSpeedOptions) - 1));
     EXPECT_EQ(cluster.SetSpinSpeedCurrent(MATTER_ARRAY_SIZE(kSpinSpeedOptions)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
@@ -269,16 +268,15 @@ TEST_F(TestLaundryWasherControlsCluster, TestSettersAndGetters)
         EXPECT_EQ(cluster.SetNumberOfRinses(supportedRinse), CHIP_NO_ERROR);
     }
 
-    NumberOfRinses::TypeInfo::DecodableType numberOfRinses{};
-    EXPECT_EQ(cluster.GetNumberOfRinses(numberOfRinses), CHIP_NO_ERROR);
+    NumberOfRinses::TypeInfo::DecodableType numberOfRinses = cluster.GetNumberOfRinses();
     EXPECT_EQ(numberOfRinses, kSupportedRinsesOptions[MATTER_ARRAY_SIZE(kSupportedRinsesOptions) - 1]);
     EXPECT_EQ(cluster.SetNumberOfRinses(kInvalidRinsesOption), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 }
 
 TEST_F(TestLaundryWasherControlsCluster, TestSetDelegate)
 {
-    LaundryWasherControlsCluster::Config configWithDefautlDelegate{ LaundryWasherControlsCluster::SupportFeatures::kSpinAndRinse };
-    LaundryWasherControlsCluster cluster(kTestEndpointId, configWithDefautlDelegate);
+    LaundryWasherControlsCluster::Config configWithDefaultDelegate{ BitFlags<Feature>(Feature::kSpin, Feature::kRinse) };
+    LaundryWasherControlsCluster cluster(kTestEndpointId, configWithDefaultDelegate);
 
     // Default delegate returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED for all indexes, so writing any value should fail with error
     // besides `Null` for spinSpeeds.

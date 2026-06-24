@@ -33,23 +33,15 @@ class LaundryWasherControlsCluster : public DefaultServerCluster
 public:
     // Spec mandates that at least one of the features declared in LaundryWasherControls::Feature must be supported.
     // This encourages correct construction of the cluster when writing the code
-    enum class SupportFeatures
-    {
-        kSpin  = BitFlags<LaundryWasherControls::Feature>(LaundryWasherControls::Feature::kSpin).Raw(),
-        kRinse = BitFlags<LaundryWasherControls::Feature>(LaundryWasherControls::Feature::kRinse).Raw(),
-        kSpinAndRinse =
-            BitFlags<LaundryWasherControls::Feature>(LaundryWasherControls::Feature::kSpin, LaundryWasherControls::Feature::kRinse)
-                .Raw(),
-    };
 
     struct Config
     {
-        Config(SupportFeatures features, LaundryWasherControls::Delegate & delegate) :
-            mFeatures(static_cast<uint32_t>(features)), mDelegate(&delegate)
+        Config(BitFlags<LaundryWasherControls::Feature> features, LaundryWasherControls::Delegate & delegate) :
+            mFeatures(features), mDelegate(&delegate)
         {
-            VerifyOrDie(mFeatures != BitFlags<LaundryWasherControls::Feature>()); // At least one feature must be set.
+            VerifyOrDie(mFeatures.HasAny()); // At least one feature must be set.
         }
-        explicit Config(SupportFeatures features) : Config(features, defaultDelegate) {}
+        explicit Config(BitFlags<LaundryWasherControls::Feature> features) : Config(features, LaundryWasherControls::Delegate::DefaultInstance()) {}
 
         BitFlags<LaundryWasherControls::Feature> GetFeatures() const { return mFeatures; }
         LaundryWasherControls::Delegate * GetDelegate() const { return mDelegate; }
@@ -57,8 +49,6 @@ public:
     private:
         BitFlags<LaundryWasherControls::Feature> mFeatures;
         LaundryWasherControls::Delegate * mDelegate;
-
-        static inline LaundryWasherControls::DefaultDelegate defaultDelegate{};
     };
 
     LaundryWasherControlsCluster(EndpointId endpointId, const Config & config) :
@@ -77,8 +67,8 @@ public:
     void SetDelegate(LaundryWasherControls::Delegate & delegate) { mDelegate = &delegate; }
     CHIP_ERROR SetSpinSpeedCurrent(const DataModel::Nullable<uint8_t> & spinSpeedCurrent);
     CHIP_ERROR SetNumberOfRinses(LaundryWasherControls::NumberOfRinsesEnum numberOfRinses);
-    CHIP_ERROR GetSpinSpeedCurrent(DataModel::Nullable<uint8_t> & spinSpeedCurrent) const;
-    CHIP_ERROR GetNumberOfRinses(LaundryWasherControls::NumberOfRinsesEnum & numberOfRinses) const;
+    DataModel::Nullable<uint8_t> GetSpinSpeedCurrent() const { return mSpinSpeedCurrent; }
+    LaundryWasherControls::NumberOfRinsesEnum GetNumberOfRinses() const { return mNumberOfRinses; }
 
 private:
     CHIP_ERROR SpinSpeedIndexValidity(const DataModel::Nullable<uint8_t> & spinSpeedCurrent);

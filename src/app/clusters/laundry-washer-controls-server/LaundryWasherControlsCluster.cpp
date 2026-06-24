@@ -70,16 +70,12 @@ DataModel::ActionReturnStatus LaundryWasherControlsCluster::WriteAttribute(const
     case SpinSpeedCurrent::Id: {
         DataModel::Nullable<uint8_t> spinSpeedCurrent;
         ReturnErrorOnFailure(decoder.Decode(spinSpeedCurrent));
-        VerifyOrReturnError(SetSpinSpeedCurrent(spinSpeedCurrent) == CHIP_NO_ERROR,
-                            Protocols::InteractionModel::Status::ConstraintError);
-        return CHIP_NO_ERROR;
+        return SetSpinSpeedCurrent(spinSpeedCurrent);
     }
     case NumberOfRinses::Id: {
         NumberOfRinsesEnum numberOfRinses;
         ReturnErrorOnFailure(decoder.Decode(numberOfRinses));
-        VerifyOrReturnError(SetNumberOfRinses(numberOfRinses) == CHIP_NO_ERROR,
-                            Protocols::InteractionModel::Status::InvalidInState);
-        return CHIP_NO_ERROR;
+        return SetNumberOfRinses(numberOfRinses);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -104,7 +100,7 @@ CHIP_ERROR LaundryWasherControlsCluster::SetSpinSpeedCurrent(const DataModel::Nu
 {
     if (!mFeatures.Has(Feature::kSpin))
     {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
     ReturnErrorOnFailure(SpinSpeedIndexValidity(spinSpeedCurrent));
@@ -117,34 +113,12 @@ CHIP_ERROR LaundryWasherControlsCluster::SetNumberOfRinses(NumberOfRinsesEnum nu
 {
     if (!mFeatures.Has(Feature::kRinse))
     {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
     ReturnErrorOnFailure(NumberOfRinsesValidity(numberOfRinses));
 
     SetAttributeValue(mNumberOfRinses, numberOfRinses, NumberOfRinses::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LaundryWasherControlsCluster::GetSpinSpeedCurrent(DataModel::Nullable<uint8_t> & spinSpeedCurrent) const
-{
-    if (!mFeatures.Has(Feature::kSpin))
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
-    spinSpeedCurrent = mSpinSpeedCurrent;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LaundryWasherControlsCluster::GetNumberOfRinses(NumberOfRinsesEnum & numberOfRinses) const
-{
-    if (!mFeatures.Has(Feature::kRinse))
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
-    numberOfRinses = mNumberOfRinses;
     return CHIP_NO_ERROR;
 }
 
