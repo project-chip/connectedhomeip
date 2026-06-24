@@ -181,16 +181,15 @@ to SE05x:
 
 ### GN Build Options
 
-| GN Option                                 | Description                            | Type    | Default | SE05x objects needed                                  |
-| ----------------------------------------- | -------------------------------------- | ------- | ------- | ----------------------------------------------------- |
-| `chip_se05x_spake_verifier`               | SPAKE2+ verifier on SE                 | Boolean | false   | 0x7D200001(W0) and 0x7D200002(L) are created runtime. The default passcode, salt and iteration count from matter stack are used. |
-| `chip_se05x_spake_prover`                 | SPAKE2+ prover on SE                   | Boolean | false   | 0x7D200003(w0) and 0x7D200004(w1) are created runtime. The default passcode, salt and iteration count from matter stack are used. |
-| `chip_se05x_rnd_gen`                      | Random number generation               | Boolean | false   | Nothing needed                                        |
-| `chip_se05x_device_attestation`           | Device attestation                     | Boolean | false   | 0x7FFF3007(DA Key) and 0x7FFF3003 (DA Cert)           |
-| `chip_se05x_spake_verifier_use_tp_values` | SPAKE with trust provisioned verifiers | Boolean | false   | Uses Trust provisioned verifiers. Refer section below |
-| `chip_se05x_spake_verifier_tp_set_no`     | Trust provisioned passcode set number  | Integer | 1       | -                                                     |
-| `chip_se05x_spake_verifier_tp_iter_cnt`   | SPAKE iteration count                  | Integer | 1000    | -                                                     |
-
+| GN Option                                 | Description                            | Type    | Default |
+| ----------------------------------------- | -------------------------------------- | ------- | ------- |
+| `chip_se05x_spake_verifier`               | SPAKE2+ verifier on SE                 | Boolean | false   |
+| `chip_se05x_spake_prover`                 | SPAKE2+ prover on SE                   | Boolean | false   |
+| `chip_se05x_rnd_gen`                      | Random number generation               | Boolean | false   |
+| `chip_se05x_device_attestation`           | Device attestation                     | Boolean | false   |
+| `chip_se05x_spake_verifier_use_tp_values` | SPAKE with trust provisioned verifiers | Boolean | false   |
+| `chip_se05x_spake_verifier_tp_set_no`     | Trust provisioned passcode set number  | Integer | 1       |
+| `chip_se05x_spake_verifier_tp_iter_cnt`   | SPAKE iteration count                  | Integer | 1000    |
 
 **Example:**
 
@@ -198,45 +197,17 @@ to SE05x:
 gn gen out --args="chip_se05x_device_attestation=true"
 ```
 
-#### Objects Required for Using `chip_se05x_spake_verifier_use_tp_values` option,
-
-1. Passcode Object id - `0x7FFF2000`. Contains 3 set of passcode and salt values. Refer `Using Trust Provisioned Verifiers of SE051H for SPAKE2+` section below for more details.
-2. PBKDF Param id - `0x7FFF3002`. Required to specific which passcode set and Iteration to be used. Refer `third_party/simw-top-mini\demos\se051h_nfc_comm_prov\common\se051h_nfc_comm_prov.h` for more details.
-3. Based on passcode set and Iteration count below objects need to be provisioned / used from TP values.
-
-| Passcode set number and iteration count  | W0 and L Ids           |
-| ---------------------------------------- | -----------------------|
-| passcode Set no 1 and Iteration 1000     | 0x7FFF2011, 0x7FFF2021 |
-| passcode Set no 1 and Iteration 5000     | 0x7FFF2012, 0x7FFF2022 |
-| passcode Set no 1 and Iteration 10000    | 0x7FFF2013, 0x7FFF2023 |
-| passcode Set no 1 and Iteration 50000    | 0x7FFF2014, 0x7FFF2024 |
-| passcode Set no 1 and Iteration 100000   | 0x7FFF2015, 0x7FFF2025 |
-|                                          |                        |
-| passcode Set no 2 and Iteration 1000     | 0x7FFF2016, 0x7FFF2026 |
-| passcode Set no 2 and Iteration 5000     | 0x7FFF2017, 0x7FFF2027 |
-| passcode Set no 2 and Iteration 10000    | 0x7FFF2018, 0x7FFF2028 |
-| passcode Set no 2 and Iteration 50000    | 0x7FFF2019, 0x7FFF2029 |
-| passcode Set no 2 and Iteration 100000   | 0x7FFF201A, 0x7FFF202A |
-|                                          |                        |
-| passcode Set no 3 and Iteration 1000     | 0x7FFF201B, 0x7FFF202B |
-| passcode Set no 3 and Iteration 5000     | 0x7FFF201C, 0x7FFF202C |
-| passcode Set no 3 and Iteration 10000    | 0x7FFF201D, 0x7FFF202D |
-| passcode Set no 3 and Iteration 50000    | 0x7FFF201E, 0x7FFF202E |
-| passcode Set no 3 and Iteration 100000   | 0x7FFF201F, 0x7FFF202F |
-
-**Note:** - The Pass code, PBKDF, Verifier objects (only the first set of verifiers by default) can be updated / created using SE051H Provision example. Refer [SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/matter_1_6_se05x/demos/se051h_nfc_comm_prov/readme.md). The other set of verifiers can also be created / updated by modifying the example.
-
 ### CMake/Kconfig Options
 
-| Kconfig Option                                   | Description                            | Default | SE05x objects needed                                  |
-| ------------------------------------------------ | -------------------------------------- | ------- | ----------------------------------------------------- |
-| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER`               | SPAKE2+ verifier on SE                 | n       | 0x7D200001(w0) and 0x7D200002(L) are created runtime. The default passcode, salt and iteration count from matter stack are used. |
-| `CONFIG_CHIP_SE05X_SPAKE_PROVER`                 | SPAKE2+ prover on SE                   | n       | 0x7D200003(w0) and 0x7D200004(w1) are created runtime. The default passcode, salt and iteration count from matter stack are used. |
-| `CONFIG_CHIP_SE05X_RND_GEN`                      | Random number generation               | n       | Nothing needed                                        |
-| `CONFIG_CHIP_SE05X_DEVICE_ATTESTATION`           | Device attestation                     | n       | 0x7FFF3007(DA Key) and 0x7FFF3003 (DA Cert)           |
-| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES` | SPAKE with trust provisioned verifiers | n       | Uses Trust provisioned verifiers. Refer section above |
-| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO`     | Trust provisioned passcode set number  | 1       | -                                                     |
-| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT`   | SPAKE iteration count                  | 1000    | -                                                     |
+| Kconfig Option                                   | Description                            | Default |
+| ------------------------------------------------ | -------------------------------------- | ------- |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER`               | SPAKE2+ verifier on SE                 | n       |
+| `CONFIG_CHIP_SE05X_SPAKE_PROVER`                 | SPAKE2+ prover on SE                   | n       |
+| `CONFIG_CHIP_SE05X_RND_GEN`                      | Random number generation               | n       |
+| `CONFIG_CHIP_SE05X_DEVICE_ATTESTATION`           | Device attestation                     | n       |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES` | SPAKE with trust provisioned verifiers | n       |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO`     | Trust provisioned passcode set number  | 1       |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT`   | SPAKE iteration count                  | 1000    |
 
 **Example:**
 
@@ -324,7 +295,7 @@ ninja -C out se05x_dev_attest_key_prov
 > system.
 
 **Reference:**
-[SE05x Device Attestation Example](https://github.com/NXP/plug-and-trust/blob/int/matter_1_6_se05x/demos/se05x_dev_attest_key_prov/readme.md)
+[SE05x Device Attestation Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se05x_dev_attest_key_prov/readme.md)
 
 <a name="scp03"></a>
 
@@ -371,8 +342,8 @@ corresponding QR code to the T4T applet.
 
 **Build the tools:**
 
--   [SE051H Get Passcode Example](https://github.com/NXP/plug-and-trust/blob/int/matter_1_6_se05x/demos/se05x_get_passcode/readme.md)
--   [SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/matter_1_6_se05x/demos/se051h_nfc_comm_prov/readme.md)
+-   [SE051H Get Passcode Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se05x_get_passcode/readme.md)
+-   [SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/readme.md)
 
 **Execute the following commands:**
 
@@ -429,7 +400,7 @@ Provision the SE051H with necessary cryptographic objects using the provisioning
 example.
 
 **Reference:**
-[SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/matter_1_6_se05x/demos/se051h_nfc_comm_prov/readme.md)
+[SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/readme.md)
 
 ### Step 2: Read Passcode from SE051H
 
@@ -437,7 +408,7 @@ The SE051H contains a binary file with the passcode and salt required for NFC
 commissioning. Retrieve the passcode using the get-passcode example.
 
 **Reference:**
-[SE051H Get Passcode Example](https://github.com/NXP/plug-and-trust/blob/int/matter_1_6_se05x/demos/se05x_get_passcode/readme.md)
+[SE051H Get Passcode Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se05x_get_passcode/readme.md)
 
 ### Step 3: Build chip-tool with NFC Support
 
