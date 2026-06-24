@@ -34,7 +34,6 @@ CommandHandlerInterfaceOnlyClusters:
     - RVC Operational State
     - Sample MEI
     - Service Area
-    - Soil Measurement
     - Thread Border Router Management
     - Thread Network Directory
     - Water Heater Management
@@ -152,6 +151,7 @@ CodeDrivenClusters:
     - Relative Humidity Measurement
     - Scenes Management
     - Smoke CO Alarm
+    - Soil Measurement
     - Software Diagnostics
     - Switch
     - TLS Certificate Management
