@@ -225,7 +225,9 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
             // ValidateIncomingTransportOptions() function already checked the trackName length
             CopyCharSpanToMutableCharSpanWithTruncation(aCMAFContainerOptions.trackName.Value(), trackNameBuffer);
             trackName.SetValue(trackNameBuffer);
-        } else {
+        }
+        else
+        {
             trackName.ClearValue();
         }
 
