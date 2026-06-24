@@ -35,6 +35,8 @@
 # ---------------------------------------------------------------------------
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/OOBDataSerializer.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/aggregator/AggregatorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/air-purifier/AirPurifierDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/air-purifier/impl/LoggingAirPurifierDevice.cpp"

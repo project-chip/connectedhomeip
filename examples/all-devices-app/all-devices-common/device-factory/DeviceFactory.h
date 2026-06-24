@@ -59,6 +59,8 @@
 
 #include <functional>
 #include <map>
+#include <oob-accessors/OOBAccessor.h>
+#include <oob-accessors/boolean-state-sensor/BooleanStateSensorAccessor.h>
 
 namespace chip::app {
 
@@ -73,7 +75,8 @@ namespace chip::app {
 class DeviceFactory
 {
 public:
-    using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
+    using DeviceCreator         = std::function<std::unique_ptr<DeviceInterface>(const std::string & nodeLabel)>;
+    using DeviceAccessorCreator = std::function<std::unique_ptr<OOBAccessor>(DeviceInterface &)>;
 
     struct Context
     {
@@ -100,6 +103,10 @@ public:
         mRegistry[deviceTypeArg] = std::move(creator);
     }
 
+    void RegisterAccessorCreator(const std::string & deviceTypeArg, DeviceAccessorCreator && creator)
+    {
+        mAccessorRegistry[deviceTypeArg] = std::move(creator);
+    }
     /**
      * Convenience overload to support making the label optional for creator registrations
      * that do not care about the label (i.e. most cases).
@@ -127,6 +134,16 @@ public:
         return nullptr;
     }
 
+    std::unique_ptr<OOBAccessor> CreateAccessor(const std::string & deviceTypeArg, DeviceInterface & device)
+    {
+        if (IsValidDevice(deviceTypeArg) && mAccessorRegistry.find(deviceTypeArg) != mAccessorRegistry.end())
+        {
+            return mAccessorRegistry.find(deviceTypeArg)->second(device);
+        }
+        ChipLogProgress(Support, "No accessor found for device type: %s.\n", deviceTypeArg.c_str());
+        return nullptr;
+    }
+
     std::vector<std::string> SupportedDeviceTypes() const
     {
         std::vector<std::string> result;
@@ -141,6 +158,7 @@ private:
     std::map<std::string, DeviceCreator> mRegistry;
     std::optional<Context> mContext;
     std::string mDefaultDevice;
+    std::map<std::string, DeviceAccessorCreator> mAccessorRegistry;
 
     DeviceFactory()
     {
@@ -205,6 +223,9 @@ private:
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
+            RegisterAccessorCreator("contact-sensor", [](DeviceInterface & device) {
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
@@ -212,6 +233,9 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<BooleanStateSensorDevice>(
                     &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
+            });
+            RegisterAccessorCreator("water-leak-detector", [](DeviceInterface & device) {
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
