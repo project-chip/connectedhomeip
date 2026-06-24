@@ -23,7 +23,5 @@ source_set("on-off-light") {
     "OnOffLightDevice.h",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/on-off-load",
-  ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/on-off-load" ]
 }

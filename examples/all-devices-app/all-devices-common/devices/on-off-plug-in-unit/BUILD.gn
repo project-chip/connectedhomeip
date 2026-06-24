@@ -22,7 +22,5 @@ source_set("on-off-plug-in-unit") {
     "OnOffPlugInUnitDevice.h",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/on-off-load/impl:logging",
-  ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/on-off-load/impl:logging" ]
 }

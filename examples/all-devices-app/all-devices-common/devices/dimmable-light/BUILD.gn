@@ -23,7 +23,5 @@ source_set("dimmable-light") {
     "DimmableLightDevice.h",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/dimmable-load",
-  ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/dimmable-load" ]
 }
