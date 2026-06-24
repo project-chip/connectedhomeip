@@ -2158,7 +2158,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
@@ -2318,7 +2318,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_room_airconditioner = 114, version 3;
+  device type ma_room_airconditioner = 114, version 4;
 
 
   server cluster Identify {

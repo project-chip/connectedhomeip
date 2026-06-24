@@ -466,6 +466,7 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         one_five, one_five_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         one_five_one, one_five_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5_1)
         one_six, one_six_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_6)
+        one_six_one, one_six_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_6_1)
         self.problems.extend(one_two_problems)
         self.problems.extend(one_three_problems)
         self.problems.extend(one_four_problems)
@@ -474,6 +475,7 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         self.problems.extend(one_five_problems)
         self.problems.extend(one_five_one_problems)
         self.problems.extend(one_six_problems)
+        self.problems.extend(one_six_one_problems)
 
         asserts.assert_equal(len(one_two_problems), 0, "Problems found when parsing 1.2 spec")
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
@@ -483,6 +485,7 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         asserts.assert_equal(len(one_five_problems), 0, "Problems found when parsing 1.5 spec")
         asserts.assert_equal(len(one_five_one_problems), 0, "Problems found when parsing 1.5.1 spec")
         asserts.assert_equal(len(one_six_problems), 0, "Problems found when parsing 1.6 spec")
+        asserts.assert_equal(len(one_six_one_problems), 0, "Problems found when parsing 1.6.1 spec")
 
         # Current ballot has a bunch of problems related to IDs being allocated for closures and TBR. These should all
         # mention ID-TBD as the id, so let's pull those out for now and make sure there are no UNKNOWN problems.
