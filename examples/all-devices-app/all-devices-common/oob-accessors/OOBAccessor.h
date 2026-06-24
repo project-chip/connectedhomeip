@@ -55,4 +55,21 @@ public:
     virtual std::optional<ActionResponse> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) = 0;
 };
 
+class SetAttributeAccessor : public OOBAccessor
+{
+public:
+    static constexpr CharSpan kActionSetAttribute = "SetAttribute"_span;
+
+    ~SetAttributeAccessor() override = default;
+
+    /**
+     * @brief Returns a list of concrete data attribute paths that this accessor supports writing to.
+     *
+     * @note **Asynchronous Safety Warning:** The returned Span is a non-owning, temporary view
+     *       whose underlying memory is only guaranteed to be valid during the synchronous
+     *       execution of this function call.
+     */
+    virtual Span<const ConcreteDataAttributePath> GetSupportedPaths() = 0;
+};
+
 } // namespace chip::app

@@ -23,9 +23,19 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
+BooleanStateSensorAccessor::BooleanStateSensorAccessor(BooleanStateSensorDevice & device) :
+    mDevice(device),
+    mSupportedPaths{ ConcreteDataAttributePath(device.GetEndpointId(), BooleanState::Id, BooleanState::Attributes::StateValue::Id) }
+{}
+
+Span<const ConcreteDataAttributePath> BooleanStateSensorAccessor::GetSupportedPaths()
+{
+    return Span<const ConcreteDataAttributePath>(mSupportedPaths.data(), mSupportedPaths.size());
+}
+
 std::optional<OOBAccessor::ActionResponse> BooleanStateSensorAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
 {
-    if (!actionName.data_equal("SetAttribute"_span))
+    if (!actionName.data_equal(SetAttributeAccessor::kActionSetAttribute))
     {
         return std::nullopt;
     }

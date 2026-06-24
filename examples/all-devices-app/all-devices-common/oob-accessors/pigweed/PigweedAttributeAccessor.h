@@ -41,7 +41,7 @@ public:
         }
 
         auto & buffer     = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        auto result = OOBAccessorRegistry::Instance().HandleAction("SetAttribute"_span, buffer);
+        auto result = OOBAccessorRegistry::Instance().HandleAction(SetAttributeAccessor::kActionSetAttribute, buffer);
         if (result.first != CHIP_ERROR_NOT_FOUND)
         {
             if (result.first == CHIP_NO_ERROR)
