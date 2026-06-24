@@ -25,7 +25,7 @@ namespace app {
 class LoggingDimmableLightDevice : public LoggingDimmableLoadDevice
 {
 public:
-    LoggingDimmableLightDevice(const Context & context);
+    LoggingDimmableLightDevice(const Context & context, const Config & config = {});
     ~LoggingDimmableLightDevice() override = default;
 };
 

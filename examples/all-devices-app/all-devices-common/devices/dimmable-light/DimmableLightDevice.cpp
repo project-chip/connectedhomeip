@@ -22,12 +22,8 @@
 namespace chip {
 namespace app {
 
-DimmableLightDevice::DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate,
-                                         Clusters::LevelControlDelegate & levelControlDelegate,
-                                         Clusters::OnOffEffectDelegate & effectDelegate,
-                                         Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
-    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), onOffDelegate,
-                       levelControlDelegate, effectDelegate, identifyDelegate, context)
+DimmableLightDevice::DimmableLightDevice(const Context & context, const Delegates & delegates, const Config & config) :
+    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), context, delegates, config)
 {}
 
 } // namespace app

@@ -93,13 +93,16 @@ public:
         TimerDelegate & timerDelegate;
     };
 
-    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
-                       Clusters::LevelControlDelegate & levelControlDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
-                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
+    struct Delegates
+    {
+        Clusters::OnOffDelegate & onOff;
+        Clusters::LevelControlDelegate & levelControl;
+        Clusters::OnOffEffectDelegate & effect;
+        Clusters::IdentifyDelegate & identify;
+    };
 
-    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
-                       Clusters::LevelControlDelegate & levelControlDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
-                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context, const Config & config);
+    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                       const Delegates & delegates, const Config & config);
     ~DimmableLoadDevice() override = default;
 
     // Public cluster getters for application and testing

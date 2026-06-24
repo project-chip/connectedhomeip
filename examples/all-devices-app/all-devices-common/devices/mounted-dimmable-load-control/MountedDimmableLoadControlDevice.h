@@ -26,7 +26,7 @@ namespace app {
 class MountedDimmableLoadControlDevice : public LoggingDimmableLoadDevice
 {
 public:
-    explicit MountedDimmableLoadControlDevice(const Context & context);
+    MountedDimmableLoadControlDevice(const Context & context, const Config & config = {});
     ~MountedDimmableLoadControlDevice() override = default;
 };
 

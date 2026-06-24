@@ -27,22 +27,15 @@ namespace chip {
 namespace app {
 
 LoggingDimmableLoadDevice::LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                                     Clusters::OnOffDelegate * customOnOff,
-                                                     Clusters::LevelControlDelegate * customLevel,
-                                                     Clusters::OnOffEffectDelegate * customEffect,
-                                                     Clusters::IdentifyDelegate * customIdentify) :
-    LoggingDimmableLoadDevice(deviceTypes, context, customOnOff, customLevel, customEffect, customIdentify, Config{})
-{}
-
-LoggingDimmableLoadDevice::LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                                     Clusters::OnOffDelegate * customOnOff,
-                                                     Clusters::LevelControlDelegate * customLevel,
-                                                     Clusters::OnOffEffectDelegate * customEffect,
-                                                     Clusters::IdentifyDelegate * customIdentify, const Config & config) :
-    DimmableLoadDevice(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
-                       customLevel ? *customLevel : static_cast<Clusters::LevelControlDelegate &>(*this),
-                       customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
-                       customIdentify ? *customIdentify : static_cast<Clusters::IdentifyDelegate &>(*this), context, config)
+                                                     const Config & config) :
+    DimmableLoadDevice(deviceTypes, context,
+                       Delegates{
+                           .onOff        = *this,
+                           .levelControl = *this,
+                           .effect       = *this,
+                           .identify     = *this
+                       },
+                       config)
 {}
 
 // OnOffDelegate

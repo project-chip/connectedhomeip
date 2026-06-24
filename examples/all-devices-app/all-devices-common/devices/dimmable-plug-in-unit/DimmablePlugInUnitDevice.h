@@ -23,7 +23,7 @@ namespace chip::app {
 class DimmablePlugInUnitDevice : public LoggingDimmableLoadDevice
 {
 public:
-    explicit DimmablePlugInUnitDevice(const Context & context);
+    DimmablePlugInUnitDevice(const Context & context, const Config & config = {});
     ~DimmablePlugInUnitDevice() override = default;
 };
 

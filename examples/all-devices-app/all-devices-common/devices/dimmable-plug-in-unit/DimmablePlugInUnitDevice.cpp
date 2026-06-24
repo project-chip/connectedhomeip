@@ -20,8 +20,8 @@
 
 namespace chip::app {
 
-DimmablePlugInUnitDevice::DimmablePlugInUnitDevice(const Context & context) :
-    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmablePlugInUnit, 1), context)
+DimmablePlugInUnitDevice::DimmablePlugInUnitDevice(const Context & context, const Config & config) :
+    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmablePlugInUnit, 1), context, config)
 {}
 
 } // namespace chip::app

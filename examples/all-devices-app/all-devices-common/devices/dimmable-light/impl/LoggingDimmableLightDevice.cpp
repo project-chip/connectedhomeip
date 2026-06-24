@@ -22,8 +22,8 @@
 namespace chip {
 namespace app {
 
-LoggingDimmableLightDevice::LoggingDimmableLightDevice(const Context & context) :
-    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), context)
+LoggingDimmableLightDevice::LoggingDimmableLightDevice(const Context & context, const Config & config) :
+    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), context, config)
 {}
 
 } // namespace app

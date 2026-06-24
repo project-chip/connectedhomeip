@@ -24,21 +24,11 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
-                                       Clusters::LevelControlDelegate & levelControlDelegate,
-                                       Clusters::OnOffEffectDelegate & effectDelegate,
-                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
-    DimmableLoadDevice(deviceTypes, onOffDelegate, levelControlDelegate, effectDelegate, identifyDelegate, context, Config{})
-{}
-
-DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
-                                       Clusters::LevelControlDelegate & levelControlDelegate,
-                                       Clusters::OnOffEffectDelegate & effectDelegate,
-                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context,
-                                       const Config & config) :
+DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                                       const Delegates & delegates, const Config & config) :
     SingleEndpointDevice(deviceTypes),
-    mOnOffDelegate(onOffDelegate), mLevelControlDelegate(levelControlDelegate), mEffectDelegate(effectDelegate),
-    mIdentifyDelegate(identifyDelegate), mContext(context), mConfig(config)
+    mOnOffDelegate(delegates.onOff), mLevelControlDelegate(delegates.levelControl), mEffectDelegate(delegates.effect),
+    mIdentifyDelegate(delegates.identify), mContext(context), mConfig(config)
 {}
 
 CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
