@@ -1,30 +1,39 @@
-/*
- *   Copyright (c) 2026 Project CHIP Authors
- *   All rights reserved.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- *
- */
 package com.google.matter.alldevices;
+
+import android.content.Context;
+import chip.platform.AndroidChipPlatform;
+import chip.platform.ChipMdnsCallbackImpl;
+import chip.platform.DiagnosticDataProviderImpl;
+import chip.platform.NsdManagerServiceBrowser;
+import chip.platform.NsdManagerServiceResolver;
+import chip.platform.PreferencesConfigurationManager;
+import chip.platform.PreferencesKeyValueStoreManager;
 
 public class App {
   private static final App INSTANCE = new App();
+  private static AndroidChipPlatform platform = null;
 
   public static App getInstance() {
     return INSTANCE;
   }
 
   private App() {}
+
+  public synchronized void initializePlatform(Context context, int discriminator) {
+    if (platform == null) {
+      platform =
+          new AndroidChipPlatform(
+              null,
+              null,
+              new PreferencesKeyValueStoreManager(context),
+              new PreferencesConfigurationManager(context),
+              new NsdManagerServiceResolver(context),
+              new NsdManagerServiceBrowser(context),
+              new ChipMdnsCallbackImpl(),
+              new DiagnosticDataProviderImpl(context));
+    }
+    platform.updateCommissionableDataProviderData(null, null, 0, 20202021L, discriminator);
+  }
 
   public native String[] getSupportedDeviceTypes();
 

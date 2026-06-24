@@ -10,13 +10,6 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import chip.platform.AndroidChipPlatform
-import chip.platform.ChipMdnsCallbackImpl
-import chip.platform.DiagnosticDataProviderImpl
-import chip.platform.NsdManagerServiceBrowser
-import chip.platform.NsdManagerServiceResolver
-import chip.platform.PreferencesConfigurationManager
-import chip.platform.PreferencesKeyValueStoreManager
 
 /**
  * MatterServerService runs the native C++ Matter event loop and dynamic device simulator engine as
@@ -28,7 +21,6 @@ import chip.platform.PreferencesKeyValueStoreManager
  * commissioning and cluster command handshakes to time out or fail.
  */
 class MatterServerService : Service() {
-  private var androidChipPlatform: AndroidChipPlatform? = null
   private var multicastLock: WifiManager.MulticastLock? = null
 
   override fun onBind(intent: Intent?): IBinder? {
@@ -61,25 +53,7 @@ class MatterServerService : Service() {
 
   private fun startServerInstance(discriminator: Int, configurationJson: String) {
     try {
-      androidChipPlatform =
-        AndroidChipPlatform(
-          null,
-          null,
-          PreferencesKeyValueStoreManager(applicationContext),
-          PreferencesConfigurationManager(applicationContext),
-          NsdManagerServiceResolver(applicationContext),
-          NsdManagerServiceBrowser(applicationContext),
-          ChipMdnsCallbackImpl(),
-          DiagnosticDataProviderImpl(applicationContext)
-        )
-
-      androidChipPlatform?.updateCommissionableDataProviderData(
-        null,
-        null,
-        0,
-        20202021L,
-        discriminator
-      )
+      App.getInstance().initializePlatform(applicationContext, discriminator)
 
       val success = App.getInstance().startApp(configurationJson)
       if (!success) {

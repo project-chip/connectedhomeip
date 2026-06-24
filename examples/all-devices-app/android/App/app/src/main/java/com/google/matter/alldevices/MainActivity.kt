@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
       }
 
       // Generate Manual Setup Code and QR Code payloads via JNI
+      App.getInstance().initializePlatform(applicationContext, discriminator)
       val codes = App.getInstance().getOnboardingCodes(discriminator)
       val manualCode = codes[0]
       val qrCode = codes[1]
