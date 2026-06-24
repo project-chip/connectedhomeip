@@ -202,8 +202,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 uint8_t failures     = secureSession->IncrementConsecutiveSendFailures();
                 if (failures >= CHIP_CONFIG_SESSION_SEND_FAILURE_THRESHOLD)
                 {
-                    ChipLogError(ExchangeManager,
-                                 "MarkAsDefunct after %u consecutive send failures, last err=%" CHIP_ERROR_FORMAT,
+                    ChipLogError(ExchangeManager, "MarkAsDefunct after %u consecutive send failures, last err=%" CHIP_ERROR_FORMAT,
                                  static_cast<unsigned>(failures), err.Format());
                     secureSession->MarkAsDefunct();
                 }

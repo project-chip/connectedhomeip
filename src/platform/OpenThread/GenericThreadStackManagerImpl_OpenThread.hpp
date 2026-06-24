@@ -61,11 +61,11 @@
 #endif
 
 #if CHIP_DEVICE_LAYER_TARGET_ESP32
-#include <platform/ESP32/ESP32Utils.h>
 #include <esp_netif.h>
 #include <esp_netif_net_stack.h>
-#include <lwip/netif.h>
 #include <lwip/ip6_addr.h>
+#include <lwip/netif.h>
+#include <platform/ESP32/ESP32Utils.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_ESP32
 
 #include <lib/core/CHIPEncoding.h>
@@ -1524,8 +1524,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         auto alreadyPresent = [&](const otIp6Address & candidate) -> bool {
             for (uint8_t i = 0; i < mSrpClient.mHostAddressCount; i++)
             {
-                if (memcmp(mSrpClient.mHostAddresses[i].mFields.m8, candidate.mFields.m8,
-                           sizeof(candidate.mFields.m8)) == 0)
+                if (memcmp(mSrpClient.mHostAddresses[i].mFields.m8, candidate.mFields.m8, sizeof(candidate.mFields.m8)) == 0)
                 {
                     return true;
                 }
@@ -1543,24 +1542,25 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         //     as any true global IPv6.
         {
             const otMeshLocalPrefix * mlPrefix = otThreadGetMeshLocalPrefix(mOTInst);
-            for (const otNetifAddress * a = otIp6GetUnicastAddresses(mOTInst);
-                 a != nullptr && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses;
-                 a = a->mNext)
+            for (const otNetifAddress * a                                               = otIp6GetUnicastAddresses(mOTInst);
+                 a != nullptr && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses; a = a->mNext)
             {
-                if (!a->mValid) continue;
-                if (a->mRloc)   continue;
+                if (!a->mValid)
+                    continue;
+                if (a->mRloc)
+                    continue;
                 // Skip link-local fe80::/10 — added separately in step 1c.
                 if (a->mAddress.mFields.m8[0] == 0xfe && (a->mAddress.mFields.m8[1] & 0xc0) == 0x80)
                 {
                     continue;
                 }
                 // Skip mesh-local (matches mesh-local /64 prefix) — added in step 1b.
-                if (mlPrefix != nullptr &&
-                    memcmp(a->mAddress.mFields.m8, mlPrefix->m8, sizeof(mlPrefix->m8)) == 0)
+                if (mlPrefix != nullptr && memcmp(a->mAddress.mFields.m8, mlPrefix->m8, sizeof(mlPrefix->m8)) == 0)
                 {
                     continue;
                 }
-                if (alreadyPresent(a->mAddress)) continue;
+                if (alreadyPresent(a->mAddress))
+                    continue;
                 mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = a->mAddress;
             }
         }
@@ -1568,8 +1568,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         // 1b) Mesh-Local EID — the canonical in-mesh address.
         {
             const otIp6Address * meshLocalEid = otThreadGetMeshLocalEid(mOTInst);
-            if (meshLocalEid != nullptr && !alreadyPresent(*meshLocalEid) &&
-                mSrpClient.mHostAddressCount < kMaxSrpHostAddresses)
+            if (meshLocalEid != nullptr && !alreadyPresent(*meshLocalEid) && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses)
             {
                 mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = *meshLocalEid;
             }
@@ -1578,8 +1577,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         // 1c) Thread link-local — per-link reachability fallback.
         {
             const otIp6Address * linkLocal = otThreadGetLinkLocalIp6Address(mOTInst);
-            if (linkLocal != nullptr && !alreadyPresent(*linkLocal) &&
-                mSrpClient.mHostAddressCount < kMaxSrpHostAddresses)
+            if (linkLocal != nullptr && !alreadyPresent(*linkLocal) && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses)
             {
                 mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = *linkLocal;
             }
@@ -1593,20 +1591,23 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         //    from corrupting the cached pointer that OT keeps internally.
         auto collectFromEspNetif = [&](const char * ifKey) {
             esp_netif_t * espNetif = esp_netif_get_handle_from_ifkey(ifKey);
-            if (espNetif == nullptr) return;
+            if (espNetif == nullptr)
+                return;
             struct netif * lwipNetif = static_cast<struct netif *>(esp_netif_get_netif_impl(espNetif));
-            if (lwipNetif == nullptr) return;
-            for (uint8_t i = 0;
-                 i < LWIP_IPV6_NUM_ADDRESSES && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses; i++)
+            if (lwipNetif == nullptr)
+                return;
+            for (uint8_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES && mSrpClient.mHostAddressCount < kMaxSrpHostAddresses; i++)
             {
-                if (!ip6_addr_isvalid(netif_ip6_addr_state(lwipNetif, i))) continue;
+                if (!ip6_addr_isvalid(netif_ip6_addr_state(lwipNetif, i)))
+                    continue;
                 const ip6_addr_t * lwipAddr = netif_ip6_addr(lwipNetif, i);
                 otIp6Address otAddr;
                 static_assert(sizeof(otAddr.mFields.m8) == 16, "otIp6Address must be 16 bytes");
                 // LwIP stores IPv6 in network byte order in the addr[] u32 array, so a raw
                 // 16-byte memcpy preserves the wire-format bytes.
                 memcpy(otAddr.mFields.m8, lwipAddr->addr, sizeof(otAddr.mFields.m8));
-                if (alreadyPresent(otAddr)) continue;
+                if (alreadyPresent(otAddr))
+                    continue;
                 mSrpClient.mHostAddresses[mSrpClient.mHostAddressCount++] = otAddr;
             }
         };
@@ -1619,8 +1620,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
 
         // Debug dump: print every address we are about to register so we can verify
         // what hits the SRP server.
-        ChipLogProgress(DeviceLayer, "SRP host '%s': registering %u address(es)",
-                        aHostName, static_cast<unsigned>(mSrpClient.mHostAddressCount));
+        ChipLogProgress(DeviceLayer, "SRP host '%s': registering %u address(es)", aHostName,
+                        static_cast<unsigned>(mSrpClient.mHostAddressCount));
         for (uint8_t i = 0; i < mSrpClient.mHostAddressCount; i++)
         {
             char addrStr[OT_IP6_ADDRESS_STRING_SIZE];
@@ -1631,8 +1632,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
         // Pass the persistent member buffer to OT — the array memory must remain valid and
         // unchanged for the lifetime of the registration (otSrpClientSetHostAddresses does
         // not copy).
-        error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, mSrpClient.mHostAddresses,
-                                                               mSrpClient.mHostAddressCount));
+        error = MapOpenThreadError(otSrpClientSetHostAddresses(mOTInst, mSrpClient.mHostAddresses, mSrpClient.mHostAddressCount));
         SuccessOrExit(error);
     }
 

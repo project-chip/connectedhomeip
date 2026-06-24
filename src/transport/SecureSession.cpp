@@ -173,7 +173,7 @@ void SecureSession::CapturePeerAddressAnchor()
     const Inet::IPAddress & ip = mPeerAddress.GetIPAddress();
     if (mPeerAddress.GetTransportType() != Transport::Type::kUdp || !ip.IsIPv6() || ip.IsIPv6Multicast())
     {
-        mPeerAddressAnchorValid = false;
+        mPeerAddressAnchorValid        = false;
         mPeerAddressRestampRejectCount = 0;
         return;
     }
@@ -207,7 +207,7 @@ void SecureSession::RestampPeerAddressIfRoutable(const PeerAddress & candidate)
     // don't accidentally trap kBle/kTcp/IPv4 transitions.
     if (candidate.GetTransportType() != Transport::Type::kUdp || !candidateIp.IsIPv6())
     {
-        mPeerAddress = candidate;
+        mPeerAddress                   = candidate;
         mPeerAddressRestampRejectCount = 0;
         return;
     }
@@ -245,9 +245,8 @@ void SecureSession::RestampPeerAddressIfRoutable(const PeerAddress & candidate)
 
     if (mPeerAddressRestampRejectCount >= kPeerAddressRestampOverrideThreshold)
     {
-        ChipLogProgress(Inet,
-                        "SecureSession[%p, LSID:%d]: peer /64 anchor override after %u rejects, accepting %s",
-                        this, mLocalSessionId, static_cast<unsigned>(mPeerAddressRestampRejectCount), candidateStr);
+        ChipLogProgress(Inet, "SecureSession[%p, LSID:%d]: peer /64 anchor override after %u rejects, accepting %s", this,
+                        mLocalSessionId, static_cast<unsigned>(mPeerAddressRestampRejectCount), candidateStr);
         mPeerAddress = candidate;
         // Adopt the new prefix as the anchor going forward.
         memcpy(mPeerAddressAnchorPrefix, candidatePrefix, sizeof(mPeerAddressAnchorPrefix));
@@ -256,10 +255,8 @@ void SecureSession::RestampPeerAddressIfRoutable(const PeerAddress & candidate)
         return;
     }
 
-    ChipLogProgress(Inet,
-                    "SecureSession[%p, LSID:%d]: ignoring restamp to non-routable peer %s (reject %u/%u)",
-                    this, mLocalSessionId, candidateStr,
-                    static_cast<unsigned>(mPeerAddressRestampRejectCount),
+    ChipLogProgress(Inet, "SecureSession[%p, LSID:%d]: ignoring restamp to non-routable peer %s (reject %u/%u)", this,
+                    mLocalSessionId, candidateStr, static_cast<unsigned>(mPeerAddressRestampRejectCount),
                     static_cast<unsigned>(kPeerAddressRestampOverrideThreshold));
 }
 

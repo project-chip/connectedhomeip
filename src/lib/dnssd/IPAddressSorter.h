@@ -67,18 +67,17 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 // report a transport type degrade to tier=Unknown (=0) for all entries, which collapses
 // the composite score back to the legacy IpScore ordering.
 namespace CompositeScore {
-constexpr uint32_t kTierShift          = 24;
-constexpr uint32_t kThreadSubShift     = 16;
-constexpr uint8_t  kTierEthernet       = 3;
-constexpr uint8_t  kTierWiFi           = 2;
-constexpr uint8_t  kTierThread         = 1;
-constexpr uint8_t  kTierUnknown        = 0;
+constexpr uint32_t kTierShift      = 24;
+constexpr uint32_t kThreadSubShift = 16;
+constexpr uint8_t kTierEthernet    = 3;
+constexpr uint8_t kTierWiFi        = 2;
+constexpr uint8_t kTierThread      = 1;
+constexpr uint8_t kTierUnknown     = 0;
 
 inline uint32_t Encode(uint8_t tier, uint8_t threadSub, uint16_t classScore)
 {
-    return (static_cast<uint32_t>(tier) << kTierShift) |
-           (static_cast<uint32_t>(threadSub) << kThreadSubShift) |
-           static_cast<uint32_t>(classScore);
+    return (static_cast<uint32_t>(tier) << kTierShift) | (static_cast<uint32_t>(threadSub) << kThreadSubShift) |
+        static_cast<uint32_t>(classScore);
 }
 } // namespace CompositeScore
 
