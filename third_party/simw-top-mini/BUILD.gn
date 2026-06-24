@@ -43,6 +43,7 @@ config("se05x_config") {
   # defines += ["FLOW_VERBOSE"]
 
   include_dirs = [
+    "repo/sss/",
     "repo/sss/inc",
     "repo/sss/port/default",
     "repo/sss/ex/src",
@@ -65,19 +66,19 @@ config("se05x_config") {
   }
 
   if (chip_se05x_auth == "scp03") {
-    include_dirs += [ "repo/feature_file/scp03_ftr" ]
+    include_dirs += [ "repo/feature_file/mbedtls2x/scp03_ftr" ]
   } else if (chip_se05x_auth == "user_id") {
-    include_dirs += [ "repo/feature_file/user_id_ftr" ]
+    include_dirs += [ "repo/feature_file/mbedtls2x/user_id_ftr" ]
   } else if (chip_se05x_auth == "aes_key") {
-    include_dirs += [ "repo/feature_file/aes_key_ftr" ]
+    include_dirs += [ "repo/feature_file/mbedtls2x/aes_key_ftr" ]
   } else if (chip_se05x_auth == "ec_key") {
-    include_dirs += [ "repo/feature_file/ec_key_ftr" ]
+    include_dirs += [ "repo/feature_file/mbedtls2x/ec_key_ftr" ]
   } else if (chip_se05x_auth == "scp03_user_id") {
-    include_dirs += [ "repo/feature_file/scp03_user_id_ftr" ]
+    include_dirs += [ "repo/feature_file/mbedtls2x/scp03_user_id_ftr" ]
   } else if (chip_se05x_auth == "scp03_aes_key") {
-    include_dirs += [ "repo/feature_file/scp03_aes_key_ftr" ]
+    include_dirs += [ "repo/feature_file/mbedtls2x/scp03_aes_key_ftr" ]
   } else if (chip_se05x_auth == "scp03_ec_key") {
-    include_dirs += [ "repo/feature_file/scp03_ec_key_ftr" ]
+    include_dirs += [ "repo/feature_file/mbedtls2x/scp03_ec_key_ftr" ]
   } else {
     include_dirs += [ "repo" ]
   }
