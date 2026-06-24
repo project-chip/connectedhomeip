@@ -384,48 +384,19 @@ To enable Thread Border Router support see the [build](#building) section.
 
 The complete Border Router guide is located [here](./nxp_otbr_guide.md).
 
-## Enabling SE05x Secure Element with MIMXRT1060-EVK-C
+## Enabling SE05x Secure Element with MIMXRT1060-EVK-B
 
 ### Hardware connections
 
 -   Connections using OM-SE051ARD board :
 
-    | Signal         | EVKCMIMXRT1060 Pin | OM-SE051ARD Pin |
+    | Signal         | EVKBMIMXRT1060 Pin | OM-SE051ARD Pin |
     | -------------- | ------------------ | --------------- |
     | I2C SDA        | J17_9              | J2_9            |
     | I2C SCL        | J17_10             | J2_10           |
     | 3V3            | J32_4              | J8_4            |
     | GND            | J17_7              | J8_7            |
     | ENA (optional) | J17_1              | J1_6            |
-
-### Hardware Connections for GPIO Notification
-
-- Connections using SE051ARD switch and DUT board :
-
-| Source                                  | Destination                     |
-| --------------------------------------- | ------------------------------- |
-| EVKCMIMXRT1060 3.3V (J32-4)             | SE051ARD (DUT) 3v3 (J8-4)       |
-| EVKCMIMXRT1060 GND (J17-7)              | SE051ARD (DUT) GND (J8-7)       |
-| EVKCMIMXRT1060 I2C_SCL (J17-10)         | SE051ARD (DUT) SCL (J2-10)      |
-| EVKCMIMXRT1060 I2C_SDA (J17-9)          | SE051ARD (DUT) SDA (J2-9)       |
-| EVKCMIMXRT1060 3.3V (J17-8)             | SE051ARD (switch) Vin (J16-2)   |
-| EVKCMIMXRT1060 J17-2                    | SE051ARD (DUT) IO2 (J11-8)      |
-| EVKCMIMXRT1060 J17-1                    | SE051ARD (switch) Enable (J13-2)|
-| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
-| SE051ARD (switch) GND (J2-7)            | SE051ARD (DUT) GND (J2-7)       |
-| SE051ARD (DUT) ENA (J13-2)              | SE051ARD (DUT) VDD (J11-1)      |
-
-- Connections using SE051H2 DUT board :
-
-| Source                                  | Destination                     |
-| --------------------------------------- | ------------------------------- |
-| EVKCMIMXRT1060 3.3V (J32-4)             | SE051H2 Vin (J8-4)              |
-| EVKCMIMXRT1060 GND (J17-7)              | SE051H2 GND (J8-7)              |
-| EVKCMIMXRT1060 I2C_SCL (J17-10)         | SE051H2 SCL (J2-10)             |
-| EVKCMIMXRT1060 I2C_SDA (J17-9)          | SE051H2 SDA (J2-9)              |
-| EVKCMIMXRT1060 J17-2                    | SE051H2 IO2 (J11-5)             |
-| EVKCMIMXRT1060 J17-1                    | SE051H2 IO/MOSI (J2-4)          |
-| EVKCMIMXRT1060 3.3V (J17-8) (HIGH)      | SE051H2 Enable(J1-6)            |
 
 
 ### Provision SE05x with required keys (One time step)

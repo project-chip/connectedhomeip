@@ -272,6 +272,8 @@ The complete Border Router guide is located [here](./nxp_otbr_guide.md).
 
 ## Enabling SE05x Secure Element with RW61x
 
+### Hardware connections
+
 -   Connections using OM-SE051ARD board :
 
     | Signal         | FRDM-RW612 Pin | OM-SE051ARD Pin |
@@ -281,35 +283,6 @@ The complete Border Router guide is located [here](./nxp_otbr_guide.md).
     | 3V3            | J3_8           | J8_4            |
     | GND            | J3_14          | J8_7            |
     | ENA (optional) | J1_12          | J1_6            |
-
-### Hardware Connections for GPIO Notification
-
-- Connections using SE051ARD switch and DUT board :
-
-| Source                               | Destination                     |
-| -------------------------------------| ------------------------------- |
-| RW612 3.3V (J3-8)                    | SE051ARD (DUT) 3v3 (J8-4)       |
-| RW612 GND  (J3-14)                   | SE051ARD (DUT) GND (J8-7)       |
-| RW612 I2C_SCL (J1-4)                 | SE051ARD (DUT) SCL (J2-10)      |
-| RW612 I2C_SDA (J1-2)                 | SE051ARD (DUT) SDA (J2-9)       |
-| RW612 3.3V (J2-16)                   | SE051ARD (switch) Vin (J16-2)   |
-| RW612 J1-10                          | SE051ARD (DUT) IO2 (J11-8)      |
-| RW612 J1-12                          | SE051ARD (switch) Enable (J13-2)|
-| SE051ARD (switch) Vout (J11-5)       | SE051ARD (DUT) SE_VDD (J14-2)   |
-| SE051ARD (switch) GND (J2-7)         | SE051ARD (DUT) GND (J2-7)       |
-| SE051ARD (DUT) ENA (J13-2)           | SE051ARD (DUT) VDD (J11-1)      |
-
-- Connections using SE051H2 DUT board :
-
-| Source                                  | Destination                     |
-| --------------------------------------- | ------------------------------- |
-| RW612 3.3V (J3-8)                       | SE051H2 3v3 (J8-4)              |
-| RW612 GND  (J3-14)                      | SE051H2 GND (J8-7)              |
-| RW612 I2C_SCL (J1-4)                    | SE051H2 SCL (J2-10)             |
-| RW612 I2C_SDA (J1-2)                    | SE051H2 SDA (J2-9)              |
-| RW612 J1-10                             | SE051H2 IO2 (J11-5)             |
-| RW612 J1-12                             | SE051H2 IO/MOSI (J2-4)          |
-| RW612 3.3V (J2-16) (HIGH)               | SE051H2 Enable(J1-6)            |
 
 
 ### Provision SE05x with required keys (One time step)
