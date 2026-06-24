@@ -16,23 +16,22 @@
  */
 
 #include "ambient-context-sensing-delegate-impl.h"
-#include <cassert>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
+#include <vector>
+#include <memory>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-constexpr uint8_t kDefACSDelegateCount = 2;
 
-AmbientContextSensingDelegate & AmbientContextSensingDelegate::GetInstance()
+AmbientContextSensingDelegate & AmbientContextSensingDelegate::AllocateInstance()
 {
-    static AmbientContextSensingDelegateImpl Instance[kDefACSDelegateCount];
-    static uint8_t UsedInstanceCount = 0;
+    static std::vector<std::unique_ptr<AmbientContextSensingDelegateImpl>> instances;
 
-    assert(UsedInstanceCount < kDefACSDelegateCount);
-    return Instance[UsedInstanceCount++];
+    instances.push_back(std::make_unique<AmbientContextSensingDelegateImpl>());
+    return *instances.back();
 }
 
 AmbientContextSensingDelegateImpl::AmbientContextSensingDelegateImpl()

@@ -76,7 +76,7 @@ class AmbientContextSensingDelegate
 public:
     virtual ~AmbientContextSensingDelegate() = default;
 
-    static AmbientContextSensingDelegate & GetInstance();
+    static AmbientContextSensingDelegate & AllocateInstance();
 
     // Buffer to keep the AmbientContextTypeSupported attribute passed from the caller
     virtual SemanticTagType * GetAmbientContextTypeSupportedBuf(size_t size) = 0;
