@@ -685,7 +685,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 31e: Verify AuxiliaryAccessUpdated event
             self.step("31e")
-            event_data = access_control_event_handler.wait_for_event_report(Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=30)
+            event_data = access_control_event_handler.wait_for_event_report(
+                Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=30)
             asserts.assert_equal(event_data.fabricIndex, fabric_index, "Incorrect fabric index in event")
             asserts.assert_equal(event_data.adminNodeID, th1_nodeid, "Incorrect adminNodeID in event")
 
@@ -703,7 +704,8 @@ class TC_ACE_1_6(MatterBaseTest):
         # If ClusterRevision is >= 4, verify that there have been NO attribute change notifications for GroupKeyMap across the entire test run.
         if group_key_management_revision >= 4:
             group_key_map_reports = group_key_map_sub.attribute_report_counts[Clusters.GroupKeyManagement.Attributes.GroupKeyMap]
-            asserts.assert_equal(group_key_map_reports, 0, f"Expected 0 GroupKeyMap change notifications, but received {group_key_map_reports}")
+            asserts.assert_equal(group_key_map_reports, 0,
+                                 f"Expected 0 GroupKeyMap change notifications, but received {group_key_map_reports}")
 
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
 
