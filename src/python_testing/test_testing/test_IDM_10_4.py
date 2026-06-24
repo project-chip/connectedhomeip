@@ -291,6 +291,19 @@ def main():
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: Groups on 2 endpoints with MCORE.G.MULTIENDPOINT - expected success")
 
+    # Regression: PICS codes that belong to a different endpoint's slice must
+    # not be evaluated against the endpoint under test (here, EP0). The Switch
+    # cluster is marked supported only on endpoint 1's slice and is absent from
+    # the EP0 device read; the EP0 run must still pass. Before check_pics was
+    # made endpoint-aware, SWTCH.S would leak in as "found in PICS but not on
+    # device" and fail the EP0 check.
+    leak_pics = _baseline_with()
+    leak_pics[1] = {"SWTCH.S": True, "SWTCH.S.A0000": True, "SWTCH.S.F00": True}
+    test_runner.config.pics = leak_pics
+    resp = create_read()
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: foreign-endpoint (EP1) PICS leaked into EP0 check - expected success")
+
     test_runner.Shutdown()
 
     print(

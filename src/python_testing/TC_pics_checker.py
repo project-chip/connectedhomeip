@@ -265,7 +265,6 @@ class TC_PICS_Checker(BasicCompositionTests):
                         endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
                     self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
 
-        self.print_step("PICS", self.pics)
         self.step(12)
         if not self.success:
             self.fail_current_test("At least one PICS error was found for this endpoint")
