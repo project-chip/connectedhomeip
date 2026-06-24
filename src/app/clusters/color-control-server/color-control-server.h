@@ -15,4 +15,4 @@
  *    limitations under the License.
  */
 #pragma once
-#include "codegen/color-control-server.h"
+#include "codegen/color-control-server.h" // nogncheck
