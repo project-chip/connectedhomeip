@@ -26,16 +26,12 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 
-LoggingOnOffLoadDevice::LoggingOnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                                               const Context & context,
-                                               Clusters::OnOffDelegate * customOnOff,
-                                               Clusters::OnOffEffectDelegate * customEffect,
+LoggingOnOffLoadDevice::LoggingOnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                                               Clusters::OnOffDelegate * customOnOff, Clusters::OnOffEffectDelegate * customEffect,
                                                Clusters::IdentifyDelegate * customIdentify) :
-    OnOffLoadDevice(deviceTypes,
-                    customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
+    OnOffLoadDevice(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
                     customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
-                    customIdentify ? *customIdentify : static_cast<Clusters::IdentifyDelegate &>(*this),
-                    context)
+                    customIdentify ? *customIdentify : static_cast<Clusters::IdentifyDelegate &>(*this), context)
 {}
 
 // OnOffDelegate

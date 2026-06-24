@@ -63,10 +63,8 @@ public:
         TimerDelegate & timerDelegate;
     };
 
-    OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                    Clusters::OnOffDelegate & onOffDelegate,
-                    Clusters::OnOffEffectDelegate & effectDelegate,
-                    Clusters::IdentifyDelegate & identifyDelegate,
+    OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
+                    Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
                     const Context & context);
     ~OnOffLoadDevice() override = default;
 

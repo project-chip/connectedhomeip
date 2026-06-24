@@ -46,18 +46,17 @@ namespace app {
  * LoggingDimmableLightDevice, DimmablePlugInUnitDevice, and MountedDimmableLoadControlDevice.
  */
 class LoggingDimmableLoadDevice : public DimmableLoadDevice,
-                                   public Clusters::OnOffDelegate,
-                                   public Clusters::LevelControlDelegate,
-                                   public Clusters::OnOffEffectDelegate,
-                                   public Clusters::IdentifyDelegate
+                                  public Clusters::OnOffDelegate,
+                                  public Clusters::LevelControlDelegate,
+                                  public Clusters::OnOffEffectDelegate,
+                                  public Clusters::IdentifyDelegate
 {
 public:
-    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                              const Context & context,
-                              Clusters::OnOffDelegate * customOnOff = nullptr,
+    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                              Clusters::OnOffDelegate * customOnOff        = nullptr,
                               Clusters::LevelControlDelegate * customLevel = nullptr,
                               Clusters::OnOffEffectDelegate * customEffect = nullptr,
-                              Clusters::IdentifyDelegate * customIdentify = nullptr);
+                              Clusters::IdentifyDelegate * customIdentify  = nullptr);
     ~LoggingDimmableLoadDevice() override = default;
 
 protected:

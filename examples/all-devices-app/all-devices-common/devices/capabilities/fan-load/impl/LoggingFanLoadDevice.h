@@ -35,15 +35,11 @@ namespace app {
  * This is intended as a base class for logging leaf simulator devices like
  * LoggingFanDevice, AirPurifierDevice, and ExtractorHoodDevice.
  */
-class LoggingFanLoadDevice : public FanLoadDevice,
-                             public Clusters::OnOffDelegate,
-                             public Clusters::FanControl::Delegate
+class LoggingFanLoadDevice : public FanLoadDevice, public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate
 {
 public:
-    LoggingFanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                         const Context & context,
-                         Clusters::FanControl::Delegate * customFan = nullptr,
-                         Clusters::OnOffDelegate * customOnOff = nullptr);
+    LoggingFanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                         Clusters::FanControl::Delegate * customFan = nullptr, Clusters::OnOffDelegate * customOnOff = nullptr);
 
     ~LoggingFanLoadDevice() override = default;
 

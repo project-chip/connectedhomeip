@@ -24,16 +24,15 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-OnOffLoadDevice::OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                                 Clusters::OnOffDelegate & onOffDelegate,
-                                 Clusters::OnOffEffectDelegate & effectDelegate,
-                                 Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+OnOffLoadDevice::OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
+                                 Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
+                                 const Context & context) :
     SingleEndpointDevice(deviceTypes),
     mOnOffDelegate(onOffDelegate), mEffectDelegate(effectDelegate), mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
 CHIP_ERROR OnOffLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                      EndpointComposition composition)
+                                     EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

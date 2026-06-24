@@ -73,10 +73,8 @@ public:
     Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
 
 protected:
-    FanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                  Clusters::FanControl::Delegate & fanDelegate,
-                  Clusters::OnOffDelegate * onOffDelegate,
-                  const Context & context);
+    FanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
+                  Clusters::OnOffDelegate * onOffDelegate, const Context & context);
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;

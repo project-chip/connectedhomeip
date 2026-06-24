@@ -25,10 +25,9 @@ namespace app {
 DimmableLightDevice::DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate,
                                          Clusters::LevelControlDelegate & levelControlDelegate,
                                          Clusters::OnOffEffectDelegate & effectDelegate,
-                                         Clusters::IdentifyDelegate & identifyDelegate,
-                                         const Context & context) :
-    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1),
-                       onOffDelegate, levelControlDelegate, effectDelegate, identifyDelegate, context)
+                                         Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDimmableLight, 1), onOffDelegate,
+                       levelControlDelegate, effectDelegate, identifyDelegate, context)
 {}
 
 } // namespace app

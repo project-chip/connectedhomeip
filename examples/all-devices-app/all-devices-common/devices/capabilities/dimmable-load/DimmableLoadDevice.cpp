@@ -24,8 +24,7 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                                       Clusters::OnOffDelegate & onOffDelegate,
+DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
                                        Clusters::LevelControlDelegate & levelControlDelegate,
                                        Clusters::OnOffEffectDelegate & effectDelegate,
                                        Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
@@ -35,7 +34,7 @@ DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> de
 {}
 
 CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                         EndpointComposition composition)
+                                        EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

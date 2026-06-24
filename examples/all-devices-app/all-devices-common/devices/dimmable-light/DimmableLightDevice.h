@@ -25,10 +25,8 @@ namespace app {
 class DimmableLightDevice : public DimmableLoadDevice
 {
 public:
-    DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate,
-                        Clusters::LevelControlDelegate & levelControlDelegate,
-                        Clusters::OnOffEffectDelegate & effectDelegate,
-                        Clusters::IdentifyDelegate & identifyDelegate,
+    DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate, Clusters::LevelControlDelegate & levelControlDelegate,
+                        Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
                         const Context & context);
     ~DimmableLightDevice() override = default;
 };

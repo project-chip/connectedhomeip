@@ -25,17 +25,16 @@ using chip::BitMask;
 namespace chip {
 namespace app {
 
-FanLoadDevice::FanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                             Clusters::FanControl::Delegate & fanDelegate,
-                             Clusters::OnOffDelegate * onOffDelegate,
-                             const Context & context) :
+FanLoadDevice::FanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
+                             Clusters::OnOffDelegate * onOffDelegate, const Context & context) :
     SingleEndpointDevice(deviceTypes),
     mFanDelegate(fanDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(context.timerDelegate), mContext(context)
 {
     VerifyOrDie(mContext.includeOnOffCluster == (mOnOffDelegate != nullptr));
 }
 
-CHIP_ERROR FanLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR FanLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                   EndpointComposition composition)
 {
     ReturnErrorOnFailure(
         RegisterDescriptor(endpoint, provider, EndpointComposition(composition.parentId, composition.pattern, mContext.tagList)));

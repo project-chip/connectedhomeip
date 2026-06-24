@@ -75,14 +75,11 @@ void ApplyOnOffToFan(FanControlCluster & fan, bool on)
 
 } // namespace
 
-LoggingFanLoadDevice::LoggingFanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                                           const Context & context,
-                                           Clusters::FanControl::Delegate * customFan,
-                                           Clusters::OnOffDelegate * customOnOff) :
-    FanLoadDevice(deviceTypes,
-                  customFan ? *customFan : static_cast<Clusters::FanControl::Delegate &>(*this),
-                  context.includeOnOffCluster ? (customOnOff ? customOnOff : static_cast<Clusters::OnOffDelegate *>(this)) : nullptr,
-                  context)
+LoggingFanLoadDevice::LoggingFanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                                           Clusters::FanControl::Delegate * customFan, Clusters::OnOffDelegate * customOnOff) :
+    FanLoadDevice(
+        deviceTypes, customFan ? *customFan : static_cast<Clusters::FanControl::Delegate &>(*this),
+        context.includeOnOffCluster ? (customOnOff ? customOnOff : static_cast<Clusters::OnOffDelegate *>(this)) : nullptr, context)
 {}
 
 // FanControl::Delegate
@@ -179,11 +176,12 @@ void LoggingFanLoadDevice::OnFanDriveStateChanged(const FanControl::FanDriveStat
 
     if (!percentSettingIsNull && !speedSettingIsNull)
     {
-        ChipLogProgress(DeviceLayer,
-                        "LoggingFanLoadDevice::OnFanDriveStateChanged() -> mode=%u percentSetting=%u percentCurrent=%u speedSetting=%u "
-                        "speedCurrent=%u",
-                        mode, static_cast<unsigned>(newState.percentSetting.Value()), percentCurrent,
-                        static_cast<unsigned>(newState.speedSetting.Value()), speedCurrent);
+        ChipLogProgress(
+            DeviceLayer,
+            "LoggingFanLoadDevice::OnFanDriveStateChanged() -> mode=%u percentSetting=%u percentCurrent=%u speedSetting=%u "
+            "speedCurrent=%u",
+            mode, static_cast<unsigned>(newState.percentSetting.Value()), percentCurrent,
+            static_cast<unsigned>(newState.speedSetting.Value()), speedCurrent);
     }
     else if (!percentSettingIsNull)
     {

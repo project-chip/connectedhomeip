@@ -41,16 +41,14 @@ namespace app {
  * LoggingOnOffLightDevice, OnOffPlugInUnitDevice, and MountedOnOffControlDevice.
  */
 class LoggingOnOffLoadDevice : public OnOffLoadDevice,
-                                public Clusters::OnOffDelegate,
-                                public Clusters::OnOffEffectDelegate,
-                                public Clusters::IdentifyDelegate
+                               public Clusters::OnOffDelegate,
+                               public Clusters::OnOffEffectDelegate,
+                               public Clusters::IdentifyDelegate
 {
 public:
-    LoggingOnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
-                            const Context & context,
-                            Clusters::OnOffDelegate * customOnOff = nullptr,
-                            Clusters::OnOffEffectDelegate * customEffect = nullptr,
-                            Clusters::IdentifyDelegate * customIdentify = nullptr);
+    LoggingOnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                           Clusters::OnOffDelegate * customOnOff = nullptr, Clusters::OnOffEffectDelegate * customEffect = nullptr,
+                           Clusters::IdentifyDelegate * customIdentify = nullptr);
     ~LoggingOnOffLoadDevice() override = default;
 
 protected:

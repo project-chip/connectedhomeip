@@ -25,10 +25,8 @@ namespace app {
 class OnOffLightDevice : public OnOffLoadDevice
 {
 public:
-    OnOffLightDevice(Clusters::OnOffDelegate & onOffDelegate,
-                     Clusters::OnOffEffectDelegate & effectDelegate,
-                     Clusters::IdentifyDelegate & identifyDelegate,
-                     const Context & context);
+    OnOffLightDevice(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                     Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
     ~OnOffLightDevice() override = default;
 };
 

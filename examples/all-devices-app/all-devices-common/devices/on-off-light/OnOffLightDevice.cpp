@@ -21,12 +21,10 @@
 namespace chip {
 namespace app {
 
-OnOffLightDevice::OnOffLightDevice(Clusters::OnOffDelegate & onOffDelegate,
-                                   Clusters::OnOffEffectDelegate & effectDelegate,
-                                   Clusters::IdentifyDelegate & identifyDelegate,
-                                   const Context & context) :
-    OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1),
-                    onOffDelegate, effectDelegate, identifyDelegate, context)
+OnOffLightDevice::OnOffLightDevice(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                                   Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+    OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), onOffDelegate, effectDelegate,
+                    identifyDelegate, context)
 {}
 
 } // namespace app
