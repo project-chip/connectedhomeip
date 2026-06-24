@@ -21,7 +21,6 @@
 #include <FreeRTOS.h>
 
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
-#include <app/server/Server.h>
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
@@ -50,30 +49,16 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
 
     if (sAlarmTimer == NULL)
     {
-        ChipLogError(DeviceLayer, "Alarm timer create failed");
-        assert(0);
+		ChipLogError(DeviceLayer, "Alarm timer create failed");
+		assert(0);
     }
 
     // read current State on endpoint one
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     mEndSelfTesting = false;
-
-    TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
-
-    if (pTestEventDelegate != nullptr)
-    {
-        static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
-        CHIP_ERROR err = pTestEventDelegate->AddHandler(&sSmokeCOTestEventTriggerHandler);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Failed to add handler for delegate: %s", chip::ErrorStr(err));
-        }
-    }
-    else
-    {
-        ChipLogError(AppServer, "TestEventTriggerDelegate is null, cannot add handler for delegate");
-    }
 
     return CHIP_NO_ERROR;
 }
