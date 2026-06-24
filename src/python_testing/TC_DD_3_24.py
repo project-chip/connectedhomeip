@@ -29,6 +29,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_DD_3_24(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def desc_TC_DD_3_24(self) -> str:
         return "[TC-DD-3.24] NFC-based commissioning - DUT without power [DUT as Commissionee]"
 
