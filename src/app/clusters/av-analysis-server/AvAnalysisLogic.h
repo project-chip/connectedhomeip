@@ -143,6 +143,13 @@ private:
     std::optional<DataModel::ActionReturnStatus>
     HandleRemoteEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                           const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleLocalDisableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                          const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleRemoteDisableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                          const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData);
+                          
 };
 
 } // namespace Clusters

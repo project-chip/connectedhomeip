@@ -339,6 +339,103 @@ std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleDisabl
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData)
 {
+    // Are we locally or remotely processing, handle appropriately
+    //
+    if (HasFeature(AvAnalysis::Feature::kLocalContextDetection)) {
+        return HandleLocalDisableContextTriggers(handler, commandPath, commandData);
+    }
+    else
+    {
+        return HandleRemoteDisableContextTriggers(handler, commandPath, commandData);
+    }
+}
+
+std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleLocalDisableContextTriggers(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData)
+{
+    if (!commandData.contextTriggers.IsNull()) 
+    {
+        // Loop over the provided context triggers
+        auto iter = commandData.contextTriggers.Value().begin();
+        
+        while (iter.Next())
+        {
+            Structs::ContextTriggerStruct::DecodableType contextTrigger = iter.GetValue();
+            
+            // Make sure the context is part of our supported set
+            //
+            auto it = std::find_if(mSupportedAmbientContexts.begin(), mSupportedAmbientContexts.end(), 
+                [&contextTrigger](const Descriptor::Structs::SemanticTagStruct::Type& stt) {
+                    return stt.namespaceID == contextTrigger.context.namespaceID && stt.tag == contextTrigger.context.tag;
+            });
+
+            if (it == mSupportedAmbientContexts.end()) 
+            {
+                return Status::DynamicConstraintError;
+            }
+            
+            // The trigger context is valid, now check the ZoneIDs, which can only be present of PERZONEDETECT is set, likewise,
+            // if we have the feature, then ZoneIDs have to be present
+            //
+            bool hasZoneIDs = contextTrigger.zoneIDs.HasValue();
+            
+            if ((hasZoneIDs && !HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)) ||
+                (!hasZoneIDs && HasFeature(AvAnalysis::Feature::kPerZoneContextDetection)))
+            {
+                return Status::InvalidCommand;
+            }
+            
+            if (hasZoneIDs)
+            {
+                // Verify via the delegate that the provided list of ZoneIDs contains values present in ZoneManagement only
+                // if the zoneIDs we have are not Null.
+                //
+                if (!contextTrigger.zoneIDs.Value().IsNull())
+                {
+                    CHIP_ERROR err = mDelegate->VerifyZoneIDsAreValid(contextTrigger.zoneIDs.Value().Value());
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        return Status::NotFound;
+                    }
+                }
+            }
+            
+            // Remove the context trigger identified by the provided context, if there is no match, error out
+            //
+            auto it2 = std::find_if(mActiveAmbientContextTriggers.begin(), mActiveAmbientContextTriggers.end(), 
+                [&contextTrigger](const AvAnalysis::Structs::ContextTriggerStruct::Type& ct) {
+                    return ct.context.namespaceID == contextTrigger.context.namespaceID && ct.context.tag == contextTrigger.context.tag;
+            });
+
+            if (it2 == mActiveAmbientContextTriggers.end()) 
+            {
+                return Status::NotFound;
+            }
+            
+            // Remove the context trigger
+            mActiveAmbientContextTriggers.erase(it2);
+        }
+    }
+    else
+    {
+        // Provided set is null, meaning the active triggers attribute shall be set to an empty list
+        //
+        mActiveAmbientContextTriggers.clear();
+    }
+    
+    // Inform the delegate of the new active context set. The delegate will read the updated contents
+    // of the attribute
+    //
+    mDelegate->ActiveAmbientContextTriggersUpdated();
+    
+    return Status::Success;
+}
+
+std::optional<DataModel::ActionReturnStatus> AvAnalysisServerLogic::HandleRemoteDisableContextTriggers(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const AvAnalysis::Commands::DisableContextTriggers::DecodableType & commandData)
+{
     return Status::Success;
 }
 
