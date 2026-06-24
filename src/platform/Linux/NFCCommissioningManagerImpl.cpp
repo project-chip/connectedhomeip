@@ -78,7 +78,10 @@ namespace {} // namespace
 #ifdef DEBUG
 #define ChipLogProgressNfcDebug(module, ...) ChipLogProgress(module, __VA_ARGS__)
 #else
-#define ChipLogProgressNfcDebug(module, ...) do {} while (0)
+#define ChipLogProgressNfcDebug(module, ...)                                                                                       \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
 #endif
 
 // This NFC Tag contains all the variables, handles and buffers related to one NFC tag instance
@@ -106,10 +109,8 @@ private:
     uint32_t mChainedResponseLength = 0;
 
 public:
-    TagInstance(Transport::NFCBase * base, const char * name, SCARDHANDLE handle,
-                const SCARD_IO_REQUEST * sendPci) :
-        nfcBase(base),
-        peerAddress(),          // peerAddress will be filled when 'discriminator' is set
+    TagInstance(Transport::NFCBase * base, const char * name, SCARDHANDLE handle, const SCARD_IO_REQUEST * sendPci) :
+        nfcBase(base), peerAddress(), // peerAddress will be filled when 'discriminator' is set
         cardHandle(handle), pioSendPci(sendPci)
     {
         ChipLogProgress(DeviceLayer, "New TagInstance with cardHandle 0x" ChipLogFormatX64, ChipLogValueX64(cardHandle));
@@ -395,7 +396,7 @@ public:
                 discriminator = static_cast<uint16_t>(dataReceived[2] * 256 + dataReceived[3]);
                 ChipLogProgressNfcDebug(DeviceLayer, "Tag discriminator: %d", discriminator);
                 peerAddress = Transport::PeerAddress::NFC(discriminator);
-                res           = CHIP_NO_ERROR;
+                res         = CHIP_NO_ERROR;
             }
             else
             {
@@ -428,7 +429,8 @@ public:
         TEMPORARY_RETURN_IGNORED SendOnNfcTagResponse(std::move(buffer));
     }
 
-    void ResetChainedResponseBuffer(void) {
+    void ResetChainedResponseBuffer(void)
+    {
         ChipLogProgressNfcDebug(DeviceLayer, "ResetChainedResponseBuffer()");
         mChainedResponseLength = 0;
     }
@@ -587,7 +589,7 @@ struct TagDiscoveryContext
 
 void NFCCommissioningManagerImpl::DispatchTagDiscovery(intptr_t arg)
 {
-    auto * ctx = reinterpret_cast<TagDiscoveryContext *>(arg);
+    auto * ctx                                 = reinterpret_cast<TagDiscoveryContext *>(arg);
     Nfc::NFCReaderTransportDelegate * delegate = nullptr;
     {
         std::lock_guard<std::mutex> lock(ctx->manager->mDelegateMutex);
@@ -651,7 +653,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
             }
 
             mNfcWorkerThreadRunning = true;
-            mNfcWorkerThread = std::thread(&NFCCommissioningManagerImpl::NfcWorkerThreadMain, this);
+            mNfcWorkerThread        = std::thread(&NFCCommissioningManagerImpl::NfcWorkerThreadMain, this);
         }
     }
 
@@ -787,7 +789,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
             if (tagInstance != nullptr)
             {
                 // Found an instance with expected Discriminator
-                targetedTagInstance = tagInstance;
+                targetedTagInstance  = tagInstance;
                 mLastTagInstanceUsed = tagInstance;
             }
         }
@@ -822,7 +824,7 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
         else
         {
             ChipLogError(DeviceLayer, "SCardEstablishContext failed: %s", pcsc_stringify_error(result));
-            mWorkerInitResult = CHIP_ERROR_INTERNAL;
+            mWorkerInitResult       = CHIP_ERROR_INTERNAL;
             mNfcWorkerThreadRunning = false;
         }
         mWorkerInitCompleted = true;
@@ -1037,9 +1039,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
             // This couple (readerName, cardHandle) is not known yet: Create a new TagInstance
             Transport::NFCBase * nfcBase = GetNFCBase();
             VerifyOrReturnLogError(nfcBase != nullptr, CHIP_ERROR_INCORRECT_STATE);
-            auto newTagInstance          =
-                std::make_shared<TagInstance>(nfcBase, readerName, cardHandle,
-                                              (dwActiveProtocol == SCARD_PROTOCOL_T0) ? SCARD_PCI_T0 : SCARD_PCI_T1);
+            auto newTagInstance = std::make_shared<TagInstance>(
+                nfcBase, readerName, cardHandle, (dwActiveProtocol == SCARD_PROTOCOL_T0) ? SCARD_PCI_T0 : SCARD_PCI_T1);
 
             CHIP_ERROR err = newTagInstance->RetrieveDiscriminator();
             if (err != CHIP_NO_ERROR)
