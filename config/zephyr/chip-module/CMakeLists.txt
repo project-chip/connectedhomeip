@@ -59,12 +59,10 @@ if(CONFIG_CHIP)
         endif()
     endif()
 
-    if(CONFIG_NEWLIB_LIBC)
-        # For ARM targets, use nosys.specs which provides stub implementations of
-        # system calls for embedded environments without full OS support
-        if (CONFIG_ARM)
-            matter_add_cflags(--specs=nosys.specs)
-        endif()
+    # For ARM targets, use nosys.specs which provides stub implementations of
+    # system calls for embedded environments without full OS support
+    if (CONFIG_ARM)
+        matter_add_cflags(--specs=nosys.specs)
     endif()
 
     if(CONFIG_MBEDTLS)
