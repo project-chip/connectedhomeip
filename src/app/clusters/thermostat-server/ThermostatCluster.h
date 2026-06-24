@@ -74,19 +74,19 @@ public:
     /// integration layer. Members are typed via the generated TypeInfo so they always track the spec.
     struct StartupConfiguration
     {
-        Attributes::AbsMinHeatSetpointLimit::TypeInfo::Type absMinHeatSetpointLimit   = 700;
-        Attributes::AbsMaxHeatSetpointLimit::TypeInfo::Type absMaxHeatSetpointLimit   = 3000;
-        Attributes::AbsMinCoolSetpointLimit::TypeInfo::Type absMinCoolSetpointLimit   = 1600;
-        Attributes::AbsMaxCoolSetpointLimit::TypeInfo::Type absMaxCoolSetpointLimit   = 3200;
-        Attributes::MinHeatSetpointLimit::TypeInfo::Type minHeatSetpointLimit         = 700;
-        Attributes::MaxHeatSetpointLimit::TypeInfo::Type maxHeatSetpointLimit         = 3000;
-        Attributes::MinCoolSetpointLimit::TypeInfo::Type minCoolSetpointLimit         = 1600;
-        Attributes::MaxCoolSetpointLimit::TypeInfo::Type maxCoolSetpointLimit         = 3200;
+        int16_t absMinHeatSetpointLimit   = 700; // 7C (44.5 F) is the default
+        int16_t absMaxHeatSetpointLimit   = 3000; // 30C (86 F) is the default
+        int16_t absMinCoolSetpointLimit   = 1600; // 16C (61 F) is the default
+        int16_t absMaxCoolSetpointLimit   = 3200; // 32C (90 F) is the default
+        int16_t minHeatSetpointLimit         = 700; // 7C (44.5 F) is the default
+        int16_t maxHeatSetpointLimit         = 3000; // 30C (86 F) is the default
+        int16_t minCoolSetpointLimit         = 1600; // 16C (61 F) is the default
+        int16_t maxCoolSetpointLimit         = 3200; // 32C (90 F) is the default
         Attributes::OccupiedHeatingSetpoint::TypeInfo::Type occupiedHeatingSetpoint   = 2000;
         Attributes::OccupiedCoolingSetpoint::TypeInfo::Type occupiedCoolingSetpoint   = 2600;
         Attributes::UnoccupiedHeatingSetpoint::TypeInfo::Type unoccupiedHeatingSetpoint = 2000;
         Attributes::UnoccupiedCoolingSetpoint::TypeInfo::Type unoccupiedCoolingSetpoint = 2600;
-        Attributes::MinSetpointDeadBand::TypeInfo::Type minSetpointDeadBand           = 20;
+        int8_t minSetpointDeadBand           = 20; // 2.0C is the default
         Attributes::ControlSequenceOfOperation::TypeInfo::Type controlSequenceOfOperation =
             ControlSequenceOfOperationEnum::kCoolingAndHeating;
         Attributes::SystemMode::TypeInfo::Type systemMode = SystemModeEnum::kAuto;
@@ -117,7 +117,7 @@ public:
     // FabricTable::Delegate: roll back an open atomic write originated by a removed fabric.
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-    uint32_t GetFeatureMap() const { return mFeatureMap; }
+    uint32_t GetFeatureMap() const { return mFeatures.Raw(); }
 
     //
     // Atomic-write state machine (moved from ThermostatAttrAccess in PR 3b-1). The session is per-instance;
@@ -158,8 +158,6 @@ public:
                              const Commands::AtomicRequest::DecodableType & commandData);
 
 private:
-    bool FeatureSupported(Feature feature) const { return (mFeatureMap & static_cast<uint32_t>(feature)) != 0; }
-
     // @brief Sets the ActivePresetHandle to the given handle (or null), validating it against the Presets list.
     Protocols::InteractionModel::Status SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle);
 
@@ -191,7 +189,7 @@ private:
     // Deadband, in 0.01C units, or 0 when AutoMode is not supported.
     int16_t DeadBandTemp() const
     {
-        return FeatureSupported(Feature::kAutoMode) ? static_cast<int16_t>(mMinSetpointDeadBand * 10) : 0;
+        return mFeatures.Has(Feature::kAutoMode) ? static_cast<int16_t>(mMinSetpointDeadBand * 10) : 0;
     }
 
     // Post-write side effects for a setpoint attribute (replaces MatterThermostatClusterServerAttributeChangedCallback):
@@ -203,7 +201,7 @@ private:
 
     Context mContext;
     Thermostat::Delegate * mDelegate = nullptr;
-    const uint32_t mFeatureMap;
+    const BitFlags<Thermostat::Feature> mFeatures;
 
     struct AtomicWriteSession
     {

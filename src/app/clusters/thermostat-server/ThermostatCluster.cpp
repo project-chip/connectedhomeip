@@ -66,226 +66,6 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-// Encodes the delegate-backed list / preset / schedule / suggestion attributes. The scalar attributes
-// (including LocalTemperature, RemoteSensing and ClusterRevision) are handled directly by ReadAttribute.
-CHIP_ERROR ThermostatCluster::ReadDelegateAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case PresetTypes::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                PresetTypeStruct::Type presetType;
-                auto err = delegate->GetPresetTypeAtIndex(i, presetType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(presetType));
-            }
-        });
-    }
-    break;
-    case NumberOfPresets::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetNumberOfPresets()));
-    }
-    break;
-    case Presets::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
-        if (InAtomicWrite(aPath.mEndpointId, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
-        {
-            return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-                for (uint8_t i = 0; true; i++)
-                {
-                    PresetStructWithOwnedMembers preset;
-                    auto err = delegate->GetPendingPresetAtIndex(i, preset);
-                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                    {
-                        return CHIP_NO_ERROR;
-                    }
-                    ReturnErrorOnFailure(err);
-                    ReturnErrorOnFailure(encoder.Encode(preset));
-                }
-            });
-        }
-        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                PresetStructWithOwnedMembers preset;
-                auto err = delegate->GetPresetAtIndex(i, preset);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(preset));
-            }
-        });
-    }
-    break;
-    case ActivePresetHandle::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        uint8_t buffer[kPresetHandleSize];
-        MutableByteSpan activePresetHandleSpan(buffer);
-        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
-
-        CHIP_ERROR err = delegate->GetActivePresetHandle(activePresetHandle);
-        ReturnErrorOnFailure(err);
-
-        ReturnErrorOnFailure(aEncoder.Encode(activePresetHandle));
-    }
-    break;
-    case ScheduleTypes::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                ScheduleTypeStruct::Type scheduleType;
-                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(scheduleType));
-            }
-        });
-    }
-    break;
-    case Schedules::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-    }
-    break;
-    case MaxThermostatSuggestions::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetMaxThermostatSuggestions()));
-    }
-    break;
-    case ThermostatSuggestions::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-            for (size_t i = 0; true; i++)
-            {
-                ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
-                auto err = delegate->GetThermostatSuggestionAtIndex(i, thermostatSuggestion);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(encoder.Encode(thermostatSuggestion));
-            }
-        });
-    }
-    break;
-    case CurrentThermostatSuggestion::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentThermostatSuggestion;
-
-        delegate->GetCurrentThermostatSuggestion(currentThermostatSuggestion);
-        ReturnErrorOnFailure(aEncoder.Encode(currentThermostatSuggestion));
-    }
-    break;
-    case ThermostatSuggestionNotFollowingReason::Id: {
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetThermostatSuggestionNotFollowingReason()));
-    }
-    break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-// Handles writes to the delegate-backed atomic-write attributes (Presets / Schedules). All other writable
-// attributes are handled directly by WriteAttribute.
-CHIP_ERROR ThermostatCluster::WriteDelegateAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    EndpointId endpoint      = aPath.mEndpointId;
-    auto & subjectDescriptor = aDecoder.GetSubjectDescriptor();
-
-    // Check atomic attributes first
-    switch (aPath.mAttributeId)
-    {
-    case Presets::Id: {
-
-        auto delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        // Presets are not editable, return INVALID_IN_STATE.
-        VerifyOrReturnError(InAtomicWrite(endpoint, MakeOptional(aPath.mAttributeId)), CHIP_IM_GLOBAL_STATUS(InvalidInState),
-                            ChipLogError(Zcl, "Presets are not editable"));
-
-        // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
-        // otherwise return BUSY.
-        if (!InAtomicWrite(endpoint, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
-        {
-            ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
-            return CHIP_IM_GLOBAL_STATUS(Busy);
-        }
-
-        // If the list operation is replace all, clear the existing pending list, iterate over the new presets list
-        // and add to the pending presets list.
-        if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
-        {
-            // Clear the pending presets list
-            delegate->ClearPendingPresetList();
-
-            Presets::TypeInfo::DecodableType newPresetsList;
-            ReturnErrorOnFailure(aDecoder.Decode(newPresetsList));
-
-            // Iterate over the presets and call the delegate to append to the list of pending presets.
-            auto iter = newPresetsList.begin();
-            while (iter.Next())
-            {
-                const PresetStruct::Type & preset = iter.GetValue();
-                ReturnErrorOnFailure(AppendPendingPreset(preset));
-            }
-            return iter.GetStatus();
-        }
-
-        // If the list operation is AppendItem, call the delegate to append the item to the list of pending presets.
-        if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
-        {
-            PresetStruct::Type preset;
-            ReturnErrorOnFailure(aDecoder.Decode(preset));
-            return AppendPendingPreset(preset);
-        }
-    }
-    break;
-    case Schedules::Id: {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 //
 // ThermostatCluster (code-driven) implementation
 //
@@ -293,7 +73,7 @@ CHIP_ERROR ThermostatCluster::WriteDelegateAttribute(const ConcreteDataAttribute
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config,
                                      const Context & context) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mContext(context), mFeatureMap(featureMap)
+    mContext(context), mFeatures(featureMap)
 {
     mAbsMinHeatSetpointLimit    = config.absMinHeatSetpointLimit;
     mAbsMaxHeatSetpointLimit    = config.absMaxHeatSetpointLimit;
@@ -337,14 +117,6 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     DefaultServerCluster::Shutdown(type);
 }
 
-void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-{
-    if (mAtomicWriteSession.state == AtomicWriteState::Open && mAtomicWriteSession.nodeId.GetFabricIndex() == fabricIndex)
-    {
-        ResetAtomicWrite(GetEndpointId());
-    }
-}
-
 int16_t ThermostatCluster::EnforceHeatingSetpointLimits(int16_t heatingSetpoint) const
 {
     int16_t minLimit = mMinHeatSetpointLimit;
@@ -375,15 +147,237 @@ int16_t ThermostatCluster::EnforceCoolingSetpointLimits(int16_t coolingSetpoint)
     return coolingSetpoint;
 }
 
+// Encodes the delegate-backed list / preset / schedule / suggestion attributes. The scalar attributes
+// (including LocalTemperature, RemoteSensing and ClusterRevision) are handled directly by ReadAttribute.
+CHIP_ERROR ThermostatCluster::ReadDelegateAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case PresetTypes::Id: {
+        auto delegate = mDelegate;
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                PresetTypeStruct::Type presetType;
+                auto err = delegate->GetPresetTypeAtIndex(i, presetType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(presetType));
+            }
+        });
+    }
+    break;
+    case NumberOfPresets::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetNumberOfPresets()));
+    }
+    break;
+    case Presets::Id: {
+        auto delegate = mDelegate;
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
+        if (InAtomicWrite(aPath.mEndpointId, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
+        {
+            return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+                for (uint8_t i = 0; true; i++)
+                {
+                    PresetStructWithOwnedMembers preset;
+                    auto err = delegate->GetPendingPresetAtIndex(i, preset);
+                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                    {
+                        return CHIP_NO_ERROR;
+                    }
+                    ReturnErrorOnFailure(err);
+                    ReturnErrorOnFailure(encoder.Encode(preset));
+                }
+            });
+        }
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                PresetStructWithOwnedMembers preset;
+                auto err = delegate->GetPresetAtIndex(i, preset);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(preset));
+            }
+        });
+    }
+    break;
+    case ActivePresetHandle::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        uint8_t buffer[kPresetHandleSize];
+        MutableByteSpan activePresetHandleSpan(buffer);
+        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
+
+        CHIP_ERROR err = mDelegate->GetActivePresetHandle(activePresetHandle);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(aEncoder.Encode(activePresetHandle));
+    }
+    break;
+    case ScheduleTypes::Id: {
+        auto delegate = mDelegate;
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(scheduleType));
+            }
+        });
+    }
+    break;
+    case Schedules::Id: {
+        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    }
+    break;
+    case MaxThermostatSuggestions::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetMaxThermostatSuggestions()));
+    }
+    break;
+    case ThermostatSuggestions::Id: {
+        auto delegate = mDelegate;
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (size_t i = 0; true; i++)
+            {
+                ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
+                auto err = delegate->GetThermostatSuggestionAtIndex(i, thermostatSuggestion);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(thermostatSuggestion));
+            }
+        });
+    }
+    break;
+    case CurrentThermostatSuggestion::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentThermostatSuggestion;
+
+        mDelegate->GetCurrentThermostatSuggestion(currentThermostatSuggestion);
+        ReturnErrorOnFailure(aEncoder.Encode(currentThermostatSuggestion));
+    }
+    break;
+    case ThermostatSuggestionNotFollowingReason::Id: {
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetThermostatSuggestionNotFollowingReason()));
+    }
+    break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+// Handles writes to the delegate-backed atomic-write attributes (Presets / Schedules). All other writable
+// attributes are handled directly by WriteAttribute.
+CHIP_ERROR ThermostatCluster::WriteDelegateAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    EndpointId endpoint      = aPath.mEndpointId;
+    auto & subjectDescriptor = aDecoder.GetSubjectDescriptor();
+
+    // Check atomic attributes first
+    switch (aPath.mAttributeId)
+    {
+    case Presets::Id: {
+
+        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        // Presets are not editable, return INVALID_IN_STATE.
+        VerifyOrReturnError(InAtomicWrite(endpoint, MakeOptional(aPath.mAttributeId)), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+                            ChipLogError(Zcl, "Presets are not editable"));
+
+        // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
+        // otherwise return BUSY.
+        if (!InAtomicWrite(endpoint, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
+        {
+            ChipLogError(Zcl, "Another node is editing presets. Server is busy. Try again later");
+            return CHIP_IM_GLOBAL_STATUS(Busy);
+        }
+
+        // If the list operation is replace all, clear the existing pending list, iterate over the new presets list
+        // and add to the pending presets list.
+        if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            // Clear the pending presets list
+            mDelegate->ClearPendingPresetList();
+
+            Presets::TypeInfo::DecodableType newPresetsList;
+            ReturnErrorOnFailure(aDecoder.Decode(newPresetsList));
+
+            // Iterate over the presets and call the delegate to append to the list of pending presets.
+            auto iter = newPresetsList.begin();
+            while (iter.Next())
+            {
+                const PresetStruct::Type & preset = iter.GetValue();
+                ReturnErrorOnFailure(AppendPendingPreset(preset));
+            }
+            return iter.GetStatus();
+        }
+
+        // If the list operation is AppendItem, call the delegate to append the item to the list of pending presets.
+        if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            PresetStruct::Type preset;
+            ReturnErrorOnFailure(aDecoder.Decode(preset));
+            return AppendPendingPreset(preset);
+        }
+    }
+    break;
+    case Schedules::Id: {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    if (mAtomicWriteSession.state == AtomicWriteState::Open && mAtomicWriteSession.nodeId.GetFabricIndex() == fabricIndex)
+    {
+        ResetAtomicWrite(GetEndpointId());
+    }
+}
+
 DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
 {
-    const bool ltne = FeatureSupported(Feature::kLocalTemperatureNotExposed);
+    const bool ltne = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
 
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(mFeatureMap);
+        return encoder.Encode(mFeatures.Raw());
     case ClusterRevision::Id:
         return encoder.Encode(Thermostat::kRevision);
     case LocalTemperature::Id:
@@ -520,7 +514,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
 
 void ThermostatCluster::GenerateScalarChangeEvent(AttributeId attributeId)
 {
-    if (!FeatureSupported(Feature::kEvents))
+    if (!mFeatures.Has(Feature::kEvents))
     {
         return;
     }
@@ -560,7 +554,7 @@ void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
 
     // Maintain the deadband by shifting the paired setpoint (replaces EnsureDeadband). WriteAttribute has
     // already validated that this shift stays within the limits, so it cannot exceed them here.
-    if (FeatureSupported(Feature::kAutoMode))
+    if (mFeatures.Has(Feature::kAutoMode))
     {
         switch (attributeId)
         {
@@ -608,9 +602,9 @@ void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
     GenerateScalarChangeEvent(attributeId);
 
     // Clear the active preset when a setpoint relevant to the current occupancy state changes.
-    if (FeatureSupported(Feature::kPresets))
+    if (mFeatures.Has(Feature::kPresets))
     {
-        const bool occupied = !FeatureSupported(Feature::kOccupancy) || mOccupancy.Has(OccupancyBitmap::kOccupied);
+        const bool occupied = !mFeatures.Has(Feature::kOccupancy) || mOccupancy.Has(OccupancyBitmap::kOccupied);
         bool clear          = false;
         switch (attributeId)
         {
@@ -649,7 +643,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         return Status::InvalidInState;
     }
 
-    const bool autoSupported = FeatureSupported(Feature::kAutoMode);
+    const bool autoSupported = mFeatures.Has(Feature::kAutoMode);
     const int16_t deadband   = DeadBandTemp();
 
     switch (attributeId)
@@ -795,7 +789,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
     case RemoteSensing::Id: {
         BitMask<RemoteSensingBitmap> requested;
         ReturnErrorOnFailure(decoder.Decode(requested));
-        if (FeatureSupported(Feature::kLocalTemperatureNotExposed))
+        if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))
         {
             VerifyOrReturnError(!requested.Has(RemoteSensingBitmap::kLocalTemperature), Status::ConstraintError);
         }
@@ -935,9 +929,9 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
     const auto & mode   = commandData.mode;
     const auto & amount = commandData.amount;
 
-    const bool heatSupported = FeatureSupported(Feature::kHeating);
-    const bool coolSupported = FeatureSupported(Feature::kCooling);
-    const bool autoSupported = FeatureSupported(Feature::kAutoMode);
+    const bool heatSupported = mFeatures.Has(Feature::kHeating);
+    const bool coolSupported = mFeatures.Has(Feature::kCooling);
+    const bool autoSupported = mFeatures.Has(Feature::kAutoMode);
     const int16_t deadband   = DeadBandTemp();
 
     Status status = Status::Failure;
@@ -1046,8 +1040,8 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
     }
 
     // A successful SetpointRaiseLower changes occupied setpoints, which clears the active preset (occupied).
-    if (status == Status::Success && FeatureSupported(Feature::kPresets) &&
-        (!FeatureSupported(Feature::kOccupancy) || mOccupancy.Has(OccupancyBitmap::kOccupied)))
+    if (status == Status::Success && mFeatures.Has(Feature::kPresets) &&
+        (!mFeatures.Has(Feature::kOccupancy) || mOccupancy.Has(OccupancyBitmap::kOccupied)))
     {
         SetActivePreset(DataModel::NullNullable);
     }
@@ -1058,15 +1052,15 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
 CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    const bool heat = FeatureSupported(Feature::kHeating);
-    const bool cool = FeatureSupported(Feature::kCooling);
-    const bool occ  = FeatureSupported(Feature::kOccupancy);
-    const bool sch  = FeatureSupported(Feature::kScheduleConfiguration);
-    const bool autoM = FeatureSupported(Feature::kAutoMode);
-    const bool ltne = FeatureSupported(Feature::kLocalTemperatureNotExposed);
-    const bool msch = FeatureSupported(Feature::kMatterScheduleConfiguration);
-    const bool pres = FeatureSupported(Feature::kPresets);
-    const bool sugg = FeatureSupported(Feature::kThermostatSuggestions);
+    const bool heat = mFeatures.Has(Feature::kHeating);
+    const bool cool = mFeatures.Has(Feature::kCooling);
+    const bool occ  = mFeatures.Has(Feature::kOccupancy);
+    const bool sch  = mFeatures.Has(Feature::kScheduleConfiguration);
+    const bool autoM = mFeatures.Has(Feature::kAutoMode);
+    const bool ltne = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
+    const bool msch = mFeatures.Has(Feature::kMatterScheduleConfiguration);
+    const bool pres = mFeatures.Has(Feature::kPresets);
+    const bool sugg = mFeatures.Has(Feature::kThermostatSuggestions);
 
     using Entry = AttributeListBuilder::OptionalAttributeEntry;
     // NOTE(3a): deprecated attributes (PI*Demand, HVACSystemTypeConfiguration, ThermostatProgrammingOperationMode,
@@ -1156,23 +1150,23 @@ CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
     };
 
     ReturnErrorOnFailure(builder.ReferenceExisting(kSetpointRaiseLower));
-    if (FeatureSupported(Feature::kScheduleConfiguration))
+    if (mFeatures.Has(Feature::kScheduleConfiguration))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kWeeklyScheduleCommands));
     }
-    if (FeatureSupported(Feature::kMatterScheduleConfiguration))
+    if (mFeatures.Has(Feature::kMatterScheduleConfiguration))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kSetActiveScheduleRequest));
     }
-    if (FeatureSupported(Feature::kPresets))
+    if (mFeatures.Has(Feature::kPresets))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kSetActivePresetRequest));
     }
-    if (FeatureSupported(Feature::kThermostatSuggestions))
+    if (mFeatures.Has(Feature::kThermostatSuggestions))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kSuggestionCommands));
     }
-    if (FeatureSupported(Feature::kPresets) || FeatureSupported(Feature::kMatterScheduleConfiguration))
+    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kAtomicRequest));
     }
@@ -1185,15 +1179,15 @@ CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path
     static constexpr CommandId kAddThermostatSuggestionResponse[] = { Commands::AddThermostatSuggestionResponse::Id };
     static constexpr CommandId kAtomicResponse[]                 = { Commands::AtomicResponse::Id };
 
-    if (FeatureSupported(Feature::kScheduleConfiguration))
+    if (mFeatures.Has(Feature::kScheduleConfiguration))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kGetWeeklyScheduleResponse));
     }
-    if (FeatureSupported(Feature::kThermostatSuggestions))
+    if (mFeatures.Has(Feature::kThermostatSuggestions))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kAddThermostatSuggestionResponse));
     }
-    if (FeatureSupported(Feature::kPresets) || FeatureSupported(Feature::kMatterScheduleConfiguration))
+    if (mFeatures.Has(Feature::kPresets) || mFeatures.Has(Feature::kMatterScheduleConfiguration))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kAtomicResponse));
     }
