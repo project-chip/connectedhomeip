@@ -145,9 +145,9 @@ the target leaf device to endpoint ID `n + 1`.
 
 You can commission and test the simulator application natively:
 
-1. **In-Device Commissioning:** Run both the simulator app and the
-   Android `CHIPTool` controller app together on the emulator, communicating
-   natively via loopback.
+1. **In-Device Commissioning:** Run both the simulator app and the Android
+   `CHIPTool` controller app together on the emulator, communicating natively
+   via loopback.
 
 ---
 
