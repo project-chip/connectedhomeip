@@ -27,19 +27,13 @@ uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 extern "C" void main_task(void const * argument)
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    if (CHIP_NO_ERROR != chip::NXP::App::GetAppTask().Start())
-    {
-        assert(0);
-    }
+    chip::NXP::App::GetAppTask().Start();
 }
 #else
 int main(int argc, char * argv[])
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    if (CHIP_NO_ERROR != chip::NXP::App::GetAppTask().Start())
-    {
-        assert(0);
-    }
+    chip::NXP::App::GetAppTask().Start();
     vTaskStartScheduler();
 }
 #endif
