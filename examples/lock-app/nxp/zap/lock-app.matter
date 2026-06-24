@@ -830,6 +830,22 @@ cluster OtaSoftwareUpdateRequestor = 42 {
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
+cluster LocalizationConfiguration = 43 {
+  revision 1;
+
+  attribute access(write: manage) char_string<35> activeLocale = 0;
+  readonly attribute char_string supportedLocales[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 cluster GeneralCommissioning = 48 {
   revision 2;
@@ -2535,7 +2551,6 @@ cluster DoorLock = 257 {
 
 endpoint 0 {
   device type ma_rootdevice = 22, version 5;
-  device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2610,6 +2625,16 @@ endpoint 0 {
     handle command AnnounceOTAProvider;
   }
 
+  server cluster LocalizationConfiguration {
+    ram      attribute activeLocale;
+    callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+  }
+
   server cluster GeneralCommissioning {
     callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
@@ -2666,8 +2691,6 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
-    callback attribute totalOperationalHours;
-    callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
@@ -2830,7 +2853,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_doorlock = 10, version 4;
+  device type ma_doorlock = 10, version 1;
 
 
   server cluster Identify {
@@ -2870,17 +2893,22 @@ endpoint 1 {
     ram      attribute doorState;
     ram      attribute numberOfTotalUsersSupported default = 10;
     ram      attribute numberOfPINUsersSupported default = 10;
+    ram      attribute numberOfRFIDUsersSupported default = 10;
     ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
     ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
     ram      attribute numberOfHolidaySchedulesSupported default = 10;
     ram      attribute maxPINCodeLength default = 8;
     ram      attribute minPINCodeLength default = 6;
+    ram      attribute maxRFIDCodeLength default = 20;
+    ram      attribute minRFIDCodeLength default = 10;
     ram      attribute credentialRulesSupport default = 1;
     ram      attribute numberOfCredentialsSupportedPerUser default = 5;
-    ram      attribute LEDSettings default = 0;
+    ram      attribute language default = "en";
     ram      attribute autoRelockTime default = 60;
+    ram      attribute soundVolume default = 0;
     ram      attribute operatingMode default = 0x00;
     ram      attribute supportedOperatingModes default = 0xFFF6;
+    ram      attribute enableOneTouchLocking default = 0x00;
     ram      attribute enablePrivacyModeButton default = 0x00;
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
@@ -2897,8 +2925,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 32177;
-    ram      attribute clusterRevision default = 10;
+    ram      attribute featureMap default = 0x7DB3;
+    ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;
