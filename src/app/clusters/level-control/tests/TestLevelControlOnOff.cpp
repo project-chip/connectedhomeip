@@ -257,7 +257,8 @@ TEST_F(TestLevelControlOnOff, TestOnOffAttributes)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate)
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
                                      .WithOnOff(onOffCluster)
                                      .WithOnOffTransitionTime(0)
                                      .WithOnTransitionTime(0)
@@ -379,7 +380,8 @@ TEST_F(TestLevelControlOnOff, TestRestorationBehaviorWhenOnLevelNull)
     // OnLevel is null (default).
     // When turning Off, it should transition to MinLevel but then RESTORE the stored level.
 
-    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate)
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
                                      .WithLighting(DataModel::NullNullable) // MinLevel=1
                                      .WithOnOff(onOffCluster) };            // Dependency active
     onOffCluster.AddDelegate(&cluster);
@@ -532,9 +534,8 @@ TEST_F(TestLevelControlOnOff, TestImmediateMoveToMinLevelWithOnOff)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{
-        kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithMinLevel(1)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithMinLevel(1) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

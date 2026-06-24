@@ -63,8 +63,7 @@ public:
 
     struct Config
     {
-        Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) :
-            mDelegate(delegate), mTimerDelegate(timerDelegate)
+        Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
         Config & WithOnOff(OnOffCluster & onOffCluster)

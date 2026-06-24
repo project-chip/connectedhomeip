@@ -134,9 +134,8 @@ TEST_F(TestLevelControlScenes, TestApplyScene)
 TEST_F(TestLevelControlScenes, TestApplySceneImmediate)
 {
     // Set a default transition time of 10s (100ds) to verify it is IGNORED when ApplyScene(0) is called.
-    LevelControlCluster cluster{
-        kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOffTransitionTime(100)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOffTransitionTime(100) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
