@@ -55,8 +55,11 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp
