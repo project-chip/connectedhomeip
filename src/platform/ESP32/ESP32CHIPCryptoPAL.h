@@ -24,8 +24,6 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 
-#include <esp_idf_version.h>
-
 namespace chip {
 namespace Crypto {
 
@@ -41,15 +39,6 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Initialize(ECPKeyTarget keyTarget, int efuseBlock);
-
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
-    /**
-     * @brief Initialize the keypair from the TEE secure storage
-     * @note  Only available on ESP-IDF < 6.0 (mbedTLS based crypto path).
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR InitializeFromTEE(ECPKeyTarget keyTarget, const char * key_id);
-#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
 
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const override;
 };

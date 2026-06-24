@@ -1,20 +1,28 @@
-CONFIG_IDF_TARGET="esp32c6"
+# Custom partition table with the ESP-TEE partitions.
+# The TEE app slots (tee_0/tee_1) plus the two OTA app slots need >4MB, so an
+# 8MB flash is required for this layout.
 CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_tee.csv"
 
 # ESP-TEE
 CONFIG_SECURE_ENABLE_TEE=y
-CONFIG_MBEDTLS_TEE_SEC_STG_ECDSA_SIGN=y
-CONFIG_SECURE_TEE_SEC_STG_MODE_DEVELOPMENT=y
+# eFuse HMAC key block used by the TEE to derive the DAC key via PBKDF2.
+# Burn the per-device HMAC key into this block (BLOCK_KEY1) with purpose HMAC_UP.
+# Must differ from the secure-storage XTS key block: in dev secure-storage mode
+# that block is treated as 0, so the PBKDF2 block must be non-zero.
+CONFIG_SECURE_TEE_PBKDF2_EFUSE_HMAC_KEY_ID=1
 
-# DAC via TEE secure storage
+# DAC signing: derive the DAC private key inside the TEE via HMAC + PBKDF2.
+# The key is never stored in flash and never leaves the secure world.
 CONFIG_SEC_CERT_DAC_PROVIDER=y
-CONFIG_USE_ESP32_TEE_SECURE_STORAGE=y
+CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2=y
+# Not using the ECDSA peripheral key path on this SoC
+CONFIG_USE_ESP32_ECDSA_PERIPHERAL=n
+# DS peripheral not used
 CONFIG_ESP_SECURE_CERT_DS_PERIPHERAL=n
 
+# Factory data provider supplies the Spake2p salt that is reused as the PBKDF2 salt
 CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER=y
 CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER=y
-CONFIG_DEVICE_VENDOR_ID=0xFFF2
-CONFIG_DEVICE_PRODUCT_ID=0x8001
 CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL="fctry"

@@ -349,10 +349,6 @@ if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
-if (CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
-    chip_gn_arg_append("chip_use_esp32_tee_secure_storage" "true")
-endif()
-
 if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
     target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
@@ -505,12 +501,12 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND matter_requires espressif__esp_secure_cert_mgr)
 endif()
 
-if (CONFIG_ENABLE_ENCRYPTED_OTA)
-    list(APPEND matter_requires espressif__esp_encrypted_img)
+if (CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2)
+    list(APPEND matter_requires tee_sec_storage)
 endif()
 
-if (CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
-    list(APPEND matter_requires tee_sec_storage)
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+    list(APPEND matter_requires espressif__esp_encrypted_img)
 endif()
 
 if (CONFIG_ENABLE_DELTA_OTA)
