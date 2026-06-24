@@ -233,20 +233,21 @@ esptool.py -p (PORT) write_flash 0x3E0000 path/to/factory_partition.bin
 ## 1.7 Protecting the DAC private key with ESP-TEE
 
 On SoCs that support ESP-TEE (Trusted Execution Environment), the Device
-Attestation Certificate (DAC) signing can be confined to the secure world so that
-the DAC private key is never present in the application (REE) and never stored in
-plaintext in flash. The application calls into the TEE only to obtain a signature;
-the key material stays inside the secure world.
+Attestation Certificate (DAC) signing can be confined to the secure world so
+that the DAC private key is never present in the application (REE) and never
+stored in plaintext in flash. The application calls into the TEE only to obtain
+a signature; the key material stays inside the secure world.
 
 Two mechanisms are used depending on the SoC's peripherals:
 
-| SoC | Mechanism | DAC private key |
-| --- | --- | --- |
-| Has HMAC peripheral (ESP32-C6/H2/C5) | Derived at runtime inside the TEE using PBKDF2-HMAC-SHA256 and signed in the TEE | Never stored — derived on demand from the eFuse HMAC key |
-| No HMAC peripheral (e.g. ESP32-C61) | Provisioned into the ECDSA peripheral, with peripheral access restricted to the TEE | Held in the ECDSA peripheral; signing happens in hardware, gated by the TEE |
+| SoC                                  | Mechanism                                                                           | DAC private key                                                             |
+| ------------------------------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Has HMAC peripheral (ESP32-C6/H2/C5) | Derived at runtime inside the TEE using PBKDF2-HMAC-SHA256 and signed in the TEE    | Never stored — derived on demand from the eFuse HMAC key                    |
+| No HMAC peripheral (e.g. ESP32-C61)  | Provisioned into the ECDSA peripheral, with peripheral access restricted to the TEE | Held in the ECDSA peripheral; signing happens in hardware, gated by the TEE |
 
-In both cases the DAC and PAI **certificates** are public and continue to be read
-from the `esp_secure_cert` partition; only the private-key handling differs.
+In both cases the DAC and PAI **certificates** are public and continue to be
+read from the `esp_secure_cert` partition; only the private-key handling
+differs.
 
 ### 1.7.1 HMAC + PBKDF2 derived DAC key (HMAC-capable SoCs)
 
@@ -294,8 +295,8 @@ idf.py -p (PORT) efuse-burn-key BLOCK_KEY1 hmac_key.bin HMAC_UP
 ### 1.7.2 ECDSA peripheral key restricted to the TEE (non-HMAC SoCs)
 
 On SoCs without an HMAC peripheral, the DAC key is provisioned into the ECDSA
-peripheral and signing is done in hardware. ESP-TEE restricts access to the ECDSA
-peripheral to the secure world (via the Access Permission Management / APM
+peripheral and signing is done in hardware. ESP-TEE restricts access to the
+ECDSA peripheral to the secure world (via the Access Permission Management / APM
 configuration of the TEE), so the application cannot drive the peripheral
 directly. From the Matter side this uses the existing
 `CONFIG_USE_ESP32_ECDSA_PERIPHERAL` signing path; the TEE-only restriction is a
@@ -303,31 +304,31 @@ property of the TEE build, not of the Matter code.
 
 ### 1.7.3 Trade-offs
 
-| Approach | Key in app (REE) RAM | Signing location | Requires | Notes |
-| --- | --- | --- | --- | --- |
-| Default format key | Yes | Software (mbedTLS) | Flash encryption to protect the key in flash | Simplest; key is materialized in RAM. |
-| ECDSA peripheral (no TEE) | Never | On-chip ECDSA peripheral | SoC with ECDSA peripheral | Key never enters software, but the app can drive the peripheral. |
-| **TEE + HMAC/PBKDF2** | Never | Inside the TEE | HMAC peripheral + ESP-TEE | No key in flash; derived on demand; signing isolated in the secure world. Recommended for HMAC-capable SoCs. |
-| **TEE + ECDSA peripheral** | Never | ECDSA peripheral, gated by TEE | ECDSA peripheral + ESP-TEE | Hardware signing with peripheral access locked to the secure world. For non-HMAC SoCs. |
+| Approach                   | Key in app (REE) RAM | Signing location               | Requires                                     | Notes                                                                                                        |
+| -------------------------- | -------------------- | ------------------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Default format key         | Yes                  | Software (mbedTLS)             | Flash encryption to protect the key in flash | Simplest; key is materialized in RAM.                                                                        |
+| ECDSA peripheral (no TEE)  | Never                | On-chip ECDSA peripheral       | SoC with ECDSA peripheral                    | Key never enters software, but the app can drive the peripheral.                                             |
+| **TEE + HMAC/PBKDF2**      | Never                | Inside the TEE                 | HMAC peripheral + ESP-TEE                    | No key in flash; derived on demand; signing isolated in the secure world. Recommended for HMAC-capable SoCs. |
+| **TEE + ECDSA peripheral** | Never                | ECDSA peripheral, gated by TEE | ECDSA peripheral + ESP-TEE                   | Hardware signing with peripheral access locked to the secure world. For non-HMAC SoCs.                       |
 
 Notes on the design decision:
 
--   An earlier iteration **stored** the DAC private key in TEE secure storage and
-    signed it through a TEE-bound mbedTLS context. That has been dropped in favor
-    of deriving the key (HMAC/PBKDF2) so that no key — not even an encrypted blob —
-    needs to be stored on the device. The `secure_storage` partition is therefore
-    not used to hold the DAC key.
--   The PBKDF2 path keeps the DAC key out of REE RAM entirely (signing happens in
-    the TEE), which is stronger than the plain `esp_secure_cert` software paths
-    where the key is loaded into application memory at sign time.
+-   An earlier iteration **stored** the DAC private key in TEE secure storage
+    and signed it through a TEE-bound mbedTLS context. That has been dropped in
+    favor of deriving the key (HMAC/PBKDF2) so that no key — not even an
+    encrypted blob — needs to be stored on the device. The `secure_storage`
+    partition is therefore not used to hold the DAC key.
+-   The PBKDF2 path keeps the DAC key out of REE RAM entirely (signing happens
+    in the TEE), which is stronger than the plain `esp_secure_cert` software
+    paths where the key is loaded into application memory at sign time.
 -   For SoCs with neither an HMAC nor an ECDSA peripheral, fall back to the
     default-format key protected by flash encryption.
 
 ## 1.7 Protecting the DAC private key
 
-The DAC private key is the most sensitive secret on the device: anything that can
-read it can impersonate the device during attestation. ESP32 SoCs offer a few
-ways to protect it, and which one to use depends on the peripherals the SoC
+The DAC private key is the most sensitive secret on the device: anything that
+can read it can impersonate the device during attestation. ESP32 SoCs offer a
+few ways to protect it, and which one to use depends on the peripherals the SoC
 provides. The `esp_secure_cert` partition records the key type, and the
 `ESP32SecureCertDACProvider` selects the matching signing path at runtime based
 on `esp_secure_cert_get_priv_key_type()`.
@@ -341,21 +342,23 @@ The supported key types (see `esp_secure_cert_key_type_t` in
 -   `ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY` — the private key lives in an eFuse
     block and signing is done entirely inside the on-chip ECDSA peripheral; the
     key is never materialized in software. Available on SoCs with an ECDSA
-    peripheral (e.g. ESP32-H2). Enabled with `CONFIG_USE_ESP32_ECDSA_PERIPHERAL`.
--   `ESP_SECURE_CERT_HMAC_DERIVED_ECDSA_KEY` — the DAC private key is **derived**
-    at runtime from a per-device HMAC key (burned into an eFuse block with purpose
-    `HMAC_UP`) using the HMAC peripheral together with PBKDF2. The derived key is
-    reconstructed by `esp_secure_cert_mgr` on demand and never stored in plaintext
-    in flash. This is the recommended option for SoCs that have an HMAC peripheral
-    but no ECDSA peripheral (e.g. ESP32-C6/H2/C5).
+    peripheral (e.g. ESP32-H2). Enabled with
+    `CONFIG_USE_ESP32_ECDSA_PERIPHERAL`.
+-   `ESP_SECURE_CERT_HMAC_DERIVED_ECDSA_KEY` — the DAC private key is
+    **derived** at runtime from a per-device HMAC key (burned into an eFuse
+    block with purpose `HMAC_UP`) using the HMAC peripheral together with
+    PBKDF2. The derived key is reconstructed by `esp_secure_cert_mgr` on demand
+    and never stored in plaintext in flash. This is the recommended option for
+    SoCs that have an HMAC peripheral but no ECDSA peripheral (e.g.
+    ESP32-C6/H2/C5).
 
 ### 1.7.1 HMAC-derived ECDSA DAC key (HMAC-capable SoCs)
 
 For SoCs with an HMAC peripheral, prefer the HMAC-derived ECDSA key. The root
 secret is the eFuse HMAC key; the DAC private key is derived from it at runtime,
 so no usable private key sits in flash. No ESP-TEE app or secure-storage
-partition is required — the standard `esp_secure_cert` + factory partition layout
-is used.
+partition is required — the standard `esp_secure_cert` + factory partition
+layout is used.
 
 Provision it with the manufacturing tool by selecting the HMAC-derived ECDSA key
 type and supplying the HMAC key (the exact flags are documented with
@@ -383,26 +386,26 @@ CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER=y
 CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL="fctry"
 ```
 
-> **WARNING:** eFuse burning is irreversible. Keep `hmac_key.bin` secret — anyone
-> with it can re-derive the DAC private key.
+> **WARNING:** eFuse burning is irreversible. Keep `hmac_key.bin` secret —
+> anyone with it can re-derive the DAC private key.
 
 ### 1.7.2 Trade-offs
 
-| Approach | Key at rest | Signing happens in | Requires | Notes |
-| --- | --- | --- | --- | --- |
-| Default format key | Plaintext DER in `esp_secure_cert` (rely on flash encryption) | Software (mbedTLS) | Flash encryption | Simplest; key is materialized in RAM. |
-| ECDSA peripheral key | eFuse block, never readable | On-chip ECDSA peripheral | SoC with ECDSA peripheral (e.g. H2) | Strongest isolation; key never enters software. |
-| HMAC-derived ECDSA key | Not stored — derived from eFuse HMAC key at runtime | Software (mbedTLS), after derivation | SoC with HMAC peripheral (C6/H2/C5) | No plaintext key in flash; no ECDSA peripheral or TEE needed. **Recommended for HMAC-capable SoCs.** |
+| Approach               | Key at rest                                                   | Signing happens in                   | Requires                            | Notes                                                                                                |
+| ---------------------- | ------------------------------------------------------------- | ------------------------------------ | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Default format key     | Plaintext DER in `esp_secure_cert` (rely on flash encryption) | Software (mbedTLS)                   | Flash encryption                    | Simplest; key is materialized in RAM.                                                                |
+| ECDSA peripheral key   | eFuse block, never readable                                   | On-chip ECDSA peripheral             | SoC with ECDSA peripheral (e.g. H2) | Strongest isolation; key never enters software.                                                      |
+| HMAC-derived ECDSA key | Not stored — derived from eFuse HMAC key at runtime           | Software (mbedTLS), after derivation | SoC with HMAC peripheral (C6/H2/C5) | No plaintext key in flash; no ECDSA peripheral or TEE needed. **Recommended for HMAC-capable SoCs.** |
 
 Notes on the design decision:
 
--   **Why not store the DAC directly in TEE secure storage?** An earlier iteration
-    signed inside ESP-TEE with the DAC key held in TEE secure storage. That pulls
-    in the full TEE app, a `secure_storage` partition and TEE OTA data, and is only
-    available on a subset of SoCs/IDF versions. For HMAC-capable SoCs the
-    HMAC-derived key gives equivalent "no usable key in flash" protection without
-    the extra partitions and TEE runtime, so the direct TEE secure-storage path is
-    not used here.
+-   **Why not store the DAC directly in TEE secure storage?** An earlier
+    iteration signed inside ESP-TEE with the DAC key held in TEE secure storage.
+    That pulls in the full TEE app, a `secure_storage` partition and TEE OTA
+    data, and is only available on a subset of SoCs/IDF versions. For
+    HMAC-capable SoCs the HMAC-derived key gives equivalent "no usable key in
+    flash" protection without the extra partitions and TEE runtime, so the
+    direct TEE secure-storage path is not used here.
 -   For SoCs that lack both an HMAC and an ECDSA peripheral, fall back to the
     default-format key protected by flash encryption.
 -   In all cases the DAC and PAI **certificates** are public and continue to be
