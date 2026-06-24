@@ -33,6 +33,9 @@ SpeakerDevice::SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clu
 CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                    EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Identify
@@ -64,7 +67,9 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void SpeakerDevice::Unregister(CodeDrivenDataModelProvider & provider)

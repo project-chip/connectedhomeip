@@ -28,6 +28,9 @@ GenericSwitchDevice::GenericSwitchDevice(TimerDelegate & timerDelegate) :
 CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                          EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -37,7 +40,9 @@ CHIP_ERROR GenericSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDa
                           SwitchCluster::StartupConfiguration{ .numberOfPositions = 2 });
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void GenericSwitchDevice::Unregister(CodeDrivenDataModelProvider & provider)

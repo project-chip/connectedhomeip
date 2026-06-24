@@ -31,6 +31,8 @@ CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataM
                                 EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     mEndpointId = allocator.Allocate();
 
     ReturnErrorOnFailure(RegisterDescriptor(
@@ -41,6 +43,7 @@ CHIP_ERROR OvenDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDataM
     ReturnErrorOnFailure(mCavity.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
     ReturnErrorOnFailure(mSurface.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
 
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

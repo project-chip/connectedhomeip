@@ -57,6 +57,9 @@ ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                            EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
@@ -96,6 +99,8 @@ CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDriven
     }
 
     mRegistered = true;
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

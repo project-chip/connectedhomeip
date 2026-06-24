@@ -39,6 +39,9 @@ OnOffLightSwitchDevice::OnOffLightSwitchDevice(TimerDelegate & timerDelegate) :
 CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                             EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -53,7 +56,9 @@ CHIP_ERROR OnOffLightSwitchDevice::Register(chip::EndpointId endpoint, CodeDrive
         endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mBindingCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void OnOffLightSwitchDevice::Unregister(CodeDrivenDataModelProvider & provider)

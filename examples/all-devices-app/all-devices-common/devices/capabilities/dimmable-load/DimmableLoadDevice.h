@@ -60,6 +60,32 @@ namespace app {
 class DimmableLoadDevice : public SingleEndpointDevice
 {
 public:
+    struct LevelControlConfig
+    {
+        // Optional LevelControl transition attributes.
+        // We use std::optional to represent support (presence of the attribute on the endpoint).
+        // For nullable attributes, we wrap DataModel::Nullable.
+        // Defaults are set to match the global CI PICS (present with value 0 or null) out-of-the-box.
+        std::optional<uint16_t> onOffTransitionTime = 0;
+        std::optional<DataModel::Nullable<uint16_t>> onTransitionTime = DataModel::Nullable<uint16_t>(0);
+        std::optional<DataModel::Nullable<uint16_t>> offTransitionTime = DataModel::Nullable<uint16_t>(0);
+        std::optional<DataModel::Nullable<uint8_t>> defaultMoveRate = DataModel::Nullable<uint8_t>(); // Null by default
+
+        // Optional LevelControl bounds and startup settings.
+        // Default startup level is present and null, which enables the Lighting feature by default (spec compliant).
+        std::optional<DataModel::Nullable<uint8_t>> startUpCurrentLevel = DataModel::Nullable<uint8_t>(); // Null by default
+        std::optional<uint8_t> minLevel;
+        std::optional<uint8_t> maxLevel;
+    };
+
+    struct Config
+    {
+        LevelControlConfig levelControl = {};
+
+        // Optional static semantic tags to associate with this dimmable load endpoint.
+        Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {};
+    };
+
     struct Context
     {
         Credentials::GroupDataProvider & groupDataProvider;
@@ -70,6 +96,10 @@ public:
     DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
                        Clusters::LevelControlDelegate & levelControlDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
                        Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
+
+    DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
+                       Clusters::LevelControlDelegate & levelControlDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context, const Config & config);
     ~DimmableLoadDevice() override = default;
 
     // Public cluster getters for application and testing
@@ -90,6 +120,7 @@ private:
     Clusters::OnOffEffectDelegate & mEffectDelegate;
     Clusters::IdentifyDelegate & mIdentifyDelegate;
     const Context mContext;
+    const Config mConfig;
 
     class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
     {

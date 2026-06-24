@@ -29,6 +29,9 @@ DeviceEnergyManagementDevice::DeviceEnergyManagementDevice(TimerDelegate & timer
 CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                   EndpointComposition composition)
 {
+    VerifyOrReturnError(SingleEndpointDevice::mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     mProvider = &provider;
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
@@ -39,7 +42,9 @@ CHIP_ERROR DeviceEnergyManagementDevice::Register(EndpointId endpoint, CodeDrive
     mDemCluster.Create(config);
     ReturnErrorOnFailure(provider.AddCluster(mDemCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void DeviceEnergyManagementDevice::Unregister(CodeDrivenDataModelProvider & provider)

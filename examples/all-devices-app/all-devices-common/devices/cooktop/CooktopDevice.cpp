@@ -90,6 +90,8 @@ CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDa
                                    EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     mEndpointId = allocator.Allocate();
 
     ReturnErrorOnFailure(RegisterDescriptor(
@@ -104,6 +106,7 @@ CHIP_ERROR CooktopDevice::Register(EndpointIdAllocator & allocator, CodeDrivenDa
         allocator.Allocate(), provider,
         EndpointComposition(mEndpointId, DataModel::EndpointCompositionPattern::kFullFamily, Span(&kSurface2Tag, 1))));
 
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

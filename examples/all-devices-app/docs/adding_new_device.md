@@ -168,6 +168,9 @@ MySensorDevice::MySensorDevice(TimerDelegate & timerDelegate, Clusters::Identify
 
 CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Wire up the mandatory identify delegate
@@ -177,7 +180,9 @@ CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     mMySensorCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mMySensorCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)

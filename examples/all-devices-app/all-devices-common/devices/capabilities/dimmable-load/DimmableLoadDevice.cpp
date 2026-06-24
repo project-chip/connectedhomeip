@@ -25,17 +25,26 @@ namespace chip {
 namespace app {
 
 DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
+                                       Clusters::LevelControlDelegate & levelControlDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
+                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+    DimmableLoadDevice(deviceTypes, onOffDelegate, levelControlDelegate, effectDelegate, identifyDelegate, context, Config{})
+{}
+
+DimmableLoadDevice::DimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
                                        Clusters::LevelControlDelegate & levelControlDelegate,
                                        Clusters::OnOffEffectDelegate & effectDelegate,
-                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+                                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context, const Config & config) :
     SingleEndpointDevice(deviceTypes),
     mOnOffDelegate(onOffDelegate), mLevelControlDelegate(levelControlDelegate), mEffectDelegate(effectDelegate),
-    mIdentifyDelegate(identifyDelegate), mContext(context)
+    mIdentifyDelegate(identifyDelegate), mContext(context), mConfig(config)
 {}
 
 CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                         EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
@@ -61,15 +70,39 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    // Optional LevelControl transition attributes enabled in CI PICS (ci-pics-values).
-    // Initialize with demo defaults (0 transition, null move rate) to pass Test_TC_LVL_2_1.
-    mLevelControlCluster.Create(LevelControlCluster::Config(endpoint, mContext.timerDelegate, mLevelControlDelegate)
-                                    .WithOnOff(mOnOffCluster.Cluster())
-                                    .WithLighting(DataModel::NullNullable)
-                                    .WithOnOffTransitionTime(0)
-                                    .WithOnTransitionTime(0)
-                                    .WithOffTransitionTime(0)
-                                    .WithDefaultMoveRate(DataModel::NullNullable));
+    LevelControlCluster::Config lvlConfig(endpoint, mContext.timerDelegate, mLevelControlDelegate);
+    lvlConfig.WithOnOff(mOnOffCluster.Cluster());
+
+    if (mConfig.levelControl.startUpCurrentLevel.has_value())
+    {
+        lvlConfig.WithLighting(*mConfig.levelControl.startUpCurrentLevel);
+    }
+    if (mConfig.levelControl.onOffTransitionTime.has_value())
+    {
+        lvlConfig.WithOnOffTransitionTime(*mConfig.levelControl.onOffTransitionTime);
+    }
+    if (mConfig.levelControl.onTransitionTime.has_value())
+    {
+        lvlConfig.WithOnTransitionTime(*mConfig.levelControl.onTransitionTime);
+    }
+    if (mConfig.levelControl.offTransitionTime.has_value())
+    {
+        lvlConfig.WithOffTransitionTime(*mConfig.levelControl.offTransitionTime);
+    }
+    if (mConfig.levelControl.defaultMoveRate.has_value())
+    {
+        lvlConfig.WithDefaultMoveRate(*mConfig.levelControl.defaultMoveRate);
+    }
+    if (mConfig.levelControl.minLevel.has_value())
+    {
+        lvlConfig.WithMinLevel(*mConfig.levelControl.minLevel);
+    }
+    if (mConfig.levelControl.maxLevel.has_value())
+    {
+        lvlConfig.WithMaxLevel(*mConfig.levelControl.maxLevel);
+    }
+
+    mLevelControlCluster.Create(lvlConfig);
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
@@ -89,6 +122,8 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
         table->RegisterHandler(&mLevelControlCluster.Cluster());
     }
 
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

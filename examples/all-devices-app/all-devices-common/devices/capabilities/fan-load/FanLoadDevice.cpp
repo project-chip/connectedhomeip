@@ -36,6 +36,9 @@ FanLoadDevice::FanLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes,
 CHIP_ERROR FanLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                    EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(
         RegisterDescriptor(endpoint, provider, EndpointComposition(composition.parentId, composition.pattern, mContext.tagList)));
 
@@ -89,7 +92,9 @@ CHIP_ERROR FanLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     mFanControlCluster.Create(fanConfig);
     ReturnErrorOnFailure(provider.AddCluster(mFanControlCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void FanLoadDevice::Unregister(CodeDrivenDataModelProvider & provider)

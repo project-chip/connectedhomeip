@@ -34,6 +34,9 @@ OnOffLoadDevice::OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTy
 CHIP_ERROR OnOffLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                      EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
@@ -74,6 +77,8 @@ CHIP_ERROR OnOffLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMo
         table->RegisterHandler(&mOnOffCluster.Cluster());
     }
 
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

@@ -42,6 +42,13 @@ public:
                               Clusters::LevelControlDelegate * customLevel = nullptr,
                               Clusters::OnOffEffectDelegate * customEffect = nullptr,
                               Clusters::IdentifyDelegate * customIdentify  = nullptr);
+
+    LoggingDimmableLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                              Clusters::OnOffDelegate * customOnOff,
+                              Clusters::LevelControlDelegate * customLevel,
+                              Clusters::OnOffEffectDelegate * customEffect,
+                              Clusters::IdentifyDelegate * customIdentify,
+                              const Config & config);
     ~LoggingDimmableLoadDevice() override = default;
 
 protected:

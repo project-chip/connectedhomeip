@@ -124,4 +124,35 @@ protected:
     LazyRegisteredServerCluster<Clusters::DescriptorCluster> mDescriptorCluster;
 };
 
+/**
+ * RAII guard to automatically rollback/unregister a device if registration fails midway.
+ *
+ * Instantiate this guard at the start of `Register`. If the registration succeeds,
+ * call `Commit()`. If the guard is destroyed without being committed (e.g., due to
+ * an early return on error), its destructor will automatically call `Unregister` on the device.
+ */
+class DeviceRegistrationTransaction
+{
+public:
+    DeviceRegistrationTransaction(DeviceInterface & device, CodeDrivenDataModelProvider & provider) :
+        mDevice(device), mProvider(provider)
+    {}
+
+    ~DeviceRegistrationTransaction()
+    {
+        if (!mCommitted)
+        {
+            mDevice.Unregister(mProvider);
+        }
+    }
+
+    /// Mark the registration as successful, preventing rollback on destruction.
+    void Commit() { mCommitted = true; }
+
+private:
+    DeviceInterface & mDevice;
+    CodeDrivenDataModelProvider & mProvider;
+    bool mCommitted = false;
+};
+
 } // namespace chip::app

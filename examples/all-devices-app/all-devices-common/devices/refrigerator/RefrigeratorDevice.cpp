@@ -30,6 +30,8 @@ CHIP_ERROR RefrigeratorDevice::Register(EndpointIdAllocator & allocator, CodeDri
                                         EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     mEndpointId = allocator.Allocate();
 
     ReturnErrorOnFailure(RegisterDescriptor(
@@ -39,6 +41,7 @@ CHIP_ERROR RefrigeratorDevice::Register(EndpointIdAllocator & allocator, CodeDri
 
     ReturnErrorOnFailure(mCabinet.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
 
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
