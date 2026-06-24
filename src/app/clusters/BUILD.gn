@@ -54,6 +54,7 @@ source_set("clusters") {
     "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials-server",
+    "operational-state-server",
     "power-source-server",
     "pressure-measurement-server",
     "proximity-ranging-server",
