@@ -11,7 +11,8 @@ runtime.
 ## Architecture Overview
 
 The Android simulator builds upon the platform-agnostic `all-devices-common`
-core library, providing an interactive Kotlin-based user interface using Compose.
+core library, providing an interactive Kotlin-based user interface using
+Compose.
 
 ```mermaid
 graph TD
@@ -64,8 +65,8 @@ operational views:
 -   **Onboarding Tab:** Shows the Commissioning QR Code image, manual pairing
     code, passcode, and discriminator.
 -   **Topology Tab:** Displays the active, commissioned endpoint tree layout.
--   **Logs Tab:** Renders an auto-scrolling console logging panel for
-    debugging cluster and device events.
+-   **Logs Tab:** Renders an auto-scrolling console logging panel for debugging
+    cluster and device events.
 
 ---
 
