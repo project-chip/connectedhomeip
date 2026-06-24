@@ -352,17 +352,6 @@ CHIP_ERROR NFCDataRetrievalInfo::GetOperationalDataSetFormSE05x(char * opDataSet
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NFCDataRetrievalInfo::SetISCommWithoutPowerAttr(bool is_comm_without_power)
-{
-    CHIP_ERROR status = se05x_reset_iscomm_without_power(is_comm_without_power);
-    if (status != CHIP_NO_ERROR)
-    {
-        ChipLogError(Crypto, "SE05x :: Failed to set IsCommissioningWithoutPower flag");
-    }
-
-    return status;
-}
-
 } // namespace NFCCommissioning
 } // namespace DeviceLayer
 } // namespace chip
