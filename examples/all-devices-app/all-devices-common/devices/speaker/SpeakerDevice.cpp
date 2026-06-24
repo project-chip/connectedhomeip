@@ -50,7 +50,7 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
     // Level Control (Volume)
-    LevelControlCluster::Config lcConfig(endpoint, mTimerDelegate, mLevelDelegate);
+    LevelControlCluster::Config lcConfig(mTimerDelegate, mLevelDelegate);
     lcConfig.WithOnOff(mOnOffCluster.Cluster());
 
     // TODO: The following attributes/features are not required for a Speaker device type.
@@ -63,7 +63,7 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     lcConfig.WithLighting(DataModel::NullNullable);
     lcConfig.WithDefaultMoveRate(DataModel::NullNullable);
 
-    mLevelControlCluster.Create(lcConfig);
+    mLevelControlCluster.Create(endpoint, lcConfig);
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 

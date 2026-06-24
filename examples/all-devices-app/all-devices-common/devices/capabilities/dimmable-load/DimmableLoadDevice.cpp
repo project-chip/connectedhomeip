@@ -72,7 +72,7 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    LevelControlCluster::Config lvlConfig(endpoint, mContext.timerDelegate, mLevelControlDelegate);
+    LevelControlCluster::Config lvlConfig(mContext.timerDelegate, mLevelControlDelegate);
     lvlConfig.WithOnOff(mOnOffCluster.Cluster());
 
     if (mConfig.levelControl.startUpCurrentLevel.has_value())
@@ -104,7 +104,7 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
         lvlConfig.WithMaxLevel(*mConfig.levelControl.maxLevel);
     }
 
-    mLevelControlCluster.Create(lvlConfig);
+    mLevelControlCluster.Create(endpoint, lvlConfig);
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
