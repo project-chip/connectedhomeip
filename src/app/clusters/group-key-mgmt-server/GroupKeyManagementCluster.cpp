@@ -683,11 +683,10 @@ CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & pat
 {
     // TODO(#72714): remove this override once the AttributeQualityFlags::kChangesOmitted quality is honored by the generator.
     static constexpr DataModel::AttributeEntry kMandatoryMetadataWithChangesOmitted[] = {
-        DataModel::AttributeEntry(
-            GroupKeyMap::Id,
-            BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
-                                                       DataModel::AttributeQualityFlags::kChangesOmitted),
-            Access::Privilege::kView, Access::Privilege::kManage),
+        DataModel::AttributeEntry(GroupKeyMap::Id,
+                                  BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                                             DataModel::AttributeQualityFlags::kChangesOmitted),
+                                  Access::Privilege::kView, Access::Privilege::kManage),
         GroupTable::kMetadataEntry,
         MaxGroupsPerFabric::kMetadataEntry,
         MaxGroupKeysPerFabric::kMetadataEntry,
