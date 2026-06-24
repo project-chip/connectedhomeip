@@ -122,7 +122,7 @@ CHIP_ERROR DimmableLoadDevice::Register(chip::EndpointId endpoint, CodeDrivenDat
 void DimmableLoadDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     // IMPORTANT: We must strictly separate DISCONNECTION (Phase 1) from DESTRUCTION (Phase 2).
-    // 
+    //
     // Phase 1 (Disconnection): Remove all delegates and unregister from all shared lists/tables
     // while all cluster objects are still fully constructed and valid. This prevents any
     // use-after-free or dangling pointer access (e.g. OnOff-Level coupling delegates) during destruction.
