@@ -131,13 +131,11 @@ JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
 
     if (sIOThread != 0)
     {
-        chip::DeviceLayer::StackLock lock;
         CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to stop event loop task: %" CHIP_ERROR_FORMAT, err.Format());
         }
-        chip::DeviceLayer::StackUnlock unlock;
         pthread_join(sIOThread, NULL);
         sIOThread = 0;
     }
