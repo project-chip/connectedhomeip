@@ -1869,7 +1869,7 @@ class ChipDeviceControllerBase:
                 ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
             res.raise_on_error()
-                                
+
             if suppressResponse:
                 if not future.done():
                     future.set_result(None)
