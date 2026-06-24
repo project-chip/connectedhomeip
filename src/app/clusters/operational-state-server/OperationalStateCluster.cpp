@@ -50,7 +50,6 @@ OperationalStateCluster::OperationalStateCluster(EndpointId endpointId, ClusterI
 {
     mCountdownTime.policy()
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement)
-        .Set(QuieterReportingPolicyEnum::kMarkDirtyOnDecrement)
         .Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero);
 }
 
