@@ -1,9 +1,0 @@
-sample:
-  name: Matter
-tests:
-  sample.matter.contact_sensor_ftd:
-    platform_allow:
-      - mcxw72_evk
-      - frdm_mcxw72
-    build_only: true
-    tags: matter
