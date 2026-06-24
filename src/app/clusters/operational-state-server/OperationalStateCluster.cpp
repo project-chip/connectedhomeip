@@ -170,7 +170,12 @@ void OperationalStateCluster::UpdateCountdownTime(bool fromDelegate)
     }
     else
     {
-        markDirty = (mCountdownTime.SetValue(newCountdownTime, now) == AttributeDirtyState::kMustReport);
+        // When the update is coming from the cluster logic (e.g. due to a state change),
+        // we should report if the value has changed since the last report.
+        auto predicate = [](const decltype(mCountdownTime)::SufficientChangePredicateCandidate & candidate) -> bool {
+            return candidate.lastDirtyValue != candidate.newValue;
+        };
+        markDirty = (mCountdownTime.SetValue(newCountdownTime, now, predicate) == AttributeDirtyState::kMustReport);
     }
 
     if (markDirty)

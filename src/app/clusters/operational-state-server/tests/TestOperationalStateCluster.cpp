@@ -299,6 +299,43 @@ TEST_F(OperationalStateClusterTest, SetOperationalState_NoOpDoesNotNotify)
     EXPECT_FALSE(found);
 }
 
+TEST_F(OperationalStateClusterTest, SetOperationalState_PausedReportsCountdownTime)
+{
+    OperationalStateCluster::Config cfg;
+    cfg.optionalAttributes.Set<CountdownTime::Id>();
+    TestableOperationalStateCluster clusterWithCountdown(kTestEndpoint, &mDelegate, cfg);
+    Testing::ClusterTester tester(clusterWithCountdown);
+    ASSERT_EQ(clusterWithCountdown.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Initial state setup.
+    EXPECT_EQ(clusterWithCountdown.SetOperationalState(to_underlying(OperationalStateEnum::kStopped)), CHIP_NO_ERROR);
+    mDelegate.mCountdownTime = 100;
+    clusterWithCountdown.UpdateCountdownTimeFromDelegate();
+    tester.GetDirtyList().clear();
+
+    // Simulate the countdown progressing by 1 second (100 -> 99).
+    mDelegate.mCountdownTime = 99;
+
+    // Change state to Paused. This should trigger UpdateCountdownTimeFromClusterLogic.
+    EXPECT_EQ(clusterWithCountdown.SetOperationalState(to_underlying(OperationalStateEnum::kPaused)), CHIP_NO_ERROR);
+
+    auto & dirty = tester.GetDirtyList();
+    bool countdownDirty = false;
+    for (auto & path : dirty)
+    {
+        if (path.mAttributeId == CountdownTime::Id)
+        {
+            countdownDirty = true;
+            break;
+        }
+    }
+    // The CountdownTime must be reported when the state changes (cluster logic update),
+    // even if it was a decrement that would normally be suppressed by the 10s delta rule.
+    EXPECT_TRUE(countdownDirty);
+
+    clusterWithCountdown.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // ---------------------------------------------------------------------------
 // IsSupportedPhase / IsSupportedOperationalState
 // ---------------------------------------------------------------------------
