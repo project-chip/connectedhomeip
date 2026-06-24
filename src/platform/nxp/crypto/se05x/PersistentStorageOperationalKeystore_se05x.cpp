@@ -83,60 +83,6 @@ PersistentStorageOpKeystorese05x::ExtractKeyIdFromSerializedKeypair(const Crypto
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Reset binary data in SE05x
- *
- * This function checks if an object with the given keyid already exists in the secure element.
- * If it exists and the size differs from the new data, it deletes the old object before writing.
- * This prevents errors when trying to overwrite objects with different sizes.
- *
- * @param[in] keyid - Key id of the object
- * @param[in] buf - Buffer containing binary data
- * @param[in] buflen - Buffer length
- * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
- */
-static CHIP_ERROR se05x_reset_binary_data(uint32_t keyid, const uint8_t * buf, size_t buflen)
-{
-    uint16_t seObjectSize = 0;
-    CHIP_ERROR err = se05x_read_object_size(keyid, &seObjectSize);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        if (seObjectSize != buflen)
-        {
-            ChipLogProgress(Crypto, "SE05x: Size mismatch for keyid 0x%" PRIx32 " (SE: %" PRIu16 " bytes, new: %" PRIu16 " bytes) - deleting old object",
-                keyid, seObjectSize, static_cast<uint16_t>(buflen));
-            se05x_delete_key(keyid);
-        }
-    }
-    else
-    {
-        ChipLogDetail(Crypto, "SE05x: No existing object found for keyid 0x%" PRIx32, keyid);
-    }
-
-    err = se05x_set_binary_data(keyid, buf, buflen);
-    return err;
-}
-
-
-static CHIP_ERROR generate_node_oper_key()
-{
-    sss_object_t keyObject = { 0 };
-    sss_status_t status    = kStatus_SSS_Fail;
-
-    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-
-    status = sss_key_object_allocate_handle(&keyObject, CHIP_SE05x_NODE_OP_KEY_INDEX + 1, kSSS_KeyPart_Pair,
-                                            kSSS_CipherType_EC_NIST_P, 256, kKeyObject_Mode_Persistent);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-
-    status = sss_key_store_generate_key(&gex_sss_chip_ctx.ks, &keyObject, 256, 0);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex fabricIndex,
                                                                    MutableByteSpan & outCertificateSigningRequest)
 {
@@ -307,20 +253,22 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     }
 
     mPendingFabricIndex = fabricIndex;
+
     ChipLogProgress(Crypto, "Fabric %u: Successfully generated new operational key at slot 0x%" PRIx32, fabricIndex, newKeyId);
 
     err = CHIP_NO_ERROR;
 
 exit:
-
     if (se05x_close_session() != CHIP_NO_ERROR)
     {
         ChipLogError(Crypto, "SE05x: Error closing session during cleanup");
     }
+
     if (err != CHIP_NO_ERROR)
     {
         ResetPendingKey();
     }
+
     return err;
 }
 
@@ -414,22 +362,6 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::CommitOpKeypairForFabric(FabricInde
     ChipLogProgress(Crypto, "Fabric %u: Deleting old key (0x%" PRIx32 ")", fabricIndex, oldKeyId);
     se05x_delete_key(oldKeyId);
 
-    err = se05x_disable_nfc_commision();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Crypto,
-            "Fabric %u: Failed to disable NFC commissioning: %" CHIP_ERROR_FORMAT,
-            fabricIndex, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(Crypto,
-            "Fabric %u: NFC commissioning disabled after successful commit",
-            fabricIndex);
-    }
-
-    se05x_host_gpio_notification_monitor_deinit();
-
     // Reset pending key state
     ResetPendingKey();
 
@@ -443,8 +375,6 @@ exit:
     return err;
 }
 
-static CHIP_ERROR se05xResetNFCCommData();
-
 CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -454,8 +384,6 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
 
     uint32_t slotAKeyId = GetSlotAKeyId(fabricIndex);
     uint32_t slotBKeyId = GetSlotBKeyId(fabricIndex);
-    bool allDeleted = true;
-    uint8_t kvsFabricCount = 0;
 
     ChipLogDetail(Crypto, "Fabric %u: Removing operational keys - Slot A: 0x%" PRIx32 ", Slot B: 0x%" PRIx32, fabricIndex,
                   slotAKeyId, slotBKeyId);
@@ -477,60 +405,9 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
         ChipLogError(Crypto, "Fabric %u: Key not found in persistent storage", fabricIndex);
     }
 
-    // To check if there are any fabrics in KVS
-    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
-    {
-        uint8_t kvs_node_oper_key[256] = { 0 };
-        uint16_t kvs_key_len                         = sizeof(kvs_node_oper_key);
-        CHIP_ERROR kvErr = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(i).KeyName(), kvs_node_oper_key, kvs_key_len);
-        if (kvErr == CHIP_NO_ERROR)
-        {
-            allDeleted = false;
-            kvsFabricCount++;
-        }
-    }
-
-    ChipLogProgress(Crypto, "Fabrics in KVS =: %u", kvsFabricCount);
-
-    if (allDeleted)
-    {
-        err = se05x_enable_nfc_commision();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Crypto, "Failed to enable NFC commissioning: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        else
-        {
-            ChipLogProgress(Crypto, "NOTE: All node OP keys deleted — NFC commissioning enabled.");
-        }
-
-        err = generate_node_oper_key();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Crypto, "Failed to dummy key pair (at id = 0x%" PRIx32 ")", (uint32_t) (CHIP_SE05x_NODE_OP_KEY_INDEX + 1));
-            goto exit;
-        }
-        else
-        {
-            ChipLogProgress(Crypto, "Created dummy key pair (at id = 0x%" PRIx32 ")",
-                            (uint32_t) (CHIP_SE05x_NODE_OP_KEY_INDEX + 1));
-        }
-
-        /* Create a dummy key pair at node operational key location,
-        so that if the NFC commissioned data is provisioned, user can do the NFC commission. */
-        err = se05xResetNFCCommData();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Crypto, "Failed to reset nfc commissioned data");
-            goto exit;
-        }
-    }
-
-    err = CHIP_NO_ERROR;
-exit:
     if (se05x_close_session() != CHIP_NO_ERROR)
     {
-        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+        ChipLogError(Crypto, "SE05x: Error closing session");
     }
 
     return err;
@@ -574,187 +451,6 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::SignWithOpKeypair(FabricIndex fabri
 
     ReturnErrorOnFailure(transientOperationalKeypair->Deserialize(serializedOpKey));
     return transientOperationalKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
-}
-
-#define SE05X_SET_BIN_DATA_TEMPLATE(keyid, buf)                                                                                    \
-    {                                                                                                                              \
-        const uint8_t buffer[] = { buf };                                                                                          \
-        err                    = se05x_reset_binary_data(keyid, buffer, sizeof(buffer));                                             \
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);                                                                            \
-    }
-
-#define SE05X_SET_EC_KEY(keyid, buf)                                \
-    {                                                               \
-        const uint8_t buffer[] = {buf};                             \
-        err = se05x_set_ec_key(keyid, buffer, sizeof(buffer));      \
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);             \
-    }
-
-static CHIP_ERROR se05xResetNFCCommData()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    /* Delete NFC commissioned data also, like Operational Credential cluster,
-    Root CA, ICA, IPK, Access control cluster, Wi-fi / thread credentials,  */
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_OP_CRED_CLUSTER_ID, OCC);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_ROOT_CER_ID, ROOT_CERTIFICATE);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_IPK_ID, IPK);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_ACL_ID, ACL);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_WIFI_CRED_ID_APP_8_4, WIFI_CRED_DATA);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_WIFI_CRED_ID_APP_8_8, WIFI_CRED_DATA);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_VR_ID, VENDOR_RESERVED);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_NOC_ID, NOC);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_PAI_ID, PAI_CERTIFICATE);
-    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_DAC_ID, DAC_CERTIFICATE);
-    SE05X_SET_EC_KEY(SE051H_DA_KEY_PAIR_ID, DA_KEY_PAIR_DATA);
-
-    {
-        uint8_t attest_tbs[] = {STRUCTURE_START,   CERTIFICATE_DECLARATION,
-                      ATTESTATION_NONCE, SE_TIMESTAMP,
-                      STRUCTURE_END,     ATTESTATION_CHALLENGE};
-
-        err = se05x_reset_binary_data(SE051H_ATTEST_TBS, attest_tbs, sizeof(attest_tbs));
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    }
-
-    {
-        uint8_t acl_data[] = {
-            DATA_VERSION_ACC,
-            CLUSTER_REVISION_ACC,
-            FEATUREMAP_ACC,
-            ATTRIBUTE_LIST_ACC,
-            ACCEPTED_COMMAND_LIST_ACC,
-            GENERATED_COMMAND_LIST_ACC,
-            ACLS,
-            EXTENSION,
-            EXTENSION_FILLER,
-            SUBJECTS_PER_ACCESS_CONTROL_ENTRY,
-            TARGETS_PER_ACCESS_CONTROL_ENTRY,
-            ACCESS_CONTROL_ENTRIES_PER_FABRIC,
-            COMMISSIONING_ARL,
-            COMMISSIONING_ARL_FILLER,
-            ARL,
-            ARL_FILLER,
-        };
-
-        err = se05x_reset_binary_data(SE051H_ACC_ID, acl_data, sizeof(acl_data));
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-
-    }
-
-    {
-        uint8_t ncc_buf[] = {
-            DATA_VERSION_NCC,
-            CLUSTER_REVISION_NCC,
-            FEATUREMAP_NCC,
-            ATTRIBUTE_LIST_NCC,
-            ACCEPTED_COMMAND_LIST_NCC,
-            GENERATED_COMMAND_LIST_NCC,
-            MAX_NETWORKS,
-            NETWORKS,
-            NETWORKS_FILLER,
-            SCAN_MAX_TIME_SECONDS,
-            CONNECT_MAX_TIME_SECONDS,
-            INTERFACE_ENABLED,
-            LAST_NETWORKING_STATUS,
-            LAST_NETWORK_ID,
-            LAST_NETWORK_ID_FILLER,
-            LAST_CONNECT_ERROR_VALUE_NCC,
-            LAST_CONNECT_ERROR_VALUE_FILLER_NCC,
-            SUPPORTED_WIFI_BANDS_NCC,
-            SUPPORTED_THREAD_FEATURES_NCC,
-            THREAD_VERSION_NCC,
-        };
-
-        uint8_t buffer[512] = {0};
-        size_t buf_len = sizeof(buffer);
-
-        // read NCC to check what was the last network interface type set for NFC comm
-        smStatus_t smstatus = SM_NOT_OK;
-        SE05x_Result_t exists = kSE05x_Result_NA;
-
-        smstatus = Se05x_API_CheckObjectExists(
-        &((sss_se05x_session_t *)&gex_sss_chip_ctx.session)->s_ctx, SE051H_NCC_ID,
-        &exists);
-        if (smstatus == SM_OK) {
-            if (exists == kSE05x_Result_SUCCESS) {
-                err = se05x_get_certificate(SE051H_NCC_ID, buffer, &buf_len);
-                VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-
-                VerifyOrReturnError(buf_len > NETWORK_INTERFACE_BTYE_OFFSET, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-                ncc_buf[NETWORK_INTERFACE_BTYE_OFFSET] = buffer[NETWORK_INTERFACE_BTYE_OFFSET];
-            }
-        }
-        else {
-            ChipLogError(Crypto, "Se05x_API_CheckObjectExists Failed");
-        }
-
-        err = se05x_reset_binary_data(SE051H_NCC_ID, ncc_buf, sizeof(ncc_buf));
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    }
-
-    {
-        uint8_t Genaral_comm_cluster_data[] = {
-            DATA_VERSION_GCC,
-            CLUSTER_REVISION_GCC,
-            FEATUREMAP_GCC,
-            ATTRIBUTE_LIST_GCC,
-            ACCEPTED_COMMAND_LIST_GCC,
-            GENERATED_COMMAND_LIST_GCC,
-            BREADCRUMB,
-            BASIC_COMMISSIONING_INFO,
-            REGULATORY_CONFIG,
-            LOCATION_CAPABILITY,
-            SUPPORTS_CONCURRENT_CONNECTION,
-            TC_ACCEPTED_VERSION,
-            TC_MIN_REQUIRED_VERSION,
-            TC_ACKNOWLEDGEMENTS,
-            TC_ACKNOWLEDGEMENTS_REQUIRED,
-            TC_UPDATE_DEADLINE,
-            IS_COMM_WITHOUT_POWER,
-        };
-        err =
-            se05x_reset_binary_data(SE051H_GENERAL_COMM_CLUSTER_ID, Genaral_comm_cluster_data, sizeof(Genaral_comm_cluster_data));
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    }
-
-    {
-        uint8_t Basic_info_cluster_data[] = {
-            DATA_VERSION_BIC,
-            CLUSTER_REVISION_BIC,
-            FEATUREMAP_BIC,
-            ATTRIBUTE_LIST_BIC,
-            ACCEPTED_COMMAND_LIST_BIC,
-            GENERATED_COMMAND_LIST_BIC,
-            DATA_MODEL_REVISION,
-            VENDOR_NAME,
-            VENDOR_NAME_FILLER,
-            VENDOR_ID,
-            PRODUCT_NAME,
-            PRODUCT_NAME_FILLER,
-            PRODUCT_ID,
-            NODE_LABEL,
-            NODE_LABEL_FILLER,
-            LOCATION,
-            HARDWARE_VERSION,
-            HARDWARE_VERSIONING,
-            HARDWARE_VERSIONING_FILLER,
-            SOFTWARE_VERSION,
-            SOFTWARE_VERSIONING,
-            SOFTWARE_VERSIONING_FILLER,
-            UNIQUE_ID,
-            UNIQUE_ID_FILLER,
-            CAPABILITY_MINIMA,
-            SPECIFICATION_VERSION,
-            MAX_PATH_PER_INVOKE,
-            CONFIGURATION_VERSION};
-
-        err = se05x_reset_binary_data(SE051H_BASIC_INFO_CLUSTER_ID, Basic_info_cluster_data, sizeof(Basic_info_cluster_data));
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace chip
