@@ -21,7 +21,6 @@
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "ICDUtil.h"
-#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <static-supported-temperature-levels.h>
@@ -68,7 +67,7 @@ void RefrigeratorApp::AppTask::PostInitMatterServerInstance()
     TEMPORARY_RETURN_IGNORED SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
     TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
-    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 // This returns an instance of this class.

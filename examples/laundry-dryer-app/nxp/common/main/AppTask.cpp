@@ -21,7 +21,6 @@
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "ICDUtil.h"
-#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 
@@ -53,7 +52,7 @@ void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
 TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
-    TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
+    TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 CHIP_ERROR cliOpState(int argc, char * argv[])
@@ -131,7 +130,7 @@ void LaundryDryerApp::AppTask::PostInitMatterStack()
 {
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
 
-    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void LaundryDryerApp::AppTask::AppMatter_RegisterCustomCliCommands()

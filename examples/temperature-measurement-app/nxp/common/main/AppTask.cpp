@@ -21,7 +21,6 @@
 #include "AppTask.h"
 #include "CHIPDeviceManager.h"
 #include "ICDUtil.h"
-#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include "TemperatureSensorManager.h"
@@ -96,5 +95,5 @@ void TemperatureSensorApp::AppTask::TemperatureMeasurementInternal(intptr_t arg)
 	temperature = TemperatureSensorMgr().GetMeasuredValue();
 	ChipLogProgress(DeviceLayer, "######## TemperatureMeasurement::Set : %d", temperature);
 	
-    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, static_cast<int16_t>(temperature)));
+    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, temperature);
 }
