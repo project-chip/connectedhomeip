@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -20,36 +20,21 @@
 /**
  *    @file
  *          Provides the implementation of the Device Layer ConfigurationManager object
- *          for NXP platforms using the NXP SDK.
+ *          for NXP MCXW7X platforms using the NXP SDK.
  */
 
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "NXPConfig.h"
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#if defined(USE_SMU2_DYNAMIC)
+#include <src/platform/nxp/mcxw71/SMU2Manager.h>
+#endif
 
+#include "fsl_cmc.h"
 #include "fsl_device_registers.h"
-
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-#include "fsl_power.h"
-#endif
-
-#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-extern "C" {
-#include "wlan.h"
-}
-#endif
-#if CONFIG_CHIP_ETHERNET
-#include "fsl_enet.h"
-#include "fsl_silicon_id.h"
-#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OtaSupport.h"
@@ -66,45 +51,52 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t rebootCause)
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t reason)
 {
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    /*
-    With current implementation kBrownOutReset couldn't be catched
-    */
     BootReasonType bootReason = BootReasonType::kUnspecified;
 
-    if (rebootCause == 0)
+    if ((reason & CMC_SRS_POR_MASK) || (reason & CMC_SRS_PIN_MASK))
     {
         bootReason = BootReasonType::kPowerOnReboot;
     }
-
-    else if (rebootCause == kPOWER_ResetCauseWdt)
-    {
-        /* Reboot can be due to hardware or software watchdog */
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-    }
-    else if (rebootCause == kPOWER_ResetCauseSysResetReq)
+    else if (reason & CMC_SRS_SW_MASK)
     {
         bootReason = BootReasonType::kSoftwareReset;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        OtaImgState_t img_state = OTA_GetImgState();
-        if (img_state == OtaImgState_RunCandidate)
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        bool otaDone   = false;
+
+        err = ReadConfigValue(NXPConfig::kConfigKey_AppOTADone, otaDone);
+        if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+        {
+            SuccessOrLog(err, DeviceLayer, "Failed to read OTA completion flag");
+        }
+
+        if (otaDone)
         {
             bootReason = BootReasonType::kSoftwareUpdateCompleted;
+            ReturnErrorAndLogOnFailure(WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, false), DeviceLayer,
+                                       "Failed to store OTA completion flag");
         }
 #endif
     }
+    else if ((reason & CMC_SRS_WDOG0_MASK) || (reason & CMC_SRS_WDOG1_MASK))
+    {
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
+    }
+    else
+    {
+        bootReason = BootReasonType::kUnspecified;
+    }
 
     return StoreBootReason(to_underlying(bootReason));
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 {
-    /* Empty implementation*/
+    ReturnErrorAndLogOnFailure(WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, true), DeviceLayer,
+                               "Failed to store OTA completion flag");
+
     return CHIP_NO_ERROR;
 }
 
@@ -112,11 +104,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
-
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    uint32_t rebootCause = POWER_GetResetCause();
-    POWER_ClearResetCause(rebootCause);
-#endif
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
@@ -133,7 +120,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     else
     {
         // The first boot after factory reset of the Node.
-        err = StoreRebootCount(1);
+        err = StoreRebootCount(0);
         SuccessOrExit(err);
     }
 
@@ -142,15 +129,15 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
-    SuccessOrExit(err = DetermineBootReason(rebootCause));
-#else
+
+    err = DetermineBootReason(CMC_GetSystemResetStatus(CMC0));
+    SuccessOrExit(err);
+
     if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_BootReason))
     {
         err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
-#endif
 
     // TODO: Initialize the global GroupKeyStore object here
 
@@ -162,27 +149,8 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    if (wlan_get_mac_address(buf) != WM_SUCCESS)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    return CHIP_NO_ERROR;
-#else
-    (void) memset(&buf[0], 0, 6); // this is to avoid compilation error in GenericConfigurationManagerImpl.cpp
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
-
-#if CONFIG_CHIP_ETHERNET
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
-{
-    ENET_GetMacAddr(ENET, buf.data());
-
-    return CHIP_NO_ERROR;
-}
-#endif
 
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
@@ -327,15 +295,22 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    ThreadStackMgr().ErasePersistentInfo();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::FactoryDataPrvdImpl().FactoryReset();
+    ThreadStackMgr().ErasePersistentInfo();
+
+#if defined(USE_SMU2_DYNAMIC)
+    SMU2::Deactivate();
+#endif
 #endif
 
-    /* Schedule a reset in the next idle call */
+    // Restart the system.
+    ChipLogProgress(DeviceLayer, "System restarting");
+
+#if CONFIG_CHIP_NXP_PLATFORM_MCXW71
+    PlatformMgrImpl().Reset();
+#else
     PlatformMgrImpl().ScheduleResetInIdle();
+#endif
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
