@@ -39,7 +39,10 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Public getters for programmatic control
-    Clusters::BridgedDeviceBasicInformationCluster & BridgedDeviceBasicInformationCluster() { return mBridgedDeviceBasicInformationCluster.Cluster(); }
+    Clusters::BridgedDeviceBasicInformationCluster & BridgedDeviceBasicInformationCluster()
+    {
+        return mBridgedDeviceBasicInformationCluster.Cluster();
+    }
 
 protected:
     TimerDelegate & mTimerDelegate;
