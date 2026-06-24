@@ -1013,7 +1013,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::SendRendezvousAnnounce
         if (mRendezvousRetransmissionCount < kMaxRendezvousRetransmissions)
         {
             const uint32_t kRendezvousRetransmissionIntervalMs = 1250;
-            ChipLogProgress(DeviceLayer, "Try the current Thread network #%" PRIu8 " in %" PRId32 " ms",
+            ChipLogProgress(DeviceLayer, "Try the current Thread network #%" PRIu8 " in %" PRIu32 " ms",
                             mRendezvousRetransmissionCount, kRendezvousRetransmissionIntervalMs);
             err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRendezvousRetransmissionIntervalMs),
                                                         _HandleRendezvousRetransmissionTimer, this);
