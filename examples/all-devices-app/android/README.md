@@ -11,17 +11,16 @@ runtime.
 ## Architecture Overview
 
 The Android simulator builds upon the platform-agnostic `all-devices-common`
-core library, providing an interactive Kotlin-based user interface using Jetpack
-Compose.
+core library, providing an interactive Kotlin-based user interface using Compose.
 
 ```mermaid
 graph TD
-    UI[Jetpack Compose UI] -->|JSON Configuration| JNI[JNI Wrapper AppImpl.cpp]
+    UI[Compose UI] -->|JSON Configuration| JNI[JNI Wrapper AppImpl.cpp]
     JNI -->|DeviceFactory::Create| Common[all-devices-common Core]
     Common -->|Dynamic Endpoint Registration| Matter[Matter SDK Data Model]
 ```
 
-1. **Jetpack Compose UI (`MainActivity.kt`):** Manages user configuration forms
+1. **Compose UI (`MainActivity.kt`):** Manages user configuration forms
    (Basic/Advanced configuration), coordinates real-time hierarchy diagram
    preview computation, and runs the log viewer console.
 2. **JNI Bridge Wrapper (`AppImpl.cpp` / `AllDevicesApp-JNI.cpp`):** Receives
@@ -65,7 +64,7 @@ operational views:
 -   **Onboarding Tab:** Shows the Commissioning QR Code image, manual pairing
     code, passcode, and discriminator.
 -   **Topology Tab:** Displays the active, commissioned endpoint tree layout.
--   **Logs Tab:** Renders an auto-scrolling monospaced console logging panel for
+-   **Logs Tab:** Renders an auto-scrolling console logging panel for
     debugging cluster and device events.
 
 ---
