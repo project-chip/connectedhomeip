@@ -27,29 +27,25 @@ CHIP_ERROR
 MigrateNullableUint8Attribute(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                               SafeAttributePersistenceProvider & safeProvider, AttributePersistenceProvider & dstProvider)
 {
-    // Check if already migrated
+    // Read the value from the destination provider to check if it's already migrated
     uint8_t readBuf[sizeof(NumericAttributeTraits<uint8_t>::StorageType)];
     MutableByteSpan readSpan(readBuf);
-    if (dstProvider.ReadValue({ endpointId, clusterId, attributeId }, readSpan) != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR err;
+    VerifyOrReturnValue((err = dstProvider.ReadValue({ endpointId, clusterId, attributeId }, readSpan)) ==
+                            CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND,
+                        err);
 
+    // Read the value from the safe provider if it's not already migrated
     DataModel::Nullable<uint8_t> value;
-    CHIP_ERROR err = safeProvider.ReadScalarValue({ endpointId, clusterId, attributeId }, value);
-    if (err == CHIP_NO_ERROR)
-    {
-        NumericAttributeTraits<uint8_t>::StorageType storageValue;
-        DataModel::NullableToStorage(value, storageValue);
-        ReturnErrorOnFailure(
-            dstProvider.WriteValue({ endpointId, clusterId, attributeId },
-                                   ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
-        ReturnErrorOnFailure(safeProvider.SafeDeleteValue({ endpointId, clusterId, attributeId }));
-    }
-    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        ReturnErrorOnFailure(err);
-    }
+    VerifyOrReturnValue((err = safeProvider.ReadScalarValue({ endpointId, clusterId, attributeId }, value)) == CHIP_NO_ERROR,
+                        (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? CHIP_NO_ERROR : err));
+
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    DataModel::NullableToStorage(value, storageValue);
+    ReturnErrorOnFailure(dstProvider.WriteValue({ endpointId, clusterId, attributeId },
+                                                ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    ReturnErrorOnFailure(safeProvider.SafeDeleteValue({ endpointId, clusterId, attributeId }));
+
     return CHIP_NO_ERROR;
 }
 
