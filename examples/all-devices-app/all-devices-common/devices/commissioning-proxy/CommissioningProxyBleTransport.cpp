@@ -298,6 +298,9 @@ public:
             if (cmd != nullptr)
                 cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
             delete ctx;
+            // The connect that paused the background scan failed before any
+            // session was established; release the scanner back to the bg scan.
+            ResumeBleBgScanIfNeeded();
             return;
         }
         if (mOriginalTransport != nullptr)
@@ -324,6 +327,9 @@ public:
                 if (endpoint != nullptr)
                     endpoint->Close();
                 delete ctx;
+                // BTP handshake failed: no session was established, so release the
+                // scanner back to a background scan paused for this connect.
+                ResumeBleBgScanIfNeeded();
                 return;
             }
 
@@ -378,6 +384,12 @@ public:
             ProxyDispatcher::DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
             sBleEndpoints.erase(sid);
             ProxyDispatcher::RemoveSession(sid);
+            // Peer (commissionee) closed the session. Unlike ProxyDisconnectRequest,
+            // this path does not run through the dispatcher's OnAllSessionsClosed(),
+            // so resume a background scan paused for the connect once the last
+            // session is gone and no connect is mid-flight.
+            if (sBleEndpoints.empty() && sBlePendingConnect == nullptr)
+                ResumeBleBgScanIfNeeded();
             return;
         }
         if (mOriginalTransport != nullptr)
@@ -906,6 +918,28 @@ void OnAllSessionsClosed()
 bool IsConnectPending()
 {
     return sBlePendingConnect != nullptr;
+}
+
+void Shutdown()
+{
+    // Cancel every outstanding per-fabric lifetime timer and free its context.
+    for (auto & [key, rec] : sBleBgFabrics)
+    {
+        if (rec.lifetimeCtx != nullptr)
+        {
+            chip::DeviceLayer::SystemLayer().CancelTimer(OnBleBgLifetimeExpiry, rec.lifetimeCtx);
+            delete rec.lifetimeCtx;
+            rec.lifetimeCtx = nullptr;
+        }
+    }
+
+    // Stop the hardware scan only if the background scan currently owns it.
+    if (!sBleBgFabrics.empty() && !sBleBgPaused)
+        (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
+
+    sBleBgFabrics.clear();
+    sBleBgPaused  = false;
+    sBleBgCluster = nullptr;
 }
 
 } // namespace Ble

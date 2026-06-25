@@ -85,6 +85,12 @@ void OnAllSessionsClosed();
 // MaxSessions.
 bool IsConnectPending();
 
+// Tear down all BLE background-scan state before the cluster is destroyed
+// (endpoint unregistration / test teardown).  Cancels outstanding per-fabric
+// lifetime timers, stops the hardware scan if it owns the scanner, and drops the
+// transport's reference to the cluster so no later timer dereferences it.
+void Shutdown();
+
 } // namespace Ble
 } // namespace CommissioningProxy
 } // namespace Clusters
