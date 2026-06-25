@@ -478,69 +478,82 @@ def run_tests_no_exit(
 
             node_id = matter_test_config.dut_node_ids[0]
 
-            # Determine actual commissioning status via DNS-SD.
-            try:
-                already_commissioned = event_loop.run_until_complete(
-                    is_commissioned(default_controller, node_id)
-                )
-            except Exception:
-                LOGGER.warning(
-                    "Could not determine commissioning status for node %s, assuming not commissioned",
-                    node_id
-                )
-                already_commissioned = False
+            # Discovery tests (TC_DD_*) verify the device's advertising state
+            # directly. Opening a PASE session from the runner would suppress
+            # commissionable advertisement and cause those tests to fail, so
+            # skip the pre-PASE wildcard read for them entirely.
+            is_discovery_test = test_class.__name__.startswith("TC_DD_")
 
-            if already_commissioned:
-                # Device is already on this fabric — read via CASE, no side effects.
-                # Any downstream setup_class_helper will also reach the device via CASE.
-                try:
-                    stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
-                    test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
-                except Exception:
-                    LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
+            if is_discovery_test:
+                LOGGER.info(
+                    "Discovery test detected (%s) — skipping pre-PASE wildcard read "
+                    "so the device remains free to advertise",
+                    test_class.__name__
+                )
             else:
-                # Device is not commissioned — attempt PASE if credentials are available.
-                # The session is kept alive afterwards so that downstream consumers
-                # (CommissionDeviceTest or BasicCompositionTests.setup_class_helper)
-                # reuse it via FindOrEstablishPASESession instead of forcing the device
-                # to reopen its commissioning window.
-                setup_code: Optional[str] = None
-                if matter_test_config.manual_code:
-                    setup_code = matter_test_config.manual_code[0]
-                elif matter_test_config.qr_code_content:
-                    setup_code = matter_test_config.qr_code_content[0]
-                elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
-                    setup_code = default_controller.CreateManualCode(
-                        matter_test_config.discriminators[0],
-                        matter_test_config.setup_passcodes[0],
+                # Determine actual commissioning status via DNS-SD.
+                try:
+                    already_commissioned = event_loop.run_until_complete(
+                        is_commissioned(default_controller, node_id)
                     )
-
-                if setup_code is not None:
-                    try:
-                        commissionee = event_loop.run_until_complete(
-                            default_controller.FindOrEstablishPASESession(
-                                setupCode=setup_code, nodeId=node_id
-                            )
-                        )
-                        if commissionee is None:
-                            LOGGER.error("FindOrEstablishPASESession returned None")
-                        else:
-                            stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
-                            test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
-                            LOGGER.info(
-                                "Keeping PASE session alive for downstream reuse "
-                                "(CommissionDeviceTest or setup_class_helper)"
-                            )
-                    except Exception:
-                        LOGGER.warning(
-                            "Could not pre-populate global wildcard before commissioning",
-                            exc_info=True
-                        )
-                else:
+                except Exception:
                     LOGGER.warning(
-                        "Device not commissioned and no setup code available — "
-                        "skipping global wildcard pre-population"
+                        "Could not determine commissioning status for node %s, assuming not commissioned",
+                        node_id
                     )
+                    already_commissioned = False
+
+                if already_commissioned:
+                    # Device is already on this fabric — read via CASE, no side effects.
+                    # Any downstream setup_class_helper will also reach the device via CASE.
+                    try:
+                        stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
+                        test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                    except Exception:
+                        LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
+                else:
+                    # Device is not commissioned — attempt PASE if credentials are available.
+                    # The session is kept alive afterwards so that downstream consumers
+                    # (CommissionDeviceTest or BasicCompositionTests.setup_class_helper)
+                    # reuse it via FindOrEstablishPASESession instead of forcing the device
+                    # to reopen its commissioning window.
+                    setup_code: Optional[str] = None
+                    if matter_test_config.manual_code:
+                        setup_code = matter_test_config.manual_code[0]
+                    elif matter_test_config.qr_code_content:
+                        setup_code = matter_test_config.qr_code_content[0]
+                    elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
+                        setup_code = default_controller.CreateManualCode(
+                            matter_test_config.discriminators[0],
+                            matter_test_config.setup_passcodes[0],
+                        )
+
+                    if setup_code is not None:
+                        try:
+                            commissionee = event_loop.run_until_complete(
+                                default_controller.FindOrEstablishPASESession(
+                                    setupCode=setup_code, nodeId=node_id
+                                )
+                            )
+                            if commissionee is None:
+                                LOGGER.error("FindOrEstablishPASESession returned None")
+                            else:
+                                stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
+                                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                                LOGGER.info(
+                                    "Keeping PASE session alive for downstream reuse "
+                                    "(CommissionDeviceTest or setup_class_helper)"
+                                )
+                        except Exception:
+                            LOGGER.warning(
+                                "Could not pre-populate global wildcard before commissioning",
+                                exc_info=True
+                            )
+                    else:
+                        LOGGER.warning(
+                            "Device not commissioned and no setup code available — "
+                            "skipping global wildcard pre-population"
+                        )
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
