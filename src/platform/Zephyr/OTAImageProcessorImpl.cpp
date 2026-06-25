@@ -59,7 +59,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     mHeaderParser.Init();
     mParams = {};
 
-// The FIXED_PARTITION_*() macros were deprecated in Zephyr 4.4. 
+// The FIXED_PARTITION_*() macros were deprecated in Zephyr 4.4.
 #if ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0)
     const struct device * flash_dev = PARTITION_DEVICE(slot1_partition);
 #else
@@ -72,12 +72,12 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         return System::MapErrorZephyr(-EFAULT);
     }
 
-#if ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0)  
+#if ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0)
     int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), PARTITION_OFFSET(slot1_partition),
-    PARTITION_SIZE(slot1_partition), NULL);
+                                PARTITION_SIZE(slot1_partition), NULL);
 #else
     int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
-    FIXED_PARTITION_SIZE(slot1_partition), NULL);
+                                FIXED_PARTITION_SIZE(slot1_partition), NULL);
 #endif
 
     if (err)
