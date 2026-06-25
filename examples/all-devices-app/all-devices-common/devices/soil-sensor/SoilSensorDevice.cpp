@@ -34,6 +34,9 @@ SoilSensorDevice::SoilSensorDevice(TimerDelegate & timerDelegate, SoilMoistureMe
 CHIP_ERROR SoilSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                       EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
@@ -49,7 +52,9 @@ CHIP_ERROR SoilSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataM
     mSoilMeasurementCluster.Create(endpoint, mMoistureLimits);
     ReturnErrorOnFailure(provider.AddCluster(mSoilMeasurementCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void SoilSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)

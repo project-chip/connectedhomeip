@@ -22,8 +22,7 @@
 namespace chip::app {
 
 /**
- * @brief An implementation of a Battery Power Source Device that decreases battery level over time.
- *
+ * Simulated battery power source that decreases the reported battery level over time.
  */
 class DecreasingBatteryPowerSourceDevice : public BatteryPowerSourceDevice, public TimerContext
 {
