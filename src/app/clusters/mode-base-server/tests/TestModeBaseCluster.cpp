@@ -341,17 +341,20 @@ TEST_F(TestModeBaseCluster, StartupAppliesStartUpModeOnBoot)
 
     {
         ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
-        ClusterTester tester(cluster, &testContext);
+        ClusterTester tester(cluster);
         ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
         DataModel::Nullable<uint8_t> startUpMode(1);
         ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
 
+        testContext.StorageDelegate().CopyFrom(tester.GetTestContext().StorageDelegate());
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
-    ClusterTester tester(cluster, &testContext);
+    ClusterTester tester(cluster);
+    // We are testing reboot behavior here, so we need to copy the storage from the previous step to restore the persisted state.
+    tester.GetTestContext().StorageDelegate().CopyFrom(testContext.StorageDelegate());
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
@@ -370,18 +373,21 @@ TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
 
     {
         ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
-        ClusterTester tester(cluster, &testContext);
+        ClusterTester tester(cluster);
         ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
         DataModel::Nullable<uint8_t> startUpMode(1);
         ASSERT_TRUE(tester.WriteAttribute(StartUpMode::Id, startUpMode).IsSuccess());
         ASSERT_TRUE(cluster.UpdateCurrentMode(0) == Status::Success);
 
+        testContext.StorageDelegate().CopyFrom(tester.GetTestContext().StorageDelegate());
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig());
-    ClusterTester tester(cluster, &testContext);
+    ClusterTester tester(cluster);
+    // We are testing reboot behavior here, so we need to copy the storage from the previous step to restore the persisted state.
+    tester.GetTestContext().StorageDelegate().CopyFrom(testContext.StorageDelegate());
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
@@ -395,20 +401,22 @@ TEST_F(TestModeBaseCluster, StartupIgnoresStartUpModeAfterOtaReboot)
 
 TEST_F(TestModeBaseCluster, StartupAppliesOnModeWhenOnOffFeatureEnabled)
 {
-
     {
         ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
-        ClusterTester tester(cluster, &testContext);
+        ClusterTester tester(cluster);
         ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
         DataModel::Nullable<uint8_t> onMode(1);
         ASSERT_TRUE(tester.WriteAttribute(OnMode::Id, onMode).IsSuccess());
 
+        testContext.StorageDelegate().CopyFrom(tester.GetTestContext().StorageDelegate());
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     ModeBaseCluster cluster(kRootEndpointId, kTestClusterId, MakeConfig(BitMask<Feature>(Feature::kOnOff), true));
-    ClusterTester tester(cluster, &testContext);
+    ClusterTester tester(cluster);
+    // We are testing reboot behavior here, so we need to copy the storage from the previous step to restore the persisted state.
+    tester.GetTestContext().StorageDelegate().CopyFrom(testContext.StorageDelegate());
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     uint8_t currentMode = 0xFF;
