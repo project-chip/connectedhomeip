@@ -466,7 +466,7 @@ def run_tests_no_exit(
             # Fail the test run on unhandled exceptions.
             ok = False
 
-        # Set custom exception handler to catch unhandled exceptions.
+        # Set custom exception handler to catch unhandled exceptions
         event_loop.set_exception_handler(_handler)
 
         runner = TestRunner(log_dir=test_config.log_path,
@@ -480,9 +480,9 @@ def run_tests_no_exit(
 
             if matter_test_config.commissioning_method is not None:
                 # CommissionDeviceTest will run — check if already commissioned
-                # first, and if so pre-populate the wildcard via CASE.
+                # first, and if so pre-populate the wildcard via CASE
                 # If not commissioned, establish PASE, read wildcard, and keep
-                # the session alive for CommissionDeviceTest to reuse.
+                # the session alive for CommissionDeviceTest to reuse
                 try:
                     already_commissioned = event_loop.run_until_complete(
                         is_commissioned(default_controller, node_id)
@@ -495,7 +495,7 @@ def run_tests_no_exit(
                     already_commissioned = False
 
                 if already_commissioned:
-                    # Device is already on this fabric — read via CASE, no side effects.
+                    # Device is already on this fabric — read via CASE, no side effects
                     try:
                         stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                         test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
@@ -503,7 +503,7 @@ def run_tests_no_exit(
                         LOGGER.warning("Could not pre-populate global wildcard via CASE", exc_info=True)
                 else:
                     # Device is not commissioned — establish PASE, read wildcard,
-                    # and keep session alive for CommissionDeviceTest to reuse.
+                    # and keep session alive for CommissionDeviceTest to reuse
                     setup_code: Optional[str] = None
                     if matter_test_config.manual_code:
                         setup_code = matter_test_config.manual_code[0]
@@ -528,7 +528,7 @@ def run_tests_no_exit(
                                 stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
                                 test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
                                     stored_global_wildcard)
-                                # Keep PASE session alive for CommissionDeviceTest to reuse.
+                                # Keep PASE session alive for CommissionDeviceTest to reuse
                                 LOGGER.info("Keeping PASE session alive for CommissionDeviceTest to reuse")
                         except Exception:
                             LOGGER.warning(
@@ -541,7 +541,7 @@ def run_tests_no_exit(
                             "skipping global wildcard pre-population"
                         )
             # If commissioning_method is None, let the test class (e.g. BasicCompositionTests)
-            # manage its own PASE session via setup_class_helper. The runner stays out of the way.
+            # manage its own PASE session via setup_class_helper. The runner stays out of the way
 
             # Add the tests selected unless we have a commission-only request
             if not matter_test_config.commission_only:
