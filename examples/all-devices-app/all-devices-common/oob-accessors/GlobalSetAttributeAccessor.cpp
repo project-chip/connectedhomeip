@@ -35,15 +35,16 @@ std::optional<OOBAccessor::ActionResponse> GlobalSetAttributeAccessor::HandleGet
 
     for (auto & accessor : OOBAccessorRegistry::Instance().GetAccessors())
     {
-        if (accessor.IsAccessorType(OOBAccessorType::kSetAttribute))
+        if (!accessor.IsAccessorType(OOBAccessorType::kSetAttribute))
         {
-            auto * setAttrAccessor = static_cast<SetAttributeAccessor *>(&accessor);
-            CHIP_ERROR err = builder.AppendElements(setAttrAccessor->GetSupportedPaths());
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Support, "Failed to append paths to builder: %" CHIP_ERROR_FORMAT, err.Format());
-                return ActionResponse(err, ReadOnlyBuffer<uint8_t>());
-            }
+            continue;
+        }
+        auto * setAttrAccessor = static_cast<SetAttributeAccessor *>(&accessor);
+        CHIP_ERROR err         = builder.AppendElements(setAttrAccessor->GetSupportedPaths());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Support, "Failed to append paths to builder: %" CHIP_ERROR_FORMAT, err.Format());
+            return ActionResponse(err, ReadOnlyBuffer<uint8_t>());
         }
     }
 
