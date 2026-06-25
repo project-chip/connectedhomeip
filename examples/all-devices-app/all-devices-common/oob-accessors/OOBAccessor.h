@@ -29,10 +29,24 @@
 
 namespace chip::app {
 
+/**
+ * @brief Identifies the specific accessor subclass type at runtime.
+ *
+ * This enum is used in place of Run-Time Type Information (RTTI) to allow
+ * dynamic type identification and safe downcasting at runtime.
+ */
+enum class OOBAccessorType
+{
+    kGeneric,
+    kSetAttribute
+};
+
 class OOBAccessor : public chip::IntrusiveListNodeBase<chip::IntrusiveMode::AutoUnlink>
 {
 public:
     virtual ~OOBAccessor() = default;
+
+    virtual bool IsAccessorType(OOBAccessorType type) const { return type == OOBAccessorType::kGeneric; }
 
     using ActionResponse = std::pair<CHIP_ERROR, ReadOnlyBuffer<uint8_t>>;
 
@@ -59,6 +73,11 @@ class SetAttributeAccessor : public OOBAccessor
 {
 public:
     static constexpr CharSpan kActionSetAttribute = "SetAttribute"_span;
+
+    bool IsAccessorType(OOBAccessorType type) const override
+    {
+        return type == OOBAccessorType::kSetAttribute || OOBAccessor::IsAccessorType(type);
+    }
 
     ~SetAttributeAccessor() override = default;
 

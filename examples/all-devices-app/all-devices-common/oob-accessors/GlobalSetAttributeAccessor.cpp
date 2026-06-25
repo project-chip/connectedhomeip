@@ -35,9 +35,9 @@ std::optional<OOBAccessor::ActionResponse> GlobalSetAttributeAccessor::HandleGet
 
     for (auto & accessor : OOBAccessorRegistry::Instance().GetAccessors())
     {
-        auto * setAttrAccessor = dynamic_cast<SetAttributeAccessor *>(&accessor);
-        if (setAttrAccessor != nullptr)
+        if (accessor.IsAccessorType(OOBAccessorType::kSetAttribute))
         {
+            auto * setAttrAccessor = static_cast<SetAttributeAccessor *>(&accessor);
             CHIP_ERROR err = builder.AppendElements(setAttrAccessor->GetSupportedPaths());
             if (err != CHIP_NO_ERROR)
             {
