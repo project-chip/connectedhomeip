@@ -64,7 +64,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     const struct device * flash_dev = PARTITION_DEVICE(slot1_partition);
 #else
     const struct device * flash_dev = FIXED_PARTITION_DEVICE(slot1_partition);
-#endif
+#endif /* ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0) */
 
     if (flash_dev == NULL || !device_is_ready(flash_dev))
     {
@@ -78,7 +78,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 #else
     int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
                                 FIXED_PARTITION_SIZE(slot1_partition), NULL);
-#endif
+#endif /* ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0) */
 
     if (err)
     {
