@@ -153,7 +153,8 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
             asserts.assert_true(rpc_response.status.ok(), msg="GetWriteAttributePaths RPC failed.")
 
             paths = rpc_response.response.paths
-            logger.info("Discovered paths: %s", paths)
+            logger.info("Discovered paths: %s", ", ".join(["(Ep=%d, ClusterId=%d, AttrId=%d)" % (
+                path.endpoint, path.cluster_id, path.attribute_id) for path in paths]))
 
             expected_paths = [
                 {"endpoint": 1, "cluster_id": Clusters.Objects.BooleanState.id,
