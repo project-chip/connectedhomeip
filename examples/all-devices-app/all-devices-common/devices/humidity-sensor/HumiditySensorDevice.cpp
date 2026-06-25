@@ -32,6 +32,9 @@ HumiditySensorDevice::HumiditySensorDevice(TimerDelegate & timerDelegate,
 CHIP_ERROR HumiditySensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                           EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -40,7 +43,9 @@ CHIP_ERROR HumiditySensorDevice::Register(EndpointId endpoint, CodeDrivenDataMod
     mRelativeHumidityMeasurementCluster.Create(endpoint, mHumidityConfig);
     ReturnErrorOnFailure(provider.AddCluster(mRelativeHumidityMeasurementCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void HumiditySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
