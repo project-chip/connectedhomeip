@@ -251,15 +251,24 @@ advance past it. When the matched sub-processor returns not-ready, `SkipData()`
 is also called and the entry is recorded as `kSkippedNotReady`. All recorded
 outcomes are reported through the outcome hook (§5) at the end of the download.
 
+The Dispatcher also owns **integrity verification**: for each `kReady` entry it
+streams a SHA-256 over the on-wire bytes as they are routed and verifies the
+digest against `subImages[i].sha256` once the entry is fully delivered, before
+the entry is closed. Sub-processors therefore do not hash their own input — they
+only write the bytes they are handed, and the Dispatcher signals completion of a
+verified entry by calling the sub-processor's close operation.
+
 **Sub Image Processor** — an interface the application registers per image ID.
-Four methods form the contract:
+The contract:
 
 -   `Init(entry)` — called once with the full `SubImageHeader` for each entry,
     before `IsReadyForOTA()`. Must be light-weight: store the fields needed for
-    the readiness decision (`entry.version`) and for subsequent writes
-    (`entry.length`, `entry.sha256`). Do not start heavy I/O here — defer that
-    to the first `Write()` call so resources are only allocated when `kReady` is
-    confirmed.
+    the readiness decision (`entry.version`). Length and SHA-256 are tracked and
+    verified by the Dispatcher, so the sub-processor does not need them. Do not
+    start heavy I/O here — defer that to the first `Write()` call so resources
+    are only allocated when `kReady` is confirmed.
+-   `IsInitialized()` → `bool` — whether `Init()` has run. The framework uses it
+    to fan out `Abort()` / `Apply()` only to sub-processors that were started.
 -   `IsReadyForOTA()` → `DeviceState` — called immediately after
     `Init()`, with no parameters. The sub-processor uses the version stored
     during `Init()` to decide: `kReady` (proceed), `kAlreadyUpToDate` (already
@@ -269,12 +278,10 @@ Four methods form the contract:
     live bus round-trip.
 -   `Write(block)` → `WriteResult` — called per chunk, only when
     `IsReadyForOTA()` returned `kReady`. On the first chunk the sub-processor
-    performs heavy initialisation. Two independent byte counters exist:
-    the Dispatcher's counter (decides when to stop feeding this entry and move
-    to the next) and the sub-processor's own running total (detects the last
-    chunk for SHA-256 finalisation and commit logic). The sub-processor must
-    maintain its own running total and compare it against `entry.length`
-    (stored during `Init()`) to detect the last chunk. Returns one of two values:
+    performs heavy initialisation. The Dispatcher owns the routing counter
+    (decides when to stop feeding this entry) and the SHA-256 verification; the
+    sub-processor simply writes the bytes it is handed. Returns one of two
+    values:
 
     | Return value | Meaning | Dispatcher action |
     | ------------ | ------- | ----------------- |
@@ -285,6 +292,10 @@ Four methods form the contract:
     uses platform scheduling but resolves within the same dispatch cycle) returns
     `kDone`. A sub-processor that delegates to a worker task (bus transfer, DMA)
     returns `kPending`.
+
+-   `Finish()` — called once after the Dispatcher has delivered every byte of
+    this entry **and verified its SHA-256**. The sub-processor closes/commits
+    its staged image (e.g. `esp_ota_end()`). A failure here aborts the session.
 
 -   `Abort(context)` — called on every sub-processor that had `Init()` called
     whenever the OTA session ends without completing normally — whether due to an
@@ -311,6 +322,11 @@ Four methods form the contract:
     that is recorded for the application's boot-time consistency check (§6.3) —
     component rollback is the application's responsibility (§7.1). Must not
     block.
+
+-   `Apply()` — called once per `Init()`-ed sub-processor during the apply phase
+    (after the outcome hook approves the update) to commit/activate the staged
+    image (e.g. `esp_ota_set_boot_partition()` and any component reboot). The
+    default implementation is a no-op for components that activate on their own.
 
 **`OnWriteComplete(result)`** — this is **not** a sub-processor interface
 method. It is an operation **on the Main Image Processor** that an
@@ -783,23 +799,28 @@ downloader and session layer as-is (`OTADownloader::SkipData()` /
 
 ### 9.1 Platform Layer Requirements
 
-#### R1 — Sub Image Processor interface: four operations
+#### R1 — Sub Image Processor interface
 
-The full contract for each operation is defined in §4.1. The four operations are:
+The full contract for each operation is defined in §4.1. The operations are:
 
 | # | Operation | One-line rule |
 |---|-----------|---------------|
-| 1 | `Init(entry)` | Light-weight; store entry fields; no heavy I/O. |
-| 2 | `IsReadyForOTA()` | Returns `DeviceState` from cached state; must complete in milliseconds. |
-| 3 | `Write(block)` | Returns `kDone` (sync) or `kPending` (async); verifies SHA-256 on last chunk. |
-| 4 | `Abort(context)` | Discard partial state, cancel async ops, release resources, do not block. |
+| 1 | `Init(entry)` | Light-weight; store `entry.version`; no heavy I/O. |
+| 2 | `IsInitialized()` | Whether `Init()` ran; used to fan out `Abort()` / `Apply()`. |
+| 3 | `IsReadyForOTA()` | Returns `DeviceState` from cached state; must complete in milliseconds. |
+| 4 | `Write(block)` | Returns `kDone` (sync) or `kPending` (async); writes the bytes handed in. |
+| 5 | `Finish()` | Close/commit the entry; called after the Dispatcher verifies its SHA-256. |
+| 6 | `Abort(context)` | Discard partial state, cancel async ops, release resources, do not block. |
+| 7 | `Apply()` | Commit/activate the staged image during the apply phase. |
 
-Asynchronous sub-processors additionally call `OnWriteComplete(result)` on the
-Main Image Processor — exactly once per `kPending` return, from a worker task
-(§4.1).
+Integrity (SHA-256 over the on-wire bytes) is verified by the **Dispatcher**,
+not the sub-processor; the sub-processor only writes bytes and closes on
+`Finish()`. Asynchronous sub-processors additionally call `OnWriteComplete(result)`
+on the Main Image Processor — exactly once per `kPending` return, from a worker
+task (§4.1).
 
 The default readiness is `kReady`. Implementations whose component is always
-present and always ready need only implement `Write` and `Abort`; the others
+present and always ready need only implement `Write` and `Finish`; the others
 have safe defaults.
 
 #### R2 — Dispatcher routing behaviour
@@ -827,19 +848,30 @@ For each entry in `MultiImageHeader.subImages[]` the Dispatcher must:
 4. If a processor is found: call `Init(entry)` (light), then call
    `IsReadyForOTA()` (no params) and record the outcome. If no processor is
    found: record `kSkippedUpToDate`.
-5. **If `kNotReady` or `kAlreadyUpToDate`:** compute the skip distance as
-   `(entry.offset + entry.length) - currentBytePosition`. This accounts for
-   any bytes of this entry already consumed by the current block (split-block
-   case). Call `SkipData(skipDistance)`. `SkipData()` sends a
-   `BlockQueryWithSkip` BDX message immediately — this is the next block
-   request. **Do not call `FetchNextData()` after `SkipData()`**; doing so
-   sends a second BDX request while one is already in-flight, corrupting the
-   stop-and-wait state machine.
+5. **If `kNotReady` or `kAlreadyUpToDate`:** skip the entry. `SkipData(n)` is
+   **relative to the bytes the provider has already sent**, and the provider has
+   already sent the whole current block — so `n` must be only the *not-yet-sent*
+   remainder of the entry, not its full length. Let
+   `deliveredEnd = currentBytePosition + bytesInHand` (where `bytesInHand` is the
+   unconsumed remainder of the current block):
+   - If `entry.offset + entry.length <= deliveredEnd` — the entire entry is
+     already in this block. **Do not call `SkipData()`**; discard the entry's
+     bytes locally, advance `currentBytePosition` to its end, and continue with
+     the next entry in the same block.
+   - Otherwise call `SkipData((entry.offset + entry.length) - deliveredEnd)` —
+     only the bytes the provider has not yet sent. `SkipData()` sends a
+     `BlockQueryWithSkip` immediately, so **do not call `FetchNextData()` after
+     it**; doing so sends a second BDX request while one is already in-flight,
+     corrupting the stop-and-wait state machine.
+
+   > Using the full `entry.length` (or `entry.offset + entry.length −
+   > currentBytePosition`) over-skips by `bytesInHand` and truncates the next
+   > entry (usually the application image) — a SHA-256 mismatch or corrupt flash.
 6. **If `kReady`:** feed chunks via `Write()` until `entry.length` bytes have
-   been delivered. The Dispatcher owns its routing counter (decides when to
-   stop feeding this entry and move to the next); the sub-processor maintains
-   its own running total independently (for SHA-256 finalisation and commit
-   logic — see §4.1). After each `Write()`:
+   been delivered, streaming the SHA-256 over those on-wire bytes. The Dispatcher
+   owns the routing counter and the integrity check; when the entry is fully
+   delivered it verifies the digest against `entry.sha256` and then calls the
+   sub-processor's `Finish()` to close the entry (§4.1). After each `Write()`:
    - If `Write()` returns `kDone`: call `FetchNextData()` to request the next
      BDX block — **unless this was the last chunk of the last entry**
      (`currentBytePosition + remaining == payloadSize`). After the last
@@ -862,10 +894,10 @@ For each entry in `MultiImageHeader.subImages[]` the Dispatcher must:
 than one entry. When the Dispatcher finishes entry[i]'s bytes mid-block, it
 immediately transitions to entry[i+1] using the remaining bytes without waiting
 for a new `ProcessBlock()` call. It runs steps 1–6 above for entry[i+1] using
-the remaining bytes. If entry[i+1] is `kNotReady` or `kAlreadyUpToDate`, the
-skip distance in step 5 correctly resolves to less than `entry[i+1].length`
-because `currentBytePosition` already accounts for the bytes consumed from the
-current block.
+the remaining bytes. If entry[i+1] is `kNotReady` or `kAlreadyUpToDate`, step 5
+handles the in-hand bytes: if entry[i+1] is wholly within the current block it
+is dropped locally with no wire skip, otherwise only the not-yet-sent remainder
+(`end − deliveredEnd`) is skipped — never the full `entry[i+1].length`.
 
 #### R3 — Outcome hook: `OnDownloadOutcome`
 
@@ -898,20 +930,28 @@ the start of the byte stream is not compatible with the sub-processor `Write`
 contract. The Main Image Processor strips the outer header before any bytes
 reach a sub-processor. Sub-processors must not be written to re-parse it.
 
-#### N3 — Encrypted OTA (`CONFIG_ENABLE_ENCRYPTED_OTA`) is incompatible
+#### N3 — Encrypted OTA (`CONFIG_ENABLE_ENCRYPTED_OTA`) is per-sub-image
 
-The pre-encrypted OTA scheme (`esp_encrypted_img`) decrypts the payload as one
-sequential stream. `SkipData()` removes ciphertext from the middle of that
-stream, so everything after the first skip decrypts to garbage. Multi-image
-OTA and whole-payload encrypted OTA are therefore **mutually exclusive at
-build time** (§11.1). Per-sub-image encryption (each sub-processor owning its
-decryption context) is future work (§16).
+Encryption is applied **per sub-image**, not over the whole payload. Each
+sub-processor owns its own decryption context (`esp_encrypted_img`): it decrypts
+the chunks routed to it and writes the plaintext to its component. Because the
+transform stays inside one sub-image's byte range, `SkipData()` between
+sub-images is unaffected. The integrity SHA-256 the Dispatcher verifies is over
+the on-wire (encrypted) bytes, matching what the packaging tool hashed. A
+sub-processor enables decryption by being given its private key before the
+transfer starts. Encryption is a reusable capability that any sub-processor can
+adopt.
 
-#### N4 — Delta OTA (`CONFIG_ENABLE_DELTA_OTA`) is incompatible
+#### N4 — Delta OTA (`CONFIG_ENABLE_DELTA_OTA`) is per-sub-image
 
-The delta patch stream is likewise sequential over the whole payload and is
-inherently tied to the application partition. Mutually exclusive at build time
-(§11.1). Per-sub-image delta encoding is future work (§16).
+Delta patching is likewise applied **per sub-image**: a sub-processor treats the
+chunks routed to it as a patch, reconstructs the new image against its current
+image as the base, and writes the result. As with encryption, the transform is
+confined to one sub-image's byte range, so inter-sub-image `SkipData()` is
+unaffected, and the integrity SHA-256 is over the on-wire (patch) bytes. Delta
+requires random-access reads of the base image; a sub-processor supplies how its
+base is read and where output is written. (Encryption and delta compose: an
+encrypted delta patch is decrypted, then applied.)
 
 #### N5 — The RCP OTA delegate is superseded
 
@@ -1065,30 +1105,12 @@ suggestion, for any product that registers a co-processor sub-processor.**
 
 ### 11.1 Build flag
 
-Multi-image OTA is disabled by default. A single flag enables the entire
-subsystem, following the same pattern as the existing optional OTA features in
-`config/esp32/components/chip/Kconfig`:
-
-```
-config ENABLE_MULTI_IMAGE_OTA
-    bool "Enable multi-image OTA"
-    depends on ENABLE_OTA_REQUESTOR
-    depends on !ENABLE_ENCRYPTED_OTA && !ENABLE_DELTA_OTA
-    default n
-```
-
-When disabled, the build compiles the existing single-image
-`OTAImageProcessorImpl` and **nothing in the current implementation changes**.
-When enabled, the multi-image processor sources under
-`src/platform/ESP32/multi-ota/` are compiled instead, and the application's
-OTA initialisation registers the multi-image processor with the downloader.
-The two implementations are mutually exclusive — exactly one
-`OTAImageProcessorInterface` implementation is linked.
-
-The `depends on !ENABLE_ENCRYPTED_OTA && !ENABLE_DELTA_OTA` exclusions are
-required, not stylistic — see §9.2 N3/N4. The Kconfig flag maps to a GN
-argument for the chip component build, gating the source list in
-`src/platform/ESP32/BUILD.gn` the same way the existing flags do.
+Multi-image OTA is disabled by default and enabled by a single build flag,
+which requires the OTA Requestor to be enabled. When disabled, the existing
+single-image processor is used and nothing changes; when enabled, the
+multi-image processor replaces it. Exactly one `OTAImageProcessorInterface`
+implementation is linked. Encrypted and delta OTA can be enabled alongside it
+(applied per sub-image — see §9.2 N3/N4).
 
 ### 11.2 Platform requirements
 
