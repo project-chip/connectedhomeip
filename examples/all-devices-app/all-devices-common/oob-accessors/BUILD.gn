@@ -21,12 +21,12 @@ config("includes") {
 
 source_set("oob-accessors") {
   sources = [
-    "OOBInfoAccessor.cpp",
-    "OOBInfoAccessor.h",
     "OOBAccessor.h",
     "OOBAccessorRegistry.h",
     "OOBDataSerializer.cpp",
     "OOBDataSerializer.h",
+    "OOBInfoAccessor.cpp",
+    "OOBInfoAccessor.h",
   ]
 
   public_deps = [
