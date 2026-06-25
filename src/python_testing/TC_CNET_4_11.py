@@ -42,7 +42,7 @@ MAX_ATTEMPTS = 4                     # Reduced to prevent stack overflow from to
 TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
 
 # Matter command timeouts
-TIMED_REQUEST_TIMEOUT_MS = 5000      # Matter command timeout (5s) - for individual Matter commands
+TIMED_REQUEST_TIMEOUT = 5            # Matter command timeout (5s) - for individual Matter commands
 COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
 ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after network changes when DUT may be slow
 OPERATIONAL_DISCOVERY_TIMEOUT = 70   # Increased to handle network delays - for first attribute read after network change
@@ -54,11 +54,11 @@ NETWORK_CHANGE_TIMEOUT = 60          # Network transition timeout (60s) - for ne
 MDNS_DISCOVERY_TIMEOUT = 8           # Slightly increased to improve mDNS resolution success - device typically responds in <5s
 
 # Wait periods (not timeouts, but delays for stability)
-WIFI_WAIT_SECONDS = 5                # WiFi stabilization wait (5s) - basic network settling time
+WIFI_WAIT = 5                        # WiFi stabilization wait (5s) - basic network settling time
 NETWORK_STABILIZATION_WAIT = 25      # Network stabilization wait (25s) - after major network changes
-RETRY_DELAY_SECONDS = 5              # Delay between retry attempts (5s) - delay for DUT recovery
+RETRY_DELAY = 5                      # Delay between retry attempts (5s) - delay for DUT recovery
 
-WPA_SOCKET_TIMEOUT_SECONDS = 5       # wpa_supplicant ctrl_interface reply timeout - the socket recv has no
+WPA_SOCKET_TIMEOUT = 5       # wpa_supplicant ctrl_interface reply timeout - the socket recv has no
 # default timeout and will block the event loop forever if a reply is lost
 
 cgen = Clusters.GeneralCommissioning
@@ -344,7 +344,7 @@ async def wpa_command(iface, cmd):
     if os.path.exists(sock_tmp):
         os.remove(sock_tmp)
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-    sock.settimeout(WPA_SOCKET_TIMEOUT_SECONDS)
+    sock.settimeout(WPA_SOCKET_TIMEOUT)
     try:
         sock.bind(sock_tmp)
         sock.sendto(cmd.encode(), sock_file)
@@ -368,7 +368,7 @@ async def scan_and_find_ssid(interface, target_ssid):
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             await wpa_command(interface, "SCAN")
-            await asyncio.sleep(RETRY_DELAY_SECONDS)
+            await asyncio.sleep(RETRY_DELAY)
 
             results = await wpa_command(interface, "SCAN_RESULTS")
             scan_lines = results.splitlines()[1:]
@@ -381,7 +381,7 @@ async def scan_and_find_ssid(interface, target_ssid):
             logger.error("scan_and_find_ssid: Scan attempt %s failed: %s", attempt, e)
 
         if attempt < MAX_ATTEMPTS:
-            await asyncio.sleep(RETRY_DELAY_SECONDS)
+            await asyncio.sleep(RETRY_DELAY)
 
     logger.error("scan_and_find_ssid: SSID %s not found after %s attempts", target_ssid, MAX_ATTEMPTS)
     return False
@@ -586,7 +586,7 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
             return ConnectionResult(1, str(e))
 
         # Wait for connection to establish
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(WIFI_WAIT)
 
         if isinstance(ssid, bytes):
             ssid_str = ssid.decode('utf-8')
@@ -666,7 +666,7 @@ async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
             logger.warning("connect_host_wifi: Exception on attempt %s: %s", attempt, e)
 
         if attempt < MAX_ATTEMPTS and (not conn or conn.returncode != 0):
-            await asyncio.sleep(RETRY_DELAY_SECONDS)
+            await asyncio.sleep(RETRY_DELAY)
 
     return conn
 
@@ -687,7 +687,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             if attempt > 1:
-                await asyncio.sleep(RETRY_DELAY_SECONDS)
+                await asyncio.sleep(RETRY_DELAY)
 
             try:
                 response = await asyncio.wait_for(
@@ -737,7 +737,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
             continue
 
         # Wait for DUT to change networks
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(WIFI_WAIT)
 
         # Try to change TH network with multiple attempts
         th_success = False
@@ -763,7 +763,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 logger.warning("change_networks: TH connection exception on attempt %s: %s", th_attempt, e)
 
             if th_attempt < MAX_ATTEMPTS:
-                await asyncio.sleep(RETRY_DELAY_SECONDS)
+                await asyncio.sleep(RETRY_DELAY)
 
         if th_success:
             return  # Success!
@@ -975,7 +975,7 @@ async def verify_operational_network(test, ssid):
         elif attempt == 2:
             retry_delay = 15
         else:
-            retry_delay = RETRY_DELAY_SECONDS
+            retry_delay = RETRY_DELAY
 
         if attempt < max_read_attempts:
             await asyncio.sleep(retry_delay)
@@ -1154,7 +1154,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -1184,7 +1184,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
             ),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT
         )
         # Verify that DUT sends NetworkConfigResponse to command with the following fields:
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
@@ -1213,13 +1213,13 @@ class TC_CNET_4_11(MatterBaseTest):
         for attempt in range(1, MAX_ATTEMPTS + 1):
             try:
                 logger.info("Step 5 attempt %s/%s: Sending AddOrUpdateWiFiNetwork command", attempt, MAX_ATTEMPTS)
-                response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
+                response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT)
                 break
             except Exception as e:
                 logger.warning("Step 5 attempt %s failed: %s", attempt, e)
                 if attempt < MAX_ATTEMPTS:
-                    logger.info("Retrying in %s seconds...", RETRY_DELAY_SECONDS)
-                    await asyncio.sleep(RETRY_DELAY_SECONDS)
+                    logger.info("Retrying in %s seconds...", RETRY_DELAY)
+                    await asyncio.sleep(RETRY_DELAY)
                 else:
                     raise Exception(f"Failed to send AddOrUpdateWiFiNetwork after {MAX_ATTEMPTS} attempts: {e}")
 
@@ -1263,13 +1263,13 @@ class TC_CNET_4_11(MatterBaseTest):
         )
         # Give extra time for DUT to update mDNS announcements with new IP after network change
         # This prevents TH from attempting to connect to stale/cached IP addresses
-        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+        await asyncio.sleep(WIFI_WAIT * 2)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(8)
 
         # Verify that the TH successfully connects to the DUT
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(WIFI_WAIT)
         await verify_operational_network(self, wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
@@ -1291,7 +1291,7 @@ class TC_CNET_4_11(MatterBaseTest):
         try:
             response = await self.send_single_cmd(
                 cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0),
-                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS*6
+                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT*6
             )
             asserts.assert_equal(
                 response.errorCode,
@@ -1313,7 +1313,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 raise
 
         # Wait for DUT to complete network reversion
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(WIFI_WAIT)
 
         # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
         self.step(11)
@@ -1330,7 +1330,7 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step(12)
 
         # Give more time for both TH and DUT to stabilize on the original network
-        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+        await asyncio.sleep(WIFI_WAIT * 2)
 
         # Verify that DUT has reverted to original network and is reachable
         try:
@@ -1340,7 +1340,7 @@ class TC_CNET_4_11(MatterBaseTest):
             logger.error("Failed to reconnect to DUT on original network: %s", e)
             # Try one more time with additional wait
             logger.info("Retrying connection to DUT...")
-            await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+            await asyncio.sleep(WIFI_WAIT * 2)
             await verify_operational_network(self, wifi_1st_ap_ssid)
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
@@ -1348,7 +1348,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         await self.send_single_cmd(
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=900),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT
         )
         # Successful command execution is implied if no exception is raised.
 
@@ -1360,7 +1360,7 @@ class TC_CNET_4_11(MatterBaseTest):
                 networkID=wifi_1st_ap_ssid.encode(),
                 breadcrumb=1
             ),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT
         )
 
         # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
@@ -1379,7 +1379,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         cmd = cnet.Commands.AddOrUpdateWiFiNetwork(
             ssid=wifi_2nd_ap_ssid.encode(), credentials=wifi_2nd_ap_credentials.encode(), breadcrumb=1)
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT)
 
         # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
         # 1. NetworkingStatus is success which is "0"
@@ -1405,13 +1405,13 @@ class TC_CNET_4_11(MatterBaseTest):
         )
         # Give extra time for DUT to update mDNS announcements with new IP after network change
         # This prevents TH from attempting to connect to stale/cached IP addresses
-        await asyncio.sleep(WIFI_WAIT_SECONDS * 2)
+        await asyncio.sleep(WIFI_WAIT * 2)
 
         # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
         self.step(17)
 
         # Verify that the TH successfully connects to the DUT
-        await asyncio.sleep(WIFI_WAIT_SECONDS)
+        await asyncio.sleep(WIFI_WAIT)
         await verify_operational_network(self, wifi_2nd_ap_ssid)
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
@@ -1433,7 +1433,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
         # Disarm the failsafe
         cmd = cgen.Commands.CommissioningComplete()
-        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
+        response = await self.send_single_cmd(cmd=cmd, timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT)
 
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
         asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse), "Got wrong response type")
