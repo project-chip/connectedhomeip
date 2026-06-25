@@ -21,10 +21,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
-
-#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip::app::OOBDataSerializer {
 
@@ -74,5 +73,38 @@ std::variant<CHIP_ERROR, AttributeRequest> ParseAttributeRequest(ByteSpan tlvBuf
  */
 std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> BuildSetAttributeRequest(const ConcreteDataAttributePath & path,
                                                                            const chip::TLV::TLVReader & attributeValueReader);
+
+/**
+ * @brief Serializes the list of concrete attribute paths into TLV.
+ *
+ * The built buffer will contain an anonymous TLV Array of Structures:
+ * Array (Anonymous)
+ *  ├── Structure (Anonymous)
+ *  │    ├── Context Tag 1: EndpointId (uint16_t)
+ *  │    ├── Context Tag 2: ClusterId (uint32_t)
+ *  │    └── Context Tag 3: AttributeId (uint32_t)
+ *  └── ...
+ *
+ * @param[in]     paths  The list of concrete data attribute paths to serialize.
+ * @return        A variant containing either a CHIP_ERROR on failure or the finalized ReadOnlyBuffer on success.
+ */
+std::variant<CHIP_ERROR, ReadOnlyBuffer<uint8_t>> SerializePathsList(Span<const ConcreteDataAttributePath> paths);
+
+/**
+ * @brief Deserializes the list of concrete attribute paths from TLV.
+ *
+ * The incoming TLV buffer MUST contain an anonymous TLV Array of Structures:
+ * Array (Anonymous)
+ *  ├── Structure (Anonymous)
+ *  │    ├── Context Tag 1: EndpointId (uint16_t)
+ *  │    ├── Context Tag 2: ClusterId (uint32_t)
+ *  │    └── Context Tag 3: AttributeId (uint32_t)
+ *  └── ...
+ *
+ * @param[in]     tlvBuffer  The TLV buffer containing the serialized paths list.
+ * @return        A variant containing either a CHIP_ERROR on failure or the ReadOnlyBuffer<ConcreteDataAttributePath> containing
+ * attribute paths on success.
+ */
+std::variant<CHIP_ERROR, ReadOnlyBuffer<ConcreteDataAttributePath>> DeSerializePathsList(ByteSpan tlvBuffer);
 
 } // namespace chip::app::OOBDataSerializer
