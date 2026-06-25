@@ -192,7 +192,7 @@ class TC_GC_2_8(MatterBaseTest):
 
             # Join G1 as a Listener on the operate endpoint and provide K1 and InputKey1.
             await dev_ctrl.SendCommand(node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
-                groupID=GROUPID_G1, endpoints=[operate_ep], keySetID=KEYSETID_K1, inputKey=INPUTKEY_1))
+                groupID=GROUPID_G1, endpoints=[operate_ep], keySetID=KEYSETID_K1, key=INPUTKEY_1))
 
             # Grant a additional Group Operate access to the target cluster on EP1.
             acl = self._admin_only_acl()
@@ -269,8 +269,8 @@ class TC_GC_2_8(MatterBaseTest):
             asserts.assert_equal(event_data.groupID, GROUPID_G1, "Incorrect GroupID in GroupcastTesting event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false (no ACL grant)")
             asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kGeneralError,
-                                 "GroupcastTesting event should report GeneralError")
+                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                                 "GroupcastTesting event should report Success")
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect DestinationIpAddress in GroupcastTesting event")
 
@@ -284,7 +284,7 @@ class TC_GC_2_8(MatterBaseTest):
             self.step(14)
             event_data = event_sub.wait_for_event_report(groupcastTesting_event, timeout_sec=30)
             asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
                                  "GroupcastTesting event should report FailedAuth")
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect DestinationIpAddress in GroupcastTesting event")
@@ -304,7 +304,7 @@ class TC_GC_2_8(MatterBaseTest):
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect DestinationIpAddress in GroupcastTesting event")
         else:
-            self.mark_step_range_skipped(5, 17)
+            self.mark_step_range_skipped(5, 16)
 
         self.step(17)
         sub.reset()
