@@ -29,14 +29,15 @@ LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelega
     AmbientContextSensorDevice(
         // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
         // when Register() is called by the application with a valid endpoint ID.
-        AmbientContextSensingConfig{kInvalidEndpointId, *this, timerDelegate}
+        AmbientContextSensingConfig{ kInvalidEndpointId, *this, timerDelegate }
             .WithFeatures(AmbientContextSensing::Feature(g_kFeatures_all))
             .WithHoldTime(10,
                           {
                               .holdTimeMin     = 1,
                               .holdTimeMax     = 300,
                               .holdTimeDefault = 10,
-                          }), timerDelegate)
+                          }),
+        timerDelegate)
 {
     // AmbientContextSensingDelegate
     for (auto & v : mAmbientContextTypeSupportedBuf)
@@ -57,7 +58,7 @@ LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelega
 }
 
 CHIP_ERROR LoggingAmbientContextSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                  EndpointComposition composition)
+                                                       EndpointComposition composition)
 {
     return AmbientContextSensorDevice::Register(endpoint, provider, composition);
 }

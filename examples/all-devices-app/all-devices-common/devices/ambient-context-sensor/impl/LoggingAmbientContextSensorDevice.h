@@ -27,7 +27,6 @@ namespace chip::app::Clusters::AmbientContextSensing {
 constexpr uint8_t kMaxACTypeSupported_s   = 20;
 constexpr uint8_t kMaxPredictedActivity_s = 3;
 
-
 /**
  * @brief A basic implementation of an Ambient Context Sensor Device.
  *
@@ -61,4 +60,4 @@ private:
     bool mAmbientContextTypeListUsed[kMaxSimultaneousDetectionLimit];
 };
 
-} //chip::app::Clusters::AmbientContextSensing
+} // namespace chip::app::Clusters::AmbientContextSensing

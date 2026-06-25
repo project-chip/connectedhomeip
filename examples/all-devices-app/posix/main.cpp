@@ -281,7 +281,8 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
         {
             auto * ambientContextSensorDevice = static_cast<AmbientContextSensorDevice *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
-                .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(&ambientContextSensorDevice->AmbientContextSensingCluster());
+                .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(
+                    &ambientContextSensorDevice->AmbientContextSensingCluster());
         }
     }
 

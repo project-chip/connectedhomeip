@@ -183,8 +183,7 @@ class AddAmbientContextDetectCommandHandler : public AllDevicesAppNamedPipeComma
 {
 public:
     const char * GetName() const override { return "AddAmbientContextDetect"; }
-    bool GetAmbientContextType(const Json::Value & actArray,
-                                      std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
+    bool GetAmbientContextType(const Json::Value & actArray, std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
     {
         // Validate AmbientContextType exists and is an array
         if (actArray.empty())
@@ -264,8 +263,7 @@ class SetPredictedActivityCommandHandler : public AllDevicesAppNamedPipeCommandH
 {
 public:
     const char * GetName() const override { return "SetPredictedActivity"; }
-    bool GetAmbientContextType(const Json::Value & actArray,
-                                      std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
+    bool GetAmbientContextType(const Json::Value & actArray, std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
     {
         // Validate AmbientContextType exists and is an array
         if (actArray.empty())
@@ -323,8 +321,7 @@ public:
         for (Json::ArrayIndex i = 0; i < predictArray.size(); i++)
         {
             Json::Value item = predictArray[i];
-            if (!item.isObject() || !item.isMember("StartTStamp") || !item.isMember("EndTStamp") ||
-                !item.isMember("Conf"))
+            if (!item.isObject() || !item.isMember("StartTStamp") || !item.isMember("EndTStamp") || !item.isMember("Conf"))
             {
                 std::string inputJson = json.toStyledString();
                 ChipLogError(AppServer, "PredictedActivity[%u], missing/invalid fields in %s", static_cast<uint16_t>(i),
@@ -368,8 +365,8 @@ public:
                 return;
             }
 
-            auto tagList =
-                chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());
+            auto tagList = chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(),
+                                                                                                       semanticTags.size());
             predictAct.ambientContextType.SetValue(tagList);
             predictArrayBuf[i] = predictAct;
         }
@@ -378,7 +375,6 @@ public:
         TEMPORARY_RETURN_IGNORED cluster->SetPredictedActivity(predictedActivityArray);
     }
 };
-
 
 class SetObjCountCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {

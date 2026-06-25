@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 

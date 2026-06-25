@@ -210,7 +210,8 @@ private:
         {
             RegisterCreator("ambient-context-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<Clusters::AmbientContextSensing::LoggingAmbientContextSensorDevice>(mContext->timerDelegate);
+                return std::make_unique<Clusters::AmbientContextSensing::LoggingAmbientContextSensorDevice>(
+                    mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
