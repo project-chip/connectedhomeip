@@ -114,9 +114,9 @@ public:
 
     // Read attribute into `out` parameter.
     // The `out` parameter must be of the correct type for the attribute being read.
-    // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::DecodableType` for the `out` parameter to be
-    // spec compliant (see the comment of the class for usage example). Will construct the attribute path using the first path
-    // returned by `GetPaths()` on the cluster.
+    // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::DecodableType` for the `out` parameter to be spec
+    // compliant (see the comment of the class for usage example).
+    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     // @returns `CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)` if the attribute is not present in AttributeList.
     template <typename T>
@@ -159,8 +159,8 @@ public:
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
-    // WARNING: This method should NOT be used for writing list attributes, use the overload below that takes a
-    // ListWritingPattern parameter instead.
+    // WARNING: This method should NOT be used for writing list attributes, use the overload below that takes a ListWritingPattern
+    // parameter instead.
 
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     // @returns `CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)` if the attribute is not present in AttributeList.
@@ -213,10 +213,11 @@ public:
         return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
     }
 
-    // This WriteAttribute overload is for writing list attributes, and allows specifying the pattern used for mutating/writing
-    // the list on the cluster side (i.e. Replacing the list in its entirety vs Clearing the list in its entirety then
-    // appending/writing list items individually). Cluster servers usually support both patterns of writing lists, Therefore we
-    // should always test list attributes using both patterns.
+    // This WriteAttribute overload is for writing list attributes, and allows specifying the pattern used for mutating/writing the
+    // list on the cluster side (i.e. Replacing the list in its entirety vs Clearing the list in its entirety then appending/writing
+    // list items individually).
+    // Cluster servers usually support both patterns of writing lists, Therefore we should always test list attributes using both
+    // patterns.
     template <typename T>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const app::DataModel::List<T> & listValue,
                                                       ListWritingPattern listWritingPattern)
