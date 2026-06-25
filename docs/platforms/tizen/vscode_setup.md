@@ -1,20 +1,86 @@
 # VS Code Setup for Tizen Development
 
-This section covers how to set up Visual Studio Code for Tizen development,
-including extension installation, graphical debugging, and task integration.
+This guide describes how to set up Visual Studio Code for Tizen development. It
+covers the recommended dev container workflow, the Tizen extension setup, task
+integration, and graphical debugging.
 
-## Tizen Extension Installation
+## Dev Container Setup (Recommended)
 
-Instead of manually installing the heavy standalone Tizen Studio GUI, the entire
-ecosystem can be managed via VS Code:
+The recommended way to develop for Tizen is using VS Code with a dev container.
+This approach provides a pre-configured environment with all necessary tools and
+SDKs for multiple Tizen targets.
+
+### Prerequisites
+
+- **Docker** installed and running on your host machine
+- **Dev Containers** extension for VS Code installed
+
+### Setup Instructions
+
+1. Open the workspace in VS Code and select "Reopen in Container" when prompted,
+   or use the Command Palette (`Ctrl+Shift+P`) →
+   `Dev Containers: Reopen in Container`.
+
+2. The dev container includes:
+    - Tizen SDK 10.0 with support for multiple target architectures (device,
+      device64)
+    - All required toolchains (ARM, ARM64, x86)
+    - Pre-configured environment variables for Tizen development
+    - `sdb` tool available at `/opt/tizen-sdk/tools/sdb`
+
+3. The container image is approximately 20GB in size as it includes:
+    - Multiple Tizen platform rootstraps
+    - Toolchains for various architectures
+    - Tizen Studio tools and utilities
+
+### Environment Variables
+
+Inside the dev container, the following environment variables are set:
+
+```bash
+declare -x TIZEN_ROOTFS="/tizen_rootfs"
+declare -x TIZEN_SDK_ROOT="/opt/tizen-sdk"
+declare -x TIZEN_SDK_SYSROOT="/opt/tizen-sdk/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
+declare -x TIZEN_SDK_TOOLCHAIN="/opt/tizen-sdk/tools/arm-linux-gnueabi-gcc-14.2"
+declare -x TIZEN_VERSION="10.0"
+```
+
+### Using VS Code Tasks
+
+The dev container supports VS Code tasks for common Tizen operations. The tasks
+are configured in `.vscode/tasks.json` and use the correct paths to Tizen tools.
+
+> **Note:** The `sdb` tool is located at `/opt/tizen-sdk/tools/sdb` inside the
+> dev container. This path is not in the default `PATH` environment variable, so
+> tasks must use the full path or the `TIZEN_SDK_ROOT/tools/sdb` variable.
+
+### Building Applications
+
+Use the VS Code tasks to build Tizen applications:
+
+1. Open the Command Palette (`Ctrl+Shift+P`) → `Tasks: Run Task` →
+   `Build LightingApp (Tizen)`
+
+2. Or use the terminal inside the container:
+    ```bash
+    scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target tizen-arm-light build"
+    ```
+
+## WSL Alternative (Tizen Extension)
+
+As an alternative to dev containers, you can use WSL with the Tizen extension
+installed locally. This approach provides direct access to Tizen tools from VS
+Code.
+
+### Tizen Extension Installation
 
 1. Install the **C/C++** extension (by Microsoft) – required for the underlying
    `cppdbg` debugging engine.
 2. Install the **Tizen Extension for Visual Studio Code** (by Samsung) from the
    Marketplace.
 
-Once the extension is installed, it handles the download of the required
-lightweight CLI package tools:
+Once the extension is installed, it handles the download of the required CLI
+package tools:
 
 1. Open the VS Code Command Palette (`Ctrl+Shift+P`).
 2. Search for and select: `Tizen: Package Manager`.
@@ -43,11 +109,38 @@ declare -x TIZEN_TOOLS_PATH="~/.tizen-extension-platform/server/sdktools/data/to
 The `sdb` tool is installed as part of the Tizen extension and is available at
 `~/.tizen-extension-platform/server/sdktools/data/tools/`.
 
+## VS Code Tasks for Tizen
+
+VS Code provides built-in task support for common Tizen development operations.
+The tasks are configured in `.vscode/tasks.json` in the workspace root.
+
+### Available Tasks
+
+1. **Build app:**
+
+    Open the Command Palette (`Ctrl+Shift+P`) → `Tasks: Run Task` →
+    `Build LightingApp (Tizen)`
+
+2. **SDB connect to device:** Required to run Tizen commands below if the device
+   is debugged over network.
+
+    Open the Command Palette → `Tasks: Run Task` → `Connect to device (Tizen)` →
+    insert IP address and port
+
+3. **Install app:** Separated from the build step.
+
+    Open the Command Palette → `Tasks: Run Task` → `Install LightingApp (Tizen)`
+
+4. **Launch with gdbserver attached:** Requires the app to be installed
+   previously.
+
+    Open the Command Palette → `Tasks: Run Task` →
+    `Launch LightingApp with gdbserver attached (Tizen)`
+
 ## Graphical Remote Debugging via VS Code
 
-This section automates the CLI attach steps into a native VS Code debugging
-configuration, allowing you to hit breakpoints, inspect variables, and view
-stack traces visually.
+This section describes how to set up remote debugging with VS Code, allowing you
+to hit breakpoints, inspect variables, and view stack traces visually.
 
 ### 1. Launch and Prepare the Process on Target
 
@@ -167,117 +260,3 @@ forwarding from the host to the target device. The target build is
     - Mouse over variables (like `aAction`) to see data tooltips
     - View live component variable fields in the **Variables** pane
     - Step through code using the graphical controls (Step Over, Step Into)
-
-## VS Code Tasks for Tizen
-
-The `augustocdias.tasks-shell-input` VS Code extension provides task integration
-for common Tizen development operations.
-
-> **TODO:** The VS Code tasks described below assume a local Tizen build
-> environment is configured on the host machine (with `TIZEN_SDK_ROOT` and
-> related environment variables set). When using Docker-based builds, these
-> tasks need to be adapted to run commands inside the Docker container. This
-> needs to be resolved.
-
-### Available Tasks
-
-1. **Build app:**
-
-    Open the Command Palette (`Ctrl+Shift+P`) → `Tasks: Run Task` →
-    `Build LightingApp (Tizen)`
-
-2. **SDB connect to device:** Required to run Tizen commands below if the device
-   is debugged over network.
-
-    Open the Command Palette → `Tasks: Run Task` → `Connect to device (Tizen)` →
-    insert IP address and port
-
-3. **Install app:** Separated from the build step.
-
-    Open the Command Palette → `Tasks: Run Task` → `Install LightingApp (Tizen)`
-
-4. **Launch with gdbserver attached:** Requires the app to be installed
-   previously.
-
-    Open the Command Palette → `Tasks: Run Task` →
-    `Launch LightingApp with gdbserver attached (Tizen)`
-
-## Dev Container Setup (Recommended)
-
-The recommended way to develop for Tizen is using VS Code with a dev container.
-This approach provides a pre-configured environment with all necessary tools and
-SDKs for multiple Tizen targets.
-
-### Prerequisites
-
--   **Docker** installed and running on your host machine
--   **Dev Containers** extension for VS Code installed
-
-### Setup Instructions
-
-1. Open the workspace in VS Code and select "Reopen in Container" when prompted,
-   or use the Command Palette (`Ctrl+Shift+P`) →
-   `Dev Containers: Reopen in Container`.
-
-2. The dev container includes:
-
-    - Tizen SDK 10.0 with support for multiple target architectures (device,
-      device64)
-    - All required toolchains (ARM, ARM64, x86)
-    - Pre-configured environment variables for Tizen development
-    - `sdb` tool available at `/opt/tizen-sdk/tools/sdb`
-
-3. The container image is approximately 20GB in size as it includes:
-    - Multiple Tizen platform rootstraps
-    - Toolchains for various architectures
-    - Tizen Studio tools and utilities
-
-### Environment Variables
-
-Inside the dev container, the following environment variables are set:
-
-```bash
-declare -x TIZEN_ROOTFS="/tizen_rootfs"
-declare -x TIZEN_SDK_ROOT="/opt/tizen-sdk"
-declare -x TIZEN_SDK_SYSROOT="/opt/tizen-sdk/platforms/tizen-10.0/tizen/rootstraps/tizen-10.0-device.core"
-declare -x TIZEN_SDK_TOOLCHAIN="/opt/tizen-sdk/tools/arm-linux-gnueabi-gcc-14.2"
-declare -x TIZEN_VERSION="10.0"
-```
-
-### Using VS Code Tasks
-
-The dev container supports VS Code tasks for common Tizen operations. The tasks
-are configured in `.vscode/tasks.json` and use the correct paths to Tizen tools.
-
-> **Note:** The `sdb` tool is located at `/opt/tizen-sdk/tools/sdb` inside the
-> dev container. This path is not in the default `PATH` environment variable, so
-> tasks must use the full path or the `TIZEN_SDK_ROOT/tools/sdb` variable.
-
-### Building Applications
-
-Use the VS Code tasks to build Tizen applications:
-
-1. Open the Command Palette (`Ctrl+Shift+P`) → `Tasks: Run Task` →
-   `Build LightingApp (Tizen)`
-
-2. Or use the terminal inside the container:
-    ```bash
-    scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target tizen-arm-light build"
-    ```
-
-### Debugging
-
-For debugging instructions, see the
-[Graphical Remote Debugging](#graphical-remote-debugging-via-vs-code) section
-above. The dev container includes all necessary debugging tools and gdbserver
-support.
-
-## WSL Alternative
-
-As an alternative to dev containers, you can use WSL with the Tizen extension
-installed locally. This approach requires manual setup of the Tizen SDK and
-tools on the WSL side.
-
-> **Note:** The dev container approach is recommended as it provides a
-> consistent, pre-configured environment with all Tizen targets supported out of
-> the box.
