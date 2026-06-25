@@ -25,8 +25,7 @@ namespace chip {
 namespace app {
 
 /**
- * @brief An implementation of a Temperature Sensor Device that increases temperature over time.
- *
+ * Simulated temperature sensor that increases the reported temperature over time.
  */
 class IncreasingTemperatureSensorDevice : public TemperatureSensorDevice, public TimerContext
 {
