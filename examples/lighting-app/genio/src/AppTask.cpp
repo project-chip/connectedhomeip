@@ -320,7 +320,7 @@ CHIP_ERROR AppTask::Init()
     MT793X_LOG("APP: Done WiFi Init");
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    sWiFiNetworkCommissioningInstance.Init();
+    (void) sWiFiNetworkCommissioningInstance.Init();
 #endif
 
     // Initialize device attestation config before server init so Operational
@@ -331,7 +331,7 @@ CHIP_ERROR AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
+    (void) chip::Server::GetInstance().Init(initParams);
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel

@@ -128,7 +128,7 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         }
         else if (FILOGIC_WIFI_PORT_AP == event_data->u.wifi_init.port)
         {
-            ConfigureWiFiAP();
+            TEMPORARY_RETURN_IGNORED ConfigureWiFiAP();
             ChangeWiFiAPState(kWiFiAPState_Activating);
         }
         else
