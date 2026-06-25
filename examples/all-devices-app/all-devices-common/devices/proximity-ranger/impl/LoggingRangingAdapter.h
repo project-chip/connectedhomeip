@@ -44,11 +44,11 @@ namespace ProximityRanging {
  *
  * Read `RangingAdapter.h` first for the full platform-integration contract
  * (registration lifecycle, threading, callback semantics, optional
- * capabilities). This class is a *fake* implementation of a Proximity Ranger
- * device that deliberately avoids calling any platform radio APIs so that
- * the Proximity Ranging cluster server can be exercised on developer
- * machines and in CI without ranging hardware, and so that platform
- * integrators have a worked example of every required override.
+ * capabilities). This class is a hardware-free simulation implementation of a
+ * Proximity Ranger device that avoids calling platform radio APIs, allowing
+ * the Proximity Ranging cluster server to be exercised on developer machines
+ * and in CI without ranging hardware, and providing platform integrators with
+ * a reference example of every required override.
  *
  * Purpose
  * -------

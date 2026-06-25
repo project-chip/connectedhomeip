@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,16 +20,40 @@
 #include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
+#include <app/clusters/on-off-server/OnOffEffectDelegate.h>
 #include <app/clusters/on-off-server/OnOffLightingCluster.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
-#include <devices/Types.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/interface/SingleEndpointDevice.h>
+#include <lib/support/TimerDelegate.h>
 
-namespace chip::app {
+namespace chip {
+namespace app {
 
-class LoggingOnOffLightDevice : public SingleEndpointDevice
+/**
+ * OnOffLoadDevice represents the generic capability baseline for any Matter device
+ * that supports basic on/off control without level adjustment.
+ *
+ * In the Matter Device Library, this capability is shared across multiple spec-defined
+ * leaf device types, such as On/Off Light (0x0100), On/Off Plug-In Unit (0x010B),
+ * and Mounted On/Off Control (0x0103).
+ *
+ * This class centralizes the registration and wiring of the mandatory server clusters
+ * for all on/off loads:
+ *   - OnOff (with lighting context)
+ *   - Identify
+ *   - ScenesManagement
+ *   - Groups
+ *
+ * It exposes public getters for all underlying clusters to allow programmatic state
+ * inspection and control by the application and test scripts.
+ *
+ * This class is abstract and is intended to be subclassed by concrete leaf device
+ * implementations that pass their specific Matter Device Type ID.
+ */
+class OnOffLoadDevice : public SingleEndpointDevice
 {
 public:
     struct Context
@@ -38,23 +63,27 @@ public:
         TimerDelegate & timerDelegate;
     };
 
-    LoggingOnOffLightDevice(const Context & context) :
-        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1)), mContext(context)
-    {}
-    ~LoggingOnOffLightDevice() override = default;
+    OnOffLoadDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
+                    Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
+                    const Context & context);
+    ~OnOffLoadDevice() override = default;
 
+    // Public cluster getters for application and testing
+    Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::ScenesManagementCluster & ScenesManagementCluster() { return mScenesManagementCluster.Cluster(); }
+    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
+
+protected:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::OnOffLightingCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
-
 private:
-    class OnOffDelegate : public Clusters::OnOffDelegate
-    {
-        void OnOffStartup(bool on) override;
-        void OnOnOffChanged(bool on) override;
-    };
+    Clusters::OnOffDelegate & mOnOffDelegate;
+    Clusters::OnOffEffectDelegate & mEffectDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
+    const Context mContext;
 
     class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
     {
@@ -71,16 +100,13 @@ private:
         EndpointId mEndpointId = kInvalidEndpointId;
     };
 
-    const Context mContext;
-
-    OnOffDelegate mOnOffDelegate;
     DefaultScenesManagementTableProvider mScenesTableProvider;
 
-    // Cluster Instances
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
     LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 
-} // namespace chip::app
+} // namespace app
+} // namespace chip

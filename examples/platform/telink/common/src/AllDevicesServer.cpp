@@ -29,7 +29,6 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
 #include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
-#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <devices/interface/DeviceInterface.h>
 #include <devices/root-node/RootNodeDevice.h>
 #include <platform/DeviceControlServer.h>
@@ -171,9 +170,8 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
     gConstructedDevice = deviceFactory.Create(gDeviceType);
     VerifyOrReturnError(gConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    DynamicEndpointIdAllocator endpointIdAllocator;
-    endpointIdAllocator.ForceNext(kDeviceEndpointId);
-    ReturnErrorOnFailure(gConstructedDevice->Register(endpointIdAllocator, *gDataModelProvider, kInvalidEndpointId));
+    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
+    ReturnErrorOnFailure(gConstructedDevice->Register(allocator, *gDataModelProvider));
 
     initParams.dataModelProvider = gDataModelProvider.get();
 

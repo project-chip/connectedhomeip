@@ -34,6 +34,9 @@ BridgedNodeDevice::BridgedNodeDevice(TimerDelegate & timerDelegate, std::string 
 
 CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the Bridged Device Basic Information cluster.
@@ -52,7 +55,9 @@ CHIP_ERROR BridgedNodeDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
 
     ReturnErrorOnFailure(provider.AddCluster(mBridgedDeviceBasicInformationCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void BridgedNodeDevice::Unregister(CodeDrivenDataModelProvider & provider)
