@@ -82,7 +82,7 @@ To update or validate this list manually, follow these steps:
 | 36        | Content Launcher                                           | 1290 (0x050A) | No                 | No                  |                                       |
 | 37        | Demand Response Load Control                               | 150 (0x0096)  | No                 | No                  |                                       |
 | 38        | Descriptor                                                 | 29 (0x001D)   | Yes                | Yes                 |                                       |
-| 39        | Device Energy Management                                   | 152 (0x0098)  | Yes                | No                  |                                       |
+| 39        | Device Energy Management                                   | 152 (0x0098)  | Yes                | Yes                 |                                       |
 | 40        | Device Energy Management Mode                              | 159 (0x009F)  | No                 | No                  | Instance of Mode Base                 |
 | 41        | Diagnostic Logs                                            | 50 (0x0032)   | Yes                | No                  |                                       |
 | 42        | Dishwasher Alarm                                           | 93 (0x005D)   | No                 | No                  |                                       |
@@ -171,12 +171,12 @@ To update or validate this list manually, follow these steps:
 | 125       | Software Diagnostics                                       | 52 (0x0034)   | Yes                | Yes                 |                                       |
 | 126       | Soil Measurement                                           | 1072 (0x0430) | Yes                | Yes                 |                                       |
 | 127       | Soil Moisture Measurement                                  | 1032 (0x0408) | No                 | No                  |                                       |
-| 128       | Switch                                                     | 59 (0x003B)   | Yes                | No                  |                                       |
+| 128       | Switch                                                     | 59 (0x003B)   | Yes                | Yes                 |                                       |
 | 129       | TLS Certificate Management                                 | 2049 (0x0801) | Yes                | No                  |                                       |
 | 130       | TLS Client Management                                      | 2050 (0x0802) | Yes                | No                  |                                       |
 | 131       | Target Navigator                                           | 1285 (0x0505) | No                 | No                  |                                       |
 | 132       | Temperature Alarm                                          | 100 (0x0064)  | No                 | No                  |                                       |
-| 133       | Temperature Control                                        | 86 (0x0056)   | Yes                | No                  |                                       |
+| 133       | Temperature Control                                        | 86 (0x0056)   | Yes                | Yes                 |                                       |
 | 134       | Temperature Controlled Cabinet Topology                    | 75 (0x004B)   | No                 | No                  |                                       |
 | 135       | Temperature Measurement                                    | 1026 (0x0402) | Yes                | Yes                 |                                       |
 | 136       | Thermostat                                                 | 513 (0x0201)  | No                 | No                  |                                       |
@@ -192,7 +192,7 @@ To update or validate this list manually, follow these steps:
 | 146       | Unit Localization                                          | 45 (0x002D)   | Yes                | No                  |                                       |
 | 147       | User Label                                                 | 65 (0x0041)   | Yes                | No                  |                                       |
 | 148       | Valid Proxies                                              | 68 (0x0044)   | No                 | No                  |                                       |
-| 149       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | No                  |                                       |
+| 149       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | Yes                 | Water Valve                           |
 | 150       | Wake On LAN                                                | 1283 (0x0503) | No                 | No                  |                                       |
 | 151       | Water Heater Management                                    | 148 (0x0094)  | Yes                | No                  |                                       |
 | 152       | Water Heater Mode                                          | 158 (0x009E)  | No                 | No                  | Instance of Mode Base                 |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **86**             | **46**              |                                       |
+| **Total** | **159**                                                    |               | **86**             | **50**              |                                       |

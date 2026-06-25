@@ -47,6 +47,10 @@ _available_devices = [
     "AGGREGATOR",
   ],
   [
+    "air-purifier",
+    "AIR_PURIFIER",
+  ],
+  [
     "air-quality-sensor",
     "AIR_QUALITY_SENSOR",
   ],
@@ -63,8 +67,24 @@ _available_devices = [
     "CONTACT_SENSOR",
   ],
   [
+    "cooktop",
+    "COOKTOP",
+  ],
+  [
+    "device-energy-management",
+    "DEVICE_ENERGY_MANAGEMENT",
+  ],
+  [
     "dimmable-light",
     "DIMMABLE_LIGHT",
+  ],
+  [
+    "dimmable-plug-in-unit",
+    "DIMMABLE_PLUG_IN_UNIT",
+  ],
+  [
+    "extractor-hood",
+    "EXTRACTOR_HOOD",
   ],
   [
     "fan",
@@ -75,12 +95,24 @@ _available_devices = [
     "FLOW_SENSOR",
   ],
   [
+    "generic-switch",
+    "GENERIC_SWITCH",
+  ],
+  [
     "humidity-sensor",
     "HUMIDITY_SENSOR",
   ],
   [
     "light-sensor",
     "LIGHT_SENSOR",
+  ],
+  [
+    "mounted-dimmable-load-control",
+    "MOUNTED_DIMMABLE_LOAD_CONTROL",
+  ],
+  [
+    "mounted-on-off-control",
+    "MOUNTED_ON_OFF_CONTROL",
   ],
   [
     "network-infrastructure-manager",
@@ -93,6 +125,18 @@ _available_devices = [
   [
     "on-off-light",
     "ON_OFF_LIGHT",
+  ],
+  [
+    "on-off-light-switch",
+    "ON_OFF_LIGHT_SWITCH",
+  ],
+  [
+    "on-off-plug-in-unit",
+    "ON_OFF_PLUG_IN_UNIT",
+  ],
+  [
+    "oven",
+    "OVEN",
   ],
   [
     "power-source",
@@ -109,6 +153,10 @@ _available_devices = [
   [
     "rain-sensor",
     "RAIN_SENSOR",
+  ],
+  [
+    "refrigerator",
+    "REFRIGERATOR",
   ],
   [
     "smoke-co-alarm",
@@ -133,6 +181,10 @@ _available_devices = [
   [
     "water-leak-detector",
     "WATER_LEAK_DETECTOR",
+  ],
+  [
+    "water-valve",
+    "WATER_VALVE",
   ],
 ]
 

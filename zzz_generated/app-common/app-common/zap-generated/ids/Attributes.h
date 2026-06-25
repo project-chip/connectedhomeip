@@ -48,6 +48,7 @@
 #include <clusters/ClosureDimension/AttributeIds.h>
 #include <clusters/ColorControl/AttributeIds.h>
 #include <clusters/CommissionerControl/AttributeIds.h>
+#include <clusters/CommissioningProxy/AttributeIds.h>
 #include <clusters/CommodityMetering/AttributeIds.h>
 #include <clusters/CommodityPrice/AttributeIds.h>
 #include <clusters/CommodityTariff/AttributeIds.h>

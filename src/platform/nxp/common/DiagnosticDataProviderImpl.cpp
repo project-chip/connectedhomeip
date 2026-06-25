@@ -22,6 +22,7 @@
  *          for nxp platform.
  */
 
+#include <FreeRTOS.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
@@ -43,16 +44,15 @@ extern "C" {
 }
 #endif
 
-#if NXP_USE_MML
-#include "fsl_component_mem_manager.h"
-#define GetFreeHeapSize MEM_GetFreeHeapSize
-#define HEAP_SIZE MinimalHeapSize_c
-#define GetMinimumEverFreeHeapSize MEM_GetFreeHeapSizeLowWaterMark
-#else
-#define GetFreeHeapSize xPortGetFreeHeapSize
-#define HEAP_SIZE configTOTAL_HEAP_SIZE
-#define GetMinimumEverFreeHeapSize xPortGetMinimumEverFreeHeapSize
-#endif // NXP_USE_MML
+inline size_t GetFreeHeapSize()
+{
+    return xPortGetFreeHeapSize();
+}
+constexpr size_t HEAP_SIZE = configTOTAL_HEAP_SIZE;
+inline size_t GetMinimumEverFreeHeapSize()
+{
+    return xPortGetMinimumEverFreeHeapSize();
+}
 
 namespace chip {
 namespace DeviceLayer {
@@ -99,11 +99,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
 
-#if NXP_USE_MML
-    MEM_ResetFreeHeapSizeLowWaterMark();
-#else
     xPortResetHeapMinimumEverFreeHeapSize();
-#endif
     return CHIP_NO_ERROR;
 }
 
