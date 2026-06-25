@@ -740,7 +740,7 @@ TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseFlow)
                   CHIP_NO_ERROR);
 
         app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
-                                     /* suppressResponse = */ true);
+                                     /* aSuppressResponse = */ true);
 
         AddAttributeDataIB(writeClient, encodingMethod);
 
@@ -777,7 +777,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseFlowWit
                   CHIP_NO_ERROR);
 
         app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
-                                     true /* suppressResponse */);
+                                     /* aSuppressResponse */ true);
 
         AddInvalidAttributeDataIB(writeClient, encodingMethod);
 
