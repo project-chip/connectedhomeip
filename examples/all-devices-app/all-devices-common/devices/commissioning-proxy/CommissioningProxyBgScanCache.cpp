@@ -229,6 +229,20 @@ void Collect(std::vector<ScanResultEntry> & out)
     }
 }
 
+void Unregister(CommissioningProxyCluster * cluster)
+{
+    if (sCluster != cluster)
+        return;
+
+    if (sSweepArmed)
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnSweep, nullptr);
+        sSweepArmed = false;
+    }
+    sCache.clear();
+    sCluster = nullptr;
+}
+
 } // namespace BgScanCache
 } // namespace CommissioningProxy
 } // namespace Clusters

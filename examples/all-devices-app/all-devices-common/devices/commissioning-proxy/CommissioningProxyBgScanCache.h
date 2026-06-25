@@ -62,6 +62,12 @@ uint8_t Count();
 // point into the cache's own storage, which stays valid for a synchronous encode.
 void Collect(std::vector<ScanResultEntry> & out);
 
+// Drop the cache's reference to `cluster` before it is destroyed (e.g. endpoint
+// unregistration or test teardown).  Cancels the sweep timer and clears the
+// cache so a self-re-arming sweep can never dereference a dangling cluster
+// pointer.  No-op if the cache currently tracks a different cluster.
+void Unregister(CommissioningProxyCluster * cluster);
+
 } // namespace BgScanCache
 } // namespace CommissioningProxy
 } // namespace Clusters

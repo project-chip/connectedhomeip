@@ -18,6 +18,11 @@
 
 #include "CommissioningProxyDevice.h"
 
+#include "CommissioningProxyBgScanCache.h"
+#if CONFIG_NETWORK_LAYER_BLE
+#include "CommissioningProxyBleTransport.h"
+#endif
+
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -51,6 +56,12 @@ void CommissioningProxyDevice::Unregister(CodeDrivenDataModelProvider & provider
 
     if (mCluster.IsConstructed())
     {
+        // Drop every cached reference to the cluster before it is destroyed so a
+        // self-re-arming background-scan sweep/timer can never dereference it.
+        Clusters::CommissioningProxy::BgScanCache::Unregister(&mCluster.Cluster());
+#if CONFIG_NETWORK_LAYER_BLE
+        Clusters::CommissioningProxy::Ble::Shutdown();
+#endif
         LogErrorOnFailure(provider.RemoveCluster(&mCluster.Cluster()));
         mCluster.Destroy();
     }
