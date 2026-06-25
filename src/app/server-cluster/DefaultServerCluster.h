@@ -159,7 +159,9 @@ protected:
     /// Marks that a specific attribute has changed value, if `status` is success.
     ///
     /// Will return `status`
-    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status);
+    DataModel::ActionReturnStatus
+    NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status,
+                                    DataModel::AttributeChangeType type = DataModel::AttributeChangeType::kReportable);
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

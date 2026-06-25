@@ -55,8 +55,11 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp
@@ -67,7 +70,8 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c)
 
 chip_configure_data_model(app
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
