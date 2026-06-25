@@ -468,6 +468,45 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         mTryingNextResultDueToSessionEstablishmentError = true;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+        // On CHIP_ERROR_TIMEOUT we never even got a Sigma2 back: the cached
+        // address may be stale (e.g. a Thread sleepy end device whose
+        // operational SRP record was published only after our initial lookup
+        // completed, so it advertises a new address while we kept retransmitting
+        // Sigma1 to the pre-operational one). Before exhausting the cached
+        // snapshot, kick off a fresh DNS-SD lookup so a newer operational
+        // advertisement can be picked up, rather than walking only the stale
+        // results until the full commissioning watchdog fires. A fresh lookup
+        // both re-queries DNS-SD and discards the stale cached snapshot
+        // (LookupNode resets the handle), so any newer address wins. BUSY is a
+        // live response from the current address, so for BUSY we keep the
+        // existing behavior of trying the cached results first.
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        if (CHIP_ERROR_TIMEOUT == error && mResolveAttemptsAllowed > 0)
+        {
+            // The fresh lookup drives its own success/failure handling via
+            // OnNodeAddressResolved / OnNodeAddressResolutionFailed and its own
+            // retry-handler notification below, so it must NOT be treated as the
+            // synchronous "try next cached result" path.
+            mTryingNextResultDueToSessionEstablishmentError = false;
+            CHIP_ERROR lookupErr                            = LookupPeerAddress();
+            if (lookupErr == CHIP_NO_ERROR)
+            {
+                // A fresh lookup is in flight; OnNodeAddressResolved (or
+                // OnNodeAddressResolutionFailed) will drive us forward. We have
+                // to notify our consumer that the resolve will take more time,
+                // but we don't know how much; mirror the estimate used by
+                // OnNodeAddressResolutionFailed's re-resolve path.
+                using namespace chip::System::Clock::Literals;
+                NotifyRetryHandlers(error, remoteMprConfig, 60_s16);
+                return;
+            }
+            // Could not start a fresh lookup; restore the flag and fall through
+            // to the cached snapshot / backoff handling below.
+            mTryingNextResultDueToSessionEstablishmentError = true;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
         if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
         {
             // Whatever work we needed to do has been handled by our

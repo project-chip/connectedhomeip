@@ -188,6 +188,8 @@ chip_test_suite("tests") {
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalSessionSetupFallback.cpp",
+    "TestOperationalSessionSetupReresolve.cpp",
+    "OperationalSessionSetupTestAccess.h",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
