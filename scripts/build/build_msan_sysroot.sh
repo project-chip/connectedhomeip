@@ -283,10 +283,15 @@ echo ">>> GLib"
 cd "$SRC"
 [[ -d "glib-$GLIB_VERSION" ]] || { wget -q "https://download.gnome.org/sources/glib/$GLIB_SERIES/glib-$GLIB_VERSION.tar.xz" && tar xf "glib-$GLIB_VERSION.tar.xz"; }
 
-# Meson wants the flags as a quoted array; derive it from $MSAN so the GLib build uses the
-# same flag set as the other deps (the OSS-Fuzz $CFLAGS or the local default).
+# Meson wants the flags as a quoted array (one element per flag). Split $MSAN on whitespace
+# into individual flags so the GLib build uses the same flag set as the other deps (the
+# OSS-Fuzz $CFLAGS or the local default). NOTE: $MSAN must NOT be a single quoted word here,
+# or meson collapses every flag into one c_args element and clang rejects it
+# ("unsupported argument ... to option '-fsanitize='"). read -ra splits explicitly and keeps
+# shellcheck happy (vs. an unquoted $MSAN, which a linter is prone to "fix" back into one word).
+read -ra _msan_flags <<<"$MSAN"
 _msan_meson=""
-for _f in "$MSAN"; do _msan_meson+="'$_f', "; done
+for _f in "${_msan_flags[@]}"; do _msan_meson+="'$_f', "; done
 
 cat >"$SRC/msan-native.ini" <<EOF
 [binaries]
