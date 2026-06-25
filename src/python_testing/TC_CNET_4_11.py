@@ -690,7 +690,7 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                 await asyncio.sleep(RETRY_DELAY_SECONDS)
 
             try:
-                err = await asyncio.wait_for(
+                response = await asyncio.wait_for(
                     test.send_single_cmd(
                         cmd=cluster.Commands.ConnectNetwork(
                             networkID=ssid,
@@ -700,10 +700,24 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                     timeout=COMMAND_TIMEOUT
                 )
 
-                if is_network_switch_successful(err):
-                    pass
+                # Spec §11.8.8.10: ConnectNetwork SHALL return ConnectNetworkResponse (0x07),
+                # not NetworkConfigResponse. Verify the response type explicitly.
+                asserts.assert_true(
+                    isinstance(response, cluster.Commands.ConnectNetworkResponse),
+                    f"Expected ConnectNetworkResponse but got: {type(response)}"
+                )
+
+                if is_network_switch_successful(response):
+                    # Spec §11.8.8.11: errorValue SHALL be null on success.
+                    asserts.assert_is_none(
+                        response.errorValue,
+                        f"Expected errorValue to be null on success, but got: {response.errorValue}"
+                    )
                 else:
-                    logger.error("change_networks: ConnectNetwork command indicated failure")
+                    logger.error(
+                        "change_networks: ConnectNetwork indicated failure (networkingStatus=%s, errorValue=%s)",
+                        response.networkingStatus, response.errorValue
+                    )
                     continue
 
             except TimeoutError:
@@ -1284,9 +1298,19 @@ class TC_CNET_4_11(MatterBaseTest):
                 cgen.Enums.CommissioningErrorEnum.kOk,
                 "ArmFailSafeResponse error code is not OK.",
             )
+        except TimeoutError:
+            # A transport-level timeout is acceptable here: the DUT may switch networks
+            # (reverting config) before it can send the response. The reversion is verified
+            # in step 12 by confirming the DUT is reachable on the original network.
+            logger.warning("ArmFailSafe(0): transport timeout — DUT likely switched networks before responding")
+        except AssertionError:
+            raise
         except Exception as e:
-            logger.warning("ArmFailSafe(0) command may have succeeded despite timeout: %s", e)
-            logger.info("Proceeding with network change as this is expected behavior")
+            error_msg = str(e).lower()
+            if "timeout" in error_msg or "commandsender.cpp" in error_msg:
+                logger.warning("ArmFailSafe(0): CHIP-layer timeout — DUT likely switched networks: %s", e)
+            else:
+                raise
 
         # Wait for DUT to complete network reversion
         await asyncio.sleep(WIFI_WAIT_SECONDS)
@@ -1340,10 +1364,12 @@ class TC_CNET_4_11(MatterBaseTest):
         )
 
         # Verify that DUT sends NetworkConfigResponse to command with the following response fields:
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
+                            f"Expected response to be of type NetworkConfigResponse but got: {type(response)}")
         # 1. NetworkingStatus is success
         asserts.assert_equal(response.networkingStatus,
                              cnet.Enums.NetworkCommissioningStatusEnum.kSuccess, "Network was not removed")
-        # 2. NetworkIndex is 'Userwifi_netidx'
+        # 2. NetworkIndex is 'Userwifi_netidx' (spec: NetworkIndex present only when NetworkingStatus == Success)
         asserts.assert_equal(response.networkIndex, userwifi_netidx,
                              "Incorrect network index in response")
 
