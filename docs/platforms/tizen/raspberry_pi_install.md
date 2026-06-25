@@ -130,8 +130,8 @@ switch to root:
 
 ```bash
 sdb connect RASPBERRY_PI_IP
+sdb root on
 sdb shell
-sdb shell root on
 ```
 
 ### Upload and Install the Wi-Fi Firmware
