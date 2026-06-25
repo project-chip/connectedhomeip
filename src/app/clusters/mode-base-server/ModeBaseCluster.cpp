@@ -126,9 +126,9 @@ Status ModeBaseCluster::UpdateCurrentMode(uint8_t aNewMode)
 
     if (mContext != nullptr)
     {
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            { mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id },
-            ByteSpan(reinterpret_cast<const uint8_t *>(&mCurrentMode), sizeof(mCurrentMode))));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(
+            attrPersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, CurrentMode::Id }, mCurrentMode));
     }
     return Status::Success;
 }
@@ -140,12 +140,9 @@ Status ModeBaseCluster::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStart
 
     if (mContext != nullptr)
     {
-        NumericAttributeTraits<uint8_t>::StorageType storageValue;
-        DataModel::NullableToStorage(mStartUpMode, storageValue);
-
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            { mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id },
-            ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(
+            attrPersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, StartUpMode::Id }, mStartUpMode));
     }
     return Status::Success;
 }
@@ -157,12 +154,8 @@ Status ModeBaseCluster::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
 
     if (mContext != nullptr)
     {
-        NumericAttributeTraits<uint8_t>::StorageType storageValue;
-        DataModel::NullableToStorage(mOnMode, storageValue);
-
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-            { mPath.mEndpointId, mPath.mClusterId, OnMode::Id },
-            ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        LogErrorOnFailure(attrPersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, OnMode::Id }, mOnMode));
     }
     return Status::Success;
 }
