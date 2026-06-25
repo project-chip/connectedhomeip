@@ -630,9 +630,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     ChipLogProgress(NotSpecified, "Storage location provider returned %s",
                     GetFilesystemStorageLocationProvider().GetConfigDataLocation().c_str());
 
-    ChipLogProgress(NotSpecified, "kvs = %s", GetFilesystemStorageLocationProvider().GetKVSDataLocation().c_str());
-    ChipLogProgress(NotSpecified, "factory = %s", GetFilesystemStorageLocationProvider().GetFactoryDataLocation().c_str());
-
 #ifdef CHIP_CONFIG_KVS_PATH
     if (LinuxDeviceOptions::GetInstance().KVS != nullptr)
     {
