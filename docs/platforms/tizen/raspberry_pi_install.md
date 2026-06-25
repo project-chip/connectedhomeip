@@ -5,10 +5,10 @@ Wi-Fi connectivity.
 
 ## Prerequisites
 
-- Linux host, or Windows with WSL Ubuntu
-- MicroSD card reader
-- Docker Compose environment configured (see
-  [Building for Tizen](./building.md#docker-compose-environment))
+-   Linux host, or Windows with WSL Ubuntu
+-   MicroSD card reader
+-   Docker Compose environment configured (see
+    [Building for Tizen](./building.md#docker-compose-environment))
 
 ## Download Tizen Images
 
@@ -18,13 +18,11 @@ Download images from the Tizen release page:
 
 Select the latest version, then navigate to `images/standard/` and download:
 
-- `tizen-10.0-boot-image.tar.gz` – Bootloader image
-- `tizen-10.0-headed-image.tar.gz` – Headed (GUI) OS image
+-   `tizen-10.0-boot-image.tar.gz` – Bootloader image
+-   `tizen-10.0-headed-image.tar.gz` – Headed (GUI) OS image
 
-:::{note}
-Always check for the latest version. The URLs above are examples and may not
-reflect the most recent release.
-:::
+:::{note} Always check for the latest version. The URLs above are examples and
+may not reflect the most recent release. :::
 
 ## Flashing the MicroSD Card
 
@@ -45,34 +43,34 @@ For reference, see the official Tizen documentation at
 1. Insert the MicroSD card into your card reader.
 2. Find the device with `lsblk` (look for the one matching your card size):
 
-   ```bash
-   lsblk
-   ```
+    ```bash
+    lsblk
+    ```
 
 3. Wipe existing partitions (replace `/dev/sdYourCard` with your actual device,
    e.g., `/dev/sde`):
 
-   ```bash
-   sudo wipefs -a /dev/sdYourCard
-   ```
+    ```bash
+    sudo wipefs -a /dev/sdYourCard
+    ```
 
 4. Flash the card:
 
-   ```bash
-   # Format the card layout for Raspberry Pi 4
-   sudo ./sd_fusing.py -d /dev/sdYourCard -t rpi4 --format
+    ```bash
+    # Format the card layout for Raspberry Pi 4
+    sudo ./sd_fusing.py -d /dev/sdYourCard -t rpi4 --format
 
-   # Flash the bootloader and OS images
-   sudo ./sd_fusing.py -d /dev/sdYourCard -b tizen-10.0-boot-image.tar.gz tizen-10.0-headed-image.tar.gz -t rpi4
-   ```
+    # Flash the bootloader and OS images
+    sudo ./sd_fusing.py -d /dev/sdYourCard -b tizen-10.0-boot-image.tar.gz tizen-10.0-headed-image.tar.gz -t rpi4
+    ```
 
 5. Safe eject:
 
-   ```bash
-   sync
-   ```
+    ```bash
+    sync
+    ```
 
-   You can now insert the card into your Raspberry Pi 4 and boot it up.
+    You can now insert the card into your Raspberry Pi 4 and boot it up.
 
 ### On Windows + WSL 2 (Optional)
 
@@ -110,16 +108,16 @@ PowerShell and run `usbipd detach --busid 3-21`.
 
 ## Configuring Wi-Fi
 
-The standard Tizen image lacks the Broadcom Wi-Fi firmware for the Raspberry Pi
-4. To install the missing firmware, you need access to the device console via
+The standard Tizen image lacks the Broadcom Wi-Fi firmware for the Raspberry
+Pi 4. To install the missing firmware, you need access to the device console via
 **SDB (Smart Development Bridge)**.
 
 ### Connect via SDB
 
 The `sdb` tool is available inside the Tizen Docker container, or you can
 install the
-[Tizen VS Code Extension](./vscode_setup.md#tizen-extension-installation) to
-use `sdb` from your host machine.
+[Tizen VS Code Extension](./vscode_setup.md#tizen-extension-installation) to use
+`sdb` from your host machine.
 
 To use `sdb` from Docker:
 
@@ -200,7 +198,7 @@ network directly inside the Tizen graphical user interface (GUI).
 
 ## Additional Resources
 
-- [Tizen flashing documentation](https://docs.stg.tizen.org/platform/developing/flashing-rpi/)
-- [sd_fusing.py script source](https://git.tizen.org/cgit/platform/kernel/tizen-fusing-scripts)
-- [Wi-Fi firmware source](https://github.com/RPi-Distro/firmware-nonfree)
-- [Samsung Tizen OS device configuration guide](https://samsungtizenos.com/docs/application/flutter/guides/flutter-tizen/doc/configure-device)
+-   [Tizen flashing documentation](https://docs.stg.tizen.org/platform/developing/flashing-rpi/)
+-   [sd_fusing.py script source](https://git.tizen.org/cgit/platform/kernel/tizen-fusing-scripts)
+-   [Wi-Fi firmware source](https://github.com/RPi-Distro/firmware-nonfree)
+-   [Samsung Tizen OS device configuration guide](https://samsungtizenos.com/docs/application/flutter/guides/flutter-tizen/doc/configure-device)

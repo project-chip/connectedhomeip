@@ -5,10 +5,10 @@ command line using GDB.
 
 ## Prerequisites
 
-- `sdb` tool available in your `PATH` (inside the Tizen Docker container or
-  installed via the
-  [VS Code Tizen Extension](./vscode_setup.md#tizen-extension-installation))
-- Application built with debug symbols (do not strip symbols)
+-   `sdb` tool available in your `PATH` (inside the Tizen Docker container or
+    installed via the
+    [VS Code Tizen Extension](./vscode_setup.md#tizen-extension-installation))
+-   Application built with debug symbols (do not strip symbols)
 
 ## Deploying GDBServer to the Target
 
@@ -80,8 +80,8 @@ Thread 8 "chip-lighting-a" hit Breakpoint 1, LightingManager::InitiateAction (th
 46          bool action_initiated = false;
 ```
 
-You can now use standard GDB commands: `print aAction`, `backtrace`,
-`continue`, etc.
+You can now use standard GDB commands: `print aAction`, `backtrace`, `continue`,
+etc.
 
 ## Debugging the Tizen TPK App via GDB CLI
 
@@ -168,12 +168,12 @@ application launch in debug mode, and gdbserver attachment:
 
 Options:
 
-| Option | Description |
-|--------|-------------|
-| `--app-name APP_NAME` | Name of app to debug (required) |
-| `--gdbserver-port PORT` | GDB server port (default: 9999) |
-| `--target SDB_ID` | SDB identifier (if not specified, first connected device is used) |
-| `-- APP_ARGUMENTS` | Arguments to pass to the debugged app |
+| Option                  | Description                                                       |
+| ----------------------- | ----------------------------------------------------------------- |
+| `--app-name APP_NAME`   | Name of app to debug (required)                                   |
+| `--gdbserver-port PORT` | GDB server port (default: 9999)                                   |
+| `--target SDB_ID`       | SDB identifier (if not specified, first connected device is used) |
+| `-- APP_ARGUMENTS`      | Arguments to pass to the debugged app                             |
 
 The script will:
 
@@ -192,6 +192,6 @@ The `tizen-crashlog.sh` helper script processes core dumps from Tizen builds:
 ./scripts/helpers/tizen-crashlog.sh
 ```
 
-It will scan `out/tizen-*/dump/` directories for `.zip` files, extract
-core dumps, and generate full thread backtraces using `gdb-multiarch` with the
+It will scan `out/tizen-*/dump/` directories for `.zip` files, extract core
+dumps, and generate full thread backtraces using `gdb-multiarch` with the
 correct Tizen sysroot.

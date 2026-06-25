@@ -32,8 +32,8 @@ For alternative build methods using GN and Ninja, see
 
 ## Installing TPK
 
-The `sdb` tool is available inside the Tizen Docker container. To use `sdb`
-from VS Code, install the
+The `sdb` tool is available inside the Tizen Docker container. To use `sdb` from
+VS Code, install the
 [Tizen Extension for VS Code](../../../docs/platforms/tizen/vscode_setup.md#tizen-extension-installation).
 
 Install the TPK on the connected device:

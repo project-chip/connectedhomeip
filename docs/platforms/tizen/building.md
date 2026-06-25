@@ -8,77 +8,77 @@ We use a combined Docker Compose configuration with four services for different
 Tizen development tasks:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 name: matter
 services:
-  tizen:
-    image: ghcr.io/project-chip/chip-build-tizen:latest
-    network_mode: "host"
-    privileged: true
-    user: ubuntu
-    working_dir: /workspace
-    volumes:
-      - .:/workspace
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      PW_ENVIRONMENT_ROOT: /workspace/.environment-tizen
-    tty: true
-    stdin_open: true
-  tizen-qemu:
-    image: ghcr.io/project-chip/chip-build-tizen-qemu:latest
-    network_mode: "host"
-    privileged: true
-    user: ubuntu
-    working_dir: /workspace
-    volumes:
-      - .:/workspace
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      PW_ENVIRONMENT_ROOT: /workspace/.environment-tizen-qemu
-    tty: true
-    stdin_open: true
-  crosscompile:
-    image: ghcr.io/project-chip/chip-build-crosscompile:latest
-    network_mode: "host"
-    privileged: true
-    user: ubuntu
-    working_dir: /workspace
-    volumes:
-      - .:/workspace
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      PW_ENVIRONMENT_ROOT: /workspace/.environment-crosscompile
-    tty: true
-    stdin_open: true
-  linux:
-    image: ghcr.io/project-chip/chip-build:latest
-    network_mode: "host"
-    privileged: true
-    user: ubuntu
-    working_dir: /workspace
-    volumes:
-      - .:/workspace
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      PW_ENVIRONMENT_ROOT: /workspace/.environment-linux
-    tty: true
-    stdin_open: true
+    tizen:
+        image: ghcr.io/project-chip/chip-build-tizen:latest
+        network_mode: "host"
+        privileged: true
+        user: ubuntu
+        working_dir: /workspace
+        volumes:
+            - .:/workspace
+            - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+            PW_ENVIRONMENT_ROOT: /workspace/.environment-tizen
+        tty: true
+        stdin_open: true
+    tizen-qemu:
+        image: ghcr.io/project-chip/chip-build-tizen-qemu:latest
+        network_mode: "host"
+        privileged: true
+        user: ubuntu
+        working_dir: /workspace
+        volumes:
+            - .:/workspace
+            - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+            PW_ENVIRONMENT_ROOT: /workspace/.environment-tizen-qemu
+        tty: true
+        stdin_open: true
+    crosscompile:
+        image: ghcr.io/project-chip/chip-build-crosscompile:latest
+        network_mode: "host"
+        privileged: true
+        user: ubuntu
+        working_dir: /workspace
+        volumes:
+            - .:/workspace
+            - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+            PW_ENVIRONMENT_ROOT: /workspace/.environment-crosscompile
+        tty: true
+        stdin_open: true
+    linux:
+        image: ghcr.io/project-chip/chip-build:latest
+        network_mode: "host"
+        privileged: true
+        user: ubuntu
+        working_dir: /workspace
+        volumes:
+            - .:/workspace
+            - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+            PW_ENVIRONMENT_ROOT: /workspace/.environment-linux
+        tty: true
+        stdin_open: true
 ```
 
-| Service | Purpose |
-|---------|---------|
-| `tizen` | Build Tizen TPK packages with the Tizen SDK toolchain; includes `sdb` |
-| `tizen-qemu` | Extends the `tizen` image with QEMU support; used for running tests in the QEMU emulator; includes `sdb` |
-| `crosscompile` | Build native Linux ARM64 binaries that can run on Tizen (e.g., on Raspberry Pi) |
-| `linux` | Build Linux x64 host tools (e.g., `chip-tool`); useful for integration testing where part of the system runs on Tizen and part on Linux |
+| Service        | Purpose                                                                                                                                 |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `tizen`        | Build Tizen TPK packages with the Tizen SDK toolchain; includes `sdb`                                                                   |
+| `tizen-qemu`   | Extends the `tizen` image with QEMU support; used for running tests in the QEMU emulator; includes `sdb`                                |
+| `crosscompile` | Build native Linux ARM64 binaries that can run on Tizen (e.g., on Raspberry Pi)                                                         |
+| `linux`        | Build Linux x64 host tools (e.g., `chip-tool`); useful for integration testing where part of the system runs on Tizen and part on Linux |
 
 All services share the same workspace volume. Artifacts built in one container
 (e.g., `out/...`) are accessible from all other containers.
 
 The `tizen` and `tizen-qemu` containers include the `sdb` tool. You can use
 `sdb` directly from inside the container, or install the
-[Tizen VS Code Extension](./vscode_setup.md#tizen-extension-installation) to
-use `sdb` from your host machine.
+[Tizen VS Code Extension](./vscode_setup.md#tizen-extension-installation) to use
+`sdb` from your host machine.
 
 ## Building with build_examples.py
 
@@ -112,11 +112,11 @@ tizen-{arm,arm64}-{all-clusters,chip-tool,light,tests}[-asan][-coverage][-no-ble
 
 For example:
 
-- `tizen-arm64-light-no-thread` – Lighting app for ARM64 without Thread
-  (BLE enabled)
-- `tizen-arm64-light-no-thread-no-ble` – Lighting app without Thread and BLE
-- `tizen-arm64-all-clusters-no-thread` – All-clusters app
-- `tizen-arm64-tests` – Unit tests
+-   `tizen-arm64-light-no-thread` – Lighting app for ARM64 without Thread (BLE
+    enabled)
+-   `tizen-arm64-light-no-thread-no-ble` – Lighting app without Thread and BLE
+-   `tizen-arm64-all-clusters-no-thread` – All-clusters app
+-   `tizen-arm64-tests` – Unit tests
 
 ### Building the Linux-ARM64 Variant (Native Binary)
 
@@ -129,15 +129,14 @@ source scripts/activate.sh
 ./scripts/build/build_examples.py --target linux-arm64-light-no-thread-no-ble-clang build
 ```
 
-The output binary will be in
-`out/linux-arm64-light-no-thread-no-ble-clang/`.
+The output binary will be in `out/linux-arm64-light-no-thread-no-ble-clang/`.
 
 ### Alternative: Building with GN and Ninja
 
 For advanced use cases that require direct control over build arguments, you can
 build manually using `gn gen` and `ninja`. See the
-[lighting-app Tizen README](../../../examples/lighting-app/tizen/README.md)
-for detailed instructions.
+[lighting-app Tizen README](../../../examples/lighting-app/tizen/README.md) for
+detailed instructions.
 
 ### Building chip-tool for the Host PC
 

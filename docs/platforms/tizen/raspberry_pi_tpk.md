@@ -6,21 +6,20 @@ OS), install it, and test it using `chip-tool`.
 
 The TPK approach uses the Tizen package manager for proper application lifecycle
 management, which is the recommended way for production deployments. This is
-different from the
-[native Linux ARM64 approach](./raspberry_pi_native_apps.md), which deploys a
-standalone binary — that works without TPK packaging but bypasses the Tizen
-runtime lifecycle. The `--enable-flashbundle` flag is required to generate the
-`.tpk` file; without it, only the raw binary is produced, which cannot be
-easily installed and run on Tizen.
+different from the [native Linux ARM64 approach](./raspberry_pi_native_apps.md),
+which deploys a standalone binary — that works without TPK packaging but
+bypasses the Tizen runtime lifecycle. The `--enable-flashbundle` flag is
+required to generate the `.tpk` file; without it, only the raw binary is
+produced, which cannot be easily installed and run on Tizen.
 
 ## Prerequisites
 
-- Raspberry Pi 4 running Tizen OS with Wi-Fi configured (see
-  [Installing Tizen on Raspberry Pi](./raspberry_pi_install.md))
-- `sdb` tool — available inside the Tizen Docker container (see
-  [Building for Tizen](./building.md#docker-compose-environment))
-- `chip-tool` built for your host PC (see
-  [Building chip-tool](./building.md#building-chip-tool-for-the-host-pc))
+-   Raspberry Pi 4 running Tizen OS with Wi-Fi configured (see
+    [Installing Tizen on Raspberry Pi](./raspberry_pi_install.md))
+-   `sdb` tool — available inside the Tizen Docker container (see
+    [Building for Tizen](./building.md#docker-compose-environment))
+-   `chip-tool` built for your host PC (see
+    [Building chip-tool](./building.md#building-chip-tool-for-the-host-pc))
 
 ## Building
 
@@ -70,7 +69,7 @@ sdb shell pkgcmd -l | grep -i matter
 
 Expected identifier:
 
-- **Package ID / App ID:** `org.tizen.matter.example.lighting`
+-   **Package ID / App ID:** `org.tizen.matter.example.lighting`
 
 ### Reinstalling
 
@@ -82,15 +81,13 @@ sdb uninstall org.tizen.matter.example.lighting
 sdb install out/tizen-arm64-light-no-thread/flashbundle/org.tizen.matter.example.lighting-1.0.0-arm64.tpk
 ```
 
-:::{note}
-You cannot reinstall an application with a different author certificate. If you
-regenerated the certificate, you must uninstall first.
-:::
+:::{note} You cannot reinstall an application with a different author
+certificate. If you regenerated the certificate, you must uninstall first. :::
 
 ## Launching the Application
 
-Native Tizen applications are managed by the platform runtime. Use `app_launcher`
-to start the application:
+Native Tizen applications are managed by the platform runtime. Use
+`app_launcher` to start the application:
 
 ```bash
 sdb shell app_launcher --start org.tizen.matter.example.lighting -- wifi true discriminator 1234 passcode 11223344
@@ -99,8 +96,8 @@ sdb shell app_launcher --start org.tizen.matter.example.lighting -- wifi true di
 ## Monitoring Application Logs
 
 Tizen channels application standard outputs and errors through the `dlog`
-daemon. To trace execution on the target device, use `dlogutil` with the
-`--pid` option:
+daemon. To trace execution on the target device, use `dlogutil` with the `--pid`
+option:
 
 ```bash
 # Launch the app and note the PID from the output
@@ -111,8 +108,8 @@ sdb shell app_launcher --start org.tizen.matter.example.lighting -- wifi true di
 sdb shell dlogutil --pid 473505
 ```
 
-This will stream Matter engine initializations, mDNS advertisements, and
-cluster interaction states.
+This will stream Matter engine initializations, mDNS advertisements, and cluster
+interaction states.
 
 ## Commissioning and Control via chip-tool
 

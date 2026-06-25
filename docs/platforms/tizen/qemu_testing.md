@@ -21,9 +21,9 @@ source scripts/activate.sh
 
 ## Running Tests
 
-Build and run the Tizen tests using `build_examples.py`. The `build` command
-for the `tizen-arm-tests` target automatically compiles and runs both unit tests
-and integration tests in QEMU:
+Build and run the Tizen tests using `build_examples.py`. The `build` command for
+the `tizen-arm-tests` target automatically compiles and runs both unit tests and
+integration tests in QEMU:
 
 ```bash
 ./scripts/build/build_examples.py --target tizen-arm-tests-no-thread-no-ble build
@@ -37,10 +37,8 @@ The test runner will:
 4. Install the lighting TPK and run integration tests (pairing, on/off control)
 5. Report pass/fail status for each test
 
-:::{note}
-The QEMU image is 32-bit ARM, so the `tizen-arm-tests` target must be used
-(not `tizen-arm64-tests`).
-:::
+:::{note} The QEMU image is 32-bit ARM, so the `tizen-arm-tests` target must be
+used (not `tizen-arm64-tests`). :::
 
 ## Coverage Reports
 

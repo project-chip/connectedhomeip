@@ -10,12 +10,12 @@ development iteration.
 
 ## Prerequisites
 
-- Raspberry Pi 4 running Tizen OS with Wi-Fi configured (see
-  [Installing Tizen on Raspberry Pi](./raspberry_pi_install.md))
-- `sdb` tool — available inside the Tizen Docker container (see
-  [Building for Tizen](./building.md#docker-compose-environment))
-- `chip-tool` built for your host PC (see
-  [Building chip-tool](./building.md#building-chip-tool-for-the-host-pc))
+-   Raspberry Pi 4 running Tizen OS with Wi-Fi configured (see
+    [Installing Tizen on Raspberry Pi](./raspberry_pi_install.md))
+-   `sdb` tool — available inside the Tizen Docker container (see
+    [Building for Tizen](./building.md#docker-compose-environment))
+-   `chip-tool` built for your host PC (see
+    [Building chip-tool](./building.md#building-chip-tool-for-the-host-pc))
 
 ## Building
 
@@ -30,11 +30,10 @@ exit
 
 The output binary will be in `out/linux-arm64-light-no-thread-no-ble-clang/`.
 
-:::{note}
-All Docker services share the same workspace volume. Artifacts built in the
-`crosscompile` container (e.g., `out/linux-arm64-light-no-thread-no-ble-clang/`)
-are also accessible from the `tizen` container, and vice versa.
-:::
+:::{note} All Docker services share the same workspace volume. Artifacts built
+in the `crosscompile` container (e.g.,
+`out/linux-arm64-light-no-thread-no-ble-clang/`) are also accessible from the
+`tizen` container, and vice versa. :::
 
 ## Installing the Binary via SDB
 
@@ -82,8 +81,8 @@ Verify that the log output displays successful CASE session establishment.
 
 ### Controlling the Cluster State (Toggle)
 
-Send an On/Off toggle action command to the commissioned lighting application
-at `Node ID = 1` on endpoint `1`:
+Send an On/Off toggle action command to the commissioned lighting application at
+`Node ID = 1` on endpoint `1`:
 
 ```bash
 ./out/linux-x64-chip-tool/chip-tool onoff toggle 1 1
@@ -91,11 +90,11 @@ at `Node ID = 1` on endpoint `1`:
 
 ## Verification
 
-- **Raspberry Pi Logs:** The terminal should register an incoming ZCL
-  interaction model action frame and transition the light attribute state
-  (`OFF_ACTION` / `ON_ACTION`).
-- **PC Terminal Status:** The `chip-tool` output must return a successful
-  command transmission status.
+-   **Raspberry Pi Logs:** The terminal should register an incoming ZCL
+    interaction model action frame and transition the light attribute state
+    (`OFF_ACTION` / `ON_ACTION`).
+-   **PC Terminal Status:** The `chip-tool` output must return a successful
+    command transmission status.
 
 ## Cleaning Up
 
