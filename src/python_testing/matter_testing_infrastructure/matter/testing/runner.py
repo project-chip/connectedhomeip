@@ -582,6 +582,7 @@ def run_tests_no_exit(
         LOGGER.error("Final result: FAIL !")
     return ok
 
+
 def run_tests(
         test_class,
         matter_test_config,
