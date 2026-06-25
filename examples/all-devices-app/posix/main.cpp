@@ -44,6 +44,7 @@
 #include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/GlobalSetAttributeAccessor.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -188,6 +189,12 @@ public:
         DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+
+        // Register the global set attribute accessor
+        auto globalSetAttributeAccessor = std::make_unique<chip::app::GlobalSetAttributeAccessor>();
+        VerifyOrReturnError(globalSetAttributeAccessor, CHIP_ERROR_NO_MEMORY);
+        chip::app::OOBAccessorRegistry::Instance().Register(*globalSetAttributeAccessor);
+        mConstructedAccessors.push_back(std::move(globalSetAttributeAccessor));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {

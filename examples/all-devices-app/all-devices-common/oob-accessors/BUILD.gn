@@ -21,6 +21,8 @@ config("includes") {
 
 source_set("oob-accessors") {
   sources = [
+    "GlobalSetAttributeAccessor.cpp",
+    "GlobalSetAttributeAccessor.h",
     "OOBAccessor.h",
     "OOBAccessorRegistry.h",
     "OOBDataSerializer.cpp",

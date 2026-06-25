@@ -35,6 +35,8 @@ public:
 
     void Register(OOBAccessor & accessor) { mAccessors.PushBack(&accessor); }
 
+    IntrusiveList<OOBAccessor, IntrusiveMode::AutoUnlink> & GetAccessors() { return mAccessors; }
+
     /**
      * @brief Routes a simulation or out-of-band control action to the registered accessors.
      *
