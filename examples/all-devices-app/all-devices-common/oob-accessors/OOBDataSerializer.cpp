@@ -228,7 +228,7 @@ std::variant<CHIP_ERROR, ReadOnlyBuffer<ConcreteDataAttributePath>> DeSerializeP
 
         ReturnErrorAndLogOnFailure(rootReader.ExitContainer(pathStructType), Support, "Failed to exit path TLV structure container");
 
-        ReturnErrorAndLogOnFailure(builder.Append(path), Support, "Failed to append path to builder");
+        ReturnErrorAndLogOnFailure(builder.AppendElements({path}), Support, "Failed to append path to builder");
     }
 
     if (err != CHIP_END_OF_TLV)
