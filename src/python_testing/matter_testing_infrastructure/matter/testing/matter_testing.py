@@ -2191,7 +2191,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             productId=setup_payload.product_id,
             discriminator=setup_payload.long_discriminator,
             customFlow=setup_payload.commissioning_flow,
-            capabilities=setup_payload.rendezvous_information & 0b10000,
+            capabilities=0b10000,
             version=setup_payload.version
         )
 

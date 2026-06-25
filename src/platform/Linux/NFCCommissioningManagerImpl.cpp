@@ -646,6 +646,11 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
         std::lock_guard<std::mutex> lock(mWorkerStartMutex);
         if (!mNfcWorkerThreadRunning)
         {
+            if (mNfcWorkerThread.joinable())
+            {
+                // Thread terminated but still joinable. Terminate it before creating a new Thread.
+                mNfcWorkerThread.join();
+            }
             {
                 std::lock_guard<std::mutex> initLock(mWorkerInitMutex);
                 mWorkerInitCompleted = false;
@@ -1013,6 +1018,9 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
 
     ChipLogProgressNfcDebug(DeviceLayer, "Scan NFC Reader %s", readerName);
 
+    Transport::NFCBase * nfcBase = GetNFCBase();
+    VerifyOrReturnLogError(nfcBase != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     // Before launching a new scan of a reader, we should discard all the saved instances using this readerName
     {
         std::lock_guard<std::mutex> lock(mTagInstancesMutex);
@@ -1037,8 +1045,6 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
         else
         {
             // This couple (readerName, cardHandle) is not known yet: Create a new TagInstance
-            Transport::NFCBase * nfcBase = GetNFCBase();
-            VerifyOrReturnLogError(nfcBase != nullptr, CHIP_ERROR_INCORRECT_STATE);
             auto newTagInstance = std::make_shared<TagInstance>(
                 nfcBase, readerName, cardHandle, (dwActiveProtocol == SCARD_PROTOCOL_T0) ? SCARD_PCI_T0 : SCARD_PCI_T1);
 
