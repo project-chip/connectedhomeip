@@ -1,4 +1,4 @@
-expo# VS Code Setup for Tizen Development
+# VS Code Setup for Tizen Development
 
 This section covers how to set up Visual Studio Code for Tizen development,
 including extension installation, graphical debugging, and task integration.
