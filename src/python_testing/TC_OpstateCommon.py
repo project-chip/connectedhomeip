@@ -983,7 +983,7 @@ class TC_OPSTATE_BASE:
                 TestStep(13, "TH waits for OperationCompletion event"),
                 TestStep(14, "TH reads from the DUT the OperationalState attribute"),
                 TestStep(15, "Restart DUT"),
-                TestStep(16, "TH waits for {PIXIT.WAITTIME.REBOOT}"),
+                TestStep(16, "TH re-establishes a subscription to the OperationCompletion event after the reboot"),
                 TestStep(17, "TH sends Start command to the DUT"),
                 TestStep(18, "TH reads from the DUT the OperationalState attribute"),
                 TestStep(19, "TH sends Pause command to the DUT"),
@@ -1006,15 +1006,6 @@ class TC_OPSTATE_BASE:
         events = cluster.Events
 
         self.init_test()
-
-        asserts.assert_true('PIXIT.WAITTIME.REBOOT' in self.matter_test_config.global_test_params,
-                            "PIXIT.WAITTIME.REBOOT must be included on the command line in "
-                            "the --int-arg flag as PIXIT.WAITTIME.REBOOT:<wait time>")
-
-        wait_time_reboot = self.matter_test_config.global_test_params['PIXIT.WAITTIME.REBOOT']
-
-        if wait_time_reboot == 0:
-            asserts.fail("PIXIT.WAITTIME.REBOOT shall be higher than 0.")
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -1126,21 +1117,17 @@ class TC_OPSTATE_BASE:
 
         # STEP 15: Restart DUT
         self.step(15)
-        # In CI environment, the STOP command (step 8) already resets the variables. Only ask for
-        # reboot outside CI environment.
-        if not self.is_ci:
-            self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when ready.\n")
-            # Expire the session and re-establish the subscription
-            self.default_controller.ExpireSessions(self.dut_node_id)
-            # Subscribe to Events and when they are received push them to a queue for checking later
-            events_callback = EventSpecificChangeCallback(events.OperationCompletion)
-            await events_callback.start(self.default_controller,
-                                        self.dut_node_id,
-                                        endpoint)
+        # Reboot the DUT. This handles both CI/development (via the test runner restart flag)
+        # and manual testing (via user prompt), and expires existing sessions so controllers
+        # can reconnect after the reboot.
+        await self.request_device_reboot()
 
-        # STEP 16: TH waits for {PIXIT.WAITTIME.REBOOT}
+        # STEP 16: Re-establish the subscription to the OperationCompletion event after the reboot
         self.step(16)
-        await asyncio.sleep(wait_time_reboot)
+        events_callback = EventSpecificChangeCallback(events.OperationCompletion)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    endpoint)
 
         # STEP 17: TH sends Start command to the DUT
         self.step(17)
