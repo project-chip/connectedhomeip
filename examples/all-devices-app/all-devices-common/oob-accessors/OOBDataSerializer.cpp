@@ -198,7 +198,8 @@ std::variant<CHIP_ERROR, ReadOnlyBuffer<ConcreteDataAttributePath>> DeSerializeP
         }
 
         chip::TLV::TLVType pathStructType;
-        ReturnErrorAndLogOnFailure(rootReader.EnterContainer(pathStructType), Support, "Failed to enter path TLV structure container");
+        ReturnErrorAndLogOnFailure(rootReader.EnterContainer(pathStructType), Support,
+                                   "Failed to enter path TLV structure container");
 
         ConcreteDataAttributePath path;
 
@@ -226,9 +227,10 @@ std::variant<CHIP_ERROR, ReadOnlyBuffer<ConcreteDataAttributePath>> DeSerializeP
         }
         ReturnErrorAndLogOnFailure(rootReader.Get(path.mAttributeId), Support, "Failed to read AttributeId value");
 
-        ReturnErrorAndLogOnFailure(rootReader.ExitContainer(pathStructType), Support, "Failed to exit path TLV structure container");
+        ReturnErrorAndLogOnFailure(rootReader.ExitContainer(pathStructType), Support,
+                                   "Failed to exit path TLV structure container");
 
-        ReturnErrorAndLogOnFailure(builder.AppendElements({path}), Support, "Failed to append path to builder");
+        ReturnErrorAndLogOnFailure(builder.AppendElements({ path }), Support, "Failed to append path to builder");
     }
 
     if (err != CHIP_END_OF_TLV)

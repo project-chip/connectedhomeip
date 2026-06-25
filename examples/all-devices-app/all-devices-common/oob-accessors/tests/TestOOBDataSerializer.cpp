@@ -191,11 +191,8 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_ArrayValue)
 
 TEST_F(TestOOBDataSerializer, BuildSupportedPathsResponse_MultiplePaths)
 {
-    std::vector<ConcreteDataAttributePath> paths = {
-        ConcreteDataAttributePath(1, 2, 3),
-        ConcreteDataAttributePath(10, 20, 30),
-        ConcreteDataAttributePath(100, 200, 300)
-    };
+    std::vector<ConcreteDataAttributePath> paths = { ConcreteDataAttributePath(1, 2, 3), ConcreteDataAttributePath(10, 20, 30),
+                                                     ConcreteDataAttributePath(100, 200, 300) };
 
     auto buildResult = OOBDataSerializer::SerializePathsList(Span<const ConcreteDataAttributePath>(paths.data(), paths.size()));
     EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
@@ -251,11 +248,8 @@ TEST_F(TestOOBDataSerializer, BuildSupportedPathsResponse_MultiplePaths)
 
 TEST_F(TestOOBDataSerializer, SerializeAndDeserialize_PathsList)
 {
-    std::vector<ConcreteDataAttributePath> paths = {
-        ConcreteDataAttributePath(1, 2, 3),
-        ConcreteDataAttributePath(10, 20, 30),
-        ConcreteDataAttributePath(100, 200, 300)
-    };
+    std::vector<ConcreteDataAttributePath> paths = { ConcreteDataAttributePath(1, 2, 3), ConcreteDataAttributePath(10, 20, 30),
+                                                     ConcreteDataAttributePath(100, 200, 300) };
 
     auto buildResult = OOBDataSerializer::SerializePathsList(Span<const ConcreteDataAttributePath>(paths.data(), paths.size()));
     EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));

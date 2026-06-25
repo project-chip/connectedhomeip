@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <optional>
 #include <oob-accessors/OOBAccessor.h>
+#include <optional>
 
 namespace chip::app {
 

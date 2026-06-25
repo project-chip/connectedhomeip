@@ -25,8 +25,7 @@
 
 namespace chip::app {
 
-class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor,
-                                 public chip::rpc::PigweedDebugInfoInterceptor
+class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor, public chip::rpc::PigweedDebugInfoInterceptor
 {
 public:
     PigweedAttributeAccessor()           = default;
@@ -34,10 +33,8 @@ public:
 
     std::variant<::pw::Status, chip::ReadOnlyBuffer<ConcreteDataAttributePath>> GetSupportedWritePaths() override
     {
-        auto actionResult = OOBAccessorRegistry::Instance().HandleAction(
-            OOBInfoAccessor::kActionGetAllSupportedSetAttributes,
-            ByteSpan()
-        );
+        auto actionResult =
+            OOBAccessorRegistry::Instance().HandleAction(OOBInfoAccessor::kActionGetAllSupportedSetAttributes, ByteSpan());
 
         if (actionResult.first != CHIP_NO_ERROR)
         {
@@ -45,10 +42,8 @@ public:
             return ::pw::Status::Internal();
         }
 
-        auto & tlvResponse = actionResult.second;
-        auto deserializeResult = OOBDataSerializer::DeSerializePathsList(
-            ByteSpan(tlvResponse.data(), tlvResponse.size())
-        );
+        auto & tlvResponse     = actionResult.second;
+        auto deserializeResult = OOBDataSerializer::DeSerializePathsList(ByteSpan(tlvResponse.data(), tlvResponse.size()));
 
         if (std::holds_alternative<CHIP_ERROR>(deserializeResult))
         {
@@ -70,8 +65,8 @@ public:
             return ::pw::Status::Internal();
         }
 
-        auto & buffer     = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        auto result = OOBAccessorRegistry::Instance().HandleAction(SetAttributeAccessor::kActionSetAttribute, buffer);
+        auto & buffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
+        auto result   = OOBAccessorRegistry::Instance().HandleAction(SetAttributeAccessor::kActionSetAttribute, buffer);
         if (result.first != CHIP_ERROR_NOT_FOUND)
         {
             if (result.first == CHIP_NO_ERROR)
