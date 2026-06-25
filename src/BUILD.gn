@@ -76,6 +76,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/concentration-measurement-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
+      "${chip_root}/src/app/clusters/dynamic-lighting-server/tests",
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
       "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
