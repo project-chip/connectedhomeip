@@ -128,10 +128,10 @@ class TC_SC_5_2(MatterBaseTest):
             TestStep("16e", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: null, AccessAllowed: null, GroupcastTestResult: FailedAuth)."),
             TestStep("16f", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to map GroupID 0x0101 to GroupKeySetID 0x01a4 (replacing GroupID 0x0102), while maintaining the mapping of GroupID 0x0300 to GroupKeySetID 0x01a3."),
             TestStep("16g", "TH sends the same group command destined for Group 0x0102 (encrypted using KeySet 0x01a4)."),
-            TestStep("16h", "TH verifies that no GroupcastTesting event is received from DUT within the response timeout."),
+            TestStep("16h", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: null, AccessAllowed: null, GroupcastTestResult: FailedAuth)."),
             TestStep("16i", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to include entries mapping GroupId 0x0101 to GroupKeySetID 0x01a4, GroupId 0x0102 to GroupKeySetID 0x01a4, and GroupId 0x0300 to GroupKeySetID 0x01a3."),
             TestStep("16j", "TH sends the same group command destined for Group 0x0102 (encrypted using KeySet 0x01a4)."),
-            TestStep("16k", "TH verifies that no GroupcastTesting event is received from DUT within the response timeout."),
+            TestStep("16k", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: 0x0102, AccessAllowed: null, GroupcastTestResult: Success)."),
             TestStep("16l", "TH sends Groupcast cluster's GroupcastTesting command on EP0 with TestOperation field set to DisableTesting."),
             TestStep("17a", "TH removes GroupKeySetID 0x01a3 by sending a KeySetRemove command to the GroupKeyManagement cluster."),
             TestStep("17b", "TH removes GroupKeySetID 0x01a4 by sending a KeySetRemove command to the GroupKeyManagement cluster."),
@@ -478,13 +478,17 @@ class TC_SC_5_2(MatterBaseTest):
             self.step("16g")
             dev_ctrl.SendGroupCommand(groupID2, operate_only_command.command_object())
 
-            # Step 16h: Verify that no GroupcastTesting event is received from DUT within response timeout.
+            # Step 16h: Validate the DUT rejected the group command via the GroupcastTesting event.
             self.step("16h")
-            try:
-                event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=5)
-                asserts.fail("Received unexpected GroupcastTesting event")
-            except queue.Empty:
-                pass
+            event_data = event_sub.wait_for_event_report(
+                Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
+                                f"Expected GroupID to be null, got {event_data.groupID}")
+            asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
+                                f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
+            asserts.assert_equal(event_data.groupcastTestResult,
+                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                                 "GroupcastTesting event should report FailedAuth")
 
             # Step 16i: Update GroupKeyMap to include 0x0101->0x01a4, 0x0102->0x01a4, 0x0300->0x01a3
             self.step("16i")
@@ -500,13 +504,16 @@ class TC_SC_5_2(MatterBaseTest):
             self.step("16j")
             dev_ctrl.SendGroupCommand(groupID2, operate_only_command.command_object())
 
-            # Step 16k: Verify that no GroupcastTesting event is received from DUT within response timeout.
+            # Step 16k: Validate the DUT received the group command via the GroupcastTesting event.
             self.step("16k")
-            try:
-                event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=5)
-                asserts.fail("Received unexpected GroupcastTesting event")
-            except queue.Empty:
-                pass
+            event_data = event_sub.wait_for_event_report(
+                Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in GroupcastTesting event")
+            asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
+                                f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
+            asserts.assert_equal(event_data.groupcastTestResult,
+                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                                 "GroupcastTesting event should report Success")
 
             # Step 16l: Disable GroupcastTesting to restore normal operation.
             self.step("16l")
