@@ -225,10 +225,10 @@ class TC_ICDB_2_4(ICDBaseTest):
         active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
         active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
         maximum_check_in_backoff_s = await self.read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
-        log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
-        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
-        log.info(f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
-        log.info(f"MaximumCheckInBackoff: {maximum_check_in_backoff_s}s")
+        log.info("IdleModeDuration: %ss", idle_mode_duration_s)
+        log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
+        log.info("ActiveModeThreshold: %sms", active_mode_threshold_ms)
+        log.info("MaximumCheckInBackoff: %ss", maximum_check_in_backoff_s)
 
         # *** STEP 4 ***
         # TH1 and TH2 each subscribe to the ICDCounter attribute with MinIntervalFloor and MaxIntervalCeiling

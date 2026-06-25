@@ -292,8 +292,8 @@ class ICDBaseTest(MatterBaseTest):
                                               idle_mode_duration_s=idle_mode_duration_s)
         resume_s = full_cycle_s if maximum_check_in_backoff_s is None else max(full_cycle_s, maximum_check_in_backoff_s)
         wait_s = max_interval_s + full_cycle_s + resume_s
-        log.info(f"Check-in resume wait: MaxInterval={max_interval_s}s + MRP-slack(FullCycle)={full_cycle_s:.1f}s "
-                 f"+ resume={resume_s:.1f}s = {wait_s:.1f}s")
+        log.info("Check-in resume wait: MaxInterval=%ss + MRP-slack(FullCycle)=%.1fs + resume=%.1fs = %.1fs",
+                 max_interval_s, full_cycle_s, resume_s, wait_s)
         return wait_s
 
     async def assert_checkin_received(self, dev_ctrl, node_id: int, timeout_s: float) -> None:
@@ -307,7 +307,7 @@ class ICDBaseTest(MatterBaseTest):
             await WaitForCheckIn(scoped_node_id, timeoutSeconds=timeout_s)
         except TimeoutError:
             asserts.fail(f"DUT did not send a check-in to node 0x{node_id:016X} within {timeout_s:.1f}s")
-        log.info(f"Check-in received from DUT for node 0x{node_id:016X}")
+        log.info("Check-in received from DUT for node 0x%016X", node_id)
 
     def create_new_controller(
             self,
