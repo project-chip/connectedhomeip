@@ -147,7 +147,7 @@ class TC_ICDB_2_4(ICDBaseTest):
                      TH2 is registered as an ICD client on the DUT.
                      Verify exactly one RegisteredClients entry is present.
                      Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH2's node ID."""),
-            TestStep(3, "TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, and ActiveModeThreshold attributes.",
+            TestStep(3, "TH1 reads from the DUT the IdleModeDuration, ActiveModeDuration, ActiveModeThreshold, and MaximumCheckInBackoff attributes.",
                      "Store values for later use."),
             TestStep(4, "TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor=0 and MaxIntervalCeiling=IdleModeDuration.", """
                      Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
@@ -224,9 +224,11 @@ class TC_ICDB_2_4(ICDBaseTest):
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
         active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
-        log.info("IdleModeDuration: %ss", idle_mode_duration_s)
-        log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
-        log.info("ActiveModeThreshold: %sms", active_mode_threshold_ms)
+        maximum_check_in_backoff_s = await self.read_icdm_attribute_expect_success(attributes.MaximumCheckInBackOff)
+        log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
+        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
+        log.info(f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
+        log.info(f"MaximumCheckInBackoff: {maximum_check_in_backoff_s}s")
 
         # *** STEP 4 ***
         # TH1 and TH2 each subscribe to the ICDCounter attribute with MinIntervalFloor and MaxIntervalCeiling
@@ -298,7 +300,8 @@ class TC_ICDB_2_4(ICDBaseTest):
         th1_subscription.Shutdown()
         th1_checkin_timeout_s = self.checkin_resume_wait_s(
             max_interval_s=th1_max_interval_s,
-            active_mode_duration_ms=active_mode_duration_ms, idle_mode_duration_s=idle_mode_duration_s)
+            active_mode_duration_ms=active_mode_duration_ms, idle_mode_duration_s=idle_mode_duration_s,
+            maximum_check_in_backoff_s=maximum_check_in_backoff_s)
 
         # Verify TH1 receives a check-in from the DUT once its subscription is dropped
         await self.assert_checkin_received(self.th1, self.dut_node_id, th1_checkin_timeout_s)

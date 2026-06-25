@@ -263,21 +263,37 @@ class ICDBaseTest(MatterBaseTest):
         await asyncio.sleep(wait_s)
 
     def checkin_resume_wait_s(self, *, max_interval_s: float,
-                              active_mode_duration_ms: int, idle_mode_duration_s: int) -> float:
+                              active_mode_duration_ms: int, idle_mode_duration_s: int,
+                              maximum_check_in_backoff_s: int | None = None) -> float:
         """Seconds to allow for the DUT to resume check-ins after a subscriber drops locally.
 
-        A TH subscription Shutdown() sends nothing to the DUT: it only notices the subscriber is
-        gone when its next periodic report (up to one MaxInterval away) fails to deliver and the
-        subscription is torn down, then it checks in on the following idle-to-active transition.
-        Allow one full cycle for that detection plus one full cycle for the check-in to fire. The
-        wait must stay silent (no polling), so the DUT can actually go idle and cycle. Derived from
-        the DUT's own timing values, so there are no hard-coded durations.
+        A TH subscription Shutdown() sends nothing to the DUT. It only notices the subscriber is
+        gone when its next periodic report (up to one MaxInterval away) fails to deliver, and it
+        declares that failure only after exhausting the MRP retransmission window; it then checks in
+        on the following idle-to-active transition. The wait is therefore the sum of:
+
+          - MaxInterval: the next report cannot come due (so detection cannot start) before this.
+          - one FullCycle: generous slack covering the MRP retransmission window before the report
+            is declared undeliverable. The real bound is a few seconds; a FullCycle is used here
+            rather than computing the exact MRP value from the session parameters.
+          - the resume term: the check-in fires on the next idle-to-active transition.
+
+        The resume term is one FullCycle for a first resumed check-in. When the awaited check-in may
+        be subject to Check-In backoff (a repeat check-in to an already-uncovered client, e.g.
+        TC-ICDB-2.4 step 7's second check-in to TH1), pass maximum_check_in_backoff_s and the resume
+        term widens to max(FullCycle, MaximumCheckInBackoff) so a spec-compliant backoff cannot time
+        the wait out.
+
+        The wait must stay silent (no polling), so the DUT can actually go idle and cycle. Derived
+        from the DUT's own timing values, so there are no hard-coded durations.
         """
         full_cycle_s = self.compute_wait_time(ICDTransition.FullCycle,
                                               active_mode_duration_ms=active_mode_duration_ms,
                                               idle_mode_duration_s=idle_mode_duration_s)
-        wait_s = max_interval_s + 2 * full_cycle_s
-        log.info(f"Check-in resume wait: MaxInterval={max_interval_s}s + 2 x FullCycle={full_cycle_s:.1f}s = {wait_s:.1f}s")
+        resume_s = full_cycle_s if maximum_check_in_backoff_s is None else max(full_cycle_s, maximum_check_in_backoff_s)
+        wait_s = max_interval_s + full_cycle_s + resume_s
+        log.info(f"Check-in resume wait: MaxInterval={max_interval_s}s + MRP-slack(FullCycle)={full_cycle_s:.1f}s "
+                 f"+ resume={resume_s:.1f}s = {wait_s:.1f}s")
         return wait_s
 
     async def assert_checkin_received(self, dev_ctrl, node_id: int, timeout_s: float) -> None:
