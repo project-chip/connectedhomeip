@@ -8155,18 +8155,6 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
 /**
- * @brief Dynamic Lighting Cluster StartEffect Command callback (from client)
- */
-bool emberAfDynamicLightingClusterStartEffectCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DynamicLighting::Commands::StartEffect::DecodableType & commandData);
-/**
- * @brief Dynamic Lighting Cluster StopEffect Command callback (from client)
- */
-bool emberAfDynamicLightingClusterStopEffectCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DynamicLighting::Commands::StopEffect::DecodableType & commandData);
-/**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */
 bool emberAfChannelClusterChangeChannelCallback(
