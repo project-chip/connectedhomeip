@@ -539,7 +539,8 @@ def run_tests_no_exit(
                                 LOGGER.error("FindOrEstablishPASESession returned None")
                             else:
                                 stored_global_wildcard = read_global_wildcard(event_loop, default_controller, node_id)
-                                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(stored_global_wildcard)
+                                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+                                    stored_global_wildcard)
                                 LOGGER.info(
                                     "Keeping PASE session alive for downstream reuse "
                                     "(CommissionDeviceTest or setup_class_helper)"
