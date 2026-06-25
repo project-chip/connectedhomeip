@@ -179,38 +179,38 @@ public:
     }
 };
 
+static bool GetAmbientContextType(const Json::Value & actArray, std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
+{
+    // Validate AmbientContextType exists and is an array
+    if (actArray.empty())
+    {
+        ChipLogError(AppServer, "AmbientContextType array is empty");
+        return false;
+    }
+    for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
+    {
+        Json::Value item = actArray[i];
+        if (!item.isObject() || !item.isMember("TypeId") || !item.isMember("TagId"))
+        {
+            ChipLogError(AppServer, "AmbientContextType[%u], missing/invalid TypeId/TagId", static_cast<uint16_t>(i));
+            return false;
+        }
+        uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
+        uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
+
+        Globals::Structs::SemanticTagStruct::Type tag = {
+            .namespaceID = typeId,
+            .tag         = tagId,
+        };
+         semanticTags.push_back(tag);
+    }
+    return true;
+}
+
 class AddAmbientContextDetectCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
     const char * GetName() const override { return "AddAmbientContextDetect"; }
-    bool GetAmbientContextType(const Json::Value & actArray, std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
-    {
-        // Validate AmbientContextType exists and is an array
-        if (actArray.empty())
-        {
-            ChipLogError(AppServer, "AmbientContextType array is empty");
-            return false;
-        }
-        for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
-        {
-            Json::Value item = actArray[i];
-            if (!item.isObject() || !item.isMember("TypeId") || !item.isMember("TagId"))
-            {
-                ChipLogError(AppServer, "AmbientContextType[%u], missing/invalid TypeId/TagId", static_cast<uint16_t>(i));
-                return false;
-            }
-            uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
-            uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
-
-            Globals::Structs::SemanticTagStruct::Type tag = {
-                .namespaceID = typeId,
-                .tag         = tagId,
-            };
-            semanticTags.push_back(tag);
-        }
-        return true;
-    }
-
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
@@ -236,7 +236,7 @@ public:
         }
         std::vector<Globals::Structs::SemanticTagStruct::Type> semanticTags;
         semanticTags.reserve(actArray.size());
-        if (!GetAmbientContextType(actArray, semanticTags))
+        if (!::GetAmbientContextType(actArray, semanticTags))
         {
             ChipLogError(AppServer, "Incorrect or unsupported detection");
             return;
@@ -263,33 +263,6 @@ class SetPredictedActivityCommandHandler : public AllDevicesAppNamedPipeCommandH
 {
 public:
     const char * GetName() const override { return "SetPredictedActivity"; }
-    bool GetAmbientContextType(const Json::Value & actArray, std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
-    {
-        // Validate AmbientContextType exists and is an array
-        if (actArray.empty())
-        {
-            ChipLogError(AppServer, "AmbientContextType array is empty");
-            return false;
-        }
-        for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
-        {
-            Json::Value item = actArray[i];
-            if (!item.isObject() || !item.isMember("TypeId") || !item.isMember("TagId"))
-            {
-                ChipLogError(AppServer, "AmbientContextType[%u], missing/invalid TypeId/TagId", static_cast<uint16_t>(i));
-                return false;
-            }
-            uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
-            uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
-
-            Globals::Structs::SemanticTagStruct::Type tag = {
-                .namespaceID = typeId,
-                .tag         = tagId,
-            };
-            semanticTags.push_back(tag);
-        }
-        return true;
-    }
     void Handle(const Json::Value & json, AllDevicesAppCommandDelegate * delegate, EndpointId endpointId) override
     {
         auto * cluster =
@@ -333,8 +306,13 @@ public:
             predictAct.endTimestamp   = item["EndTStamp"].asUInt();
             VerifyOrReturn(predictAct.startTimestamp < predictAct.endTimestamp,
                            ChipLogError(AppServer, "PredictedActivity, incorrect startTime/endTime"));
-            predictAct.confidence = static_cast<chip::Percent>(item["Conf"].asUInt());
-
+            auto confidenceValue = item["Conf"].asUInt();
+            if (confidenceValue > 100)
+            {
+                ChipLogError(AppServer, "PredictedActivity, incorrect confidence value");
+                return;
+            }
+            predictAct.confidence = static_cast<chip::Percent>(confidenceValue);
             if (item.isMember("CrowdDetect"))
             {
                 predictAct.crowdDetected.SetValue(static_cast<bool>(item["CrowdDetect"].asBool()));
@@ -359,7 +337,7 @@ public:
             auto & semanticTags = allSemanticTags[i];
             semanticTags.clear();
             semanticTags.reserve(actArray.size());
-            if (!GetAmbientContextType(actArray, semanticTags))
+            if (!::GetAmbientContextType(actArray, semanticTags))
             {
                 ChipLogError(AppServer, "Incorrect or unsupported detection");
                 return;
