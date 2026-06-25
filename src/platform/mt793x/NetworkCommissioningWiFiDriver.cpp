@@ -65,7 +65,7 @@ CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
 
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     return err;
 }
 
@@ -182,7 +182,7 @@ void GenioWiFiDriver::OnConnectWiFiNetwork()
 
     if (mpConnectCallback)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -288,10 +288,10 @@ void GenioWiFiDriver::OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult)
             security = GetInstance().ConvertSecuritytype(aScanResult->auth_mode);
 
             scanResponse.security.Set(security);
-            scanResponse.channel         = aScanResult->channel;
+            scanResponse.channel = aScanResult->channel;
             scanResponse.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
             scanResponse.signal.strength = aScanResult->rssi;
-            scanResponse.ssidLen         = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+            scanResponse.ssidLen = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
             memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
             memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
 

@@ -205,7 +205,7 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
     ChipLogDetail(Discovery, "Mdns: %s name: %s, type: %s, domain: %s, flags: %ld", __func__, name, type, domain, flags);
 
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
-    sdCtx->Finalize(err);
+    TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err);
 };
 
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
@@ -425,7 +425,7 @@ static void resolve_client_task(void * parameter)
                 GenericContext * context = MdnsContexts::GetInstance().GetBySockFd(fd);
                 if (context && context->mSelectCount > 10)
                 {
-                    context->Finalize(kDNSServiceErr_Timeout);
+                    TEMPORARY_RETURN_IGNORED context->Finalize(kDNSServiceErr_Timeout);
                 }
             }
         }
@@ -445,13 +445,13 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     if (kDNSServiceErr_NoError == err)
     {
-        sdCtx->OnNewAddress(interfaceId, address);
+        TEMPORARY_RETURN_IGNORED sdCtx->OnNewAddress(interfaceId, address);
     }
 
     if (!(flags & kDNSServiceFlagsMoreComing))
     {
-        VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
-        sdCtx->Finalize();
+        VerifyOrReturn(sdCtx->HasAddress(), TEMPORARY_RETURN_IGNORED sdCtx->Finalize(kDNSServiceErr_BadState));
+        TEMPORARY_RETURN_IGNORED sdCtx->Finalize();
     }
 }
 
@@ -472,7 +472,7 @@ static void GetAddrInfo(ResolveContext * sdCtx)
 
         auto err          = DNSServiceGetAddrInfo(&resolveClient, 0, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
         sdCtx->serviceRef = resolveClient;
-        VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+        VerifyOrReturn(kDNSServiceErr_NoError == err, TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err));
     }
 }
 
@@ -488,13 +488,13 @@ void ChipDNSServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint
         sdCtx->OnNewInterface(interfaceIndex, fullname, hosttarget, port, txtLen, txtRecord);
         if (kDNSServiceInterfaceIndexLocalOnly == interfaceIndex)
         {
-            sdCtx->OnNewLocalOnlyAddress();
-            sdCtx->Finalize();
+            TEMPORARY_RETURN_IGNORED sdCtx->OnNewLocalOnlyAddress();
+            TEMPORARY_RETURN_IGNORED sdCtx->Finalize();
             return;
         }
         if (!(flags & kDNSServiceFlagsMoreComing))
         {
-            VerifyOrReturn(sdCtx->HasInterface(), sdCtx->Finalize(kDNSServiceErr_BadState));
+            VerifyOrReturn(sdCtx->HasInterface(), TEMPORARY_RETURN_IGNORED sdCtx->Finalize(kDNSServiceErr_BadState));
             GetAddrInfo(sdCtx);
         }
     }
