@@ -37,6 +37,7 @@
 
 #include <assert.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -112,6 +113,8 @@ chip::app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningIns
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
 
@@ -331,6 +334,10 @@ CHIP_ERROR AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     (void) chip::Server::GetInstance().Init(initParams);
 
     // Create FreeRTOS sw timer for Function Selection.
@@ -540,15 +547,9 @@ void AppTask::OccupancyEventHandler(AppEvent * aEvent)
         return;
     }
 
-    auto cluster = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
-    if (!cluster)
-    {
-        MT793X_LOG("Cannot find occupancy cluster on endpoint 1");
-        return;
-    }
-
+    // OccupancySensing cluster is not present in the lighting-app data
+    // model; keep the shell command observable via the log only.
     MT793X_LOG("Lighting occupancy: %u", aEvent->OccupancytEvent.Present);
-    cluster->SetOccupancy(aEvent->OccupancytEvent.Present);
 }
 
 void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
