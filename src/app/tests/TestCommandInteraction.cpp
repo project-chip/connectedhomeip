@@ -1684,8 +1684,8 @@ TEST_F(TestCommandInteraction, TestCommandSenderGroupCommandNoResponseFlow)
 TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseFlow)
 {
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* isTimedRequest = */ false,
-                                     /* suppressResponse = */ true);
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
 
     AddInvokeRequestData(&commandSender);
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
@@ -1706,8 +1706,8 @@ TEST_F(TestCommandInteraction, TestCommandSenderSuppressResponseSuppressStatusRe
 {
 
     mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* isTimedRequest = */ false,
-                                     /* suppressResponse = */ true);
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ true);
 
     chip::isCommandDispatched = false;
     AddInvalidInvokeRequestData(&commandSender);
