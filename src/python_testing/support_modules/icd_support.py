@@ -31,6 +31,7 @@ from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import ScopedNodeId, WaitForCheckIn
 from matter.interaction_model import InteractionModelError
 from matter.testing.matter_testing import MatterBaseTest
 
@@ -260,6 +261,37 @@ class ICDBaseTest(MatterBaseTest):
                                         idle_mode_duration_s=idle_mode_duration_s)
         log.info("Waiting %ss for %s...", wait_s, transition.name)
         await asyncio.sleep(wait_s)
+
+    def checkin_resume_wait_s(self, *, max_interval_s: float,
+                              active_mode_duration_ms: int, idle_mode_duration_s: int) -> float:
+        """Seconds to allow for the DUT to resume check-ins after a subscriber drops locally.
+
+        A TH subscription Shutdown() sends nothing to the DUT: it only notices the subscriber is
+        gone when its next periodic report (up to one MaxInterval away) fails to deliver and the
+        subscription is torn down, then it checks in on the following idle-to-active transition.
+        Allow one full cycle for that detection plus one full cycle for the check-in to fire. The
+        wait must stay silent (no polling), so the DUT can actually go idle and cycle. Derived from
+        the DUT's own timing values, so there are no hard-coded durations.
+        """
+        full_cycle_s = self.compute_wait_time(ICDTransition.FullCycle,
+                                              active_mode_duration_ms=active_mode_duration_ms,
+                                              idle_mode_duration_s=idle_mode_duration_s)
+        wait_s = max_interval_s + 2 * full_cycle_s
+        log.info(f"Check-in resume wait: MaxInterval={max_interval_s}s + 2 x FullCycle={full_cycle_s:.1f}s = {wait_s:.1f}s")
+        return wait_s
+
+    async def assert_checkin_received(self, dev_ctrl, node_id: int, timeout_s: float) -> None:
+        """Assert the DUT delivers a check-in to TH's fabric within timeout_s.
+
+        Requires TH to have registered as an ICD client during commissioning
+        (EnableICDRegistration), so the received check-in can be decrypted.
+        """
+        scoped_node_id = ScopedNodeId(node_id, dev_ctrl.GetFabricIndexInternal())
+        try:
+            await WaitForCheckIn(scoped_node_id, timeoutSeconds=timeout_s)
+        except (asyncio.TimeoutError, TimeoutError):
+            asserts.fail(f"DUT did not send a check-in to node 0x{node_id:016X} within {timeout_s:.1f}s")
+        log.info(f"Check-in received from DUT for node 0x{node_id:016X}")
 
     def create_new_controller(
             self,
