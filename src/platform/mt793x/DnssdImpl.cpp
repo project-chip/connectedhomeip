@@ -44,6 +44,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Dnssd;
@@ -320,7 +321,16 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     DnssdService service;
 
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceBrowseReply %s", StringOrNullMarker(serviceName));
-    strcpy(service.mName, serviceName);
+
+    chip::StringBuilderBase nameBuilder(service.mName, sizeof(service.mName));
+    nameBuilder.Add(serviceName);
+    if (!nameBuilder.Fit())
+    {
+        // This is a DNSServiceBrowseReply callback with a fixed signature, so we cannot
+        // propagate an error. The StringBuilder still guarantees service.mName stays
+        // bounded and null-terminated, so just log the truncation and continue.
+        ChipLogError(ServiceProvisioning, "serviceName truncated: %s", StringOrNullMarker(serviceName));
+    }
 
     ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);
 }
@@ -335,9 +345,15 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
     (void) addressType;
     ChipLogProgress(ServiceProvisioning, "ChipDnssdBrowse %s", StringOrNullMarker(type));
-    strcpy(ServiceType, type);
-    strcat(ServiceType, ".");
-    strcat(ServiceType, GetProtocolString(protocol));
+    chip::StringBuilderBase typeBuilder(ServiceType, sizeof(ServiceType));
+    typeBuilder.Add(type).Add(".").Add(GetProtocolString(protocol));
+    if (!typeBuilder.Fit())
+    {
+        ChipLogError(ServiceProvisioning, "ServiceType too long, truncated: type=%s protocol=%s", StringOrNullMarker(type),
+                     GetProtocolString(protocol));
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+        return error;
+    }
     err = DNSServiceBrowse(&BrowseClient, 0, 0, ServiceType, SERVICE_DOMAIN, ChipDNSServiceBrowseReply, (void *) callback);
     ChipLogProgress(ServiceProvisioning, "DNSServiceBrowse %d", (int) err);
     if (err)
@@ -495,9 +511,14 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     uint32_t interfaceIndex = GetInterfaceId(interface);
 
     ChipLogProgress(ServiceProvisioning, "ChipDnssdResolve %s", service->mName);
-    strcpy(ServiceType, service->mType);
-    strcat(ServiceType, ".");
-    strcat(ServiceType, GetProtocolString(service->mProtocol));
+    chip::StringBuilderBase typeBuilder(ServiceType, sizeof(ServiceType));
+    typeBuilder.Add(service->mType).Add(".").Add(GetProtocolString(service->mProtocol));
+    if (!typeBuilder.Fit())
+    {
+        ChipLogError(ServiceProvisioning, "ServiceType too long, truncated: type=%s protocol=%s",
+                     StringOrNullMarker(service->mType), GetProtocolString(service->mProtocol));
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, service->mAddressType);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
