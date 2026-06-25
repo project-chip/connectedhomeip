@@ -92,12 +92,10 @@ The application supports the following device types (specified via the
 -   `soil-sensor`
 -   `speaker`
 -   `water-freeze-detector`
--   `water-leak-detector`
-<<<<<<< cp-pr3-all-devices-app
--   `commissioning-proxy`
-=======
+-   `water-leak-detector` <<<<<<< cp-pr3-all-devices-app
+-   # `commissioning-proxy`
 -   `water-valve`
->>>>>>> master
+    > > > > > > > master
 
 You can run the application with `--help` to see the list of valid device types.
 
