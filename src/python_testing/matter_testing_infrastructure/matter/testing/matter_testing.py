@@ -2184,12 +2184,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         asserts.assert_equal(len(dut_node_ids), 1, "Expected exactly one DUT node id in matter_test_config.dut_node_ids")
         dut_node_id = dut_node_ids[0]
 
+        # Retrieve the long_discriminator
+        long_discriminator = setup_payload.long_discriminator
+        asserts.assert_is_not_none(long_discriminator, "Expected setup payload to contain a long discriminator")
+        long_discriminator = typing.cast(int, long_discriminator)
+
         # Create a new SetupPayload where only the NTL bit (0b10000) is kept in the discovery capabilities bitmask
         ntl_onboarding_data = SetupPayload().GenerateQrCode(
             passcode=setup_payload.setup_passcode,
             vendorId=setup_payload.vendor_id,
             productId=setup_payload.product_id,
-            discriminator=setup_payload.long_discriminator,
+            discriminator=long_discriminator,
             customFlow=setup_payload.commissioning_flow,
             capabilities=0b10000,
             version=setup_payload.version
@@ -2198,7 +2203,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Create SetupPayloadInfo from Onboarding data
         ntl_setup_payload_info = SetupPayloadInfo()
         ntl_setup_payload_info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-        ntl_setup_payload_info.filter_value = setup_payload.long_discriminator
+        ntl_setup_payload_info.filter_value = long_discriminator
         ntl_setup_payload_info.passcode = setup_payload.setup_passcode
         ntl_setup_payload_info.setup_code = ntl_onboarding_data
 
@@ -2214,7 +2219,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        result = await commission_device(dev_ctrl, dut_node_id, ntl_setup_payload_info, commissioning_info)
+        pairing_status = await commission_device(dev_ctrl, dut_node_id, ntl_setup_payload_info, commissioning_info)
+        result = bool(pairing_status)
         if result:
             self._dut_confirmed_available = True
         return result
