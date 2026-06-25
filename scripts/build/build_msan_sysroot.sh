@@ -257,7 +257,7 @@ echo ">>> zlib"
 cd "$SRC"
 [[ -d "zlib-$ZLIB_VERSION" ]] || { wget -q -O - "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.gz" | tar xz; }
 cd "zlib-$ZLIB_VERSION"
-CC="$CC_BIN" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" ./configure --prefix="$SYSROOT" --static
+CC="$CC_BIN" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory ${LDFLAGS:-}" ./configure --prefix="$SYSROOT" --static
 make -j"$(nproc)" && make install
 
 # libffi
@@ -265,7 +265,7 @@ echo ">>> libffi"
 cd "$SRC"
 [[ -d "libffi-$LIBFFI_VERSION" ]] || { wget -q "https://github.com/libffi/libffi/releases/download/v$LIBFFI_VERSION/libffi-$LIBFFI_VERSION.tar.gz" && tar xzf "libffi-$LIBFFI_VERSION.tar.gz"; }
 cd "libffi-$LIBFFI_VERSION"
-CC="$CC_BIN" CXX="$CXX_BIN" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
+CC="$CC_BIN" CXX="$CXX_BIN" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory ${LDFLAGS:-}" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
 
@@ -274,7 +274,7 @@ echo ">>> pcre2"
 cd "$SRC"
 [[ -d "pcre2-$PCRE2_VERSION" ]] || { wget -q "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$PCRE2_VERSION/pcre2-$PCRE2_VERSION.tar.gz" && tar xzf "pcre2-$PCRE2_VERSION.tar.gz"; }
 cd "pcre2-$PCRE2_VERSION"
-CC="$CC_BIN" CXX="$CXX_BIN" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
+CC="$CC_BIN" CXX="$CXX_BIN" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory ${LDFLAGS:-}" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
 
