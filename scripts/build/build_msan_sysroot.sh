@@ -286,7 +286,7 @@ cd "$SRC"
 # Meson wants the flags as a quoted array; derive it from $MSAN so the GLib build uses the
 # same flag set as the other deps (the OSS-Fuzz $CFLAGS or the local default).
 _msan_meson=""
-for _f in $MSAN; do _msan_meson+="'$_f', "; done
+for _f in "$MSAN"; do _msan_meson+="'$_f', "; done
 
 cat >"$SRC/msan-native.ini" <<EOF
 [binaries]
