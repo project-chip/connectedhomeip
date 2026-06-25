@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +18,19 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/clusters/mode-base-server/Delegate.h>
+#include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/mode-base-server/mode-base-cluster-objects.h>
-#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/support/IntrusiveList.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ModeBase {
+namespace chip::app::Clusters::ModeBase {
 
-class Instance : public CommandHandlerInterface, public AttributeAccessInterface, public IntrusiveListNodeBase<>
+class Instance : public IntrusiveListNodeBase<>
 {
 public:
     /**
-     * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
+     * Creates a ModeBase cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
@@ -44,10 +40,14 @@ public:
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature);
 
-    ~Instance() override;
+    /**
+     * @brief Destroys a ModeBase cluster instance. The Deinit() function needs to be called for this instance
+     * to be unregistered and stopped from being called by the interaction model.
+     */
+    ~Instance();
 
     /**
-     * Initialise the ModeBase server instance.
+     * Initialise the ModeBase cluster instance.
      * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap, if the
      * CommandHandler or AttributeHandler registration fails or if the Delegate::Init() returns an error.
      */
@@ -94,11 +94,7 @@ public:
     /**
      * @return The endpoint ID.
      */
-    EndpointId GetEndpointId() const { return mEndpointId; }
-
-    // Cluster constants, from the spec.
-    static constexpr uint8_t kMaxModeLabelSize = 64;
-    static constexpr uint8_t kMaxNumOfModeTags = 8;
+    EndpointId GetEndpointId() const { return mClusterPath.mEndpointId; }
 
     // List change reporting
     /**
@@ -111,7 +107,7 @@ public:
      * Returns true if the feature is supported.
      * @param feature the feature to check.
      */
-    bool HasFeature(Feature feature) const;
+    bool HasFeature(ModeBase::Feature feature) const { return mFeature.Has(feature); }
 
     /**
      * This function returns true if the mode value given matches one of the supported modes, otherwise it returns false.
@@ -125,60 +121,21 @@ public:
     // Get mode value by mode tag
     CHIP_ERROR GetModeValueByModeTag(uint16_t modeTag, uint8_t & value);
 
-    bool GetFailTransition() { return failTransition; }
-    void ToggleFailTransition() { failTransition = !failTransition; }
+    bool GetFailTransition() const { return mFailTransition; }
+    void ToggleFailTransition() { mFailTransition = !mFailTransition; }
 
 private:
-    Delegate * mDelegate;
+    Delegate * mDelegate{};
+    ConcreteClusterPath mClusterPath{};
+    BitMask<ModeBase::Feature> mFeature{};
+    ModeBaseCluster::OptionalAttributeSet mOptionalAttributeSet{};
+    bool mFailTransition = false;
 
-    EndpointId mEndpointId;
-    ClusterId mClusterId;
+    // The Code Driven ModeBase cluster instance (lazy-initialized)
+    chip::app::LazyRegisteredServerCluster<ModeBaseCluster> mCluster;
 
-    // Attribute data store
-    uint8_t mCurrentMode = 0; // This is a temporary value and may not be valid. We will change this to the value of the first
-                              // mode in the list at the start of the Init function to ensure that it represents a valid mode.
-    DataModel::Nullable<uint8_t> mStartUpMode;
-    DataModel::Nullable<uint8_t> mOnMode;
-    uint32_t mFeature;
-
-    bool failTransition = false;
-
-    template <typename RequestT, typename FuncT>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func);
-
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-    /**
-     * Register this ModeBase instance in gModeBaseAliasesInstances.
-     */
     void RegisterThisInstance();
-
-    /**
-     * Unregister this ModeBase instance in gModeBaseAliasesInstances.
-     */
     void UnregisterThisInstance();
-
-    /**
-     * Internal change-to-mode command handler function.
-     */
-    void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
-
-    /**
-     * Helper function that loads all the persistent attributes from the KVS. These attributes are CurrentMode,
-     * StartUpMode and OnMode.
-     */
-    void LoadPersistentAttributes();
-
-    /**
-     * Helper function that encodes the supported modes.
-     * @param encoder The encoder to encode the supported modes into.
-     */
-    CHIP_ERROR EncodeSupportedModes(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
 // This does not return a reference to const IntrusiveList, because the caller might need
@@ -186,7 +143,4 @@ private:
 // access to const Instance.
 IntrusiveList<Instance> & GetModeBaseInstanceList();
 
-} // namespace ModeBase
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ModeBase

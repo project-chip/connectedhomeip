@@ -30,9 +30,13 @@ SpeakerDevice::SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clu
     mLevelDelegate(levelDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(timerDelegate)
 {}
 
-CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                   EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Identify
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -46,7 +50,7 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
     // Level Control (Volume)
-    LevelControlCluster::Config lcConfig(endpoint, mTimerDelegate, mLevelDelegate);
+    LevelControlCluster::Config lcConfig(mTimerDelegate, mLevelDelegate);
     lcConfig.WithOnOff(mOnOffCluster.Cluster());
 
     // TODO: The following attributes/features are not required for a Speaker device type.
@@ -59,16 +63,18 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     lcConfig.WithLighting(DataModel::NullNullable);
     lcConfig.WithDefaultMoveRate(DataModel::NullNullable);
 
-    mLevelControlCluster.Create(lcConfig);
+    mLevelControlCluster.Create(endpoint, lcConfig);
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void SpeakerDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mLevelControlCluster.IsConstructed())
     {
         if (mOnOffCluster.IsConstructed())

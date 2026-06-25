@@ -892,7 +892,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nullable epochStartTime1 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSData * _Nullable epochKey2 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nullable epochStartTime2 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nonnull groupKeyMulticastPolicy MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2282,6 +2281,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRNetworkIdentityManagementClusterClientStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull clientIndex MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nonnull clientIdentifier MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull clientIdentityType MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable networkIdentityIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
@@ -2291,6 +2291,17 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy) NSString * _Nonnull networkName MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @property (nonatomic, copy) NSNumber * _Nonnull channel MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @property (nonatomic, copy) NSNumber * _Nonnull activeTimestamp MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommissioningProxyClusterScanResultStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nullable address MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull transport MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull discriminator MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull productID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nullable extendedData MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable wiFiBand MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
