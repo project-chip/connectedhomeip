@@ -179,7 +179,8 @@ public:
     }
 };
 
-static bool GetAmbientContextType(const Json::Value & actArray, std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
+static bool GetAmbientContextType(const Json::Value & actArray,
+                                  std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
 {
     // Validate AmbientContextType exists and is an array
     if (actArray.empty())
@@ -202,7 +203,7 @@ static bool GetAmbientContextType(const Json::Value & actArray, std::vector<Glob
             .namespaceID = typeId,
             .tag         = tagId,
         };
-         semanticTags.push_back(tag);
+        semanticTags.push_back(tag);
     }
     return true;
 }
