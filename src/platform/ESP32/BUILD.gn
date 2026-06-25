@@ -35,14 +35,7 @@ declare_args() {
   chip_enable_route_hook = false
   chip_memory_alloc_mode = "default"
 
-  # Enable multi-image OTA. When true the MultiImageOTAProcessor and
-  # AppImageProcessor replace the standard single-image OTAImageProcessorImpl.
-  # Requires chip_enable_ota_requestor = true.
   chip_enable_multi_ota_requestor = false
-
-  # Build the reusable encryption helper for multi-image OTA. Only meaningful when
-  # chip_enable_multi_ota_requestor is true; pulls in the espressif__esp_encrypted_img component.
-  # (Delta OTA is built into AppImageProcessor and gated directly by CONFIG_ENABLE_DELTA_OTA.)
   chip_enable_encrypted_ota = false
 }
 

@@ -35,10 +35,6 @@ namespace chip {
 /**
  * @brief Application-firmware sub-processor: writes the app image to the inactive OTA partition and
  *        activates it on apply.
- *
- * On-wire integrity is verified by the dispatcher. Encryption is an inherited capability of
- * EncryptedOTAHelper. Delta is built in (the patch base is the running partition, which only the
- * application can read with random access) rather than exposed as a shared helper.
  */
 class AppImageProcessor : public SubImageProcessor
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
@@ -63,14 +59,14 @@ private:
 #ifdef CONFIG_ENABLE_DELTA_OTA
     static constexpr size_t kPatchHeaderSize = 64; // magic(4) + base SHA-256(32) + reserved
 
-    // esp_delta_ota callbacks (cfg.user_data == this): base is the running partition, reconstructed
-    // bytes go to esp_ota_write.
+    // esp_delta_ota callbacks, base is the running partition, reconstructed bytes go to esp_ota_write.
     static esp_err_t DeltaReadCallback(uint8_t * buf, size_t size, int srcOffset, void * arg);
     static esp_err_t DeltaWriteCallback(const uint8_t * buf, size_t size, void * arg);
+    // Apply the patch and writes that data to the passive partition.
     CHIP_ERROR FeedPatch(ByteSpan patch);
-    // Validate/consume the CHIP patch header on the leading bytes; advances @p data / @p size.
+    // Validate/consume the CHIP patch header on the leading bytes
     CHIP_ERROR VerifyAndStripPatchHeader(const uint8_t *& data, size_t & size);
-    // Accumulate/verify the reconstructed image header (chip id), then write the patched output.
+    // Accumulate/verify the reconstructed image header, then write the patched output.
     esp_err_t WritePatchedOutput(const uint8_t * buf, size_t size);
 
     esp_delta_ota_handle_t mDeltaHandle = nullptr;

@@ -285,15 +285,12 @@ endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
-endif()
-
-if (CONFIG_ENABLE_MULTI_IMAGE_OTA)
-    chip_gn_arg_append("chip_enable_multi_ota_requestor"           "true")
-    if (CONFIG_ENABLE_ENCRYPTED_OTA)
-        chip_gn_arg_append("chip_enable_encrypted_ota"            "true")
+    if (CONFIG_ENABLE_MULTI_IMAGE_OTA)
+        chip_gn_arg_append("chip_enable_multi_ota_requestor"           "true")
+        if (CONFIG_ENABLE_ENCRYPTED_OTA)
+            chip_gn_arg_append("chip_enable_encrypted_ota"            "true")
+        endif()
     endif()
-    # Delta OTA is compiled into AppImageProcessor and gated by CONFIG_ENABLE_DELTA_OTA directly;
-    # the esp_delta_ota component is added to matter_requires further below when that config is set.
 endif()
 
 if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)

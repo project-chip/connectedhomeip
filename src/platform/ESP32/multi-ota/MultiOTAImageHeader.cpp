@@ -48,7 +48,6 @@ CHIP_ERROR MultiOTAImageHeaderParser::AccumulateAndDecode(ByteSpan & buffer, Mul
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    // Init() may have left mBuffer null on alloc failure.
     if (mState != State::kNotInitialized && mBuffer.Get() == nullptr)
     {
         Clear();
@@ -110,7 +109,7 @@ CHIP_ERROR MultiOTAImageHeaderParser::DecodeMultiOTAImageHeader()
 CHIP_ERROR MultiOTAImageHeaderParser::DecodeSubImageHeaders(MultiOTAImageHeader & header)
 {
     VerifyOrReturnError(mBufferOffset >= mNumImages * kSubImageHeaderSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    // No padding is allowed between sub-image headers.
+    // SubImageHeader has no padding (sizeof == 48), so the buffer can be read directly as an array of structs.
     auto * subImageHeaderEntries = reinterpret_cast<SubImageHeader *>(mBuffer.Get());
 
     for (uint8_t i = 0; i < mNumImages; i++)

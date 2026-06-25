@@ -35,7 +35,7 @@ struct ImageProcessorEntry
 
 enum class SubImageStatus : uint8_t
 {
-    kWritten,         // sub-processor was kReady; all bytes delivered
+    kWritten,         // sub-processor was kReady; all bytes delivered successfully
     kSkippedUpToDate, // kAlreadyUpToDate, or no processor registered for the imageId
     kSkippedNotReady, // kNotReady
 };
@@ -61,17 +61,25 @@ public:
     CHIP_ERROR ConfirmCurrentImage() override;
 
     /**
-     * Register a sub-processor under its image-ID tag. The caller owns the entry node.
-     * @retval CHIP_ERROR_INVALID_ARGUMENT  processor is null or tag is 0
-     * @retval CHIP_ERROR_DUPLICATE_KEY_ID  tag already registered
+     * @brief Register a sub-processor under its image-ID tag. The caller owns the entry node.
+     *
+     * @param entry The entry node to register.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the processor is null or tag is 0,
+     *         or CHIP_ERROR_DUPLICATE_KEY_ID if the tag is already registered.
      */
     CHIP_ERROR RegisterProcessor(ImageProcessorEntry & entry);
 
     /**
+     * @brief Gives the application the final decision on whether to apply a downloaded update.
+     *
      * Invoked once after a successful download, on the Matter thread, before the apply phase.
-     * Inspect the per-sub-image results and return true to apply the staged update, or false to
-     * discard it (the device stays on the old firmware and the next QueryImage retries the bundle).
-     * Must not block — decide from the in-RAM results only. Default implementation returns true.
+     * The application can inspect the per-sub-image results and decide whether the staged
+     * update should be applied. Returning true proceeds with the update; returning false
+     * discards the staged update and keeps the currently running firmware. The next
+     * QueryImage request may offer the bundle again.
+     *
+     * This callback must not block and should make its decision using only the provided
+     * in-memory results. The default implementation always returns true.
      */
     virtual bool ShouldApplyUpdate(Span<const SubImageResult> results) { return true; }
 
@@ -88,7 +96,7 @@ private:
     // Tracker for the current sub-image, and the entry currently being written.
     uint32_t mCurrentSubImageCursor      = 0;
     bool mCurrentEntryStarted            = false;   // readiness for the active entry already decided
-    SubImageProcessor * mActiveProcessor = nullptr; // processor for the active (kReady) entry
+    SubImageProcessor * mActiveProcessor = nullptr; // active sub-processor with kReady state
     Crypto::Hash_SHA256_stream mActiveHasher;       // SHA-256 over the active sub-image's wire bytes
 
     // Per-sub-image result table, reported to ShouldApplyUpdate() callback.

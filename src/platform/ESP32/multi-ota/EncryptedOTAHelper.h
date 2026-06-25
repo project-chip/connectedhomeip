@@ -24,7 +24,7 @@
 namespace chip {
 
 /**
- * @brief Adds pre-encrypted OTA (esp_encrypted_img) support to a sub-image processor.
+ * @brief Adds pre-encrypted OTA support to a sub-image processor (esp_encrypted_img).
  *
  * Inherited by a processor that handles encrypted images: the key is supplied once via the public
  * InitEncryptedOTA(), and the protected hooks decrypt each chunk during the transfer. The mechanics
@@ -83,9 +83,7 @@ private:
     // Release the caller-owned buffer returned by the last Decrypt(), if any.
     void FreeDecryptedBuffer();
 
-    /*
-     * @brief The RSA private key in PEM format.
-     */
+    // PEM RSA private key. Not copied — the caller's buffer must outlive this helper.
     CharSpan mKey;
     esp_decrypt_handle_t mHandle = nullptr;
     void * mDecryptedBuffer      = nullptr;

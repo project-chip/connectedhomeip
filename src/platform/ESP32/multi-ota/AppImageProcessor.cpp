@@ -249,6 +249,11 @@ esp_err_t AppImageProcessor::WritePatchedOutput(const uint8_t * buf, size_t size
         VerifyOrReturnValue(err == ESP_OK, err);
     }
 
+    // The image header may have consumed the whole chunk; nothing left to write.
+    if (size == index)
+    {
+        return ESP_OK;
+    }
     return esp_ota_write(mOtaHandle, buf + index, size - index);
 }
 

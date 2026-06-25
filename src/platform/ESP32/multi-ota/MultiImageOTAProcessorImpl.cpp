@@ -263,7 +263,7 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
             if (imageProcessor->GetSubProcessor(activeSubImage->imageId, processor) != CHIP_NO_ERROR || processor == nullptr)
             {
                 // No processor registered for this image ID, assume already up to date.
-                ChipLogDetail(SoftwareUpdate, "No processor for image ID 0x%" PRIx32 ", skipping", activeSubImage->imageId);
+                ChipLogError(SoftwareUpdate, "No processor for image ID 0x%" PRIx32 ", skipping", activeSubImage->imageId);
                 readiness = DeviceState::kAlreadyUpToDate;
             }
             else
@@ -280,15 +280,28 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
                                PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed));
             }
 
-            // OTA will be skipped this cycle: skip the whole entry and move to the next one
+            // OTA will be skipped this cycle: drop the rest of this entry and move to the next one.
             if (readiness != DeviceState::kReady)
             {
                 const SubImageStatus status =
                     (readiness == DeviceState::kNotReady) ? SubImageStatus::kSkippedNotReady : SubImageStatus::kSkippedUpToDate;
                 imageProcessor->RecordSubImageResult(activeSubImage->imageId, activeSubImage->version, status);
+
+                // OTA provider will skip the bytes from what it has already sent (the end of this block), not from the cursor we're
+                // at. So we need to skip only the part of this entry that has not been sent yet; any bytes already in this block
+                // are dropped here.
+                const uint32_t deliveredEnd = imageProcessor->mCurrentSubImageCursor + static_cast<uint32_t>(remainingBlock.size());
                 imageProcessor->mParams.downloadedBytes += bytesLeftInSubImage; // progress counts skipped bytes
                 imageProcessor->mCurrentSubImageCursor = subImageEnd;
-                LogErrorOnFailure(imageProcessor->mDownloader->SkipData(bytesLeftInSubImage));
+
+                if (subImageEnd <= deliveredEnd)
+                {
+                    // If the skippable required bytes are already in this block, consume them locally No need to call SkipData()
+                    remainingBlock = remainingBlock.SubSpan(bytesLeftInSubImage);
+                    continue;
+                }
+
+                LogErrorOnFailure(imageProcessor->mDownloader->SkipData(subImageEnd - deliveredEnd));
                 return;
             }
 
@@ -451,26 +464,30 @@ CHIP_ERROR MultiImageOTAProcessorImpl::ProcessMultiImageHeader(ByteSpan & block)
         VerifyOrReturnError(mMultiOTAImageHeader.subImages.back().imageId == kAppImageProcessorTag,
                             CHIP_ERROR_INVALID_FILE_IDENTIFIER);
 
-        size_t appImageCount = 0;
+        const uint32_t headerSize = kFixedHeaderSize + mMultiOTAImageHeader.subImages.size() * kSubImageHeaderSize;
+        VerifyOrReturnError(mParams.totalFileBytes <= UINT32_MAX, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+
+        uint64_t expectedOffset = headerSize;
+        size_t appImageCount    = 0;
         for (const auto & subImage : mMultiOTAImageHeader.subImages)
         {
-            // Every entry must lie within the payload.
-            VerifyOrReturnError(static_cast<uint64_t>(subImage.offset) + subImage.length <= mParams.totalFileBytes,
-                                CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+            VerifyOrReturnError(subImage.length > 0, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+            VerifyOrReturnError(subImage.offset == expectedOffset, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+            expectedOffset += subImage.length;
             if (subImage.imageId == kAppImageProcessorTag)
             {
                 appImageCount++;
             }
         }
+        VerifyOrReturnError(expectedOffset == mParams.totalFileBytes, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         VerifyOrReturnError(appImageCount == 1, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
 
         VerifyOrReturnError(mSubImageResults.Alloc(mMultiOTAImageHeader.subImages.size()), CHIP_ERROR_NO_MEMORY);
         mSubImageResultCount = 0;
 
         // Cursor and progress start at the first binary's offset.
-        const uint32_t headerSize = kFixedHeaderSize + mMultiOTAImageHeader.subImages.size() * kSubImageHeaderSize;
-        mParams.downloadedBytes   = headerSize;
-        mCurrentSubImageCursor    = headerSize;
+        mParams.downloadedBytes = headerSize;
+        mCurrentSubImageCursor  = headerSize;
     }
     return CHIP_NO_ERROR;
 }

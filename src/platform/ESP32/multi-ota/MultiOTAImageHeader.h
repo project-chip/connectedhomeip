@@ -46,7 +46,9 @@ struct SubImageHeader
     uint32_t version;                            // expected installed version of this binary
     uint32_t offset;                             // byte offset of binary data from payload start
     uint32_t length;                             // exact byte count of the binary
-    uint8_t sha256[Crypto::kSHA256_Hash_Length]; // mandatory SHA-256 digest of [offset, offset+length)
+    // SHA-256 of this binary as sent over the wire. For an encrypted or delta image, that is the
+    // encrypted/patch bytes — not the final decrypted or rebuilt image.
+    uint8_t sha256[Crypto::kSHA256_Hash_Length];
 };
 
 static_assert(sizeof(SubImageHeader) == 48, "SubImageHeader size must be 48 bytes");

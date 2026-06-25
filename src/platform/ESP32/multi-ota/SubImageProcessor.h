@@ -71,27 +71,26 @@ public:
      * @brief Report readiness for this OTA cycle. .
      *
      * @param[out] state  reporting state of the device for this OTA cycle.
-     * @retval CHIP_NO_ERROR if the operation was successful; other error code otherwise.
+     * @retval CHIP_NO_ERROR on success, other error code otherwise.
      */
     virtual CHIP_ERROR IsReadyForOTA(DeviceState & state) = 0;
 
     /**
      * @brief Consume one ordered chunk of this sub-image's binary.
      *
-     * The bytes are ready to write to the component: the dispatcher has already verified the
-     * on-wire integrity, and any transform helper layered in front (decryption, delta patching)
-     * has already run, so an implementation only writes them to its target.
+     * The data is ready to be written to the target component. If the OTA
+     * package is encrypted, the payload has already been decrypted.
      *
-     * @param block  Binary bytes for this component; valid only for the duration of the call.
-     * @retval CHIP_NO_ERROR if the chunk was accepted; other error code otherwise.
+     * @param block  Payload bytes for this sub-image; valid only for the duration of the call.
+     * @retval CHIP_NO_ERROR on success, other error code otherwise.
      */
     virtual CHIP_ERROR Write(ByteSpan & block) = 0;
 
     /**
-     * @brief Close the component's image after the final chunk. Called once by the dispatcher when
+     * @brief Close this sub-image after the final chunk. Called once by the dispatcher when
      *        all of this sub-image's bytes have been delivered and its integrity has been verified.
      *
-     * @retval CHIP_NO_ERROR if the image was closed successfully; other error code otherwise.
+     * @retval CHIP_NO_ERROR on success, other error code otherwise.
      */
     virtual CHIP_ERROR Finish() { return CHIP_NO_ERROR; }
 
@@ -103,9 +102,9 @@ public:
     virtual void Abort(AbortContext & context) = 0;
 
     /**
-     * @brief Commit the component during the apply phase. Called once per Initialized processor.
+     * @brief Commit this sub-image during the apply phase. Called once per Initialized processor.
      *
-     * @retval CHIP_NO_ERROR if the commit was successful; other error code otherwise.
+     * @retval CHIP_NO_ERROR on success, other error code otherwise.
      */
     virtual CHIP_ERROR Apply() { return CHIP_NO_ERROR; }
 };
