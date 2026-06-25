@@ -17,71 +17,16 @@
 
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/level-control/LevelControlCluster.h>
-#include <app/clusters/level-control/LevelControlDelegate.h>
-#include <app/clusters/on-off-server/OnOffDelegate.h>
-#include <app/clusters/on-off-server/OnOffEffectDelegate.h>
-#include <app/clusters/on-off-server/OnOffLightingCluster.h>
-#include <app/clusters/scenes-server/SceneTable.h>
-#include <app/clusters/scenes-server/SceneTableImpl.h>
-#include <app/clusters/scenes-server/ScenesManagementCluster.h>
-#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/interface/SingleEndpointDevice.h>
-#include <lib/support/TimerDelegate.h>
+#include <devices/capabilities/dimmable-load/DimmableLoadDevice.h>
 
 namespace chip {
 namespace app {
 
-class DimmableLightDevice : public SingleEndpointDevice
+class DimmableLightDevice : public DimmableLoadDevice
 {
 public:
-    struct Context
-    {
-        Credentials::GroupDataProvider & groupDataProvider;
-        FabricTable & fabricTable;
-        TimerDelegate & timerDelegate;
-    };
-
-    DimmableLightDevice(Clusters::OnOffDelegate & onOffDelegate, Clusters::LevelControlDelegate & levelControlDelegate,
-                        Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
-                        const Context & context);
+    DimmableLightDevice(const Context & context, const Delegates & delegates, const Config & config = {});
     ~DimmableLightDevice() override = default;
-
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-private:
-    Clusters::OnOffDelegate & mOnOffDelegate;
-    Clusters::LevelControlDelegate & mLevelControlDelegate;
-    Clusters::OnOffEffectDelegate & mEffectDelegate;
-    Clusters::IdentifyDelegate & mIdentifyDelegate;
-    const Context mContext;
-
-    class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
-    {
-    public:
-        Clusters::ScenesManagementSceneTable * Take() override
-        {
-            return scenes::GetSceneTableImpl(mEndpointId, scenes::kMaxScenesPerEndpoint);
-        }
-        void Release(Clusters::ScenesManagementSceneTable *) override {}
-
-        void SetEndpoint(EndpointId endpoint) { mEndpointId = endpoint; }
-
-    private:
-        EndpointId mEndpointId = kInvalidEndpointId;
-    };
-
-    DefaultScenesManagementTableProvider mScenesTableProvider;
-
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-    LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
-    LazyRegisteredServerCluster<Clusters::LevelControlCluster> mLevelControlCluster;
-    LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 
 } // namespace app

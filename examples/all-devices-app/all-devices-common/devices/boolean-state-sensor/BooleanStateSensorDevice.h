@@ -36,7 +36,7 @@ public:
     /// class for the sensor types that share the same core functionality through the identify and
     /// boolean state clusters. The caller creating a BooleanStateSensorDevice MUST ensure that the underlying
     /// data for the Span of deviceTypes remains valid for the entire lifetime of the BooleanStateSensorDevice object instance.
-    BooleanStateSensorDevice(TimerDelegate * timerDelegate, Span<const DataModel::DeviceTypeEntry> deviceType) :
+    BooleanStateSensorDevice(TimerDelegate & timerDelegate, Span<const DataModel::DeviceTypeEntry> deviceType) :
         SingleEndpointDevice(deviceType), mTimerDelegate(timerDelegate)
     {}
     ~BooleanStateSensorDevice() override = default;
@@ -45,10 +45,12 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // Public getters for programmatic control
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::BooleanStateCluster & BooleanState() { return mBooleanStateCluster.Cluster(); }
 
 private:
-    TimerDelegate * mTimerDelegate;
+    TimerDelegate & mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BooleanStateCluster> mBooleanStateCluster;
 };
