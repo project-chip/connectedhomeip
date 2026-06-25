@@ -219,7 +219,7 @@ class XmlAttribute:
     # Quality flags from the spec XML <quality> element
     changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
     quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
-    atomic_write: bool = False # Atomic Write quality: written via atomic transaction; staged values not reported until commit
+    atomic_write: bool = False  # Atomic Write quality: written via atomic transaction; staged values not reported until commit
     constraints: Optional[Constraints] = None
 
     def access_string(self):
