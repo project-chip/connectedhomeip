@@ -20,15 +20,45 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
+#include <oob-accessors/OOBInfoAccessor.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
 
 namespace chip::app {
 
-class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
+class PigweedAttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor,
+                                 public chip::rpc::PigweedDebugInfoInterceptor
 {
 public:
     PigweedAttributeAccessor()           = default;
     ~PigweedAttributeAccessor() override = default;
+
+    std::variant<::pw::Status, chip::ReadOnlyBuffer<ConcreteDataAttributePath>> GetSupportedWritePaths() override
+    {
+        auto actionResult = OOBAccessorRegistry::Instance().HandleAction(
+            OOBInfoAccessor::kActionGetAllSupportedSetAttributes,
+            ByteSpan()
+        );
+
+        if (actionResult.first != CHIP_NO_ERROR)
+        {
+            ChipLogError(Support, "Failed to retrieve OOB supported write paths: %" CHIP_ERROR_FORMAT, actionResult.first.Format());
+            return ::pw::Status::Internal();
+        }
+
+        auto & tlvResponse = actionResult.second;
+        auto deserializeResult = OOBDataSerializer::DeSerializePathsList(
+            ByteSpan(tlvResponse.data(), tlvResponse.size())
+        );
+
+        if (std::holds_alternative<CHIP_ERROR>(deserializeResult))
+        {
+            CHIP_ERROR err = std::get<CHIP_ERROR>(deserializeResult);
+            ChipLogError(Support, "Failed to deserialize OOB supported paths: %" CHIP_ERROR_FORMAT, err.Format());
+            return ::pw::Status::Internal();
+        }
+
+        return std::move(std::get<ReadOnlyBuffer<ConcreteDataAttributePath>>(deserializeResult));
+    }
 
     std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, const TLV::TLVReader & reader) override
     {

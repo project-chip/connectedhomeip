@@ -422,6 +422,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #if PW_RPC_ENABLED
     static chip::app::PigweedAttributeAccessor sPwOobAccessor;
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
+    chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().SetInfoInterceptor(&sPwOobAccessor);
 
     chip::rpc::Init(33000); // TODO: Add an arg for Pw port.
     ChipLogProgress(AppServer, "PW_RPC initialized.");

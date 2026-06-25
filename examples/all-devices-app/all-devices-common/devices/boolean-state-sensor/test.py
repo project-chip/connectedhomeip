@@ -145,6 +145,37 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
 
             logger.info("Successfully toggled and verified independent state changes on endpoints 1 and 2!")
 
+            # 3. Discover all writable attribute paths via PwRPC and verify
+            self.step(4, "Discover all writable attribute paths via PwRPC and verify")
+            logger.info("Discovering all writable attribute paths via PwRPC...")
+
+            rpc_response = device.rpcs.chip.rpc.Attributes.GetWriteAttributePaths()
+            asserts.assert_true(rpc_response.status.ok(), msg="GetWriteAttributePaths RPC failed.")
+
+            paths = rpc_response.response.paths
+            logger.info("Discovered paths: %s", paths)
+
+            expected_paths = [
+                {"endpoint": 1, "cluster_id": Clusters.Objects.BooleanState.id,
+                    "attribute_id": Clusters.Objects.BooleanState.Attributes.StateValue.attribute_id},
+                {"endpoint": 2, "cluster_id": Clusters.Objects.BooleanState.id,
+                    "attribute_id": Clusters.Objects.BooleanState.Attributes.StateValue.attribute_id}
+            ]
+
+            asserts.assert_equal(len(paths), len(expected_paths), f"Expected {len(expected_paths)} paths, got {len(paths)}")
+
+            for expected in expected_paths:
+                found = False
+                for path in paths:
+                    if (path.endpoint == expected["endpoint"] and
+                        path.cluster_id == expected["cluster_id"] and
+                            path.attribute_id == expected["attribute_id"]):
+                        found = True
+                        break
+                asserts.assert_true(found, msg=f"Expected path {expected} was not found in the discovered paths list.")
+
+            logger.info("Successfully discovered and verified all writable attribute paths.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

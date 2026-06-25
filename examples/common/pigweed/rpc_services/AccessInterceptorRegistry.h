@@ -56,6 +56,9 @@ public:
 
     const std::set<PigweedDebugAccessInterceptor *> & GetAllAccessors() const { return mAccessors; }
 
+    void SetInfoInterceptor(PigweedDebugInfoInterceptor * interceptor) { mInfoInterceptor = interceptor; }
+    PigweedDebugInfoInterceptor * GetInfoInterceptor() const { return mInfoInterceptor; }
+
     /**
      * Returns the singleton instance of the attribute accessor registory.
      */
@@ -67,6 +70,7 @@ public:
 
 private:
     std::set<PigweedDebugAccessInterceptor *> mAccessors;
+    PigweedDebugInfoInterceptor * mInfoInterceptor = nullptr;
 };
 
 } // namespace rpc
