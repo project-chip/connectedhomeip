@@ -289,7 +289,7 @@ class ICDBaseTest(MatterBaseTest):
         scoped_node_id = ScopedNodeId(node_id, dev_ctrl.GetFabricIndexInternal())
         try:
             await WaitForCheckIn(scoped_node_id, timeoutSeconds=timeout_s)
-        except (asyncio.TimeoutError, TimeoutError):
+        except TimeoutError:
             asserts.fail(f"DUT did not send a check-in to node 0x{node_id:016X} within {timeout_s:.1f}s")
         log.info(f"Check-in received from DUT for node 0x{node_id:016X}")
 
