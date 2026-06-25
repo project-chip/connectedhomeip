@@ -337,6 +337,13 @@ DataModel::ActionReturnStatus WindowCoveringCluster::WriteAttribute(const DataMo
         chip::BitMask<Mode> mode;
         ReturnErrorOnFailure(decoder.Decode(mode));
         VerifyOrReturnValue(mode.Raw() <= 0x0F, Status::ConstraintError);
+        // TODO: Spec 5.3.6.14.2: "In a write interaction, setting this bit to 0, while the device
+        // is in calibration mode, is not allowed and SHALL generate a FAILURE error status. In order
+        // to leave calibration mode, the device must perform its calibration routine, either as a
+        // self-calibration or assisted by external tool(s), depending on the device/manufacturer
+        // implementation."
+        // Disabled because Test_TC_WNCV_2_3 Step 2d writes Mode=0x00 to exit calibration,
+        // which contradicts the spec. Needs test update
         // VerifyOrReturnValue(!mMode.Has(Mode::kCalibrationMode) || mode.Has(Mode::kCalibrationMode), Status::Failure);
         SetMode(mode);
         return Status::Success;
