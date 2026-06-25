@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.pragma.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,13 +21,13 @@
 
 namespace chip::app {
 
-class GlobalSetAttributeAccessor : public OOBAccessor
+class OOBInfoAccessor : public OOBAccessor
 {
 public:
     static constexpr CharSpan kActionGetAllSupportedSetAttributes = "GetAllSupportedSetAttributes"_span;
 
-    GlobalSetAttributeAccessor()           = default;
-    ~GlobalSetAttributeAccessor() override = default;
+    OOBInfoAccessor()           = default;
+    ~OOBInfoAccessor() override = default;
 
     std::optional<ActionResponse> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
 

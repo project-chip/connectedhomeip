@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-#include <oob-accessors/GlobalSetAttributeAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
+#include <oob-accessors/OOBInfoAccessor.h>
 
 namespace chip::app {
 
-std::optional<OOBAccessor::ActionResponse> GlobalSetAttributeAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
+std::optional<OOBAccessor::ActionResponse> OOBInfoAccessor::HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
 {
     if (actionName.data_equal(kActionGetAllSupportedSetAttributes))
     {
@@ -29,7 +29,7 @@ std::optional<OOBAccessor::ActionResponse> GlobalSetAttributeAccessor::HandleAct
     return std::nullopt;
 }
 
-std::optional<OOBAccessor::ActionResponse> GlobalSetAttributeAccessor::HandleGetAllSupportedSetAttributes(ByteSpan tlvBuffer)
+std::optional<OOBAccessor::ActionResponse> OOBInfoAccessor::HandleGetAllSupportedSetAttributes(ByteSpan tlvBuffer)
 {
     ReadOnlyBufferBuilder<ConcreteDataAttributePath> builder;
 
