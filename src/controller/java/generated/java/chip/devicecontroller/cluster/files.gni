@@ -16,6 +16,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AmbientContextSensingClusterObjectCountConfigStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AmbientContextSensingClusterPredictedActivityStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AmbientContextSensingClusterSemanticTagStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AmbientSensingUnionClusterContributorStatusChangeStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/AmbientSensingUnionClusterUnionContributorStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ApplicationBasicClusterApplicationStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ApplicationLauncherClusterApplicationEPStruct.kt",
