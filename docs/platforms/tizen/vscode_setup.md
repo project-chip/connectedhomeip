@@ -12,8 +12,8 @@ SDKs for multiple Tizen targets.
 
 ### Prerequisites
 
-- **Docker** installed and running on your host machine
-- **Dev Containers** extension for VS Code installed
+-   **Docker** installed and running on your host machine
+-   **Dev Containers** extension for VS Code installed
 
 ### Setup Instructions
 
@@ -22,6 +22,7 @@ SDKs for multiple Tizen targets.
    `Dev Containers: Reopen in Container`.
 
 2. The dev container includes:
+
     - Tizen SDK 10.0 with support for multiple target architectures (device,
       device64)
     - All required toolchains (ARM, ARM64, x86)
