@@ -41,6 +41,7 @@ class PlatformGroup:
         self.maintainers = [m.lower() for m in maintainers]
         self.paths = paths
         self.spec = pathspec.PathSpec.from_lines('gitignore', paths)
+        self.path_specs = {glob: pathspec.PathSpec.from_lines('gitignore', [glob]) for glob in paths}
 
     def matches_file(self, filepath: str) -> bool:
         return self.spec.match_file(filepath)
@@ -184,13 +185,7 @@ class PlatformMergeBot:
         self.merge_pr(pr, valid_approvals_per_group)
 
     def post_eligibility_comment(self, pr: PullRequest, active_groups: dict[str, list[str]], missing_approvals: dict[str, PlatformGroup]):
-        # Check if eligibility comment already exists
-        for comment in pr.get_issue_comments():
-            if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
-                log.debug("PR #%d already has an eligibility comment. Not posting duplicate.", pr.number)
-                return
-
-        # Generate comment body
+        # Generate comment body first so we can compare it
         comment_body = f"{ELIGIBILITY_COMMENT_MARKER}\n"
         comment_body += "### Platform Maintainers Auto-Merge Info\n"
         comment_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
@@ -204,6 +199,19 @@ class PlatformMergeBot:
             comment_body += "  *Paths matched:*\n"
             for glob in group.paths:
                 comment_body += f"    * `{glob}`\n"
+
+        # Check if eligibility comment already exists
+        for comment in pr.get_issue_comments():
+            if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
+                if comment.body.strip() != comment_body.strip():
+                    if self.dry_run:
+                        log.info("[Dry Run] Would update eligibility comment on PR #%d", pr.number)
+                    else:
+                        log.info("Updating eligibility comment on PR #%d", pr.number)
+                        comment.edit(comment_body)
+                else:
+                    log.debug("PR #%d already has an up-to-date eligibility comment.", pr.number)
+                return
 
         if self.dry_run:
             log.info("[Dry Run] Would post eligibility comment to PR #%d:\n%s", pr.number, comment_body)
@@ -221,9 +229,7 @@ class PlatformMergeBot:
             # Try to find which glob patterns matched the files in this group
             matched_globs = set()
             for f in files:
-                for glob in group.paths:
-                    # quick check of which pattern matched this file
-                    spec = pathspec.PathSpec.from_lines('gitignore', [glob])
+                for glob, spec in group.path_specs.items():
                     if spec.match_file(f):
                         matched_globs.add(glob)
 
@@ -234,12 +240,12 @@ class PlatformMergeBot:
             log.info("[Dry Run] Would post merge comment to PR #%d:\n%s", pr.number, merge_reason_comment)
             log.info("[Dry Run] Would merge PR #%d (method: squash)", pr.number)
         else:
-            log.info("Posting merge explanation comment to PR #%d", pr.number)
-            pr.create_issue_comment(merge_reason_comment)
-
             log.info("Merging PR #%d", pr.number)
             # Use squash merge
             pr.merge(merge_method="squash", commit_title=f"{pr.title} (Auto-merged by platform-bot)")
+
+            log.info("Posting merge explanation comment to PR #%d", pr.number)
+            pr.create_issue_comment(merge_reason_comment)
 
     def run(self):
         log.info("Scanning open pull requests...")
@@ -280,7 +286,7 @@ def main(
     dry_run,
 ):
     coloredlogs.install(
-        level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s"
+        level=__LOG_LEVELS__[log_level.upper()], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
 
     gh_token = None

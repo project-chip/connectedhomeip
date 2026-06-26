@@ -208,21 +208,49 @@ esp32:
         self.assertIn(platform_merge_bot.ELIGIBILITY_COMMENT_MARKER, mock_pr.create_issue_comment.call_args[0][0])
         self.assertIn("Needs approval", mock_pr.create_issue_comment.call_args[0][0])
 
-    def test_check_and_process_pr_already_commented_no_duplicate(self):
+    def test_check_and_process_pr_already_commented_updates_if_different(self):
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
         reviews = []
-        # Existing eligibility comment
+        # Existing eligibility comment with different body
         mock_comment = MagicMock()
-        mock_comment.body = f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nInfo..."
+        mock_comment.body = f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews, comments=[mock_comment])
 
         self.bot.check_and_process_pr(mock_pr)
 
-        # Should not merge, and should NOT create another comment
+        # Should not merge, should not create a new comment, but should edit the existing one
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_not_called()
+        mock_comment.edit.assert_called_once()
+
+    def test_check_and_process_pr_already_commented_no_op_if_identical(self):
+        files = [
+            self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
+        ]
+        reviews = []
+
+        # Generate the expected body to make it identical
+        expected_body = f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\n"
+        expected_body += "### Platform Maintainers Auto-Merge Info\n"
+        expected_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
+        expected_body += "To merge, we require at least one approval from each of these groups:\n"
+        expected_body += "- **nxp**: @doru91, @nxpdev (❌ Needs approval)\n"
+        expected_body += "  *Paths matched:*\n"
+        expected_body += "    * `src/platform/nxp/**`\n"
+        expected_body += "    * `examples/**/nxp/**`\n"
+
+        mock_comment = MagicMock()
+        mock_comment.body = expected_body
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews, comments=[mock_comment])
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        # Should not merge, should not create a new comment, and should not edit the existing one
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+        mock_comment.edit.assert_not_called()
 
     def test_check_and_process_pr_fully_approved_merge(self):
         files = [
