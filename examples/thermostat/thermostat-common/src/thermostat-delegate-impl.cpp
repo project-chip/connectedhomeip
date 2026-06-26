@@ -147,6 +147,14 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<Mutable
 
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
 {
+    ByteSpan oldHandle(mActivePresetHandleData, mActivePresetHandleDataSize);
+    ByteSpan newHandle = newActivePresetHandle.IsNull() ? ByteSpan() : newActivePresetHandle.Value();
+
+    if (oldHandle.data_equal(newHandle))
+    {
+        return CHIP_NO_ERROR;
+    }
+
     if (!newActivePresetHandle.IsNull())
     {
         size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
@@ -168,6 +176,9 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
         mActivePresetHandleDataSize = 0;
         ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
     }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
+
     return CHIP_NO_ERROR;
 }
 
@@ -449,7 +460,6 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
         // ActivePresetHandle. Otherwise set the ActivePresetHandle to the preset handle in the suggestion and set
         // ThermostatSuggestionNotFollowingReason to null.
         TEMPORARY_RETURN_IGNORED SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
-        MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
         TEMPORARY_RETURN_IGNORED SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
 
         // Start a timer from the timestamp in currentMatterEpochTimestamp to the timestamp in the expiration time.
