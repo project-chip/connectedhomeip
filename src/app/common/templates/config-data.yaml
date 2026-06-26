@@ -151,8 +151,8 @@ CodeDrivenClusters:
     - Relative Humidity Measurement
     - Scenes Management
     - Smoke CO Alarm
-    - Soil Measurement
     - Software Diagnostics
+    - Soil Measurement
     - Switch
     - TLS Certificate Management
     - TLS Client Management
