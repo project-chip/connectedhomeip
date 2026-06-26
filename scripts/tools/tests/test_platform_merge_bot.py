@@ -27,10 +27,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from platform_merge_bot import (
-    PlatformMergeBot,
-    ELIGIBILITY_COMMENT_MARKER,
-)  # noqa: E402
+from platform_merge_bot import ELIGIBILITY_COMMENT_MARKER, PlatformMergeBot  # noqa: E402
 
 
 class TestPlatformMergeBot(unittest.TestCase):
