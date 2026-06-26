@@ -258,7 +258,7 @@ bool WriteLinesToFile(const std::string & filePath, const std::vector<std::strin
 bool ParseXmlAttributeLong(const std::string & haystack, const char * attrName, size_t searchStart, long & outValue)
 {
     std::string searchStr = std::string(attrName) + "=\"";
-    size_t attrPos = haystack.find(searchStr, searchStart);
+    size_t attrPos        = haystack.find(searchStr, searchStart);
     if (attrPos == std::string::npos)
     {
         return false;
@@ -270,8 +270,8 @@ bool ParseXmlAttributeLong(const std::string & haystack, const char * attrName, 
         return false;
     }
     std::string valStr = haystack.substr(valStart, valEnd - valStart);
-    char * endPtr       = nullptr;
-    long val            = std::strtol(valStr.c_str(), &endPtr, 10);
+    char * endPtr      = nullptr;
+    long val           = std::strtol(valStr.c_str(), &endPtr, 10);
     if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
     {
         outValue = val;
@@ -297,8 +297,7 @@ bool ParseXmlAttributeLong(const std::string & haystack, const char * attrName, 
  * @param segDurationTs   Segment duration in timescale units
  * @param segCount        Number of segments in the timeline
  */
-void AppendSegmentTimeline(std::vector<std::string> & outputLines, const std::string & indent, int64_t segDurationTs,
-                           int segCount)
+void AppendSegmentTimeline(std::vector<std::string> & outputLines, const std::string & indent, int64_t segDurationTs, int segCount)
 {
     outputLines.push_back(indent + "<SegmentTimeline>");
     chip::StringBuilder<128> sb;
@@ -308,7 +307,8 @@ void AppendSegmentTimeline(std::vector<std::string> & outputLines, const std::st
     }
     else
     {
-        sb.AddFormat(kRepeatedSegmentFmt, indent.c_str(), static_cast<long long>(segDurationTs), static_cast<long long>(segCount - 1));
+        sb.AddFormat(kRepeatedSegmentFmt, indent.c_str(), static_cast<long long>(segDurationTs),
+                     static_cast<long long>(segCount - 1));
     }
     outputLines.push_back(sb.c_str());
     outputLines.push_back(indent + "</SegmentTimeline>");
