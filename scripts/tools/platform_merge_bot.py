@@ -83,6 +83,8 @@ class PlatformMergeBot:
 
         # get_reviews() returns reviews chronologically
         for review in pr.get_reviews():
+            if not review.user or not review.user.login:
+                continue
             user = review.user.login.lower()
             if review.state == 'APPROVED':
                 approvers.add(user)
@@ -110,16 +112,21 @@ class PlatformMergeBot:
 
         # pr.get_files() returns PaginatedList of File objects
         for pr_file in pr.get_files():
-            filepath = pr_file.filename
-            matched_any = False
-            for group_name, group in self.groups.items():
-                if group.matches_file(filepath):
-                    matched_files_per_group[group_name].append(filepath)
-                    matched_any = True
+            filepaths_to_check = [pr_file.filename]
+            prev_filepath = getattr(pr_file, "previous_filename", None)
+            if prev_filepath:
+                filepaths_to_check.append(prev_filepath)
 
-            if not matched_any:
-                uncovered_files.append(filepath)
-                is_fully_covered = False
+            for filepath in filepaths_to_check:
+                matched_any = False
+                for group_name, group in self.groups.items():
+                    if group.matches_file(filepath):
+                        matched_files_per_group[group_name].append(filepath)
+                        matched_any = True
+
+                if not matched_any:
+                    uncovered_files.append(filepath)
+                    is_fully_covered = False
 
         return is_fully_covered, matched_files_per_group, uncovered_files
 
@@ -179,7 +186,7 @@ class PlatformMergeBot:
     def post_eligibility_comment(self, pr: PullRequest, active_groups: dict[str, list[str]], missing_approvals: dict[str, PlatformGroup]):
         # Check if eligibility comment already exists
         for comment in pr.get_issue_comments():
-            if ELIGIBILITY_COMMENT_MARKER in comment.body:
+            if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
                 log.debug("PR #%d already has an eligibility comment. Not posting duplicate.", pr.number)
                 return
 

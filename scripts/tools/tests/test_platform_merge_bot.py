@@ -74,6 +74,7 @@ esp32:
     def create_mock_file(self, filename: str) -> MagicMock:
         mock_file = MagicMock()
         mock_file.filename = filename
+        mock_file.previous_filename = None
         return mock_file
 
     def create_mock_review(self, username: str, state: str) -> MagicMock:
@@ -161,6 +162,16 @@ esp32:
         self.assertFalse(is_fully_covered)
         self.assertEqual(uncovered, ["src/app/Command.cpp"])
         self.assertEqual(len(matched_files["nxp"]), 1)
+
+    def test_analyze_pr_files_rename_bypass(self):
+        mock_file = self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")
+        mock_file.previous_filename = "src/app/Command.cpp"
+        files = [mock_file]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
+        is_fully_covered, matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
+
+        self.assertFalse(is_fully_covered)
+        self.assertIn("src/app/Command.cpp", uncovered)
 
     def test_check_and_process_pr_draft(self):
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], [], draft=True)
