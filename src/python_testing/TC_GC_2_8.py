@@ -37,15 +37,20 @@
 import asyncio
 import logging
 
-from mobly import asserts
-from TC_GC_common import generate_fabric_under_test_matcher, get_feature_map, get_iana_multicast_address, get_operate_only_commands
-
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from mobly import asserts
+from TC_GC_common import (
+    find_colliding_epoch_key,
+    generate_fabric_under_test_matcher,
+    get_feature_map,
+    get_iana_multicast_address,
+    get_operate_only_commands,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -274,20 +279,39 @@ class TC_GC_2_8(MatterBaseTest):
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect DestinationIpAddress in GroupcastTesting event")
 
-            self.step(13)
-            event_sub.reset()
-            # Remap GroupID G1 to KeySetID K2 on controller to cause a failed decryption by the DUT
-            dev_ctrl.SetGroupKey(GROUPID_G1, KEYSETID_K2)
-            dev_ctrl.SendGroupCommand(GROUPID_G1, operate_command.command_object())
-            await asyncio.sleep(3)
+            # Attempt to derive a distinct epoch key whose Group Session ID collides with K1 on this fabric.
+            compressed_fabric_id = dev_ctrl.GetCompressedFabricId().to_bytes(8, byteorder="big")
+            colliding_epoch_key = find_colliding_epoch_key(INPUTKEY_1, compressed_fabric_id)
 
-            self.step(14)
-            event_data = event_sub.wait_for_event_report(groupcastTesting_event, timeout_sec=30)
-            asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
-                                 "GroupcastTesting event should report FailedAuth")
-            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
-                                 "Incorrect DestinationIpAddress in GroupcastTesting event")
+            if colliding_epoch_key == b"":
+                self.mark_step_range_skipped(13, 14)
+            else:
+                self.step(13)
+                event_sub.reset()
+
+                # Override KeySetID K2 on controller with the colliding epoch key
+                dev_ctrl.SetGroupKeySet(
+                    keyset_id=KEYSETID_K2,
+                    policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+                    num_keys=1,
+                    epoch_key0=colliding_epoch_key, epoch_start_time0=2220000,
+                    epoch_key1=None, epoch_start_time1=0,
+                    epoch_key2=None, epoch_start_time2=0)
+
+                # Step 13
+                # Remap GroupID G1 to KeySetID K2 on controller so step 13 encrypts group message for G1 with K2 while the DUT only holds K1;
+                # the collision makes the DUT select K1 for decryption, which fails and yields FailedAuth.
+                dev_ctrl.SetGroupKey(GROUPID_G1, KEYSETID_K2)
+                dev_ctrl.SendGroupCommand(GROUPID_G1, operate_command.command_object())
+                await asyncio.sleep(3)
+
+                self.step(14)
+                event_data = event_sub.wait_for_event_report(groupcastTesting_event, timeout_sec=30)
+                asserts.assert_equal(event_data.groupcastTestResult,
+                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                                     "GroupcastTesting event should report FailedAuth")
+                asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                     "Incorrect DestinationIpAddress in GroupcastTesting event")
 
             self.step(15)
             await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
