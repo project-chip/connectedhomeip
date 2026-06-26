@@ -32,6 +32,8 @@ from platform_merge_bot import PlatformMergeBot  # noqa: E402
 
 
 class TestPlatformMergeBot(unittest.TestCase):
+    """Unit tests for the platform merge bot."""
+
     def setUp(self) -> None:
         """Sets up the test case by creating a temporary config file and mocking the Github API."""
         # Create a temporary config file for testing

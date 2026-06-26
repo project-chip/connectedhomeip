@@ -71,7 +71,11 @@ class PlatformGroup:
 
 
 class PlatformMergeBot:
-    def __init__(self, token: str, repo_name: str, config_path: str, dry_run: bool):
+    """Orchestrates scanning, checking coverage, and auto-merging PRs that affect platform-maintained paths."""
+
+    def __init__(
+        self, token: str, repo_name: str, config_path: str, dry_run: bool
+    ) -> None:
         self.api = Github(token)
         self.repo = self.api.get_repo(repo_name)
         self.config_path = config_path
