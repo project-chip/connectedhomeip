@@ -148,9 +148,9 @@ CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<Mutable
 CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
 {
     bool newIsNull = newActivePresetHandle.IsNull();
+    ByteSpan oldHandle(mActivePresetHandleData, mActivePresetHandleDataSize);
 
-    if (mActivePresetHandleIsNull == newIsNull &&
-        (newIsNull || ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize).data_equal(newActivePresetHandle.Value())))
+    if (mActivePresetHandleIsNull == newIsNull && (newIsNull || oldHandle.data_equal(newActivePresetHandle.Value())))
     {
         return CHIP_NO_ERROR;
     }
