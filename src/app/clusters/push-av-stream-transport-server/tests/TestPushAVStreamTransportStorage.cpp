@@ -659,8 +659,6 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_FALSE(transportConfigurationStorageNull.transportOptions.HasValue());
 }
 
-<<<<<<< HEAD
-=======
 TEST_F(TestPushAVStreamTransportStorage, TestVideoStreamDeepCopy)
 {
     // Test that video stream names are deep copied into flat buffer
@@ -1229,7 +1227,6 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage_DecodableTy
     }
 }
 
->>>>>>> e2077a4bcf ([Camera] Fix Heap Buffer Overflow in Push-AV Stream Transport Cluster (#72530))
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

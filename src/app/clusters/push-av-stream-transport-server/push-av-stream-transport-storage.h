@@ -295,17 +295,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         // Copy video streams storage
         mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
-<<<<<<< HEAD
-        if (!mVideoStreamsStorage.empty())
-        {
-            videoStreams.SetValue(
-                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
-        }
-        else
-        {
-            videoStreams.ClearValue();
-        }
-=======
 
         // Rebind video stream name CharSpans to our own name buffer
         for (size_t i = 0; i < mVideoStreamsStorage.size(); i++)
@@ -316,21 +305,9 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         // Rebind videoStreams list view to point to our storage
         UpdateVideoStreamsList();
->>>>>>> e2077a4bcf ([Camera] Fix Heap Buffer Overflow in Push-AV Stream Transport Cluster (#72530))
 
         // Copy audio streams storage
         mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
-<<<<<<< HEAD
-        if (!mAudioStreamsStorage.empty())
-        {
-            audioStreams.SetValue(
-                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
-        }
-        else
-        {
-            audioStreams.ClearValue();
-        }
-=======
 
         // Rebind audio stream name CharSpans to our own name buffer
         for (size_t i = 0; i < mAudioStreamsStorage.size(); i++)
@@ -341,7 +318,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         // Rebind audioStreams list view to point to our storage
         UpdateAudioStreamsList();
->>>>>>> e2077a4bcf ([Camera] Fix Heap Buffer Overflow in Push-AV Stream Transport Cluster (#72530))
 
         return *this;
     }
@@ -368,44 +344,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = transportOptions.expiryTime;
 
-<<<<<<< HEAD
-        // Handle videoStreams from decodable type
-        if (transportOptions.videoStreams.HasValue())
-        {
-            mVideoStreamsStorage.clear();
-            auto iter = transportOptions.videoStreams.Value().begin();
-            while (iter.Next())
-            {
-                auto & videoStream = iter.GetValue();
-                mVideoStreamsStorage.push_back(videoStream);
-            }
-            videoStreams.SetValue(
-                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
-        }
-        else
-        {
-            mVideoStreamsStorage.clear();
-            videoStreams.ClearValue();
-        }
-
-        // Handle audioStreams from decodable type
-        if (transportOptions.audioStreams.HasValue())
-        {
-            mAudioStreamsStorage.clear();
-            auto iter = transportOptions.audioStreams.Value().begin();
-            while (iter.Next())
-            {
-                auto & audioStream = iter.GetValue();
-                mAudioStreamsStorage.push_back(audioStream);
-            }
-            audioStreams.SetValue(
-                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
-        }
-        else
-        {
-            mAudioStreamsStorage.clear();
-            audioStreams.ClearValue();
-=======
         // Handle videoStreams from decodable type - perform deep copy into flat buffer
         ClearVideoStreams();
         if (transportOptions.videoStreams.HasValue())
@@ -434,7 +372,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
                     break;
                 }
             }
->>>>>>> e2077a4bcf ([Camera] Fix Heap Buffer Overflow in Push-AV Stream Transport Cluster (#72530))
         }
 
         return *this;
@@ -451,11 +388,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
     CHIP_ERROR AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
     {
-<<<<<<< HEAD
-        mVideoStreamsStorage.push_back(videoStream);
-        videoStreams.SetValue(
-            DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
-=======
         // Defense-in-depth: reject if flat buffer is full
         VerifyOrReturnError(mVideoStreamNameBufferUsed + kMaxStreamNameLength <= mVideoStreamNameBuffer.size(),
                             CHIP_ERROR_BUFFER_TOO_SMALL,
@@ -475,7 +407,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         UpdateVideoStreamsList();
         return CHIP_NO_ERROR;
->>>>>>> e2077a4bcf ([Camera] Fix Heap Buffer Overflow in Push-AV Stream Transport Cluster (#72530))
     }
 
     void UpdateVideoStreamsList()
@@ -500,11 +431,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
     CHIP_ERROR AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
     {
-<<<<<<< HEAD
-        mAudioStreamsStorage.push_back(audioStream);
-        audioStreams.SetValue(
-            DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
-=======
         // Defense-in-depth: reject if flat buffer is full
         VerifyOrReturnError(mAudioStreamNameBufferUsed + kMaxStreamNameLength <= mAudioStreamNameBuffer.size(),
                             CHIP_ERROR_BUFFER_TOO_SMALL,
@@ -524,7 +450,6 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         UpdateAudioStreamsList();
         return CHIP_NO_ERROR;
->>>>>>> e2077a4bcf ([Camera] Fix Heap Buffer Overflow in Push-AV Stream Transport Cluster (#72530))
     }
 
     void UpdateAudioStreamsList()
@@ -546,8 +471,6 @@ private:
     ContainerOptionsStorage mContainerOptionsStorage;
     std::vector<Structs::VideoStreamStruct::Type> mVideoStreamsStorage;
     std::vector<Structs::AudioStreamStruct::Type> mAudioStreamsStorage;
-<<<<<<< HEAD
-=======
 
     // Separate flat storage for stream names (deep copy buffers)
     std::array<char, kMaxVideoStreams * kMaxStreamNameLength> mVideoStreamNameBuffer;
@@ -555,7 +478,6 @@ private:
 
     size_t mVideoStreamNameBufferUsed = 0;
     size_t mAudioStreamNameBufferUsed = 0;
->>>>>>> e2077a4bcf ([Camera] Fix Heap Buffer Overflow in Push-AV Stream Transport Cluster (#72530))
 };
 
 /**
