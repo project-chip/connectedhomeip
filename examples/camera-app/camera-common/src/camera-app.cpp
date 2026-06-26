@@ -45,14 +45,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     // Instantiate Chime Server
     mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
 
-    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
-
-    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
-                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
-
-    Clusters::PushAvStreamTransport::SetTLSCertificateManagementDelegate(
-        mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
-
     // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
         CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
@@ -328,6 +320,15 @@ void CameraApp::InitCameraDeviceClusters()
     }
 
     CreateAndInitializeCameraAVStreamMgmt();
+
+    // Only init PushAV once AVSM is init
+    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
+
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
+                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
+
+    Clusters::PushAvStreamTransport::SetTLSCertificateManagementDelegate(
+        mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
 
     // Set the WebRTCTransportProvider server in the manager
     mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
