@@ -1752,6 +1752,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def harness_param(self, name: str) -> Any:
         """Return a declared harness parameter value from ``matter_test_config``.
 
+        Returns the direct config value when available. For ``discriminator`` /
+        ``passcode`` satisfied only via ``--qr-code`` or ``--manual-code``, returns
+        ``None`` because the decoded value is not on ``MatterTestConfig``.
+
         Args:
             name: Logical name declared with ``@harness_params`` (registry key).
 

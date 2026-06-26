@@ -103,13 +103,43 @@ class TestMatterBaseTestSetupValidation(unittest.TestCase):
         instance = self._make_instance(provide_required=False, force_dut_expected=True)
         with self.assertRaises(signals.TestFailure) as ctx:
             instance.setup_test()
-        # The failure is the declarative-PIXIT validation, not a downstream DUT error.
-        self.assertIn("smoke_pixit", str(ctx.exception))
+        msg = str(ctx.exception)
+        self.assertIn("missing required PIXIT", msg)
+        self.assertIn("smoke_pixit", msg)
+        self.assertNotIn("AccessControl", msg)
 
     def test_setup_test_passes_when_required_pixit_present(self):
         """With the PIXIT supplied and no DUT expected, setup_test completes cleanly."""
         instance = self._make_instance(provide_required=True, force_dut_expected=False)
-        instance.setup_test()  # must not raise
+        instance.setup_test()
+        self.assertEqual(instance.current_step_index, 0)
+        self.assertFalse(instance.failed)
+
+    def test_setup_test_fails_when_pixit_wrong_type(self):
+        """A present PIXIT with the wrong Python type fails in validation, not at the DUT."""
+        class _TypeValidationTest(MatterBaseTest):
+            requires_dut = False
+
+            @pixit("smoke_pixit", str, "Required smoke pixit", required=True)
+            @pixit("smoke_timeout", int, "Timeout seconds", required=True)
+            def test_needs_pixit(self):
+                pass
+
+        instance = _TypeValidationTest.__new__(_TypeValidationTest)
+        instance.is_commissioning = False
+        instance._dut_confirmed_available = True
+        instance.user_params = {
+            "matter_test_config": global_stash.stash_globally(MatterTestConfig()),
+            "smoke_pixit": "value",
+            "smoke_timeout": "30",
+        }
+        instance.current_test_info = type("TestInfo", (), {"name": "test_needs_pixit"})()
+        with self.assertRaises(signals.TestFailure) as ctx:
+            instance.setup_test()
+        msg = str(ctx.exception)
+        self.assertIn("PIXIT parameter type error", msg)
+        self.assertIn("smoke_timeout", msg)
+        self.assertNotIn("AccessControl", msg)
 
 
 if __name__ == "__main__":

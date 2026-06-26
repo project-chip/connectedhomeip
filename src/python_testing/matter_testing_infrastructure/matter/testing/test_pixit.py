@@ -23,8 +23,9 @@ from matter.testing.harness_params import (HarnessParamDefinition, format_declar
                                            format_missing_test_parameters, get_harness_param_definitions, harness_params,
                                            resolve_harness_value, validate_harness_params)
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions,
-                                  pixit, validate_pixits)
+from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error,
+                                  format_pixit_type_errors, format_pixit_value_for_dump, get_pixit_definitions,
+                                  validate_pixit_types, pixit, validate_pixits)
 
 
 class TestPixitDefinition(unittest.TestCase):
@@ -32,20 +33,24 @@ class TestPixitDefinition(unittest.TestCase):
 
     def test_creation_with_defaults(self):
         """Test PixitDefinition is created with correct default values."""
-        pixit = PixitDefinition(name="test_param", type=str, description="A test parameter")
-        self.assertEqual(pixit.name, "test_param")
-        self.assertEqual(pixit.type, str)
-        self.assertEqual(pixit.description, "A test parameter")
-        self.assertTrue(pixit.required)
-        self.assertIs(pixit.default, _PIXIT_NO_DEFAULT)
+        pixit_def = PixitDefinition(name="test_param", type=str, description="A test parameter")
+        self.assertEqual(pixit_def.name, "test_param")
+        self.assertEqual(pixit_def.type, str)
+        self.assertEqual(pixit_def.description, "A test parameter")
+        self.assertTrue(pixit_def.required)
+        self.assertIs(pixit_def.default, _PIXIT_NO_DEFAULT)
+        self.assertFalse(pixit_def.sensitive)
 
     def test_creation_optional_with_default(self):
         """Test PixitDefinition for optional PIXIT with default value."""
-        pixit = PixitDefinition(name="timeout", type=int, description="Timeout in seconds", required=False, default=30)
-        self.assertEqual(pixit.name, "timeout")
-        self.assertEqual(pixit.type, int)
-        self.assertFalse(pixit.required)
-        self.assertEqual(pixit.default, 30)
+        pixit_def = PixitDefinition(
+            name="timeout", type=int, description="Timeout in seconds", required=False, default=30, sensitive=True
+        )
+        self.assertEqual(pixit_def.name, "timeout")
+        self.assertEqual(pixit_def.type, int)
+        self.assertFalse(pixit_def.required)
+        self.assertEqual(pixit_def.default, 30)
+        self.assertTrue(pixit_def.sensitive)
 
 
 class TestRequiresPixitDecorator(unittest.TestCase):
@@ -472,6 +477,25 @@ class TestFormatDeclaredParametersForFailure(unittest.TestCase):
         self.assertIn("app_path", out)
         self.assertIn("***REDACTED***", out)
 
+    def test_sensitive_pixit_redacted_in_dump(self):
+        @pixit("secret_token", str, "Token", required=True, sensitive=True)
+        def m(self):
+            pass
+
+        user = {"secret_token": "super-secret"}
+        out = format_declared_parameters_for_failure(m, user, MatterTestConfig())
+        self.assertIn("***REDACTED***", out)
+        self.assertNotIn("super-secret", out)
+
+    def test_non_sensitive_pixit_shown_in_dump(self):
+        @pixit("app_path", str, "Path", required=True)
+        def m(self):
+            pass
+
+        user = {"app_path": "/tmp/app"}
+        out = format_declared_parameters_for_failure(m, user, MatterTestConfig())
+        self.assertIn("'/tmp/app'", out)
+
 
 class TestResolveHarnessValue(unittest.TestCase):
     """Tests for resolve_harness_value."""
@@ -481,9 +505,99 @@ class TestResolveHarnessValue(unittest.TestCase):
         cfg.discriminators = [3840]
         self.assertEqual(resolve_harness_value("discriminator", cfg), 3840)
 
+    def test_resolve_discriminator_qr_runtime_is_none(self):
+        cfg = MatterTestConfig()
+        cfg.qr_code_content = ["MT:fake"]
+        self.assertIsNone(resolve_harness_value("discriminator", cfg))
+
+    def test_discriminator_qr_display_placeholder_in_dump(self):
+        @harness_params("discriminator")
+        def m(self):
+            pass
+
+        cfg = MatterTestConfig()
+        cfg.qr_code_content = ["MT:fake"]
+        out = format_declared_parameters_for_failure(m, {}, cfg)
+        self.assertIn("<from --qr-code>", out)
+
+    def test_resolve_discriminator_manual_runtime_is_none(self):
+        cfg = MatterTestConfig()
+        cfg.manual_code = ["34970112332"]
+        self.assertIsNone(resolve_harness_value("discriminator", cfg))
+
+    def test_discriminator_manual_display_placeholder_in_dump(self):
+        @harness_params("discriminator")
+        def m(self):
+            pass
+
+        cfg = MatterTestConfig()
+        cfg.manual_code = ["34970112332"]
+        out = format_declared_parameters_for_failure(m, {}, cfg)
+        self.assertIn("<from --manual-code>", out)
+
     def test_unknown_raises(self):
         with self.assertRaises(ValueError):
             resolve_harness_value("nope", MatterTestConfig())
+
+
+class TestValidatePixitTypes(unittest.TestCase):
+    """Tests for strict PIXIT type validation at setup."""
+
+    def test_correct_int_type_passes(self):
+        defs = [PixitDefinition(name="timeout_sec", type=int, description="Timeout")]
+        user_params = {"timeout_sec": 30}
+        self.assertEqual(validate_pixit_types(defs, user_params), [])
+
+    def test_string_for_int_fails(self):
+        defs = [PixitDefinition(name="timeout_sec", type=int, description="Timeout")]
+        user_params = {"timeout_sec": "30"}
+        errors = validate_pixit_types(defs, user_params)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("timeout_sec", errors[0])
+        self.assertIn("int-arg", errors[0])
+
+    def test_non_numeric_string_for_int_fails(self):
+        defs = [PixitDefinition(name="timeout_sec", type=int, description="Timeout")]
+        user_params = {"timeout_sec": "not-a-number"}
+        errors = validate_pixit_types(defs, user_params)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("timeout_sec", errors[0])
+
+    def test_string_for_bool_fails(self):
+        defs = [PixitDefinition(name="flag", type=bool, description="Flag")]
+        user_params = {"flag": "False"}
+        errors = validate_pixit_types(defs, user_params)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("bool-arg", errors[0])
+
+    def test_correct_bool_type_passes(self):
+        defs = [PixitDefinition(name="flag", type=bool, description="Flag")]
+        user_params = {"flag": False}
+        self.assertEqual(validate_pixit_types(defs, user_params), [])
+
+    def test_format_pixit_type_errors(self):
+        msg = format_pixit_type_errors("test_x", ["err one", "err two"])
+        self.assertIn("test_x", msg)
+        self.assertIn("err one", msg)
+
+    def test_format_pixit_value_for_dump_sensitive(self):
+        pdef = PixitDefinition(name="tok", type=str, description="Token", sensitive=True)
+        self.assertEqual(format_pixit_value_for_dump(pdef, {"tok": "secret"}), "***REDACTED***")
+
+
+class TestFormatMissingTestParametersTypes(unittest.TestCase):
+    """Type errors surface via format_missing_test_parameters after presence passes."""
+
+    def test_type_error_when_present_but_wrong_type(self):
+        @pixit("count", int, "Count", required=True)
+        def m(self):
+            pass
+
+        cfg = MatterTestConfig()
+        msg = format_missing_test_parameters("test_x", m, {"count": "30"}, cfg)
+        self.assertIsNotNone(msg)
+        self.assertIn("count", msg)
+        self.assertIn("int-arg", msg)
 
 
 # NOTE: Tests for MatterBaseTest.pixit() default resolution live in

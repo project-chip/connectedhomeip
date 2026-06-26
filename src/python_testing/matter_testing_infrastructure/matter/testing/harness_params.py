@@ -49,8 +49,9 @@ from dataclasses import dataclass
 from typing import Any
 
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions,
-                                  validate_pixits)
+from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error,
+                                  format_pixit_type_errors, format_pixit_value_for_dump, get_pixit_definitions,
+                                  validate_pixit_types, validate_pixits)
 
 
 @dataclass(frozen=True)
@@ -69,7 +70,8 @@ class _HarnessParamSpec:
     cli_hint: str
     sensitive: bool
     is_satisfied: Callable[[MatterTestConfig], bool]
-    resolve: Callable[[MatterTestConfig], Any]
+    resolve_runtime: Callable[[MatterTestConfig], Any]
+    resolve_display: Callable[[MatterTestConfig], Any]
 
 
 def _commissioning_credentials_satisfied(cfg: MatterTestConfig) -> bool:
@@ -80,7 +82,13 @@ def _passcode_satisfied(cfg: MatterTestConfig) -> bool:
     return bool(cfg.setup_passcodes) or bool(cfg.qr_code_content) or bool(cfg.manual_code)
 
 
-def _resolve_discriminator(cfg: MatterTestConfig) -> Any:
+def _resolve_discriminator_runtime(cfg: MatterTestConfig) -> Any:
+    if cfg.discriminators:
+        return cfg.discriminators[0]
+    return None
+
+
+def _resolve_discriminator_display(cfg: MatterTestConfig) -> Any:
     if cfg.discriminators:
         return cfg.discriminators[0]
     if cfg.qr_code_content:
@@ -90,7 +98,13 @@ def _resolve_discriminator(cfg: MatterTestConfig) -> Any:
     return None
 
 
-def _resolve_passcode(cfg: MatterTestConfig) -> Any:
+def _resolve_passcode_runtime(cfg: MatterTestConfig) -> Any:
+    if cfg.setup_passcodes:
+        return cfg.setup_passcodes[0]
+    return None
+
+
+def _resolve_passcode_display(cfg: MatterTestConfig) -> Any:
     if cfg.setup_passcodes:
         return cfg.setup_passcodes[0]
     if cfg.qr_code_content or cfg.manual_code:
@@ -104,63 +118,72 @@ HARNESS_PARAM_REGISTRY: dict[str, _HarnessParamSpec] = {
         cli_hint="--discriminator <value>  or  --qr-code <payload>  or  --manual-code <code>",
         sensitive=False,
         is_satisfied=_commissioning_credentials_satisfied,
-        resolve=_resolve_discriminator,
+        resolve_runtime=_resolve_discriminator_runtime,
+        resolve_display=_resolve_discriminator_display,
     ),
     "passcode": _HarnessParamSpec(
         description="PAKE passcode for commissioning (or use --qr-code / --manual-code).",
         cli_hint="--passcode <value>  or  --qr-code / --manual-code",
         sensitive=True,
         is_satisfied=_passcode_satisfied,
-        resolve=_resolve_passcode,
+        resolve_runtime=_resolve_passcode_runtime,
+        resolve_display=_resolve_passcode_display,
     ),
     "wifi_ssid": _HarnessParamSpec(
         description="Wi-Fi network SSID (e.g. for ble-wifi commissioning).",
         cli_hint="--wifi-ssid <SSID>",
         sensitive=False,
         is_satisfied=lambda cfg: cfg.wifi_ssid is not None,
-        resolve=lambda cfg: cfg.wifi_ssid,
+        resolve_runtime=lambda cfg: cfg.wifi_ssid,
+        resolve_display=lambda cfg: cfg.wifi_ssid,
     ),
     "wifi_passphrase": _HarnessParamSpec(
         description="Wi-Fi network passphrase.",
         cli_hint="--wifi-passphrase <passphrase>",
         sensitive=True,
         is_satisfied=lambda cfg: cfg.wifi_passphrase is not None,
-        resolve=lambda cfg: cfg.wifi_passphrase,
+        resolve_runtime=lambda cfg: cfg.wifi_passphrase,
+        resolve_display=lambda cfg: cfg.wifi_passphrase,
     ),
     "commissioning_method": _HarnessParamSpec(
         description="Commissioning method name (see runner --commissioning-method choices).",
         cli_hint="--commissioning-method <method>",
         sensitive=False,
         is_satisfied=lambda cfg: cfg.commissioning_method is not None and str(cfg.commissioning_method).strip() != "",
-        resolve=lambda cfg: cfg.commissioning_method,
+        resolve_runtime=lambda cfg: cfg.commissioning_method,
+        resolve_display=lambda cfg: cfg.commissioning_method,
     ),
     "dut_node_id": _HarnessParamSpec(
         description="DUT node id on the fabric.",
         cli_hint="--dut-node-id <id>",
         sensitive=False,
         is_satisfied=lambda cfg: bool(cfg.dut_node_ids),
-        resolve=lambda cfg: cfg.dut_node_ids[0] if cfg.dut_node_ids else None,
+        resolve_runtime=lambda cfg: cfg.dut_node_ids[0] if cfg.dut_node_ids else None,
+        resolve_display=lambda cfg: cfg.dut_node_ids[0] if cfg.dut_node_ids else None,
     ),
     "endpoint": _HarnessParamSpec(
         description="Endpoint under test (may be implicit; declare if the test requires an explicit value).",
         cli_hint="--endpoint <n>",
         sensitive=False,
         is_satisfied=lambda cfg: cfg.endpoint is not None,
-        resolve=lambda cfg: cfg.endpoint,
+        resolve_runtime=lambda cfg: cfg.endpoint,
+        resolve_display=lambda cfg: cfg.endpoint,
     ),
     "thread_dataset": _HarnessParamSpec(
         description="Thread operational dataset hex (ble-thread / similar).",
         cli_hint="--thread-dataset-hex <hex>",
         sensitive=True,
         is_satisfied=lambda cfg: cfg.thread_operational_dataset is not None,
-        resolve=lambda cfg: cfg.thread_operational_dataset,
+        resolve_runtime=lambda cfg: cfg.thread_operational_dataset,
+        resolve_display=lambda cfg: cfg.thread_operational_dataset,
     ),
     "commissionee_ip": _HarnessParamSpec(
         description="Commissionee IP (on-network-ip commissioning).",
         cli_hint="--ip-addr <address>",
         sensitive=False,
         is_satisfied=lambda cfg: cfg.commissionee_ip_address_just_for_testing is not None,
-        resolve=lambda cfg: cfg.commissionee_ip_address_just_for_testing,
+        resolve_runtime=lambda cfg: cfg.commissionee_ip_address_just_for_testing,
+        resolve_display=lambda cfg: cfg.commissionee_ip_address_just_for_testing,
     ),
 }
 
@@ -277,6 +300,10 @@ def format_missing_test_parameters(
         harness_missing, harness_optional = validate_harness_params(harness_defs, matter_test_config)
 
     if not pixit_missing and not harness_missing:
+        if pixit_defs:
+            type_errors = validate_pixit_types(pixit_defs, user_params)
+            if type_errors:
+                return format_pixit_type_errors(test_name, type_errors)
         return None
 
     parts: list[str] = []
@@ -289,12 +316,18 @@ def format_missing_test_parameters(
 
 
 def resolve_harness_value(name: str, config: MatterTestConfig) -> Any:
-    """Resolve a logical harness name to a value from ``MatterTestConfig``."""
+    """Resolve a logical harness name to a runtime value from ``MatterTestConfig``.
+
+    Returns the direct config value when available. For commissioning credentials
+    satisfied only via ``--qr-code`` / ``--manual-code``, returns ``None`` (the
+    decoded value is not stored on ``MatterTestConfig``). Use failure-dump display
+    or explicit ``--discriminator`` / ``--passcode`` when a numeric value is needed.
+    """
     if name not in HARNESS_PARAM_REGISTRY:
         raise ValueError(
             f"Unknown harness parameter {name!r}. Valid names: {sorted(HARNESS_PARAM_REGISTRY)!r}"
         )
-    return HARNESS_PARAM_REGISTRY[name].resolve(config)
+    return HARNESS_PARAM_REGISTRY[name].resolve_runtime(config)
 
 
 def _format_value_for_dump(name: str, raw: Any, satisfied: bool) -> str:
@@ -330,7 +363,7 @@ def format_declared_parameters_for_failure(
         seen_pixit.add(pdef.name)
         type_name = pdef.type.__name__
         if pdef.name in user_params and user_params[pdef.name] is not None:
-            val_repr = repr(user_params[pdef.name])
+            val_repr = format_pixit_value_for_dump(pdef, user_params)
         elif not pdef.required and pdef.default is not _PIXIT_NO_DEFAULT:
             val_repr = f"{repr(pdef.default)} (default)"
         else:
@@ -347,7 +380,7 @@ def format_declared_parameters_for_failure(
         seen_h.add(hdef.name)
         spec = HARNESS_PARAM_REGISTRY[hdef.name]
         satisfied = spec.is_satisfied(matter_test_config)
-        raw = spec.resolve(matter_test_config)
+        raw = spec.resolve_display(matter_test_config)
         val = _format_value_for_dump(hdef.name, raw, satisfied)
         req_label = "required" if hdef.required else "optional"
         lines.append(f"  [harness] {hdef.name} ({req_label}): {spec.description}")

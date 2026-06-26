@@ -55,12 +55,15 @@ class PixitDefinition:
     Attributes:
         name: The key used to pass the PIXIT value via command-line args
               (e.g., --string-arg name:value, --int-arg name:value).
-        type: Expected Python type of the value (str, int, bool, float).
+        type: Expected Python type of the value (str, int, bool, float). Enforced at
+              setup via ``isinstance``; use the matching ``--*-arg`` flag when passing
+              values on the command line.
         description: Human-readable description shown in error messages.
         required: If True, the test fails early when the PIXIT is not provided.
                   If False, the PIXIT is optional and uses the default value.
         default: Default value for optional PIXITs. Ignored when required=True.
                  Uses _PIXIT_NO_DEFAULT sentinel to distinguish "no default" from None.
+        sensitive: If True, the value is redacted in failure-parameter dumps.
     """
 
     name: str
@@ -68,9 +71,17 @@ class PixitDefinition:
     description: str
     required: bool = True
     default: Any = _PIXIT_NO_DEFAULT
+    sensitive: bool = False
 
 
-def pixit(name: str, value_type: type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
+def pixit(
+    name: str,
+    value_type: type,
+    description: str,
+    required: bool = True,
+    default: Any = _PIXIT_NO_DEFAULT,
+    sensitive: bool = False,
+):
     """Decorator that declares a PIXIT parameter requirement for a test method.
 
     This decorator attaches PIXIT metadata to the test method. When the test runs,
@@ -85,11 +96,13 @@ def pixit(name: str, value_type: type, description: str, required: bool = True, 
 
     Args:
         name: The parameter name (key in user_params).
-        value_type: Expected Python type (str, int, bool, float).
+        value_type: Expected Python type (str, int, bool, float). Enforced at setup;
+                    pass values with the matching ``--*-arg`` flag (e.g. ``--int-arg``).
         description: Human-readable description for error messages.
         required: Whether this PIXIT must be provided. Defaults to True.
         default: Default value when not provided. Only used when required=False.
                  If required=True, this argument is ignored.
+        sensitive: If True, redact the value in failure-parameter dumps.
 
     Example:
         @pixit("app_path", str, "Path to the server application")
@@ -105,6 +118,7 @@ def pixit(name: str, value_type: type, description: str, required: bool = True, 
         description=description,
         required=required,
         default=default,
+        sensitive=sensitive,
     )
 
     def decorator(func):
@@ -161,6 +175,54 @@ def validate_pixits(
             available_optional.append(pixit_def)
 
     return missing_required, available_optional
+
+
+def _pixit_type_mismatch_message(name: str, value: Any, expected_type: type) -> str:
+    flag = _type_to_arg_flag(expected_type)
+    return (
+        f"PIXIT {name!r} expected {expected_type.__name__}, "
+        f"got {type(value).__name__} ({value!r}). "
+        f"Provide via: --{flag} {name}:<value>"
+    )
+
+
+def validate_pixit_types(pixit_definitions: list[PixitDefinition], user_params: dict) -> list[str]:
+    """Return error messages for PIXIT values that do not match declared types."""
+    errors: list[str] = []
+    seen_names: set[str] = set()
+
+    for pixit_def in pixit_definitions:
+        if pixit_def.name in seen_names:
+            continue
+        seen_names.add(pixit_def.name)
+        if pixit_def.name not in user_params or user_params[pixit_def.name] is None:
+            continue
+        value = user_params[pixit_def.name]
+        if not isinstance(value, pixit_def.type):
+            errors.append(_pixit_type_mismatch_message(pixit_def.name, value, pixit_def.type))
+
+    return errors
+
+
+def format_pixit_type_errors(test_name: str, errors: list[str]) -> str:
+    """Format PIXIT type validation errors for setup."""
+    lines = [
+        f"Test '{test_name}' has PIXIT parameter type error(s):",
+        "",
+    ]
+    for err in errors:
+        lines.append(f"  - {err}")
+    return "\n".join(lines)
+
+
+def format_pixit_value_for_dump(pdef: PixitDefinition, user_params: dict) -> str:
+    """Format a PIXIT value for failure dumps (redacts when ``sensitive``)."""
+    value = user_params[pdef.name]
+    if pdef.sensitive:
+        return "***REDACTED***"
+    if isinstance(value, bytes):
+        return f"<{len(value)} bytes>"
+    return repr(value)
 
 
 def format_pixit_error(test_name: str, missing_required: list[PixitDefinition], available_optional: list[PixitDefinition]) -> str:
