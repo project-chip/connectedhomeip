@@ -38,9 +38,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # Fetch all history so git diffs or file listings can work if needed (though PyGithub handles this)
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
