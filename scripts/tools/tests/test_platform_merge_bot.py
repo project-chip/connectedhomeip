@@ -55,10 +55,13 @@ esp32:
         with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.yaml') as f:
             f.write(self.config_content)
             self.temp_config_name = f.name
+        self.addCleanup(os.unlink, self.temp_config_name)
 
         # Patch Github initialization so we don't hit the network
         self.github_patcher = patch('platform_merge_bot.Github')
         self.mock_github_class = self.github_patcher.start()
+        self.addCleanup(self.github_patcher.stop)
+
         self.mock_github_instance = MagicMock()
         self.mock_github_class.return_value = self.mock_github_instance
         self.mock_repo = MagicMock()
@@ -72,10 +75,6 @@ esp32:
             dry_run=False
         )
         self.bot._bot_username = "platform-merge-bot"
-
-    def tearDown(self):
-        self.github_patcher.stop()
-        os.unlink(self.temp_config_name)
 
     def create_mock_file(self, filename: str) -> MagicMock:
         mock_file = MagicMock()
@@ -331,6 +330,24 @@ esp32:
 
         # Should NOT merge because of the active changes requested
         mock_pr.merge.assert_not_called()
+
+    def test_get_pr_review_states_comment_does_not_overwrite_approval(self):
+        reviews = [
+            self.create_mock_review("doru91", "APPROVED"),
+            self.create_mock_review("doru91", "COMMENTED"),
+        ]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
+        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
+        self.assertIn("doru91", approvers)
+
+    def test_get_pr_review_states_comment_does_not_overwrite_changes_requested(self):
+        reviews = [
+            self.create_mock_review("doru91", "CHANGES_REQUESTED"),
+            self.create_mock_review("doru91", "COMMENTED"),
+        ]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
+        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
+        self.assertIn("doru91", change_requesters)
 
 
 if __name__ == '__main__':

@@ -27,7 +27,7 @@ from github.PullRequest import PullRequest
 
 log = logging.getLogger(__name__)
 
-__LOG_LEVELS__ = logging.getLevelNamesMapping()
+_LOG_LEVELS = logging.getLevelNamesMapping()
 
 DEFAULT_REPOSITORY = "project-chip/connectedhomeip"
 DEFAULT_CONFIG_PATH = ".github/platform_maintainers.yaml"
@@ -83,6 +83,10 @@ class PlatformMergeBot:
             paths = group_data.get('paths', [])
             if not isinstance(maintainers, list) or not isinstance(paths, list):
                 raise ValueError(f"Group '{group_name}' must contain 'maintainers' and 'paths' lists.")
+            if not all(isinstance(m, str) for m in maintainers):
+                raise ValueError(f"Group '{group_name}' maintainers must be a list of strings.")
+            if not all(isinstance(p, str) for p in paths):
+                raise ValueError(f"Group '{group_name}' paths must be a list of strings.")
             self.groups[group_name] = PlatformGroup(group_name, maintainers, paths)
 
         log.info("Loaded %d platform groups from config.", len(self.groups))
@@ -95,9 +99,13 @@ class PlatformMergeBot:
             if not review.user or not review.user.login:
                 continue
             user = review.user.login.lower()
-            user_reviews[user] = review.state
+            if review.state in ('APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'):
+                user_reviews[user] = review.state
 
         approvers = {user for user, state in user_reviews.items() if state == 'APPROVED'}
+        # Exclude author from self-approval
+        author = pr.user.login.lower()
+        approvers.discard(author)
         change_requesters = {user for user, state in user_reviews.items() if state == 'CHANGES_REQUESTED'}
         return approvers, change_requesters
 
@@ -267,7 +275,7 @@ class PlatformMergeBot:
 @click.option(
     "--log-level",
     default="INFO",
-    type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
+    type=click.Choice(list(_LOG_LEVELS.keys()), case_sensitive=False),
     help="Determines the verbosity of script output.",
 )
 @click.option("--token-env", default="GH_TOKEN", help="Environment variable containing the GitHub token")
@@ -292,7 +300,7 @@ def main(
     dry_run,
 ):
     coloredlogs.install(
-        level=__LOG_LEVELS__[log_level.upper()], fmt="%(asctime)s %(levelname)-7s %(message)s"
+        level=_LOG_LEVELS[log_level.upper()], fmt="%(asctime)s %(levelname)-7s %(message)s"
     )
 
     gh_token = None
