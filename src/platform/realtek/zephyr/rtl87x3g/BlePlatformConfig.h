@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,10 +16,20 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Platform-specific configuration overrides for the CHIP BLE
+ *          Layer on Realtek platform.
+ *
+ */
+
 #pragma once
 
-#ifdef CONFIG_BOARD_RTL87X3G_EVB
-#include <platform/realtek/zephyr/rtl87x3g/CHIPDevicePlatformEvent.h>
-#else
-#include <platform/Zephyr/CHIPDevicePlatformEvent.h>
-#endif
+// ==================== Platform Adaptations ====================
+
+#define BLE_CONNECTION_OBJECT uint16_t
+#define BLE_CONNECTION_UNINITIALIZED (0xFFFF)
+#define BLE_MAX_RECEIVE_WINDOW_SIZE 5
+
+#define BLE_CONFIG_ERROR_MIN 6000000
+#define BLE_CONFIG_ERROR_MAX 6000999

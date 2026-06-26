@@ -1,0 +1,60 @@
+/ {
+	chosen {
+		zephyr,ieee802154 = &ieee802154;
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+		debounce-interval-ms = <30>;
+		button0: button_0 {
+			gpios = <&gpioa 23 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "Push button switch 0";
+		};
+		button1: button_1 {
+			gpios = <&gpioa 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "Push button switch 1";
+		};
+		button2: button_2 {
+			gpios = <&gpioa 24 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "Push button switch 2";
+		};
+	};
+
+};
+
+&flash {
+	partitions {
+		storage_partition: partition@342000 {
+			label = "storage";
+			reg = <0x342000 DT_SIZE_K(64)>;
+		};
+	};
+};
+
+&gpioa {
+	status = "okay";
+};
+
+&gpiob {
+	status = "okay";
+};
+
+&ieee802154 {
+	status = "okay";
+};
+
+&dtcm {
+	reg = <0x2000B800 DT_SIZE_K(70)>;
+};
+
+&heap_dtcm {
+	reg = <0x2001D000 DT_SIZE_K(12)>;
+};
+
+&sram {
+	reg = <0x20020000 DT_SIZE_K(120)>;
+};
+
+&heap_sram {
+	reg = <0x2003E000 DT_SIZE_K(40)>;
+};

@@ -15,10 +15,26 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Defines platform-specific event types and data for the chip
+ *          Device Layer on Realtek platforms.
+ */
+
 #pragma once
 
-#ifdef CONFIG_BOARD_RTL87X3G_EVB
-#include <platform/realtek/zephyr/rtl87x3g/CHIPDevicePlatformEvent.h>
-#else
-#include <platform/Zephyr/CHIPDevicePlatformEvent.h>
-#endif
+#include <platform/CHIPDeviceEvent.h>
+
+namespace chip {
+namespace DeviceLayer {
+
+/**
+ * Represents platform-specific event information
+ */
+struct ChipDevicePlatformEvent final
+{
+    // TODO - add platform specific definition extension
+};
+
+} // namespace DeviceLayer
+} // namespace chip
