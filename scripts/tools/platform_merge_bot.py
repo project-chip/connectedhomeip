@@ -172,8 +172,8 @@ class PlatformMergeBot:
         """Analyzes the files changed in the PR.
 
         Returns:
-          - matched_files_per_group: Map of group_name -> list of files matching it.
-          - uncovered_files: List of files that matched no group.
+          - matched_files_per_group: Map of group_name -> set of files matching it.
+          - uncovered_files: Set of files that matched no group.
         """
         matched_files_per_group: dict[str, set[str]] = {
             name: set() for name in self.groups
