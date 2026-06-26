@@ -37,20 +37,16 @@
 import asyncio
 import logging
 
+from mobly import asserts
+from TC_GC_common import (find_colliding_epoch_key, generate_fabric_under_test_matcher, get_feature_map, get_iana_multicast_address,
+                          get_operate_only_commands)
+
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from mobly import asserts
-from TC_GC_common import (
-    find_colliding_epoch_key,
-    generate_fabric_under_test_matcher,
-    get_feature_map,
-    get_iana_multicast_address,
-    get_operate_only_commands,
-)
 
 logger = logging.getLogger(__name__)
 

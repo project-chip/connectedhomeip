@@ -20,14 +20,15 @@ import logging
 from dataclasses import dataclass
 from typing import Optional
 
-import matter.clusters as Clusters
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from mobly import asserts
+
+import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import AttributeMatcher
 from matter.testing.spec_parsing import build_xml_clusters, dm_from_spec_version
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
