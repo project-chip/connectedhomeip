@@ -82,46 +82,42 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
-    app::DataModel::Nullable<chip::Percent100ths> currentPercent100ths;
-    app::DataModel::Nullable<chip::Percent100ths> targetPercent100ths;
-    app::DataModel::Nullable<chip::Percent> currentPercentage;
-
     auto wc = FindClusterOnEndpoint(endpoint);
     VerifyOrDie(wc != nullptr);
-    if (currentPercentage.IsNull())
+
+    const BitFlags<Feature> features = wc->GetFeatureMap();
+
+    // The position attributes only exist on position-aware configurations. Initialize any null values to 0 so the
+    // device reports a concrete starting position, but only for the lift/tilt features this endpoint actually supports.
+    if (features.Has(Feature::kPositionAwareLift))
     {
-        wc->SetCurrentPositionTiltPercentage(0);
+        if (wc->GetCurrentPositionLiftPercentage().IsNull())
+        {
+            wc->SetCurrentPositionLiftPercentage(0);
+        }
+        if (wc->GetCurrentPositionLiftPercent100ths().IsNull())
+        {
+            wc->SetCurrentPositionLiftPercent100ths(0);
+        }
+        if (wc->GetTargetPositionLiftPercent100ths().IsNull())
+        {
+            wc->SetTargetPositionLiftPercent100ths(0);
+        }
     }
 
-    wc->SetCurrentPositionTiltPercentage(currentPercentage);
-    if (currentPercentage.IsNull())
+    if (features.Has(Feature::kPositionAwareTilt))
     {
-        wc->SetCurrentPositionTiltPercentage(0);
-    }
-
-    currentPercent100ths = wc->GetCurrentPositionLiftPercent100ths();
-    if (currentPercent100ths.IsNull())
-    {
-        currentPercent100ths.SetNonNull(0);
-        wc->SetCurrentPositionLiftPercent100ths(0);
-    }
-
-    targetPercent100ths = wc->GetTargetPositionLiftPercent100ths();
-    if (targetPercent100ths.IsNull())
-    {
-        wc->SetTargetPositionLiftPercent100ths(0);
-    }
-
-    currentPercent100ths = wc->GetCurrentPositionTiltPercent100ths();
-    if (currentPercent100ths.IsNull())
-    {
-        currentPercent100ths.SetNonNull(0);
-        wc->SetCurrentPositionTiltPercent100ths(0);
-    }
-
-    targetPercent100ths = wc->GetTargetPositionTiltPercent100ths();
-    if (targetPercent100ths.IsNull())
-    {
-        wc->SetTargetPositionTiltPercent100ths(0);
+        if (wc->GetCurrentPositionTiltPercentage().IsNull())
+        {
+            wc->SetCurrentPositionTiltPercentage(0);
+        }
+        if (wc->GetCurrentPositionTiltPercent100ths().IsNull())
+        {
+            wc->SetCurrentPositionTiltPercent100ths(0);
+        }
+        if (wc->GetTargetPositionTiltPercent100ths().IsNull())
+        {
+            wc->SetTargetPositionTiltPercent100ths(0);
+        }
     }
 }
