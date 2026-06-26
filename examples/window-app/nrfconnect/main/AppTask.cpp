@@ -173,7 +173,7 @@ CHIP_ERROR AppTask::Init()
     err = sThreadNetworkDriver.Init();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("sThreadNetworkDriver.Init() falied");
+        LOG_ERR("sThreadNetworkDriver.Init() failed");
         return err;
     }
 #elif !defined(CONFIG_WIFI_NRF70)

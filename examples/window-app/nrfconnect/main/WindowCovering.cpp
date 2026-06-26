@@ -118,7 +118,6 @@ chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
     {
         current = wc->GetCurrentPositionTiltPercent100ths();
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
-        opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
     if (!current.IsNull())
