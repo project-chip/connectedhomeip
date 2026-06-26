@@ -43,11 +43,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-ByteSpan ByteSpanFromCharSpan(CharSpan span)
-{
-    return ByteSpan(Uint8::from_const_char(span.data()), span.size());
-}
-
 #if MATTER_ENABLE_UBUS
 ubus::UbusManager gUbusManager{};
 #endif
@@ -114,11 +109,7 @@ static void ApplicationEarlyInit()
 #endif
 }
 
-void ApplicationInit()
-{
-    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                                                 ByteSpanFromCharSpan("Setec Astronomy"_span));
-}
+void ApplicationInit() {}
 
 void ApplicationShutdown()
 {
