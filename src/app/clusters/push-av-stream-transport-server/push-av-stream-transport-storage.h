@@ -177,10 +177,6 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         {
             CENCKey.ClearValue();
         }
-        else
-        {
-            trackName.ClearValue();
-        }
 
         metadataEnabled = aCMAFContainerOptions.metadataEnabled;
 
