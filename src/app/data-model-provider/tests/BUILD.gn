@@ -20,6 +20,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestActionReturnStatus.cpp",
     "TestEventEmitting.cpp",
+    "TestJitterDeferredAttributeChangeListener.cpp",
     "TestMetadataEntries.cpp",
     "TestProviderListeners.cpp",
   ]
@@ -31,6 +32,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }
 

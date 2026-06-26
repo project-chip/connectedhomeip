@@ -43,6 +43,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/nrfconnect/FactoryResetTestEventTriggerHandler.h>
 #include <setup_payload/OnboardingCodesUtil.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <system/SystemClock.h>
 
 #ifdef CONFIG_CHIP_WIFI
@@ -304,8 +305,9 @@ CHIP_ERROR AppTask::Init()
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+    initParams.dataModelProvider               = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.dataModelProviderChangeListener = &GetCustomizedAttributeChangeListener();
+    initParams.testEventTriggerDelegate        = &sTestEventTriggerDelegate;
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     // Set up OpenThread configuration when OpenThread is included
@@ -317,6 +319,7 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+    GetCustomizedAttributeChangeListener().SetUnderlyingListener(&chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine());
     AppFabricTableDelegate::Init();
 
 #ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
@@ -779,4 +782,11 @@ void AppTask::UpdateClusterState()
             LOG_ERR("Updating level cluster failed: %x", to_underlying(status));
         }
     });
+}
+
+chip::app::DataModel::JitterDeferredAttributeChangeListener & AppTask::GetCustomizedAttributeChangeListener()
+{
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::DataModel::JitterDeferredAttributeChangeListener sCustomizedAttributeChangeListener(nullptr, sTimerDelegate);
+    return sCustomizedAttributeChangeListener;
 }

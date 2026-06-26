@@ -47,6 +47,8 @@ source_set("data-model-provider") {
     "Context.h",
     "EventsGenerator.cpp",
     "EventsGenerator.h",
+    "JitterDeferredAttributeChangeListener.cpp",
+    "JitterDeferredAttributeChangeListener.h",
     "MetadataLookup.cpp",
     "MetadataLookup.h",
     "Provider.cpp",

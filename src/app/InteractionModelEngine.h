@@ -430,7 +430,7 @@ public:
     // state
     //
     // Returns the old data model provider value.
-    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
+    DataModel::Provider * SetDataModelProvider(DataModel::Provider * model, DataModel::AttributeChangeListener * listener = nullptr);
 
     // DeviceLoadStatusProvider functions implementation
     MessageStats GetMessageStats() override;
@@ -746,6 +746,7 @@ private:
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
     DataModel::Provider * mDataModelProvider = nullptr;
+    DataModel::AttributeChangeListener * mActiveAttributeChangeListener = nullptr;
     // Tracks whether the provider was shut down and needs Startup() called again.
     // We can't null mDataModelProvider on shutdown because tests and other code
     // may still reference it between Shutdown() and the next Init().

@@ -23,6 +23,7 @@
 #include "PWMDevice.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <app/data-model-provider/JitterDeferredAttributeChangeListener.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nrfconnect/FactoryDataProvider.h>
@@ -53,6 +54,8 @@ public:
     };
 
     CHIP_ERROR StartApp();
+
+    static chip::app::DataModel::JitterDeferredAttributeChangeListener & GetCustomizedAttributeChangeListener();
 
     void UpdateClusterState();
     PWMDevice & GetPWMDevice() { return mPWMDevice; }

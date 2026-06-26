@@ -307,6 +307,14 @@ void InteractionModelEngine::Shutdown()
     if (mDataModelProvider != nullptr)
     {
         ChipLogProgress(InteractionModel, "Shutting down data model provider %p", mDataModelProvider);
+        if (mActiveAttributeChangeListener != nullptr)
+        {
+            mDataModelProvider->UnregisterAttributeChangeListener(*mActiveAttributeChangeListener);
+        }
+        else
+        {
+            mDataModelProvider->UnregisterAttributeChangeListener(mReportingEngine);
+        }
         LogErrorOnFailure(mDataModelProvider->Shutdown());
         mDataModelProviderNeedsStartup = true;
     }
@@ -1944,7 +1952,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     return DataModel::ValidateClusterPath(provider, aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
 }
 
-DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model)
+DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model, DataModel::AttributeChangeListener * listener)
 {
     // Altering data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
@@ -1965,7 +1973,14 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     else if (oldModel != nullptr)
     {
         // Different provider replacing the current one — shut down the old one first.
-        oldModel->UnregisterAttributeChangeListener(mReportingEngine);
+        if (mActiveAttributeChangeListener != nullptr)
+        {
+            oldModel->UnregisterAttributeChangeListener(*mActiveAttributeChangeListener);
+        }
+        else
+        {
+            oldModel->UnregisterAttributeChangeListener(mReportingEngine);
+        }
         if (!mDataModelProviderNeedsStartup)
         {
             // Only shut down if not already shut down by InteractionModelEngine::Shutdown().
@@ -1978,6 +1993,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     }
 
     mDataModelProvider = model;
+    mActiveAttributeChangeListener = listener;
     if (mDataModelProvider != nullptr)
     {
         CHIP_ERROR err = mDataModelProvider->Startup({
@@ -1993,7 +2009,14 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
         // Register to the new model (skip if same provider — already registered)
         if (model != oldModel)
         {
-            mDataModelProvider->RegisterAttributeChangeListener(mReportingEngine);
+            if (mActiveAttributeChangeListener != nullptr)
+            {
+                mDataModelProvider->RegisterAttributeChangeListener(*mActiveAttributeChangeListener);
+            }
+            else
+            {
+                mDataModelProvider->RegisterAttributeChangeListener(mReportingEngine);
+            }
         }
     }
 
