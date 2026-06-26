@@ -65,7 +65,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import queue
 
 from mobly import asserts
 from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_on_root_node
@@ -230,34 +229,34 @@ class TC_SC_5_2(MatterBaseTest):
         # Step 2c: Configure local GroupKeyMap on the TH
         self.step("2c")
         dev_ctrl.SetGroupKeySet(
-            keyset_id=keySetID1, 
-            policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst, 
+            keyset_id=keySetID1,
+            policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             num_keys=1,
-            epoch_key0=epochKeyForKeySets, 
+            epoch_key0=epochKeyForKeySets,
             epoch_start_time0=2220000,
-            epoch_key1=None, 
+            epoch_key1=None,
             epoch_start_time1=0,
-            epoch_key2=None, 
+            epoch_key2=None,
             epoch_start_time2=0
         )
-        
+
         dev_ctrl.SetGroupKeySet(
-            keyset_id=keySetID2, 
-            policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst, 
+            keyset_id=keySetID2,
+            policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             num_keys=1,
-            epoch_key0=epochKeyForKeySets, 
+            epoch_key0=epochKeyForKeySets,
             epoch_start_time0=2220000,
-            epoch_key1=None, 
+            epoch_key1=None,
             epoch_start_time1=0,
-            epoch_key2=None, 
+            epoch_key2=None,
             epoch_start_time2=0
         )
 
         group_addr_policy = GROUP_INFO_FLAG_USE_IANA_ADDR if groupcast_enabled else GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY
-        
+
         dev_ctrl.SetGroupInfo(groupID1, "Group 0x0101", group_addr_policy)
         dev_ctrl.SetGroupKey(groupID1, keySetID2)
-        
+
         dev_ctrl.SetGroupInfo(groupID2, "Group 0x0102", group_addr_policy)
         dev_ctrl.SetGroupKey(groupID2, keySetID2)
 
