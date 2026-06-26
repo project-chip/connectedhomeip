@@ -24,8 +24,8 @@ from matter.testing.harness_params import (HarnessParamDefinition, format_declar
                                            resolve_harness_value, validate_harness_params)
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error,
-                                  format_pixit_type_errors, format_pixit_value_for_dump, get_pixit_definitions,
-                                  validate_pixit_types, pixit, validate_pixits)
+                                  format_pixit_type_errors, format_pixit_value_for_dump, get_pixit_definitions, pixit,
+                                  validate_pixit_types, validate_pixits)
 
 
 class TestPixitDefinition(unittest.TestCase):
