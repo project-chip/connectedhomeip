@@ -16,7 +16,14 @@
  */
 #pragma once
 
+#include <sdkconfig.h>
 #include <stdint.h>
+
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+#include <lib/core/CHIPError.h>
+#include <src/platform/ESP32/multi-ota/MultiImageOTAProcessorImpl.h>
+#endif
+
 class OTAHelpers
 {
 public:
@@ -27,6 +34,10 @@ public:
     }
     static constexpr uint32_t kInitOTARequestorDelaySec = 3;
     void InitOTARequestor(void);
+
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+    CHIP_ERROR RegisterSubImageProcessor(chip::ImageProcessorEntry & entry);
+#endif
 };
 
 namespace chip {

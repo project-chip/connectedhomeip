@@ -187,6 +187,13 @@ void OTAHelpers::InitOTARequestor()
     }
 }
 
+#ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
+CHIP_ERROR OTAHelpers::RegisterSubImageProcessor(chip::ImageProcessorEntry & entry)
+{
+    return gImageProcessor.RegisterProcessor(entry);
+}
+#endif // CONFIG_ENABLE_MULTI_IMAGE_OTA
+
 namespace chip {
 namespace Shell {
 namespace {

@@ -285,6 +285,8 @@ void MultiImageOTAProcessorImpl::HandleProcessBlock(intptr_t context)
             {
                 const SubImageStatus status =
                     (readiness == DeviceState::kNotReady) ? SubImageStatus::kSkippedNotReady : SubImageStatus::kSkippedUpToDate;
+                ChipLogError(SoftwareUpdate, "Sub-image 0x%" PRIx32 " skipped: %s", activeSubImage->imageId,
+                             readiness == DeviceState::kNotReady ? "kNotReady" : "kAlreadyUpToDate");
                 imageProcessor->RecordSubImageResult(activeSubImage->imageId, activeSubImage->version, status);
 
                 // OTA provider will skip the bytes from what it has already sent (the end of this block), not from the cursor we're
