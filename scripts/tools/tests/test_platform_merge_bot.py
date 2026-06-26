@@ -449,6 +449,43 @@ esp32:
         mock_comment.delete.assert_called_once()
         mock_pr.merge.assert_not_called()
 
+    def test_check_and_process_pr_already_commented_deletes_duplicates(self) -> None:
+        """Tests that duplicate eligibility comments are deleted and only one is kept/updated."""
+        files = [
+            self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
+        ]
+        reviews = []
+
+        # We have two eligibility comments
+        mock_comment1 = MagicMock()
+        mock_comment1.user.login = "platform-merge-bot"
+        mock_comment1.body = (
+            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
+        )
+
+        mock_comment2 = MagicMock()
+        mock_comment2.user.login = "platform-merge-bot"
+        mock_comment2.body = (
+            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nDuplicate Info..."
+        )
+
+        mock_pr = self.create_mock_pr(
+            1,
+            "Test PR",
+            "author",
+            files,
+            reviews,
+            comments=[mock_comment1, mock_comment2],
+        )
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        # The first comment should be edited (updated)
+        mock_comment1.edit.assert_called_once()
+        # The second comment should be deleted
+        mock_comment2.delete.assert_called_once()
+        mock_pr.merge.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

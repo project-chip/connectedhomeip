@@ -104,9 +104,18 @@ class PlatformMergeBot:
             )
 
         for group_name, group_data in content.items():
+            if not isinstance(group_name, str):
+                raise ValueError(f"Group name '{group_name}' must be a string.")
             if not isinstance(group_data, dict):
                 raise ValueError(
                     f"Invalid data format for group '{group_name}'. Expected a dictionary."
+                )
+            allowed_keys = {"maintainers", "paths"}
+            invalid_keys = set(group_data.keys()) - allowed_keys
+            if invalid_keys:
+                raise ValueError(
+                    f"Group '{group_name}' contains unrecognized keys: {list(invalid_keys)}. "
+                    f"Only {list(allowed_keys)} are allowed."
                 )
             maintainers = group_data.get("maintainers", [])
             paths = group_data.get("paths", [])
@@ -297,26 +306,50 @@ class PlatformMergeBot:
             for glob in group.get_matched_globs(files):
                 comment_body += f"    * `{glob}`\n"
 
+        eligibility_comment_found = False
         for comment in pr.get_issue_comments():
             if comment.user and comment.user.login.lower() == self.bot_username:
                 if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
-                    if comment.body.strip() != comment_body.strip():
+                    if not eligibility_comment_found:
+                        eligibility_comment_found = True
+                        if comment.body.strip() != comment_body.strip():
+                            if self.dry_run:
+                                log.info(
+                                    "[Dry Run] Would update eligibility comment on PR #%d",
+                                    pr.number,
+                                )
+                            else:
+                                log.info(
+                                    "Updating eligibility comment on PR #%d", pr.number
+                                )
+                                comment.edit(comment_body)
+                        else:
+                            log.debug(
+                                "PR #%d already has an up-to-date eligibility comment.",
+                                pr.number,
+                            )
+                    else:
                         if self.dry_run:
                             log.info(
-                                "[Dry Run] Would update eligibility comment on PR #%d",
+                                "[Dry Run] Would delete duplicate eligibility comment on PR #%d",
                                 pr.number,
                             )
                         else:
                             log.info(
-                                "Updating eligibility comment on PR #%d", pr.number
+                                "Deleting duplicate eligibility comment on PR #%d",
+                                pr.number,
                             )
-                            comment.edit(comment_body)
-                    else:
-                        log.debug(
-                            "PR #%d already has an up-to-date eligibility comment.",
-                            pr.number,
-                        )
-                    return
+                            try:
+                                comment.delete()
+                            except GithubException as e:
+                                log.error(
+                                    "Failed to delete duplicate comment #%d: %s",
+                                    comment.id,
+                                    e,
+                                )
+
+        if eligibility_comment_found:
+            return
 
         if self.dry_run:
             log.info(
@@ -343,8 +376,12 @@ class PlatformMergeBot:
                             "Deleting stale eligibility comment on PR #%d",
                             pr.number,
                         )
-                        comment.delete()
-                    return
+                        try:
+                            comment.delete()
+                        except GithubException as e:
+                            log.error(
+                                "Failed to delete stale comment #%d: %s", comment.id, e
+                            )
 
     def merge_pr(
         self, pr: PullRequest, valid_approvals_per_group: dict[str, GroupApproval]
@@ -376,7 +413,14 @@ class PlatformMergeBot:
             )
 
             log.info("Posting merge explanation comment to PR #%d", pr.number)
-            pr.create_issue_comment(merge_reason_comment)
+            try:
+                pr.create_issue_comment(merge_reason_comment)
+            except GithubException as e:
+                log.error(
+                    "Failed to post merge explanation comment to PR #%d: %s",
+                    pr.number,
+                    e,
+                )
 
     def run(self) -> None:
         """Scans all open pull requests and processes them."""
