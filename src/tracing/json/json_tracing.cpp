@@ -531,7 +531,7 @@ void JsonBackend::OutputValue(::Json::Value & value)
             }
             else
             {
-                ChipLogProgress(Automation, "%s", StringBuilder<kMaxLogLineLength>(line).c_str());
+                ChipLogProgress(Automation, "%s", StringBuilder<kMaxLogLineLength+1>(line).c_str());
             }
         }
     }
