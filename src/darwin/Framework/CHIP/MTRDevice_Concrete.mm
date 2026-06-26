@@ -5741,6 +5741,17 @@ uint32_t SubscriptionCallback::ComputeTimeTillNextSubscription()
         waitTimeInMsec = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
     }
 
+    // Floor the computed delay so a zero Fibonacci step (mResubscriptionNumRetries == 0,
+    // where GetFibonacciForIndex(0) == 0 leaves waitTimeInMsec == 0) can never produce a
+    // 0 ms re-arm. Without this floor a burst of resubscribe triggers can drive
+    // back-to-back SubscribeRequests on an already-established session. This mirrors the
+    // MIN_WAIT floor enforced in -_doHandleSubscriptionReset: and the equivalent floor in
+    // ReadClient::ComputeTimeTillNextSubscription.
+    constexpr uint32_t kMinResubscribeDelayMsec = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS * 1000;
+    if (waitTimeInMsec < kMinResubscribeDelayMsec) {
+        waitTimeInMsec = kMinResubscribeDelayMsec;
+    }
+
     return waitTimeInMsec;
 }
 
