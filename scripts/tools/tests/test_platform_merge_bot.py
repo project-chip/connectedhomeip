@@ -27,8 +27,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-import platform_merge_bot  # noqa: E402
-from platform_merge_bot import PlatformMergeBot  # noqa: E402
+from platform_merge_bot import (
+    PlatformMergeBot,
+    ELIGIBILITY_COMMENT_MARKER,
+)  # noqa: E402
 
 
 class TestPlatformMergeBot(unittest.TestCase):
@@ -178,9 +180,15 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
         matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
 
-        self.assertEqual(len(uncovered), 0)
-        self.assertEqual(len(matched_files["nxp"]), 2)
-        self.assertEqual(len(matched_files["esp32"]), 0)
+        self.assertEqual(uncovered, set())
+        self.assertEqual(
+            matched_files["nxp"],
+            {
+                "src/platform/nxp/SystemTimeSupport.cpp",
+                "examples/all-clusters-app/nxp/main.cpp",
+            },
+        )
+        self.assertEqual(matched_files["esp32"], set())
 
     def test_analyze_pr_files_not_fully_covered(self) -> None:
         """Tests that uncovered files are correctly identified."""
@@ -191,8 +199,10 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
         matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
 
-        self.assertEqual(uncovered, ["src/app/Command.cpp"])
-        self.assertEqual(len(matched_files["nxp"]), 1)
+        self.assertEqual(uncovered, {"src/app/Command.cpp"})
+        self.assertEqual(
+            matched_files["nxp"], {"src/platform/nxp/SystemTimeSupport.cpp"}
+        )
 
     def test_analyze_pr_files_rename_bypass(self) -> None:
         """Tests that previous filenames of renamed files are also checked for coverage."""
@@ -240,7 +250,7 @@ esp32:
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_called_once()
         self.assertIn(
-            platform_merge_bot.ELIGIBILITY_COMMENT_MARKER,
+            ELIGIBILITY_COMMENT_MARKER,
             mock_pr.create_issue_comment.call_args[0][0],
         )
         self.assertIn("Needs approval", mock_pr.create_issue_comment.call_args[0][0])
@@ -254,9 +264,7 @@ esp32:
         # Existing eligibility comment with different body
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
-        mock_comment.body = (
-            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
-        )
+        mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, reviews, comments=[mock_comment]
         )
@@ -276,7 +284,7 @@ esp32:
         reviews = []
 
         # Generate the expected body to make it identical
-        expected_body = f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\n"
+        expected_body = f"{ELIGIBILITY_COMMENT_MARKER}\n"
         expected_body += "### Platform Maintainers Auto-Merge Info\n"
         expected_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
         expected_body += (
@@ -422,9 +430,7 @@ esp32:
         ]
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
-        mock_comment.body = (
-            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
-        )
+        mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, [], comments=[mock_comment]
         )
@@ -439,9 +445,7 @@ esp32:
         files = []  # No changed files
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
-        mock_comment.body = (
-            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
-        )
+        mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, [], comments=[mock_comment]
         )
@@ -461,15 +465,11 @@ esp32:
         # We have two eligibility comments
         mock_comment1 = MagicMock()
         mock_comment1.user.login = "platform-merge-bot"
-        mock_comment1.body = (
-            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
-        )
+        mock_comment1.body = f"{ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
 
         mock_comment2 = MagicMock()
         mock_comment2.user.login = "platform-merge-bot"
-        mock_comment2.body = (
-            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nDuplicate Info..."
-        )
+        mock_comment2.body = f"{ELIGIBILITY_COMMENT_MARKER}\nDuplicate Info..."
 
         mock_pr = self.create_mock_pr(
             1,
@@ -487,6 +487,48 @@ esp32:
         # The second comment should be deleted
         mock_comment2.delete.assert_called_once()
         mock_pr.merge.assert_not_called()
+
+    def test_config_loading_invalid_format(self) -> None:
+        """Tests that ValueError is raised for various invalid config formats."""
+        invalid_contents = [
+            # Not a dict
+            "[]",
+            # Group name not string (YAML allows int keys)
+            "123:\n  maintainers:\n    - dev\n  paths:\n    - 'path/**'",
+            # Group data not dict
+            "group: 'not a dict'",
+            # Unrecognized keys
+            "group:\n  maintainers:\n    - dev\n  paths:\n    - 'path/**'\n  extra: 1",
+            # Maintainers not list
+            "group:\n  maintainers: dev\n  paths:\n    - 'path/**'",
+            # Paths not list
+            "group:\n  maintainers:\n    - dev\n  paths: 'path/**'",
+            # Empty maintainers
+            "group:\n  maintainers: []\n  paths:\n    - 'path/**'",
+            # Empty paths
+            "group:\n  maintainers:\n    - dev\n  paths: []",
+            # Empty maintainer string
+            "group:\n  maintainers:\n    - ''\n  paths:\n    - 'path/**'",
+            # Empty path string
+            "group:\n  maintainers:\n    - dev\n  paths:\n    - ' '",
+        ]
+
+        for content in invalid_contents:
+            with tempfile.NamedTemporaryFile(
+                delete=False, mode="w", suffix=".yaml"
+            ) as f:
+                f.write(content)
+                temp_name = f.name
+            try:
+                with self.assertRaises(ValueError):
+                    PlatformMergeBot(
+                        token="dummy_token",
+                        repo_name="dummy/repo",
+                        config_path=temp_name,
+                        dry_run=False,
+                    )
+            finally:
+                os.unlink(temp_name)
 
 
 if __name__ == "__main__":

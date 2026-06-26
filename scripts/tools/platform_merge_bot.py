@@ -17,7 +17,7 @@
 
 import logging
 import os
-from typing import NamedTuple
+from typing import Iterable, NamedTuple
 
 import click
 import coloredlogs
@@ -40,7 +40,7 @@ class GroupApproval(NamedTuple):
     """Represents an approval for a platform group."""
 
     approver: str
-    files: list[str]
+    files: set[str]
 
 
 class PlatformGroup:
@@ -60,7 +60,7 @@ class PlatformGroup:
         """Checks if a file path matches this group's configured paths."""
         return self.spec.match_file(filepath)
 
-    def get_matched_globs(self, files: list[str]) -> list[str]:
+    def get_matched_globs(self, files: Iterable[str]) -> list[str]:
         """Returns the list of glob patterns in this group that match any of the given files."""
         matched_globs = set()
         for f in files:
@@ -102,49 +102,45 @@ class PlatformMergeBot:
         with open(self.config_path, encoding="utf-8") as f:
             content = yaml.safe_load(f)
 
-        if not content or not isinstance(content, dict):
+        if not isinstance(content, dict):
             raise ValueError(
                 "Invalid config file format. Expected a YAML dictionary of groups."
             )
 
-        for group_name, group_data in content.items():
-            if not isinstance(group_name, str):
-                raise ValueError(f"Group name '{group_name}' must be a string.")
-            if not isinstance(group_data, dict):
+        for name, data in content.items():
+            if not isinstance(name, str):
+                raise ValueError(f"Group name '{name}' must be a string.")
+            if not isinstance(data, dict):
                 raise ValueError(
-                    f"Invalid data format for group '{group_name}'. Expected a dictionary."
+                    f"Invalid data format for group '{name}'. Expected a dictionary."
                 )
-            allowed_keys = {"maintainers", "paths"}
-            invalid_keys = set(group_data.keys()) - allowed_keys
+
+            invalid_keys = set(data.keys()) - {"maintainers", "paths"}
             if invalid_keys:
                 raise ValueError(
-                    f"Group '{group_name}' contains unrecognized keys: {list(invalid_keys)}. "
-                    f"Only {list(allowed_keys)} are allowed."
+                    f"Group '{name}' contains unrecognized keys: {list(invalid_keys)}"
                 )
-            maintainers = group_data.get("maintainers", [])
-            paths = group_data.get("paths", [])
-            if not isinstance(maintainers, list) or not isinstance(paths, list):
-                raise ValueError(
-                    f"Group '{group_name}' must contain 'maintainers' and 'paths' lists."
-                )
-            if not maintainers:
-                raise ValueError(
-                    f"Group '{group_name}' maintainers list cannot be empty."
-                )
-            if not paths:
-                raise ValueError(f"Group '{group_name}' paths list cannot be empty.")
 
-            for m in maintainers:
-                if not isinstance(m, str) or not m.strip():
-                    raise ValueError(
-                        f"Group '{group_name}' maintainer '{m}' must be a non-empty string."
-                    )
-            for p in paths:
-                if not isinstance(p, str) or not p.strip():
-                    raise ValueError(
-                        f"Group '{group_name}' path '{p}' must be a non-empty string."
-                    )
-            self.groups[group_name] = PlatformGroup(group_name, maintainers, paths)
+            maintainers = data.get("maintainers")
+            paths = data.get("paths")
+
+            if not isinstance(maintainers, list) or not maintainers:
+                raise ValueError(
+                    f"Group '{name}' must contain a non-empty 'maintainers' list."
+                )
+            if not isinstance(paths, list) or not paths:
+                raise ValueError(
+                    f"Group '{name}' must contain a non-empty 'paths' list."
+                )
+
+            if not all(isinstance(m, str) and m.strip() for m in maintainers):
+                raise ValueError(
+                    f"Group '{name}' maintainers must be non-empty strings."
+                )
+            if not all(isinstance(p, str) and p.strip() for p in paths):
+                raise ValueError(f"Group '{name}' paths must be non-empty strings.")
+
+            self.groups[name] = PlatformGroup(name, maintainers, paths)
 
         log.info("Loaded %d platform groups from config.", len(self.groups))
 
@@ -153,9 +149,10 @@ class PlatformMergeBot:
         user_reviews = {}
         # get_reviews() returns reviews chronologically
         for review in pr.get_reviews():
-            if not review.user or not review.user.login:
+            review_user = getattr(review.user, "login", None)
+            if not review_user:
                 continue
-            user = review.user.login.lower()
+            user = review_user.lower()
             if review.state in ("APPROVED", "CHANGES_REQUESTED", "DISMISSED"):
                 user_reviews[user] = review.state
 
@@ -163,26 +160,25 @@ class PlatformMergeBot:
             user for user, state in user_reviews.items() if state == "APPROVED"
         }
         # Exclude author from self-approval
-        author = pr.user.login.lower() if pr.user and pr.user.login else ""
+        pr_author = getattr(pr.user, "login", None)
+        author = pr_author.lower() if pr_author else ""
         approvers.discard(author)
         change_requesters = {
             user for user, state in user_reviews.items() if state == "CHANGES_REQUESTED"
         }
         return approvers, change_requesters
 
-    def analyze_pr_files(
-        self, pr: PullRequest
-    ) -> tuple[dict[str, list[str]], list[str]]:
+    def analyze_pr_files(self, pr: PullRequest) -> tuple[dict[str, set[str]], set[str]]:
         """Analyzes the files changed in the PR.
 
         Returns:
           - matched_files_per_group: Map of group_name -> list of files matching it.
           - uncovered_files: List of files that matched no group.
         """
-        matched_files_per_group: dict[str, list[str]] = {
-            name: [] for name in self.groups
+        matched_files_per_group: dict[str, set[str]] = {
+            name: set() for name in self.groups
         }
-        uncovered_files = []
+        uncovered_files = set()
 
         # pr.get_files() returns PaginatedList of File objects
         for pr_file in pr.get_files():
@@ -195,19 +191,18 @@ class PlatformMergeBot:
                 matched_any = False
                 for group_name, group in self.groups.items():
                     if group.matches_file(filepath):
-                        matched_files_per_group[group_name].append(filepath)
+                        matched_files_per_group[group_name].add(filepath)
                         matched_any = True
 
                 if not matched_any:
-                    uncovered_files.append(filepath)
+                    uncovered_files.add(filepath)
 
         return matched_files_per_group, uncovered_files
 
     def check_and_process_pr(self, pr: PullRequest) -> None:
         """Checks the coverage and approvals for a single PR, and merges if eligible."""
-        log.info(
-            "Checking PR #%d: '%s' (Author: %s)", pr.number, pr.title, pr.user.login
-        )
+        pr_author = getattr(pr.user, "login", None) or "ghost"
+        log.info("Checking PR #%d: '%s' (Author: %s)", pr.number, pr.title, pr_author)
 
         if pr.draft:
             log.info("PR #%d is a draft. Skipping.", pr.number)
@@ -219,7 +214,7 @@ class PlatformMergeBot:
             log.info(
                 "PR #%d contains files outside the platform-maintained scope. Skipping. Uncovered files: %s",
                 pr.number,
-                uncovered_files[:5],
+                list(uncovered_files)[:5],
             )
             self.remove_eligibility_comment(pr)
             return
@@ -266,7 +261,7 @@ class PlatformMergeBot:
             else:
                 # Pick the first matched approver for documentation
                 valid_approvals_per_group[group_name] = GroupApproval(
-                    list(group_approvers)[0], files
+                    sorted(group_approvers)[0], files
                 )
 
         if missing_approvals:
@@ -282,10 +277,20 @@ class PlatformMergeBot:
         log.info("PR #%d is fully approved and ready to merge!", pr.number)
         self.merge_pr(pr, valid_approvals_per_group)
 
+    def _find_bot_comments(self, pr: PullRequest) -> list:
+        """Finds comments posted by this bot on the PR."""
+        bot_comments = []
+        for comment in pr.get_issue_comments():
+            comment_user = getattr(comment.user, "login", None)
+            if comment_user and comment_user.lower() == self.bot_username:
+                if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
+                    bot_comments.append(comment)
+        return bot_comments
+
     def post_eligibility_comment(
         self,
         pr: PullRequest,
-        active_groups: dict[str, list[str]],
+        active_groups: dict[str, set[str]],
         missing_approvals: dict[str, PlatformGroup],
     ) -> None:
         """Posts or updates a comment stating the auto-merge status of the PR."""
@@ -310,82 +315,71 @@ class PlatformMergeBot:
             for glob in group.get_matched_globs(files):
                 comment_body += f"    * `{glob}`\n"
 
-        eligibility_comment_found = False
-        for comment in pr.get_issue_comments():
-            if comment.user and comment.user.login.lower() == self.bot_username:
-                if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
-                    if not eligibility_comment_found:
-                        eligibility_comment_found = True
-                        if comment.body.strip() != comment_body.strip():
-                            if self.dry_run:
-                                log.info(
-                                    "[Dry Run] Would update eligibility comment on PR #%d",
-                                    pr.number,
-                                )
-                            else:
-                                log.info(
-                                    "Updating eligibility comment on PR #%d", pr.number
-                                )
-                                comment.edit(comment_body)
-                        else:
-                            log.debug(
-                                "PR #%d already has an up-to-date eligibility comment.",
-                                pr.number,
-                            )
-                    else:
-                        if self.dry_run:
-                            log.info(
-                                "[Dry Run] Would delete duplicate eligibility comment on PR #%d",
-                                pr.number,
-                            )
-                        else:
-                            log.info(
-                                "Deleting duplicate eligibility comment on PR #%d",
-                                pr.number,
-                            )
-                            try:
-                                comment.delete()
-                            except GithubException as e:
-                                log.error(
-                                    "Failed to delete duplicate comment #%d: %s",
-                                    comment.id,
-                                    e,
-                                )
+        bot_comments = self._find_bot_comments(pr)
+        if bot_comments:
+            main_comment = bot_comments[0]
+            if main_comment.body.strip() != comment_body.strip():
+                if self.dry_run:
+                    log.info(
+                        "[Dry Run] Would update eligibility comment on PR #%d",
+                        pr.number,
+                    )
+                else:
+                    log.info("Updating eligibility comment on PR #%d", pr.number)
+                    main_comment.edit(comment_body)
+            else:
+                log.debug(
+                    "PR #%d already has an up-to-date eligibility comment.",
+                    pr.number,
+                )
 
-        if eligibility_comment_found:
-            return
-
-        if self.dry_run:
-            log.info(
-                "[Dry Run] Would post eligibility comment to PR #%d:\n%s",
-                pr.number,
-                comment_body,
-            )
+            for duplicate in bot_comments[1:]:
+                if self.dry_run:
+                    log.info(
+                        "[Dry Run] Would delete duplicate eligibility comment on PR #%d",
+                        pr.number,
+                    )
+                else:
+                    log.info(
+                        "Deleting duplicate eligibility comment on PR #%d",
+                        pr.number,
+                    )
+                    try:
+                        duplicate.delete()
+                    except GithubException as e:
+                        log.error(
+                            "Failed to delete duplicate comment #%d: %s",
+                            duplicate.id,
+                            e,
+                        )
         else:
-            log.info("Posting eligibility comment to PR #%d", pr.number)
-            pr.create_issue_comment(comment_body)
+            if self.dry_run:
+                log.info(
+                    "[Dry Run] Would post eligibility comment to PR #%d:\n%s",
+                    pr.number,
+                    comment_body,
+                )
+            else:
+                log.info("Posting eligibility comment to PR #%d", pr.number)
+                pr.create_issue_comment(comment_body)
 
     def remove_eligibility_comment(self, pr: PullRequest) -> None:
         """Removes the eligibility comment if it exists on the PR."""
-        for comment in pr.get_issue_comments():
-            if comment.user and comment.user.login.lower() == self.bot_username:
-                if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
-                    if self.dry_run:
-                        log.info(
-                            "[Dry Run] Would delete stale eligibility comment on PR #%d",
-                            pr.number,
-                        )
-                    else:
-                        log.info(
-                            "Deleting stale eligibility comment on PR #%d",
-                            pr.number,
-                        )
-                        try:
-                            comment.delete()
-                        except GithubException as e:
-                            log.error(
-                                "Failed to delete stale comment #%d: %s", comment.id, e
-                            )
+        for comment in self._find_bot_comments(pr):
+            if self.dry_run:
+                log.info(
+                    "[Dry Run] Would delete stale eligibility comment on PR #%d",
+                    pr.number,
+                )
+            else:
+                log.info(
+                    "Deleting stale eligibility comment on PR #%d",
+                    pr.number,
+                )
+                try:
+                    comment.delete()
+                except GithubException as e:
+                    log.error("Failed to delete stale comment #%d: %s", comment.id, e)
 
     def merge_pr(
         self, pr: PullRequest, valid_approvals_per_group: dict[str, GroupApproval]
@@ -491,14 +485,11 @@ def main(
         if not gh_token:
             raise click.ClickException(f"Token file {token_file} is empty")
     else:
-        env_var = token_env or "GH_TOKEN"
-        gh_token = os.environ.get(env_var)
-        if not gh_token and env_var == "GH_TOKEN":
-            gh_token = os.environ.get("GITHUB_TOKEN")
+        gh_token = os.environ.get(token_env) or os.environ.get("GITHUB_TOKEN")
 
         if not gh_token:
             raise click.ClickException(
-                f"Require a token. Set environment variable '{env_var}' (or 'GITHUB_TOKEN') or provide --token-file"
+                f"Require a token. Set environment variable '{token_env}' (or 'GITHUB_TOKEN') or provide --token-file"
             )
 
     bot = PlatformMergeBot(gh_token, repo, config, dry_run)
