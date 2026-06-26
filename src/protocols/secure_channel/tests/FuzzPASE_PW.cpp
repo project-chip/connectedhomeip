@@ -651,7 +651,7 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
     // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
     // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
-    VerifyOrReturn(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode) == CHIP_NO_ERROR);
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     /************************Injecting Fuzzed Pake1 Message into PaseSession::OnMessageReceived*************************/
 
@@ -756,7 +756,7 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
     // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
     // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
-    VerifyOrReturn(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode) == CHIP_NO_ERROR);
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
                                                                   kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,
@@ -889,7 +889,7 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
     // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
     // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
-    VerifyOrReturn(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode) == CHIP_NO_ERROR);
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
                                                                   kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,
