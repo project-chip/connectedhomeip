@@ -540,7 +540,7 @@ void ReliableMessageMgr::SetAdditionalMRPBackoffTime(const Optional<System::Cloc
 
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
-    const auto sessionHandle = entry.ec->GetSessionHandle();
+    const auto sessionHandle                 = entry.ec->GetSessionHandle();
     const System::Clock::Timeout baseTimeout = [&]() {
         // A responder exchange always has received at least one message (the initiation request).
         // Therefore, !HasReceivedAtLeastOneMessage() is only true for the initiator's first message.
