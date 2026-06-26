@@ -106,7 +106,7 @@ tests:
       disabled: true
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE & TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
@@ -120,7 +120,7 @@ tests:
     - label:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.TCCM.MODE_CHANGE_FAIL"
-      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE & TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
 
@@ -135,7 +135,7 @@ tests:
       disabled: true
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE & TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
