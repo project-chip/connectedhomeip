@@ -404,6 +404,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 - (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
+- (void)unitTestReadClientCreatedForDevice:(MTRDevice *)device;
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device;
@@ -3300,6 +3301,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            callback->AdoptReadClient(std::move(readClient));
                            callback->AdoptClusterStateCache(std::move(clusterStateCache));
                            callback.release();
+
+#ifdef DEBUG
+                           // Each ReadClient corresponds to one SubscribeRequest going out
+                           // on the wire. Tests use this to assert that the coldstart
+                           // double-trigger (controllerResumed-style setup mid-CASE followed
+                           // by _deviceMayBeReachable) results in exactly ONE subscription,
+                           // not two. See #72721.
+                           {
+                               std::lock_guard lock(self->_lock);
+                               [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                                   if ([testDelegate respondsToSelector:@selector(unitTestReadClientCreatedForDevice:)]) {
+                                       [testDelegate unitTestReadClientCreatedForDevice:self];
+                                   }
+                               }];
+                           }
+#endif
                        }];
 
     // Set up connectivity monitoring in case network becomes routable after any part of the subscription process goes into backoff retries.
