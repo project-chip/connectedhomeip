@@ -18,8 +18,9 @@ branch and a baseline (like the `master` fork-point).
 You MUST use the `podman-vscode-build` skill to handle container setup and build
 execution.
 
-- **macOS Note**: As per `podman-vscode-build`, use `docker` instead of `podman`
-  on macOS due to stability and proper Rosetta 2 support for the x86 toolchains.
+-   **macOS Note**: As per `podman-vscode-build`, use `docker` instead of
+    `podman` on macOS due to stability and proper Rosetta 2 support for the x86
+    toolchains.
 
 ### B. Rust Tools Installation (macOS & Linux)
 
@@ -44,12 +45,12 @@ cargo install elf_bloat asm-annotate
 
 Identify your target's ELF path relative to the repo root before you start:
 
-- **Linux / POSIX**: `out/<target>/<app-name>`
-- **ESP32**: `out/<target>/<app-name>.elf`
-- **Silicon Labs EFR32**: `out/<target>/<app-name>.out`
-- **nRF Connect (script)**:
-  `examples/<app>/nrfconnect/build/nrfconnect/zephyr/zephyr.elf`
-- **nRF/Telink (build_examples.py)**: `out/<target>/zephyr/zephyr.elf`
+-   **Linux / POSIX**: `out/<target>/<app-name>`
+-   **ESP32**: `out/<target>/<app-name>.elf`
+-   **Silicon Labs EFR32**: `out/<target>/<app-name>.out`
+-   **nRF Connect (script)**:
+    `examples/<app>/nrfconnect/build/nrfconnect/zephyr/zephyr.elf`
+-   **nRF/Telink (build_examples.py)**: `out/<target>/zephyr/zephyr.elf`
 
 ## 3. Comparison Workflow
 
