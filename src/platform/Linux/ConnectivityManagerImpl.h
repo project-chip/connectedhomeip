@@ -156,6 +156,14 @@ public:
     void SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept;
     void SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept;
 
+    // Network Commissioning Action Delegation Methods
+
+    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
+                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
+    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
+    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
+                        Optional<int32_t> inConnectStatus) noexcept;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
 #endif
@@ -226,14 +234,8 @@ private:
     unsigned int mAssociationRetriesLeft = 0;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-    // Network Commissioning Action Delegation Methods
 
-    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
-                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
-    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
-    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
-                        Optional<int32_t> inConnectStatus) noexcept;
-
+private:
     // ==================== ConnectivityManager Private Methods ====================
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

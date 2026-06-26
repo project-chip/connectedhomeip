@@ -30,6 +30,9 @@ FlowSensorDevice::FlowSensorDevice(TimerDelegate & timerDelegate, FlowMeasuremen
 
 CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -38,7 +41,9 @@ CHIP_ERROR FlowSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelPr
     mFlowMeasurementCluster.Create(endpoint, mFlowConfig);
     ReturnErrorOnFailure(provider.AddCluster(mFlowMeasurementCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void FlowSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)

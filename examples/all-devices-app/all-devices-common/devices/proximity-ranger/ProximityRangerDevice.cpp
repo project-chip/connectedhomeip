@@ -57,45 +57,26 @@ ProximityRangerDevice::ProximityRangerDevice(TimerDelegate & timerDelegate,
 CHIP_ERROR ProximityRangerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                            EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     VerifyOrReturnError(!mRegistered, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
-    CHIP_ERROR err = provider.AddCluster(mIdentifyCluster.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        // AddCluster failed, so the cluster was never registered with the provider; destroy
-        // the constructed object directly rather than going through Unregister (which would
-        // call provider.RemoveCluster on a cluster the provider never accepted).
-        mIdentifyCluster.Destroy();
-        Unregister(provider);
-        return err;
-    }
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mProximityRangingCluster.Create(
         endpoint,
         ProximityRanging::ProximityRangingCluster::Config(mTimerDelegate)
             .WithFeatures(DeriveFeatures())
             .WithAdapters(Span<ProximityRanging::RangingAdapter * const>(mAdapters.data(), mAdapters.size())));
-    err = provider.AddCluster(mProximityRangingCluster.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        // See above: AddCluster failed, so destroy this cluster directly. Unregister still
-        // unwinds the previously-registered mIdentifyCluster.
-        mProximityRangingCluster.Destroy();
-        Unregister(provider);
-        return err;
-    }
+    ReturnErrorOnFailure(provider.AddCluster(mProximityRangingCluster.Registration()));
 
-    err = provider.AddEndpoint(mEndpointRegistration);
-    if (err != CHIP_NO_ERROR)
-    {
-        Unregister(provider);
-        return err;
-    }
-
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     mRegistered = true;
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
