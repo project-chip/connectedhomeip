@@ -21,21 +21,19 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-# Global placeholders for dynamically imported local modules (shields them from formatters)
-platform_merge_bot = None
-PlatformGroup = None
-PlatformMergeBot = None
+# Ensure the parent directory is in the path so we can import platform_merge_bot
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# isort: split
+
+# pylint: disable=wrong-import-position
+import platform_merge_bot  # noqa: E402
+from platform_merge_bot import GroupApproval, PlatformGroup, PlatformMergeBot  # noqa: E402
 
 
 class TestPlatformMergeBot(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-        global platform_merge_bot, PlatformGroup, PlatformMergeBot
-        import platform_merge_bot
-        from platform_merge_bot import PlatformGroup, PlatformMergeBot
-
-    def setUp(self):
+    def setUp(self) -> None:
+        """Sets up the test case by creating a temporary config file and mocking the Github API."""
         # Create a temporary config file for testing
         self.config_content = """
 nxp:
@@ -77,18 +75,30 @@ esp32:
         self.bot._bot_username = "platform-merge-bot"
 
     def create_mock_file(self, filename: str) -> MagicMock:
+        """Creates a mock file object with the given filename."""
         mock_file = MagicMock()
         mock_file.filename = filename
         mock_file.previous_filename = None
         return mock_file
 
     def create_mock_review(self, username: str, state: str) -> MagicMock:
+        """Creates a mock review object with the given user and state."""
         mock_review = MagicMock()
         mock_review.user.login = username
         mock_review.state = state
         return mock_review
 
-    def create_mock_pr(self, number: int, title: str, author: str, files: list, reviews: list, comments: list = None, draft: bool = False) -> MagicMock:
+    def create_mock_pr(
+        self,
+        number: int,
+        title: str,
+        author: str,
+        files: list[MagicMock],
+        reviews: list[MagicMock],
+        comments: list[MagicMock] | None = None,
+        draft: bool = False
+    ) -> MagicMock:
+        """Creates a mock PullRequest object with the given parameters."""
         mock_pr = MagicMock()
         mock_pr.number = number
         mock_pr.title = title
@@ -99,7 +109,8 @@ esp32:
         mock_pr.get_issue_comments.return_value = comments or []
         return mock_pr
 
-    def test_config_loading(self):
+    def test_config_loading(self) -> None:
+        """Tests that the YAML config is parsed correctly into PlatformGroup objects."""
         self.assertEqual(len(self.bot.groups), 2)
         self.assertIn("nxp", self.bot.groups)
         self.assertIn("esp32", self.bot.groups)
@@ -108,7 +119,8 @@ esp32:
         self.assertEqual(nxp_group.maintainers, ["doru91", "nxpdev"])
         self.assertEqual(nxp_group.paths, ["src/platform/nxp/**", "examples/**/nxp/**"])
 
-    def test_file_matching(self):
+    def test_file_matching(self) -> None:
+        """Tests that file path matching against platform groups functions correctly."""
         nxp_group = self.bot.groups["nxp"]
 
         self.assertTrue(nxp_group.matches_file("src/platform/nxp/SystemTimeSupport.cpp"))
@@ -118,7 +130,8 @@ esp32:
         self.assertFalse(nxp_group.matches_file("src/platform/ESP32/SystemTimeSupport.cpp"))
         self.assertFalse(nxp_group.matches_file("src/app/Command.cpp"))
 
-    def test_get_pr_review_states(self):
+    def test_get_pr_review_states(self) -> None:
+        """Tests that the correct active reviewers are identified from the chronological reviews list."""
         reviews = [
             self.create_mock_review("doru91", "COMMENTED"),
             self.create_mock_review("nxpdev", "APPROVED"),
@@ -144,49 +157,51 @@ esp32:
         approvers2, change_requesters2 = self.bot.get_pr_review_states(mock_pr2)
         self.assertNotIn("doru91", approvers2)
 
-    def test_analyze_pr_files_fully_covered(self):
+    def test_analyze_pr_files_fully_covered(self) -> None:
+        """Tests that all changed files are covered by platform groups."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
             self.create_mock_file("examples/all-clusters-app/nxp/main.cpp"),
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
-        is_fully_covered, matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
+        matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
 
-        self.assertTrue(is_fully_covered)
         self.assertEqual(len(uncovered), 0)
         self.assertEqual(len(matched_files["nxp"]), 2)
         self.assertEqual(len(matched_files["esp32"]), 0)
 
-    def test_analyze_pr_files_not_fully_covered(self):
+    def test_analyze_pr_files_not_fully_covered(self) -> None:
+        """Tests that uncovered files are correctly identified."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
             self.create_mock_file("src/app/Command.cpp"),  # Uncovered
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
-        is_fully_covered, matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
+        matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
 
-        self.assertFalse(is_fully_covered)
         self.assertEqual(uncovered, ["src/app/Command.cpp"])
         self.assertEqual(len(matched_files["nxp"]), 1)
 
-    def test_analyze_pr_files_rename_bypass(self):
+    def test_analyze_pr_files_rename_bypass(self) -> None:
+        """Tests that previous filenames of renamed files are also checked for coverage."""
         mock_file = self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")
         mock_file.previous_filename = "src/app/Command.cpp"
         files = [mock_file]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, [])
-        is_fully_covered, matched_files, uncovered = self.bot.analyze_pr_files(mock_pr)
+        _, uncovered = self.bot.analyze_pr_files(mock_pr)
 
-        self.assertFalse(is_fully_covered)
         self.assertIn("src/app/Command.cpp", uncovered)
 
-    def test_check_and_process_pr_draft(self):
+    def test_check_and_process_pr_draft(self) -> None:
+        """Tests that drafts are skipped entirely without checking files."""
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], [], draft=True)
         self.bot.check_and_process_pr(mock_pr)
 
         # Verify no files were fetched
         mock_pr.get_files.assert_not_called()
 
-    def test_check_and_process_pr_not_eligible(self):
+    def test_check_and_process_pr_not_eligible(self) -> None:
+        """Tests that PR containing uncovered files is skipped and not merged."""
         files = [
             self.create_mock_file("src/app/Command.cpp"),
         ]
@@ -197,7 +212,8 @@ esp32:
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_not_called()
 
-    def test_check_and_process_pr_needs_approval(self):
+    def test_check_and_process_pr_needs_approval(self) -> None:
+        """Tests that PR lacking platform maintainer approvals does not merge and gets an eligibility comment."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
@@ -214,7 +230,8 @@ esp32:
         self.assertIn(platform_merge_bot.ELIGIBILITY_COMMENT_MARKER, mock_pr.create_issue_comment.call_args[0][0])
         self.assertIn("Needs approval", mock_pr.create_issue_comment.call_args[0][0])
 
-    def test_check_and_process_pr_already_commented_updates_if_different(self):
+    def test_check_and_process_pr_already_commented_updates_if_different(self) -> None:
+        """Tests that an existing eligibility comment is edited if the status has changed."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
@@ -232,7 +249,8 @@ esp32:
         mock_pr.create_issue_comment.assert_not_called()
         mock_comment.edit.assert_called_once()
 
-    def test_check_and_process_pr_already_commented_no_op_if_identical(self):
+    def test_check_and_process_pr_already_commented_no_op_if_identical(self) -> None:
+        """Tests that an existing eligibility comment is untouched if the status is identical."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
@@ -246,7 +264,6 @@ esp32:
         expected_body += "- **nxp**: @doru91, @nxpdev (❌ Needs approval)\n"
         expected_body += "  *Paths matched:*\n"
         expected_body += "    * `src/platform/nxp/**`\n"
-        expected_body += "    * `examples/**/nxp/**`\n"
 
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
@@ -260,7 +277,8 @@ esp32:
         mock_pr.create_issue_comment.assert_not_called()
         mock_comment.edit.assert_not_called()
 
-    def test_check_and_process_pr_fully_approved_merge(self):
+    def test_check_and_process_pr_fully_approved_merge(self) -> None:
+        """Tests that PR is merged and commented when fully approved."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
@@ -269,7 +287,6 @@ esp32:
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
-        self.bot.run_command_mock = MagicMock()  # just in case
         self.bot.check_and_process_pr(mock_pr)
 
         # Should merge and comment
@@ -279,7 +296,8 @@ esp32:
 
         mock_pr.merge.assert_called_once_with(merge_method="squash", commit_title="Test PR (Auto-merged by platform-bot)")
 
-    def test_check_and_process_pr_multi_group_approved(self):
+    def test_check_and_process_pr_multi_group_approved(self) -> None:
+        """Tests that PR is merged when all affected platform groups have approved."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
             self.create_mock_file("src/platform/ESP32/SystemTimeSupport.cpp"),
@@ -297,7 +315,8 @@ esp32:
         self.assertIn("approved by @doru91", mock_pr.create_issue_comment.call_args[0][0])
         self.assertIn("approved by @esp32dev", mock_pr.create_issue_comment.call_args[0][0])
 
-    def test_check_and_process_pr_multi_group_missing_one_approval(self):
+    def test_check_and_process_pr_multi_group_missing_one_approval(self) -> None:
+        """Tests that PR is not merged and lists pending groups when only some groups approved."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
             self.create_mock_file("src/platform/ESP32/SystemTimeSupport.cpp"),
@@ -315,7 +334,8 @@ esp32:
         self.assertIn("- **esp32**: @esp32dev (❌ Needs approval)", mock_pr.create_issue_comment.call_args[0][0])
         self.assertIn("- **nxp**: @doru91, @nxpdev (✅ Approved)", mock_pr.create_issue_comment.call_args[0][0])
 
-    def test_check_and_process_pr_blocked_by_changes_requested(self):
+    def test_check_and_process_pr_blocked_by_changes_requested(self) -> None:
+        """Tests that any active changes requested review blocks auto-merge."""
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
@@ -331,7 +351,8 @@ esp32:
         # Should NOT merge because of the active changes requested
         mock_pr.merge.assert_not_called()
 
-    def test_get_pr_review_states_comment_does_not_overwrite_approval(self):
+    def test_get_pr_review_states_comment_does_not_overwrite_approval(self) -> None:
+        """Tests that a standard comment review does not overwrite an existing approval review."""
         reviews = [
             self.create_mock_review("doru91", "APPROVED"),
             self.create_mock_review("doru91", "COMMENTED"),
@@ -340,7 +361,8 @@ esp32:
         approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
         self.assertIn("doru91", approvers)
 
-    def test_get_pr_review_states_comment_does_not_overwrite_changes_requested(self):
+    def test_get_pr_review_states_comment_does_not_overwrite_changes_requested(self) -> None:
+        """Tests that a standard comment review does not overwrite an existing changes requested review."""
         reviews = [
             self.create_mock_review("doru91", "CHANGES_REQUESTED"),
             self.create_mock_review("doru91", "COMMENTED"),
@@ -348,6 +370,8 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
         approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
         self.assertIn("doru91", change_requesters)
+
+
 
 
 if __name__ == '__main__':
