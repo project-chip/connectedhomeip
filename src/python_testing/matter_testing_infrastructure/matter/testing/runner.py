@@ -337,7 +337,7 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-    matter_test_config = parse_matter_test_args()
+    matter_test_config = convert_args_to_matter_config(parse_matter_test_args())
 
     # Find the test class in the test script.
     test_class = _find_test_class()
@@ -1085,4 +1085,4 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     if not argv:
         argv = sys.argv[1:]
 
-    return convert_args_to_matter_config(parser.parse_args(argv))
+    return parser.parse_args(argv)

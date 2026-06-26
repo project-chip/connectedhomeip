@@ -19,8 +19,6 @@ from typing import Optional
 
 import yaml
 
-from matter.testing.defaults import TestingDefaults
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -36,7 +34,7 @@ class Metadata:
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
-    timeout: float = TestingDefaults.DEFAULT_TIMEOUT_S
+    timeout: float | None = None
     quiet: bool = False
 
 
@@ -157,7 +155,7 @@ class MetadataReader:
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
                 factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
-                timeout=float(attr.get("timeout", str(TestingDefaults.DEFAULT_TIMEOUT_S))),
+                timeout=float(attr.get("timeout")) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
             ))
 
