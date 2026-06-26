@@ -1128,7 +1128,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
     const char * bssPath = wpa_supplicant_1_interface_get_current_bss(mWpaSupplicant.iface.get());
-    VerifyOrReturnError(bssPath != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(bssPath != nullptr && strcmp(bssPath, "/") != 0, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(_GetBssInfo(bssPath, bssInfo));
 
