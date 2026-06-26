@@ -22,13 +22,13 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 # Ensure the parent directory is in the path so we can import platform_merge_bot
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # isort: split
 
 # pylint: disable=wrong-import-position
 import platform_merge_bot  # noqa: E402
-from platform_merge_bot import GroupApproval, PlatformGroup, PlatformMergeBot  # noqa: E402
+from platform_merge_bot import PlatformMergeBot  # noqa: E402
 
 
 class TestPlatformMergeBot(unittest.TestCase):
@@ -50,13 +50,13 @@ esp32:
   paths:
     - "src/platform/ESP32/**"
 """
-        with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.yaml') as f:
+        with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".yaml") as f:
             f.write(self.config_content)
             self.temp_config_name = f.name
         self.addCleanup(os.unlink, self.temp_config_name)
 
         # Patch Github initialization so we don't hit the network
-        self.github_patcher = patch('platform_merge_bot.Github')
+        self.github_patcher = patch("platform_merge_bot.Github")
         self.mock_github_class = self.github_patcher.start()
         self.addCleanup(self.github_patcher.stop)
 
@@ -70,7 +70,7 @@ esp32:
             token="dummy_token",
             repo_name="dummy/repo",
             config_path=self.temp_config_name,
-            dry_run=False
+            dry_run=False,
         )
         self.bot._bot_username = "platform-merge-bot"
 
@@ -96,7 +96,7 @@ esp32:
         files: list[MagicMock],
         reviews: list[MagicMock],
         comments: list[MagicMock] | None = None,
-        draft: bool = False
+        draft: bool = False,
     ) -> MagicMock:
         """Creates a mock PullRequest object with the given parameters."""
         mock_pr = MagicMock()
@@ -123,11 +123,19 @@ esp32:
         """Tests that file path matching against platform groups functions correctly."""
         nxp_group = self.bot.groups["nxp"]
 
-        self.assertTrue(nxp_group.matches_file("src/platform/nxp/SystemTimeSupport.cpp"))
-        self.assertTrue(nxp_group.matches_file("src/platform/nxp/rt/rt1060/SystemTimeSupport.cpp"))
-        self.assertTrue(nxp_group.matches_file("examples/all-clusters-app/nxp/main.cpp"))
+        self.assertTrue(
+            nxp_group.matches_file("src/platform/nxp/SystemTimeSupport.cpp")
+        )
+        self.assertTrue(
+            nxp_group.matches_file("src/platform/nxp/rt/rt1060/SystemTimeSupport.cpp")
+        )
+        self.assertTrue(
+            nxp_group.matches_file("examples/all-clusters-app/nxp/main.cpp")
+        )
 
-        self.assertFalse(nxp_group.matches_file("src/platform/ESP32/SystemTimeSupport.cpp"))
+        self.assertFalse(
+            nxp_group.matches_file("src/platform/ESP32/SystemTimeSupport.cpp")
+        )
         self.assertFalse(nxp_group.matches_file("src/app/Command.cpp"))
 
     def test_get_pr_review_states(self) -> None:
@@ -137,7 +145,9 @@ esp32:
             self.create_mock_review("nxpdev", "APPROVED"),
             self.create_mock_review("doru91", "CHANGES_REQUESTED"),
             self.create_mock_review("doru91", "APPROVED"),  # approved later
-            self.create_mock_review("nxpdev", "CHANGES_REQUESTED"),  # requested changes later
+            self.create_mock_review(
+                "nxpdev", "CHANGES_REQUESTED"
+            ),  # requested changes later
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
         approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
@@ -227,7 +237,10 @@ esp32:
         # Should not merge, but should post eligibility comment
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_called_once()
-        self.assertIn(platform_merge_bot.ELIGIBILITY_COMMENT_MARKER, mock_pr.create_issue_comment.call_args[0][0])
+        self.assertIn(
+            platform_merge_bot.ELIGIBILITY_COMMENT_MARKER,
+            mock_pr.create_issue_comment.call_args[0][0],
+        )
         self.assertIn("Needs approval", mock_pr.create_issue_comment.call_args[0][0])
 
     def test_check_and_process_pr_already_commented_updates_if_different(self) -> None:
@@ -239,8 +252,12 @@ esp32:
         # Existing eligibility comment with different body
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
-        mock_comment.body = f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
-        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews, comments=[mock_comment])
+        mock_comment.body = (
+            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
+        )
+        mock_pr = self.create_mock_pr(
+            1, "Test PR", "author", files, reviews, comments=[mock_comment]
+        )
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -260,7 +277,9 @@ esp32:
         expected_body = f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\n"
         expected_body += "### Platform Maintainers Auto-Merge Info\n"
         expected_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
-        expected_body += "To merge, we require at least one approval from each of these groups:\n"
+        expected_body += (
+            "To merge, we require at least one approval from each of these groups:\n"
+        )
         expected_body += "- **nxp**: @doru91, @nxpdev (❌ Needs approval)\n"
         expected_body += "  *Paths matched:*\n"
         expected_body += "    * `src/platform/nxp/**`\n"
@@ -268,7 +287,9 @@ esp32:
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
         mock_comment.body = expected_body
-        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews, comments=[mock_comment])
+        mock_pr = self.create_mock_pr(
+            1, "Test PR", "author", files, reviews, comments=[mock_comment]
+        )
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -291,10 +312,17 @@ esp32:
 
         # Should merge and comment
         self.assertEqual(mock_pr.create_issue_comment.call_count, 1)
-        self.assertIn("Platform Maintainers Auto-Merge Executed", mock_pr.create_issue_comment.call_args[0][0])
-        self.assertIn("approved by @doru91", mock_pr.create_issue_comment.call_args[0][0])
+        self.assertIn(
+            "Platform Maintainers Auto-Merge Executed",
+            mock_pr.create_issue_comment.call_args[0][0],
+        )
+        self.assertIn(
+            "approved by @doru91", mock_pr.create_issue_comment.call_args[0][0]
+        )
 
-        mock_pr.merge.assert_called_once_with(merge_method="squash", commit_title="Test PR (Auto-merged by platform-bot)")
+        mock_pr.merge.assert_called_once_with(
+            merge_method="squash", commit_title="Test PR (Auto-merged by platform-bot)"
+        )
 
     def test_check_and_process_pr_multi_group_approved(self) -> None:
         """Tests that PR is merged when all affected platform groups have approved."""
@@ -312,8 +340,12 @@ esp32:
 
         # Should merge because both groups are approved
         mock_pr.merge.assert_called_once()
-        self.assertIn("approved by @doru91", mock_pr.create_issue_comment.call_args[0][0])
-        self.assertIn("approved by @esp32dev", mock_pr.create_issue_comment.call_args[0][0])
+        self.assertIn(
+            "approved by @doru91", mock_pr.create_issue_comment.call_args[0][0]
+        )
+        self.assertIn(
+            "approved by @esp32dev", mock_pr.create_issue_comment.call_args[0][0]
+        )
 
     def test_check_and_process_pr_multi_group_missing_one_approval(self) -> None:
         """Tests that PR is not merged and lists pending groups when only some groups approved."""
@@ -331,8 +363,14 @@ esp32:
 
         # Should NOT merge, should post eligibility indicating esp32 lacks approval
         mock_pr.merge.assert_not_called()
-        self.assertIn("- **esp32**: @esp32dev (❌ Needs approval)", mock_pr.create_issue_comment.call_args[0][0])
-        self.assertIn("- **nxp**: @doru91, @nxpdev (✅ Approved)", mock_pr.create_issue_comment.call_args[0][0])
+        self.assertIn(
+            "- **esp32**: @esp32dev (❌ Needs approval)",
+            mock_pr.create_issue_comment.call_args[0][0],
+        )
+        self.assertIn(
+            "- **nxp**: @doru91, @nxpdev (✅ Approved)",
+            mock_pr.create_issue_comment.call_args[0][0],
+        )
 
     def test_check_and_process_pr_blocked_by_changes_requested(self) -> None:
         """Tests that any active changes requested review blocks auto-merge."""
@@ -361,7 +399,9 @@ esp32:
         approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
         self.assertIn("doru91", approvers)
 
-    def test_get_pr_review_states_comment_does_not_overwrite_changes_requested(self) -> None:
+    def test_get_pr_review_states_comment_does_not_overwrite_changes_requested(
+        self,
+    ) -> None:
         """Tests that a standard comment review does not overwrite an existing changes requested review."""
         reviews = [
             self.create_mock_review("doru91", "CHANGES_REQUESTED"),
@@ -372,7 +412,5 @@ esp32:
         self.assertIn("doru91", change_requesters)
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

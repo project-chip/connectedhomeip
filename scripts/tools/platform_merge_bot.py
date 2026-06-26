@@ -39,6 +39,7 @@ ELIGIBILITY_COMMENT_MARKER = "<!-- platform-merge-bot-eligibility-marker -->"
 
 class GroupApproval(NamedTuple):
     """Represents an approval for a platform group."""
+
     approver: str
     files: list[str]
 
@@ -50,8 +51,10 @@ class PlatformGroup:
         self.name = name
         self.maintainers = [m.lower() for m in maintainers]
         self.paths = paths
-        self.spec = pathspec.PathSpec.from_lines('gitignore', paths)
-        self.path_specs = {glob: pathspec.PathSpec.from_lines('gitignore', [glob]) for glob in paths}
+        self.spec = pathspec.PathSpec.from_lines("gitignore", paths)
+        self.path_specs = {
+            glob: pathspec.PathSpec.from_lines("gitignore", [glob]) for glob in paths
+        }
 
     def matches_file(self, filepath: str) -> bool:
         """Checks if a file path matches this group's configured paths."""
@@ -64,7 +67,7 @@ class PlatformGroup:
             for glob, spec in self.path_specs.items():
                 if spec.match_file(f):
                     matched_globs.add(glob)
-        return sorted(list(matched_globs))
+        return sorted(matched_globs)
 
 
 class PlatformMergeBot:
@@ -79,9 +82,12 @@ class PlatformMergeBot:
 
     @property
     def bot_username(self) -> str:
+        """Retrieves the username of the authenticated bot, falling back to a default on failure."""
         if self._bot_username is None:
             try:
                 self._bot_username = self.api.get_user().login.lower()
+            except GithubException:
+                self._bot_username = "platform-merge-bot"
             except Exception:
                 self._bot_username = "platform-merge-bot"
         return self._bot_username
@@ -94,19 +100,29 @@ class PlatformMergeBot:
             content = yaml.safe_load(f)
 
         if not content or not isinstance(content, dict):
-            raise ValueError("Invalid config file format. Expected a YAML dictionary of groups.")
+            raise ValueError(
+                "Invalid config file format. Expected a YAML dictionary of groups."
+            )
 
         for group_name, group_data in content.items():
             if not isinstance(group_data, dict):
-                raise ValueError(f"Invalid data format for group '{group_name}'. Expected a dictionary.")
-            maintainers = group_data.get('maintainers', [])
-            paths = group_data.get('paths', [])
+                raise ValueError(
+                    f"Invalid data format for group '{group_name}'. Expected a dictionary."
+                )
+            maintainers = group_data.get("maintainers", [])
+            paths = group_data.get("paths", [])
             if not isinstance(maintainers, list) or not isinstance(paths, list):
-                raise ValueError(f"Group '{group_name}' must contain 'maintainers' and 'paths' lists.")
+                raise ValueError(
+                    f"Group '{group_name}' must contain 'maintainers' and 'paths' lists."
+                )
             if not all(isinstance(m, str) for m in maintainers):
-                raise ValueError(f"Group '{group_name}' maintainers must be a list of strings.")
+                raise ValueError(
+                    f"Group '{group_name}' maintainers must be a list of strings."
+                )
             if not all(isinstance(p, str) for p in paths):
-                raise ValueError(f"Group '{group_name}' paths must be a list of strings.")
+                raise ValueError(
+                    f"Group '{group_name}' paths must be a list of strings."
+                )
             self.groups[group_name] = PlatformGroup(group_name, maintainers, paths)
 
         log.info("Loaded %d platform groups from config.", len(self.groups))
@@ -119,24 +135,32 @@ class PlatformMergeBot:
             if not review.user or not review.user.login:
                 continue
             user = review.user.login.lower()
-            if review.state in ('APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'):
+            if review.state in ("APPROVED", "CHANGES_REQUESTED", "DISMISSED"):
                 user_reviews[user] = review.state
 
-        approvers = {user for user, state in user_reviews.items() if state == 'APPROVED'}
+        approvers = {
+            user for user, state in user_reviews.items() if state == "APPROVED"
+        }
         # Exclude author from self-approval
         author = pr.user.login.lower()
         approvers.discard(author)
-        change_requesters = {user for user, state in user_reviews.items() if state == 'CHANGES_REQUESTED'}
+        change_requesters = {
+            user for user, state in user_reviews.items() if state == "CHANGES_REQUESTED"
+        }
         return approvers, change_requesters
 
-    def analyze_pr_files(self, pr: PullRequest) -> tuple[dict[str, list[str]], list[str]]:
+    def analyze_pr_files(
+        self, pr: PullRequest
+    ) -> tuple[dict[str, list[str]], list[str]]:
         """Analyzes the files changed in the PR.
 
         Returns:
           - matched_files_per_group: Map of group_name -> list of files matching it.
           - uncovered_files: List of files that matched no group.
         """
-        matched_files_per_group: dict[str, list[str]] = {name: [] for name in self.groups}
+        matched_files_per_group: dict[str, list[str]] = {
+            name: [] for name in self.groups
+        }
         uncovered_files = []
 
         # pr.get_files() returns PaginatedList of File objects
@@ -160,7 +184,9 @@ class PlatformMergeBot:
 
     def check_and_process_pr(self, pr: PullRequest) -> None:
         """Checks the coverage and approvals for a single PR, and merges if eligible."""
-        log.info("Checking PR #%d: '%s' (Author: %s)", pr.number, pr.title, pr.user.login)
+        log.info(
+            "Checking PR #%d: '%s' (Author: %s)", pr.number, pr.title, pr.user.login
+        )
 
         if pr.draft:
             log.info("PR #%d is a draft. Skipping.", pr.number)
@@ -171,7 +197,8 @@ class PlatformMergeBot:
         if uncovered_files:
             log.info(
                 "PR #%d contains files outside the platform-maintained scope. Skipping. Uncovered files: %s",
-                pr.number, uncovered_files[:5]
+                pr.number,
+                uncovered_files[:5],
             )
             return
 
@@ -181,14 +208,27 @@ class PlatformMergeBot:
             log.info("PR #%d has no changed files? Skipping.", pr.number)
             return
 
-        log.info("PR #%d is fully covered by platform groups: %s", pr.number, list(active_groups.keys()))
+        log.info(
+            "PR #%d is fully covered by platform groups: %s",
+            pr.number,
+            list(active_groups.keys()),
+        )
 
         # Get current approvals and change requests
         approvers, change_requesters = self.get_pr_review_states(pr)
-        log.debug("PR #%d current approvers: %s, change requesters: %s", pr.number, list(approvers), list(change_requesters))
+        log.debug(
+            "PR #%d current approvers: %s, change requesters: %s",
+            pr.number,
+            list(approvers),
+            list(change_requesters),
+        )
 
         if change_requesters:
-            log.info("PR #%d has active changes requested by: %s. Skipping.", pr.number, list(change_requesters))
+            log.info(
+                "PR #%d has active changes requested by: %s. Skipping.",
+                pr.number,
+                list(change_requesters),
+            )
             return
 
         # Check approvals for each active group
@@ -202,12 +242,15 @@ class PlatformMergeBot:
                 missing_approvals[group_name] = group
             else:
                 # Pick the first matched approver for documentation
-                valid_approvals_per_group[group_name] = GroupApproval(list(group_approvers)[0], files)
+                valid_approvals_per_group[group_name] = GroupApproval(
+                    list(group_approvers)[0], files
+                )
 
         if missing_approvals:
             log.info(
                 "PR #%d is missing approvals from platform maintainers for groups: %s",
-                pr.number, list(missing_approvals.keys())
+                pr.number,
+                list(missing_approvals.keys()),
             )
             self.post_eligibility_comment(pr, active_groups, missing_approvals)
             return
@@ -220,19 +263,25 @@ class PlatformMergeBot:
         self,
         pr: PullRequest,
         active_groups: dict[str, list[str]],
-        missing_approvals: dict[str, PlatformGroup]
+        missing_approvals: dict[str, PlatformGroup],
     ) -> None:
         """Posts or updates a comment stating the auto-merge status of the PR."""
         # Generate comment body first so we can compare it
         comment_body = f"{ELIGIBILITY_COMMENT_MARKER}\n"
         comment_body += "### Platform Maintainers Auto-Merge Info\n"
         comment_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
-        comment_body += "To merge, we require at least one approval from each of these groups:\n"
+        comment_body += (
+            "To merge, we require at least one approval from each of these groups:\n"
+        )
 
         for group_name, files in active_groups.items():
             group = self.groups[group_name]
             maintainer_mentions = ", ".join([f"@{m}" for m in group.maintainers])
-            status = "❌ Needs approval" if group_name in missing_approvals else "✅ Approved"
+            status = (
+                "❌ Needs approval"
+                if group_name in missing_approvals
+                else "✅ Approved"
+            )
             comment_body += f"- **{group_name}**: {maintainer_mentions} ({status})\n"
             comment_body += "  *Paths matched:*\n"
             for glob in group.get_matched_globs(files):
@@ -243,21 +292,35 @@ class PlatformMergeBot:
                 if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
                     if comment.body.strip() != comment_body.strip():
                         if self.dry_run:
-                            log.info("[Dry Run] Would update eligibility comment on PR #%d", pr.number)
+                            log.info(
+                                "[Dry Run] Would update eligibility comment on PR #%d",
+                                pr.number,
+                            )
                         else:
-                            log.info("Updating eligibility comment on PR #%d", pr.number)
+                            log.info(
+                                "Updating eligibility comment on PR #%d", pr.number
+                            )
                             comment.edit(comment_body)
                     else:
-                        log.debug("PR #%d already has an up-to-date eligibility comment.", pr.number)
+                        log.debug(
+                            "PR #%d already has an up-to-date eligibility comment.",
+                            pr.number,
+                        )
                     return
 
         if self.dry_run:
-            log.info("[Dry Run] Would post eligibility comment to PR #%d:\n%s", pr.number, comment_body)
+            log.info(
+                "[Dry Run] Would post eligibility comment to PR #%d:\n%s",
+                pr.number,
+                comment_body,
+            )
         else:
             log.info("Posting eligibility comment to PR #%d", pr.number)
             pr.create_issue_comment(comment_body)
 
-    def merge_pr(self, pr: PullRequest, valid_approvals_per_group: dict[str, GroupApproval]) -> None:
+    def merge_pr(
+        self, pr: PullRequest, valid_approvals_per_group: dict[str, GroupApproval]
+    ) -> None:
         """Merges the PR and posts a comment explaining the approvals."""
         # Generate merge comment explaining reasons
         merge_reason_comment = "### Platform Maintainers Auto-Merge Executed\n"
@@ -270,12 +333,19 @@ class PlatformMergeBot:
             merge_reason_comment += f"- **{group_name}** changes (matching {globs_str}) approved by @{approval.approver}\n"
 
         if self.dry_run:
-            log.info("[Dry Run] Would post merge comment to PR #%d:\n%s", pr.number, merge_reason_comment)
+            log.info(
+                "[Dry Run] Would post merge comment to PR #%d:\n%s",
+                pr.number,
+                merge_reason_comment,
+            )
             log.info("[Dry Run] Would merge PR #%d (method: squash)", pr.number)
         else:
             log.info("Merging PR #%d", pr.number)
             # Use squash merge
-            pr.merge(merge_method="squash", commit_title=f"{pr.title} (Auto-merged by platform-bot)")
+            pr.merge(
+                merge_method="squash",
+                commit_title=f"{pr.title} (Auto-merged by platform-bot)",
+            )
 
             log.info("Posting merge explanation comment to PR #%d", pr.number)
             pr.create_issue_comment(merge_reason_comment)
@@ -283,7 +353,7 @@ class PlatformMergeBot:
     def run(self) -> None:
         """Scans all open pull requests and processes them."""
         log.info("Scanning open pull requests...")
-        open_prs = self.repo.get_pulls(state='open')
+        open_prs = self.repo.get_pulls(state="open")
         for pr in open_prs:
             try:
                 self.check_and_process_pr(pr)
@@ -298,7 +368,11 @@ class PlatformMergeBot:
     type=click.Choice(list(_LOG_LEVELS.keys()), case_sensitive=False),
     help="Determines the verbosity of script output.",
 )
-@click.option("--token-env", default="GH_TOKEN", help="Environment variable containing the GitHub token")
+@click.option(
+    "--token-env",
+    default="GH_TOKEN",
+    help="Environment variable containing the GitHub token",
+)
 @click.option("--token-file", help="Read github token from the given file")
 @click.option(
     "--repo",
@@ -310,7 +384,12 @@ class PlatformMergeBot:
     default=DEFAULT_CONFIG_PATH,
     help=f"Path to the platform maintainers yaml config (default: {DEFAULT_CONFIG_PATH})",
 )
-@click.option("--dry-run", default=False, is_flag=True, help="Simulate merging and commenting without executing")
+@click.option(
+    "--dry-run",
+    default=False,
+    is_flag=True,
+    help="Simulate merging and commenting without executing",
+)
 def main(
     log_level: str,
     token_env: str,
@@ -321,7 +400,8 @@ def main(
 ) -> None:
     """Platform Merge Bot entry point."""
     coloredlogs.install(
-        level=_LOG_LEVELS[log_level.upper()], fmt="%(asctime)s %(levelname)-7s %(message)s"
+        level=_LOG_LEVELS[log_level.upper()],
+        fmt="%(asctime)s %(levelname)-7s %(message)s",
     )
 
     gh_token = None
@@ -337,7 +417,9 @@ def main(
             gh_token = os.environ.get("GITHUB_TOKEN")
 
         if not gh_token:
-            raise click.ClickException(f"Require a token. Set environment variable '{env_var}' (or 'GITHUB_TOKEN') or provide --token-file")
+            raise click.ClickException(
+                f"Require a token. Set environment variable '{env_var}' (or 'GITHUB_TOKEN') or provide --token-file"
+            )
 
     bot = PlatformMergeBot(gh_token, repo, config, dry_run)
     bot.run()
