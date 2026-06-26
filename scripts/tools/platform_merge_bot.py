@@ -248,7 +248,7 @@ class PlatformMergeBot:
             try:
                 self.check_and_process_pr(pr)
             except Exception as e:
-                log.error("Error processing PR #%d: %s", pr.number, e, exc_info=True)
+                log.exception("Error processing PR #%d: %s", pr.number, e)
 
 
 @click.command()

@@ -17,22 +17,22 @@
 
 import os
 import sys
-import tempfile
-import unittest
-from unittest.mock import MagicMock, patch
-
-import platform_merge_bot
-from platform_merge_bot import PlatformMergeBot
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # isort: split
 
+import tempfile
+import unittest
+from unittest.mock import MagicMock, patch
+
+import platform_merge_bot
+from platform_merge_bot import PlatformGroup, PlatformMergeBot
+
 
 class TestPlatformMergeBot(unittest.TestCase):
     def setUp(self):
         # Create a temporary config file for testing
-        self.temp_config = tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.yaml')
         self.config_content = """
 nxp:
   maintainers:
@@ -48,8 +48,9 @@ esp32:
   paths:
     - "src/platform/ESP32/**"
 """
-        self.temp_config.write(self.config_content)
-        self.temp_config.close()
+        with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.yaml') as f:
+            f.write(self.config_content)
+            self.temp_config_name = f.name
 
         # Patch Github initialization so we don't hit the network
         self.github_patcher = patch('platform_merge_bot.Github')
@@ -63,13 +64,13 @@ esp32:
         self.bot = PlatformMergeBot(
             token="dummy_token",
             repo_name="dummy/repo",
-            config_path=self.temp_config.name,
+            config_path=self.temp_config_name,
             dry_run=False
         )
 
     def tearDown(self):
         self.github_patcher.stop()
-        os.unlink(self.temp_config.name)
+        os.unlink(self.temp_config_name)
 
     def create_mock_file(self, filename: str) -> MagicMock:
         mock_file = MagicMock()
