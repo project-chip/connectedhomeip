@@ -167,4 +167,3 @@ For more details on debugging with GDB CLI, see
 
 For VS Code graphical debugging and tasks, see
 [VS Code Setup for Tizen Development](../../../docs/platforms/tizen/vscode_setup.md).
-
