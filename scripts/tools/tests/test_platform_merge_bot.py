@@ -17,17 +17,16 @@
 
 import os
 import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# isort: split
-
 import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
 import platform_merge_bot
-from platform_merge_bot import PlatformGroup, PlatformMergeBot
+from platform_merge_bot import PlatformMergeBot
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# isort: split
 
 
 class TestPlatformMergeBot(unittest.TestCase):
