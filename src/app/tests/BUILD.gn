@@ -189,7 +189,6 @@ chip_test_suite("tests") {
     "TestNumericAttributeTraits.cpp",
     "TestOperationalSessionSetupFallback.cpp",
     "TestOperationalSessionSetupReresolve.cpp",
-    "OperationalSessionSetupTestAccess.h",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
@@ -207,6 +206,8 @@ chip_test_suite("tests") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  sources = [ "OperationalSessionSetupTestAccess.h" ]
 
   public_deps = [
     ":app-test-stubs",

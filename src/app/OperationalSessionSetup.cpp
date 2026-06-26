@@ -482,7 +482,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
         // live response from the current address, so for BUSY we keep the
         // existing behavior of trying the cached results first.
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-        if (CHIP_ERROR_TIMEOUT == error && mResolveAttemptsAllowed > 0)
+        if (CHIP_ERROR_TIMEOUT == error && mRemainingAttempts > 0 && mResolveAttemptsAllowed > 0)
         {
             // The fresh lookup drives its own success/failure handling via
             // OnNodeAddressResolved / OnNodeAddressResolutionFailed and its own
@@ -493,9 +493,16 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
             if (lookupErr == CHIP_NO_ERROR)
             {
                 // A fresh lookup is in flight; OnNodeAddressResolved (or
-                // OnNodeAddressResolutionFailed) will drive us forward. We have
-                // to notify our consumer that the resolve will take more time,
-                // but we don't know how much; mirror the estimate used by
+                // OnNodeAddressResolutionFailed) will drive us forward.
+                // LookupPeerAddress() has already consumed an attempt from both
+                // mRemainingAttempts and mResolveAttemptsAllowed, so a peer that
+                // keeps re-resolving (DNS-SD answers) while CASE keeps timing out
+                // cannot loop here forever: each fresh-lookup re-resolve costs one
+                // attempt, and the guard above stops taking this path once either
+                // counter hits 0.
+                //
+                // We have to notify our consumer that the resolve will take more
+                // time, but we don't know how much; mirror the estimate used by
                 // OnNodeAddressResolutionFailed's re-resolve path.
                 using namespace chip::System::Clock::Literals;
                 NotifyRetryHandlers(error, remoteMprConfig, 60_s16);
