@@ -541,29 +541,34 @@ void ReliableMessageMgr::SetAdditionalMRPBackoffTime(const Optional<System::Cloc
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
     const auto sessionHandle = entry.ec->GetSessionHandle();
-
-    // Per Matter Core spec §4.11.2.1 Retransmissions: choose the Active or Idle
-    // base timeout based on the peer's CURRENT activity mode at the moment we
-    // schedule the retransmit. The peer may have been Active when it last sent
-    // us a message in this exchange, but transitioned back to Idle once its
-    // Session Active Threshold (SAT) elapsed.
-    //
-    // For Intermittently Connected Devices (ICDs) where SAI ≪ SII, an earlier
-    // shortcut here pinned to ActiveRetransTimeout (SAI) for the remainder of
-    // the exchange as soon as one message had been received. That caused every
-    // subsequent retransmit to be scheduled well inside the peer's sleep
-    // window, defeating reliable delivery. A common failure mode is CASE Sigma3
-    // to a sleepy device: the just-received Sigma2 marks the exchange "has
-    // received a message", so Sigma3 retransmits were spaced on SAI-derived
-    // backoff (sub-second to a few seconds) instead of the SII-derived spacing
-    // the ICD actually polls on (multiple seconds), and the device never
-    // observed any of them.
-    //
-    // GetMRPBaseTimeout() re-evaluates IsPeerActive() against SAT on every
-    // call, returning ActiveRetransTimeout (SAI) while the peer is in its
-    // Active window and IdleRetransTimeout (SII) afterward, which is the
-    // behavior the spec actually prescribes.
-    System::Clock::Timeout baseTimeout = sessionHandle->GetMRPBaseTimeout();
+    const System::Clock::Timeout baseTimeout = [&]() {
+        // A responder exchange always has received at least one message (the initiation request).
+        // Therefore, !HasReceivedAtLeastOneMessage() is only true for the initiator's first message.
+        bool isFirstMessageOfExchange = !entry.ec->HasReceivedAtLeastOneMessage();
+        if (isFirstMessageOfExchange)
+        {
+            // Matter Core Specification §4.12.2.1:
+            //   "For the first message of a new exchange, the base interval, i, SHALL be
+            //    set according to the idle state of the peer node as stored in the Session
+            //    Context of the session (either the Secure Session Context or the
+            //    Unsecured Session Context depending on the Session Type)."
+            //
+            // We use the idle retransmission timeout (SII) from the session.
+            return sessionHandle->GetRemoteMRPConfig().mIdleRetransTimeout;
+        }
+        // Matter Core Specification §4.12.2.1:
+        //   "For all subsequent messages of the exchange, the base interval, i,
+        //    SHOULD be set according to the active state of the peer node as stored in
+        //    the Session Context of the session (either the Secure Session Context or
+        //    the Unsecured Session Context depending on the Session Type), unless the
+        //    sender has other means to determine whether the device is active or idle."
+        //
+        // We use GetMRPBaseTimeout() which implements these other means by
+        // checking IsPeerActive() (tracking time since the last active receive
+        // against the Session Active Threshold (SAT)). If the peer is active,
+        // it uses SAI; otherwise it falls back to SII.
+        return std::chrono::duration_cast<System::Clock::Timeout>(sessionHandle->GetMRPBaseTimeout());
+    }();
 
     System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
     entry.nextRetransTime          = System::SystemClock().GetMonotonicTimestamp() + backoff;
