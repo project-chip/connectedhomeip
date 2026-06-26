@@ -21,15 +21,20 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-import platform_merge_bot
-from platform_merge_bot import PlatformMergeBot
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# isort: split
+# Global placeholders for dynamically imported local modules (shields them from formatters)
+platform_merge_bot = None
+PlatformGroup = None
+PlatformMergeBot = None
 
 
 class TestPlatformMergeBot(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+        global platform_merge_bot, PlatformGroup, PlatformMergeBot
+        import platform_merge_bot
+        from platform_merge_bot import PlatformGroup, PlatformMergeBot
+
     def setUp(self):
         # Create a temporary config file for testing
         self.config_content = """
@@ -66,6 +71,7 @@ esp32:
             config_path=self.temp_config_name,
             dry_run=False
         )
+        self.bot._bot_username = "platform-merge-bot"
 
     def tearDown(self):
         self.github_patcher.stop()
@@ -113,7 +119,7 @@ esp32:
         self.assertFalse(nxp_group.matches_file("src/platform/ESP32/SystemTimeSupport.cpp"))
         self.assertFalse(nxp_group.matches_file("src/app/Command.cpp"))
 
-    def test_get_pr_approvers(self):
+    def test_get_pr_review_states(self):
         reviews = [
             self.create_mock_review("doru91", "COMMENTED"),
             self.create_mock_review("nxpdev", "APPROVED"),
@@ -122,12 +128,13 @@ esp32:
             self.create_mock_review("nxpdev", "CHANGES_REQUESTED"),  # requested changes later
         ]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
-        approvers = self.bot.get_pr_approvers(mock_pr)
+        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
 
         # doru91 should be in approvers (latest was approved)
         # nxpdev should NOT be in approvers (latest was changes requested)
         self.assertIn("doru91", approvers)
         self.assertNotIn("nxpdev", approvers)
+        self.assertIn("nxpdev", change_requesters)
 
         # test dismissed
         reviews2 = [
@@ -135,7 +142,7 @@ esp32:
             self.create_mock_review("doru91", "DISMISSED"),
         ]
         mock_pr2 = self.create_mock_pr(2, "Test PR 2", "author", [], reviews2)
-        approvers2 = self.bot.get_pr_approvers(mock_pr2)
+        approvers2, change_requesters2 = self.bot.get_pr_review_states(mock_pr2)
         self.assertNotIn("doru91", approvers2)
 
     def test_analyze_pr_files_fully_covered(self):
@@ -215,6 +222,7 @@ esp32:
         reviews = []
         # Existing eligibility comment with different body
         mock_comment = MagicMock()
+        mock_comment.user.login = "platform-merge-bot"
         mock_comment.body = f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews, comments=[mock_comment])
 
@@ -242,6 +250,7 @@ esp32:
         expected_body += "    * `examples/**/nxp/**`\n"
 
         mock_comment = MagicMock()
+        mock_comment.user.login = "platform-merge-bot"
         mock_comment.body = expected_body
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews, comments=[mock_comment])
 
@@ -306,6 +315,22 @@ esp32:
         mock_pr.merge.assert_not_called()
         self.assertIn("- **esp32**: @esp32dev (❌ Needs approval)", mock_pr.create_issue_comment.call_args[0][0])
         self.assertIn("- **nxp**: @doru91, @nxpdev (✅ Approved)", mock_pr.create_issue_comment.call_args[0][0])
+
+    def test_check_and_process_pr_blocked_by_changes_requested(self):
+        files = [
+            self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
+        ]
+        # doru91 approved, but someone else requested changes
+        reviews = [
+            self.create_mock_review("doru91", "APPROVED"),
+            self.create_mock_review("other_user", "CHANGES_REQUESTED"),
+        ]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        # Should NOT merge because of the active changes requested
+        mock_pr.merge.assert_not_called()
 
 
 if __name__ == '__main__':

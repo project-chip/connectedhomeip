@@ -54,13 +54,23 @@ class PlatformMergeBot:
         self.config_path = config_path
         self.dry_run = dry_run
         self.groups: dict[str, PlatformGroup] = {}
+        self._bot_username = None
         self.load_config()
+
+    @property
+    def bot_username(self) -> str:
+        if self._bot_username is None:
+            try:
+                self._bot_username = self.api.get_user().login.lower()
+            except Exception:
+                self._bot_username = "platform-merge-bot"
+        return self._bot_username
 
     def load_config(self):
         if not os.path.exists(self.config_path):
             raise FileNotFoundError(f"Config file not found at {self.config_path}")
 
-        with open(self.config_path) as f:
+        with open(self.config_path, encoding="utf-8") as f:
             content = yaml.safe_load(f)
 
         if not content or not isinstance(content, dict):
@@ -77,27 +87,19 @@ class PlatformMergeBot:
 
         log.info("Loaded %d platform groups from config.", len(self.groups))
 
-    def get_pr_approvers(self, pr: PullRequest) -> set[str]:
-        """Returns the set of users who have currently approved the PR."""
-        approvers = set()
-        change_requesters = set()
-
+    def get_pr_review_states(self, pr: PullRequest) -> tuple[set[str], set[str]]:
+        """Returns the set of users who have currently approved and those who have requested changes."""
+        user_reviews = {}
         # get_reviews() returns reviews chronologically
         for review in pr.get_reviews():
             if not review.user or not review.user.login:
                 continue
             user = review.user.login.lower()
-            if review.state == 'APPROVED':
-                approvers.add(user)
-                change_requesters.discard(user)
-            elif review.state == 'CHANGES_REQUESTED':
-                change_requesters.add(user)
-                approvers.discard(user)
-            elif review.state == 'DISMISSED':
-                approvers.discard(user)
-                change_requesters.discard(user)
+            user_reviews[user] = review.state
 
-        return approvers
+        approvers = {user for user, state in user_reviews.items() if state == 'APPROVED'}
+        change_requesters = {user for user, state in user_reviews.items() if state == 'CHANGES_REQUESTED'}
+        return approvers, change_requesters
 
     def analyze_pr_files(self, pr: PullRequest) -> tuple[bool, dict[str, list[str]], list[str]]:
         """
@@ -155,9 +157,13 @@ class PlatformMergeBot:
 
         log.info("PR #%d is fully covered by platform groups: %s", pr.number, list(active_groups.keys()))
 
-        # Get current approvals
-        approvers = self.get_pr_approvers(pr)
-        log.debug("PR #%d current approvers: %s", pr.number, list(approvers))
+        # Get current approvals and change requests
+        approvers, change_requesters = self.get_pr_review_states(pr)
+        log.debug("PR #%d current approvers: %s, change requesters: %s", pr.number, list(approvers), list(change_requesters))
+
+        if change_requesters:
+            log.info("PR #%d has active changes requested by: %s. Skipping.", pr.number, list(change_requesters))
+            return
 
         # Check approvals for each active group
         missing_approvals: dict[str, PlatformGroup] = {}
@@ -200,18 +206,18 @@ class PlatformMergeBot:
             for glob in group.paths:
                 comment_body += f"    * `{glob}`\n"
 
-        # Check if eligibility comment already exists
         for comment in pr.get_issue_comments():
-            if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
-                if comment.body.strip() != comment_body.strip():
-                    if self.dry_run:
-                        log.info("[Dry Run] Would update eligibility comment on PR #%d", pr.number)
+            if comment.user and comment.user.login.lower() == self.bot_username:
+                if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
+                    if comment.body.strip() != comment_body.strip():
+                        if self.dry_run:
+                            log.info("[Dry Run] Would update eligibility comment on PR #%d", pr.number)
+                        else:
+                            log.info("Updating eligibility comment on PR #%d", pr.number)
+                            comment.edit(comment_body)
                     else:
-                        log.info("Updating eligibility comment on PR #%d", pr.number)
-                        comment.edit(comment_body)
-                else:
-                    log.debug("PR #%d already has an up-to-date eligibility comment.", pr.number)
-                return
+                        log.debug("PR #%d already has an up-to-date eligibility comment.", pr.number)
+                    return
 
         if self.dry_run:
             log.info("[Dry Run] Would post eligibility comment to PR #%d:\n%s", pr.number, comment_body)
@@ -291,7 +297,7 @@ def main(
 
     gh_token = None
     if token_file:
-        with open(token_file) as f:
+        with open(token_file, encoding="utf-8") as f:
             gh_token = f.read().strip()
         if not gh_token:
             raise Exception(f"Token file {token_file} is empty")
