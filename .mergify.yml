@@ -56,6 +56,18 @@ pull_request_rules:
               labels:
                   - backport-v1.6-sve-branch
 
+    - name: Backport to v1.6-branch
+      conditions:
+          - merged
+          - base=master
+          - label="request-backport-supported"
+      actions:
+          backport:
+              branches:
+                  - v1.6-branch
+              labels:
+                  - backport-v1.6-branch
+
     - name: Backport to v1.5-branch
       conditions:
           - merged
@@ -88,6 +100,7 @@ pull_request_rules:
       conditions:
           - or:
                 - label="backport-v1.6-sve-branch"
+                - label="backport-v1.6-branch"
                 - label="backport-v1.5-branch"
                 - label="backport-v1.4.2-branch"
           - author=mergify[bot]
