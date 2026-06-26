@@ -38,7 +38,8 @@ class TC_DD_3_23(MatterBaseTest):
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
             TestStep(2, "Validate the NFC bit in payload and Perform the commissioning"),
             TestStep(3, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
-            TestStep(4, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
+            TestStep(4, "DUT is powered OFF."),
+            TestStep(5, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
         ]
 
     def setup_test(self):
