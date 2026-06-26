@@ -17,13 +17,12 @@
 
 import logging
 import os
+from typing import NamedTuple
 
 import click
 import coloredlogs
 import pathspec
 import yaml
-from typing import NamedTuple
-
 from github import Github, GithubException
 from github.PullRequest import PullRequest
 
