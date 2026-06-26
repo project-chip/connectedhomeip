@@ -148,7 +148,7 @@ class TC_GC_2_8(MatterBaseTest):
         sub.await_all_expected_report_matches(
             expected_matchers=[generate_fabric_under_test_matcher(F1)], timeout_sec=60)
 
-        # DUT (Lister) joins G1 joins with KeySetId K1 and InputKey1
+        # DUT (Listener) joins G1 joins with KeySetId K1 and InputKey1
         GROUPID_G1 = 0x0103
         KEYSETID_K1 = 0x01a3
         INPUTKEY_1 = bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf")
@@ -279,35 +279,32 @@ class TC_GC_2_8(MatterBaseTest):
             compressed_fabric_id = dev_ctrl.GetCompressedFabricId().to_bytes(8, byteorder="big")
             colliding_epoch_key = find_colliding_epoch_key(INPUTKEY_1, compressed_fabric_id)
 
-            if colliding_epoch_key == b"":
-                self.mark_step_range_skipped(13, 14)
-            else:
-                self.step(13)
-                event_sub.reset()
+            self.step(13)
+            event_sub.reset()
 
-                # Override KeySetID K2 on controller with the colliding epoch key
-                dev_ctrl.SetGroupKeySet(
-                    keyset_id=KEYSETID_K2,
-                    policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-                    num_keys=1,
-                    epoch_key0=colliding_epoch_key, epoch_start_time0=2220000,
-                    epoch_key1=None, epoch_start_time1=0,
-                    epoch_key2=None, epoch_start_time2=0)
+            # Override KeySetID K2 on controller with the colliding epoch key
+            dev_ctrl.SetGroupKeySet(
+                keyset_id=KEYSETID_K2,
+                policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+                num_keys=1,
+                epoch_key0=colliding_epoch_key, epoch_start_time0=2220000,
+                epoch_key1=None, epoch_start_time1=0,
+                epoch_key2=None, epoch_start_time2=0)
 
-                # Step 13
-                # Remap GroupID G1 to KeySetID K2 on controller so step 13 encrypts group message for G1 with K2 while the DUT only holds K1;
-                # the collision makes the DUT select K1 for decryption, which fails and yields FailedAuth.
-                dev_ctrl.SetGroupKey(GROUPID_G1, KEYSETID_K2)
-                dev_ctrl.SendGroupCommand(GROUPID_G1, operate_command.command_object())
-                await asyncio.sleep(3)
+            # Step 13
+            # Remap GroupID G1 to KeySetID K2 on controller so step 13 encrypts group message for G1 with K2 while the DUT only holds K1;
+            # the collision makes the DUT select K1 for decryption, which fails and yields FailedAuth.
+            dev_ctrl.SetGroupKey(GROUPID_G1, KEYSETID_K2)
+            dev_ctrl.SendGroupCommand(GROUPID_G1, operate_command.command_object())
+            await asyncio.sleep(3)
 
-                self.step(14)
-                event_data = event_sub.wait_for_event_report(groupcastTesting_event, timeout_sec=30)
-                asserts.assert_equal(event_data.groupcastTestResult,
-                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
-                                     "GroupcastTesting event should report FailedAuth")
-                asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
-                                     "Incorrect DestinationIpAddress in GroupcastTesting event")
+            self.step(14)
+            event_data = event_sub.wait_for_event_report(groupcastTesting_event, timeout_sec=30)
+            asserts.assert_equal(event_data.groupcastTestResult,
+                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                                 "GroupcastTesting event should report FailedAuth")
+            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                 "Incorrect DestinationIpAddress in GroupcastTesting event")
 
             self.step(15)
             await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
