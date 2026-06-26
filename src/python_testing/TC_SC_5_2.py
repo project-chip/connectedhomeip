@@ -96,20 +96,20 @@ class TC_SC_5_2(MatterBaseTest):
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Manage privileges for groups 0x0101, 0x0102, and 0x0300, and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT to write GroupKeySetID 0x01a3."),
             TestStep("2b", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT to write GroupKeySetID 0x01a4 with the exact same key material."),
-            TestStep("2c", "As part of test setup on the TH side, configure the local GroupKeyMap on the TH with 3 key mappings that will be used throughout the test and never changed: GroupId 0x0300 bound to GroupKeySetID 0x01a3, GroupId 0x0101 bound to GroupKeySetID 0x01a4, GroupId 0x0102 bound to GroupKeySetID 0x01a4."),
-            TestStep("3", "If Groupcast cluster is enabled on the RootNode endpoint of the DUT, skip to step 12. Otherwise, TH binds GroupId 0x0300 with GroupKeySetID 0x01a3, and GroupId 0x0101 with GroupKeySetID 0x01a4 on the DUT in the GroupKeyMap attribute list on GroupKeyManagement cluster."),
+            TestStep("2c", "As part of test setup on the TH side, configure the local GroupKeyMap on the TH with 4 key mappings that will be used throughout the test and never changed: GroupId 0x0300 bound to GroupKeySetID 0x01a3, GroupId 0x0101 bound to GroupKeySetID 0x01a4, GroupId 0x0102 bound to GroupKeySetID 0x01a4, GroupId 0x0201 bound to GroupKeySetID 0x01a4."),
+            TestStep("3", "If Groupcast cluster is enabled on the RootNode endpoint of the DUT, skip to step 12. Otherwise, TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4, GroupId 0x0201 -> KeySetId 0x01a4. Note: No entries are removed."),
             TestStep("4", "TH cleans up the groups by sending the RemoveAllGroups command to the DUT on the current endpoint under test."),
             TestStep("5a", "TH sends AddGroup Command over CASE to DUT on the current endpoint under test with GroupID 0x0300."),
             TestStep("5b", "TH sends AddGroup Command over CASE to DUT on the current endpoint under test with GroupID 0x0101."),
             TestStep("6a", "TH sends an AddGroup Command to the Groups cluster with the GroupID field set to 0x0201. The command is sent as a group command using GroupID 0x0101 (encrypted using KeySet 0x01a4)."),
             TestStep("6b", "TH sends a ViewGroup Command to the Groups cluster on the current endpoint under test over CASE with the GroupID set to 0x0201 to confirm that the AddGroup command from step 6a was successful."),
-            TestStep("7a", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to map GroupID 0x0102 to GroupKeySetID 0x01a4 (replacing the entry for GroupID 0x0101), while maintaining the mapping of GroupID 0x0300 to GroupKeySetID 0x01a3."),
+            TestStep("7a", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0102 -> KeySetId 0x01a4. Note: Removes GroupId 0x0101 and 0x0201."),
             TestStep("7b", "TH sends an AddGroup Command to the Groups cluster with the GroupID field set to 0x0202. The command is sent as a group command using GroupID 0x0101 (encrypted using KeySet 0x01a4)."),
             TestStep("7c", "TH sends a ViewGroup Command to the Groups cluster on the current endpoint under test over CASE with the GroupID set to 0x0202 to confirm that the AddGroup command from step 7b was rejected."),
-            TestStep("8a", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to map GroupID 0x0101 to GroupKeySetID 0x01a4 (replacing GroupID 0x0102), while maintaining the mapping of GroupID 0x0300 to GroupKeySetID 0x01a3."),
+            TestStep("8a", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4. Note: Removes GroupId 0x0102."),
             TestStep("8b", "TH sends an AddGroup Command to the Groups cluster with the GroupID field set to 0x0203. The command is sent as a group command using GroupID 0x0102 (encrypted using KeySet 0x01a4)."),
             TestStep("8c", "TH sends a ViewGroup Command to the Groups cluster on the current endpoint under test over CASE with the GroupID set to 0x0203 to confirm that the AddGroup command from step 8b was rejected."),
-            TestStep("9a", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to include entries mapping GroupId 0x0101 to GroupKeySetID 0x01a4, GroupId 0x0102 to GroupKeySetID 0x01a4, and GroupId 0x0300 to GroupKeySetID 0x01a3."),
+            TestStep("9a", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4, GroupId 0x0102 -> KeySetId 0x01a4. Note: No entries are removed."),
             TestStep("9b", "TH sends an AddGroup Command to the Groups cluster with the GroupID field set to 0x0204. The command is sent as a group command using GroupID 0x0102."),
             TestStep("9c", "TH sends a ViewGroup Command to the Groups cluster on the current endpoint under test over CASE with the GroupID set to 0x0204 to confirm that the AddGroup command from step 9b was rejected."),
             TestStep("10a", "TH sends a RemoveGroup Command to the Groups cluster with the GroupID field set to 0x0101. The command is sent as a group command using GroupID 0x0300."),
@@ -123,13 +123,13 @@ class TC_SC_5_2(MatterBaseTest):
             TestStep("15b", "TH sends the GroupcastTesting command on EP0 with TestOperation field set to EnableListenerTesting and DurationSeconds field set to 120."),
             TestStep("16a", "TH sends a group command requiring Operate privilege available on the current endpoint under test as a group command using GroupID 0x0101 (encrypted using KeySet 0x01a4)."),
             TestStep("16b", "TH waits for and verifies the GroupcastTesting event from DUT (AccessAllowed: true, GroupcastTestResult: Success)."),
-            TestStep("16c", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to map GroupID 0x0102 to GroupKeySetID 0x01a4 (replacing the entry for GroupID 0x0101), while maintaining the mapping of GroupID 0x0300 to GroupKeySetID 0x01a3."),
+            TestStep("16c", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0102 -> KeySetId 0x01a4. Note: Removes GroupId 0x0101."),
             TestStep("16d", "TH sends the same group command destined for Group 0x0101 (encrypted using KeySet 0x01a4)."),
             TestStep("16e", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: null, AccessAllowed: null, GroupcastTestResult: FailedAuth)."),
-            TestStep("16f", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to map GroupID 0x0101 to GroupKeySetID 0x01a4 (replacing GroupID 0x0102), while maintaining the mapping of GroupID 0x0300 to GroupKeySetID 0x01a3."),
+            TestStep("16f", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4. Note: Removes GroupId 0x0102."),
             TestStep("16g", "TH sends the same group command destined for Group 0x0102 (encrypted using KeySet 0x01a4)."),
             TestStep("16h", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: null, AccessAllowed: null, GroupcastTestResult: FailedAuth)."),
-            TestStep("16i", "TH updates the GroupKeyMap attribute list on the DUT's GroupKeyManagement cluster to include entries mapping GroupId 0x0101 to GroupKeySetID 0x01a4, GroupId 0x0102 to GroupKeySetID 0x01a4, and GroupId 0x0300 to GroupKeySetID 0x01a3."),
+            TestStep("16i", "TH writes GroupKeyMap on DUT with entries: GroupId 0x0300 -> KeySetId 0x01a3, GroupId 0x0101 -> KeySetId 0x01a4, GroupId 0x0102 -> KeySetId 0x01a4. Note: No entries are removed."),
             TestStep("16j", "TH sends the same group command destined for Group 0x0102 (encrypted using KeySet 0x01a4)."),
             TestStep("16k", "TH waits for and verifies the GroupcastTesting event from DUT (GroupID: 0x0102, AccessAllowed: null, GroupcastTestResult: Success)."),
             TestStep("16l", "TH sends Groupcast cluster's GroupcastTesting command on EP0 with TestOperation field set to DisableTesting."),
@@ -163,7 +163,6 @@ class TC_SC_5_2(MatterBaseTest):
 
     async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller
-        dev_ctrl.InitGroupTestingData()
         node_id = self.dut_node_id
         groupcast_enabled = await is_groupcast_on_root_node(self)
 
@@ -265,6 +264,9 @@ class TC_SC_5_2(MatterBaseTest):
         dev_ctrl.SetGroupInfo(groupID3, "Group 0x0300", group_addr_policy)
         dev_ctrl.SetGroupKey(groupID3, keySetID1)
 
+        dev_ctrl.SetGroupInfo(groupID4, "Group 0x0201", group_addr_policy)
+        dev_ctrl.SetGroupKey(groupID4, keySetID2)
+
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "11")
         else:
@@ -273,6 +275,7 @@ class TC_SC_5_2(MatterBaseTest):
             mapping = [
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID4, groupKeySetID=keySetID2),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
