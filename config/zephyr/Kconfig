@@ -64,7 +64,6 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 # See config/common/cmake/Kconfig for full definition
 config CHIP_LIB_SHELL
 	imply SHELL
-	imply OPENTHREAD_SHELL if OPENTHREAD
 
 if OPENTHREAD
 
