@@ -49,11 +49,12 @@ class PlatformGroup:
 
     def __init__(self, name: str, maintainers: list[str], paths: list[str]) -> None:
         self.name = name
-        self.maintainers = [m.lower() for m in maintainers]
-        self.paths = paths
-        self.spec = pathspec.PathSpec.from_lines("gitignore", paths)
+        self.maintainers = sorted({m.strip().lower() for m in maintainers})
+        self.paths = sorted({p.strip() for p in paths})
+        self.spec = pathspec.PathSpec.from_lines("gitignore", self.paths)
         self.path_specs = {
-            glob: pathspec.PathSpec.from_lines("gitignore", [glob]) for glob in paths
+            glob: pathspec.PathSpec.from_lines("gitignore", [glob])
+            for glob in self.paths
         }
 
     def matches_file(self, filepath: str) -> bool:
@@ -88,11 +89,10 @@ class PlatformMergeBot:
                 self._bot_username = self.api.get_user().login.lower()
             except GithubException:
                 self._bot_username = "platform-merge-bot"
-            except Exception:
-                self._bot_username = "platform-merge-bot"
         return self._bot_username
 
-    def load_config(self):
+    def load_config(self) -> None:
+        """Loads and validates the platform groups configuration from the YAML file."""
         if not os.path.exists(self.config_path):
             raise FileNotFoundError(f"Config file not found at {self.config_path}")
 
@@ -115,14 +115,23 @@ class PlatformMergeBot:
                 raise ValueError(
                     f"Group '{group_name}' must contain 'maintainers' and 'paths' lists."
                 )
-            if not all(isinstance(m, str) for m in maintainers):
+            if not maintainers:
                 raise ValueError(
-                    f"Group '{group_name}' maintainers must be a list of strings."
+                    f"Group '{group_name}' maintainers list cannot be empty."
                 )
-            if not all(isinstance(p, str) for p in paths):
-                raise ValueError(
-                    f"Group '{group_name}' paths must be a list of strings."
-                )
+            if not paths:
+                raise ValueError(f"Group '{group_name}' paths list cannot be empty.")
+
+            for m in maintainers:
+                if not isinstance(m, str) or not m.strip():
+                    raise ValueError(
+                        f"Group '{group_name}' maintainer '{m}' must be a non-empty string."
+                    )
+            for p in paths:
+                if not isinstance(p, str) or not p.strip():
+                    raise ValueError(
+                        f"Group '{group_name}' path '{p}' must be a non-empty string."
+                    )
             self.groups[group_name] = PlatformGroup(group_name, maintainers, paths)
 
         log.info("Loaded %d platform groups from config.", len(self.groups))
@@ -142,7 +151,7 @@ class PlatformMergeBot:
             user for user, state in user_reviews.items() if state == "APPROVED"
         }
         # Exclude author from self-approval
-        author = pr.user.login.lower()
+        author = pr.user.login.lower() if pr.user and pr.user.login else ""
         approvers.discard(author)
         change_requesters = {
             user for user, state in user_reviews.items() if state == "CHANGES_REQUESTED"
@@ -200,12 +209,14 @@ class PlatformMergeBot:
                 pr.number,
                 uncovered_files[:5],
             )
+            self.remove_eligibility_comment(pr)
             return
 
         # Determine which groups are active (i.e. have changed files)
         active_groups = {name: files for name, files in matched_files.items() if files}
         if not active_groups:
             log.info("PR #%d has no changed files? Skipping.", pr.number)
+            self.remove_eligibility_comment(pr)
             return
 
         log.info(
@@ -318,6 +329,24 @@ class PlatformMergeBot:
             log.info("Posting eligibility comment to PR #%d", pr.number)
             pr.create_issue_comment(comment_body)
 
+    def remove_eligibility_comment(self, pr: PullRequest) -> None:
+        """Removes the eligibility comment if it exists on the PR."""
+        for comment in pr.get_issue_comments():
+            if comment.user and comment.user.login.lower() == self.bot_username:
+                if comment.body and ELIGIBILITY_COMMENT_MARKER in comment.body:
+                    if self.dry_run:
+                        log.info(
+                            "[Dry Run] Would delete stale eligibility comment on PR #%d",
+                            pr.number,
+                        )
+                    else:
+                        log.info(
+                            "Deleting stale eligibility comment on PR #%d",
+                            pr.number,
+                        )
+                        comment.delete()
+                    return
+
     def merge_pr(
         self, pr: PullRequest, valid_approvals_per_group: dict[str, GroupApproval]
     ) -> None:
@@ -373,7 +402,11 @@ class PlatformMergeBot:
     default="GH_TOKEN",
     help="Environment variable containing the GitHub token",
 )
-@click.option("--token-file", help="Read github token from the given file")
+@click.option(
+    "--token-file",
+    type=click.Path(exists=True, dir_okay=False, readable=True),
+    help="Read github token from the given file",
+)
 @click.option(
     "--repo",
     default=DEFAULT_REPOSITORY,

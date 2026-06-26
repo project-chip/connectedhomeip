@@ -117,7 +117,7 @@ esp32:
 
         nxp_group = self.bot.groups["nxp"]
         self.assertEqual(nxp_group.maintainers, ["doru91", "nxpdev"])
-        self.assertEqual(nxp_group.paths, ["src/platform/nxp/**", "examples/**/nxp/**"])
+        self.assertEqual(nxp_group.paths, ["examples/**/nxp/**", "src/platform/nxp/**"])
 
     def test_file_matching(self) -> None:
         """Tests that file path matching against platform groups functions correctly."""
@@ -410,6 +410,44 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], reviews)
         approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
         self.assertIn("doru91", change_requesters)
+
+    def test_check_and_process_pr_removes_comment_when_ineligible(self) -> None:
+        """Tests that a stale eligibility comment is deleted if the PR is no longer eligible."""
+        files = [
+            self.create_mock_file(
+                "src/app/Command.cpp"
+            ),  # Uncovered file makes it ineligible
+        ]
+        mock_comment = MagicMock()
+        mock_comment.user.login = "platform-merge-bot"
+        mock_comment.body = (
+            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
+        )
+        mock_pr = self.create_mock_pr(
+            1, "Test PR", "author", files, [], comments=[mock_comment]
+        )
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_comment.delete.assert_called_once()
+        mock_pr.merge.assert_not_called()
+
+    def test_check_and_process_pr_removes_comment_when_no_changed_files(self) -> None:
+        """Tests that a stale eligibility comment is deleted if the PR has no changed files."""
+        files = []  # No changed files
+        mock_comment = MagicMock()
+        mock_comment.user.login = "platform-merge-bot"
+        mock_comment.body = (
+            f"{platform_merge_bot.ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
+        )
+        mock_pr = self.create_mock_pr(
+            1, "Test PR", "author", files, [], comments=[mock_comment]
+        )
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_comment.delete.assert_called_once()
+        mock_pr.merge.assert_not_called()
 
 
 if __name__ == "__main__":
