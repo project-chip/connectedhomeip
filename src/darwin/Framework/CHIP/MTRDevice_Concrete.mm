@@ -3308,14 +3308,23 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            // double-trigger (controllerResumed-style setup mid-CASE followed
                            // by _deviceMayBeReachable) results in exactly ONE subscription,
                            // not two. See #72721.
-                           {
+                           //
+                           // We are running with the Matter stack lock held here, not
+                           // self->_lock; hop to the device queue (matching the attribute/event
+                           // report counters above) so the synchronous delegate call-out
+                           // happens under self->_lock the same way every other unitTest* hook
+                           // does, instead of acquiring self->_lock while holding the stack lock.
+                           dispatch_async(self.queue, ^{
+                               mtr_strongify(self);
+                               VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason ReadClient created hook called back with nil MTRDevice"));
+
                                std::lock_guard lock(self->_lock);
                                [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
                                    if ([testDelegate respondsToSelector:@selector(unitTestReadClientCreatedForDevice:)]) {
                                        [testDelegate unitTestReadClientCreatedForDevice:self];
                                    }
                                }];
-                           }
+                           });
 #endif
                        }];
 

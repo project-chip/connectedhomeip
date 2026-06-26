@@ -6218,6 +6218,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
+    // Commissioning above left an established CASE session to the node. If that
+    // session is still cached, the subscription setup below reuses it synchronously
+    // and ReadClient #1 is created before the second trigger's Matter-queue block can
+    // run -- yielding two ReadClients on BOTH the buggy and fixed trees, so the test
+    // cannot distinguish them. Release the cached session first (no delegate is set
+    // yet, so _resetSubscription / _ensureSubscriptionForExistingDelegates are no-ops
+    // and only ReleaseSession has effect), then drain the Matter queue so the release
+    // has completed. setDelegate: below then performs a real asynchronous CASE, giving
+    // the second trigger an actual in-flight attempt to cancel.
+    [device _deviceMayBeReachable];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
     // Count ReadClients created. Each ReadClient corresponds to exactly one
