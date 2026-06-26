@@ -375,24 +375,38 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
     }
 }
 
-TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTest)
+// DisableContextTriggers Sub-tests
+// 1. Null, verify the active set is an empty list
+// 2. Provide a context that doesn't exist, ensure error
+// 3. Existing context, missing ZoneIDs, ensure error
+// 4. Existing context, removal of that context and all associated Zones
+TEST_F(TestLocalAvAnalysisCluster, ExecuteDisableContextTriggersCommandTestContextTriggersIsNull)
 {
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
-    ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
-    Commands::DisableContextTriggers::DecodableType commandData;
+    ConcreteCommandPath kCommandPath{ 1, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+  
+    // Null context triggers, active set is an empty list
+    commandData.contextTriggers.SetNull();
+    auto response = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, kCommandPath, commandData);
 
-    auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, kCommandPath, commandData);
-
-    // The response should contain an ActionReturnStatus
     if (response.has_value())
     {
         ASSERT_TRUE(response.value().IsSuccess());
     }
     else
     {
+        // Fail the test case
         FAIL();
     }
+    
+    // Read the active triggers
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
+    
+    auto aActiveContextIterator = aActiveContextTriggers.begin();
+    ASSERT_TRUE(!aActiveContextIterator.Next());
 }
 
 } // namespace
