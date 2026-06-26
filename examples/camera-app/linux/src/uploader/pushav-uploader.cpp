@@ -432,7 +432,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
             fullPath                                 = fullPath.substr(0, fullPath.size() - kUploadSuffixLen);
         }
     }
-    else if (extension == ".mpd")
+    else if (isMpdExtension)
     {
         contentType = "application/dash+xml"; // Manifest file
     }

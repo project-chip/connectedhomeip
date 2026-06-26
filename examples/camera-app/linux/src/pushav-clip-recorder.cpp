@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <regex>
@@ -186,6 +187,13 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
 }
 
 namespace {
+
+// SegmentTimeline <S> element format strings
+// Single segment: <S t="0" d="360000" />
+static constexpr char kSingleSegmentFmt[] = "%s    <S t=\"0\" d=\"%lld\" />";
+// Repeated segments: <S t="0" d="360000" r="2" />
+static constexpr char kRepeatedSegmentFmt[] = "%s    <S t=\"0\" d=\"%lld\" r=\"%lld\" />";
+
 int ReadPacket(void * opaque, uint8_t * buf, int bufSize)
 {
     struct BufferData * bd = (struct BufferData *) opaque;
@@ -195,7 +203,9 @@ int ReadPacket(void * opaque, uint8_t * buf, int bufSize)
     }
 
     if (!bufSize)
+    {
         return AVERROR_EOF;
+    }
 
     /* copy internal buffer data to buf */
     memcpy(buf, bd->mPtr, static_cast<size_t>(bufSize));
@@ -204,6 +214,106 @@ int ReadPacket(void * opaque, uint8_t * buf, int bufSize)
 
     return bufSize;
 }
+
+/**
+ * @brief Writes a vector of lines to a file, preserving the original newline convention.
+ *
+ * Each line is written as-is, with '\n' inserted between lines (not after the last one).
+ *
+ * @param filePath  Path to the output file
+ * @param lines     Lines to write
+ * @return true if writing succeeded, false on failure
+ */
+bool WriteLinesToFile(const std::string & filePath, const std::vector<std::string> & lines)
+{
+    std::ofstream outFile(filePath);
+    if (!outFile)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < lines.size(); ++i)
+    {
+        outFile << lines[i];
+        if (i < lines.size() - 1)
+        {
+            outFile << "\n";
+        }
+    }
+    outFile.close();
+    return outFile.good();
+}
+
+/**
+ * @brief Parses a quoted XML attribute value as a long integer.
+ *
+ * Searches for `attrName="` in `haystack` starting from `searchStart`,
+ * extracts the value between the quotes, and parses it with strtol.
+ *
+ * @param haystack      The string to search in
+ * @param attrName      The attribute name (e.g. "timescale" or "duration")
+ * @param searchStart   Position in haystack to start searching from
+ * @param outValue      Output: the parsed value (only valid on success)
+ * @return true if the attribute was found and successfully parsed as a non-negative long
+ */
+bool ParseXmlAttributeLong(const std::string & haystack, const char * attrName, size_t searchStart, long & outValue)
+{
+    std::string searchStr = std::string(attrName) + "=\"";
+    size_t attrPos = haystack.find(searchStr, searchStart);
+    if (attrPos == std::string::npos)
+    {
+        return false;
+    }
+    size_t valStart = attrPos + searchStr.length();
+    size_t valEnd   = haystack.find("\"", valStart);
+    if (valEnd == std::string::npos)
+    {
+        return false;
+    }
+    std::string valStr = haystack.substr(valStart, valEnd - valStart);
+    char * endPtr       = nullptr;
+    long val            = std::strtol(valStr.c_str(), &endPtr, 10);
+    if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
+    {
+        outValue = val;
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief Appends SegmentTimeline <S> elements to the output line vector.
+ *
+ * Generates the DASH SegmentTimeline entries for a given stream.
+ * For a single segment, emits: <S t="0" d="duration" />
+ * For multiple segments, emits: <S t="0" d="duration" r="repeatCount" />
+ *
+ * Example output (3 segments, timescale=90000, 4s each):
+ *   <SegmentTimeline>
+ *       <S t="0" d="360000" r="2" />
+ *   </SegmentTimeline>
+ *
+ * @param outputLines     Vector to append lines to
+ * @param indent          Whitespace indent for the current SegmentTemplate
+ * @param segDurationTs   Segment duration in timescale units
+ * @param segCount        Number of segments in the timeline
+ */
+void AppendSegmentTimeline(std::vector<std::string> & outputLines, const std::string & indent, int64_t segDurationTs,
+                           int segCount)
+{
+    outputLines.push_back(indent + "<SegmentTimeline>");
+    chip::StringBuilder<128> sb;
+    if (segCount == 1)
+    {
+        sb.AddFormat(kSingleSegmentFmt, indent.c_str(), static_cast<long long>(segDurationTs));
+    }
+    else
+    {
+        sb.AddFormat(kRepeatedSegmentFmt, indent.c_str(), static_cast<long long>(segDurationTs), static_cast<long long>(segCount - 1));
+    }
+    outputLines.push_back(sb.c_str());
+    outputLines.push_back(indent + "</SegmentTimeline>");
+}
+
 } // namespace
 
 bool PushAVClipRecorder::IsH264IFrame(const uint8_t * data, unsigned int length)
@@ -843,20 +953,11 @@ void PushAVClipRecorder::UpdateMPDParams(const std::string & mpdPath)
     if (foundAndReplaced)
     {
         std::string uploadMpdPath = mpdPath + ".upload";
-        std::ofstream outFile(uploadMpdPath);
-        if (!outFile)
+        if (!WriteLinesToFile(uploadMpdPath, lines))
         {
-            ChipLogError(Camera, "ERROR: Failed to open upload MPD file for writing: %s", uploadMpdPath.c_str());
+            ChipLogError(Camera, "ERROR: Failed to write upload MPD file: %s", uploadMpdPath.c_str());
             return;
         }
-
-        for (size_t i = 0; i < lines.size(); ++i)
-        {
-            outFile << lines[i];
-            if (i < lines.size() - 1) // Don't add newline after last line
-                outFile << "\n";
-        }
-        outFile.close();
         ChipLogProgress(Camera, "Successfully updated stream info in upload MPD file: %s", uploadMpdPath.c_str());
     }
     else
@@ -876,20 +977,20 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
 
     std::vector<std::string> lines;
     std::string line;
-
-    // Track segment counts per stream for SegmentTimeline generation
-    // mUploadSegmentID[i] is the next segment number to upload, so count = mUploadSegmentID[i] - kInitialSegmentId
-    std::vector<int> segmentCounts;
-    for (size_t i = 0; i < mUploadSegmentID.size(); i++)
-    {
-        segmentCounts.push_back(mUploadSegmentID[i] - kInitialSegmentId);
-    }
-
     while (std::getline(inFile, line))
     {
         lines.push_back(line);
     }
     inFile.close();
+
+    // Track segment counts per stream for SegmentTimeline generation.
+    // mUploadSegmentID[i] is the next segment number to upload, so count = mUploadSegmentID[i] - kInitialSegmentId.
+    std::vector<int> segmentCounts;
+    segmentCounts.reserve(mUploadSegmentID.size());
+    for (int id : mUploadSegmentID)
+    {
+        segmentCounts.push_back(id - kInitialSegmentId);
+    }
 
     if (segmentCounts.empty())
     {
@@ -898,9 +999,20 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
     }
 
     // Add SegmentTimeline to each SegmentTemplate.
+    //
     // After av_write_trailer, the MPD is already static with type="static",
     // mediaPresentationDuration, and no minimumUpdatePeriod/suggestedPresentationDelay.
     // The only missing piece is the SegmentTimeline inside each SegmentTemplate.
+    //
+    // Example transformation (self-closing SegmentTemplate with 3 segments):
+    //   Before:
+    //     <SegmentTemplate timescale="90000" duration="360000" ... />
+    //   After:
+    //     <SegmentTemplate timescale="90000" duration="360000" ...>
+    //       <SegmentTimeline>
+    //           <S t="0" d="360000" r="2" />
+    //       </SegmentTimeline>
+    //     </SegmentTemplate>
     bool modified = false;
     std::vector<std::string> outputLines;
     size_t streamIdx = 0;
@@ -912,18 +1024,18 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
 
     for (size_t i = 0; i < lines.size(); i++)
     {
-        std::string line = lines[i];
+        std::string currentLine = lines[i];
 
         if (!inSegmentTemplate)
         {
-            size_t stPos = line.find("<SegmentTemplate");
+            size_t stPos = currentLine.find("<SegmentTemplate");
             if (stPos != std::string::npos)
             {
                 inSegmentTemplate = true;
                 timescale         = 90000;
                 segDurationTs     = 0;
                 templateIndent.clear();
-                for (char c : line)
+                for (char c : currentLine)
                 {
                     if (c == ' ' || c == '\t')
                     {
@@ -939,45 +1051,24 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
 
         if (inSegmentTemplate)
         {
-            size_t tsPos = line.find("timescale=\"");
-            if (tsPos != std::string::npos)
+            // Parse timescale and duration attributes from the current line
+            long parsedVal = 0;
+            if (ParseXmlAttributeLong(currentLine, "timescale", 0, parsedVal))
             {
-                size_t valStart = tsPos + 11;
-                size_t valEnd   = line.find("\"", valStart);
-                if (valEnd != std::string::npos)
-                {
-                    std::string valStr = line.substr(valStart, valEnd - valStart);
-                    char * endPtr      = nullptr;
-                    long val           = std::strtol(valStr.c_str(), &endPtr, 10);
-                    if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
-                    {
-                        timescale = val;
-                    }
-                }
+                timescale = parsedVal;
+            }
+            if (ParseXmlAttributeLong(currentLine, "duration", 0, parsedVal))
+            {
+                segDurationTs = parsedVal;
             }
 
-            size_t durPos = line.find("duration=\"");
-            if (durPos != std::string::npos)
-            {
-                size_t valStart = durPos + 10;
-                size_t valEnd   = line.find("\"", valStart);
-                if (valEnd != std::string::npos)
-                {
-                    std::string valStr = line.substr(valStart, valEnd - valStart);
-                    char * endPtr      = nullptr;
-                    long val           = std::strtol(valStr.c_str(), &endPtr, 10);
-                    if (endPtr != valStr.c_str() && *endPtr == '\0' && val >= 0)
-                    {
-                        segDurationTs = val;
-                    }
-                }
-            }
-
-            size_t selfClosePos = line.find("/>");
-            size_t closeTagPos  = line.find("</SegmentTemplate>");
+            size_t selfClosePos = currentLine.find("/>");
+            size_t closeTagPos  = currentLine.find("</SegmentTemplate>");
 
             if (selfClosePos != std::string::npos && (closeTagPos == std::string::npos || selfClosePos < closeTagPos))
             {
+                // Self-closing tag: <SegmentTemplate ... />
+                // Replace /> with >, insert SegmentTimeline, then close with </SegmentTemplate>
                 if (segDurationTs == 0 && streamIdx < segmentCounts.size())
                 {
                     segDurationTs = (static_cast<int64_t>(mClipInfo.mSegmentDurationMs) * timescale) / 1000;
@@ -986,31 +1077,34 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
                 int segCount = (streamIdx < segmentCounts.size()) ? segmentCounts[streamIdx] : 0;
                 if (segCount > 0 && segDurationTs > 0)
                 {
-                    line.replace(selfClosePos, 2, ">");
-                    outputLines.push_back(line);
-                    outputLines.push_back(templateIndent + "<SegmentTimeline>");
-                    if (segCount == 1)
-                    {
-                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" />");
-                    }
-                    else
-                    {
-                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" +
-                                              std::to_string(segCount - 1) + "\" />");
-                    }
-                    outputLines.push_back(templateIndent + "</SegmentTimeline>");
+                    currentLine.replace(selfClosePos, 2, ">");
+                    outputLines.push_back(currentLine);
+                    AppendSegmentTimeline(outputLines, templateIndent, segDurationTs, segCount);
                     outputLines.push_back(templateIndent + "</SegmentTemplate>");
                     modified = true;
                 }
                 else
                 {
-                    outputLines.push_back(line);
+                    outputLines.push_back(currentLine);
                 }
                 inSegmentTemplate = false;
                 streamIdx++;
             }
             else if (closeTagPos != std::string::npos)
             {
+                // Explicit close tag: <SegmentTemplate ...>...</SegmentTemplate>
+                // Insert SegmentTimeline before the closing tag.
+                //
+                // Example transformation (3 segments):
+                //   Before:
+                //     <SegmentTemplate timescale="90000" duration="360000" ...>
+                //     </SegmentTemplate>
+                //   After:
+                //     <SegmentTemplate timescale="90000" duration="360000" ...>
+                //       <SegmentTimeline>
+                //           <S t="0" d="360000" r="2" />
+                //       </SegmentTimeline>
+                //     </SegmentTemplate>
                 if (segDurationTs == 0 && streamIdx < segmentCounts.size())
                 {
                     segDurationTs = (static_cast<int64_t>(mClipInfo.mSegmentDurationMs) * timescale) / 1000;
@@ -1019,52 +1113,32 @@ void PushAVClipRecorder::FinalizeMPD(const std::string & mpdPath)
                 int segCount = (streamIdx < segmentCounts.size()) ? segmentCounts[streamIdx] : 0;
                 if (segCount > 0 && segDurationTs > 0)
                 {
-                    outputLines.push_back(templateIndent + "<SegmentTimeline>");
-                    if (segCount == 1)
-                    {
-                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" />");
-                    }
-                    else
-                    {
-                        outputLines.push_back(templateIndent + "    <S t=\"0\" d=\"" + std::to_string(segDurationTs) + "\" r=\"" +
-                                              std::to_string(segCount - 1) + "\" />");
-                    }
-                    outputLines.push_back(templateIndent + "</SegmentTimeline>");
+                    AppendSegmentTimeline(outputLines, templateIndent, segDurationTs, segCount);
                     modified = true;
                 }
-                outputLines.push_back(line);
+                outputLines.push_back(currentLine);
                 inSegmentTemplate = false;
                 streamIdx++;
             }
             else
             {
-                outputLines.push_back(line);
+                outputLines.push_back(currentLine);
             }
         }
         else
         {
-            outputLines.push_back(line);
+            outputLines.push_back(currentLine);
         }
     }
 
     // Write the modified MPD
     if (modified)
     {
-        std::ofstream outFile(mpdPath);
-        if (!outFile)
+        if (!WriteLinesToFile(mpdPath, outputLines))
         {
-            ChipLogError(Camera, "ERROR: Failed to open MPD file for writing finalization: %s", mpdPath.c_str());
+            ChipLogError(Camera, "ERROR: Failed to write finalized MPD file: %s", mpdPath.c_str());
             return;
         }
-        for (size_t i = 0; i < outputLines.size(); i++)
-        {
-            outFile << outputLines[i];
-            if (i < outputLines.size() - 1)
-            {
-                outFile << "\n";
-            }
-        }
-        outFile.close();
         ChipLogProgress(Camera, "FinalizeMPD: Successfully finalized MPD: %s", mpdPath.c_str());
     }
     else
