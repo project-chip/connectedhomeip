@@ -1094,7 +1094,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage_DecodableTy
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.trackName = Span(trackName.data(), trackName.size());
     cmafContainerOptions.metadataEnabled.ClearValue();
 
     ContainerOptionsStruct containerOptions;
