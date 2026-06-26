@@ -35,11 +35,20 @@ using namespace chip::app::Clusters::ModeBase;
 using namespace chip::app::Clusters::ModeBase::Attributes;
 
 constexpr EndpointId kEndpointId = 1;
-constexpr ClusterId kClusterId     = DishwasherMode::Id;
+constexpr ClusterId kClusterId   = DishwasherMode::Id;
 
-ConcreteAttributePath CurrentModePath() { return { kEndpointId, kClusterId, CurrentMode::Id }; }
-ConcreteAttributePath StartUpModePath() { return { kEndpointId, kClusterId, StartUpMode::Id }; }
-ConcreteAttributePath OnModePath() { return { kEndpointId, kClusterId, OnMode::Id }; }
+ConcreteAttributePath CurrentModePath()
+{
+    return { kEndpointId, kClusterId, CurrentMode::Id };
+}
+ConcreteAttributePath StartUpModePath()
+{
+    return { kEndpointId, kClusterId, StartUpMode::Id };
+}
+ConcreteAttributePath OnModePath()
+{
+    return { kEndpointId, kClusterId, OnMode::Id };
+}
 
 void ExpectSafeProviderHasNoValue(DefaultSafeAttributePersistenceProvider & safeProvider, const ConcreteAttributePath & path)
 {
@@ -161,9 +170,10 @@ TEST_F(MigrationTestFixture, SkipsAttributesAlreadyPresentInDestinationProvider)
               CHIP_NO_ERROR);
     NumericAttributeTraits<uint8_t>::StorageType startUpStorageValue;
     DataModel::NullableToStorage(kDstStartUpMode, startUpStorageValue);
-    ASSERT_EQ(dstProvider.WriteValue(StartUpModePath(),
-                                     ByteSpan(reinterpret_cast<const uint8_t *>(&startUpStorageValue), sizeof(startUpStorageValue))),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(
+        dstProvider.WriteValue(StartUpModePath(),
+                               ByteSpan(reinterpret_cast<const uint8_t *>(&startUpStorageValue), sizeof(startUpStorageValue))),
+        CHIP_NO_ERROR);
 
     ASSERT_EQ(MigrateModeBaseServerStorage(kEndpointId, kClusterId, safeProvider, dstProvider), CHIP_NO_ERROR);
 
