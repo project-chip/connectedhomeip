@@ -25,10 +25,7 @@ namespace chip {
 namespace app {
 
 /**
- * @brief A basic implementation of an Occupancy Sensor Device.
- *
- * This class serves as a simple example of an occupancy sensor. It simply
- * logs on occupancy or hold time changed.
+ * Concrete implementation of OccupancySensorDevice that logs occupancy and hold time transitions.
  */
 class LoggingOccupancySensorDevice : public OccupancySensorDevice, public Clusters::OccupancySensingDelegate
 {

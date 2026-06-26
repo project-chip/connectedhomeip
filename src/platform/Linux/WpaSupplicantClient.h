@@ -22,8 +22,10 @@
 #include <glib.h>
 
 #include <inet/InetInterface.h>
+#include <lib/support/FixedBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
@@ -227,6 +229,29 @@ protected:
      */
     CHIP_ERROR SetIfName(const CharSpan & inIfName) noexcept;
 
+    void NotifyWiFiConnectivityChange(const ConnectivityChange & inChange);
+    CHIP_ERROR ScanNetwork(const ByteSpan & ssid);
+    void Start();
+    CHIP_ERROR StartSync();
+    CHIP_ERROR StopAutoScan();
+
+    virtual void UpdateWiFiNetworkStatus(){};
+
+private:
+    bool GetBssInfo(const gchar * inBssPath, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
+
+    virtual void PostNetworkConnect(){};
+    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable){};
+    void OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * properties);
+    void OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path);
+    void OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
+    void OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
+    void OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
+    CHIP_ERROR StartOnGLib();
+
+protected:
     struct GDBusWpaSupplicant
     {
         GAutoPtr<WpaSupplicant1> proxy;
@@ -250,7 +275,10 @@ protected:
 
 private:
     ConnectivityManagerImpl * mConnectivityManagerImpl = nullptr;
+    bool mAssociationStarted;
+    unsigned int mAssociationRetriesLeft;
     char mWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
+    Internal::WiFiSSIDFixedBuffer mInterestedSSID;
 };
 
 } // namespace Internal

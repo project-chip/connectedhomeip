@@ -16,9 +16,12 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  output_name = "TestProximityRangingCluster"
+  output_name = "TestProximityRanging"
 
-  test_sources = [ "TestProximityRangingCluster.cpp" ]
+  test_sources = [
+    "TestProximityRangingCluster.cpp",
+    "TestProximityRangingDriver.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 
@@ -27,5 +30,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }

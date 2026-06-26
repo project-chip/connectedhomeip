@@ -3038,7 +3038,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -3413,7 +3413,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmerswitch = 260, version 3;
+  device type ma_dimmerswitch = 260, version 4;
 
   binding cluster Identify;
   binding cluster OnOff;

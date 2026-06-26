@@ -1971,7 +1971,7 @@ cluster FlowMeasurement = 1028 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2191,7 +2191,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_pumpcontroller = 772, version 4;
+  device type ma_pumpcontroller = 772, version 5;
 
   binding cluster OnOff;
   binding cluster PumpConfigurationAndControl;
