@@ -139,6 +139,17 @@ public:
     // Atomic-write state machine (moved from ThermostatAttrAccess in PR 3b-1). The session is per-instance;
     // every method operates on this cluster's endpoint (the `endpoint` parameters must equal GetEndpointId()).
     //
+    /// @brief Gets the scoped node id of the originator of the open atomic write, or ScopedNodeId() if none.
+    ScopedNodeId GetAtomicWriteOriginatorScopedNodeId(EndpointId endpoint);
+
+    /// @brief Sets the atomic write state for the given originatorNodeId.
+    bool
+    SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
+                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+
+    /// @brief Resets (closes) the atomic write, clears the pending preset list and cancels the timeout timer.
+    void ResetAtomicWrite(EndpointId endpoint);
+
 
     /// @brief Checks if an atomic write is open, optionally filtered by an attribute ID.
     bool InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId = NullOptional);
@@ -154,17 +165,6 @@ public:
     bool
     InAtomicWrite(EndpointId endpoint, CommandHandler * commandObj,
                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
-
-    /// @brief Sets the atomic write state for the given originatorNodeId.
-    bool
-    SetAtomicWrite(EndpointId endpoint, ScopedNodeId originatorNodeId, AtomicWriteState state,
-                   Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
-
-    /// @brief Resets (closes) the atomic write, clears the pending preset list and cancels the timeout timer.
-    void ResetAtomicWrite(EndpointId endpoint);
-
-    /// @brief Gets the scoped node id of the originator of the open atomic write, or ScopedNodeId() if none.
-    ScopedNodeId GetAtomicWriteOriginatorScopedNodeId(EndpointId endpoint);
 
     void BeginAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                           const Commands::AtomicRequest::DecodableType & commandData);
