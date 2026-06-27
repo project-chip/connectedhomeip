@@ -132,8 +132,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-    // FabricTable::Delegate: roll back an open atomic write originated by a removed fabric.
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
     uint32_t GetFeatureMap() const { return mFeatures.Raw(); }
 
@@ -176,6 +174,8 @@ public:
                              const Commands::AtomicRequest::DecodableType & commandData);
 
 private:
+    // FabricTable::Delegate: roll back an open atomic write originated by a removed fabric.
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
     // @brief Sets the ActivePresetHandle to the given handle (or null), validating it against the Presets list.
     Protocols::InteractionModel::Status SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle);
 
