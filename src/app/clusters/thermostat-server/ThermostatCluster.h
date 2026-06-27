@@ -229,6 +229,9 @@ private:
     // shifts the paired setpoint to maintain the deadband, emits change events, and clears the active preset.
     void HandleSetpointPostWrite(AttributeId attributeId);
 
+    // Sets member to value and, if it changed, persists it to attribute storage. Returns true if changed.
+    bool SetAndPersistSetpoint(int16_t & member, int16_t value, AttributeId attributeId);
+
     // Emits the relevant change event for a just-written scalar attribute, if the Events feature is supported.
     void GenerateScalarChangeEvent(AttributeId attributeId);
     void LoadPersistentAttributes();
