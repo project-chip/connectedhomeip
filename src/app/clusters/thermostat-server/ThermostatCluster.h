@@ -99,16 +99,31 @@ public:
 
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
-    // Setters for device-set read-only attributes. Each notifies subscribers and, when the Events
-    // feature is enabled, emits the corresponding Matter event — matching the behaviour of the legacy
-    // MatterThermostatClusterServerAttributeChangedCallback / GenerateEvents path.
+    // Setters
+    // LocalTemperature
     void SetLocalTemperature(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetLocalTemperature();
+
+    // OutdoorTemperature
+    void SetOutdoorTemperature(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetOutdoorTemperature();
+
+    // Occupancy
     void SetOccupancy(BitMask<OccupancyBitmap> value);
+    BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> GetOccupancy();
+
+    // LocalTemperatureCalibration
+    void SetLocalTemperatureCalibration(int8_t value);
+    int8_t GetLocalTemperatureCalibration();
+
+    // OccupiedCoolingSetpoint
+    void SetOccupiedCoolingSetpoint(int16_t value);
+    int16_t GetOccupiedCoolingSetpoint();
+
     void SetThermostatRunningState(BitMask<RelayStateBitmap> value);
     void SetThermostatRunningMode(ThermostatRunningModeEnum value);
 
     // Setters for device-set read-only attributes that do not generate events.
-    void SetOutdoorTemperature(DataModel::Nullable<int16_t> value);
     void SetSetpointChangeSource(SetpointChangeSourceEnum value);
     void SetSetpointChangeAmount(DataModel::Nullable<int16_t> value);
     void SetSetpointChangeSourceTimestamp(uint32_t value);
@@ -232,25 +247,22 @@ private:
     AtomicWriteSession mAtomicWriteSession;
 
     // Scalar attribute state (formerly Ember RAM-backed). Typed through the generated TypeInfo.
-    Attributes::LocalTemperature::TypeInfo::Type mLocalTemperature{};
-    Attributes::OutdoorTemperature::TypeInfo::Type mOutdoorTemperature{};
-    Attributes::Occupancy::TypeInfo::Type mOccupancy{};
-    Attributes::AbsMinHeatSetpointLimit::TypeInfo::Type mAbsMinHeatSetpointLimit;
-    Attributes::AbsMaxHeatSetpointLimit::TypeInfo::Type mAbsMaxHeatSetpointLimit;
-    Attributes::AbsMinCoolSetpointLimit::TypeInfo::Type mAbsMinCoolSetpointLimit;
-    Attributes::AbsMaxCoolSetpointLimit::TypeInfo::Type mAbsMaxCoolSetpointLimit;
-    Attributes::PICoolingDemand::TypeInfo::Type mPICoolingDemand{};
-    Attributes::PIHeatingDemand::TypeInfo::Type mPIHeatingDemand{};
-    Attributes::HVACSystemTypeConfiguration::TypeInfo::Type mHVACSystemTypeConfiguration{};
-    Attributes::LocalTemperatureCalibration::TypeInfo::Type mLocalTemperatureCalibration{};
-    Attributes::OccupiedCoolingSetpoint::TypeInfo::Type mOccupiedCoolingSetpoint;
-    Attributes::OccupiedHeatingSetpoint::TypeInfo::Type mOccupiedHeatingSetpoint;
-    Attributes::UnoccupiedCoolingSetpoint::TypeInfo::Type mUnoccupiedCoolingSetpoint;
-    Attributes::UnoccupiedHeatingSetpoint::TypeInfo::Type mUnoccupiedHeatingSetpoint;
-    Attributes::MinHeatSetpointLimit::TypeInfo::Type mMinHeatSetpointLimit;
-    Attributes::MaxHeatSetpointLimit::TypeInfo::Type mMaxHeatSetpointLimit;
-    Attributes::MinCoolSetpointLimit::TypeInfo::Type mMinCoolSetpointLimit;
-    Attributes::MaxCoolSetpointLimit::TypeInfo::Type mMaxCoolSetpointLimit;
+    DataModel::Nullable<int16_t> mLocalTemperature{};
+    DataModel::Nullable<int16_t> mOutdoorTemperature{};
+    BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> mOccupancy{};
+    int16_t mAbsMinHeatSetpointLimit;
+    int16_t mAbsMaxHeatSetpointLimit;
+    int16_t mAbsMinCoolSetpointLimit;
+    int16_t mAbsMaxCoolSetpointLimit;
+    int8_t mLocalTemperatureCalibration{ 0 };
+    int16_t mOccupiedCoolingSetpoint;
+    int16_t mOccupiedHeatingSetpoint;
+    int16_t mUnoccupiedCoolingSetpoint;
+    int16_t mUnoccupiedHeatingSetpoint;
+    int16_t mMinHeatSetpointLimit;
+    int16_t mMaxHeatSetpointLimit;
+    int16_t mMinCoolSetpointLimit;
+    int16_t mMaxCoolSetpointLimit;
     Attributes::MinSetpointDeadBand::TypeInfo::Type mMinSetpointDeadBand;
     Attributes::RemoteSensing::TypeInfo::Type mRemoteSensing{};
     Attributes::ControlSequenceOfOperation::TypeInfo::Type mControlSequenceOfOperation;

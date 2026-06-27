@@ -426,8 +426,6 @@ void ThermostatCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricI
 DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
 {
-    const bool ltne = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
-
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
@@ -435,10 +433,10 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case ClusterRevision::Id:
         return encoder.Encode(Thermostat::kRevision);
     case LocalTemperature::Id:
-        return ltne ? encoder.EncodeNull() : encoder.Encode(mLocalTemperature);
+        return mFeatures.Has(Feature::kLocalTemperatureNotExposed) ? encoder.EncodeNull() : encoder.Encode(mLocalTemperature);
     case RemoteSensing::Id: {
         auto value = mRemoteSensing;
-        if (ltne)
+        if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))
         {
             value.Clear(RemoteSensingBitmap::kLocalTemperature);
         }
@@ -456,12 +454,6 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mAbsMinCoolSetpointLimit);
     case AbsMaxCoolSetpointLimit::Id:
         return encoder.Encode(mAbsMaxCoolSetpointLimit);
-    case PICoolingDemand::Id:
-        return encoder.Encode(mPICoolingDemand);
-    case PIHeatingDemand::Id:
-        return encoder.Encode(mPIHeatingDemand);
-    case HVACSystemTypeConfiguration::Id:
-        return encoder.Encode(mHVACSystemTypeConfiguration);
     case LocalTemperatureCalibration::Id:
         return encoder.Encode(mLocalTemperatureCalibration);
     case OccupiedCoolingSetpoint::Id:
@@ -611,12 +603,57 @@ void ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> value)
     }
 }
 
+DataModel::Nullable<int16_t> ThermostatCluster::GetLocalTemperature()
+{
+    return mLocalTemperature;
+}
+
+void ThermostatCluster::SetOutdoorTemperature(DataModel::Nullable<int16_t> value)
+{
+    SetAttributeValue(mOutdoorTemperature, value, OutdoorTemperature::Id);
+}
+
+DataModel::Nullable<int16_t> ThermostatCluster::GetOutdoorTemperature()
+{
+    return mOutdoorTemperature;
+}
+
 void ThermostatCluster::SetOccupancy(BitMask<OccupancyBitmap> value)
 {
     if (SetAttributeValue(mOccupancy, value, Occupancy::Id) && mFeatures.Has(Feature::kEvents))
     {
         GenerateOccupancyChangeEvent(GetEndpointId(), NullOptional, mOccupancy);
     }
+}
+
+BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> ThermostatCluster::GetOccupancy()
+{
+    return mOccupancy;
+}
+
+void ThermostatCluster::SetLocalTemperatureCalibration(int8_t value)
+{
+    VerifyOrReturn(value != mLocalTemperatureCalibration);
+    NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id, DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id }, { reinterpret_cast<const uint8_t *>(&mLocalTemperatureCalibration), sizeof(mLocalTemperatureCalibration) }));
+}
+
+int8_t ThermostatCluster::GetLocalTemperatureCalibration()
+{
+    return mLocalTemperatureCalibration;
+}
+
+void ThermostatCluster::SetOccupiedCoolingSetpoint(int16_t value)
+{
+    VerifyOrReturn(value != mOccupiedCoolingSetpoint);
+    NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id, DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id }, { reinterpret_cast<const uint8_t *>(&mOccupiedCoolingSetpoint), sizeof(mOccupiedCoolingSetpoint) }));
+
+}
+
+int16_t ThermostatCluster::GetOccupiedCoolingSetpoint()
+{
+    return mOccupiedCoolingSetpoint;
 }
 
 void ThermostatCluster::SetThermostatRunningState(BitMask<RelayStateBitmap> value)
@@ -633,11 +670,6 @@ void ThermostatCluster::SetThermostatRunningMode(ThermostatRunningModeEnum value
     {
         GenerateRunningModeChangeEvent(GetEndpointId(), NullOptional, mThermostatRunningMode);
     }
-}
-
-void ThermostatCluster::SetOutdoorTemperature(DataModel::Nullable<int16_t> value)
-{
-    SetAttributeValue(mOutdoorTemperature, value, OutdoorTemperature::Id);
 }
 
 void ThermostatCluster::SetSetpointChangeSource(SetpointChangeSourceEnum value)
@@ -720,84 +752,6 @@ void ThermostatCluster::SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> va
     const ByteSpan toStore = mActiveScheduleHandle.IsNull() ? ByteSpan{} : mActiveScheduleHandle.Value();
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, ActiveScheduleHandle::Id }, toStore));
-}
-
-void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
-{
-    const int16_t deadband = DeadBandTemp();
-
-    // Maintain the deadband by shifting the paired setpoint (replaces EnsureDeadband). WriteAttribute has
-    // already validated that this shift stays within the limits, so it cannot exceed them here.
-    if (mFeatures.Has(Feature::kAutoMode))
-    {
-        switch (attributeId)
-        {
-        case OccupiedHeatingSetpoint::Id: {
-            int16_t minValidCooling = static_cast<int16_t>(mOccupiedHeatingSetpoint + deadband);
-            if (mOccupiedCoolingSetpoint < minValidCooling &&
-                SetAttributeValue(mOccupiedCoolingSetpoint, minValidCooling, OccupiedCoolingSetpoint::Id))
-            {
-                GenerateScalarChangeEvent(OccupiedCoolingSetpoint::Id);
-            }
-            break;
-        }
-        case OccupiedCoolingSetpoint::Id: {
-            int16_t maxValidHeating = static_cast<int16_t>(mOccupiedCoolingSetpoint - deadband);
-            if (mOccupiedHeatingSetpoint > maxValidHeating &&
-                SetAttributeValue(mOccupiedHeatingSetpoint, maxValidHeating, OccupiedHeatingSetpoint::Id))
-            {
-                GenerateScalarChangeEvent(OccupiedHeatingSetpoint::Id);
-            }
-            break;
-        }
-        case UnoccupiedHeatingSetpoint::Id: {
-            int16_t minValidCooling = static_cast<int16_t>(mUnoccupiedHeatingSetpoint + deadband);
-            if (mUnoccupiedCoolingSetpoint < minValidCooling &&
-                SetAttributeValue(mUnoccupiedCoolingSetpoint, minValidCooling, UnoccupiedCoolingSetpoint::Id))
-            {
-                GenerateScalarChangeEvent(UnoccupiedCoolingSetpoint::Id);
-            }
-            break;
-        }
-        case UnoccupiedCoolingSetpoint::Id: {
-            int16_t maxValidHeating = static_cast<int16_t>(mUnoccupiedCoolingSetpoint - deadband);
-            if (mUnoccupiedHeatingSetpoint > maxValidHeating &&
-                SetAttributeValue(mUnoccupiedHeatingSetpoint, maxValidHeating, UnoccupiedHeatingSetpoint::Id))
-            {
-                GenerateScalarChangeEvent(UnoccupiedHeatingSetpoint::Id);
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-    GenerateScalarChangeEvent(attributeId);
-
-    // Clear the active preset when a setpoint relevant to the current occupancy state changes.
-    if (mFeatures.Has(Feature::kPresets))
-    {
-        const bool occupied = !mFeatures.Has(Feature::kOccupancy) || mOccupancy.Has(OccupancyBitmap::kOccupied);
-        bool clear          = false;
-        switch (attributeId)
-        {
-        case OccupiedHeatingSetpoint::Id:
-        case OccupiedCoolingSetpoint::Id:
-            clear = occupied;
-            break;
-        case UnoccupiedHeatingSetpoint::Id:
-        case UnoccupiedCoolingSetpoint::Id:
-            clear = !occupied;
-            break;
-        default:
-            break;
-        }
-        if (clear)
-        {
-            SetActivePreset(DataModel::NullNullable);
-        }
-    }
 }
 
 DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -1010,6 +964,84 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacityformat));
     default:
         return Status::UnsupportedWrite;
+    }
+}
+
+void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
+{
+    const int16_t deadband = DeadBandTemp();
+
+    // Maintain the deadband by shifting the paired setpoint (replaces EnsureDeadband). WriteAttribute has
+    // already validated that this shift stays within the limits, so it cannot exceed them here.
+    if (mFeatures.Has(Feature::kAutoMode))
+    {
+        switch (attributeId)
+        {
+        case OccupiedHeatingSetpoint::Id: {
+            int16_t minValidCooling = static_cast<int16_t>(mOccupiedHeatingSetpoint + deadband);
+            if (mOccupiedCoolingSetpoint < minValidCooling &&
+                SetAttributeValue(mOccupiedCoolingSetpoint, minValidCooling, OccupiedCoolingSetpoint::Id))
+            {
+                GenerateScalarChangeEvent(OccupiedCoolingSetpoint::Id);
+            }
+            break;
+        }
+        case OccupiedCoolingSetpoint::Id: {
+            int16_t maxValidHeating = static_cast<int16_t>(mOccupiedCoolingSetpoint - deadband);
+            if (mOccupiedHeatingSetpoint > maxValidHeating &&
+                SetAttributeValue(mOccupiedHeatingSetpoint, maxValidHeating, OccupiedHeatingSetpoint::Id))
+            {
+                GenerateScalarChangeEvent(OccupiedHeatingSetpoint::Id);
+            }
+            break;
+        }
+        case UnoccupiedHeatingSetpoint::Id: {
+            int16_t minValidCooling = static_cast<int16_t>(mUnoccupiedHeatingSetpoint + deadband);
+            if (mUnoccupiedCoolingSetpoint < minValidCooling &&
+                SetAttributeValue(mUnoccupiedCoolingSetpoint, minValidCooling, UnoccupiedCoolingSetpoint::Id))
+            {
+                GenerateScalarChangeEvent(UnoccupiedCoolingSetpoint::Id);
+            }
+            break;
+        }
+        case UnoccupiedCoolingSetpoint::Id: {
+            int16_t maxValidHeating = static_cast<int16_t>(mUnoccupiedCoolingSetpoint - deadband);
+            if (mUnoccupiedHeatingSetpoint > maxValidHeating &&
+                SetAttributeValue(mUnoccupiedHeatingSetpoint, maxValidHeating, UnoccupiedHeatingSetpoint::Id))
+            {
+                GenerateScalarChangeEvent(UnoccupiedHeatingSetpoint::Id);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+
+    GenerateScalarChangeEvent(attributeId);
+
+    // Clear the active preset when a setpoint relevant to the current occupancy state changes.
+    if (mFeatures.Has(Feature::kPresets))
+    {
+        const bool occupied = !mFeatures.Has(Feature::kOccupancy) || mOccupancy.Has(OccupancyBitmap::kOccupied);
+        bool clear          = false;
+        switch (attributeId)
+        {
+        case OccupiedHeatingSetpoint::Id:
+        case OccupiedCoolingSetpoint::Id:
+            clear = occupied;
+            break;
+        case UnoccupiedHeatingSetpoint::Id:
+        case UnoccupiedCoolingSetpoint::Id:
+            clear = !occupied;
+            break;
+        default:
+            break;
+        }
+        if (clear)
+        {
+            SetActivePreset(DataModel::NullNullable);
+        }
     }
 }
 
