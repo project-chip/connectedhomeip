@@ -67,9 +67,36 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-//
-// ThermostatCluster (code-driven) implementation
-//
+int16_t ThermostatCluster::EnforceHeatingSetpointLimits(int16_t heatingSetpoint) const
+{
+    int16_t minLimit = mMinHeatSetpointLimit;
+    int16_t maxLimit = mMaxHeatSetpointLimit;
+    if (minLimit < mAbsMinHeatSetpointLimit)
+        minLimit = mAbsMinHeatSetpointLimit;
+    if (maxLimit > mAbsMaxHeatSetpointLimit)
+        maxLimit = mAbsMaxHeatSetpointLimit;
+    if (heatingSetpoint < minLimit)
+        heatingSetpoint = minLimit;
+    if (heatingSetpoint > maxLimit)
+        heatingSetpoint = maxLimit;
+    return heatingSetpoint;
+}
+
+int16_t ThermostatCluster::EnforceCoolingSetpointLimits(int16_t coolingSetpoint) const
+{
+    int16_t minLimit = mMinCoolSetpointLimit;
+    int16_t maxLimit = mMaxCoolSetpointLimit;
+    if (minLimit < mAbsMinCoolSetpointLimit)
+        minLimit = mAbsMinCoolSetpointLimit;
+    if (maxLimit > mAbsMaxCoolSetpointLimit)
+        maxLimit = mAbsMaxCoolSetpointLimit;
+    if (coolingSetpoint < minLimit)
+        coolingSetpoint = minLimit;
+    if (coolingSetpoint > maxLimit)
+        coolingSetpoint = maxLimit;
+    return coolingSetpoint;
+}
+
 
 ThermostatCluster::ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config,
                                      const Context & context) :
@@ -172,36 +199,6 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     }
     mContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(type);
-}
-
-int16_t ThermostatCluster::EnforceHeatingSetpointLimits(int16_t heatingSetpoint) const
-{
-    int16_t minLimit = mMinHeatSetpointLimit;
-    int16_t maxLimit = mMaxHeatSetpointLimit;
-    if (minLimit < mAbsMinHeatSetpointLimit)
-        minLimit = mAbsMinHeatSetpointLimit;
-    if (maxLimit > mAbsMaxHeatSetpointLimit)
-        maxLimit = mAbsMaxHeatSetpointLimit;
-    if (heatingSetpoint < minLimit)
-        heatingSetpoint = minLimit;
-    if (heatingSetpoint > maxLimit)
-        heatingSetpoint = maxLimit;
-    return heatingSetpoint;
-}
-
-int16_t ThermostatCluster::EnforceCoolingSetpointLimits(int16_t coolingSetpoint) const
-{
-    int16_t minLimit = mMinCoolSetpointLimit;
-    int16_t maxLimit = mMaxCoolSetpointLimit;
-    if (minLimit < mAbsMinCoolSetpointLimit)
-        minLimit = mAbsMinCoolSetpointLimit;
-    if (maxLimit > mAbsMaxCoolSetpointLimit)
-        maxLimit = mAbsMaxCoolSetpointLimit;
-    if (coolingSetpoint < minLimit)
-        coolingSetpoint = minLimit;
-    if (coolingSetpoint > maxLimit)
-        coolingSetpoint = maxLimit;
-    return coolingSetpoint;
 }
 
 // Encodes the delegate-backed list / preset / schedule / suggestion attributes. The scalar attributes
