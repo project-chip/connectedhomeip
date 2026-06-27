@@ -796,6 +796,11 @@ struct EmberAfPluginDoorLockCredentialInfo
 
     EmberAfPluginDoorLockCredentialInfo & operator=(const EmberAfPluginDoorLockCredentialInfo & other)
     {
+        if (this == &other)
+        {
+            return *this;
+        }
+
         status             = other.status;
         credentialType     = other.credentialType;
         creationSource     = other.creationSource;
@@ -804,7 +809,10 @@ struct EmberAfPluginDoorLockCredentialInfo
         lastModifiedBy     = other.lastModifiedBy;
 
         size_t dataLen = std::min(other.credentialData.size(), sizeof(credentialDataBuffer));
-        memcpy(credentialDataBuffer, other.credentialData.data(), dataLen);
+        if (dataLen > 0)
+        {
+            memcpy(credentialDataBuffer, other.credentialData.data(), dataLen);
+        }
         credentialData = chip::MutableByteSpan(credentialDataBuffer, dataLen);
         return *this;
     }
@@ -849,6 +857,11 @@ struct EmberAfPluginDoorLockUserInfo
 
     EmberAfPluginDoorLockUserInfo & operator=(const EmberAfPluginDoorLockUserInfo & other)
     {
+        if (this == &other)
+        {
+            return *this;
+        }
+
         userUniqueId       = other.userUniqueId;
         userStatus         = other.userStatus;
         userType           = other.userType;
@@ -859,7 +872,10 @@ struct EmberAfPluginDoorLockUserInfo
         lastModifiedBy     = other.lastModifiedBy;
 
         size_t nameLen = std::min(other.userName.size(), sizeof(nameBuffer));
-        memcpy(nameBuffer, other.userName.data(), nameLen);
+        if (nameLen > 0)
+        {
+            memcpy(nameBuffer, other.userName.data(), nameLen);
+        }
         userName = chip::MutableCharSpan(nameBuffer, nameLen);
 
         size_t credentialCount = std::min(other.credentials.size(), sizeof(credentialsBuffer) / sizeof(credentialsBuffer[0]));
