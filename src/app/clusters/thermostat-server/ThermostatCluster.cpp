@@ -733,6 +733,36 @@ int8_t ThermostatCluster::GetMinSetpointDeadbanc()
     return mMinSetpointDeadBand;
 }
 
+Protocols::InteractionModel::Status ThermostatCluster::SetRemoteSensing(BitMask<RemoteSensingBitmap> value)
+{
+    return HandleRemoteSensing(value);
+}
+
+BitMask<RemoteSensingBitmap> ThermostatCluster::GetRemoteSensing()
+{
+    return mRemoteSensing;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum value)
+{
+    return HandleControlSequenceOfOperation(value);
+}
+
+ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation()
+{
+    return mControlSequenceOfOperation;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetSystemMode(SystemModeEnum value)
+{
+    return HandleSystemMode(value);
+}
+
+SystemModeEnum ThermostatCluster::GetSystemMode()
+{
+    return mSystemMode;
+}
+
 void ThermostatCluster::SetThermostatRunningState(BitMask<RelayStateBitmap> value)
 {
     if (SetAttributeValue(mThermostatRunningState, value, ThermostatRunningState::Id) && mFeatures.Has(Feature::kEvents))
@@ -949,6 +979,57 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinSetpointDeadband
     return Status::Success;
 }
 
+Protocols::InteractionModel::Status ThermostatCluster::HandleRemoteSensing(BitMask<RemoteSensingBitmap> value)
+{
+    if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))
+    {
+        VerifyOrReturnError(!value.Has(RemoteSensingBitmap::kLocalTemperature), Status::ConstraintError);
+    }
+    SetAttributeValue(mRemoteSensing, value, RemoteSensing::Id);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, RemoteSensing::Id },
+        { reinterpret_cast<const uint8_t *>(mRemoteSensing.RawStorage()), sizeof(mRemoteSensing.Raw()) }));
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::HandleControlSequenceOfOperation(ControlSequenceOfOperationEnum value)
+{
+    VerifyOrReturnError(value <= ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat, Status::InvalidValue);
+    SetAttributeValue(mControlSequenceOfOperation, value, ControlSequenceOfOperation::Id);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id },
+        { reinterpret_cast<const uint8_t *>(&mControlSequenceOfOperation), sizeof(mControlSequenceOfOperation) }));
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::HandleSystemMode(SystemModeEnum value)
+{
+    VerifyOrReturnError(EnsureKnownEnumValue(mControlSequenceOfOperation) != ControlSequenceOfOperationEnum::kUnknownEnumValue &&
+                            EnsureKnownEnumValue(value) != SystemModeEnum::kUnknownEnumValue,
+                        Status::InvalidValue);
+    switch (mControlSequenceOfOperation)
+    {
+    case ControlSequenceOfOperationEnum::kCoolingOnly:
+    case ControlSequenceOfOperationEnum::kCoolingWithReheat:
+        VerifyOrReturnError(value != SystemModeEnum::kHeat && value != SystemModeEnum::kEmergencyHeat,
+                            Status::InvalidValue);
+        break;
+    case ControlSequenceOfOperationEnum::kHeatingOnly:
+    case ControlSequenceOfOperationEnum::kHeatingWithReheat:
+        VerifyOrReturnError(value != SystemModeEnum::kCool && value != SystemModeEnum::kPrecooling,
+                            Status::InvalidValue);
+        break;
+    default:
+        break;
+    }
+    SetAttributeValue(mSystemMode, value, SystemMode::Id);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, SystemMode::Id },
+        { reinterpret_cast<const uint8_t *>(&mSystemMode), sizeof(mSystemMode) }));
+    GenerateScalarChangeEvent(SystemMode::Id);
+    return Status::Success;
+}
+
 DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                 AttributeValueDecoder & decoder)
 {
@@ -1009,50 +1090,17 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
     case RemoteSensing::Id: {
         BitMask<RemoteSensingBitmap> requested;
         ReturnErrorOnFailure(decoder.Decode(requested));
-        if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))
-        {
-            VerifyOrReturnError(!requested.Has(RemoteSensingBitmap::kLocalTemperature), Status::ConstraintError);
-        }
-        SetAttributeValue(mRemoteSensing, requested, RemoteSensing::Id);
-        LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(request.path, 
-            { reinterpret_cast<const uint8_t *>(requested.RawStorage()), sizeof(requested.Raw()) }));
-        return CHIP_NO_ERROR;
+        return HandleRemoteSensing(requested);
     }
     case ControlSequenceOfOperation::Id: {
         ControlSequenceOfOperationEnum requested;
         ReturnErrorOnFailure(decoder.Decode(requested));
-        VerifyOrReturnError(requested <= ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat, Status::InvalidValue);
-        SetAttributeValue(mControlSequenceOfOperation, requested, ControlSequenceOfOperation::Id);
-        LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(request.path,
-             { reinterpret_cast<const uint8_t *>(requested), sizeof(requested) }));
-        return CHIP_NO_ERROR;
+        return HandleControlSequenceOfOperation(requested);
     }
     case SystemMode::Id: {
         SystemModeEnum requested;
         ReturnErrorOnFailure(decoder.Decode(requested));
-        VerifyOrReturnError(EnsureKnownEnumValue(mControlSequenceOfOperation) != ControlSequenceOfOperationEnum::kUnknownEnumValue &&
-                                EnsureKnownEnumValue(requested) != SystemModeEnum::kUnknownEnumValue,
-                            Status::InvalidValue);
-        switch (mControlSequenceOfOperation)
-        {
-        case ControlSequenceOfOperationEnum::kCoolingOnly:
-        case ControlSequenceOfOperationEnum::kCoolingWithReheat:
-            VerifyOrReturnError(requested != SystemModeEnum::kHeat && requested != SystemModeEnum::kEmergencyHeat,
-                                Status::InvalidValue);
-            break;
-        case ControlSequenceOfOperationEnum::kHeatingOnly:
-        case ControlSequenceOfOperationEnum::kHeatingWithReheat:
-            VerifyOrReturnError(requested != SystemModeEnum::kCool && requested != SystemModeEnum::kPrecooling,
-                                Status::InvalidValue);
-            break;
-        default:
-            break;
-        }
-        SetAttributeValue(mSystemMode, requested, SystemMode::Id);
-        LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(request.path,
-             { reinterpret_cast<const uint8_t *>(requested), sizeof(requested) }));
-        GenerateScalarChangeEvent(SystemMode::Id);
-        return CHIP_NO_ERROR;
+        return HandleSystemMode(requested);
     }
     // Writable attributes without cross-attribute validation — decode, persist, and notify in one step.
     case LocalTemperatureCalibration::Id:
