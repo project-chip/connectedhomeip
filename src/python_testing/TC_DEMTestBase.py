@@ -191,9 +191,9 @@ class DEMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_power_range_adjustment_command(self, minPower: int, maxPower: int, duration: int,
-                                            cause: Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum,
-                                            endpoint: int = None, timedRequestTimeoutMs: int = 3000,
-                                            expected_status: Status = Status.Success):
+                                                  cause: Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum,
+                                                  endpoint: int = None, timedRequestTimeoutMs: int = 3000,
+                                                  expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.PowerRangeAdjustRequest(
                 minPower=minPower,
@@ -209,7 +209,7 @@ class DEMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def send_cancel_power_range_adjustment_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
-                                                   expected_status: Status = Status.Success):
+                                                         expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.CancelPowerRangeAdjustRequest(),
                                        endpoint=endpoint,
@@ -219,7 +219,6 @@ class DEMTestBase:
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-
 
     def print_forecast(self, forecast):
         for index, slot in enumerate(forecast.slots):
