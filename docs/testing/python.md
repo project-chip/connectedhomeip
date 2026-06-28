@@ -869,7 +869,7 @@ for that run, e.g.:
 
     -   Example: `700.6`
     -   Default: Value of test script `--timeout` argument plus slack time,
-        otherwise `matter.testing.TestingDefaults.DEFAULT_TIMEOUT_S`
+        otherwise `matter.testing.defaults.TestingDefaults.DEFAULT_TIMEOUT_S`
 
 -   `quiet`: Sets the verbosity level of the test run. When set to True, the
     test run will be quieter.
