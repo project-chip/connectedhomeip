@@ -190,7 +190,7 @@ def run_timeout(run: Metadata) -> float:
         return run.timeout
     if run.script_args is not None:
         p = matter_test_args_parser()
-        args = p.parse_known_args(shlex.split(run.script_args))
+        (args, _) = p.parse_known_args(shlex.split(run.script_args))
         if args.timeout is not None:
             return args.timeout + TestingDefaults.TEST_RUNNER_SLACK_S
     return TestingDefaults.DEFAULT_TIMEOUT_S
