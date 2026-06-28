@@ -34,8 +34,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 #       --app-pipe /tmp/pavst_2_13_fifo
+#       --timeout 300
 #     factory-reset: true
-#     timeout: 300
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 

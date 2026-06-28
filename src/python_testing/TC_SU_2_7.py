@@ -42,9 +42,9 @@
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_image_download_timeout:360
+#       --timeout 1800
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
-#     timeout: 1800
 #     app-ready-pattern: Server initialization complete
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
