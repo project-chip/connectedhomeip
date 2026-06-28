@@ -71,8 +71,9 @@ SystemModeEnum Setpoint::Mode() const
 
 temperature OptionalSetpoint::Temperature() const
 {
-    if (mTemperature.HasValue())
+    if (mTemperature.HasValue()) {
         return mTemperature.Value();
+    }
     return mAbsoluteSetpoint.Temperature();
 }
 

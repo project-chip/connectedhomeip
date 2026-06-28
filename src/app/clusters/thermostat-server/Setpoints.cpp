@@ -74,11 +74,11 @@ bool Setpoints::Valid()
         {
             return false;
         }
-        if (!absoluteHeatLimits.Valid(userHeatLimits.minimum))
+        if (userHeatLimits.minimum.HasTemperature() && !absoluteHeatLimits.Valid(userHeatLimits.minimum))
         {
             return false;
         }
-        if (!absoluteHeatLimits.Valid(userHeatLimits.maximum))
+        if (userHeatLimits.maximum.HasTemperature() && !absoluteHeatLimits.Valid(userHeatLimits.maximum))
         {
             return false;
         }
@@ -101,11 +101,11 @@ bool Setpoints::Valid()
         {
             return false;
         }
-        if (!absoluteCoolLimits.Valid(userCoolLimits.minimum))
+        if (userCoolLimits.minimum.HasTemperature() && !absoluteCoolLimits.Valid(userCoolLimits.minimum))
         {
             return false;
         }
-        if (!absoluteCoolLimits.Valid(userCoolLimits.maximum))
+        if (userCoolLimits.maximum.HasTemperature() && !absoluteCoolLimits.Valid(userCoolLimits.maximum))
         {
             return false;
         }
@@ -157,14 +157,14 @@ void Setpoints::FixUserLimits(AbsoluteSetpointLimits & absoluteLimits, UserSetpo
         // Would only happen if the host fed us bad limits, as these are not user-settable
         return;
     }
-    if (!absoluteLimits.Valid(userLimits.minimum))
+    if (userLimits.minimum.HasTemperature() && !absoluteLimits.Valid(userLimits.minimum))
     {
         if (userLimits.minimum.SetTemperature(absoluteLimits.Minimum()))
         {
             fixedAttributes.Set(userLimits.minimum.AttributeId());
         }
     }
-    if (!absoluteLimits.Valid(userLimits.maximum))
+    if (userLimits.maximum.HasTemperature() && !absoluteLimits.Valid(userLimits.maximum))
     {
         if (userLimits.maximum.SetTemperature(absoluteLimits.Maximum()))
         {
