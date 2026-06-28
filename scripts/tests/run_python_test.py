@@ -41,8 +41,8 @@ from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
-from matter.testing.tasks import Subprocess
 from matter.testing.runner import parse_matter_test_args
+from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
 
