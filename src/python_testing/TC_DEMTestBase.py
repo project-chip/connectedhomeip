@@ -190,6 +190,37 @@ class DEMTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
+    async def send_power_range_adjustment_command(self, minPower: int, maxPower: int, duration: int,
+                                            cause: Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum,
+                                            endpoint: int = None, timedRequestTimeoutMs: int = 3000,
+                                            expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.PowerRangeAdjustRequest(
+                minPower=minPower,
+                maxPower=maxPower,
+                duration=duration,
+                cause=cause),
+                endpoint=endpoint,
+                timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_cancel_power_range_adjustment_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
+                                                   expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.CancelPowerRangeAdjustRequest(),
+                                       endpoint=endpoint,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+            asserts.assert_equal(expected_status, Status.Success)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+
     def print_forecast(self, forecast):
         for index, slot in enumerate(forecast.slots):
             log.info("   [%s] MinDuration: %s MaxDuration: %s DefaultDuration: %s",
@@ -261,3 +292,9 @@ class DEMTestBase:
 
     async def send_test_event_trigger_forecast_clear(self):
         await self.send_test_event_triggers(eventTrigger=0x0098000000000010)
+
+    async def send_test_event_trigger_power_range_adjustment(self):
+        await self.send_test_event_triggers(eventTrigger=0x0098000000000011)
+
+    async def send_test_event_trigger_power_range_adjustment_clear(self):
+        await self.send_test_event_triggers(eventTrigger=0x0098000000000012)

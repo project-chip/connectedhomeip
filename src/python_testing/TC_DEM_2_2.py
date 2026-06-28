@@ -177,7 +177,8 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
         # Commission DUT - already done
 
         self.step("2")
-        await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment], [])
+        await self.validate_feature_map([Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerAdjustment], \
+                                        [Clusters.DeviceEnergyManagement.Bitmaps.Feature.kPowerRangeAdjustment])
 
         self.step("3")
         # Subscribe to Events and when they are sent push them to a queue for checking later
