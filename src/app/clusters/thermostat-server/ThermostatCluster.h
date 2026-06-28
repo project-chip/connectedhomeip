@@ -132,6 +132,26 @@ public:
     Protocols::InteractionModel::Status SetUnoccupiedHeatingSetpoint(int16_t value);
     int16_t GetUnoccupiedHeatingSetpoint();
 
+    // MinHeatSetpointLimit
+    Protocols::InteractionModel::Status SetMinHeatSetpointLimit(int16_t value);
+    int16_t GetMinHeatSetpointLimit();
+
+    // MaxHeatSetpointLimit
+    Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(int16_t value);
+    int16_t GetMaxHeatSetpointLimit();
+
+    // MinCoolSetpointLimit
+    Protocols::InteractionModel::Status SetMinCoolSetpointLimit(int16_t value);
+    int16_t GetMinCoolSetpointLimit();
+
+    // MaxCoolSetpointLimit
+    Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(int16_t value);
+    int16_t GetMaxCoolSetpointLimit();
+
+    // MinSetpointDeadbanc
+    Protocols::InteractionModel::Status SetMinSetpointDeadbanc(int8_t value);
+    int8_t GetMinSetpointDeadbanc();
+
     void SetThermostatRunningState(BitMask<RelayStateBitmap> value);
     void SetThermostatRunningMode(ThermostatRunningModeEnum value);
 
@@ -242,6 +262,11 @@ private:
     void HandleSetpointPostWrite(AttributeId attributeId);
     Protocols::InteractionModel::Status HandleOccupancyHeatingSetpoint(int16_t value, AttributeId attributeId);
     Protocols::InteractionModel::Status HandleOccupancyCoolingSetpoint(int16_t value, AttributeId attributeId);
+    Protocols::InteractionModel::Status HandleMinHeatSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMaxHeatSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMinCoolSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMaxCoolSetpointLimit(int16_t value);
+    Protocols::InteractionModel::Status HandleMinSetpointDeadband(int8_t value);
 
     // Sets member to value and, if it changed, persists it to attribute storage. Returns true if changed.
     bool SetAndPersistSetpoint(int16_t & member, int16_t value, AttributeId attributeId);
