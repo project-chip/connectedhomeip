@@ -337,7 +337,8 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-    matter_test_config = convert_args_to_matter_config(parse_matter_test_args())
+    p = matter_test_args_parser()
+    matter_test_config = convert_args_to_matter_config(p.parse_args())
 
     # Find the test class in the test script.
     test_class = _find_test_class()
@@ -943,7 +944,7 @@ def root_index(s: str) -> int:
         return root_index
 
 
-def parse_matter_test_args(argv: Optional[list[str]] = None):
+def matter_test_args_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -1082,7 +1083,4 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
     args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
-    if not argv:
-        argv = sys.argv[1:]
-
-    return parser.parse_args(argv)
+    return parser

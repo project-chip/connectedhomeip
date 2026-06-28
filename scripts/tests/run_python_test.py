@@ -41,7 +41,7 @@ from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
-from matter.testing.runner import parse_matter_test_args
+from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
@@ -189,7 +189,8 @@ def run_timeout(run: Metadata) -> float:
     if run.timeout is not None:
         return run.timeout
     if run.script_args is not None:
-        args = parse_matter_test_args(shlex.split(run.script_args))
+        p = matter_test_args_parser()
+        args = p.parse_known_args(shlex.split(run.script_args))
         if args.timeout is not None:
             return args.timeout + TestingDefaults.TEST_RUNNER_SLACK_S
     return TestingDefaults.DEFAULT_TIMEOUT_S
