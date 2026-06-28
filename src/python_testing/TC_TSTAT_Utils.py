@@ -242,17 +242,19 @@ class ThermostatSimulator:
             cool_val = state.unoccupiedCoolingSetpoint
 
         # 1. Clamp to user limits
-        min_heat = state.minHeatSetpointLimit if state.minHeatSetpointLimit is not None else state.absMinHeatSetpointLimit
-        max_heat = state.maxHeatSetpointLimit if state.maxHeatSetpointLimit is not None else state.absMaxHeatSetpointLimit
-        if heat_val < min_heat or heat_val > max_heat:
-            heat_val = min(max(heat_val, min_heat), max_heat)
-            fixed_ids.add(heat_id)
+        if state.hasHeat:
+            min_heat = state.minHeatSetpointLimit if state.minHeatSetpointLimit is not None else state.absMinHeatSetpointLimit
+            max_heat = state.maxHeatSetpointLimit if state.maxHeatSetpointLimit is not None else state.absMaxHeatSetpointLimit
+            if heat_val < min_heat or heat_val > max_heat:
+                heat_val = min(max(heat_val, min_heat), max_heat)
+                fixed_ids.add(heat_id)
 
-        min_cool = state.minCoolSetpointLimit if state.minCoolSetpointLimit is not None else state.absMinCoolSetpointLimit
-        max_cool = state.maxCoolSetpointLimit if state.maxCoolSetpointLimit is not None else state.absMaxCoolSetpointLimit
-        if cool_val < min_cool or cool_val > max_cool:
-            cool_val = min(max(cool_val, min_cool), max_cool)
-            fixed_ids.add(cool_id)
+        if state.hasCool:
+            min_cool = state.minCoolSetpointLimit if state.minCoolSetpointLimit is not None else state.absMinCoolSetpointLimit
+            max_cool = state.maxCoolSetpointLimit if state.maxCoolSetpointLimit is not None else state.absMaxCoolSetpointLimit
+            if cool_val < min_cool or cool_val > max_cool:
+                cool_val = min(max(cool_val, min_cool), max_cool)
+                fixed_ids.add(cool_id)
 
         if is_occupied:
             state.occupiedHeatingSetpoint = heat_val
@@ -309,14 +311,22 @@ class ThermostatSimulator:
         # Range Check
         match attribute_id:
             case (cluster.Attributes.OccupiedHeatingSetpoint.attribute_id |
-                  cluster.Attributes.UnoccupiedHeatingSetpoint.attribute_id |
-                  cluster.Attributes.MinHeatSetpointLimit.attribute_id |
+                  cluster.Attributes.UnoccupiedHeatingSetpoint.attribute_id):
+                min_heat = current_state.minHeatSetpointLimit if current_state.minHeatSetpointLimit is not None else current_state.absMinHeatSetpointLimit
+                max_heat = current_state.maxHeatSetpointLimit if current_state.maxHeatSetpointLimit is not None else current_state.absMaxHeatSetpointLimit
+                if new_value < min_heat or new_value > max_heat:
+                    return (Status.ConstraintError, current_state, set())
+            case (cluster.Attributes.MinHeatSetpointLimit.attribute_id |
                   cluster.Attributes.MaxHeatSetpointLimit.attribute_id):
                 if new_value < current_state.absMinHeatSetpointLimit or new_value > current_state.absMaxHeatSetpointLimit:
                     return (Status.ConstraintError, current_state, set())
             case (cluster.Attributes.OccupiedCoolingSetpoint.attribute_id |
-                  cluster.Attributes.UnoccupiedCoolingSetpoint.attribute_id |
-                  cluster.Attributes.MinCoolSetpointLimit.attribute_id |
+                  cluster.Attributes.UnoccupiedCoolingSetpoint.attribute_id):
+                min_cool = current_state.minCoolSetpointLimit if current_state.minCoolSetpointLimit is not None else current_state.absMinCoolSetpointLimit
+                max_cool = current_state.maxCoolSetpointLimit if current_state.maxCoolSetpointLimit is not None else current_state.absMaxCoolSetpointLimit
+                if new_value < min_cool or new_value > max_cool:
+                    return (Status.ConstraintError, current_state, set())
+            case (cluster.Attributes.MinCoolSetpointLimit.attribute_id |
                   cluster.Attributes.MaxCoolSetpointLimit.attribute_id):
                 if new_value < current_state.absMinCoolSetpointLimit or new_value > current_state.absMaxCoolSetpointLimit:
                     return (Status.ConstraintError, current_state, set())
