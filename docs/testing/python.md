@@ -868,7 +868,8 @@ for that run, e.g.:
     the test run is considered failed. The value is in seconds.
 
     -   Example: `700.6`
-    -   Default: `matter.testing.TestingDefaults.DEFAULT_TIMEOUT_S`
+    -   Default: Value of test script `--timeout` argument plus slack time, otherwise
+        `matter.testing.TestingDefaults.DEFAULT_TIMEOUT_S`
 
 -   `quiet`: Sets the verbosity level of the test run. When set to True, the
     test run will be quieter.
