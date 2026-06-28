@@ -176,12 +176,27 @@ public:
     void SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value);
     DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration();
 
+    // ThermostatRunningState
     void SetThermostatRunningState(BitMask<RelayStateBitmap> value);
+    BitMask<RelayStateBitmap> GetThermostatRunningState();
 
-    // Setters for device-set read-only attributes that do not generate events.
+    // SetpointChangeSource
     void SetSetpointChangeSource(SetpointChangeSourceEnum value);
+    SetpointChangeSourceEnum GetSetpointChangeSource();
+
+    // SetpointChangeAmount
     void SetSetpointChangeAmount(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetSetpointChangeAmount();
+
+    // SetpointChangeSourceTimestamp
     void SetSetpointChangeSourceTimestamp(uint32_t value);
+    uint32_t GetSetpointChangeSourceTimestamp();
+
+    // EmergencyHeatDelta
+    void SetEmergencyHeatDelta(uint32_t value);
+    uint32_t GetEmergencyHeatDelta();
+
+
     void SetACCoilTemperature(DataModel::Nullable<int16_t> value);
     // Handle setters also persist their values across reboots.
     void SetActivePresetHandle(DataModel::Nullable<ByteSpan> value);
@@ -331,27 +346,17 @@ private:
     int16_t mMaxHeatSetpointLimit;
     int16_t mMinCoolSetpointLimit;
     int16_t mMaxCoolSetpointLimit;
-    Attributes::MinSetpointDeadBand::TypeInfo::Type mMinSetpointDeadBand;
-    Attributes::RemoteSensing::TypeInfo::Type mRemoteSensing{};
-    Attributes::ControlSequenceOfOperation::TypeInfo::Type mControlSequenceOfOperation;
-    Attributes::SystemMode::TypeInfo::Type mSystemMode;
-    Attributes::ThermostatRunningMode::TypeInfo::Type mThermostatRunningMode{};
-    Attributes::StartOfWeek::TypeInfo::Type mStartOfWeek{};
-    Attributes::NumberOfWeeklyTransitions::TypeInfo::Type mNumberOfWeeklyTransitions{};
-    Attributes::NumberOfDailyTransitions::TypeInfo::Type mNumberOfDailyTransitions{};
-    Attributes::TemperatureSetpointHold::TypeInfo::Type mTemperatureSetpointHold{};
-    Attributes::TemperatureSetpointHoldDuration::TypeInfo::Type mTemperatureSetpointHoldDuration{};
-    Attributes::ThermostatProgrammingOperationMode::TypeInfo::Type mThermostatProgrammingOperationMode{};
-    Attributes::ThermostatRunningState::TypeInfo::Type mThermostatRunningState{};
-    Attributes::SetpointChangeSource::TypeInfo::Type mSetpointChangeSource{};
+    int8_t mMinSetpointDeadBand;
+    BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{};
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation;
+    SystemModeEnum mSystemMode;
+    ThermostatRunningModeEnum mThermostatRunningMode{};
+    TemperatureSetpointHoldEnum mTemperatureSetpointHold{};
+    DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration{};
+    BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> mThermostatRunningState{};
+    SetpointChangeSourceEnum mSetpointChangeSource{};
     Attributes::SetpointChangeAmount::TypeInfo::Type mSetpointChangeAmount{};
-    Attributes::SetpointChangeSourceTimestamp::TypeInfo::Type mSetpointChangeSourceTimestamp{};
-    Attributes::OccupiedSetback::TypeInfo::Type mOccupiedSetback{};
-    Attributes::OccupiedSetbackMin::TypeInfo::Type mOccupiedSetbackMin{};
-    Attributes::OccupiedSetbackMax::TypeInfo::Type mOccupiedSetbackMax{};
-    Attributes::UnoccupiedSetback::TypeInfo::Type mUnoccupiedSetback{};
-    Attributes::UnoccupiedSetbackMin::TypeInfo::Type mUnoccupiedSetbackMin{};
-    Attributes::UnoccupiedSetbackMax::TypeInfo::Type mUnoccupiedSetbackMax{};
+    uint32_t mSetpointChangeSourceTimestamp{};
     Attributes::EmergencyHeatDelta::TypeInfo::Type mEmergencyHeatDelta{};
     Attributes::ACType::TypeInfo::Type mACType{};
     Attributes::ACCapacity::TypeInfo::Type mACCapacity{};

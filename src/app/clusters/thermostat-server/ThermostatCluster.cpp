@@ -480,18 +480,10 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mSystemMode);
     case ThermostatRunningMode::Id:
         return encoder.Encode(mThermostatRunningMode);
-    case StartOfWeek::Id:
-        return encoder.Encode(mStartOfWeek);
-    case NumberOfWeeklyTransitions::Id:
-        return encoder.Encode(mNumberOfWeeklyTransitions);
-    case NumberOfDailyTransitions::Id:
-        return encoder.Encode(mNumberOfDailyTransitions);
     case TemperatureSetpointHold::Id:
         return encoder.Encode(mTemperatureSetpointHold);
     case TemperatureSetpointHoldDuration::Id:
         return encoder.Encode(mTemperatureSetpointHoldDuration);
-    case ThermostatProgrammingOperationMode::Id:
-        return encoder.Encode(mThermostatProgrammingOperationMode);
     case ThermostatRunningState::Id:
         return encoder.Encode(mThermostatRunningState);
     case SetpointChangeSource::Id:
@@ -500,18 +492,6 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mSetpointChangeAmount);
     case SetpointChangeSourceTimestamp::Id:
         return encoder.Encode(mSetpointChangeSourceTimestamp);
-    case OccupiedSetback::Id:
-        return encoder.Encode(mOccupiedSetback);
-    case OccupiedSetbackMin::Id:
-        return encoder.Encode(mOccupiedSetbackMin);
-    case OccupiedSetbackMax::Id:
-        return encoder.Encode(mOccupiedSetbackMax);
-    case UnoccupiedSetback::Id:
-        return encoder.Encode(mUnoccupiedSetback);
-    case UnoccupiedSetbackMin::Id:
-        return encoder.Encode(mUnoccupiedSetbackMin);
-    case UnoccupiedSetbackMax::Id:
-        return encoder.Encode(mUnoccupiedSetbackMax);
     case EmergencyHeatDelta::Id:
         return encoder.Encode(mEmergencyHeatDelta);
     case ACType::Id:
@@ -771,6 +751,11 @@ void ThermostatCluster::SetThermostatRunningState(BitMask<RelayStateBitmap> valu
     }
 }
 
+BitMask<RelayStateBitmap> ThermostatCluster::GetThermostatRunningState()
+{
+    return mThermostatRunningState;
+}
+
 void ThermostatCluster::SetThermostatRunningMode(ThermostatRunningModeEnum value)
 {
     if (SetAttributeValue(mThermostatRunningMode, value, ThermostatRunningMode::Id) && mFeatures.Has(Feature::kEvents))
@@ -818,14 +803,29 @@ void ThermostatCluster::SetSetpointChangeSource(SetpointChangeSourceEnum value)
     SetAttributeValue(mSetpointChangeSource, value, SetpointChangeSource::Id);
 }
 
+SetpointChangeSourceEnum ThermostatCluster::GetSetpointChangeSource()
+{
+    return mSetpointChangeSource;
+}
+
 void ThermostatCluster::SetSetpointChangeAmount(DataModel::Nullable<int16_t> value)
 {
     SetAttributeValue(mSetpointChangeAmount, value, SetpointChangeAmount::Id);
 }
 
+DataModel::Nullable<int16_t> ThermostatCluster::GetSetpointChangeAmount()
+{
+    return mSetpointChangeAmount;
+}
+
 void ThermostatCluster::SetSetpointChangeSourceTimestamp(uint32_t value)
 {
     SetAttributeValue(mSetpointChangeSourceTimestamp, value, SetpointChangeSourceTimestamp::Id);
+}
+
+uint32_t ThermostatCluster::GetSetpointChangeSourceTimestamp()
+{
+    return mSetpointChangeSourceTimestamp;
 }
 
 void ThermostatCluster::SetACCoilTemperature(DataModel::Nullable<int16_t> value)
