@@ -779,6 +779,40 @@ void ThermostatCluster::SetThermostatRunningMode(ThermostatRunningModeEnum value
     }
 }
 
+ThermostatRunningModeEnum ThermostatCluster::GetThermostatRunningMode()
+{
+    return mThermostatRunningMode;
+}
+
+void ThermostatCluster::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum value)
+{
+    SetAttributeValue(mTemperatureSetpointHold, value, TemperatureSetpointHold::Id);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
+        { reinterpret_cast<const uint8_t *>(&mTemperatureSetpointHold), sizeof(mTemperatureSetpointHold) }));
+}
+
+TemperatureSetpointHoldEnum ThermostatCluster::GetTemperatureSetpointHold()
+{
+    return mTemperatureSetpointHold;
+}
+
+void ThermostatCluster::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value)
+{
+    SetAttributeValue(mTemperatureSetpointHoldDuration, value, TemperatureSetpointHoldDuration::Id);
+
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    DataModel::NullableToStorage(value, storageValue);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
+        { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
+}
+
+DataModel::Nullable<uint16_t> ThermostatCluster::GetTemperatureSetpointHoldDuration()
+{
+    return mTemperatureSetpointHoldDuration;
+}
+
 void ThermostatCluster::SetSetpointChangeSource(SetpointChangeSourceEnum value)
 {
     SetAttributeValue(mSetpointChangeSource, value, SetpointChangeSource::Id);
@@ -976,6 +1010,9 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinSetpointDeadband
     VerifyOrReturnError(mFeatures.Has(Feature::kAutoMode), Status::UnsupportedAttribute);
     VerifyOrReturnError(value >= 0 && value <= 127, Status::InvalidValue);
     SetAttributeValue(mMinSetpointDeadBand, value, MinSetpointDeadBand::Id);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id },
+        { reinterpret_cast<const uint8_t *>(&mMinSetpointDeadBand), sizeof(mMinSetpointDeadBand) }));
     return Status::Success;
 }
 

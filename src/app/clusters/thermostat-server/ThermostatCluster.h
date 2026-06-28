@@ -164,8 +164,19 @@ public:
     Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum value);
     SystemModeEnum GetSystemMode();
 
-    void SetThermostatRunningState(BitMask<RelayStateBitmap> value);
+    // ThermostatRunningMode
     void SetThermostatRunningMode(ThermostatRunningModeEnum value);
+    ThermostatRunningModeEnum GetThermostatRunningMode();
+
+    // TemperatureSetpointHold
+    void SetTemperatureSetpointHold(TemperatureSetpointHoldEnum value);
+    TemperatureSetpointHoldEnum GetTemperatureSetpointHold();
+
+    // TemperatureSetpointHoldDuration
+    void SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value);
+    DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration();
+
+    void SetThermostatRunningState(BitMask<RelayStateBitmap> value);
 
     // Setters for device-set read-only attributes that do not generate events.
     void SetSetpointChangeSource(SetpointChangeSourceEnum value);
