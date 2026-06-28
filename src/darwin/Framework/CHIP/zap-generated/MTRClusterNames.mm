@@ -141,6 +141,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeLaundryDryerControlsID:
         result = @"LaundryDryerControls";
         break;
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+        result = @"TemperatureControlledCabinetTopology";
+        break;
     case MTRClusterIDTypeModeSelectID:
         result = @"ModeSelect";
         break;
@@ -351,6 +354,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeAmbientContextSensingID:
         result = @"AmbientContextSensing";
         break;
+    case MTRClusterIDTypeAmbientSensingUnionID:
+        result = @"AmbientSensingUnion";
+        break;
     case MTRClusterIDTypeProximityRangingID:
         result = @"ProximityRanging";
         break;
@@ -368,6 +374,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeThreadNetworkDirectoryID:
         result = @"ThreadNetworkDirectory";
+        break;
+    case MTRClusterIDTypeCommissioningProxyID:
+        result = @"CommissioningProxy";
         break;
     case MTRClusterIDTypeWakeOnLANID:
         result = @"WakeOnLAN";
@@ -432,6 +441,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeChimeID:
         result = @"Chime";
         break;
+    case MTRClusterIDTypeAVAnalysisID:
+        result = @"AVAnalysis";
+        break;
     case MTRClusterIDTypeCommodityTariffID:
         result = @"CommodityTariff";
         break;
@@ -464,6 +476,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeSampleMEIID:
         result = @"SampleMEI";
+        break;
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+        result = @"TestHiddenManufacturerSpecific";
         break;
 
     default:
@@ -2922,6 +2937,46 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+
+        switch (attributeID) {
+
+            // Cluster TemperatureControlledCabinetTopology attributes
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeDisabledCabinetsID:
+            result = @"DisabledCabinets";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeTopologyID:
+            result = @"Topology";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterTemperatureControlledCabinetTopologyAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known TemperatureControlledCabinetTopology attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeModeSelectID:
 
         switch (attributeID) {
@@ -4461,6 +4516,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeOptOutStateID:
             result = @"OptOutState";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributePowerRangeAdjustmentID:
+            result = @"PowerRangeAdjustment";
             break;
 
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeGeneratedCommandListID:
@@ -7775,8 +7834,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AmbientContextTypeSupported";
             break;
 
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID:
-            result = @"ObjectCountReached";
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountThresholdReachedID:
+            result = @"ObjectCountThresholdReached";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID:
@@ -7803,6 +7862,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"PredictedActivity";
             break;
 
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSensorFusionSupportedID:
+            result = @"SensorFusionSupported";
+            break;
+
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -7825,6 +7888,50 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known AmbientContextSensing attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (attributeID) {
+
+            // Cluster AmbientSensingUnion attributes
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionNameID:
+            result = @"UnionName";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionHealthID:
+            result = @"UnionHealth";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionContributorListID:
+            result = @"UnionContributorList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AmbientSensingUnion attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -8145,6 +8252,70 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ThreadNetworkDirectory attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (attributeID) {
+
+            // Cluster CommissioningProxy attributes
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeTransportID:
+            result = @"Transport";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeScanMaxTimeID:
+            result = @"ScanMaxTime";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeMaxSessionsID:
+            result = @"MaxSessions";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeMaxCachedResultsID:
+            result = @"MaxCachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeNumCachedResultsID:
+            result = @"NumCachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeCacheTimeoutID:
+            result = @"CacheTimeout";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeCachedResultsID:
+            result = @"CachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeWiFiBandID:
+            result = @"WiFiBand";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known CommissioningProxy attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -9266,6 +9437,62 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (attributeID) {
+
+            // Cluster AVAnalysis attributes
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeSupportedAmbientContextsID:
+            result = @"SupportedAmbientContexts";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeActiveAmbientContextTriggersID:
+            result = @"ActiveAmbientContextTriggers";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeMaxAnalysisStreamCountID:
+            result = @"MaxAnalysisStreamCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeCurrentAnalysisStreamCountID:
+            result = @"CurrentAnalysisStreamCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAnalysisStreamsID:
+            result = @"AnalysisStreams";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeTrackingEnabledID:
+            result = @"TrackingEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAVAnalysisAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AVAnalysis attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommodityTariffID:
 
         switch (attributeID) {
@@ -10190,6 +10417,42 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (attributeID) {
+
+            // Cluster TestHiddenManufacturerSpecific attributes
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeTestAttributeID:
+            result = @"TestAttribute";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known TestHiddenManufacturerSpecific attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     default:
         result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
         break;
@@ -10938,6 +11201,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeModeSelectID:
 
         switch (commandID) {
@@ -11432,6 +11705,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterDeviceEnergyManagementCommandCancelRequestID:
             result = @"CancelRequest";
+            break;
+
+        case MTRCommandIDTypeClusterDeviceEnergyManagementCommandPowerRangeAdjustRequestID:
+            result = @"PowerRangeAdjustRequest";
+            break;
+
+        case MTRCommandIDTypeClusterDeviceEnergyManagementCommandCancelPowerRangeAdjustRequestID:
+            result = @"CancelPowerRangeAdjustRequest";
             break;
 
         default:
@@ -12174,6 +12455,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeProximityRangingID:
 
         switch (commandID) {
@@ -12286,6 +12577,40 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterThreadNetworkDirectoryCommandGetOperationalDatasetID:
             result = @"GetOperationalDataset";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyConnectRequestID:
+            result = @"ProxyConnectRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyDisconnectRequestID:
+            result = @"ProxyDisconnectRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyScanRequestID:
+            result = @"ProxyScanRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyBackGroundScanStartRequestID:
+            result = @"ProxyBackGroundScanStartRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyBackGroundScanStopRequestID:
+            result = @"ProxyBackGroundScanStopRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyMessageRequestID:
+            result = @"ProxyMessageRequest";
             break;
 
         default:
@@ -12872,6 +13197,40 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEnableContextTriggersID:
+            result = @"EnableContextTriggers";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandDisableContextTriggersID:
+            result = @"DisableContextTriggers";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamID:
+            result = @"EstablishAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandActivateAnalysisStreamID:
+            result = @"ActivateAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandDeactivateAnalysisStreamID:
+            result = @"DeactivateAnalysisStream";
+            break;
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandRemoveAnalysisStreamID:
+            result = @"RemoveAnalysisStream";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommodityTariffID:
 
         switch (commandID) {
@@ -13263,6 +13622,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         case MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID:
             result = @"AddArguments";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -13775,6 +14144,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         break;
 
     case MTRClusterIDTypeLaundryDryerControlsID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
 
         switch (commandID) {
 
@@ -14612,6 +14991,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeProximityRangingID:
 
         switch (commandID) {
@@ -14692,6 +15081,28 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterThreadNetworkDirectoryCommandOperationalDatasetResponseID:
             result = @"OperationalDatasetResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyConnectResponseID:
+            result = @"ProxyConnectResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyScanResponseID:
+            result = @"ProxyScanResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyMessageResponseID:
+            result = @"ProxyMessageResponse";
             break;
 
         default:
@@ -14986,6 +15397,20 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAVAnalysisCommandEstablishAnalysisStreamResponseID:
+            result = @"EstablishAnalysisStreamResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommodityTariffID:
 
         switch (commandID) {
@@ -15213,6 +15638,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         case MTRCommandIDTypeClusterSampleMEICommandAddArgumentsResponseID:
             result = @"AddArgumentsResponse";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -15814,6 +16249,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeTemperatureControlledCabinetTopologyID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeModeSelectID:
 
         switch (eventID) {
@@ -16250,6 +16695,14 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterDeviceEnergyManagementEventResumedID:
             result = @"Resumed";
+            break;
+
+        case MTREventIDTypeClusterDeviceEnergyManagementEventPowerRangeAdjustStartID:
+            result = @"PowerRangeAdjustStart";
+            break;
+
+        case MTREventIDTypeClusterDeviceEnergyManagementEventPowerRangeAdjustEndID:
+            result = @"PowerRangeAdjustEnd";
             break;
 
         default:
@@ -16862,6 +17315,29 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (eventID) {
+
+            // Cluster AmbientSensingUnion events
+        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorAddedID:
+            result = @"UnionContributorAdded";
+            break;
+
+        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorRemovedID:
+            result = @"UnionContributorRemoved";
+            break;
+
+        case MTREventIDTypeClusterAmbientSensingUnionEventUnionContributorStatusChangedID:
+            result = @"UnionContributorStatusChanged";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeProximityRangingID:
 
         switch (eventID) {
@@ -16922,6 +17398,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeThreadNetworkDirectoryID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommissioningProxyID:
 
         switch (eventID) {
 
@@ -17188,6 +17674,29 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeAVAnalysisID:
+
+        switch (eventID) {
+
+            // Cluster AVAnalysis events
+        case MTREventIDTypeClusterAVAnalysisEventAnalysisSessionStartID:
+            result = @"AnalysisSessionStart";
+            break;
+
+        case MTREventIDTypeClusterAVAnalysisEventAnalysisSessionEndID:
+            result = @"AnalysisSessionEnd";
+            break;
+
+        case MTREventIDTypeClusterAVAnalysisEventPerceivedContextID:
+            result = @"PerceivedContext";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeCommodityTariffID:
 
         switch (eventID) {
@@ -17314,6 +17823,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterSampleMEIEventPingCountEventID:
             result = @"PingCountEvent";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTestHiddenManufacturerSpecificID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

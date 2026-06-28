@@ -179,7 +179,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(6)
         battery_alert_report = battery_alert_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Battery alert report {battery_alert_report} with value {battery_alert_report.value}")
+        log.info("Battery alert report %s with value %s", battery_alert_report, battery_alert_report.value)
         asserts.assert_equal(battery_alert_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(7)
@@ -197,7 +197,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(10)
         battery_alert_report = battery_alert_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Smoke state report {battery_alert_report} with value {battery_alert_report.value}")
+        log.info("Smoke state report %s with value %s", battery_alert_report, battery_alert_report.value)
         asserts.assert_equal(battery_alert_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical)
 
         self.step(11)
@@ -216,7 +216,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(14)
         battery_alert_report = battery_alert_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Battery Alert Report {battery_alert_report} with value {battery_alert_report.value}")
+        log.info("Battery Alert Report %s with value %s", battery_alert_report, battery_alert_report.value)
         asserts.assert_equal(battery_alert_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
 
         self.step(15)
@@ -244,7 +244,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(19)
         hardware_fault_report = hardware_fault_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Hardware Fault report {hardware_fault_report} with value {hardware_fault_report.value}")
+        log.info("Hardware Fault report %s with value %s", hardware_fault_report, hardware_fault_report.value)
         asserts.assert_equal(hardware_fault_report.value, True)
 
         self.step(20)
@@ -261,7 +261,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(23)
         hardware_fault_report = hardware_fault_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Smoke state report {hardware_fault_report} with value {hardware_fault_report.value}")
+        log.info("Smoke state report %s with value %s", hardware_fault_report, hardware_fault_report.value)
         asserts.assert_equal(hardware_fault_report.value, 0)
 
         self.step(24)
@@ -287,7 +287,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(28)
         end_of_service_report = end_of_service_alert_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"End of service alert report {end_of_service_report} with value {end_of_service_report.value}")
+        log.info("End of service alert report %s with value %s", end_of_service_report, end_of_service_report.value)
         asserts.assert_equal(end_of_service_report.value, self.smokeco_cluster.Enums.EndOfServiceEnum.kExpired)
 
         self.step(29)
@@ -304,7 +304,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(32)
         end_of_service_report = end_of_service_alert_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"End of service report {hardware_fault_report} with value {end_of_service_report.value}")
+        log.info("End of service report %s with value %s", hardware_fault_report, end_of_service_report.value)
         asserts.assert_equal(end_of_service_report.value, self.smokeco_cluster.Enums.EndOfServiceEnum.kNormal)
 
         self.step(33)
@@ -333,7 +333,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(38)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
-        log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
+        log.info("Test in progress report %s with value %s", test_in_progress_report, test_in_progress_report.value)
         asserts.assert_true(test_in_progress_report.value, "Test is not in progresss and should be in progress.")
 
         self.step(39)
@@ -342,7 +342,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(40)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
-        log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
+        log.info("Test in progress report %s with value %s", test_in_progress_report, test_in_progress_report.value)
         asserts.assert_equal(test_in_progress_report.value, False)
 
         self.step(41)
@@ -363,7 +363,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(45)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
-        log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
+        log.info("Test in progress report %s with value %s", test_in_progress_report, test_in_progress_report.value)
         asserts.assert_true(test_in_progress_report.value, "Test is not in progress and should be in progress.")
 
         self.step(46)
@@ -372,7 +372,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(47)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
-        log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
+        log.info("Test in progress report %s with value %s", test_in_progress_report, test_in_progress_report.value)
         asserts.assert_false(test_in_progress_report.value, "Test should not be in progress and is on progress.")
 
         self.step(48)

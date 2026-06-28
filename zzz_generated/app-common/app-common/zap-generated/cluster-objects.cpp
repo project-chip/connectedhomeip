@@ -51,6 +51,10 @@
 #include <clusters/AmbientContextSensing/Commands.ipp>
 #include <clusters/AmbientContextSensing/Events.ipp>
 #include <clusters/AmbientContextSensing/Structs.ipp>
+#include <clusters/AmbientSensingUnion/Attributes.ipp>
+#include <clusters/AmbientSensingUnion/Commands.ipp>
+#include <clusters/AmbientSensingUnion/Events.ipp>
+#include <clusters/AmbientSensingUnion/Structs.ipp>
 #include <clusters/ApplicationBasic/Attributes.ipp>
 #include <clusters/ApplicationBasic/Commands.ipp>
 #include <clusters/ApplicationBasic/Events.ipp>
@@ -63,6 +67,10 @@
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
 #include <clusters/AudioOutput/Structs.ipp>
+#include <clusters/AvAnalysis/Attributes.ipp>
+#include <clusters/AvAnalysis/Commands.ipp>
+#include <clusters/AvAnalysis/Events.ipp>
+#include <clusters/AvAnalysis/Structs.ipp>
 #include <clusters/BallastConfiguration/Attributes.ipp>
 #include <clusters/BallastConfiguration/Commands.ipp>
 #include <clusters/BallastConfiguration/Events.ipp>
@@ -127,6 +135,10 @@
 #include <clusters/CommissionerControl/Commands.ipp>
 #include <clusters/CommissionerControl/Events.ipp>
 #include <clusters/CommissionerControl/Structs.ipp>
+#include <clusters/CommissioningProxy/Attributes.ipp>
+#include <clusters/CommissioningProxy/Commands.ipp>
+#include <clusters/CommissioningProxy/Events.ipp>
+#include <clusters/CommissioningProxy/Structs.ipp>
 #include <clusters/CommodityMetering/Attributes.ipp>
 #include <clusters/CommodityMetering/Commands.ipp>
 #include <clusters/CommodityMetering/Events.ipp>
@@ -523,10 +535,18 @@
 #include <clusters/TemperatureControl/Commands.ipp>
 #include <clusters/TemperatureControl/Events.ipp>
 #include <clusters/TemperatureControl/Structs.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Attributes.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Commands.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Events.ipp>
+#include <clusters/TemperatureControlledCabinetTopology/Structs.ipp>
 #include <clusters/TemperatureMeasurement/Attributes.ipp>
 #include <clusters/TemperatureMeasurement/Commands.ipp>
 #include <clusters/TemperatureMeasurement/Events.ipp>
 #include <clusters/TemperatureMeasurement/Structs.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Attributes.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Commands.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Events.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Structs.ipp>
 #include <clusters/Thermostat/Attributes.ipp>
 #include <clusters/Thermostat/Commands.ipp>
 #include <clusters/Thermostat/Events.ipp>
@@ -1326,6 +1346,19 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::CommissioningProxy::Id: {
+        switch (aCommand)
+        {
+        case Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::Channel::Id: {
         switch (aCommand)
         {
@@ -1489,6 +1522,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::AvAnalysis::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::CommodityTariff::Id: {
         switch (aCommand)
         {
@@ -1591,6 +1631,41 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::CommodityPrice::Id) &&
         (aCommand == Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyConnectResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyScanRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyScanResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Id))
     {
         return true;
     }

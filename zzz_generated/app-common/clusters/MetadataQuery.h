@@ -24,12 +24,16 @@
 #include <clusters/AirQuality/MetadataProvider.h>
 #include <clusters/AmbientContextSensing/Ids.h>
 #include <clusters/AmbientContextSensing/MetadataProvider.h>
+#include <clusters/AmbientSensingUnion/Ids.h>
+#include <clusters/AmbientSensingUnion/MetadataProvider.h>
 #include <clusters/ApplicationBasic/Ids.h>
 #include <clusters/ApplicationBasic/MetadataProvider.h>
 #include <clusters/ApplicationLauncher/Ids.h>
 #include <clusters/ApplicationLauncher/MetadataProvider.h>
 #include <clusters/AudioOutput/Ids.h>
 #include <clusters/AudioOutput/MetadataProvider.h>
+#include <clusters/AvAnalysis/Ids.h>
+#include <clusters/AvAnalysis/MetadataProvider.h>
 #include <clusters/BallastConfiguration/Ids.h>
 #include <clusters/BallastConfiguration/MetadataProvider.h>
 #include <clusters/BasicInformation/Ids.h>
@@ -62,6 +66,8 @@
 #include <clusters/ColorControl/MetadataProvider.h>
 #include <clusters/CommissionerControl/Ids.h>
 #include <clusters/CommissionerControl/MetadataProvider.h>
+#include <clusters/CommissioningProxy/Ids.h>
+#include <clusters/CommissioningProxy/MetadataProvider.h>
 #include <clusters/CommodityMetering/Ids.h>
 #include <clusters/CommodityMetering/MetadataProvider.h>
 #include <clusters/CommodityPrice/Ids.h>
@@ -260,8 +266,12 @@
 #include <clusters/TargetNavigator/MetadataProvider.h>
 #include <clusters/TemperatureControl/Ids.h>
 #include <clusters/TemperatureControl/MetadataProvider.h>
+#include <clusters/TemperatureControlledCabinetTopology/Ids.h>
+#include <clusters/TemperatureControlledCabinetTopology/MetadataProvider.h>
 #include <clusters/TemperatureMeasurement/Ids.h>
 #include <clusters/TemperatureMeasurement/MetadataProvider.h>
+#include <clusters/TestHiddenManufacturerSpecific/Ids.h>
+#include <clusters/TestHiddenManufacturerSpecific/MetadataProvider.h>
 #include <clusters/Thermostat/Ids.h>
 #include <clusters/Thermostat/MetadataProvider.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Ids.h>
@@ -360,6 +370,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == AmbientContextSensing::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AmbientContextSensing::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AmbientSensingUnion::Id) || ...))
+    {
+        if (id == AmbientSensingUnion::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AmbientSensingUnion::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ApplicationBasic::Id) || ...))
     {
         if (id == ApplicationBasic::Id)
@@ -374,6 +389,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == AudioOutput::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioOutput::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AvAnalysis::Id) || ...))
+    {
+        if (id == AvAnalysis::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AvAnalysis::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == BallastConfiguration::Id) || ...))
     {
@@ -457,6 +477,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == CommissionerControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissionerControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommissioningProxy::Id) || ...))
+    {
+        if (id == CommissioningProxy::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissioningProxy::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommodityMetering::Id) || ...))
     {
@@ -956,10 +981,21 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == TemperatureControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureControl::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureControlledCabinetTopology::Id) || ...))
+    {
+        if (id == TemperatureControlledCabinetTopology::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureControlledCabinetTopology::Id>::EntryFor(
+                command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TemperatureMeasurement::Id) || ...))
     {
         if (id == TemperatureMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TemperatureMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == TestHiddenManufacturerSpecific::Id) || ...))
+    {
+        if (id == TestHiddenManufacturerSpecific::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, TestHiddenManufacturerSpecific::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == Thermostat::Id) || ...))
     {

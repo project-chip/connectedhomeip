@@ -27,9 +27,11 @@
 #include <clusters/AdministratorCommissioning/CommandIds.h>
 #include <clusters/AirQuality/CommandIds.h>
 #include <clusters/AmbientContextSensing/CommandIds.h>
+#include <clusters/AmbientSensingUnion/CommandIds.h>
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationLauncher/CommandIds.h>
 #include <clusters/AudioOutput/CommandIds.h>
+#include <clusters/AvAnalysis/CommandIds.h>
 #include <clusters/BallastConfiguration/CommandIds.h>
 #include <clusters/BasicInformation/CommandIds.h>
 #include <clusters/Binding/CommandIds.h>
@@ -46,6 +48,7 @@
 #include <clusters/ClosureDimension/CommandIds.h>
 #include <clusters/ColorControl/CommandIds.h>
 #include <clusters/CommissionerControl/CommandIds.h>
+#include <clusters/CommissioningProxy/CommandIds.h>
 #include <clusters/CommodityMetering/CommandIds.h>
 #include <clusters/CommodityPrice/CommandIds.h>
 #include <clusters/CommodityTariff/CommandIds.h>
@@ -145,7 +148,9 @@
 #include <clusters/Switch/CommandIds.h>
 #include <clusters/TargetNavigator/CommandIds.h>
 #include <clusters/TemperatureControl/CommandIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/CommandIds.h>
 #include <clusters/TemperatureMeasurement/CommandIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/CommandIds.h>
 #include <clusters/Thermostat/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
 #include <clusters/ThreadBorderRouterManagement/CommandIds.h>

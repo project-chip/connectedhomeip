@@ -386,7 +386,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         overallTargetState.SetNonNull(GenericOverallTargetState{});
     }
 
-    ClosureDimensionEndpoint mClosurePanelEndpoint =
+    ClosureDimensionEndpoint & mClosurePanelEndpoint =
         endpointId == kClosurePanelEndpoint2 ? mClosurePanelEndpoint2 : mClosurePanelEndpoint3;
     ClosureDimension::ClusterConformance mClosurePanelConformance = mClosurePanelEndpoint.GetClusterInstance().GetConformance();
 

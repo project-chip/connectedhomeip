@@ -107,8 +107,6 @@ if [ "$#" == "0" ]; then
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
-        rs91x_wpa3_transition
-            Support for WPA3 transition mode on RS91x
         slc_gen_path
             Allow users to define a path where slc generates board files. (requires --slc_generate or --slc_reuse_files)
             (default: /third_party/silabs/slc_gen/<board>/)
@@ -230,11 +228,6 @@ else
                 optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
                 shift
                 ;;
-            # Option not to be used until ot-efr32 github is updated
-            # --use_ot_github_sources)
-            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
-            #    shift
-            #    ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false sl_uart_log_output=false "
                 shift

@@ -40,7 +40,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
+#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/root-node/RootNodeDevice.h>
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -185,7 +186,9 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #endif
 
     VerifyOrReturnError(sRootNodeDevice != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(sRootNodeDevice->Register(kRootEndpointId, *sDataModelProvider, chip::kInvalidEndpointId));
+
+    chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    ReturnErrorOnFailure(sRootNodeDevice->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
         .groupDataProvider = *groupDataProvider,
@@ -214,7 +217,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     sConstructedDevice = deviceFactory.Create(deviceType);
     VerifyOrReturnError(sConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(sConstructedDevice->Register(kDeviceEndpointId, *sDataModelProvider, chip::kInvalidEndpointId));
+    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
+    ReturnErrorOnFailure(sConstructedDevice->Register(allocator, *sDataModelProvider));
 
     return CHIP_NO_ERROR;
 }
