@@ -165,17 +165,17 @@ class TC_SC_5_2(MatterBaseTest):
         node_id = self.dut_node_id
         groupcast_enabled = await is_groupcast_on_root_node(self)
 
-        keySetID1 = 0x01a3
-        keySetID2 = 0x01a4
+        keySetId01a3 = 0x01a3
+        keySetId01a4 = 0x01a4
         epochKeyForKeySets = bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf")
 
-        groupID1 = 0x0101
-        groupID2 = 0x0102
-        groupID3 = 0x0300
-        groupID4 = 0x0201
-        groupID5 = 0x0202
-        groupID6 = 0x0203
-        groupID7 = 0x0204
+        groupId0101 = 0x0101
+        groupId0102 = 0x0102
+        groupId0300 = 0x0300
+        groupId0201 = 0x0201
+        groupId0202 = 0x0202
+        groupId0203 = 0x0203
+        groupId0204 = 0x0204
 
         GROUP_INFO_FLAG_USE_IANA_ADDR = dev_ctrl.GROUP_INFO_FLAG_NONE
         GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY = dev_ctrl.GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY
@@ -191,7 +191,7 @@ class TC_SC_5_2(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
-                subjects=[groupID1, groupID2, groupID3],
+                subjects=[groupId0101, groupId0102, groupId0300],
                 targets=NullValue),
         ]
         await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
@@ -200,7 +200,7 @@ class TC_SC_5_2(MatterBaseTest):
         self.step("2a")
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetWrite(
             groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
-                groupKeySetID=keySetID1,
+                groupKeySetID=keySetId01a3,
                 groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
                 epochKey0=epochKeyForKeySets,
                 epochStartTime0=2220000,
@@ -215,7 +215,7 @@ class TC_SC_5_2(MatterBaseTest):
         self.step("2b")
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetWrite(
             groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
-                groupKeySetID=keySetID2,
+                groupKeySetID=keySetId01a4,
                 groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
                 epochKey0=epochKeyForKeySets,
                 epochStartTime0=2220000,
@@ -229,7 +229,7 @@ class TC_SC_5_2(MatterBaseTest):
         # Step 2c: Configure local GroupKeyMap on the TH
         self.step("2c")
         dev_ctrl.SetGroupKeySet(
-            keyset_id=keySetID1,
+            keyset_id=keySetId01a3,
             policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             num_keys=1,
             epoch_key0=epochKeyForKeySets,
@@ -241,7 +241,7 @@ class TC_SC_5_2(MatterBaseTest):
         )
 
         dev_ctrl.SetGroupKeySet(
-            keyset_id=keySetID2,
+            keyset_id=keySetId01a4,
             policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             num_keys=1,
             epoch_key0=epochKeyForKeySets,
@@ -254,17 +254,17 @@ class TC_SC_5_2(MatterBaseTest):
 
         group_addr_policy = GROUP_INFO_FLAG_USE_IANA_ADDR if groupcast_enabled else GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY
 
-        dev_ctrl.SetGroupInfo(groupID1, "Group 0x0101", group_addr_policy)
-        dev_ctrl.SetGroupKey(groupID1, keySetID2)
+        dev_ctrl.SetGroupInfo(groupId0101, "Group 0x0101", group_addr_policy)
+        dev_ctrl.SetGroupKey(groupId0101, keySetId01a4)
 
-        dev_ctrl.SetGroupInfo(groupID2, "Group 0x0102", group_addr_policy)
-        dev_ctrl.SetGroupKey(groupID2, keySetID2)
+        dev_ctrl.SetGroupInfo(groupId0102, "Group 0x0102", group_addr_policy)
+        dev_ctrl.SetGroupKey(groupId0102, keySetId01a4)
 
-        dev_ctrl.SetGroupInfo(groupID3, "Group 0x0300", group_addr_policy)
-        dev_ctrl.SetGroupKey(groupID3, keySetID1)
+        dev_ctrl.SetGroupInfo(groupId0300, "Group 0x0300", group_addr_policy)
+        dev_ctrl.SetGroupKey(groupId0300, keySetId01a3)
 
-        dev_ctrl.SetGroupInfo(groupID4, "Group 0x0201", group_addr_policy)
-        dev_ctrl.SetGroupKey(groupID4, keySetID2)
+        dev_ctrl.SetGroupInfo(groupId0201, "Group 0x0201", group_addr_policy)
+        dev_ctrl.SetGroupKey(groupId0201, keySetId01a4)
 
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "11")
@@ -272,9 +272,9 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 3: GroupKeyMap binding
             self.step("3")
             mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID2),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID4, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0201, groupKeySetID=keySetId01a4),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
@@ -285,88 +285,88 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 5a: AddGroup 0x0300
             self.step("5a")
-            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.AddGroup(groupID3))
+            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.AddGroup(groupId0300))
             asserts.assert_equal(result.status, Status.Success, "AddGroup 0x0300 failed")
-            asserts.assert_equal(result.groupID, groupID3, "AddGroup 0x0300 groupID mismatch")
+            asserts.assert_equal(result.groupID, groupId0300, "AddGroup 0x0300 groupID mismatch")
 
             # Step 5b: AddGroup 0x0101
             self.step("5b")
-            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.AddGroup(groupID1))
+            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.AddGroup(groupId0101))
             asserts.assert_equal(result.status, Status.Success, "AddGroup 0x0101 failed")
-            asserts.assert_equal(result.groupID, groupID1, "AddGroup 0x0101 groupID mismatch")
+            asserts.assert_equal(result.groupID, groupId0101, "AddGroup 0x0101 groupID mismatch")
 
             # Step 6a: AddGroup 0x0201 as group command via GroupID 0x0101
             self.step("6a")
-            dev_ctrl.SendGroupCommand(groupID1, Clusters.Groups.Commands.AddGroup(groupID4))
+            dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0201))
 
             # Step 6b: ViewGroup 0x0201 to confirm success
             self.step("6b")
-            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupID4))
+            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupId0201))
             asserts.assert_equal(result.status, Status.Success, "ViewGroup 0x0201 failed")
-            asserts.assert_equal(result.groupID, groupID4, "ViewGroup groupID mismatch")
+            asserts.assert_equal(result.groupID, groupId0201, "ViewGroup groupID mismatch")
 
             # Step 7a: Update GroupKeyMap to map 0x0102 to 0x01a4, maintaining 0x0300 to 0x01a3
             self.step("7a")
             mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
             # Step 7b: AddGroup 0x0202 as group command via GroupID 0x0101
             self.step("7b")
-            dev_ctrl.SendGroupCommand(groupID1, Clusters.Groups.Commands.AddGroup(groupID5))
+            dev_ctrl.SendGroupCommand(groupId0101, Clusters.Groups.Commands.AddGroup(groupId0202))
 
             # Step 7c: ViewGroup 0x0202 to confirm rejection
             self.step("7c")
-            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupID5))
+            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupId0202))
             asserts.assert_equal(result.status, Status.NotFound, "ViewGroup should return NOT_FOUND for rejected AddGroup 0x0202")
 
             # Step 8a: Update GroupKeyMap to map 0x0101 to 0x01a4, maintaining 0x0300 to 0x01a3
             self.step("8a")
             mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
             # Step 8b: AddGroup 0x0203 as group command via GroupID 0x0102
             self.step("8b")
-            dev_ctrl.SendGroupCommand(groupID2, Clusters.Groups.Commands.AddGroup(groupID6))
+            dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0203))
 
             # Step 8c: ViewGroup 0x0203 to confirm rejection
             self.step("8c")
-            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupID6))
+            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupId0203))
             asserts.assert_equal(result.status, Status.NotFound, "ViewGroup should return NOT_FOUND for rejected AddGroup 0x0203")
 
             # Step 9a: Update GroupKeyMap to include 0x0101->0x01a4, 0x0102->0x01a4, 0x0300->0x01a3
             self.step("9a")
             mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID2),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
             # Step 9b: AddGroup 0x0204 as group command via GroupID 0x0102
             self.step("9b")
-            dev_ctrl.SendGroupCommand(groupID2, Clusters.Groups.Commands.AddGroup(groupID7))
+            dev_ctrl.SendGroupCommand(groupId0102, Clusters.Groups.Commands.AddGroup(groupId0204))
 
             # Step 9c: ViewGroup 0x0204 to confirm rejection
             self.step("9c")
-            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupID7))
+            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupId0204))
             asserts.assert_equal(result.status, Status.NotFound, "ViewGroup should return NOT_FOUND for rejected AddGroup 0x0204")
 
             # Step 10a: RemoveGroup 0x0101 as group command via GroupID 0x0300
             self.step("10a")
-            dev_ctrl.SendGroupCommand(groupID3, Clusters.Groups.Commands.RemoveGroup(groupID1))
+            dev_ctrl.SendGroupCommand(groupId0300, Clusters.Groups.Commands.RemoveGroup(groupId0101))
 
             # Step 10b: ViewGroup 0x0101 to confirm removal
             self.step("10b")
-            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupID1))
+            result = await self.send_single_cmd(endpoint=groups_endpoint, cmd=Clusters.Groups.Commands.ViewGroup(groupId0101))
             asserts.assert_equal(result.status, Status.NotFound, "ViewGroup should return NOT_FOUND after RemoveGroup 0x0101")
 
             # Step 11: RemoveAllGroups cleanup
@@ -390,19 +390,19 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 13a: JoinGroup 0x0300
             self.step("13a")
             await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(
-                groupID=groupID3, endpoints=[groups_endpoint], keySetID=keySetID1))
+                groupID=groupId0300, endpoints=[groups_endpoint], keySetID=keySetId01a3))
 
             # Step 13b: JoinGroup 0x0101
             self.step("13b")
             await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(
-                groupID=groupID1, endpoints=[groups_endpoint], keySetID=keySetID2))
+                groupID=groupId0101, endpoints=[groups_endpoint], keySetID=keySetId01a4))
 
             # Step 14: Read Membership
             self.step("14")
             membership = await self.read_single_attribute_check_success(cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership, endpoint=0)
             group_ids = [entry.groupID for entry in membership]
-            asserts.assert_in(groupID3, group_ids, "GroupID 0x0300 not found in Membership")
-            asserts.assert_in(groupID1, group_ids, "GroupID 0x0101 not found in Membership")
+            asserts.assert_in(groupId0300, group_ids, "GroupID 0x0300 not found in Membership")
+            asserts.assert_in(groupId0101, group_ids, "GroupID 0x0101 not found in Membership")
 
             # Step 15a: Subscribe to GroupcastTesting events on the RootNode.
             self.step("15a")
@@ -430,13 +430,13 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 16a: Send the operate-only command as a group command to GroupID 0x0101.
             self.step("16a")
-            dev_ctrl.SendGroupCommand(groupID1, operate_only_command.command_object())
+            dev_ctrl.SendGroupCommand(groupId0101, operate_only_command.command_object())
 
             # Step 16b: Validate the DUT received the group command via the GroupcastTesting event.
             self.step("16b")
             event_data = event_sub.wait_for_event_report(
                 Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
-            asserts.assert_equal(event_data.groupID, groupID1, "Incorrect group ID in GroupcastTesting event")
+            asserts.assert_equal(event_data.groupID, groupId0101, "Incorrect group ID in GroupcastTesting event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult,
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
@@ -445,15 +445,15 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 16c: Update GroupKeyMap to map 0x0102 to 0x01a4, maintaining 0x0300 to 0x01a3
             self.step("16c")
             mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
             # Step 16d: Send the operate-only command as a group command to GroupID 0x0101.
             self.step("16d")
-            dev_ctrl.SendGroupCommand(groupID1, operate_only_command.command_object())
+            dev_ctrl.SendGroupCommand(groupId0101, operate_only_command.command_object())
 
             # Step 16e: Validate the DUT rejected the group command via the GroupcastTesting event.
             self.step("16e")
@@ -470,15 +470,15 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 16f: Update GroupKeyMap to map 0x0101 to 0x01a4, maintaining 0x0300 to 0x01a3
             self.step("16f")
             mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
             # Step 16g: Send the operate-only command as a group command to GroupID 0x0102.
             self.step("16g")
-            dev_ctrl.SendGroupCommand(groupID2, operate_only_command.command_object())
+            dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
 
             # Step 16h: Validate the DUT rejected the group command via the GroupcastTesting event.
             self.step("16h")
@@ -495,22 +495,22 @@ class TC_SC_5_2(MatterBaseTest):
             # Step 16i: Update GroupKeyMap to include 0x0101->0x01a4, 0x0102->0x01a4, 0x0300->0x01a3
             self.step("16i")
             mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID2),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID2),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
+                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
             ]
             result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
             # Step 16j: Send the operate-only command as a group command to GroupID 0x0102.
             self.step("16j")
-            dev_ctrl.SendGroupCommand(groupID2, operate_only_command.command_object())
+            dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
 
             # Step 16k: Validate the DUT received the group command via the GroupcastTesting event.
             self.step("16k")
             event_data = event_sub.wait_for_event_report(
                 Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
-            asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in GroupcastTesting event")
+            asserts.assert_equal(event_data.groupID, groupId0102, "Incorrect group ID in GroupcastTesting event")
             asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
                                 f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
             asserts.assert_equal(event_data.groupcastTestResult,
@@ -524,11 +524,11 @@ class TC_SC_5_2(MatterBaseTest):
 
         # Step 17a: KeySetRemove 0x01a3
         self.step("17a")
-        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(keySetID1))
+        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(keySetId01a3))
 
         # Step 17b: KeySetRemove 0x01a4
         self.step("17b")
-        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(keySetID2))
+        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(keySetId01a4))
 
         # Step 18: Restore ACL
         self.step("18")
