@@ -18,6 +18,7 @@
 #include "ThermostatClusterPresets.h"
 #include "ThermostatCluster.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -116,18 +117,22 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
 
 /**
  * @brief Finds and returns an entry in the Presets attribute list that matches
- *        a preset, if such an entry exists. The presetToMatch must have a preset handle.
+ *        the given preset handle, if such an entry exists.
  *
  * @param[in] delegate The delegate to use.
- * @param[in] presetToMatch The preset to match with.
- * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as the presetToMatch.
+ * @param[in] presetHandle The preset handle to match against entries in the Presets attribute list.
+ * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as @p presetHandle.
+ *                            Only valid if @p found is set to true.
+ * @param[out] found Set to true if a matching preset was found; set to false if no matching preset exists.
  *
- * @return true if a matching entry was found in the  presets attribute list, false otherwise.
+ * @return CHIP_NO_ERROR if the lookup completed (regardless of whether a matching preset was found);
+ *         otherwise an appropriate error code.
  */
-bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
-                                PresetStructWithOwnedMembers & matchingPreset)
+CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & presetHandle,
+                                      PresetStructWithOwnedMembers & matchingPreset, bool & found)
 {
-    VerifyOrReturnValue(delegate != nullptr, false);
+    found = false;
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     for (uint8_t i = 0; true; i++)
     {
@@ -140,16 +145,18 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<B
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "GetMatchingPresetInPresets: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
-            return false;
+            return err;
         }
 
-        // Note: presets coming from our delegate always have a handle.
-        if (presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
+        // Treat presets with a null handle as non-matching.
+        auto presetHandleFromPreset = matchingPreset.GetPresetHandle();
+        if (!presetHandleFromPreset.IsNull() && presetHandle.data_equal(presetHandleFromPreset.Value()))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -302,10 +309,44 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         return Status::InvalidInState;
     }
 
-    // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(delegate, presetHandle.Value()))
+    if (!presetHandle.IsNull())
     {
-        return Status::InvalidCommand;
+        PresetStructWithOwnedMembers matchingPreset;
+        bool found           = false;
+        CHIP_ERROR lookupErr = GetMatchingPresetInPresets(delegate, presetHandle.Value(), matchingPreset, found);
+        if (lookupErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to lookup preset with error %" CHIP_ERROR_FORMAT, lookupErr.Format());
+            return StatusIB(lookupErr).mStatus;
+        }
+        if (!found)
+        {
+            return Status::InvalidCommand;
+        }
+
+        Optional<int16_t> coolingSetpointValue = matchingPreset.GetCoolingSetpoint();
+        if (coolingSetpointValue.HasValue())
+        {
+            int16_t constrainedCoolingSetpoint = EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint);
+            Status status                      = OccupiedCoolingSetpoint::Set(endpoint, constrainedCoolingSetpoint);
+            if (status != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set OccupiedCoolingSetpoint with status %u", to_underlying(status));
+                return status;
+            }
+        }
+
+        Optional<int16_t> heatingSetpointValue = matchingPreset.GetHeatingSetpoint();
+        if (heatingSetpointValue.HasValue())
+        {
+            int16_t constrainedHeatingSetpoint = EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint);
+            Status status                      = OccupiedHeatingSetpoint::Set(endpoint, constrainedHeatingSetpoint);
+            if (status != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set OccupiedHeatingSetpoint with status %u", to_underlying(status));
+                return status;
+            }
+        }
     }
 
     CHIP_ERROR err = delegate->SetActivePresetHandle(presetHandle);
@@ -341,7 +382,13 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         // Per spec we need to check that:
         // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        if (!GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset))
+        bool found           = false;
+        CHIP_ERROR lookupErr = GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset, found);
+        if (lookupErr != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+        }
+        if (!found)
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
