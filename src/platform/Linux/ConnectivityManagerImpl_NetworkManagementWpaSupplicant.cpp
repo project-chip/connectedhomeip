@@ -1118,45 +1118,24 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
-    constexpr size_t bssIdSize = 6;
-    static_assert(kMaxHardwareAddrSize >= bssIdSize, "We are assuming we can fit a BSSID in a buffer of size kMaxHardwareAddrSize");
-    VerifyOrReturnError(value.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    WiFiScanResponse bssInfo;
+    static_assert(kMaxHardwareAddrSize >= sizeof(bssInfo.bssid),
+                  "We are assuming we can fit a BSSID in a buffer of size kMaxHardwareAddrSize");
+    VerifyOrReturnError(value.size() >= sizeof(bssInfo.bssid), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    // On Linux simulation, we don't have the DBus API to get the BSSID of connected AP. Use mac address
-    // of local WiFi network card instead.
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        // Walk through linked list, maintaining head pointer so we can free list later.
-        for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-        {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kWiFi)
-            {
-                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, value.data(), kMaxHardwareAddrSize) !=
-                    CHIP_NO_ERROR)
-                {
-                    ChipLogError(DeviceLayer, "Failed to get WiFi network hardware address");
-                }
-                else
-                {
-                    // Set 48-bit IEEE MAC Address
-                    value.reduce_size(bssIdSize);
-                    err = CHIP_NO_ERROR;
-                    break;
-                }
-            }
-        }
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
-        freeifaddrs(ifaddr);
-    }
+    const char * bssPath = wpa_supplicant_1_interface_get_current_bss(mWpaSupplicant.iface.get());
+    VerifyOrReturnError(bssPath != nullptr && strcmp(bssPath, "/") != 0, CHIP_ERROR_INCORRECT_STATE);
 
-    return err;
+    ReturnErrorOnFailure(_GetBssInfo(bssPath, bssInfo));
+
+    memcpy(value.data(), bssInfo.bssid, sizeof(bssInfo.bssid));
+    value.reduce_size(sizeof(bssInfo.bssid));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & securityType)
@@ -1385,7 +1364,7 @@ std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
 
 } // namespace
 
-bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result)
+CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result)
 {
     // This function can be called without g_main_context_get_thread_default() being set.
     // The BSS proxy object is created in a synchronous manner, so the D-Bus call will be
@@ -1395,32 +1374,27 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     GAutoPtr<GError> err;
     GAutoPtr<WpaSupplicant1BSS> bss(wpa_supplicant_1_bss_proxy_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, bssPath, nullptr, &err.GetReceiver()));
+    VerifyOrReturnError(bss != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to create BSS proxy: %s", err->message));
 
-    if (bss == nullptr)
-    {
-        return false;
-    }
-
-    WpaSupplicant1BSSProxy * bssProxy = WPA_SUPPLICANT_1_BSS_PROXY(bss.get());
-
-    GAutoPtr<GVariant> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
-    GAutoPtr<GVariant> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
+    GVariant * ssid  = wpa_supplicant_1_bss_get_ssid(bss.get());
+    GVariant * bssid = wpa_supplicant_1_bss_get_bssid(bss.get());
 
     // Network scan is performed in the background, so the BSS
     // may be gone when we try to get the properties.
     if (ssid == nullptr || bssid == nullptr)
     {
         ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", StringOrNullMarker(bssPath));
-        return false;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     gsize ssidLen                = 0;
     gsize bssidLen               = 0;
     char bssidStr[2 * 6 + 5 + 1] = { 0 };
-    auto ssidStr      = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(uint8_t)));
-    auto bssidBuf     = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(uint8_t)));
-    gint16 signal     = wpa_supplicant_1_bss_get_signal(bss.get());
-    guint16 frequency = wpa_supplicant_1_bss_get_frequency(bss.get());
+    auto ssidStr                 = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(ssid, &ssidLen, sizeof(uint8_t)));
+    auto bssidBuf                = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(bssid, &bssidLen, sizeof(uint8_t)));
+    int16_t signal               = wpa_supplicant_1_bss_get_signal(bss.get());
+    uint16_t frequency           = wpa_supplicant_1_bss_get_frequency(bss.get());
 
     if (bssidLen == 6)
     {
@@ -1433,8 +1407,6 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
                      WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Got a network with incorrect BSSID len: %" G_GSIZE_FORMAT " != 6", bssidLen);
         bssidLen = 0;
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
-                  NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // Internal sentinel (bit 7). Not a real WiFiSecurityBitmap value; keeps an EAP-only
     // network from being reported as Open. Masked off before the result is returned.
@@ -1515,25 +1487,10 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
 
         return res;
     };
-    auto GetNetworkSecurityType =
-        [IsNetworkWPAPSK, IsNetworkWPA2PSK](
-            WpaSupplicant1BSSProxy * proxy) -> chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> {
-        GAutoPtr<GVariant> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "WPA"));
-        GAutoPtr<GVariant> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "RSN"));
-
-        chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> res(IsNetworkWPAPSK(wpa.get()),
-                                                                                    IsNetworkWPA2PSK(rsn.get()));
-        if (!res.HasAny())
-        {
-            res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kUnencrypted);
-        }
-        res.Clear(kEAP);
-        return res;
-    };
 
     // Drop the network if its SSID or BSSID is illegal.
-    VerifyOrReturnError(ssidLen <= kMaxWiFiSSIDLength, false);
-    VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
+    VerifyOrReturnError(ssidLen <= kMaxWiFiSSIDLength, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, CHIP_ERROR_INTERNAL);
     memcpy(result.ssid, ssidStr, ssidLen);
     memcpy(result.bssid, bssidBuf, bssidLen);
     result.ssidLen     = ssidLen;
@@ -1554,9 +1511,17 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);
     result.wiFiBand = bandInfo.first;
     result.channel  = bandInfo.second;
-    result.security = GetNetworkSecurityType(bssProxy);
 
-    return true;
+    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> networkSecurityType(
+        IsNetworkWPAPSK(wpa_supplicant_1_bss_get_wpa(bss.get())), IsNetworkWPA2PSK(wpa_supplicant_1_bss_get_rsn(bss.get())));
+    if (!networkSecurityType.HasAny())
+    {
+        networkSecurityType.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kUnencrypted);
+    }
+    networkSecurityType.Clear(kEAP);
+    result.security = networkSecurityType;
+
+    return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success)
@@ -1576,8 +1541,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     for (const char * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
-        if (_GetBssInfo(bssPath, network))
+        if (_GetBssInfo(bssPath, network) == CHIP_NO_ERROR)
         {
+            ChipLogDetail(DeviceLayer, "Network Found: %s (%02x:%02x:%02x:%02x:%02x:%02x) Signal: %d",
+                          NullTerminated(StringOrNullMarker((const char *) network.ssid), network.ssidLen).c_str(),
+                          network.bssid[0], network.bssid[1], network.bssid[2], network.bssid[3], network.bssid[4],
+                          network.bssid[5], network.signal.strength);
             if (mInterestedSSID.empty() ||
                 (network.ssidLen == mInterestedSSID.size() &&
                  memcmp(network.ssid, mInterestedSSID.data(), mInterestedSSID.size()) == 0))

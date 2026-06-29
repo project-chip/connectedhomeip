@@ -1,6 +1,6 @@
 # Matter Clusters Implementation Status (159 total)
 
-**Updated as of**: 2026-06-12 (Matter Specification SHA:
+**Updated as of**: 2026-06-25 (Matter Specification SHA:
 `5a31ae2acb487bea09286243ccb5ad4ca9d3ef08`)
 
 ## Discovery & Updating Methodology
@@ -51,7 +51,7 @@ To update or validate this list manually, follow these steps:
 | 5         | Activated Carbon Filter Monitoring                         | 114 (0x0072)  | Yes                | No                  | Alias of Resource Monitoring          |
 | 6         | Administrator Commissioning                                | 60 (0x003C)   | Yes                | Yes                 |                                       |
 | 7         | Air Quality                                                | 91 (0x005B)   | Yes                | Yes                 |                                       |
-| 8         | Ambient Context Sensing                                    | 1073 (0x0431) | No                 | No                  |                                       |
+| 8         | Ambient Context Sensing                                    | 1073 (0x0431) | Yes                | No                  |                                       |
 | 9         | Ambient Sensing Union                                      | 1074 (0x0432) | No                 | No                  |                                       |
 | 10        | Application Basic                                          | 1293 (0x050D) | No                 | No                  |                                       |
 | 11        | Application Launcher                                       | 1292 (0x050C) | No                 | No                  |                                       |
@@ -59,7 +59,7 @@ To update or validate this list manually, follow these steps:
 | 13        | Audio Output                                               | 1291 (0x050B) | No                 | No                  |                                       |
 | 14        | Ballast Configuration                                      | 769 (0x0301)  | No                 | No                  |                                       |
 | 15        | Basic Information                                          | 40 (0x0028)   | Yes                | Yes                 |                                       |
-| 16        | Binding                                                    | 30 (0x001E)   | Yes                | No                  |                                       |
+| 16        | Binding                                                    | 30 (0x001E)   | Yes                | Yes                 |                                       |
 | 17        | Boolean State                                              | 69 (0x0045)   | Yes                | Yes                 |                                       |
 | 18        | Boolean State Configuration                                | 128 (0x0080)  | Yes                | No                  |                                       |
 | 19        | Bridged Device Basic Information                           | 57 (0x0039)   | Yes                | Yes                 |                                       |
@@ -82,11 +82,11 @@ To update or validate this list manually, follow these steps:
 | 36        | Content Launcher                                           | 1290 (0x050A) | No                 | No                  |                                       |
 | 37        | Demand Response Load Control                               | 150 (0x0096)  | No                 | No                  |                                       |
 | 38        | Descriptor                                                 | 29 (0x001D)   | Yes                | Yes                 |                                       |
-| 39        | Device Energy Management                                   | 152 (0x0098)  | Yes                | No                  |                                       |
-| 40        | Device Energy Management Mode                              | 159 (0x009F)  | No                 | No                  | Instance of Mode Base                 |
+| 39        | Device Energy Management                                   | 152 (0x0098)  | Yes                | Yes                 |                                       |
+| 40        | Device Energy Management Mode                              | 159 (0x009F)  | Yes                | No                  | Instance of Mode Base                 |
 | 41        | Diagnostic Logs                                            | 50 (0x0032)   | Yes                | No                  |                                       |
 | 42        | Dishwasher Alarm                                           | 93 (0x005D)   | No                 | No                  |                                       |
-| 43        | Dishwasher Mode                                            | 89 (0x0059)   | No                 | No                  | Instance of Mode Base                 |
+| 43        | Dishwasher Mode                                            | 89 (0x0059)   | Yes                | No                  | Instance of Mode Base                 |
 | 44        | Door Lock                                                  | 257 (0x0101)  | No                 | No                  |                                       |
 | 45        | Dynamic Lighting                                           | 773 (0x0305)  | No                 | No                  |                                       |
 | 46        | Ecosystem Information                                      | 1872 (0x0750) | No                 | No                  |                                       |
@@ -97,7 +97,7 @@ To update or validate this list manually, follow these steps:
 | 51        | Electrical Power Measurement                               | 144 (0x0090)  | Yes                | No                  |                                       |
 | 52        | Electrical Protection Alarm                                | 163 (0x00A3)  | No                 | No                  |                                       |
 | 53        | Energy EVSE                                                | 153 (0x0099)  | Yes                | No                  |                                       |
-| 54        | Energy EVSE Mode                                           | 157 (0x009D)  | No                 | No                  | Instance of Mode Base                 |
+| 54        | Energy EVSE Mode                                           | 157 (0x009D)  | Yes                | No                  | Instance of Mode Base                 |
 | 55        | Energy Preference                                          | 155 (0x009B)  | No                 | No                  |                                       |
 | 56        | Ethernet Network Diagnostics                               | 55 (0x0037)   | Yes                | No                  |                                       |
 | 57        | Fan Control                                                | 514 (0x0202)  | Yes                | Yes                 |                                       |
@@ -119,7 +119,7 @@ To update or validate this list manually, follow these steps:
 | 73        | Keypad Input                                               | 1289 (0x0509) | No                 | No                  |                                       |
 | 74        | Laundry Dryer Controls                                     | 74 (0x004A)   | No                 | No                  |                                       |
 | 75        | Laundry Washer Controls                                    | 83 (0x0053)   | No                 | No                  |                                       |
-| 76        | Laundry Washer Mode                                        | 81 (0x0051)   | No                 | No                  | Instance of Mode Base                 |
+| 76        | Laundry Washer Mode                                        | 81 (0x0051)   | Yes                | No                  | Instance of Mode Base                 |
 | 77        | Leaf Wetness Measurement                                   | 1031 (0x0407) | No                 | No                  |                                       |
 | 78        | Level Control                                              | 8 (0x0008)    | Yes                | Yes                 |                                       |
 | 79        | Localization Configuration                                 | 43 (0x002B)   | Yes                | No                  |                                       |
@@ -130,7 +130,7 @@ To update or validate this list manually, follow these steps:
 | 84        | Messages                                                   | 151 (0x0097)  | No                 | No                  |                                       |
 | 85        | Meter Identification                                       | 2822 (0x0B06) | No                 | No                  |                                       |
 | 86        | Microwave Oven Control                                     | 95 (0x005F)   | Yes                | No                  |                                       |
-| 87        | Microwave Oven Mode                                        | 94 (0x005E)   | No                 | No                  | Instance of Mode Base                 |
+| 87        | Microwave Oven Mode                                        | 94 (0x005E)   | Yes                | No                  | Instance of Mode Base                 |
 | 88        | Mode Select                                                | 80 (0x0050)   | No                 | No                  |                                       |
 | 89        | Network Commissioning                                      | 49 (0x0031)   | Yes                | Yes                 |                                       |
 | 90        | Network Identity Management                                | 1104 (0x0450) | Yes                | No                  |                                       |
@@ -140,9 +140,9 @@ To update or validate this list manually, follow these steps:
 | 94        | Occupancy Sensing                                          | 1030 (0x0406) | Yes                | Yes                 |                                       |
 | 95        | On/Off                                                     | 6 (0x0006)    | Yes                | Yes                 |                                       |
 | 96        | Operational Credentials                                    | 62 (0x003E)   | Yes                | Yes                 |                                       |
-| 97        | Operational State                                          | 96 (0x0060)   | No                 | No                  |                                       |
-| 98        | Oven Cavity Operational State                              | 72 (0x0048)   | No                 | No                  |                                       |
-| 99        | Oven Mode                                                  | 73 (0x0049)   | No                 | No                  | Instance of Mode Base                 |
+| 97        | Operational State                                          | 96 (0x0060)   | Yes                | No                  |                                       |
+| 98        | Oven Cavity Operational State                              | 72 (0x0048)   | Yes                | No                  |                                       |
+| 99        | Oven Mode                                                  | 73 (0x0049)   | Yes                | No                  | Instance of Mode Base                 |
 | 100       | Ozone Concentration Measurement                            | 1045 (0x0415) | Yes                | Yes                 | Instance of Concentration Measurement |
 | 101       | PM1 Concentration Measurement                              | 1068 (0x042C) | Yes                | Yes                 | Instance of Concentration Measurement |
 | 102       | PM10 Concentration Measurement                             | 1069 (0x042D) | Yes                | Yes                 | Instance of Concentration Measurement |
@@ -157,12 +157,12 @@ To update or validate this list manually, follow these steps:
 | 111       | Pulse Width Modulation                                     | 28 (0x001C)   | No                 | No                  |                                       |
 | 112       | Pump Configuration and Control                             | 512 (0x0200)  | No                 | No                  |                                       |
 | 113       | Push AV Stream Transport                                   | 1365 (0x0555) | Yes                | No                  |                                       |
-| 114       | RVC Clean Mode                                             | 85 (0x0055)   | No                 | No                  | Instance of Mode Base                 |
-| 115       | RVC Operational State                                      | 97 (0x0061)   | No                 | No                  |                                       |
-| 116       | RVC Run Mode                                               | 84 (0x0054)   | No                 | No                  | Instance of Mode Base                 |
+| 114       | RVC Clean Mode                                             | 85 (0x0055)   | Yes                | No                  | Instance of Mode Base                 |
+| 115       | RVC Operational State                                      | 97 (0x0061)   | Yes                | No                  |                                       |
+| 116       | RVC Run Mode                                               | 84 (0x0054)   | Yes                | No                  | Instance of Mode Base                 |
 | 117       | Radon Concentration Measurement                            | 1071 (0x042F) | Yes                | Yes                 | Instance of Concentration Measurement |
 | 118       | Refrigerator Alarm                                         | 87 (0x0057)   | No                 | No                  |                                       |
-| 119       | Refrigerator And Temperature Controlled Cabinet Mode       | 82 (0x0052)   | No                 | No                  | Instance of Mode Base                 |
+| 119       | Refrigerator And Temperature Controlled Cabinet Mode       | 82 (0x0052)   | Yes                | No                  | Instance of Mode Base                 |
 | 120       | Relative Humidity Measurement                              | 1029 (0x0405) | Yes                | Yes                 |                                       |
 | 121       | Scenes                                                     | 5 (0x0005)    | No                 | No                  |                                       |
 | 122       | Scenes Management                                          | 98 (0x0062)   | Yes                | Yes                 |                                       |
@@ -171,16 +171,16 @@ To update or validate this list manually, follow these steps:
 | 125       | Software Diagnostics                                       | 52 (0x0034)   | Yes                | Yes                 |                                       |
 | 126       | Soil Measurement                                           | 1072 (0x0430) | Yes                | Yes                 |                                       |
 | 127       | Soil Moisture Measurement                                  | 1032 (0x0408) | No                 | No                  |                                       |
-| 128       | Switch                                                     | 59 (0x003B)   | Yes                | No                  |                                       |
+| 128       | Switch                                                     | 59 (0x003B)   | Yes                | Yes                 |                                       |
 | 129       | TLS Certificate Management                                 | 2049 (0x0801) | Yes                | No                  |                                       |
 | 130       | TLS Client Management                                      | 2050 (0x0802) | Yes                | No                  |                                       |
 | 131       | Target Navigator                                           | 1285 (0x0505) | No                 | No                  |                                       |
 | 132       | Temperature Alarm                                          | 100 (0x0064)  | No                 | No                  |                                       |
-| 133       | Temperature Control                                        | 86 (0x0056)   | Yes                | No                  |                                       |
+| 133       | Temperature Control                                        | 86 (0x0056)   | Yes                | Yes                 |                                       |
 | 134       | Temperature Controlled Cabinet Topology                    | 75 (0x004B)   | No                 | No                  |                                       |
 | 135       | Temperature Measurement                                    | 1026 (0x0402) | Yes                | Yes                 |                                       |
 | 136       | Thermostat                                                 | 513 (0x0201)  | No                 | No                  |                                       |
-| 137       | Thermostat Mode                                            | 99 (0x0063)   | No                 | No                  | Instance of Mode Base                 |
+| 137       | Thermostat Mode                                            | 99 (0x0063)   | Yes                | No                  | Instance of Mode Base                 |
 | 138       | Thermostat User Interface Configuration                    | 516 (0x0204)  | No                 | No                  |                                       |
 | 139       | Thread Border Router Diagnostics                           | 1108 (0x0454) | No                 | No                  |                                       |
 | 140       | Thread Border Router Management                            | 1106 (0x0452) | Yes                | Yes                 |                                       |
@@ -192,10 +192,10 @@ To update or validate this list manually, follow these steps:
 | 146       | Unit Localization                                          | 45 (0x002D)   | Yes                | No                  |                                       |
 | 147       | User Label                                                 | 65 (0x0041)   | Yes                | No                  |                                       |
 | 148       | Valid Proxies                                              | 68 (0x0044)   | No                 | No                  |                                       |
-| 149       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | No                  |                                       |
+| 149       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | Yes                 | Water Valve                           |
 | 150       | Wake On LAN                                                | 1283 (0x0503) | No                 | No                  |                                       |
 | 151       | Water Heater Management                                    | 148 (0x0094)  | Yes                | No                  |                                       |
-| 152       | Water Heater Mode                                          | 158 (0x009E)  | No                 | No                  | Instance of Mode Base                 |
+| 152       | Water Heater Mode                                          | 158 (0x009E)  | Yes                | No                  | Instance of Mode Base                 |
 | 153       | Water Tank Level Monitoring                                | 121 (0x0079)  | Yes                | No                  | Alias of Resource Monitoring          |
 | 154       | WebRTC Transport Provider                                  | 1363 (0x0553) | Yes                | No                  |                                       |
 | 155       | WebRTC Transport Requestor                                 | 1364 (0x0554) | Yes                | No                  |                                       |
@@ -203,4 +203,4 @@ To update or validate this list manually, follow these steps:
 | 157       | Wi-Fi Network Management                                   | 1105 (0x0451) | Yes                | Yes                 |                                       |
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
-| **Total** | **159**                                                    |               | **86**             | **46**              |                                       |
+| **Total** | **159**                                                    |               | **101**            | **51**              |                                       |

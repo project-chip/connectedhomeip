@@ -13,21 +13,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-static_library("on-off-light") {
+source_set("on-off-light") {
   sources = [
-    "LoggingOnOffLightDevice.cpp",
-    "LoggingOnOffLightDevice.h",
+    "OnOffLightDevice.cpp",
+    "OnOffLightDevice.h",
   ]
 
-  public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
-    "${chip_root}/src/app/clusters/groups-server",
-    "${chip_root}/src/app/clusters/identify-server",
-    "${chip_root}/src/app/clusters/on-off-server",
-    "${chip_root}/src/app/clusters/scenes-server",
-    "${chip_root}/zzz_generated/app-common/devices",
-  ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/capabilities/on-off-load" ]
 }
