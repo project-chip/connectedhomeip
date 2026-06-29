@@ -820,6 +820,24 @@ esp32:
         self.assertEqual(unresolved[0]["author"], "system")
         self.assertIn("Too many review threads", unresolved[0]["body_preview"])
 
+    @patch("urllib.request.urlopen")
+    def test_get_unresolved_threads_malformed_graphql_response(self, mock_urlopen: MagicMock) -> None:
+        """Tests that _get_unresolved_threads raises RuntimeError if the JSON payload is missing key data structures."""
+        import json
+        mock_response = MagicMock()
+        mock_response.read.return_value = json.dumps({
+            "data": {
+                "repository": {}
+            }
+        }).encode("utf-8")
+        mock_urlopen.return_value.__enter__.return_value = mock_response
+
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", [], [])
+        with self.assertRaises(RuntimeError) as ctx:
+            PlatformMergeBot._get_unresolved_threads(self.bot, mock_pr)
+
+        self.assertIn("missing PR repository/pullRequest data", str(ctx.exception))
+
 
 if __name__ == "__main__":
     unittest.main()

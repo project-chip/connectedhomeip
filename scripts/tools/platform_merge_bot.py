@@ -25,6 +25,7 @@ import coloredlogs
 import pathspec
 import yaml
 from github import Github, GithubException
+from github.Commit import Commit
 from github.PullRequest import PullRequest
 
 log = logging.getLogger(__name__)
@@ -252,17 +253,7 @@ class PlatformMergeBot:
                 log.info("PR #%d is a draft. Skipping.", pr.number)
                 return
 
-        if (
-            ValidationCheck.PULLAPPROVE not in self.skip_checks
-            and self._is_pullapprove_green(pr)
-        ):
-            log.info(
-                "PR #%d has a successful pullapprove check. Skipping bot merge (standard flow applies).",
-                pr.number,
-            )
-            self.remove_eligibility_comment(pr)
-            return
-
+        # Perform file analysis first (saves API calls for ineligible PRs)
         matched_files, uncovered_files = self.analyze_pr_files(pr)
 
         if uncovered_files:
@@ -286,6 +277,20 @@ class PlatformMergeBot:
             pr.number,
             list(active_groups.keys()),
         )
+
+        # Get the commit object once for subsequent status/CI checks
+        commit = self.repo.get_commit(sha=pr.head.sha)
+
+        if (
+            ValidationCheck.PULLAPPROVE not in self.skip_checks
+            and self._is_pullapprove_green(commit)
+        ):
+            log.info(
+                "PR #%d has a successful pullapprove check. Skipping bot merge (standard flow applies).",
+                pr.number,
+            )
+            self.remove_eligibility_comment(pr)
+            return
 
         # Get current approvals and change requests
         approvers, change_requesters = self.get_pr_review_states(pr)
@@ -325,7 +330,7 @@ class PlatformMergeBot:
 
         ci_passed = True
         if ValidationCheck.CI not in self.skip_checks:
-            ci_passed = self._has_ci_passed(pr)
+            ci_passed = self._has_ci_passed(pr, commit)
 
         is_ready = not missing_approvals and not unresolved_threads and ci_passed
 
@@ -345,9 +350,8 @@ class PlatformMergeBot:
         )
         self.merge_pr(pr, valid_approvals_per_group)
 
-    def _is_pullapprove_green(self, pr: PullRequest) -> bool:
+    def _is_pullapprove_green(self, commit: Commit) -> bool:
         """Returns True if the pullapprove check exists and is in the 'success' state."""
-        commit = self.repo.get_commit(sha=pr.head.sha)
         combined_status = commit.get_combined_status()
         for status in combined_status.statuses:
             if status.context == "pullapprove":
@@ -405,9 +409,16 @@ class PlatformMergeBot:
                         f"GraphQL API returned errors: {res_data['errors']}"
                     )
 
-                threads_data = res_data["data"]["repository"]["pullRequest"][
-                    "reviewThreads"
-                ]
+                data = res_data.get("data")
+                if (
+                    not data
+                    or not data.get("repository")
+                    or not data["repository"].get("pullRequest")
+                ):
+                    raise RuntimeError(
+                        f"GraphQL response missing PR repository/pullRequest data: {res_data}"
+                    )
+                threads_data = data["repository"]["pullRequest"]["reviewThreads"]
                 if threads_data["pageInfo"]["hasNextPage"]:
                     log.warning(
                         "PR #%d has more than 100 review threads. Gating merge to be safe.",
@@ -459,10 +470,8 @@ class PlatformMergeBot:
 
         return unresolved
 
-    def _has_ci_passed(self, pr: PullRequest) -> bool:
+    def _has_ci_passed(self, pr: PullRequest, commit: Commit) -> bool:
         """Checks if all CI checks (combined status and check runs) have passed on the PR's latest commit."""
-        commit = self.repo.get_commit(sha=pr.head.sha)
-
         combined_status = commit.get_combined_status()
         # pullapprove is ignored because it delegates normal PR approvals. Since this
         # bot bypasses standard reviews for platform-restricted changes, PullApprove
@@ -619,6 +628,8 @@ class PlatformMergeBot:
 
     def remove_eligibility_comment(self, pr: PullRequest) -> None:
         """Removes the eligibility comment if it exists on the PR."""
+        if pr.comments == 0:
+            return
         for comment in self._find_bot_comments(pr):
             if self.dry_run:
                 log.info(
