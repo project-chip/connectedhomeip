@@ -134,6 +134,10 @@ public:
     // DataModel::AttributeChangeListener implementation
     void OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type) override;
     void OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type) override;
+    void UpdateListenerConfiguration(const DataModel::AttributeChangeListenerConfiguration & config) override
+    {
+        ChipLogError(DataManagement, "UpdateListenerConfiguration not implemented on reporting::Engine");
+    }
 
 private:
     /**

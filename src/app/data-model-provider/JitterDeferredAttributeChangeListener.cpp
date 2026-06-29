@@ -81,6 +81,26 @@ void JitterDeferredAttributeChangeListener::FlushDirtyPaths()
 void JitterDeferredAttributeChangeListener::TimerFired()
 {
     FlushDirtyPaths();
+    mDeferAttributePathBaseTimeoutMs   = kDefaultDeferAttributePathBaseTimeoutMs;
+    mDeferAttributePathJitterTimeoutMs = kDefaultDeferAttributePathJitterTimeoutMs;
+}
+
+void JitterDeferredAttributeChangeListener::UpdateListenerConfiguration(const AttributeChangeListenerConfiguration & config)
+{
+    if (config.delay.has_value())
+    {
+        uint32_t delay = config.delay.value();
+        mDeferAttributePathBaseTimeoutMs   = (uint16_t) (delay >> 16);
+        mDeferAttributePathJitterTimeoutMs = (uint16_t) (delay & 0xFFFF);
+
+        if (mTimer.IsTimerActive(this))
+        {
+            mTimer.CancelTimer(this);
+            uint32_t jitterMs =
+                (mDeferAttributePathJitterTimeoutMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterTimeoutMs;
+            (void) mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathBaseTimeoutMs + jitterMs));
+        }
+    }
 }
 
 } // namespace DataModel

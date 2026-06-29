@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <optional>
 
 namespace chip::app::DataModel {
 
@@ -57,6 +58,11 @@ enum class EndpointChangeType
     kRemoved,
 };
 
+struct AttributeChangeListenerConfiguration
+{
+    std::optional<uint32_t> delay;
+};
+
 /// Interface for components wishing to be notified of attribute changes.
 ///
 /// Implement this interface to receive callbacks when attributes are modified
@@ -90,6 +96,9 @@ public:
     /// Called when an endpoint's structure or composition changes
     /// (e.g., clusters added/removed, or for bridged device changes).
     virtual void OnEndpointChanged(EndpointId endpointId, EndpointChangeType type) {}
+
+    /// Update the listener configuration dynamically.
+    virtual void UpdateListenerConfiguration(const AttributeChangeListenerConfiguration & config) {}
 
     AttributeChangeListener * GetNextAttributeChangeListener() const { return mNextAttributeChange; }
     void SetNextAttributeChangeListener(AttributeChangeListener * next) { mNextAttributeChange = next; }

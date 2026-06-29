@@ -38,19 +38,19 @@ class JitterDeferredAttributeChangeListener : public AttributeChangeListener, pu
 {
 public:
     static constexpr uint32_t kMaxAttributePathsBufferSize       = 10;
-    static constexpr uint32_t kDeferAttributePathBaseTimeoutMs   = 1000;
-    static constexpr uint32_t kDeferAttributePathJitterTimeoutMs = 1000;
+    static constexpr uint16_t kDefaultDeferAttributePathBaseTimeoutMs   = 200;
+    static constexpr uint16_t kDefaultDeferAttributePathJitterTimeoutMs = 500;
 
     JitterDeferredAttributeChangeListener(AttributeChangeListener * aUnderlyingListener, TimerDelegate & aTimer,
-                                          uint32_t aDeferAttributePathBaseTimeoutMs, uint32_t aDeferAttributePathJitterTimeoutMs) :
+                                          uint16_t aDeferAttributePathBaseTimeoutMs, uint16_t aDeferAttributePathJitterTimeoutMs) :
         mUnderlyingListener(aUnderlyingListener),
         mTimer(aTimer), mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
         mDeferAttributePathJitterTimeoutMs(aDeferAttributePathJitterTimeoutMs)
     {}
 
     JitterDeferredAttributeChangeListener(AttributeChangeListener * aUnderlyingListener, TimerDelegate & aTimer) :
-        JitterDeferredAttributeChangeListener(aUnderlyingListener, aTimer, kDeferAttributePathBaseTimeoutMs,
-                                              kDeferAttributePathJitterTimeoutMs)
+        JitterDeferredAttributeChangeListener(aUnderlyingListener, aTimer, kDefaultDeferAttributePathBaseTimeoutMs,
+                                              kDefaultDeferAttributePathJitterTimeoutMs)
     {}
 
     void SetUnderlyingListener(AttributeChangeListener * listener) { mUnderlyingListener = listener; }
@@ -58,14 +58,15 @@ public:
     void OnAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type) override;
     void OnEndpointChanged(EndpointId endpointId, EndpointChangeType type) override;
     void TimerFired() override;
+    void UpdateListenerConfiguration(const AttributeChangeListenerConfiguration & config) override;
 
 private:
     void FlushDirtyPaths();
 
     AttributeChangeListener * mUnderlyingListener;
     TimerDelegate & mTimer;
-    uint32_t mDeferAttributePathBaseTimeoutMs;
-    uint32_t mDeferAttributePathJitterTimeoutMs;
+    uint16_t mDeferAttributePathBaseTimeoutMs;
+    uint16_t mDeferAttributePathJitterTimeoutMs;
     std::array<ConcreteAttributePath, kMaxAttributePathsBufferSize> mAttributePaths;
     uint32_t mCurrentIndex = 0;
 };

@@ -129,4 +129,26 @@ TEST_F(TestJitterDeferredAttributeChangeListener, TestBufferFullFlush)
     EXPECT_EQ(underlyingListener.mPaths.back(), kOverflowPath);
 }
 
+TEST_F(TestJitterDeferredAttributeChangeListener, TestUpdateListenerConfiguration)
+{
+    MockAttributeChangeListener underlyingListener;
+    JitterDeferredAttributeChangeListener jitteryListener(&underlyingListener, mMockTimerDelegate, kBaseTimeoutMs, 0);
+
+    jitteryListener.OnAttributeChanged(kTestPaths[0], AttributeChangeType::kReportable);
+
+    // Verify configuration updates dynamically
+    AttributeChangeListenerConfiguration newConfig;
+    newConfig.delay = (5000 << 16) | 0;
+    jitteryListener.UpdateListenerConfiguration(newConfig);
+
+    // Advance clock past original timeout of 1000ms. It shouldn't trigger since the new timeout is 5000ms.
+    mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(1500));
+    EXPECT_EQ(underlyingListener.mPaths.size(), 0u);
+
+    // Advance past the new 5000ms timeout (cumulative 6500ms since start).
+    mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(5000));
+    EXPECT_EQ(underlyingListener.mPaths.size(), 1u);
+    EXPECT_EQ(underlyingListener.mPaths[0], kTestPaths[0]);
+}
+
 } // namespace
