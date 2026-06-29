@@ -266,7 +266,8 @@ def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
                 targets.append(TestTarget(
                     name=item['name'],
                     command=item['app'],
-                    arguments=item.get('args', [])
+                    arguments=item.get('args', []),
+                    test_arguments=item.get('test_args', [])
                 ))
 
     # default to a 'standard app name' if nothing set in the yaml file

@@ -50,6 +50,9 @@ NetworkInfrastructureManagerDevice::~NetworkInfrastructureManagerDevice()
 CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                         EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // 1. Thread Border Router Management
@@ -73,7 +76,9 @@ CHIP_ERROR NetworkInfrastructureManagerDevice::Register(chip::EndpointId endpoin
                                             mThreadDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void NetworkInfrastructureManagerDevice::Unregister(CodeDrivenDataModelProvider & provider)

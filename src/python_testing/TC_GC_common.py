@@ -20,6 +20,8 @@ import logging
 from dataclasses import dataclass
 from typing import Optional
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -29,6 +31,55 @@ from matter.testing.matter_testing import AttributeMatcher
 from matter.testing.spec_parsing import build_xml_clusters, dm_from_spec_version
 
 logger = logging.getLogger(__name__)
+
+GROUP_EPOCH_KEY_LENGTH_BYTES = 16
+_GROUP_KEY_V1_INFO = b"GroupKey v1.0"
+_GROUP_KEY_HASH_INFO = b"GroupKeyHash"
+
+
+def derive_group_operational_key(epoch_key: bytes, compressed_fabric_id: bytes) -> bytes:
+    """Derive the operational group encryption key from an epoch key and compressed fabric ID."""
+    asserts.assert_equal(len(epoch_key), GROUP_EPOCH_KEY_LENGTH_BYTES,
+                         "Epoch key must be 16 bytes")
+    asserts.assert_equal(len(compressed_fabric_id), 8,
+                         "Compressed fabric ID must be 8 bytes")
+    return HKDF(
+        algorithm=hashes.SHA256(),
+        length=GROUP_EPOCH_KEY_LENGTH_BYTES,
+        salt=compressed_fabric_id,
+        info=_GROUP_KEY_V1_INFO,
+    ).derive(epoch_key)
+
+
+def derive_group_session_id(epoch_key: bytes, compressed_fabric_id: bytes) -> int:
+    """Derive the 16-bit Group Session ID for an epoch key on a fabric."""
+    operational_key = derive_group_operational_key(epoch_key, compressed_fabric_id)
+    session_id_bytes = HKDF(
+        algorithm=hashes.SHA256(),
+        length=2,
+        salt=b"",
+        info=_GROUP_KEY_HASH_INFO,
+    ).derive(operational_key)
+    return int.from_bytes(session_id_bytes, byteorder="big")
+
+
+def find_colliding_epoch_key(reference_epoch_key: bytes, compressed_fabric_id: bytes,
+                             max_attempts: int = 65536 * 10) -> bytes:
+    """Find an epoch key which lead to a Group Session ID collision with reference_epoch_key on the same fabric.
+    Group Session IDs are 16 bits wide, so a collision is expected after around 2^16 (65536) attempts.
+    Limit the number of attempts to avoid infinite loop or long execution time.
+    10 times the expected convergence attempts should provide less than 0.005% chance of not finding a collision.
+    """
+    target_session_id = derive_group_session_id(reference_epoch_key, compressed_fabric_id)
+    for attempt in range(1, max_attempts + 1):
+        candidate = attempt.to_bytes(GROUP_EPOCH_KEY_LENGTH_BYTES, byteorder="big")
+        if candidate == reference_epoch_key:
+            continue
+        if derive_group_session_id(candidate, compressed_fabric_id) == target_session_id:
+            # found an epoch key whose Group Session ID collides with the one of reference_epoch_key
+            return candidate
+
+    raise ValueError("Could not find a colliding key")
 
 
 def group_id_from_node_id(node_id: int) -> int:
@@ -354,4 +405,40 @@ def get_per_group_multicast_address(fabric_id: int, group_id: int) -> bytes:
 
     # Combine all portions into 128-bit address
     addr_int = (prefix_scope_plen << 96) | (network_prefix << 32) | group_id_field
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
+    return ipaddress.IPv6Address(addr_int).packed
     return ipaddress.IPv6Address(addr_int).packed
