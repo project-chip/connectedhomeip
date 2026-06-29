@@ -18,27 +18,10 @@
 #include "ble_config.h"
 #include "wifi_config.h"
 
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/silabs/wifi/WifiInterface.h>
-#include <platform/silabs/wifi/wfx_msgs.h>
-
 extern "C" {
-#include "sl_si91x_driver.h"
 #include "sl_si91x_types.h"
 #include "sl_wifi.h"
-#if SL_MBEDTLS_USE_TINYCRYPT
-#include "sl_si91x_constants.h"
-#include "sl_si91x_trng.h"
-#else
-#include <psa/crypto.h>
-#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
-
-#if SLI_SI91X_MCU_INTERFACE
-#include "rsi_wisemcu_hardware_setup.h"
-#endif // SLI_SI91X_MCU_INTERFACE
-
-extern WfxRsi_t wfx_rsi;
 
 sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void)
 {
@@ -71,7 +54,7 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
     }
 
 #ifndef SLI_SI91X_MCU_INTERFACE
-    configuration->boot_config.feature_bit_map |= SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1 | SL_SI91X_FEAT_HOST_TO_DEV_ULP_GPIO_1;
+    configuration->boot_config.feature_bit_map |= SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1 | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE;
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #ifdef ipv6_FEATURE_REQUIRED
@@ -123,58 +106,4 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
 #ifdef RSI_PROCESS_MAX_RX_DATA
     configuration->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_EXT_TCP_MAX_RECV_LENGTH;
 #endif
-}
-
-sl_status_t SiWxPlatformInit(void)
-{
-    sl_status_t status = SL_STATUS_OK;
-
-#ifdef SLI_SI91X_MCU_INTERFACE
-    uint8_t xtal_enable = 1;
-    status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, nullptr);
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status));
-        return status;
-    }
-#endif // SLI_SI91X_MCU_INTERFACE
-
-    sl_wifi_firmware_version_t version = { 0 };
-    status                             = sl_wifi_get_firmware_version(&version);
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "sl_wifi_get_firmware_version failed: 0x%lx", static_cast<uint32_t>(status));
-        return status;
-    }
-
-    ChipLogDetail(DeviceLayer, "Firmware version is: %x%x.%d.%d.%d.%d.%d.%d", version.chip_id, version.rom_id, version.major,
-                  version.minor, version.security_version, version.patch_num, version.customer_id, version.build_num);
-
-    status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, reinterpret_cast<sl_mac_address_t *>(wfx_rsi.sta_mac.data()));
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "sl_wifi_get_mac_address failed: 0x%lx", static_cast<uint32_t>(status));
-        return status;
-    }
-
-#ifdef SL_MBEDTLS_USE_TINYCRYPT
-    constexpr uint32_t trngKey[TRNG_KEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
-
-    status = sl_si91x_trng_entropy();
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "sl_si91x_trng_entropy failed: 0x%lx", static_cast<uint32_t>(status));
-        return status;
-    }
-
-    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNG_KEY_SIZE);
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%lx", static_cast<uint32_t>(status));
-        return status;
-    }
-#endif // SL_MBEDTLS_USE_TINYCRYPT
-
-    wfx_rsi.dev_state.Set(chip::DeviceLayer::Silabs::WifiInterface::WifiState::kStationInit);
-    return status;
 }

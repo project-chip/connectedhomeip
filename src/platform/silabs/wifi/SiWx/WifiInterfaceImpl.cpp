@@ -43,6 +43,12 @@ extern "C" {
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
+#if SL_MBEDTLS_USE_TINYCRYPT
+#include "sl_si91x_constants.h"
+#include "sl_si91x_trng.h"
+#else
+#include <psa/crypto.h>
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 
 #include <sl_net.h>
 #include <sl_net_constants.h>
@@ -409,6 +415,48 @@ sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInte
     return profile;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+sl_status_t SiWxPlatformInit(void)
+{
+    sl_status_t status = SL_STATUS_OK;
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+    // SoC Configurations
+    uint8_t xtal_enable = 1;
+    status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, nullptr);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status)));
+#endif // SLI_SI91X_MCU_INTERFACE
+
+    sl_wifi_firmware_version_t version = { 0 };
+    status                             = sl_wifi_get_firmware_version(&version);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_get_firmware_version failed: 0x%lx", static_cast<uint32_t>(status)));
+
+    ChipLogDetail(DeviceLayer, "Firmware version is: %x%x.%d.%d.%d.%d.%d.%d", version.chip_id, version.rom_id, version.major,
+                  version.minor, version.security_version, version.patch_num, version.customer_id, version.build_num);
+
+    status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, reinterpret_cast<sl_mac_address_t *>(wfx_rsi.sta_mac.data()));
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_get_mac_address failed: 0x%lx", static_cast<uint32_t>(status)));
+
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+    constexpr uint32_t trngKey[TRNG_KEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+
+    // To check the Entropy of TRNG and verify TRNG functioning.
+    status = sl_si91x_trng_entropy();
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_trng_entropy failed: 0x%lx", static_cast<uint32_t>(status)));
+
+    // Initiate and program the key required for TRNG hardware engine
+    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNG_KEY_SIZE);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%lx", static_cast<uint32_t>(status)));
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+
+    wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationInit);
+    return status;
+}
 
 } // namespace
 

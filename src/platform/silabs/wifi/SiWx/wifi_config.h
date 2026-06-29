@@ -57,7 +57,6 @@ extern "C" {
 
 sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void);
 void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
-sl_status_t SiWxPlatformInit(void);
 
 #ifdef __cplusplus
 }
