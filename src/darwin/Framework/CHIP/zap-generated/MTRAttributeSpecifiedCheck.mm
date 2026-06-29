@@ -6389,6 +6389,9 @@ static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
+    case Attributes::LoggedIn::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

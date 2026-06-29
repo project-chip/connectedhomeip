@@ -50550,6 +50550,7 @@ class AccountLogin(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
+                ClusterObjectFieldDescriptor(Label="loggedIn", Tag=0x00000000, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -50557,11 +50558,16 @@ class AccountLogin(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    loggedIn: typing.Optional[bool] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kOAuth = 0x1
 
     class Commands:
         @dataclass
@@ -50644,7 +50650,64 @@ class AccountLogin(Cluster):
 
             node: typing.Optional[uint] = None
 
+        @dataclass
+        class GetDeviceAuthURI(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050E
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetDeviceAuthURIResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+        @dataclass
+        class GetDeviceAuthURIResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050E
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="userCode", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="verificationURI", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="verificationURIComplete", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="expiresIn", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="interval", Tag=4, Type=uint),
+                    ])
+
+            userCode: str = ""
+            verificationURI: str = ""
+            verificationURIComplete: typing.Optional[str] = None
+            expiresIn: uint = 0
+            interval: uint = 0
+
     class Attributes:
+        @dataclass
+        class LoggedIn(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
