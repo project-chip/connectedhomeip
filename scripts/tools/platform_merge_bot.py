@@ -410,8 +410,15 @@ class PlatformMergeBot:
                 ]
                 if threads_data["pageInfo"]["hasNextPage"]:
                     log.warning(
-                        "PR #%d has more than 100 review threads. Some unresolved threads might be ignored.",
+                        "PR #%d has more than 100 review threads. Gating merge to be safe.",
                         pr.number,
+                    )
+                    unresolved.append(
+                        {
+                            "author": "system",
+                            "body_preview": "Too many review threads (>100). Please resolve or clean up threads.",
+                            "url": pr.html_url + "/files",
+                        }
                     )
 
                 threads = threads_data["nodes"]
