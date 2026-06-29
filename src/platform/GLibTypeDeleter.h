@@ -275,7 +275,7 @@ struct GAutoPtrDeleter
  *    Deleter trait for a single, caller-owned C string.
  *
 
- *  `GAutoPtr<char>` manages a `char *` pointing at one
+ *  `GAutoPtr<gchar>` manages a `gchar *` pointing at one
  *  null-terminated string from the GLib allocator (for example, @c
  *  g_strdup(), `g_strdup_printf()`, or a generated `*_dup_*()`
  *  accessor). Released with a single `g_free()`.
@@ -285,14 +285,14 @@ struct GAutoPtrDeleter
  *  @note
  *    Scalar case only. Do not conflate with the string-*array* cases
  *    @ref GAutoPtrDeleter<gchar *> (owned vector, `g_strfreev()`) and
- *    @ref GAutoPtrDeleter<const char *> (borrowed vector,
+ *    @ref GAutoPtrDeleter<const gchar *> (borrowed vector,
  *    container-only `g_free()`).
  *
  *  @sa GFree
  *
  */
 template <>
-struct GAutoPtrDeleter<char>
+struct GAutoPtrDeleter<gchar>
 {
     using deleter = GFree;
 };
@@ -302,14 +302,14 @@ struct GAutoPtrDeleter<char>
  *    Deleter trait for a *borrowed* null-terminated string array: the
  *    container is caller-owned, the elements are not.
  *
- *  `GAutoPtr<const char *>` manages a `const char **` from APIs that
+ *  `GAutoPtr<const gchar *>` manages a `const gchar **` from APIs that
  *  return a shallow copy of a string array while retaining ownership
  *  of the strings. Canonical producer: `g_variant_get_strv()`, whose
  *  array must be released with `g_free()` while its strings stay
  *  owned by the `GVariant` and must **not** be freed.
  *
- *  Stored pointer: `const char **` (== `const gchar **`). Released
- *  with: `g_free()` on the array only.
+ *  Stored pointer: `const gchar **`. Released with: `g_free()` on the
+ *  array only.
  *
  *  @warning
  *    Do **not** change this to `g_strfreev()` and do **not** drop the
@@ -323,7 +323,7 @@ struct GAutoPtrDeleter<char>
  *
  *  @note
  *    `gchar` is `ypedef`'d to `char`, so `GAutoPtr<const gchar *>`
- *    and `GAutoPtr<const char *>` name the same instantiation and
+ *    and `GAutoPtr<const gchar *>` name the same instantiation and
  *    select this specialization; the call-site spelling difference is
  *    cosmetic.
  *
@@ -332,7 +332,7 @@ struct GAutoPtrDeleter<char>
  *
  */
 template <>
-struct GAutoPtrDeleter<const char *>
+struct GAutoPtrDeleter<const gchar *>
 {
     using deleter = GFree;
 };
@@ -383,18 +383,17 @@ struct GAutoPtrDeleter<GError>
  *  g_strsplit(), `g_strdupv()`, `g_variant_dup_strv()`. The whole
  *  vector is released with `g_strfreev()`.
  *
- *  Stored pointer: `gchar **` (== `char **`). Released with:
- *  `g_strfreev()`.
+ *  Stored pointer: `gchar **`. Released with: `g_strfreev()`.
  *
  *  @note
- *    Choose between this and @ref GAutoPtrDeleter<const char *> by
+ *    Choose between this and @ref GAutoPtrDeleter<const gchar *> by
  *    the const-ness of the GLib return type: `gchar **` (for example,
  *    `g_variant_dup_strv`) selects this trait; `const gchar **` (for
  *    example, `g_variant_get_strv`) selects the const one. The
  *    pointer conversion rules enforce that choice at compile time.
  *
  *  @sa GStrvDeleter
- *  @sa GAutoPtrDeleter<const char *>
+ *  @sa GAutoPtrDeleter<const gchar *>
  *
  */
 template <>
@@ -455,9 +454,9 @@ struct GAutoPtrDeleter<GVariantIter>
  *    string-array specializations the angle-bracket type is the
  *    element while the owned object is the array:
  *
- *      - `GAutoPtr<char>`         owns `char *`        (one string; `g_free`)
- *      - `GAutoPtr<gchar *>`      owns `gchar **`      (owned strv; `g_strfreev`)
- *      - `GAutoPtr<const char *>` owns `const char **` (borrowed strv; `g_free` on the container only)
+ *      - `GAutoPtr<gchar>`         owns `gchar *`        (one string; `g_free`)
+ *      - `GAutoPtr<gchar *>`       owns `gchar **`       (owned strv; `g_strfreev`)
+ *      - `GAutoPtr<const gchar *>` owns `const gchar **` (borrowed strv; `g_free` on the container only)
  *
  *  @sa GAutoPtrDeleter
  *  @sa UniquePointerReceiver
