@@ -126,12 +126,12 @@ public:
     SessionParameters(ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig()) : BasicSessionParameters(mrpConfig) {}
 
     static constexpr size_t kSizeOfSupportedTransports = sizeof(uint16_t);
-    static constexpr size_t kSizeOfMaxTCPPayloadSize   = sizeof(uint32_t);
+    static constexpr size_t kTCPFramingHeaderSize      = 4;
 
     static constexpr size_t kEstimatedTLVSize =
         TLV::EstimateStructOverhead(kSizeOfSessionIdleInterval, kSizeOfSessionActiveInterval, kSizeOfSessionActiveThreshold,
                                     kSizeOfDataModelRevision, kSizeOfInteractionModelRevision, kSizeOfSpecificationVersion,
-                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kSizeOfMaxTCPPayloadSize);
+                                    kSizeOfMaxPathsPerInvoke, kSizeOfSupportedTransports, kTCPFramingHeaderSize);
 
     uint16_t GetSupportedTransports() const { return mSupportedTransports; }
     void SetSupportedTransports(const uint16_t supportedTransports) { mSupportedTransports = supportedTransports; }
@@ -144,7 +144,7 @@ private:
     uint16_t mSupportedTransports = 0;
     // Maximum size of the TCP payload that the node is capable of receiving
     // from its peer.
-    uint32_t mMaxTCPPayloadSize = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - kSizeOfMaxTCPPayloadSize;
+    uint32_t mMaxTCPPayloadSize = CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - kTCPFramingHeaderSize;
 };
 #else
 using SessionParameters = BasicSessionParameters;
