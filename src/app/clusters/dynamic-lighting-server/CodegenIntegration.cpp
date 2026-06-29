@@ -94,3 +94,23 @@ void MatterDynamicLightingClusterShutdownCallback(EndpointId endpointId, MatterC
 }
 
 void MatterDynamicLightingPluginServerInitCallback() {}
+
+namespace chip::app::Clusters::DynamicLighting {
+
+DynamicLightingCluster * FindClusterOnEndpoint(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * dynamicLighting = CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = DynamicLighting::Id,
+            .fixedClusterInstanceCount = kDynamicLightingFixedClusterCount,
+            .maxClusterInstanceCount   = kDynamicLightingMaxClusterCount,
+        },
+        integrationDelegate);
+
+    return static_cast<DynamicLightingCluster *>(dynamicLighting);
+}
+
+} // namespace chip::app::Clusters::DynamicLighting
