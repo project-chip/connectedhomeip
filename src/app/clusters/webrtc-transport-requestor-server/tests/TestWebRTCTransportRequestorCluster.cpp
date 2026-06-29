@@ -18,13 +18,13 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/data-model-provider/tests/TestConstants.h>
 #include <clusters/WebRTCTransportRequestor/Attributes.h>
 #include <clusters/WebRTCTransportRequestor/Commands.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
@@ -254,8 +254,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestHandleOfferWithICEServers)
     Commands::Offer::Type request;
     request.webRTCSessionID = kSessionId;
     request.sdp             = chip::CharSpan::fromCharString("v=0");
-    request.ICEServers.SetValue(
-        DataModel::List<const Globals::Structs::ICEServerStruct::Type>(&iceServer, 1));
+    request.ICEServers.SetValue(DataModel::List<const Globals::Structs::ICEServerStruct::Type>(&iceServer, 1));
 
     auto result = tester.Invoke(request);
     ASSERT_TRUE(result.status.has_value());
