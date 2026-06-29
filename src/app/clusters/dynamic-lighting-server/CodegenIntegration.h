@@ -18,3 +18,9 @@
 #pragma once
 
 #include <app/clusters/dynamic-lighting-server/DynamicLightingCluster.h>
+
+namespace chip::app::Clusters::DynamicLighting {
+
+DynamicLightingCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+} // namespace chip::app::Clusters::DynamicLighting

@@ -55,7 +55,7 @@ DataModel::ActionReturnStatus DynamicLightingCluster::WriteAttribute(const DataM
     case CurrentSpeed::Id:
         return Protocols::InteractionModel::Status::InvalidInState;
     default:
-        return DefaultServerCluster::WriteAttribute(request, decoder);
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
 }
 
@@ -76,7 +76,7 @@ std::optional<DataModel::ActionReturnStatus> DynamicLightingCluster::InvokeComma
     case Commands::StopEffect::Id:
         return Protocols::InteractionModel::Status::InvalidCommand;
     default:
-        return DefaultServerCluster::InvokeCommand(request, input_arguments, handler);
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 }
 
