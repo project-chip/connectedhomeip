@@ -18,8 +18,8 @@
 
 #include "CommissioningProxyDevice.h"
 
-#include <app/server/Server.h>
 #include "CommissioningProxyBgScanCache.h"
+#include <app/server/Server.h>
 #if CONFIG_NETWORK_LAYER_BLE
 #include "CommissioningProxyBleTransport.h"
 #endif

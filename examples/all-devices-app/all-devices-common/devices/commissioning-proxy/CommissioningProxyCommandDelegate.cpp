@@ -651,9 +651,9 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
                     transport.Raw(), timeout, fabricIndex, ChipLogValueX64(nodeId));
 
     [[maybe_unused]] const WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
-    const uint8_t tbits            = transport.Raw();
-    const bool needsPaf            = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF)) != 0;
-    const bool needsBle            = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
+    const uint8_t tbits                             = transport.Raw();
+    const bool needsPaf                             = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF)) != 0;
+    const bool needsBle                             = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
 
     // A background scan may select multiple transports (spec: "Multiple
     // transports can be selected for the scan").  Start each requested transport
