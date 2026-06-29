@@ -19,7 +19,10 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -47,6 +50,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_ACL_2_6(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)

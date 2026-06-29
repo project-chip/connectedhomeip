@@ -264,6 +264,8 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 
 
 class TestSpecParsingSupport(MatterBaseTest):
+    requires_dut = False
+
     def setup_class(self):
         super().setup_class()
         # Latest fully certified build
@@ -279,6 +281,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         one_five_xml_clusters, one_five_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         one_five_one_xml_clusters, one_five_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5_1)
         one_six_xml_clusters, one_six_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
+        one_six_one_xml_clusters, one_six_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
 
         # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
         asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
@@ -295,6 +298,9 @@ class TestSpecParsingSupport(MatterBaseTest):
         for p in one_six_problems:
             print(p)
         asserts.assert_equal(len(one_six_problems), 0, "Unexpected problems found on 1.6 cluster parsing")
+        for p in one_six_one_problems:
+            print(p)
+        asserts.assert_equal(len(one_six_one_problems), 0, "Unexpected problems found on 1.6.1 cluster parsing")
 
         asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_two_clusters.keys())),
                                0, "1.2.2 dir does not contain any clusters not in 1.3")
@@ -312,6 +318,8 @@ class TestSpecParsingSupport(MatterBaseTest):
                                      0, "1.5.1 has fewer clusters than 1.5")
         asserts.assert_greater_equal(len(set(one_six_xml_clusters.keys()) - set(one_five_one_xml_clusters.keys())),
                                      0, "1.6 has fewer clusters than 1.5.1")
+        asserts.assert_greater_equal(len(set(one_six_one_xml_clusters.keys()) - set(one_six_xml_clusters.keys())),
+                                     0, "1.6.1 has fewer clusters than 1.6")
 
         # The following clusters were removed in 1.3: Scenes, Leaf Wetness Measurement, Soil Moisture Measurement
         one_two_removed = {0x0005, 0x0407, 0x0408}

@@ -88,6 +88,8 @@ shared_library("ChipDeviceCtrl") {
       "matter/bdx/bdx.cpp",
       "matter/bdx/test-bdx-transfer-server.cpp",
       "matter/bdx/test-bdx-transfer-server.h",
+      "matter/case_capture/CASECapture.cpp",
+      "matter/case_capture/CASECapture.h",
       "matter/clusters/attribute.cpp",
       "matter/clusters/command.cpp",
       "matter/commissioning/PlaceholderOperationalCredentialsIssuer.h",
@@ -242,9 +244,7 @@ pw_python_package("matter-core-module") {
     "matter/ble/library_handle.py",
     "matter/ble/scan_devices.py",
     "matter/ble/types.py",
-    "matter/clusters/Attribute.py",
-    "matter/clusters/Command.py",
-    "matter/clusters/__init__.py",
+    "matter/case_capture/__init__.py",
     "matter/commissioning/__init__.py",
     "matter/commissioning/commissioning_flow_blocks.py",
     "matter/commissioning/pase.py",
@@ -275,11 +275,6 @@ pw_python_package("matter-core-module") {
     "matter/tracing/__init__.py",
     "matter/utils/CommissioningBuildingBlocks.py",
     "matter/utils/__init__.py",
-    "matter/yaml/__init__.py",
-    "matter/yaml/data_model_lookup.py",
-    "matter/yaml/errors.py",
-    "matter/yaml/format_converter.py",
-    "matter/yaml/runner.py",
   ]
   if (chip_support_webrtc_python_bindings) {
     sources += [
@@ -388,11 +383,14 @@ pw_python_distribution("matter-core") {
 pw_python_package("matter-clusters-module") {
   sources = [
     "matter/ChipUtility.py",
+    "matter/clusters/Attribute.py",
     "matter/clusters/CHIPClusters.py",
     "matter/clusters/ClusterObjects.py",
+    "matter/clusters/Command.py",
     "matter/clusters/Objects.py",
     "matter/clusters/TestObjects.py",
     "matter/clusters/Types.py",
+    "matter/clusters/__init__.py",
     "matter/clusters/enum.py",
     "matter/tlv/__init__.py",
     "matter/tlv/tlvlist.py",
@@ -410,10 +408,14 @@ pw_python_package("matter-clusters-module") {
       python_requires = chip_python_requires
       install_requires = [
         "aenum",
+        "construct",
         "dacite",
+        "rich",
       ]
     }
   }
+
+  python_deps = [ ":matter-core-module" ]
 }
 
 pw_python_distribution("matter-clusters") {

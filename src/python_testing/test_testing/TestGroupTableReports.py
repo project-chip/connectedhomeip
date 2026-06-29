@@ -47,6 +47,7 @@ from matter.testing.runner import default_matter_test_main
 
 
 class TestGroupTableReports(MatterBaseTest):
+    requires_dut = False
 
     @async_test_body
     async def test_group_table_reports(self):

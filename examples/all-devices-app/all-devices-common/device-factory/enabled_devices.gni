@@ -43,8 +43,20 @@ _all_devices_all_enabled = all_devices_enabled_devices == []
 #   - Update scripts/build/build/targets.py to include the new device
 _available_devices = [
   [
+    "aggregator",
+    "AGGREGATOR",
+  ],
+  [
+    "air-purifier",
+    "AIR_PURIFIER",
+  ],
+  [
     "air-quality-sensor",
     "AIR_QUALITY_SENSOR",
+  ],
+  [
+    "bridged-node",
+    "BRIDGED_NODE",
   ],
   [
     "chime",
@@ -55,12 +67,52 @@ _available_devices = [
     "CONTACT_SENSOR",
   ],
   [
+    "cooktop",
+    "COOKTOP",
+  ],
+  [
+    "device-energy-management",
+    "DEVICE_ENERGY_MANAGEMENT",
+  ],
+  [
     "dimmable-light",
     "DIMMABLE_LIGHT",
   ],
   [
+    "dimmable-plug-in-unit",
+    "DIMMABLE_PLUG_IN_UNIT",
+  ],
+  [
+    "extractor-hood",
+    "EXTRACTOR_HOOD",
+  ],
+  [
     "fan",
     "FAN",
+  ],
+  [
+    "flow-sensor",
+    "FLOW_SENSOR",
+  ],
+  [
+    "generic-switch",
+    "GENERIC_SWITCH",
+  ],
+  [
+    "humidity-sensor",
+    "HUMIDITY_SENSOR",
+  ],
+  [
+    "light-sensor",
+    "LIGHT_SENSOR",
+  ],
+  [
+    "mounted-dimmable-load-control",
+    "MOUNTED_DIMMABLE_LOAD_CONTROL",
+  ],
+  [
+    "mounted-on-off-control",
+    "MOUNTED_ON_OFF_CONTROL",
   ],
   [
     "network-infrastructure-manager",
@@ -75,12 +127,40 @@ _available_devices = [
     "ON_OFF_LIGHT",
   ],
   [
+    "on-off-light-switch",
+    "ON_OFF_LIGHT_SWITCH",
+  ],
+  [
+    "on-off-plug-in-unit",
+    "ON_OFF_PLUG_IN_UNIT",
+  ],
+  [
+    "oven",
+    "OVEN",
+  ],
+  [
     "power-source",
     "POWER_SOURCE",
   ],
   [
+    "pressure-sensor",
+    "PRESSURE_SENSOR",
+  ],
+  [
     "proximity-ranger",
     "PROXIMITY_RANGER",
+  ],
+  [
+    "rain-sensor",
+    "RAIN_SENSOR",
+  ],
+  [
+    "refrigerator",
+    "REFRIGERATOR",
+  ],
+  [
+    "smoke-co-alarm",
+    "SMOKE_CO_ALARM",
   ],
   [
     "soil-sensor",
@@ -95,8 +175,16 @@ _available_devices = [
     "TEMPERATURE_SENSOR",
   ],
   [
+    "water-freeze-detector",
+    "WATER_FREEZE_DETECTOR",
+  ],
+  [
     "water-leak-detector",
     "WATER_LEAK_DETECTOR",
+  ],
+  [
+    "water-valve",
+    "WATER_VALVE",
   ],
 ]
 

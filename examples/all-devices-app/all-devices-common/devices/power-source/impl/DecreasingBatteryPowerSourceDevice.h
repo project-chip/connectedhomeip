@@ -22,8 +22,7 @@
 namespace chip::app {
 
 /**
- * @brief An implementation of a Battery Power Source Device that decreases battery level over time.
- *
+ * Simulated battery power source that decreases the reported battery level over time.
  */
 class DecreasingBatteryPowerSourceDevice : public BatteryPowerSourceDevice, public TimerContext
 {
@@ -31,8 +30,7 @@ public:
     DecreasingBatteryPowerSourceDevice();
     ~DecreasingBatteryPowerSourceDevice() override;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // TimerContext
