@@ -362,9 +362,11 @@ class PlatformMergeBot:
           repository(owner: $owner, name: $name) {
             pullRequest(number: $number) {
               reviewThreads(first: 100) {
+                pageInfo {
+                  hasNextPage
+                }
                 nodes {
                   isResolved
-                  isOutdated
                   comments(first: 1) {
                     nodes {
                       author { login }
@@ -403,9 +405,16 @@ class PlatformMergeBot:
                         f"GraphQL API returned errors: {res_data['errors']}"
                     )
 
-                threads = res_data["data"]["repository"]["pullRequest"][
+                threads_data = res_data["data"]["repository"]["pullRequest"][
                     "reviewThreads"
-                ]["nodes"]
+                ]
+                if threads_data["pageInfo"]["hasNextPage"]:
+                    log.warning(
+                        "PR #%d has more than 100 review threads. Some unresolved threads might be ignored.",
+                        pr.number,
+                    )
+
+                threads = threads_data["nodes"]
                 for thread in threads:
                     if not thread["isResolved"]:
                         first_comment = (
