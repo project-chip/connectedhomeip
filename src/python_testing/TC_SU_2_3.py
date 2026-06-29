@@ -52,13 +52,13 @@
 import asyncio
 import logging
 import os
-import tempfile
-import subprocess
-from pathlib import Path
 import queue
 import socket
+import subprocess
+import tempfile
 import textwrap
 import time
+from pathlib import Path
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
@@ -222,7 +222,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         def read_access_log(self) -> str:
             if not self.access_log or not os.path.exists(self.access_log):
                 return ""
-            with open(self.access_log, "r", encoding="utf-8") as f:
+            with open(self.access_log, encoding="utf-8") as f:
                 return f.read()
 
     def steps_TC_SU_2_3(self) -> list[TestStep]:
