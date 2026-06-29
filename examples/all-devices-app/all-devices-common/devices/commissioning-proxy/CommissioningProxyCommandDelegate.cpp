@@ -339,7 +339,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         return chip::Protocols::InteractionModel::Status::Busy;
     }
 
-    const chip::BitMask<CapabilitiesBitmap> requested(transport);
+    [[maybe_unused]] const chip::BitMask<CapabilitiesBitmap> requested(transport);
     const uint8_t scanMaxTime = GetScanMaxTime();
 
     auto * agg   = new ScanAggregator();
@@ -606,9 +606,9 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest transport:%u timeout:%u fabricIndex:%u nodeId:0x" ChipLogFormatX64,
                     transport.Raw(), timeout, fabricIndex, ChipLogValueX64(nodeId));
 
-    const WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
-    const uint8_t tbits            = transport.Raw();
-    const bool needsBle            = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
+    [[maybe_unused]] const WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
+    const uint8_t tbits                             = transport.Raw();
+    const bool needsBle                             = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
 
     // A background scan may select multiple transports (spec: "Multiple
     // transports can be selected for the scan").  Start each requested transport
@@ -644,8 +644,8 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(chip:
                     "ProxyBackgroundScanStopRequest transport:0x%x wiFiBands:0x%x fabricIndex:%u nodeId:0x" ChipLogFormatX64,
                     transportMask.Raw(), wiFiBandsMask.Raw(), fabricIndex, ChipLogValueX64(nodeId));
 
-    const CapabilitiesBitmap transport = static_cast<CapabilitiesBitmap>(transportMask.Raw());
-    const WiFiBandBitmap wiFiBands     = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
+    [[maybe_unused]] const CapabilitiesBitmap transport = static_cast<CapabilitiesBitmap>(transportMask.Raw());
+    [[maybe_unused]] const WiFiBandBitmap wiFiBands     = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
 
     // Fan the stop out to every transport; each matches the request against its
     // own per-fabric record.  NotFound is returned only if no transport had a
