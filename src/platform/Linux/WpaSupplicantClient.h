@@ -256,8 +256,8 @@ protected:
     {
         GAutoPtr<WpaSupplicant1> proxy;
         GAutoPtr<WpaSupplicant1Interface> iface;
-        GAutoPtr<gchar> interfacePath;
-        GAutoPtr<gchar> networkPath;
+        GCharPtr interfacePath;
+        GCharPtr networkPath;
 
         // Must be called synchronously on the GLib thread while the
         // GLib main loop is still running.

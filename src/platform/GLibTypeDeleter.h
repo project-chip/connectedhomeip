@@ -497,4 +497,74 @@ public:
     UniquePointerReceiver<T, deleter> GetReceiver() { return MakeUniquePointerReceiver(*this); }
 };
 
+/**
+ *  @brief
+ *    Owning smart pointer for a single, caller-owned GLib C string.
+ *
+ *  Alias for `GAutoPtr<gchar>`. Use for one NUL-terminated string from
+ *  the GLib allocator, e.g. `g_strdup()`, `g_strdup_printf()`, or a
+ *  generated `*_dup_*()` accessor. Released with a single `g_free()`.
+ *
+ *  Stored pointer: `gchar *`. Released with: `g_free()`.
+ *
+ *  @note
+ *    Scalar string only; this is **not** a strv. For arrays use
+ *    `GStrvPtr` (owned) or `GBorrowedStrvPtr` (borrowed).
+ *
+ *  @sa GAutoPtrDeleter<gchar>
+ *
+ */
+using GCharPtr = GAutoPtr<gchar>;
+
+/**
+ *  @brief
+ *    Owning smart pointer for a fully caller-owned, null-terminated GLib
+ *    string array (a "strv").
+ *
+ *  Alias for `GAutoPtr<gchar *>`. Use for arrays returned by deep-copy
+ *  APIs that transfer ownership of both the array and every string, e.g.
+ *  `g_strsplit()`, `g_strdupv()`, `g_variant_dup_strv()`. The whole
+ *  vector is released with `g_strfreev()`.
+ *
+ *  Stored pointer: `gchar **`. Released with: `g_strfreev()`.
+ *
+ *  @note
+ *    This is the *owned* strv. Its borrowed twin is `GBorrowedStrvPtr`;
+ *    the two are kept distinct at compile time by the const-qualifier on
+ *    the element type, so an owned array cannot be assigned the borrowed
+ *    deleter or vice versa.
+ *
+ *  @sa GBorrowedStrvPtr
+ *  @sa GAutoPtrDeleter<gchar *>
+ *
+ */
+using GStrvPtr = GAutoPtr<gchar *>;
+
+/**
+ *  @brief
+ *    Owning smart pointer for a *borrowed* null-terminated GLib string
+ *    array: the container is caller-owned, the strings are not.
+ *
+ *  Alias for `GAutoPtr<const gchar *>`. Use for arrays returned by
+ *  shallow-copy APIs that hand back the vector but retain ownership of
+ *  the strings, canonically `g_variant_get_strv()`. Only the array is
+ *  released, with `g_free()`; the strings stay owned by their source
+ *  (e.g. the `GVariant`) and must **not** be freed.
+ *
+ *  Stored pointer: `const gchar **`. Released with: `g_free()` on the
+ *  array only.
+ *
+ *  @warning
+ *    The `const` is load-bearing, not cosmetic: because `const gchar **`
+ *    does not convert to `gchar **` (or vice versa), it is what makes
+ *    routing a borrowed array into the owning `GStrvPtr` deleter, or an
+ *    owned array into this one, a compile error. Do not strip it to
+ *    "simplify" the type.
+ *
+ *  @sa GStrvPtr
+ *  @sa GAutoPtrDeleter<const gchar *>
+ *
+ */
+using GBorrowedStrvPtr = GAutoPtr<const gchar *>;
+
 } // namespace chip
