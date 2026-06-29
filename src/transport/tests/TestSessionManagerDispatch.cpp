@@ -640,9 +640,9 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
     // Injects a test fabric to obtain FabricIndex 1
     FabricTable * fabricTable = sessionManager.GetFabricTable();
     ASSERT_NE(nullptr, fabricTable);
-    FabricIndex fabricIndex   = kUndefinedFabricIndex;
-    CHIP_ERROR err = fabricTable->AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                             GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &fabricIndex);
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    CHIP_ERROR err          = fabricTable->AddNewFabricForTestIgnoringCollisions(
+        GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &fabricIndex);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     // Extracts assigned 64-bit compressed fabric ID span.
@@ -669,7 +669,7 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
     EXPECT_EQ(CHIP_NO_ERROR, provider->SetKeySet(fabricIndex, compressedFabricSpan, keySet));
     EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupKeyAt(fabricIndex, 0, groupKey));
     EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupInfoAt(fabricIndex, 0, groupInfo));
-    
+
     // Instantiates outgoing (for PrepareMessage) session.
     Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
     SessionHandle outgoingHandle(outgoingSession);
@@ -678,9 +678,9 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
     // Create the test payload header, data, and buffer
     PayloadHeader payloadHeader;
     payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
-    const char testPayload[]              = "PrivacyTest";
-    System::PacketBufferHandle payloadBuf = MessagePacketBuffer::NewWithData(
-        reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
+    const char testPayload[] = "PrivacyTest";
+    System::PacketBufferHandle payloadBuf =
+        MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
     ASSERT_FALSE(payloadBuf.IsNull());
 
     // Prepare the group message
@@ -690,7 +690,7 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
 
     // Unwraps the buffer and verifies PrepareMessage set the privacy flag bit high and set the group session type.
     PacketHeader decodedHeader;
-    uint16_t headerSize = 0;
+    uint16_t headerSize                    = 0;
     System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
     ASSERT_FALSE(writableMsg.IsNull());
     EXPECT_EQ(CHIP_NO_ERROR, decodedHeader.Decode(writableMsg->Start(), writableMsg->DataLength(), &headerSize));
