@@ -18,6 +18,7 @@ nxp:
     - "src/platform/nxp/**"
     - "examples/platform/nxp/**"
     - "examples/**/nxp/**"
+    - "third_party/nxp/**"
 
 silabs:
   maintainers:
@@ -33,6 +34,7 @@ silabs:
     - "src/platform/silabs/**"
     - "examples/platform/silabs/**"
     - "examples/**/silabs/**"
+    - "third_party/silabs/**"
 
 # --- Proposals / Opt-In Templates ---
 

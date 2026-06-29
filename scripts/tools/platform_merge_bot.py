@@ -273,9 +273,64 @@ class PlatformMergeBot:
             self.post_eligibility_comment(pr, active_groups, missing_approvals)
             return
 
-        # If we got here, all active groups have at least one approval. We can merge!
-        log.info("PR #%d is fully approved and ready to merge!", pr.number)
+        if not self._has_ci_passed(pr):
+            log.info(
+                "PR #%d is fully approved but CI checks are pending or failed. Skipping merge.",
+                pr.number,
+            )
+            self.post_eligibility_comment(pr, active_groups, missing_approvals)
+            return
+
+        log.info(
+            "PR #%d is fully approved, CI passed, and ready to merge!", pr.number
+        )
         self.merge_pr(pr, valid_approvals_per_group)
+
+    def _has_ci_passed(self, pr: PullRequest) -> bool:
+        """Checks if all CI checks (combined status and check runs) have passed on the PR's latest commit."""
+        commit = self.repo.get_commit(sha=pr.head.sha)
+
+        combined_status = commit.get_combined_status()
+        # pullapprove is ignored because it delegates normal PR approvals. Since this
+        # bot bypasses standard reviews for platform-restricted changes, PullApprove
+        # will remain pending forever.
+        ignored_contexts = {"pullapprove"}
+        for status in combined_status.statuses:
+            if status.context in ignored_contexts:
+                continue
+            if status.state != "success":
+                log.info(
+                    "PR #%d HEAD commit %s status '%s' is '%s' (%s)",
+                    pr.number,
+                    pr.head.sha[:8],
+                    status.context,
+                    status.state,
+                    status.description,
+                )
+                return False
+
+        check_suites = commit.get_check_suites()
+        for suite in check_suites:
+            if suite.status != "completed":
+                log.info(
+                    "PR #%d HEAD commit %s check suite '%s' is not completed (status: '%s')",
+                    pr.number,
+                    pr.head.sha[:8],
+                    suite.id,
+                    suite.status,
+                )
+                return False
+            if suite.conclusion not in ("success", "neutral", "skipped"):
+                log.info(
+                    "PR #%d HEAD commit %s check suite '%s' failed (conclusion: '%s')",
+                    pr.number,
+                    pr.head.sha[:8],
+                    suite.id,
+                    suite.conclusion,
+                )
+                return False
+
+        return True
 
     def _find_bot_comments(self, pr: PullRequest) -> list:
         """Finds comments posted by this bot on the PR."""
@@ -408,6 +463,7 @@ class PlatformMergeBot:
             pr.merge(
                 merge_method="squash",
                 commit_title=f"{pr.title} (Auto-merged by platform-bot)",
+                sha=pr.head.sha,
             )
 
             log.info("Posting merge explanation comment to PR #%d", pr.number)

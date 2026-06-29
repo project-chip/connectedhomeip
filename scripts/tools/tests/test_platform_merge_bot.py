@@ -66,6 +66,14 @@ esp32:
         self.mock_repo = MagicMock()
         self.mock_github_instance.get_repo.return_value = self.mock_repo
 
+        # Default mock commit with passing CI
+        self.mock_commit = MagicMock()
+        self.mock_commit.get_combined_status.return_value.state = "success"
+        self.mock_commit.get_combined_status.return_value.total_count = 0
+        self.mock_commit.get_combined_status.return_value.statuses = []
+        self.mock_commit.get_check_suites.return_value = []
+        self.mock_repo.get_commit.return_value = self.mock_commit
+
         # Initialize bot under test
         self.bot = PlatformMergeBot(
             token="dummy_token",
@@ -108,6 +116,7 @@ esp32:
         mock_pr.get_files.return_value = files
         mock_pr.get_reviews.return_value = reviews
         mock_pr.get_issue_comments.return_value = comments or []
+        mock_pr.head.sha = "dummy_sha"
         return mock_pr
 
     def test_config_loading(self) -> None:
@@ -328,7 +337,9 @@ esp32:
         )
 
         mock_pr.merge.assert_called_once_with(
-            merge_method="squash", commit_title="Test PR (Auto-merged by platform-bot)"
+            merge_method="squash",
+            commit_title="Test PR (Auto-merged by platform-bot)",
+            sha="dummy_sha",
         )
 
     def test_check_and_process_pr_multi_group_approved(self) -> None:
@@ -526,6 +537,110 @@ esp32:
                     )
             finally:
                 os.unlink(temp_name)
+
+    def test_check_and_process_pr_ci_pending_status_does_not_merge(self) -> None:
+        """Tests that a PR is not merged when combined status is pending."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock a pending CI status check
+        mock_status = MagicMock()
+        mock_status.context = "license/cla"
+        mock_status.state = "pending"
+        mock_status.description = "Checking CLA..."
+        self.mock_commit.get_combined_status.return_value.statuses = [mock_status]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        # Should still post/update eligibility comment
+        mock_pr.create_issue_comment.assert_called_once()
+
+    def test_check_and_process_pr_ci_pullapprove_pending_still_merges(self) -> None:
+        """Tests that pullapprove pending status does not block merge."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock pending pullapprove status but passing CLA status
+        status_cla = MagicMock()
+        status_cla.context = "license/cla"
+        status_cla.state = "success"
+        status_cla.description = "CLA signed"
+
+        status_pa = MagicMock()
+        status_pa.context = "pullapprove"
+        status_pa.state = "pending"
+        status_pa.description = "Pending approvals"
+
+        self.mock_commit.get_combined_status.return_value.statuses = [
+            status_cla,
+            status_pa,
+        ]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_called_once()
+
+    def test_check_and_process_pr_ci_failing_check_suite_does_not_merge(self) -> None:
+        """Tests that a PR is not merged when check suite fails."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock completed but failed check suite
+        mock_suite = MagicMock()
+        mock_suite.status = "completed"
+        mock_suite.conclusion = "failure"
+        self.mock_commit.get_check_suites.return_value = [mock_suite]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_called_once()
+
+    def test_check_and_process_pr_ci_incomplete_check_suite_does_not_merge(self) -> None:
+        """Tests that a PR is not merged when check suite is still running."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock in_progress check suite
+        mock_suite = MagicMock()
+        mock_suite.status = "in_progress"
+        mock_suite.conclusion = None
+        self.mock_commit.get_check_suites.return_value = [mock_suite]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_called_once()
+
+    def test_check_and_process_pr_ci_passing_non_blocking_check_suite_merges(self) -> None:
+        """Tests that neutral/skipped/success check suites allow merge."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock successful, neutral, and skipped check suites
+        mock_suite1 = MagicMock()
+        mock_suite1.status = "completed"
+        mock_suite1.conclusion = "success"
+
+        mock_suite2 = MagicMock()
+        mock_suite2.status = "completed"
+        mock_suite2.conclusion = "neutral"
+
+        mock_suite3 = MagicMock()
+        mock_suite3.status = "completed"
+        mock_suite3.conclusion = "skipped"
+
+        self.mock_commit.get_check_suites.return_value = [mock_suite1, mock_suite2, mock_suite3]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_called_once()
 
 
 if __name__ == "__main__":
