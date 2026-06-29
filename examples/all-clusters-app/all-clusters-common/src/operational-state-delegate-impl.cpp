@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/generic-callbacks.h>
 #include <operational-state-delegate-impl.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -36,11 +37,11 @@ DataModel::Nullable<uint32_t> GenericOperationalStateDelegateImpl::GetCountdownT
 
 CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    if (index >= mOperationalStateList.size())
+    if (index >= mOperationalStateIds.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalState = mOperationalStateList[index];
+    operationalState.Set(mOperationalStateIds[index]);
     return CHIP_NO_ERROR;
 }
 
@@ -146,7 +147,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
     auto countdown_time = delegate->GetCountdownTime();
 
-    if (countdown_time.IsNull() || countdown_time.Value() > 0)
+    if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
         {
@@ -157,7 +158,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             delegate->mPausedTime++;
         }
     }
-    else
+    else if (!countdown_time.IsNull() && countdown_time.Value() <= 0)
     {
         OperationalState::GenericOperationalError noError(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         delegate->HandleStopStateCallback(noError);
@@ -202,14 +203,18 @@ void OperationalState::Shutdown()
     }
 }
 
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(endpointId == 1u);
     VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
 
     gOperationalStateDelegate           = new OperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
-    gOperationalStateInstance           = new OperationalState::Instance(gOperationalStateDelegate, operationalStateEndpoint);
+
+    OperationalStateCluster::Config config;
+    constexpr chip::AttributeId kCountdownTimeId = chip::app::Clusters::OperationalState::Attributes::CountdownTime::Id;
+    config.optionalAttributes.Set<kCountdownTimeId>();
+    gOperationalStateInstance = new OperationalState::Instance(gOperationalStateDelegate, operationalStateEndpoint, config);
 
     TEMPORARY_RETURN_IGNORED gOperationalStateInstance->SetOperationalState(
         to_underlying(OperationalState::OperationalStateEnum::kStopped));
@@ -217,7 +222,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gOperationalStateInstance->Init();
 }
 
-void emberAfOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     OperationalState::Shutdown();
 }

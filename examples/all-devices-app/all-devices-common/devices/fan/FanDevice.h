@@ -16,74 +16,20 @@
 
 #pragma once
 
-#include <app/clusters/fan-control-server/FanControlCluster.h>
-#include <app/clusters/groups-server/GroupsCluster.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/on-off-server/OnOffCluster.h>
-#include <app/clusters/scenes-server/SceneTable.h>
-#include <app/clusters/scenes-server/SceneTableImpl.h>
-#include <app/clusters/scenes-server/ScenesManagementCluster.h>
-#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/interface/SingleEndpointDevice.h>
-#include <lib/support/TimerDelegate.h>
+#include <devices/capabilities/fan-load/FanLoadDevice.h>
 
 namespace chip {
 namespace app {
 
-class FanDevice : public SingleEndpointDevice
+class FanDevice : public FanLoadDevice
 {
 public:
-    struct Context
-    {
-        Credentials::GroupDataProvider & groupDataProvider;
-        FabricTable & fabricTable;
-        TimerDelegate & timerDelegate;
-        bool includeOnOffCluster = true;
-    };
-
-    /// If onOffDelegate is null, the endpoint will not have an On/Off cluster. If it is not null, Register() will add
-    /// the On/Off cluster and wire it to that delegate. When the pointer is null, context.includeOnOffCluster must be false.
     FanDevice(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate, const Context & context);
-
     ~FanDevice() override = default;
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-    // Accessors for subclasses/implementations to interact with clusters
-    Clusters::FanControlCluster & FanControlCluster();
-    Clusters::OnOffCluster * TryGetOnOffCluster();
-
-private:
-    class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
-    {
-    public:
-        Clusters::ScenesManagementSceneTable * Take() override
-        {
-            return scenes::GetSceneTableImpl(mEndpointId, scenes::kMaxScenesPerEndpoint);
-        }
-        void Release(Clusters::ScenesManagementSceneTable *) override {}
-
-        void SetEndpoint(EndpointId endpoint) { mEndpointId = endpoint; }
-
-    private:
-        EndpointId mEndpointId = kInvalidEndpointId;
-    };
-
-    Clusters::FanControl::Delegate & mFanDelegate;
-    Clusters::OnOffDelegate * mOnOffDelegate = nullptr;
-    TimerDelegate & mTimerDelegate;
-
-    const Context mContext;
-
-    DefaultScenesManagementTableProvider mScenesTableProvider;
-
-    LazyRegisteredServerCluster<Clusters::FanControlCluster> mFanControlCluster;
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-    LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
-    LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
+protected:
+    FanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
+              Clusters::OnOffDelegate * onOffDelegate, const Context & context);
 };
 
 } // namespace app

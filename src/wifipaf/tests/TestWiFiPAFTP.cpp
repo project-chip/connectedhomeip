@@ -209,5 +209,23 @@ TEST_F(TestWiFiPAFTP, EnforcesMinFragmentSize)
     EXPECT_EQ(GetTxFragmentSize(), WiFiPAFTP::sMaxFragmentSize);
     EXPECT_EQ(GetRxFragmentSize(), WiFiPAFTP::sMaxFragmentSize);
 }
+
+// Init() must reset the Rx sequence-history ring index. HandleCharacteristicReceived() uses it to index
+// mRxSeqHist[] on every received fragment, so a stale/uninitialized value (e.g. a non-zeroed engine) would
+// write out of bounds. Seed it out of range, re-init, and confirm it lands back inside the array.
+TEST_F(TestWiFiPAFTP, InitResetsRxSeqHistoryIndex)
+{
+    mRxSeqHistId = static_cast<uint8_t>(CHIP_PAFTP_RXHIST_SIZE + 100);
+    ASSERT_EQ(Init(nullptr, false), CHIP_NO_ERROR);
+    EXPECT_LT(mRxSeqHistId, CHIP_PAFTP_RXHIST_SIZE);
+
+    // Exercise the indexed write in HandleCharacteristicReceived; in bounds now, ASan would catch otherwise.
+    const uint8_t frag[] = { 0x00, 0x00 };
+    auto buf             = System::PacketBufferHandle::NewWithData(frag, sizeof(frag));
+    ASSERT_FALSE(buf.IsNull());
+    SequenceNumber_t receivedAck = 0;
+    bool didReceiveAck           = false;
+    EXPECT_EQ(HandleCharacteristicReceived(std::move(buf), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+}
 }; // namespace WiFiPAF
 }; // namespace chip

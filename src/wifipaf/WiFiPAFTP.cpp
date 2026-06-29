@@ -80,6 +80,8 @@ CHIP_ERROR WiFiPAFTP::Init(void * an_app_state, bool expect_first_ack)
     mRxNewestUnackedSeqNum = 0;
     mRxOldestUnackedSeqNum = 0;
     mRxFragmentSize        = sDefaultFragmentSize;
+    mRxSeqHistId           = 0;
+    memset(mRxSeqHist, 0, sizeof(mRxSeqHist));
     mTxState               = kState_Idle;
     mTxBuf                 = nullptr;
     mTxFragmentSize        = sDefaultFragmentSize;

@@ -62,7 +62,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <devices/occupancy-sensor/OccupancySensorDevice.h>
-#include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/on-off-light/impl/LoggingOnOffLightDevice.h>
 
 using namespace chip;
 using namespace chip::app;
