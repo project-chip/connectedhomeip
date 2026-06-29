@@ -755,6 +755,7 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
         case Clusters::AccountLogin::Commands::Login::Id:
         case Clusters::AccountLogin::Commands::Logout::Id:
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
             return true;
         default:
             return false;
@@ -1432,6 +1433,10 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::Login::Id:
             return true;
         case Clusters::AccountLogin::Commands::Logout::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id:
             return true;
         default:
             return false;
