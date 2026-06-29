@@ -18,8 +18,8 @@
 #pragma once
 
 #include <app/clusters/operational-state-server/RvcOperationalStateCluster.h>
-#include <devices/interface/SingleEndpointDevice.h>
 #include <devices/capabilities/operational-state/LoggingRvcOperationalStateDelegate.h>
+#include <devices/interface/SingleEndpointDevice.h>
 
 namespace chip::app {
 

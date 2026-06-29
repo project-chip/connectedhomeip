@@ -42,11 +42,7 @@ CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t in
 CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     // Provide a basic set of phases to satisfy the reviewer's comment about phase lists.
-    static const char * kSupportedPhases[] = {
-        "Starting",
-        "Operating",
-        "Finishing"
-    };
+    static const char * kSupportedPhases[] = { "Starting", "Operating", "Finishing" };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedPhases))
     {

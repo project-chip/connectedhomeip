@@ -19,8 +19,8 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/operational-state-server/OvenCavityOperationalStateCluster.h>
 #include <app/clusters/temperature-control-server/TemperatureControlCluster.h>
-#include <devices/interface/SingleEndpointDevice.h>
 #include <devices/capabilities/operational-state/LoggingOperationalStateDelegate.h>
+#include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
