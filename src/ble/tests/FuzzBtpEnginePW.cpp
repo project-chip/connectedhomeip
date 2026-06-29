@@ -32,7 +32,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <ble/Ble.h>
-#include <ble/BtpEngine.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>

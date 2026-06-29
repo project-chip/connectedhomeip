@@ -35,11 +35,8 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
-#include <ble/BLEEndPoint.h>
 #include <ble/Ble.h>
 #include <ble/BleConfig.h>
-#include <ble/BleLayer.h>
-#include <ble/BleLayerDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
