@@ -16,6 +16,7 @@
 #
 
 import asyncio
+import contextlib
 import logging
 import socket
 
@@ -93,7 +94,7 @@ class MatterServiceListener(ServiceListener):
                     if self._found_event:
                         self._found_event.set()
         except Exception as e:
-            logger.warning(f"MatterServiceListener: Failed to get service info for {name}: {e}")
+            logger.warning("MatterServiceListener: Failed to get service info for %s: %s", name, e)
 
     def remove_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         pass
@@ -111,8 +112,8 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
     service_types = ["_matter._tcp.local.", "_matterc._udp.local."]
 
     logger.info(
-        f" --- find_matter_devices_mdns: Searching for Matter devices"
-        f"{' with target device ID: ' + str(target_device_id) if target_device_id else ''}")
+        " --- find_matter_devices_mdns: Searching for Matter devices%s",
+        ' with target device ID: ' + str(target_device_id) if target_device_id else '')
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
         zc = None
@@ -123,10 +124,8 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
             browsers = [ServiceBrowser(zc, stype, listener) for stype in service_types]
 
             # Wait until a device is found or the timeout expires
-            try:
+            with contextlib.suppress(asyncio.TimeoutError):
                 await asyncio.wait_for(found_event.wait(), timeout=MDNS_DISCOVERY_TIMEOUT)
-            except TimeoutError:
-                pass
 
             for browser in browsers:
                 browser.cancel()
@@ -135,13 +134,13 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
                 return listener.discovered_services
 
         except Exception as e:
-            logger.error(f" --- find_matter_devices_mdns: Discovery attempt {attempt} failed: {e}")
+            logger.error(" --- find_matter_devices_mdns: Discovery attempt %d failed: %s", attempt, e)
         finally:
             if zc is not None:
                 try:
                     zc.close()
                 except Exception as e:
-                    logger.warning(f"Failed to close zeroconf instance: {e}")
+                    logger.warning("Failed to close zeroconf instance: %s", e)
 
         if attempt < MAX_ATTEMPTS:
             await asyncio.sleep(SCAN_RETRY_DELAY)
@@ -207,7 +206,7 @@ class TC_CNET_4_23(MatterBaseTest):
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus,
         )
-        logger.info(f" --- LastNetworkingStatus = {status}")
+        logger.info(" --- LastNetworkingStatus = %s", status)
         if expected_status is not None:
             asserts.assert_equal(status, expected_status,
                                  f"Expected {expected_status}, got {status}")
@@ -321,16 +320,16 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(1)
 
         networks = await self._read_networks(endpoint)
-        logger.info(f" --- Found {len(networks)} network(s) configured during commissioning")
+        logger.info(" --- Found %d network(s) configured during commissioning", len(networks))
         for network in networks:
             network_id = network.networkID
-            logger.info(f" --- Removing network: {network_id.decode('utf-8', errors='replace')}")
+            logger.info(" --- Removing network: %s", network_id.decode('utf-8', errors='replace'))
             remove_response = await self.send_single_cmd(
                 endpoint=endpoint,
                 cmd=cnet.Commands.RemoveNetwork(networkID=network_id, breadcrumb=0)
             )
             await self._validate_network_config_response(remove_response)
-            logger.info(f" --- Network removed successfully: {network_id.decode('utf-8', errors='replace')}")
+            logger.info(" --- Network removed successfully: %s", network_id.decode('utf-8', errors='replace'))
 
         networks_after = await self._read_networks(endpoint)
         asserts.assert_equal(len(networks_after), 0,
@@ -339,7 +338,7 @@ class TC_CNET_4_23(MatterBaseTest):
 
         # Step 2: AddOrUpdateWiFiNetwork with incorrect SSID
         self.step(2)
-        logger.info(f" --- Using incorrect SSID: {incorrect_ssid.decode()} with correct password")
+        logger.info(" --- Using incorrect SSID: %s with correct password", incorrect_ssid.decode())
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -354,7 +353,7 @@ class TC_CNET_4_23(MatterBaseTest):
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(networkID=incorrect_ssid, breadcrumb=2))
         await self._validate_connect_network_response(response, expect_success=False)
-        logger.info(f" --- ConnectNetwork failed as expected for incorrect SSID: {incorrect_ssid.decode()}")
+        logger.info(" --- ConnectNetwork failed as expected for incorrect SSID: %s", incorrect_ssid.decode())
 
         # Step 4: Read LastNetworkingStatus — expect kNetworkNotFound
         self.step(4)
@@ -364,14 +363,14 @@ class TC_CNET_4_23(MatterBaseTest):
         # Step 5: Read Networks — verify incorrect SSID is stored
         self.step(5)
         networks = await self._read_networks(endpoint)
-        logger.info(f" --- Networks attribute has {len(networks)} network(s)")
+        logger.info(" --- Networks attribute has %d network(s)", len(networks))
         network_ids = [net.networkID for net in networks]
         asserts.assert_in(incorrect_ssid, network_ids,
                           f"Expected incorrect SSID {incorrect_ssid.decode()} to be in Networks list")
 
         # Step 6: RemoveNetwork with incorrect SSID
         self.step(6)
-        logger.info(f" --- Removing incorrect SSID: {incorrect_ssid.decode()}")
+        logger.info(" --- Removing incorrect SSID: %s", incorrect_ssid.decode())
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.RemoveNetwork(networkID=incorrect_ssid, breadcrumb=3),
@@ -381,13 +380,13 @@ class TC_CNET_4_23(MatterBaseTest):
         # Step 7: Read Networks — verify list is empty
         self.step(7)
         networks = await self._read_networks(endpoint)
-        logger.info(f" --- Networks attribute has {len(networks)} network(s) after removal")
+        logger.info(" --- Networks attribute has %d network(s) after removal", len(networks))
         asserts.assert_equal(len(networks), 0,
                              f"Expected Networks list to be empty, but has {len(networks)} network(s)")
 
         # Step 8: AddOrUpdateWiFiNetwork with correct SSID but incorrect password
         self.step(8)
-        logger.info(f" --- Using correct SSID: {correct_ssid.decode('utf-8', errors='replace')} with incorrect password")
+        logger.info(" --- Using correct SSID: %s with incorrect password", correct_ssid.decode('utf-8', errors='replace'))
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -417,7 +416,7 @@ class TC_CNET_4_23(MatterBaseTest):
         target_ssid_found = False
 
         for attempt in range(1, MAX_ATTEMPTS + 1):
-            logger.info(f" --- ScanNetworks attempt {attempt}/{MAX_ATTEMPTS}")
+            logger.info(" --- ScanNetworks attempt %d/%d", attempt, MAX_ATTEMPTS)
             response = await self.send_single_cmd(
                 endpoint=endpoint,
                 cmd=cnet.Commands.ScanNetworks(breadcrumb=6))
@@ -425,21 +424,21 @@ class TC_CNET_4_23(MatterBaseTest):
                                 "Unexpected value returned from ScanNetworks")
 
             ssids_found = [network.ssid for network in response.wiFiScanResults]
-            logger.info(f" --- Scan results: Found {len(ssids_found)} networks")
+            logger.info(" --- Scan results: Found %d networks", len(ssids_found))
 
             if len(ssids_found) > 0:
                 for i, ssid in enumerate(ssids_found):
-                    logger.info(f" --- Network {i}: {ssid} (type: {type(ssid)})")
+                    logger.info(" --- Network %d: %s (type: %s)", i, ssid, type(ssid))
                 if correct_ssid in ssids_found:
                     target_ssid_found = True
-                    logger.info(f" --- Found target SSID: {correct_ssid.decode('utf-8', errors='replace')} on attempt {attempt}")
+                    logger.info(" --- Found target SSID: %s on attempt %d", correct_ssid.decode('utf-8', errors='replace'), attempt)
                     break
-                logger.warning(f" --- Target SSID not found in scan results (attempt {attempt})")
+                logger.warning(" --- Target SSID not found in scan results (attempt %d)", attempt)
             else:
-                logger.warning(f" --- No networks found in scan (attempt {attempt})")
+                logger.warning(" --- No networks found in scan (attempt %d)", attempt)
 
             if not target_ssid_found and attempt < MAX_ATTEMPTS:
-                logger.info(f" --- Waiting {SCAN_RETRY_DELAY}s before retry...")
+                logger.info(" --- Waiting %ds before retry...", SCAN_RETRY_DELAY)
                 await asyncio.sleep(SCAN_RETRY_DELAY)
 
         asserts.assert_true(target_ssid_found,
@@ -448,7 +447,7 @@ class TC_CNET_4_23(MatterBaseTest):
 
         # Step 12: AddOrUpdateWiFiNetwork with correct credentials
         self.step(12)
-        logger.info(f"Using correct SSID: {correct_ssid.decode('utf-8', errors='replace')} with correct password")
+        logger.info("Using correct SSID: %s with correct password", correct_ssid.decode('utf-8', errors='replace'))
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -463,7 +462,7 @@ class TC_CNET_4_23(MatterBaseTest):
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(networkID=correct_ssid, breadcrumb=8))
         await self._validate_connect_network_response(response, expect_success=True)
-        logger.info(f" --- ConnectNetwork succeeded for SSID: {correct_ssid.decode('utf-8', errors='replace')}")
+        logger.info(" --- ConnectNetwork succeeded for SSID: %s", correct_ssid.decode('utf-8', errors='replace'))
 
         # Step 14: Read LastNetworkingStatus — expect kSuccess
         self.step(14)
@@ -476,7 +475,7 @@ class TC_CNET_4_23(MatterBaseTest):
         connected_networks = [network.networkID for network in response if network.connected]
         asserts.assert_true(correct_ssid in connected_networks,
                             f"Expected device to be connected to SSID '{correct_ssid.decode('utf-8', errors='replace')}'")
-        logger.info(f" --- Device is connected to SSID: {correct_ssid.decode('utf-8', errors='replace')}")
+        logger.info(" --- Device is connected to SSID: %s", correct_ssid.decode('utf-8', errors='replace'))
 
         # Step 16: CommissioningComplete over CASE
         self.step(16)
@@ -485,7 +484,7 @@ class TC_CNET_4_23(MatterBaseTest):
         # before switching from PASE to CASE
         logger.info(" --- Discovering device on WiFi network via mDNS...")
         discovered_devices = await find_matter_devices_mdns(self.dut_node_id)
-        logger.info(f" --- Found {len(discovered_devices)} device(s) via mDNS")
+        logger.info(" --- Found %d device(s) via mDNS", len(discovered_devices))
         asserts.assert_greater(len(discovered_devices), 0,
                                "No devices found via mDNS after WiFi connection")
 
