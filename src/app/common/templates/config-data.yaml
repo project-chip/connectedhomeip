@@ -39,7 +39,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Sample MEI
     - Service Area
-    - Soil Measurement
     - Thread Border Router Management
     - Thread Network Directory
     - Water Heater Management
@@ -159,6 +158,7 @@ CodeDrivenClusters:
     - Scenes Management
     - Smoke CO Alarm
     - Software Diagnostics
+    - Soil Measurement
     - Switch
     - TLS Certificate Management
     - TLS Client Management
