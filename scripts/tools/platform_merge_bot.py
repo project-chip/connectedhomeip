@@ -396,21 +396,18 @@ class PlatformMergeBot:
 
         unresolved = []
         try:
-            with urllib.request.urlopen(req) as response:
+            with urllib.request.urlopen(req, timeout=30) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 if "errors" in res_data:
-                    log.error(
-                        "GraphQL errors querying unresolved threads for PR #%d: %s",
-                        pr.number,
-                        res_data["errors"],
+                    raise RuntimeError(
+                        f"GraphQL API returned errors: {res_data['errors']}"
                     )
-                    return []
 
                 threads = res_data["data"]["repository"]["pullRequest"][
                     "reviewThreads"
                 ]["nodes"]
                 for thread in threads:
-                    if not thread["isResolved"] and not thread["isOutdated"]:
+                    if not thread["isResolved"]:
                         first_comment = (
                             thread["comments"]["nodes"][0]
                             if thread["comments"]["nodes"]
@@ -424,7 +421,9 @@ class PlatformMergeBot:
                         url = first_comment["url"] if first_comment else ""
                         body_preview = ""
                         if first_comment and first_comment.get("body"):
-                            body_preview = " ".join(first_comment["body"].split())
+                            body_preview = " ".join(
+                                first_comment["body"].split()
+                            )
                             if len(body_preview) > 40:
                                 body_preview = body_preview[:37] + "..."
                         unresolved.append(
@@ -435,9 +434,12 @@ class PlatformMergeBot:
                             }
                         )
         except Exception as e:
-            log.warning(
-                "Failed to query unresolved threads for PR #%d: %s", pr.number, e
+            log.error(
+                "Failed to query unresolved threads for PR #%d: %s",
+                pr.number,
+                e,
             )
+            raise
 
         return unresolved
 
@@ -660,6 +662,7 @@ class PlatformMergeBot:
     def run(self, pr_number: int | None = None) -> None:
         """Runs the bot, either scanning all open PRs or processing a single PR."""
         self.single_pr_mode = pr_number is not None
+        has_errors = False
         if self.single_pr_mode:
             log.info("Processing single PR #%d...", pr_number)
             try:
@@ -667,6 +670,7 @@ class PlatformMergeBot:
                 self.check_and_process_pr(pr)
             except Exception as e:
                 log.exception("Error processing PR #%d: %s", pr_number, e)
+                has_errors = True
         else:
             log.info("Scanning open pull requests...")
             open_prs = self.repo.get_pulls(state="open")
@@ -675,6 +679,9 @@ class PlatformMergeBot:
                     self.check_and_process_pr(pr)
                 except Exception as e:
                     log.exception("Error processing PR #%d: %s", pr.number, e)
+                    has_errors = True
+        if has_errors:
+            raise RuntimeError("One or more PRs encountered errors during processing.")
 
 
 @click.command()

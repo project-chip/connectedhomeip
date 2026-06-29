@@ -48,11 +48,11 @@ jobs:
         run: |
           python3 -m venv venv
           venv/bin/pip3 install \
-              click \
-              coloredlogs \
-              pyyaml \
-              pathspec \
-              pygithub \
+              click==8.1.7 \
+              coloredlogs==15.0.1 \
+              pyyaml==6.0.1 \
+              pathspec==0.12.1 \
+              pygithub==2.3.0 \
               && echo "DONE installing python prerequisites"
 
       - name: Run Platform Auto-Merge Bot
