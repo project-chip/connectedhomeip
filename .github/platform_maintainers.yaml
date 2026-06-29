@@ -19,6 +19,7 @@ nxp:
     - "examples/platform/nxp/**"
     - "examples/**/nxp/**"
     - "third_party/nxp/**"
+    - "config/nxp/**"
 
 silabs:
   maintainers:
@@ -35,6 +36,8 @@ silabs:
     - "examples/platform/silabs/**"
     - "examples/**/silabs/**"
     - "third_party/silabs/**"
+    - "config/silabs/**"
+    - "config/efr32/**"
 
 # --- Proposals / Opt-In Templates ---
 
@@ -48,6 +51,7 @@ silabs:
 #     - "src/platform/ESP32/**"
 #     - "examples/platform/esp32/**"
 #     - "examples/**/esp32/**"
+#     - "config/esp32/**"
 # 
 # telink:
 #   maintainers:
@@ -57,6 +61,7 @@ silabs:
 #     - "src/platform/telink/**"
 #     - "examples/platform/telink/**"
 #     - "examples/**/telink/**"
+#     - "config/telink/**"
 # 
 # nrfconnect:
 #   maintainers:
@@ -67,6 +72,7 @@ silabs:
 #     - "src/platform/nrfconnect/**"
 #     - "examples/platform/nrfconnect/**"
 #     - "examples/**/nrfconnect/**"
+#     - "config/nrfconnect/**"
 # 
 # tizen:
 #   maintainers:
@@ -76,6 +82,7 @@ silabs:
 #     - "src/platform/Tizen/**"
 #     - "examples/platform/tizen/**"
 #     - "examples/**/tizen/**"
+#     - "config/tizen/**"
 # 
 # realtek:
 #   maintainers:
@@ -87,6 +94,8 @@ silabs:
 #     - "examples/platform/ameba/**"
 #     - "examples/**/realtek/**"
 #     - "examples/**/ameba/**"
+#     - "config/realtek/**"
+#     - "config/ameba/**"
 # 
 # asr:
 #   maintainers:
@@ -95,6 +104,7 @@ silabs:
 #     - "src/platform/ASR/**"
 #     - "examples/platform/asr/**"
 #     - "examples/**/asr/**"
+#     - "config/asr/**"
 # 
 # beken:
 #   maintainers:
@@ -103,6 +113,7 @@ silabs:
 #     - "src/platform/Beken/**"
 #     - "examples/platform/beken/**"
 #     - "examples/**/beken/**"
+#     - "config/beken/**"
 # 
 # bouffalolab:
 #   maintainers:
@@ -111,6 +122,7 @@ silabs:
 #     - "src/platform/bouffalolab/**"
 #     - "examples/platform/bouffalolab/**"
 #     - "examples/**/bouffalolab/**"
+#     - "config/bouffalolab/**"
 # 
 # qpg:
 #   maintainers:
@@ -121,6 +133,7 @@ silabs:
 #     - "src/platform/qpg/**"
 #     - "examples/platform/qpg/**"
 #     - "examples/**/qpg/**"
+#     - "config/qpg/**"
 # 
 # stm32:
 #   maintainers:
@@ -129,6 +142,7 @@ silabs:
 #     - "src/platform/stm32/**"
 #     - "examples/platform/stm32/**"
 #     - "examples/**/stm32/**"
+#     - "config/stm32/**"
 # 
 # webos:
 #   maintainers:
@@ -154,3 +168,5 @@ silabs:
 #     - "examples/platform/cc32xx/**"
 #     - "examples/**/ti/**"
 #     - "examples/**/cc32xx/**"
+#     - "config/ti/**"
+#     - "config/cc32xx/**"

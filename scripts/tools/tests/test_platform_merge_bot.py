@@ -82,6 +82,8 @@ esp32:
             dry_run=False,
         )
         self.bot._bot_username = "platform-merge-bot"
+        self.bot._get_unresolved_threads = MagicMock(return_value=[])
+        self.bot._is_pullapprove_green = MagicMock(return_value=False)
 
     def create_mock_file(self, filename: str) -> MagicMock:
         """Creates a mock file object with the given filename."""
@@ -113,6 +115,7 @@ esp32:
         mock_pr.title = title
         mock_pr.user.login = author
         mock_pr.draft = draft
+        mock_pr.state = "open"
         mock_pr.get_files.return_value = files
         mock_pr.get_reviews.return_value = reviews
         mock_pr.get_issue_comments.return_value = comments or []
@@ -299,6 +302,11 @@ esp32:
         expected_body += "- **nxp**: @doru91, @nxpdev (❌ Needs approval)\n"
         expected_body += "  *Paths matched:*\n"
         expected_body += "    * `src/platform/nxp/**`\n"
+        expected_body += "\n### Merge Requirements Status\n"
+        expected_body += "⚠️ **PR is not ready to merge yet:**\n"
+        expected_body += "- ❌ Needs platform maintainer approvals (see above).\n"
+        expected_body += "- ✅ All review conversations resolved.\n"
+        expected_body += "- ✅ All CI status and check suites passed.\n"
 
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
@@ -640,6 +648,130 @@ esp32:
 
         self.bot.check_and_process_pr(mock_pr)
 
+        mock_pr.merge.assert_called_once()
+
+    def test_check_and_process_pr_pullapprove_green_skips(self) -> None:
+        """Tests that a PR is skipped (and comments removed) if pullapprove is green."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_comment = MagicMock()
+        mock_comment.user.login = "platform-merge-bot"
+        mock_comment.body = "<!-- platform-merge-bot-eligibility-marker -->"
+        mock_pr = self.create_mock_pr(
+            1, "Test PR", "author", files, reviews, comments=[mock_comment]
+        )
+
+        # Mock pullapprove green
+        self.bot._is_pullapprove_green.return_value = True
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        # Should delete the eligibility comment
+        mock_comment.delete.assert_called_once()
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_unresolved_comments_does_not_merge(self) -> None:
+        """Tests that unresolved review threads block merge and print comment status."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock an unresolved thread
+        self.bot._get_unresolved_threads.return_value = [
+            {
+                "author": "jmartinez-silabs",
+                "body_preview": "Maybe we could check...",
+                "url": "https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
+            }
+        ]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_called_once()
+        comment_body = mock_pr.create_issue_comment.call_args[0][0]
+        self.assertIn("Has unresolved review conversations", comment_body)
+        self.assertIn("jmartinez-silabs", comment_body)
+        self.assertIn("Maybe we could check...", comment_body)
+
+    def test_check_and_process_pr_closed_skips(self) -> None:
+        """Tests that a closed PR is skipped."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+        mock_pr.state = "closed"
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_single_pr_dry_run_bypasses_closed(self) -> None:
+        """Tests that a closed PR is processed when single_pr_mode and dry_run are active."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+        mock_pr.state = "closed"
+
+        # Enable single_pr_mode and dry_run
+        self.bot.single_pr_mode = True
+        self.bot.dry_run = True
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        # Should log and say "Would merge" in dry-run (which means checking passed and didn't return early)
+        # Note: merge is not called in dry-run, but mock_pr.merge should not be called either.
+        # We can assert that analyze_pr_files was called, proving it bypassed the state check.
+        mock_pr.get_files.assert_called_once()
+
+    def test_check_and_process_pr_skip_checks_comments(self) -> None:
+        """Tests that COMMENTS skip check skips unresolved comment checking."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Configure skip check
+        from platform_merge_bot import ValidationCheck
+
+        self.bot.skip_checks = {ValidationCheck.COMMENTS}
+
+        # Mock unresolved threads (should be ignored)
+        self.bot._get_unresolved_threads.return_value = [
+            {
+                "author": "jmartinez-silabs",
+                "body_preview": "unresolved",
+                "url": "https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
+            }
+        ]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        # Should merge because comments check was skipped
+        mock_pr.merge.assert_called_once()
+
+    def test_check_and_process_pr_skip_checks_ci(self) -> None:
+        """Tests that CI skip check bypasses failing combined status."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Configure skip check
+        from platform_merge_bot import ValidationCheck
+
+        self.bot.skip_checks = {ValidationCheck.CI}
+
+        # Mock pending status (should be ignored)
+        mock_status = MagicMock()
+        mock_status.context = "license/cla"
+        mock_status.state = "pending"
+        self.mock_commit.get_combined_status.return_value.statuses = [
+            mock_status
+        ]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        # Should merge because CI check was skipped
         mock_pr.merge.assert_called_once()
 
 

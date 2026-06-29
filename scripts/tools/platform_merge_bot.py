@@ -17,6 +17,7 @@
 
 import logging
 import os
+from enum import Enum
 from typing import Iterable, NamedTuple
 
 import click
@@ -34,6 +35,12 @@ DEFAULT_REPOSITORY = "project-chip/connectedhomeip"
 DEFAULT_CONFIG_PATH = ".github/platform_maintainers.yaml"
 
 ELIGIBILITY_COMMENT_MARKER = "<!-- platform-merge-bot-eligibility-marker -->"
+
+
+class ValidationCheck(Enum):
+    CI = "ci"
+    PULLAPPROVE = "pullapprove"
+    COMMENTS = "comments"
 
 
 class GroupApproval(NamedTuple):
@@ -74,12 +81,21 @@ class PlatformMergeBot:
     """Orchestrates scanning, checking coverage, and auto-merging PRs that affect platform-maintained paths."""
 
     def __init__(
-        self, token: str, repo_name: str, config_path: str, dry_run: bool
+        self,
+        token: str,
+        repo_name: str,
+        config_path: str,
+        dry_run: bool,
+        skip_checks: list[str] | None = None,
     ) -> None:
+        self.token = token
+        self.repo_name = repo_name
         self.api = Github(token)
         self.repo = self.api.get_repo(repo_name)
         self.config_path = config_path
         self.dry_run = dry_run
+        self.skip_checks = {ValidationCheck(c) for c in (skip_checks or [])}
+        self.single_pr_mode = False
         self.groups: dict[str, PlatformGroup] = {}
         self._bot_username = None
         self.load_config()
@@ -204,8 +220,40 @@ class PlatformMergeBot:
         pr_author = getattr(pr.user, "login", None) or "ghost"
         log.info("Checking PR #%d: '%s' (Author: %s)", pr.number, pr.title, pr_author)
 
+        if pr.state != "open":
+            if self.dry_run and self.single_pr_mode:
+                log.info(
+                    "PR #%d state is '%s' but bypassing open check for testing in dry-run.",
+                    pr.number,
+                    pr.state,
+                )
+            else:
+                log.info(
+                    "PR #%d is not open (state: '%s'). Skipping.",
+                    pr.number,
+                    pr.state,
+                )
+                return
+
         if pr.draft:
-            log.info("PR #%d is a draft. Skipping.", pr.number)
+            if self.dry_run and self.single_pr_mode:
+                log.info(
+                    "PR #%d is draft but bypassing draft check for testing in dry-run.",
+                    pr.number,
+                )
+            else:
+                log.info("PR #%d is a draft. Skipping.", pr.number)
+                return
+
+        if (
+            ValidationCheck.PULLAPPROVE not in self.skip_checks
+            and self._is_pullapprove_green(pr)
+        ):
+            log.info(
+                "PR #%d has a successful pullapprove check. Skipping bot merge (standard flow applies).",
+                pr.number,
+            )
+            self.remove_eligibility_comment(pr)
             return
 
         matched_files, uncovered_files = self.analyze_pr_files(pr)
@@ -264,27 +312,127 @@ class PlatformMergeBot:
                     sorted(group_approvers)[0], files
                 )
 
-        if missing_approvals:
-            log.info(
-                "PR #%d is missing approvals from platform maintainers for groups: %s",
-                pr.number,
-                list(missing_approvals.keys()),
-            )
-            self.post_eligibility_comment(pr, active_groups, missing_approvals)
-            return
+        unresolved_threads = []
+        if ValidationCheck.COMMENTS not in self.skip_checks:
+            unresolved_threads = self._get_unresolved_threads(pr)
 
-        if not self._has_ci_passed(pr):
+        ci_passed = True
+        if ValidationCheck.CI not in self.skip_checks:
+            ci_passed = self._has_ci_passed(pr)
+
+        is_ready = not missing_approvals and not unresolved_threads and ci_passed
+
+        if not is_ready:
             log.info(
-                "PR #%d is fully approved but CI checks are pending or failed. Skipping merge.",
+                "PR #%d is eligible but not ready to merge. Updating status comment.",
                 pr.number,
             )
-            self.post_eligibility_comment(pr, active_groups, missing_approvals)
+            self.post_eligibility_comment(
+                pr, active_groups, missing_approvals, unresolved_threads, ci_passed
+            )
             return
 
         log.info(
-            "PR #%d is fully approved, CI passed, and ready to merge!", pr.number
+            "PR #%d is fully approved, CI passed, no unresolved comments, and ready to merge!",
+            pr.number,
         )
         self.merge_pr(pr, valid_approvals_per_group)
+
+    def _is_pullapprove_green(self, pr: PullRequest) -> bool:
+        """Returns True if the pullapprove check exists and is in the 'success' state."""
+        commit = self.repo.get_commit(sha=pr.head.sha)
+        combined_status = commit.get_combined_status()
+        for status in combined_status.statuses:
+            if status.context == "pullapprove":
+                return status.state == "success"
+        return False
+
+    def _get_unresolved_threads(self, pr: PullRequest) -> list[dict]:
+        """Queries GitHub GraphQL API to find active unresolved review threads on the PR."""
+        owner, repo_name = self.repo_name.split("/")
+        query = """
+        query($owner: String!, $name: String!, $number: Int!) {
+          repository(owner: $owner, name: $name) {
+            pullRequest(number: $number) {
+              reviewThreads(first: 100) {
+                nodes {
+                  isResolved
+                  isOutdated
+                  comments(first: 1) {
+                    nodes {
+                      author { login }
+                      body
+                      url
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+        variables = {"owner": owner, "name": repo_name, "number": pr.number}
+
+        import json
+        import urllib.request
+
+        req = urllib.request.Request(
+            "https://api.github.com/graphql",
+            data=json.dumps({"query": query, "variables": variables}).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json",
+                "User-Agent": "platform-merge-bot",
+            },
+            method="POST",
+        )
+
+        unresolved = []
+        try:
+            with urllib.request.urlopen(req) as response:
+                res_data = json.loads(response.read().decode("utf-8"))
+                if "errors" in res_data:
+                    log.error(
+                        "GraphQL errors querying unresolved threads for PR #%d: %s",
+                        pr.number,
+                        res_data["errors"],
+                    )
+                    return []
+
+                threads = res_data["data"]["repository"]["pullRequest"][
+                    "reviewThreads"
+                ]["nodes"]
+                for thread in threads:
+                    if not thread["isResolved"] and not thread["isOutdated"]:
+                        first_comment = (
+                            thread["comments"]["nodes"][0]
+                            if thread["comments"]["nodes"]
+                            else None
+                        )
+                        author = (
+                            first_comment["author"]["login"]
+                            if first_comment and first_comment["author"]
+                            else "unknown"
+                        )
+                        url = first_comment["url"] if first_comment else ""
+                        body_preview = ""
+                        if first_comment and first_comment.get("body"):
+                            body_preview = " ".join(first_comment["body"].split())
+                            if len(body_preview) > 40:
+                                body_preview = body_preview[:37] + "..."
+                        unresolved.append(
+                            {
+                                "author": author,
+                                "body_preview": body_preview,
+                                "url": url,
+                            }
+                        )
+        except Exception as e:
+            log.warning(
+                "Failed to query unresolved threads for PR #%d: %s", pr.number, e
+            )
+
+        return unresolved
 
     def _has_ci_passed(self, pr: PullRequest) -> bool:
         """Checks if all CI checks (combined status and check runs) have passed on the PR's latest commit."""
@@ -347,6 +495,8 @@ class PlatformMergeBot:
         pr: PullRequest,
         active_groups: dict[str, set[str]],
         missing_approvals: dict[str, PlatformGroup],
+        unresolved_threads: list[dict],
+        ci_passed: bool,
     ) -> None:
         """Posts or updates a comment stating the auto-merge status of the PR."""
         # Generate comment body first so we can compare it
@@ -369,6 +519,30 @@ class PlatformMergeBot:
             comment_body += "  *Paths matched:*\n"
             for glob in group.get_matched_globs(files):
                 comment_body += f"    * `{glob}`\n"
+
+        comment_body += "\n### Merge Requirements Status\n"
+        if not missing_approvals and not unresolved_threads and ci_passed:
+            comment_body += "✅ **All checks passed. PR is ready for merge.**\n"
+        else:
+            comment_body += "⚠️ **PR is not ready to merge yet:**\n"
+            if missing_approvals:
+                comment_body += "- ❌ Needs platform maintainer approvals (see above).\n"
+            else:
+                comment_body += "- ✅ Has all platform maintainer approvals.\n"
+
+            if unresolved_threads:
+                comment_body += "- ❌ Has unresolved review conversations:\n"
+                for thread in unresolved_threads:
+                    link_part = f" ([Link]({thread['url']}))" if thread["url"] else ""
+                    comment_preview = f': *"{thread["body_preview"]}"*' if thread["body_preview"] else ""
+                    comment_body += f"  * Unresolved thread by @{thread['author']}{link_part}{comment_preview}\n"
+            else:
+                comment_body += "- ✅ All review conversations resolved.\n"
+
+            if ci_passed:
+                comment_body += "- ✅ All CI status and check suites passed.\n"
+            else:
+                comment_body += "- ❌ CI checks are pending or failed.\n"
 
         bot_comments = self._find_bot_comments(pr)
         if bot_comments:
@@ -476,15 +650,24 @@ class PlatformMergeBot:
                     e,
                 )
 
-    def run(self) -> None:
-        """Scans all open pull requests and processes them."""
-        log.info("Scanning open pull requests...")
-        open_prs = self.repo.get_pulls(state="open")
-        for pr in open_prs:
+    def run(self, pr_number: int | None = None) -> None:
+        """Runs the bot, either scanning all open PRs or processing a single PR."""
+        self.single_pr_mode = pr_number is not None
+        if self.single_pr_mode:
+            log.info("Processing single PR #%d...", pr_number)
             try:
+                pr = self.repo.get_pull(pr_number)
                 self.check_and_process_pr(pr)
             except Exception as e:
-                log.exception("Error processing PR #%d: %s", pr.number, e)
+                log.exception("Error processing PR #%d: %s", pr_number, e)
+        else:
+            log.info("Scanning open pull requests...")
+            open_prs = self.repo.get_pulls(state="open")
+            for pr in open_prs:
+                try:
+                    self.check_and_process_pr(pr)
+                except Exception as e:
+                    log.exception("Error processing PR #%d: %s", pr.number, e)
 
 
 @click.command()
@@ -520,6 +703,17 @@ class PlatformMergeBot:
     is_flag=True,
     help="Simulate merging and commenting without executing",
 )
+@click.option(
+    "--pr",
+    type=int,
+    help="Process only this specific pull request number.",
+)
+@click.option(
+    "--skip-check",
+    multiple=True,
+    type=click.Choice(["ci", "pullapprove", "comments"]),
+    help="Validation check to skip. Can be specified multiple times.",
+)
 def main(
     log_level: str,
     token_env: str,
@@ -527,8 +721,19 @@ def main(
     repo: str,
     config: str,
     dry_run: bool,
+    pr: int | None,
+    skip_check: tuple[str, ...],
 ) -> None:
-    """Platform Merge Bot entry point."""
+    """Platform Merge Bot entry point.
+
+    Example Dry-Run and Validation Testing:
+    ---------------------------------------
+    # Run the bot in dry-run mode on a specific PR (even if closed/merged) to see what it would do:
+    GITHUB_TOKEN=$(gh auth token) python3 scripts/tools/platform_merge_bot.py --dry-run --pr 72779
+
+    # Run in dry-run mode, skipping CI and PullApprove status validations:
+    GITHUB_TOKEN=$(gh auth token) python3 scripts/tools/platform_merge_bot.py --dry-run --pr 72779 --skip-check ci --skip-check pullapprove
+    """
     coloredlogs.install(
         level=_LOG_LEVELS[log_level.upper()],
         fmt="%(asctime)s %(levelname)-7s %(message)s",
@@ -548,8 +753,10 @@ def main(
                 f"Require a token. Set environment variable '{token_env}' (or 'GITHUB_TOKEN') or provide --token-file"
             )
 
-    bot = PlatformMergeBot(gh_token, repo, config, dry_run)
-    bot.run()
+    bot = PlatformMergeBot(
+        gh_token, repo, config, dry_run, skip_checks=list(skip_check)
+    )
+    bot.run(pr_number=pr)
 
 
 if __name__ == "__main__":
