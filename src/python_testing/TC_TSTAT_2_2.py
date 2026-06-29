@@ -383,6 +383,9 @@ class TC_TSTAT_2_2(MatterBaseTest):
             hasOccupancy=self.hasOccupancy
         )
 
+        if not self.state.valid():
+            self.fail(f"Initial thermostat state is not valid: {self.state.__dict__}")
+
         self.step("2a")
         if self.pics_guard(hasCoolingFeature):
             target_val = self.state.minCoolSetpointLimit + \
