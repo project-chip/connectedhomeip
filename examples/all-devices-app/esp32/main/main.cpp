@@ -26,7 +26,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
+#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -84,7 +84,6 @@ static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
 
 #include "DeviceFactoryPlatformOverride.h"
-#include "Esp32BleRssiRangingAdapter.h"
 
 namespace {
 
@@ -253,9 +252,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             .wifiDriver = sWiFiDriver,
         });
 
-    DynamicEndpointIdAllocator endpointIdAllocator({ kRootEndpointId, CONFIG_ALL_DEVICES_ENDPOINT });
-    endpointIdAllocator.ForceNext(kRootEndpointId);
-    err = gRootNodeDevice->Register(endpointIdAllocator, dataModelProvider);
+    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    err = gRootNodeDevice->Register(rootAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -277,8 +275,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
-    err = gConstructedDevice->Register(endpointIdAllocator, dataModelProvider, kInvalidEndpointId);
+    ConsecutiveEndpointIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
+    err = gConstructedDevice->Register(allocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());

@@ -34,6 +34,7 @@ namespace app {
 
 CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;
     ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, composition));
 
     // TODO: This needs to be refactored so the optional attributes, commands and features being set for
