@@ -329,9 +329,9 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
 
         // Write the heating setpoint first when both setpoints are moving down to avoid
         // transiently violating the deadband (cooling - heating >= MinSetpointDeadBand).
-        int16_t currentHeating  = 0;
-        bool hasCurrentHeating  = (OccupiedHeatingSetpoint::Get(endpoint, &currentHeating) == Status::Success);
-        bool writeHeatingFirst  = heatingSetpointValue.HasValue() && coolingSetpointValue.HasValue() && hasCurrentHeating &&
+        int16_t currentHeating = 0;
+        bool hasCurrentHeating = (OccupiedHeatingSetpoint::Get(endpoint, &currentHeating) == Status::Success);
+        bool writeHeatingFirst = heatingSetpointValue.HasValue() && coolingSetpointValue.HasValue() && hasCurrentHeating &&
             EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint) < currentHeating;
 
         if (writeHeatingFirst)
