@@ -217,7 +217,14 @@ class PlatformMergeBot:
 
     def check_and_process_pr(self, pr: PullRequest) -> None:
         """Checks the coverage and approvals for a single PR, and merges if eligible."""
-        pr_author = getattr(pr.user, "login", None) or "ghost"
+        if pr.user is None or not getattr(pr.user, "login", None):
+            log.info(
+                "PR #%d has no valid author (deleted account). Skipping.",
+                pr.number,
+            )
+            return
+
+        pr_author = pr.user.login
         log.info("Checking PR #%d: '%s' (Author: %s)", pr.number, pr.title, pr_author)
 
         if pr.state != "open":

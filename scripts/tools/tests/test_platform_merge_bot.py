@@ -291,33 +291,27 @@ esp32:
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
         reviews = []
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
-        # Generate the expected body to make it identical
-        expected_body = f"{ELIGIBILITY_COMMENT_MARKER}\n"
-        expected_body += "### Platform Maintainers Auto-Merge Info\n"
-        expected_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
-        expected_body += (
-            "To merge, we require at least one approval from each of these groups:\n"
-        )
-        expected_body += "- **nxp**: @doru91, @nxpdev (❌ Needs approval)\n"
-        expected_body += "  *Paths matched:*\n"
-        expected_body += "    * `src/platform/nxp/**`\n"
-        expected_body += "\n### Merge Requirements Status\n"
-        expected_body += "⚠️ **PR is not ready to merge yet:**\n"
-        expected_body += "- ❌ Needs platform maintainer approvals (see above).\n"
-        expected_body += "- ✅ All review conversations resolved.\n"
-        expected_body += "- ✅ All CI status and check suites passed.\n"
+        # First run: posts the eligibility comment
+        self.bot.check_and_process_pr(mock_pr)
+        mock_pr.create_issue_comment.assert_called_once()
+        posted_comment_body = mock_pr.create_issue_comment.call_args[0][0]
 
+        # Set up the PR to return the posted comment in subsequent get_issue_comments() calls
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
-        mock_comment.body = expected_body
-        mock_pr = self.create_mock_pr(
-            1, "Test PR", "author", files, reviews, comments=[mock_comment]
-        )
+        mock_comment.body = posted_comment_body
+        mock_pr.get_issue_comments.return_value = [mock_comment]
 
+        # Reset mocks
+        mock_pr.merge.reset_mock()
+        mock_pr.create_issue_comment.reset_mock()
+        mock_comment.edit.reset_mock()
+
+        # Second run: should be a no-op since status is identical
         self.bot.check_and_process_pr(mock_pr)
 
-        # Should not merge, should not create a new comment, and should not edit the existing one
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_not_called()
         mock_comment.edit.assert_not_called()
@@ -773,6 +767,30 @@ esp32:
 
         # Should merge because CI check was skipped
         mock_pr.merge.assert_called_once()
+
+    def test_get_pr_review_states_disallows_self_approval(self) -> None:
+        """Tests that a PR author cannot approve their own PR."""
+        reviews = [
+            self.create_mock_review("doru91", "APPROVED"),
+        ]
+        # PR is authored by "doru91"
+        mock_pr = self.create_mock_pr(1, "Test PR", "doru91", [], reviews)
+        approvers, change_requesters = self.bot.get_pr_review_states(mock_pr)
+
+        self.assertNotIn("doru91", approvers)
+
+    def test_check_and_process_pr_deleted_author_skips(self) -> None:
+        """Tests that a PR from a deleted/ghost author is skipped."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "ghost", files, reviews)
+        # Simulate deleted user account where pr.user is None
+        mock_pr.user = None
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
 
 
 if __name__ == "__main__":
