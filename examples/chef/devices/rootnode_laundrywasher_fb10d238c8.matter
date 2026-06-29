@@ -1938,13 +1938,13 @@ endpoint 1 {
 
   server cluster LaundryWasherControls {
     callback attribute spinSpeeds;
-    ram      attribute spinSpeedCurrent default = 1;
-    ram      attribute numberOfRinses default = 1;
+    ram      attribute spinSpeedCurrent default = 0;
+    ram      attribute numberOfRinses default = 0;
     callback attribute supportedRinses;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     callback attribute clusterRevision;
   }
 
