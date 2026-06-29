@@ -32,6 +32,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -509,6 +510,27 @@ void EnsureDeadband(const ConcreteAttributePath & attributePath)
     }
 }
 
+bool GetTrackedSetpointIndex(AttributeId attributeId, size_t & index)
+{
+    switch (attributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        index = 0;
+        return true;
+    case OccupiedCoolingSetpoint::Id:
+        index = 1;
+        return true;
+    case UnoccupiedHeatingSetpoint::Id:
+        index = 2;
+        return true;
+    case UnoccupiedCoolingSetpoint::Id:
+        index = 3;
+        return true;
+    default:
+        return false;
+    }
+}
+
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep =
@@ -945,11 +967,13 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
     case OccupiedCoolingSetpoint::Id:
         clearActivePreset = supportsPresets && occupied;
         EnsureDeadband(attributePath);
+        gThermostatAttrAccess.UpdateSetpointChangeAttributes(attributePath.mEndpointId, attributePath.mAttributeId);
         break;
     case UnoccupiedHeatingSetpoint::Id:
     case UnoccupiedCoolingSetpoint::Id:
         clearActivePreset = supportsPresets && !occupied;
         EnsureDeadband(attributePath);
+        gThermostatAttrAccess.UpdateSetpointChangeAttributes(attributePath.mEndpointId, attributePath.mAttributeId);
         break;
     }
     if (featureMap.Has(Feature::kEvents))
@@ -960,6 +984,87 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
     {
         ChipLogProgress(Zcl, "Setting active preset to null");
         gThermostatAttrAccess.SetActivePreset(attributePath.mEndpointId, std::nullopt);
+    }
+}
+
+void ThermostatAttrAccess::SavePreviousSetpointValue(EndpointId endpoint, AttributeId attributeId, int16_t value)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    size_t setpointIndex;
+    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues) && GetTrackedSetpointIndex(attributeId, setpointIndex))
+    {
+        mPreviousSetpointValues[ep][setpointIndex] = { attributeId, value };
+    }
+}
+
+bool ThermostatAttrAccess::GetPreviousSetpointValue(EndpointId endpoint, AttributeId attributeId, int16_t & value)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    size_t setpointIndex;
+    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues) && GetTrackedSetpointIndex(attributeId, setpointIndex) &&
+        mPreviousSetpointValues[ep][setpointIndex].attributeId == attributeId)
+    {
+        value                                      = mPreviousSetpointValues[ep][setpointIndex].value;
+        mPreviousSetpointValues[ep][setpointIndex] = {};
+        return true;
+    }
+    return false;
+}
+
+void ThermostatAttrAccess::UpdateSetpointChangeAttributes(EndpointId endpoint, AttributeId changedAttributeId)
+{
+    int16_t previousValue;
+    if (!GetPreviousSetpointValue(endpoint, changedAttributeId, previousValue))
+    {
+        return;
+    }
+
+    int16_t newValue  = 0;
+    Status readStatus = Status::Failure;
+    switch (changedAttributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        readStatus = OccupiedHeatingSetpoint::Get(endpoint, &newValue);
+        break;
+    case OccupiedCoolingSetpoint::Id:
+        readStatus = OccupiedCoolingSetpoint::Get(endpoint, &newValue);
+        break;
+    case UnoccupiedHeatingSetpoint::Id:
+        readStatus = UnoccupiedHeatingSetpoint::Get(endpoint, &newValue);
+        break;
+    case UnoccupiedCoolingSetpoint::Id:
+        readStatus = UnoccupiedCoolingSetpoint::Get(endpoint, &newValue);
+        break;
+    default:
+        return;
+    }
+
+    if (readStatus != Status::Success)
+    {
+        return;
+    }
+
+    int16_t changeAmount = static_cast<int16_t>(static_cast<int32_t>(newValue) - previousValue);
+    SetpointChangeAmount::Set(endpoint, DataModel::MakeNullable(changeAmount));
+
+    auto source     = SetpointChangeSourceEnum::kManual;
+    auto * delegate = GetDelegate(endpoint);
+    if (delegate != nullptr)
+    {
+        source = delegate->GetSetpointChangeSource();
+    }
+    SetpointChangeSource::Set(endpoint, source);
+
+    uint32_t chipEpochSeconds;
+    if (System::Clock::GetClock_MatterEpochS(chipEpochSeconds) == CHIP_NO_ERROR)
+    {
+        SetpointChangeSourceTimestamp::Set(endpoint, chipEpochSeconds);
+    }
+    else
+    {
+        SetpointChangeSourceTimestamp::Set(endpoint, 0);
     }
 }
 
@@ -1098,8 +1203,15 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
             requested > MaxHeatSetpointLimit)
             return Status::InvalidValue;
-        return CheckCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
-                                            DeadBandTemp);
+        {
+            Status status = CheckCoolingSetpointDeadband(AutoSupported, requested,
+                                                         std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit), DeadBandTemp);
+            if (status == Status::Success)
+            {
+                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedHeatingSetpoint);
+            }
+            return status;
+        }
     }
 
     case OccupiedCoolingSetpoint::Id: {
@@ -1109,8 +1221,15 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
             requested > MaxCoolSetpointLimit)
             return Status::InvalidValue;
-        return CheckHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
-                                            DeadBandTemp);
+        {
+            Status status = CheckHeatingSetpointDeadband(AutoSupported, requested,
+                                                         std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit), DeadBandTemp);
+            if (status == Status::Success)
+            {
+                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedCoolingSetpoint);
+            }
+            return status;
+        }
     }
 
     case UnoccupiedHeatingSetpoint::Id: {
@@ -1120,8 +1239,15 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
             requested > MaxHeatSetpointLimit)
             return Status::InvalidValue;
-        return CheckCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
-                                            DeadBandTemp);
+        {
+            Status status = CheckCoolingSetpointDeadband(AutoSupported, requested,
+                                                         std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit), DeadBandTemp);
+            if (status == Status::Success)
+            {
+                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedHeatingSetpoint);
+            }
+            return status;
+        }
     }
     case UnoccupiedCoolingSetpoint::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1130,8 +1256,15 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
             requested > MaxCoolSetpointLimit)
             return Status::InvalidValue;
-        return CheckHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
-                                            DeadBandTemp);
+        {
+            Status status = CheckHeatingSetpointDeadband(AutoSupported, requested,
+                                                         std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit), DeadBandTemp);
+            if (status == Status::Success)
+            {
+                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedCoolingSetpoint);
+            }
+            return status;
+        }
     }
 
     case MinHeatSetpointLimit::Id: {
