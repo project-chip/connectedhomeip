@@ -36,13 +36,10 @@ public:
     void HandleStartStateCallback(GenericOperationalError & err) override;
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-    // Optional: For RVC support
-    void HandleGoHomeCommandCallback(GenericOperationalError & err) override;
-
     // Application API to bind the cluster instance to this delegate
     void SetCluster(OperationalStateCluster * cluster) { mCluster = cluster; }
 
-private:
+protected:
     OperationalStateCluster * mCluster = nullptr;
     DataModel::Nullable<uint32_t> mCountdownTime;
 };

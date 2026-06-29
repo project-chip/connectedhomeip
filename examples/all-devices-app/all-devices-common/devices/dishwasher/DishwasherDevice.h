@@ -19,7 +19,7 @@
 
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <devices/operational-state/LoggingOperationalStateDelegate.h>
+#include <devices/capabilities/operational-state/LoggingOperationalStateDelegate.h>
 
 namespace chip::app {
 

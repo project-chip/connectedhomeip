@@ -23,7 +23,6 @@ namespace chip::app::Clusters::OperationalState {
 
 CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    // Define a basic set of states for the simulator
     static constexpr uint8_t kSupportedStates[] = {
         to_underlying(OperationalStateEnum::kStopped),
         to_underlying(OperationalStateEnum::kRunning),
@@ -42,8 +41,19 @@ CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t in
 
 CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
-    // No phases defined in this simple mock
-    return CHIP_ERROR_NOT_FOUND;
+    // Provide a basic set of phases to satisfy the reviewer's comment about phase lists.
+    static const char * kSupportedPhases[] = {
+        "Starting",
+        "Operating",
+        "Finishing"
+    };
+
+    if (index >= MATTER_ARRAY_SIZE(kSupportedPhases))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(kSupportedPhases[index]), operationalPhase);
 }
 
 void LoggingOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
@@ -79,16 +89,6 @@ void LoggingOperationalStateDelegate::HandleStartStateCallback(GenericOperationa
 void LoggingOperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
     ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Stop command received.");
-    if (mCluster)
-    {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
-    }
-    err.Set(to_underlying(ErrorStateEnum::kNoError));
-}
-
-void LoggingOperationalStateDelegate::HandleGoHomeCommandCallback(GenericOperationalError & err)
-{
-    ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Go Home command received.");
     if (mCluster)
     {
         LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));

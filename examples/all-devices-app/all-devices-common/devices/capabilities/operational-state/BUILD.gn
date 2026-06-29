@@ -19,6 +19,8 @@ source_set("operational-state-delegate") {
   sources = [
     "LoggingOperationalStateDelegate.cpp",
     "LoggingOperationalStateDelegate.h",
+    "LoggingRvcOperationalStateDelegate.cpp",
+    "LoggingRvcOperationalStateDelegate.h",
   ]
 
   public_deps = [
