@@ -19,7 +19,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 #include <cstdint>

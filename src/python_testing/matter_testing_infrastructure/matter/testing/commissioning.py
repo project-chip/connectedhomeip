@@ -19,17 +19,22 @@
 This module contains classes and functions designed to handle the commissioning process of Matter devices.
 """
 
+import asyncio
+import contextlib
 import logging
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from enum import StrEnum
+from typing import Any, Optional
 
-from mobly import asserts, base_test, signals
+from mobly import asserts
 
-import matter.testing.global_stash as global_stash
+import matter.clusters as Clusters
 from matter import ChipDeviceCtrl, discovery
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
+
+from .commissioning_types import PaseParams
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
@@ -46,10 +51,12 @@ class SetupPayloadInfo:
         filter_type (discovery.FilterType): The type of filter used for discrimination. Default is `FilterType.LONG_DISCRIMINATOR`.
         filter_value (int): The value associated with the filter type. Default is `0`.
         passcode (int): A unique code or password required for setup. Default is `0`.
+        setup_code (Optional[str]): Setup code. Optional string, default None.
     """
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
     passcode: int = 0
+    setup_code: Optional[str] = None
 
 
 @dataclass
@@ -87,6 +94,8 @@ class CommissioningInfo:
     wifi_ssid: Optional[str] = None
     tc_version_to_simulate: Optional[int] = None
     tc_user_response_to_simulate: Optional[int] = None
+    thread_ba_host: Optional[str] = None
+    thread_ba_port: Optional[int] = None
 
 
 @dataclass
@@ -120,6 +129,83 @@ class PairingStatus:
         return str(self.exception) if self.exception else "Pairing Successful"
 
 
+class Commission:
+    def __init__(
+        self,
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+        node_id: int,
+        info: SetupPayloadInfo,
+        commissioning_info: CommissioningInfo
+    ):
+        """
+        Args:
+            dev_ctrl: Controller used to interact with the device.
+            node_id: Node ID assigned to the DUT.
+            info: Setup payload information (discriminator, passcode, etc). Used to establish PASE and identify the device.
+            commissioning_info: Additional commissioning parameters (WiFi credentials, Thread dataset, etc.).
+        """
+
+        self.dev_ctrl = dev_ctrl
+        self.node_id = node_id
+        self.info = info
+        self.commissioning_info = commissioning_info
+
+    async def start(self):
+        self._set_tc_ack_if_needed()
+
+        await self._prepare()
+        await self._find_or_establish_pase_if_needed()
+        return await self._commission()
+
+    def _set_tc_ack_if_needed(self):
+        """
+        Configure Terms & Conditions acknowledgements in the controller.
+
+        NOTE:
+        This does not need to be passed explicitly to Commission().
+        The controller internally uses this configuration during commissioning.
+        """
+
+        if (
+            self.commissioning_info.tc_version_to_simulate is not None
+            and self.commissioning_info.tc_user_response_to_simulate is not None
+        ):
+            self.dev_ctrl.SetTCAcknowledgements(
+                self.commissioning_info.tc_version_to_simulate,
+                self.commissioning_info.tc_user_response_to_simulate
+            )
+
+    async def _find_or_establish_pase_if_needed(self):
+        setup_code = self.info.setup_code
+        if setup_code is None:
+            setup_code = self.dev_ctrl.CreateManualCode(
+                self.info.filter_value,
+                self.info.passcode
+            )
+
+        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+            setupCode=setup_code,
+            nodeId=self.node_id
+        )
+        if commissionee is None:
+            raise RuntimeError("Failed to find or establish PASE session")
+
+    async def _prepare(self):
+        if self.commissioning_info.wifi_ssid is not None and self.commissioning_info.wifi_passphrase is not None:
+            self.dev_ctrl.SetWiFiCredentials(
+                self.commissioning_info.wifi_ssid,
+                self.commissioning_info.wifi_passphrase
+            )
+
+        if self.commissioning_info.thread_operational_dataset is not None:
+            self.dev_ctrl.SetThreadOperationalDataset(
+                self.commissioning_info.thread_operational_dataset
+            )
+
+    async def _commission(self):
+        return await self.dev_ctrl.Commission(self.node_id)
+
+
 async def commission_device(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
 ) -> PairingStatus:
@@ -141,84 +227,26 @@ async def commission_device(
         with storing the reason for pairing failure by storing the exception raised during commissioning process.
 
     """
+    try:
+        commissioning = Commission(dev_ctrl, node_id, info, commissioning_info)
+        await commissioning.start()
+        return PairingStatus()
 
-    if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
-        LOGGER.debug(
-            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response "
-            f"{commissioning_info.tc_user_response_to_simulate}."
-        )
-        dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
+    except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+        LOGGER.exception("Commissioning failed")
+        return PairingStatus(exception=e)
 
-    if commissioning_info.commissioning_method == "on-network":
-        try:
-            await dev_ctrl.CommissionOnNetwork(
-                nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "ble-wifi":
-        try:
-            asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for ble-wifi commissioning")
-            asserts.assert_is_not_none(commissioning_info.wifi_passphrase,
-                                       "WiFi Passphrase must be provided for ble-wifi commissioning")
-            # Type assertions to help mypy understand these are not None after the asserts
-            assert commissioning_info.wifi_ssid is not None
-            assert commissioning_info.wifi_passphrase is not None
-            await dev_ctrl.CommissionBleWiFi(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.wifi_ssid,
-                commissioning_info.wifi_passphrase,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "ble-thread":
-        try:
-            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
-                                       "Thread dataset must be provided for ble-thread commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.thread_operational_dataset is not None
-            await dev_ctrl.CommissionBleThread(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.thread_operational_dataset,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "nfc-thread":
-        try:
-            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
-                                       "Thread dataset must be provided for nfc-thread commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.thread_operational_dataset is not None
-            await dev_ctrl.CommissionNfcThread(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.thread_operational_dataset,
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
-            return PairingStatus(exception=e)
-    else:
-        raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
+    except Exception as e:
+        # Catch unexpected errors to avoid crashing test infrastructure.
+        # These are surfaced as PairingStatus failures instead.
+        LOGGER.exception("Unexpected commissioning failure")
+        return PairingStatus(exception=e)
 
 
 async def commission_devices(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
-    dut_node_ids: List[int],
-    setup_payloads: List[SetupPayloadInfo],
+    dut_node_ids: list[int],
+    setup_payloads: list[SetupPayloadInfo],
     commissioning_info: CommissioningInfo,
 ) -> bool:
     """
@@ -237,13 +265,13 @@ async def commission_devices(
     """
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
-        LOGGER.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        LOGGER.info("Commissioning method: %s", commissioning_info.commissioning_method)
         commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
     return all(commissioned)
 
 
-def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadInfo]:
+def get_setup_payload_info_config(matter_test_config: Any) -> list[SetupPayloadInfo]:
     """
     Get and builds the payload info provided in the execution.
 
@@ -253,98 +281,69 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
     Returns:
          List[SetupPayloadInfo]: List of Payload used by the test case
     """
-    setup_payloads = []
+    infos: list[SetupPayloadInfo] = []
+
+    manual_code_equivalents = []
+
     for qr_code in matter_test_config.qr_code_content:
         try:
-            setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-        except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
-            asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
+            setup_payload = SetupPayload().ParseQrCode(qr_code)
 
-    manual_code_equivalents = [(s.long_discriminator >> 8, s.setup_passcode) for s in setup_payloads]
+            info = SetupPayloadInfo()
+            info.passcode = setup_payload.setup_passcode
+            info.setup_code = qr_code
+
+            if setup_payload.short_discriminator is not None:
+                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+                info.filter_value = setup_payload.short_discriminator
+            else:
+                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+                info.filter_value = setup_payload.long_discriminator
+
+            infos.append(info)
+
+            manual_code_equivalents.append(
+                (setup_payload.short_discriminator, setup_payload.setup_passcode)
+            )
+
+        except ChipStackError:  # chipstack-ok
+            asserts.fail(f"QR code '{qr_code}' failed to parse properly as a Matter setup code.")
+
     for manual_code in matter_test_config.manual_code:
         try:
-            # Remove any duplicate codes - where the discriminator and passcode match a previously added QR code.
-            # This lets testers pass in the QR and equivalent manual code in order to run
-            # the DD tests with a single set of parameters
             temp_payload = SetupPayload().ParseManualPairingCode(manual_code)
+
             if (temp_payload.short_discriminator, temp_payload.setup_passcode) in manual_code_equivalents:
                 continue
-            setup_payloads.append(temp_payload)
-        except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
-            asserts.fail(
-                f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
 
-    infos = []
-    for setup_payload in setup_payloads:
-        info = SetupPayloadInfo()
-        info.passcode = setup_payload.setup_passcode
-        if setup_payload.short_discriminator is not None:
+            info = SetupPayloadInfo()
+            info.passcode = temp_payload.setup_passcode
+            info.setup_code = manual_code
             info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-            info.filter_value = setup_payload.short_discriminator
-        else:
-            info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-            info.filter_value = setup_payload.long_discriminator
-        infos.append(info)
+            info.filter_value = temp_payload.short_discriminator
+
+            infos.append(info)
+
+        except ChipStackError:  # chipstack-ok
+            asserts.fail(
+                f"Manual code '{manual_code}' failed to parse properly as a Matter setup code. "
+                "Check that all digits are correct and length is 11 or 21 characters."
+            )
 
     num_passcodes = 0 if matter_test_config.setup_passcodes is None else len(matter_test_config.setup_passcodes)
     num_discriminators = 0 if matter_test_config.discriminators is None else len(matter_test_config.discriminators)
     asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
+
     if matter_test_config.discriminators:
         for idx, discriminator in enumerate(matter_test_config.discriminators):
             info = SetupPayloadInfo()
             info.passcode = matter_test_config.setup_passcodes[idx]
             info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
             info.filter_value = discriminator
+            info.setup_code = None
             infos.append(info)
 
     return infos
-
-
-class CommissionDeviceTest(base_test.BaseTestClass):
-    """Test class auto-injected at the start of test list to commission a device when requested"""
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        # This class is used to commission the device so is set to True
-        self.is_commissioning = True
-        # Save the stashed values into attributes to avoid mobly conflic with ctypes when mobly performs copy().
-        test_config = args[0]
-        self.default_controller = test_config.user_params['default_controller']
-        meta_config = test_config.user_params['meta_config']
-        self.dut_node_ids: List[int] = meta_config['dut_node_ids']
-        self.commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=meta_config['commissionee_ip_address_just_for_testing'],
-            commissioning_method=meta_config['commissioning_method'],
-            thread_operational_dataset=meta_config['thread_operational_dataset'],
-            wifi_passphrase=meta_config['wifi_passphrase'],
-            wifi_ssid=meta_config['wifi_ssid'],
-            tc_version_to_simulate=meta_config['tc_version_to_simulate'],
-            tc_user_response_to_simulate=meta_config['tc_user_response_to_simulate'],
-        )
-        self.setup_payloads: List[SetupPayloadInfo] = get_setup_payload_info_config(
-            global_stash.unstash_globally(test_config.user_params['matter_test_config']))
-
-    def test_run_commissioning(self):
-        """This method is the test called by mobly, which try to commission the device until is complete or raises an error.
-        Raises:
-            signals.TestAbortAll: Failed to commission node(s)
-        """
-        if not self.event_loop.run_until_complete(commission_devices(
-            dev_ctrl=self.default_controller,
-            dut_node_ids=self.dut_node_ids,
-            setup_payloads=self.setup_payloads,
-            commissioning_info=self.commissioning_info
-        )):
-            raise signals.TestAbortAll("Failed to commission node(s)")
-
-    # Default controller is used by commission_devices
-    @property
-    def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
-        return global_stash.unstash_globally(self._default_controller)
-
-    @default_controller.setter
-    def default_controller(self, tmp_default_controller):
-        self._default_controller = tmp_default_controller
 
 
 @dataclass
@@ -379,3 +378,324 @@ class SetupParameters:
     def manual_code(self):
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
+
+
+# Commissioning Status Detection Functions
+
+# Default timeout for DNS-SD discovery (in seconds)
+# Short timeout since DNS-SD is fast - device should respond quickly if operational
+DNSSD_DISCOVERY_TIMEOUT_SEC = 3
+
+
+class EstablishedSessionKind(StrEnum):
+    """Session type that succeeded when establishing PASE and CASE in parallel."""
+
+    PASE = "pase"
+    CASE = "case"
+
+
+async def _is_device_operational_via_dnssd(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
+) -> bool:
+    """
+    Check if a device is advertising as operational on this fabric via DNS-SD.
+
+    This is a fast check that avoids the long CASE timeout when a device is not
+    commissioned. Devices advertise operational services on _matter._tcp.local.
+    with instance name format: {compressed_fabric_id}-{node_id}
+
+    Args:
+        dev_ctrl: The chip device controller instance (used to get compressed fabric ID)
+        node_id: Node ID of the device to check
+        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
+
+    Returns:
+        True if device is advertising as operational on this fabric, False otherwise
+    """
+    from mdns_discovery.mdns_discovery import MdnsDiscovery
+
+    try:
+        # Build expected instance name for this fabric+node
+        compressed_fabric_id = dev_ctrl.GetCompressedFabricId()
+        expected_instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+
+        LOGGER.info("Checking DNS-SD for operational service: %s", expected_instance_name)
+
+        # Discover operational services
+        mdns = MdnsDiscovery()
+        services = await mdns.get_operational_services(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        # Check if our expected instance is in the discovered services
+        for service in services:
+            if service.instance_name == expected_instance_name:
+                LOGGER.info("Device %s found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
+                return True
+
+        LOGGER.info("Device %s not found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
+        return False
+
+    except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
+        LOGGER.warning("DNS-SD check failed, will fall back to connection attempt: %s", e)
+        return False
+
+
+async def _is_device_commissionable_via_dnssd(
+    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
+) -> bool:
+    """
+    Check if any device is advertising as commissionable via DNS-SD on the network.
+
+    This check avoids long CASE timeouts when a device is in pairing mode.
+    Devices advertise commissionable services on _matterc._udp.local.
+
+    Args:
+        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
+
+    Returns:
+        True if any device is advertising as commissionable, False otherwise
+    """
+    from mdns_discovery.mdns_discovery import MdnsDiscovery
+
+    try:
+        LOGGER.info("Checking DNS-SD for commissionable service (_matterc._udp.local.)")
+
+        # Discover commissionable services
+        mdns = MdnsDiscovery()
+        services = await mdns.get_commissionable_services(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        if services:
+            LOGGER.info("Found %s commissionable device(s) via DNS-SD", len(services))
+            return True
+
+        LOGGER.info("No commissionable devices found via DNS-SD")
+        return False
+
+    except (OSError, ValueError, RuntimeError, TypeError) as e:
+        LOGGER.warning("DNS-SD commissionable check failed: %s", e)
+        return False
+
+
+async def _establish_pase_or_case_session(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    pase_params: Optional[PaseParams] = None
+) -> EstablishedSessionKind:
+    """
+    Establish a session to the device by trying PASE and CASE in parallel.
+
+    This is used as a fallback when DNS-SD check doesn't find the device operational.
+    The device might be:
+    - Not commissioned (PASE will succeed if pase_params provided)
+    - Commissioned but DNS-SD failed for some reason (CASE will succeed)
+
+    Whichever connection succeeds first is used; the other is cancelled.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID for the session
+        pase_params: Optional parameters for PASE establishment.
+                    If not provided, only CASE will be attempted.
+
+    Returns:
+        Whether the active session is PASE or CASE. CASE implies an operational
+        session on this controller's fabric; PASE implies not (for this fabric).
+
+    Raises:
+        RuntimeError: If both connection attempts fail
+    """
+    task_list = []
+
+    # Add PASE task if we have parameters
+    if pase_params is not None:
+        setup_code = pase_params.resolve_setup_code(dev_ctrl)
+
+        if setup_code:
+            LOGGER.info("Creating PASE task for node %s", node_id)
+            pase_future = dev_ctrl.FindOrEstablishPASESession(setup_code, node_id)
+            task_list.append(asyncio.create_task(pase_future, name="pase"))
+
+    # Always add CASE task (allowPASE=False to force CASE)
+    LOGGER.info("Creating CASE task for node %s", node_id)
+    case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
+    task_list.append(asyncio.create_task(case_future, name="case"))
+
+    LOGGER.info("Attempting parallel PASE/CASE connection to node %s", node_id)
+
+    # Wait for first successful completion
+    done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+
+    # Check if the completed task succeeded or raised an exception
+    completed_task = done.pop()
+    completed_name = completed_task.get_name()
+
+    def _session_kind_from_task_name(name: str) -> EstablishedSessionKind:
+        return EstablishedSessionKind.PASE if name == "pase" else EstablishedSessionKind.CASE
+
+    try:
+        # This will raise if the task failed
+        completed_task.result()
+        LOGGER.info("Successfully established %s session to node %s", completed_name.upper(), node_id)
+    except (ChipStackError, RuntimeError, OSError) as e:
+        # First task failed, wait for the other if there is one
+        if pending:
+            LOGGER.info("%s failed (%s), waiting for other connection attempt", completed_name.upper(), e)
+            done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+            completed_task2 = done2.pop()
+            completed_name2 = completed_task2.get_name()
+            try:
+                completed_task2.result()
+                LOGGER.info("Successfully established %s session to node %s", completed_name2.upper(), node_id)
+                # Cancel any remaining
+                for task in pending2:
+                    task.cancel()
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await task
+                return _session_kind_from_task_name(completed_name2)
+            except (ChipStackError, RuntimeError, OSError) as e2:
+                # Use task names to correctly label which error came from which connection type
+                if completed_name == "pase":
+                    pase_error, case_error = e, e2
+                else:
+                    pase_error, case_error = e2, e
+                raise RuntimeError(
+                    f"Both PASE and CASE connection attempts failed for node {node_id}. "
+                    f"PASE error: {pase_error}, CASE error: {case_error}"
+                ) from e2
+        else:
+            raise
+
+    # Cancel pending tasks
+    for task in pending:
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
+
+    return _session_kind_from_task_name(completed_name)
+
+
+async def is_commissioned(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int
+) -> bool:
+    """
+    Check if the device is commissioned on the current fabric (Controller's fabric).
+
+    Uses a passive detection strategy:
+
+    1. DNS-SD operational check (_matter._tcp): if the device advertises as operational
+       for this fabric and node, returns True immediately.
+    2. DNS-SD commissionable check (_matterc._udp): if the device advertises a pairing
+       window, returns False immediately (fast-fail — device is not operational).
+    3. If neither mDNS check is conclusive, returns False (device is off, broken,
+       or on another fabric without an open commissioning window).
+
+    This function is side-effect free: it does not open PASE or CASE sessions.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+
+    Returns:
+        True if the device is confirmed to be commissioned on this fabric, False otherwise.
+    """
+    try:
+        # Step 1: Fast DNS-SD check — is the device operational on this fabric?
+        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
+
+        if is_operational:
+            LOGGER.info("Device %s is operational via DNS-SD - confirmed commissioned", node_id)
+            return True
+
+        # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
+        is_commissionable = await _is_device_commissionable_via_dnssd()
+
+        if is_commissionable:
+            LOGGER.info("Device %s is commissionable via DNS-SD (pairing window open) - not commissioned", node_id)
+            return False
+
+        # Step 3: Neither mDNS check was conclusive.
+        # Device is off, broken, or on another fabric without a commissioning window.
+        LOGGER.info("Device %s not found via any DNS-SD check - not commissioned on this fabric", node_id)
+        return False
+
+    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
+        LOGGER.error("Failed to check commissioning status for node %s: %s", node_id, e)
+        raise
+
+
+async def get_commissioned_fabric_count(
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    pase_params: Optional[PaseParams] = None
+) -> int:
+    """
+    Get the number of commissioned fabrics on a device.
+
+    Uses DNS-SD to check if the device is operational on this fabric, avoiding long timeouts.
+    Then reads the TrustedRootCertificates attribute from endpoint 0 and returns the count.
+    OperationalCredentials is node-scoped per the Matter spec and always resides on endpoint 0.
+
+    Args:
+        dev_ctrl: The chip device controller instance
+        node_id: Node ID of the device to check
+        pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
+
+    Returns:
+        Number of commissioned fabrics (count of trusted root certificates).
+        Returns 0 if device is factory fresh.
+
+    Raises:
+        ChipStackError: If unable to read the TrustedRootCertificates attribute
+        ValueError: If device is not operational via DNS-SD and no pase_params are provided
+        RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
+    """
+    try:
+        # Fast DNS-SD check to determine if device is operational on this fabric
+        # This avoids the long CASE timeout if device is not commissioned
+        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
+
+        if is_operational:
+            # Device is operational on this fabric - use CASE
+            LOGGER.info("Device %s is operational via DNS-SD, using CASE connection", node_id)
+            result = await dev_ctrl.ReadAttribute(
+                nodeId=node_id,
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        elif pase_params is not None:
+            # Device not operational on this fabric via DNS-SD - could be:
+            # 1. Not commissioned at all (factory fresh) - PASE will work
+            # 2. Commissioned but DNS-SD failed - CASE will work
+            # Try both in parallel for fastest response
+            LOGGER.info("Device %s not found via DNS-SD, trying parallel PASE/CASE connection", node_id)
+            await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
+            result = await dev_ctrl.ReadAttribute(
+                nodeId=node_id,
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            )
+        else:
+            # No PASE params and not operational - can't proceed without risking long timeout
+            raise ValueError(
+                f"Device {node_id} is not operational on this fabric and no PASE parameters provided. "
+                "Cannot get fabric count without risking long connection timeout."
+            )
+
+        # Extract the trusted root certificates list
+        # OperationalCredentials is node-scoped, always on endpoint 0
+        root_certs = result[0][Clusters.OperationalCredentials][
+            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
+        ]
+
+        # Return the count
+        return len(root_certs)
+
+    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
+        LOGGER.error("Failed to check commissioning status for node %s: %s", node_id, e)
+        raise

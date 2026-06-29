@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 
 import constants
 import stateful_shell
@@ -34,7 +35,7 @@ TermColors = constants.TermColors
 shell = stateful_shell.StatefulShell()
 
 _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
-_REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
+_REPO_BASE_PATH = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
@@ -43,9 +44,6 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
-    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
-    "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
-    "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -108,14 +106,7 @@ def load_config() -> None:
     return config
 
 
-def check_python_version() -> None:
-    if sys.version_info[0] < 3:
-        flush_print('Must use Python 3. Current version is ' +
-                    str(sys.version_info[0]))
-        exit(1)
-
-
-def load_cicd_config() -> Dict[str, Any]:
+def load_cicd_config() -> dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         return json.loads(config_file.read())
 
@@ -278,7 +269,6 @@ def bundle_telink(device_name: str) -> None:
 
 def main() -> int:
 
-    check_python_version()
     config = load_config()
     cicd_config = load_cicd_config()
 
@@ -542,7 +532,7 @@ def main() -> int:
         shell.run_cmd(
             f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
         shell.run_cmd(
-            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/../.zephyrrc')
         # QUIRK:
         # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
         # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH
@@ -876,7 +866,7 @@ def main() -> int:
                 'import("${chip_root}/config/standalone/args.gni")',
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
-                'chip_enable_openthread = false',
+                'chip_enable_thread = false',
                 'chip_generate_link_map_file = true',
                 'chip_config_network_layer_ble = false',
                 'chip_device_project_config_include = "<CHIPProjectAppConfig.h>"',
@@ -889,6 +879,7 @@ def main() -> int:
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
                 'chip_app_data_model_target = "//:chef-data-model"',
+                'shell_use_all_clusters_data_model = false',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)

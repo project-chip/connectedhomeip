@@ -97,12 +97,12 @@ void DefaultServerCluster::Shutdown(ClusterShutdownType)
     mContext = nullptr;
 }
 
-void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
+void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId, DataModel::AttributeChangeType type)
 {
     IncreaseDataVersion();
 
     VerifyOrReturn(mContext != nullptr);
-    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
+    mContext->provider.NotifyAttributeChanged({ mPath.mEndpointId, mPath.mClusterId, attributeId }, type);
 }
 
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const
@@ -133,11 +133,12 @@ CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & p
 }
 
 DataModel::ActionReturnStatus DefaultServerCluster::NotifyAttributeChangedIfSuccess(AttributeId attributeId,
-                                                                                    DataModel::ActionReturnStatus status)
+                                                                                    DataModel::ActionReturnStatus status,
+                                                                                    DataModel::AttributeChangeType type)
 {
     if (status.IsSuccess() && !status.IsNoOpSuccess())
     {
-        NotifyAttributeChanged(attributeId);
+        NotifyAttributeChanged(attributeId, type);
     }
     return status;
 }

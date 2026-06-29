@@ -24,7 +24,7 @@ optimize_debug_level = "s"
 chip_enable_ota_requestor = false
 chip_project_config_include_dirs =
     [ "${chip_root}/examples/lighting-app/stm32/include/STM32WB5" ]
-chip_enable_openthread = true
+chip_enable_thread = true
 chip_enable_ble = true
 chip_openthread_ftd = false
 chip_detail_logging = false

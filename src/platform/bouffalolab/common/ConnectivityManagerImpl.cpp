@@ -21,7 +21,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/bouffalolab/common/BLConfig.h>
+#include <platform/bouffalolab/common/BflbConfig.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/BLEManager.h>
 
@@ -34,13 +34,13 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #if CHIP_DEVICE_LAYER_TARGET_BL602
-#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif
 #if CHIP_DEVICE_LAYER_TARGET_BL702
-#include <platform/bouffalolab/BL702/NetworkCommissioningDriver.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif
-#if CHIP_DEVICE_LAYER_TARGET_BL616
-#include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif
 #endif
 
@@ -51,6 +51,12 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_BFLB && defined(CONFIG_PM) && CONFIG_PM
+extern "C" {
+#include <pm_manager.h>
+}
 #endif
 
 using namespace ::chip;
@@ -102,10 +108,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0);
     SuccessOrExit(err);
 
     return (ssidLen != 0);
@@ -147,7 +153,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         mWiFiStationState = newState;
         ConnectivityMgrImpl().DriveStationState();
         TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
-            []() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnNetworkStatusChange(); });
+            []() { NetworkCommissioning::BflbWiFiDriver::GetInstance().OnNetworkStatusChange(); });
     }
 }
 
@@ -155,10 +161,10 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiSSID);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BflbConfig::kConfigKey_WiFiSSID);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiPassword);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BflbConfig::kConfigKey_WiFiPassword);
     SuccessOrExit(err);
 
 exit:
@@ -177,14 +183,20 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
+    ReturnErrorOnFailure(
+        PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
 
-    return NetworkCommissioning::BLWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
+    return NetworkCommissioning::BflbWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
 }
 
 void ConnectivityManagerImpl::OnWiFiStationConnected()
 {
+#if CHIP_DEVICE_LAYER_TARGET_BFLB && defined(CONFIG_PM) && CONFIG_PM
+    ChipLogProgress(NotSpecified, "[LP] WiFi connected, enter STA PS");
+    pm_enter_lp_perparation();
+#endif
+
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
@@ -227,7 +239,7 @@ void ConnectivityManagerImpl::DriveStationState()
         if (ConnectivityManager::kWiFiStationState_Connecting == mWiFiStationState)
         {
             TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
-                []() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork(false); });
+                []() { NetworkCommissioning::BflbWiFiDriver::GetInstance().OnConnectWiFiNetwork(false); });
         }
     }
     break;
@@ -235,7 +247,7 @@ void ConnectivityManagerImpl::DriveStationState()
         ChipLogProgress(DeviceLayer, "Wi-Fi station connected.");
         OnWiFiStationConnected();
         TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
-            []() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork(true); });
+            []() { NetworkCommissioning::BflbWiFiDriver::GetInstance().OnConnectWiFiNetwork(true); });
     }
     break;
     case ConnectivityManager::kWiFiStationState_Disconnecting: {

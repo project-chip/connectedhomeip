@@ -19,6 +19,7 @@
 #include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
@@ -43,14 +44,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     // Instantiate Chime Server
     mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
-
-    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
-
-    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
-                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
-
-    Clusters::PushAvStreamTransport::SetTLSCertificateManagementDelegate(
-        mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
 
     // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
@@ -256,7 +249,7 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
         avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageRotation);
     }
 
-    uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
+    uint8_t maxConcurrentVideoEncoders   = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
     VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
     bool nightVisionUsesInfrared         = mCameraDevice->GetCameraHALInterface().GetNightVisionUsesInfrared();
@@ -277,11 +270,28 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
-    mAVStreamMgmtServer.Create(mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs,
-                               maxConcurrentVideoEncoders, maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport,
-                               rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities, spkrCapabilities,
-                               twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
-                               streamUsagePriorities);
+    CameraAVStreamManagementCluster::InitArguments args{
+        .context                      = CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
+        .delegate                     = mCameraDevice->GetCameraAVStreamMgmtDelegate(),
+        .endpointId                   = mEndpoint,
+        .features                     = avsmFeatures,
+        .optionalAttrs                = avsmOptionalAttrs,
+        .maxConcurrentEncoders        = maxConcurrentVideoEncoders,
+        .maxEncodedPixelRate          = maxEncodedPixelRate,
+        .videoSensorParams            = sensorParams,
+        .nightVisionUsesInfrared      = nightVisionUsesInfrared,
+        .minViewPort                  = minViewport,
+        .rateDistortionTradeOffPoints = std::move(rateDistortionTradeOffPoints),
+        .maxContentBufferSize         = maxContentBufferSize,
+        .microphoneCapabilities       = micCapabilities,
+        .spkrCapabilities             = spkrCapabilities,
+        .twoWayTalkSupport            = twowayTalkSupport,
+        .snapshotCapabilities         = std::move(snapshotCapabilities),
+        .maxNetworkBandwidth          = maxNetworkBandwidth,
+        .supportedStreamUsages        = std::move(supportedStreamUsages),
+        .streamUsagePriorities        = std::move(streamUsagePriorities)
+    };
+    mAVStreamMgmtServer.Create(std::move(args));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAVStreamMgmtServer.Registration());
     if (err != CHIP_NO_ERROR)
@@ -311,6 +321,15 @@ void CameraApp::InitCameraDeviceClusters()
 
     CreateAndInitializeCameraAVStreamMgmt();
 
+    // Only init PushAV once AVSM is init
+    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVTransportDelegate()));
+
+    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
+                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
+
+    Clusters::PushAvStreamTransport::SetTLSCertificateManagementDelegate(
+        mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
+
     // Set the WebRTCTransportProvider server in the manager
     mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
 
@@ -339,6 +358,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
         ChipLogError(Camera, "CameraAVStreamMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     mAVStreamMgmtServer.Destroy();
+
+    err = CodegenDataModelProvider::Instance().Registry().Unregister(&mAVSettingsUserLevelMgmtServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "CameraAVSettingsUserLevelMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mAVSettingsUserLevelMgmtServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

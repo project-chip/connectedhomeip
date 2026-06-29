@@ -18,7 +18,7 @@ import sys
 import unittest
 from difflib import unified_diff
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 try:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
@@ -56,7 +56,7 @@ def RenderAsIdlTxt(idl: Idl) -> str:
     return storage.content or ""
 
 
-def XmlToIdl(what: Union[str, List[str]]) -> Idl:
+def XmlToIdl(what: Union[str, list[str]]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 
@@ -761,6 +761,50 @@ endpoint 2 {
               readonly attribute int16u clusterRevision = 65533;
             }
             ''')
+
+        self.assertIdlEqual(xml_idl, expected_idl)
+
+    def testOptionalCommandAndEvent(self):
+        xml_idl = XmlToIdl('''
+            <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="123" name="Test" revision="1">
+              <events>
+                <event id="1" name="OptionalEvent" priority="info">
+                  <optionalConform/>
+                </event>
+                <event id="2" name="OptionalEventWithFeature" priority="info">
+                  <optionalConform>
+                    <feature name="FEAT"/>
+                  </optionalConform>
+                </event>
+              </events>
+              <commands>
+                <command id="10" name="OptionalCommand" source="client">
+                  <optionalConform/>
+                </command>
+                <command id="11" name="OptionalCommandWithFeature" source="client">
+                  <optionalConform>
+                    <feature name="FEAT"/>
+                  </optionalConform>
+                </command>
+              </commands>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               info optional event OptionalEvent = 1 {}
+               info optional event OptionalEventWithFeature = 2 {}
+               optional command OptionalCommand(): DefaultSuccess = 10;
+               optional command OptionalCommandWithFeature(): DefaultSuccess = 11;
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
 
         self.assertIdlEqual(xml_idl, expected_idl)
 

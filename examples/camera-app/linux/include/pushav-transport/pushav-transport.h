@@ -33,9 +33,20 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <protocols/interaction_model/StatusCode.h>
 #include <thread>
 #include <vector>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PushAvStreamTransport {
+class PushAvStreamTransportManager;
+} // namespace PushAvStreamTransport
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 static constexpr int kInvalidZoneId             = -1; // Invalid zone id value for trigger detection
 static constexpr int kDefaultSensitivity        = 5;  // Default motion sensitivity level
@@ -78,7 +89,7 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
-                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
+                          const std::vector<int> & zoneIds = { kInvalidZoneId }, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
@@ -128,6 +139,12 @@ public:
 
     void SetFabricIndex(chip::FabricIndex accessingFabricIndex) { mFabricIndex = accessingFabricIndex; }
 
+    // Set the manager reference for coordination
+    void SetTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
+    {
+        mManager = manager;
+    }
+
     uint64_t GetSessionNumber() const { return mSessionNumber; }
 
 private:
@@ -157,6 +174,9 @@ private:
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
 
+    // Manager reference for coordination
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * mManager = nullptr;
+
     // Note, a ZoneID within a Zone List can be Null, meaning the entry applies to all zones.
     std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> mZoneSensitivityList;
 
@@ -172,4 +192,7 @@ private:
     uint32_t mCurrentlyUsedBandwidthbps     = 0;
     bool mCurrentActivationByManualTrigger  = false;
     bool mPreviousActivationByManualTrigger = false;
+
+    // Mutex for synchronizing recorder access
+    std::mutex mRecorderMutex;
 };

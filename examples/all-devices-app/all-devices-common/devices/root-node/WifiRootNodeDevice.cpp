@@ -25,25 +25,32 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                                        EndpointComposition composition)
 {
-    ReturnErrorOnFailure(RootNodeDevice::Register(endpointId, provider, parentId));
+    ReturnErrorOnFailure(RootNodeDevice::Register(endpointId, provider, composition));
 
     mWifiDiagnosticsCluster.Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
                                    WiFiDiagnosticsServerCluster::OptionalAttributeSet{},
                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));
 
-    mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver, mGeneralCommissioningCluster.Cluster());
+    mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver,
+                                        NetworkCommissioningCluster::Context{
+                                            .breadcrumbTracker   = mGeneralCommissioningCluster.Cluster(),
+                                            .failSafeContext     = mContext.failSafeContext,
+                                            .platformManager     = mContext.platformManager,
+                                            .deviceControlServer = mContext.deviceControlServer,
+                                        });
     ReturnErrorOnFailure(mNetworkCommissioningCluster.Cluster().Init());
     ReturnErrorOnFailure(provider.AddCluster(mNetworkCommissioningCluster.Registration()));
 
     return CHIP_NO_ERROR;
 }
 
-void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void WifiRootNodeDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    RootNodeDevice::UnRegister(provider);
+    RootNodeDevice::Unregister(provider);
     if (mNetworkCommissioningCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));

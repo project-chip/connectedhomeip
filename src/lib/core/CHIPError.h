@@ -58,7 +58,7 @@ public:
     using StorageType = uint32_t;
 
     /// Type for encapsulated error values.
-    using ValueType = StorageType;
+    using ValueType = int32_t;
 
     /// Integer `printf` format for errors. This is a C macro in order to allow for string literal concatenation.
 #define CHIP_ERROR_INTEGER_FORMAT PRIx32
@@ -94,8 +94,20 @@ public:
         kLwIP       = 0x3, ///< Encapsulated LwIP errors.
         kOpenThread = 0x4, ///< Encapsulated OpenThread errors.
         kPlatform   = 0x5, ///< Platform-defined encapsulation.
-        kLastRange  = kPlatform,
+        // Platform-defined encapsulation with 31-bit value. This is a special range which maximizes
+        // the number of bits available for the encapsulated value. Such approach should minimize the
+        // risk of value truncation when encapsulating platform-specific error codes. Since we do not
+        // control platform-specific error codes we should not make assumptions about their size.
+        kPlatformExtended = 0x80,
+        kLastRange        = kPlatform,
     };
+
+    /**
+     * The kPlatformExtended value is a special range where the highest bit of the StorageType is set
+     * to indicate platform encapsulation. Platform encapsulated errors use all the lower 31 bits for
+     * the encapsulated value.
+     */
+    static_assert(Range::kLastRange < Range::kPlatformExtended, "The last range must be less than kPlatformExtended");
 
     /**
      * Secondary classification of CHIP SDK errors (Range::kSDK).
@@ -136,14 +148,14 @@ public:
      */
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     constexpr ChipError(Range range, ValueType value, std::source_location location = std::source_location()) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))), mSourceLocation(location)
+        mError(MakeInteger(range, MaskValue(range, value))), mSourceLocation(location)
     {}
 #elif CHIP_CONFIG_ERROR_SOURCE
     constexpr ChipError(Range range, ValueType value, const char * file = nullptr, unsigned int line = 0) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))), mLine(line), mFile(file)
+        mError(MakeInteger(range, MaskValue(range, value))), mLine(line), mFile(file)
     {}
 #else
-    constexpr ChipError(Range range, ValueType value) : mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) {}
+    constexpr ChipError(Range range, ValueType value) : mError(MakeInteger(range, MaskValue(range, value))) {}
 #endif
 
     /**
@@ -256,37 +268,46 @@ public:
     /**
      * Test whether @a error belongs to the Range @a range.
      */
-    constexpr bool IsRange(Range range) const
-    {
-        return (mError & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<StorageType>(range));
-    }
+    constexpr bool IsRange(Range range) const { return range == GetRange(); }
 
     /**
      * Get the Range to which the @a error belongs.
      */
-    constexpr Range GetRange() const { return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError)); }
+    constexpr Range GetRange() const
+    {
+        if (mError & (1u << kPlatformBit))
+        {
+            return Range::kPlatformExtended;
+        }
+        return static_cast<Range>(GetField(kRangeStartBit, kRangeLength, mError));
+    }
 
     /**
      * Get the encapsulated value of an @a error.
      */
-    constexpr ValueType GetValue() const { return GetField(kValueStart, kValueLength, mError); }
-
-    /**
-     * Test whether type @a T can always be losslessly encapsulated in a CHIP_ERROR.
-     */
-    template <typename T>
-    static constexpr bool CanEncapsulate()
+    constexpr ValueType GetValue() const
     {
-        return std::numeric_limits<typename std::make_unsigned_t<T>>::digits <= kValueLength;
+        if (mError & (1u << kPlatformBit))
+        {
+            return GetField<ValueType>(kPlatformValueStart, kPlatformValueLength, mError);
+        }
+        return GetField<ValueType>(kValueStartBit, kValueLength, mError);
     }
 
     /**
-     * Test whether if @a value can be losslessly encapsulated in a CHIP_ERROR.
+     * Test whether @a value type can be losslessly encapsulated in a CHIP_ERROR.
+     *
+     * @note
+     * This function does not check the actual value, only the type T.
      */
     template <typename T>
-    static constexpr bool CanEncapsulate(T value)
+    static constexpr bool CanEncapsulate(Range range, T value)
     {
-        return CanEncapsulate<T>() || FitsInField(kValueLength, static_cast<ValueType>(value));
+        if (range == Range::kPlatformExtended)
+        {
+            return std::numeric_limits<T>::min() >= kPlatformValueMin && std::numeric_limits<T>::max() <= kPlatformValueMax;
+        }
+        return std::numeric_limits<T>::min() >= kValueMin && std::numeric_limits<T>::max() <= kValueMax;
     }
 
     /**
@@ -294,15 +315,15 @@ public:
      */
     constexpr bool IsPart(SdkPart part) const
     {
-        return (mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
-            (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
-             MakeField(kSdkPartStart, static_cast<StorageType>(part)));
+        return (mError & (MakeMask(kRangeStartBit, kRangeLength) | MakeMask(kSdkPartStartBit, kSdkPartLength))) ==
+            (MakeField(kRangeStartBit, static_cast<StorageType>(Range::kSDK)) |
+             MakeField(kSdkPartStartBit, static_cast<StorageType>(part)));
     }
 
     /**
      * Get the SDK code for an SDK error.
      */
-    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStart, kSdkCodeLength, mError)); }
+    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStartBit, kSdkCodeLength, mError)); }
 
     /**
      * Test whether @a error is an SDK error representing an Interaction Model
@@ -370,34 +391,61 @@ private:
      *  |       |       |       |       |       |       |       |       |
      *  |     range     |                     value                     |
      *  |    kSdk==0    |       0               |0| part|    code       |   SDK error
-     *  |    01 - FF    |          encapsulated error code              |   Encapsulated error
+     *  |    01 - 7F    |          encapsulated error code              |   Encapsulated error
+     *  |1|                   encapsulated platform error code          |   Encapsulated platform error
      */
-    static constexpr int kRangeStart  = 24;
-    static constexpr int kRangeLength = 8;
-    static constexpr int kValueStart  = 0;
-    static constexpr int kValueLength = 24;
+    static constexpr int kRangeStartBit = 24;
+    static constexpr int kRangeLength   = 8;
+    static constexpr int kValueStartBit = 0;
+    static constexpr int kValueLength   = 24;
+    static constexpr int kValueMax      = (1u << kValueLength) - 1;
+    static constexpr int kValueMin      = -kValueMax - 1;
 
-    static constexpr int kSdkPartStart  = 8;
-    static constexpr int kSdkPartLength = 3;
-    static constexpr int kSdkCodeStart  = 0;
-    static constexpr int kSdkCodeLength = 8;
+    static constexpr int kPlatformBit         = 31;
+    static constexpr int kPlatformValueStart  = 0;
+    static constexpr int kPlatformValueLength = 31;
+    static constexpr int kPlatformValueMax    = (1u << kPlatformValueLength) - 1;
+    static constexpr int kPlatformValueMin    = -kPlatformValueMax - 1;
 
-    static constexpr StorageType GetField(unsigned int start, unsigned int length, StorageType value)
+    static constexpr int kSdkPartStartBit = 8;
+    static constexpr int kSdkPartLength   = 3;
+    static constexpr int kSdkCodeStartBit = 0;
+    static constexpr int kSdkCodeLength   = 8;
+
+    template <typename T = StorageType>
+    static constexpr T GetField(unsigned int start, unsigned int length, StorageType value)
     {
-        return (value >> start) & ((1u << length) - 1);
+        // For signed types T, the right shift performs sign extension, so the following code
+        // correctly preserves the sign of the extracted field.
+        return static_cast<T>(value << (std::numeric_limits<decltype(value)>::digits - start - length)) >>
+            (std::numeric_limits<decltype(value)>::digits - length);
     }
+
     static constexpr StorageType MakeMask(unsigned int start, unsigned int length) { return ((1u << length) - 1) << start; }
     static constexpr StorageType MakeField(unsigned int start, StorageType value) { return value << start; }
     static constexpr bool FitsInField(unsigned int length, StorageType value) { return value < (1u << length); }
 
     static constexpr StorageType MakeInteger(Range range, StorageType value)
     {
-        return MakeField(kRangeStart, to_underlying(range)) | MakeField(kValueStart, value);
+        return MakeField(kRangeStartBit, to_underlying(range)) | MakeField(kValueStartBit, value);
     }
     static constexpr StorageType MakeInteger(SdkPart part, uint8_t code)
     {
-        return MakeInteger(Range::kSDK, MakeField(kSdkPartStart, to_underlying(part)) | MakeField(kSdkCodeStart, code));
+        return MakeInteger(Range::kSDK, MakeField(kSdkPartStartBit, to_underlying(part)) | MakeField(kSdkCodeStartBit, code));
     }
+
+    // Clear all bits outside the value field.
+    //
+    // This function does not mask the value for the kPlatformExtended range because in
+    // case of kPlatformExtended the entire lower 31 bits are used for the value and the
+    // highest bit is set anyway to indicate this special range.
+    static constexpr StorageType MaskValue(Range range, ValueType value)
+    {
+        // No masking is needed for kPlatformExtended because MakeInteger will set the MSB.
+        return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStartBit, kValueLength))
+                                                   : static_cast<StorageType>(value);
+    }
+
     template <unsigned int START, unsigned int LENGTH>
     struct MaskConstant
     {
@@ -405,19 +453,22 @@ private:
     };
 
     // Assert that Range and Value fields fit in StorageType and don't overlap.
-    static_assert(kRangeStart + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
-    static_assert(kValueStart + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
-    static_assert((MaskConstant<kRangeStart, kRangeLength>::value & MaskConstant<kValueStart, kValueLength>::value) == 0,
+    static_assert(kRangeStartBit + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
+    static_assert(kValueStartBit + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
+    static_assert((MaskConstant<kRangeStartBit, kRangeLength>::value & MaskConstant<kValueStartBit, kValueLength>::value) == 0,
                   "Range and Value overlap");
 
     // Assert that SDK Part and Code fields fit in SdkCode field and don't overlap.
-    static_assert(kSdkPartStart + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
-    static_assert(kSdkCodeStart + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
-    static_assert((MaskConstant<kSdkPartStart, kSdkPartLength>::value & MaskConstant<kSdkCodeStart, kSdkCodeLength>::value) == 0,
+    static_assert(kSdkPartStartBit + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
+    static_assert(kSdkCodeStartBit + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
+    static_assert((MaskConstant<kSdkPartStartBit, kSdkPartLength>::value & MaskConstant<kSdkCodeStartBit, kSdkCodeLength>::value) ==
+                      0,
                   "SdkPart and SdkCode overlap");
 
-    // Assert that Value fits in ValueType.
-    static_assert(kValueStart + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
+    // Assert that value fits in ValueType.
+    static_assert(kValueStartBit + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
+    static_assert(kPlatformValueStart + kPlatformValueLength <= std::numeric_limits<ValueType>::digits,
+                  "Platform value does not fit in ValueType");
 
     StorageType mError;
 

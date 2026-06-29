@@ -38,7 +38,7 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
@@ -69,6 +69,11 @@ class TC_PAVST_2_5(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         if self.server is not None:
             self.server.terminate()
         super().teardown_class()
+
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+        super().teardown_test()
 
     def steps_TC_PAVST_2_5(self) -> list[TestStep]:
         return [
@@ -119,8 +124,8 @@ class TC_PAVST_2_5(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream()
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         # Commission DUT - already done
@@ -143,7 +148,7 @@ class TC_PAVST_2_5(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "AllocatedAudioStreams must not be empty",
         )
 
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )

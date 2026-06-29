@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,16 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.cpp"
-    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.h"
+   "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
     "${CLUSTER_DIR}/ThreadNetworkDiagnosticsCluster.cpp"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsCluster.h"
+    "${CLUSTER_DIR}/DirectThreadNetworkDiagnosticsProvider.cpp"
+    "${CLUSTER_DIR}/DirectThreadNetworkDiagnosticsProvider.h"
+    "${CLUSTER_DIR}/ThreadNetworkDiagnosticsProvider.h"
 )

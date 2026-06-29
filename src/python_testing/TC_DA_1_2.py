@@ -54,7 +54,6 @@ import random
 import re
 from enum import IntEnum
 from pathlib import Path
-from typing import Tuple
 
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -90,7 +89,7 @@ def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:
     return rdn[0].value.strip()
 
 
-def parse_ids_from_subject(cert: x509.Certificate) -> Tuple[str, str]:
+def parse_ids_from_subject(cert: x509.Certificate) -> tuple[str, str]:
     vid_str = get_value_for_oid('1.3.6.1.4.1.37244.2.1', cert)
     pid_str = get_value_for_oid('1.3.6.1.4.1.37244.2.2', cert)
 
@@ -110,7 +109,7 @@ def parse_single_vidpid_from_common_name(commonName: str, tag_str: str) -> str:
     return s
 
 
-def parse_ids_from_common_name(cert: x509.Certificate) -> Tuple[str, str]:
+def parse_ids_from_common_name(cert: x509.Certificate) -> tuple[str, str]:
     common = get_value_for_oid('2.5.4.3', cert)
     vid_str = parse_single_vidpid_from_common_name(common, 'Mvid:')
     pid_str = parse_single_vidpid_from_common_name(common, 'Mpid:')
@@ -118,7 +117,7 @@ def parse_ids_from_common_name(cert: x509.Certificate) -> Tuple[str, str]:
     return vid_str, pid_str
 
 
-def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> Tuple[int, int, int, int]:
+def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> tuple[int, int, int, int]:
     dac_vid_str, dac_pid_str = parse_ids_from_subject(dac)
     pai_vid_str, pai_pid_str = parse_ids_from_subject(pai)
 
@@ -253,8 +252,8 @@ class TC_DA_1_2(BasicCompositionTests):
                             "DUT returned invalid response to AttestationRequest")
 
         self.step("3a")
-        type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
-        dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
+        cert_type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
+        dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=cert_type))
         asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_dac = dac_resp.certificate
@@ -267,8 +266,8 @@ class TC_DA_1_2(BasicCompositionTests):
         asserts.assert_equal(parsed_dac.version, x509.Version.v3, "DUT returned incorrect certificate type")
 
         self.step("3b")
-        type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
-        pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
+        cert_type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
+        pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=cert_type))
         asserts.assert_true(matchers.is_type(pai_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_pai = pai_resp.certificate
@@ -453,11 +452,11 @@ class TC_DA_1_2(BasicCompositionTests):
                 if not filename.name.endswith('.der'):
                     continue
                 with filename.open("rb") as f:
-                    log.info(f'Parsing CD signing certificate file: {filename}')
+                    log.info('Parsing CD signing certificate file: %s', filename)
                     try:
                         cert = x509.load_der_x509_certificate(f.read())
                     except ValueError:
-                        log.info(f'File {filename} is not a valid certificate, skipping')
+                        log.info('File %s is not a valid certificate, skipping', filename)
                         continue
                     pub = cert.public_key()
                     ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest

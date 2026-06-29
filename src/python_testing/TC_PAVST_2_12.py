@@ -43,7 +43,7 @@ import logging
 import time
 
 from mobly import asserts
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
@@ -77,6 +77,11 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         if self.server is not None:
             self.server.terminate()
         super().teardown_class()
+
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.tlsEndpointId)
+        super().teardown_test()
 
     def steps_TC_PAVST_2_12(self) -> list[TestStep]:
         return [
@@ -192,8 +197,8 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream()
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         # Commission DUT - already done
@@ -222,11 +227,11 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones
         )
-        logger.info(f"aZones: {aZones}")
+        logger.info("aZones: %s", aZones)
 
         self.step(5)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=zmcluster, attribute=zmattr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        logger.info("Rx'd FeatureMap: %s", aFeatureMap)
         self.twoDCartSupported = aFeatureMap & zmcluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
         self.userDefinedSupported = aFeatureMap & zmcluster.Bitmaps.Feature.kUserDefined
         self.perZoneSensSupported = aFeatureMap & zmcluster.Bitmaps.Feature.kPerZoneSensitivity
@@ -247,7 +252,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 zone=zoneToCreate
             )
             cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
-            logger.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            logger.info("Rx'd CreateTwoDCartesianZoneResponse : %s", cmdResponse)
             asserts.assert_equal(type(cmdResponse), zmcluster.Commands.CreateTwoDCartesianZoneResponse,
                                  "Incorrect response type")
             asserts.assert_is_not_none(
@@ -272,7 +277,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+                                                              tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must respond with Status Code Success.")
         except InteractionModelError as e:
@@ -306,7 +311,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step(9)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        logger.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID1, "Unexpected value for ConnectionID returned")
 
         self.step(10)
@@ -332,7 +337,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+                                                              tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must respond with Status Code Success.")
         except InteractionModelError as e:
@@ -356,7 +361,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step(14)
         event_data = event_callback.wait_for_event_expect_no_report(timeout_sec=5)
-        logger.info(f"Successfully timed out without receiving any PushTransportBegin event for zone: {aZones}")
+        logger.info("Successfully timed out without receiving any PushTransportBegin event for zone: %s", aZones)
 
         self.step(15)
         cmd = pvcluster.Commands.SetTransportStatus(
@@ -370,12 +375,12 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step(16)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        logger.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
 
         self.step(17)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=initDuration+preRollLength)
-        logger.info(f"Event data {event_data}")
+        logger.info("Event data %s", event_data)
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
 
         await asyncio.to_thread(time.sleep, 5)  # Wait for 5 seconds before sending DeallocatePushTransport command

@@ -45,12 +45,6 @@ choice CHIP_NXP_PLATFORM_SELECTION
 		help
 			NXP RT1060 platform.
 
-	config CHIP_NXP_PLATFORM_MCXW71
-		bool "mcxw71 platform"
-		depends on MCUX_HW_DEVICE_MCXW716C
-		help
-			NXP mcxw71 platform.
-
 	config CHIP_NXP_PLATFORM_MCXW72
 		bool "mcxw72 platform"
 		depends on MCUX_HW_DEVICE_MCXW727C
@@ -64,7 +58,6 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 	default "rt/rw61x" if CHIP_NXP_PLATFORM_RW61X
 	default "rt/rt1170" if CHIP_NXP_PLATFORM_RT1170
 	default "rt/rt1060" if CHIP_NXP_PLATFORM_RT1060
-	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "mcxw72" if CHIP_NXP_PLATFORM_MCXW72
 	default "not specified"
 	help
@@ -72,21 +65,13 @@ config CHIP_NXP_PLATFORM_FOLDER_NAME
 
 config CHIP_NXP_DEVICE_LAYER
 	string "NXP device layer"
-	default "nxp/mcxw71" if CHIP_NXP_PLATFORM_MCXW71
 	default "nxp/common"
 
 # Invisible symbol to get the platform family name
 config CHIP_NXP_PLATFORM_FAMILY
 	string
-	default "mcxw71" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default "mcxw72" if CHIP_NXP_PLATFORM_MCXW72
 	default "rt" if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
-
-config CHIP_NXP_CRYPTO_IMPL
-	string "NXP Crypto Implementation chosen"
-	default "se05x" if CHIP_SE05X
-	default ""
-	help
-		Defines crypto implementation to be used
 
 choice CHIP_NVM_COMPONENT
 	prompt "NVM component selection"
@@ -134,65 +119,6 @@ config CHIP_DEVICE_USE_ZEPHYR_BLE
 	help
 		Use Zephyr implementation for BLE manager.
 
-# Secure Element Configurations
-
-config CHIP_SE05X
-	bool "Enable Secure Element support"
-	select SE05X_LIB
-	help
-		Enable SE05x Secure element for offloading crypto operations.
-
-if CHIP_SE05X
-
-config CHIP_SE05X_SPAKE_VERIFIER
-	bool "Enable SE05x Secure element for offloading spake verifier"
-	help
-		Enable SE05x Secure element for offloading spake verifier.
-
-config CHIP_SE05X_SPAKE_PROVER
-	bool "Enable SE05x Secure element for offloading spake prover"
-	help
-		Enable SE05x Secure element for offloading spake prover.
-
-config CHIP_SE05X_RND_GEN
-	bool "Enable SE05x Secure element for offloading random number generation"
-	help
-		Enable SE05x Secure element for offloading random number generation.
-
-config CHIP_SE05X_GENERATE_EC_KEY
-	bool "Enable SE05x Secure element for EC key Generate"
-	default y
-	help
-		Enable SE05x Secure element for EC key Generate.
-
-config CHIP_SE05X_ECDSA_VERIFY
-	bool "Enable SE05x Secure element for ECDSA Verify"
-	default y
-	help
-		Enable SE05x Secure element for ECDSA Verify.
-
-config CHIP_SE05X_PBKDF2_SHA256
-	bool "Enable SE05x Secure element for PBKDF2_SHA256"
-	help
-		Enable SE05x Secure element for PBKDF2_SHA256.
-
-config CHIP_SE05X_HKDF_SHA256
-	bool "Enable SE05x Secure element for HKDF_SHA256"
-	help
-		Enable SE05x Secure element for HKDF_SHA256.
-
-config CHIP_SE05X_HMAC_SHA256
-	bool "Enable SE05x Secure element for HMAC_SHA256"
-	help
-		Enable SE05x Secure element for HMAC_SHA256.
-
-config CHIP_SE05X_DEVICE_ATTESTATION
-	bool "Enable SE05x Secure element for offloading Device attestation Sign"
-	help
-		Enable SE05x Secure element for offloading Device attestation Sign.
-
-endif # CHIP_SE05X
-
 config CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
 	bool "Use Posted Operations in Idle task for OTA Image Processing"
 	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
@@ -236,7 +162,7 @@ config DEBUG
 
 config CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
 	bool "Use Multiple BLE connections after commissioning"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of Multiple BLE connections after commissioning.
 
@@ -254,13 +180,13 @@ config CHIP_NXP_BLE_BONDING
 
 config NXP_USE_SMU2_STATIC
 	bool "Use SMU2"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of SMU2.
 
 config NXP_USE_SMU2_DYNAMIC
 	bool "Use extra SMU2 after commissioning"
-	depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	depends on CHIP_NXP_PLATFORM_MCXW72
 	help
 	  Enable app usage of extra SMU2 after commissioning.
 
@@ -268,6 +194,27 @@ config NXP_USE_LOW_POWER
 	bool "Enable low power support"
 	help
 	  Enables low power support
+
+if NXP_USE_LOW_POWER
+
+config NXP_USE_POWER_DOWN
+	bool "Use PowerDown to reduce power consumption"
+	help
+	  Uses PowerDown to reduce power consumption during idle times
+
+if NXP_USE_POWER_DOWN
+
+config NXP_POWER_DOWN_POLL_THRESHOLD
+	int "Data poll interval threshold, in seconds, for power down"
+	depends on NXP_USE_POWER_DOWN
+	range 1 60
+	help
+	  Minimum data poll interval, in seconds, from which the device will
+	  start using power down as a low power state, instead of deep sleep
+
+endif # NXP_USE_POWER_DOWN
+
+endif # NXP_USE_LOW_POWER
 
 config NXP_USE_PLAIN_DAC_KEY
 	bool "Store DAC private key in plaintext"

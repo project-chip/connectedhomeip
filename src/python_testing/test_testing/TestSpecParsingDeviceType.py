@@ -17,13 +17,13 @@
 import re
 import xml.etree.ElementTree as ElementTree
 
-from DeviceConformanceTests import DeviceConformanceTests, get_supersets
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, conformance_allowed
+from matter.testing.device_conformance_tests import DeviceConformanceTests, get_supersets
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
                                          parse_single_device_type)
@@ -39,18 +39,20 @@ def run_against_all_spec_revisions(body):
 
 
 class TestSpecParsingDeviceType(DeviceConformanceTests):
+    requires_dut = False
+
     def _create_xmls(self, revision: PrebuiltDataModelDirectory):
         print(f"-------------- Testing against spec revision {revision.dirname}")
         self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(revision)
         self.xml_device_types, self.xml_device_types_problems = build_xml_device_types(revision)
         # Let's just build a dictionary of device types to IDs because I need them and we don't have codegen
-        self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): id for id, dt in self.xml_device_types.items()}
+        self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): tid for tid, dt in self.xml_device_types.items()}
 
     # This just tests that the prebuilt specs can be parsed without failures
 
     @run_against_all_spec_revisions
     def test_spec_device_parsing(self):
-        for id, d in self.xml_device_types.items():
+        for _, d in self.xml_device_types.items():
             print(str(d))
 
     def teardown_test(self):
@@ -59,6 +61,7 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
             print(self.problems)
 
     def setup_class(self):
+        super().setup_class()
         self.device_type_id = 0xBBEF
         self.revision = 2
         self.classification_class = "simple"
@@ -111,7 +114,6 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
                                     </clusters>
                                     </deviceType>""")
         # We're going to use the real cluster stuff so I don't need to write new XML. Device type uses Identify and Groups.
-        super().setup_class()
 
     def test_device_type_clusters(self):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
@@ -124,9 +126,9 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         asserts.assert_equal(device_type[self.device_type_id].revision, self.revision, "Unexpected revision")
         asserts.assert_equal(len(device_type[self.device_type_id].server_clusters),
                              len(self.clusters), "Unexpected number of clusters")
-        for id, name in self.clusters.items():
-            asserts.assert_equal(device_type[self.device_type_id].server_clusters[id].name, name, "Incorrect cluster name")
-            asserts.assert_equal(str(device_type[self.device_type_id].server_clusters[id].conformance),
+        for cid, name in self.clusters.items():
+            asserts.assert_equal(device_type[self.device_type_id].server_clusters[cid].name, name, "Incorrect cluster name")
+            asserts.assert_equal(str(device_type[self.device_type_id].server_clusters[cid].conformance),
                                  'M', 'Incorrect cluster conformance')
 
     def test_no_clusters(self):
@@ -430,19 +432,19 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
 
     @run_against_all_spec_revisions
     def test_all_device_types(self):
-        for id in self.xml_device_types:
-            self.create_good_device(id)
+        for tid in self.xml_device_types:
+            self.create_good_device(tid)
             success, problems = self.check_device_type(fail_on_extra_clusters=True)
             for p in problems:
                 print(p)
-            asserts.assert_false(problems, f"Unexpected problems on device type {id}")
-            asserts.assert_true(success, f"Unexpected failure on device type {id}")
+            asserts.assert_false(problems, f"Unexpected problems on device type {tid}")
+            asserts.assert_true(success, f"Unexpected failure on device type {tid}")
 
     @run_against_all_spec_revisions
     def test_disallowed_cluster(self):
-        for id, dt in self.xml_device_types.items():
+        for tid, dt in self.xml_device_types.items():
             expected_problems = 0
-            self.create_good_device(id)
+            self.create_good_device(tid)
             for cluster_id, cluster in dt.server_clusters.items():
                 if not conformance_allowed(cluster.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES), False):
                     self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList].append(cluster_id)
@@ -463,6 +465,8 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         one_four_two, one_four_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_2)
         one_five, one_five_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         one_five_one, one_five_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5_1)
+        one_six, one_six_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_6)
+        one_six_one, one_six_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_6_1)
         self.problems.extend(one_two_problems)
         self.problems.extend(one_three_problems)
         self.problems.extend(one_four_problems)
@@ -470,6 +474,8 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         self.problems.extend(one_four_two_problems)
         self.problems.extend(one_five_problems)
         self.problems.extend(one_five_one_problems)
+        self.problems.extend(one_six_problems)
+        self.problems.extend(one_six_one_problems)
 
         asserts.assert_equal(len(one_two_problems), 0, "Problems found when parsing 1.2 spec")
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
@@ -478,6 +484,8 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         asserts.assert_equal(len(one_four_two_problems), 0, "Problems found when parsing 1.4.2 spec")
         asserts.assert_equal(len(one_five_problems), 0, "Problems found when parsing 1.5 spec")
         asserts.assert_equal(len(one_five_one_problems), 0, "Problems found when parsing 1.5.1 spec")
+        asserts.assert_equal(len(one_six_problems), 0, "Problems found when parsing 1.6 spec")
+        asserts.assert_equal(len(one_six_one_problems), 0, "Problems found when parsing 1.6.1 spec")
 
         # Current ballot has a bunch of problems related to IDs being allocated for closures and TBR. These should all
         # mention ID-TBD as the id, so let's pull those out for now and make sure there are no UNKNOWN problems.
@@ -511,6 +519,8 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
                              set(), "There are some 1.4.2 device types that are unexpectedly not included in the 1.5 spec")
         asserts.assert_equal(set(one_five.keys())-set(one_five_one.keys()),
                              set(), "There are some 1.5 device types that are unexpectedly not included in the 1.5.1 spec")
+        asserts.assert_equal(set(one_five_one.keys())-set(one_six.keys()),
+                             set(), "There are some 1.5.1 device types that are unexpectedly not included in the 1.6 spec")
 
     @run_against_all_spec_revisions
     def test_application_device_type_on_root(self):
@@ -577,17 +587,17 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         # 4 -> 3
         # 5 - all alone
         # 6 - utility endpoint
-        one = XmlDeviceType('one', 1, [], [], 'simple', 'endpoint',
+        one = XmlDeviceType('one', 1, [], [], 'simple', 'endpoint', {1: ""},
                             superset_of_device_type_name='two', superset_of_device_type_id=2)
-        two = XmlDeviceType('two', 1, [], [], 'simple', 'endpoint',
+        two = XmlDeviceType('two', 1, [], [], 'simple', 'endpoint', {1: ""},
                             superset_of_device_type_name='three', superset_of_device_type_id=3)
-        three = XmlDeviceType('three', 1, [], [], 'simple', 'endpoint',
+        three = XmlDeviceType('three', 1, [], [], 'simple', 'endpoint', {1: ""},
                               superset_of_device_type_name=None, superset_of_device_type_id=0)
-        four = XmlDeviceType('four', 1, [], [], 'simple', 'endpoint',
+        four = XmlDeviceType('four', 1, [], [], 'simple', 'endpoint', {1: ""},
                              superset_of_device_type_name='three', superset_of_device_type_id=3)
-        five = XmlDeviceType('five', 1, [], [], 'simple', 'endpoint',
+        five = XmlDeviceType('five', 1, [], [], 'simple', 'endpoint', {1: ""},
                              superset_of_device_type_name=None, superset_of_device_type_id=0)
-        six = XmlDeviceType('six', 1, [], [], 'utility', 'endpoint',
+        six = XmlDeviceType('six', 1, [], [], 'utility', 'endpoint', {1: ""},
                             superset_of_device_type_name=None, superset_of_device_type_id=0)
         return {1: one, 2: two, 3: three, 4: four, 5: five, 6: six}
 

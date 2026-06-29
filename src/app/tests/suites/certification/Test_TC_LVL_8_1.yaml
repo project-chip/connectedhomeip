@@ -13,6 +13,13 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
+CI:
+    - name: "Test against all-devices/speaker"
+      app: all-devices
+      args:
+          - --device
+          - speaker
+
 name: 32.1.9 [TC-LVL-8.1] Verification of commands (DUT as Client)"
 
 PICS:

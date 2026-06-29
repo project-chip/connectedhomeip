@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/thermostat-server/thermostat-delegate.h>
+#include <app/clusters/thermostat-server/ThermostatDelegate.h>
 
 namespace chip {
 namespace app {
@@ -150,6 +150,7 @@ private:
 
     uint8_t mActivePresetHandleData[kPresetHandleSize];
     size_t mActivePresetHandleDataSize;
+    bool mActivePresetHandleIsNull = true;
 
     uint8_t mMaxThermostatSuggestions;
     ThermostatSuggestionStructWithOwnedMembers mThermostatSuggestions[kMaxNumberOfThermostatSuggestions];

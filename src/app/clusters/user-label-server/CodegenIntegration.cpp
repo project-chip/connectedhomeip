@@ -17,9 +17,11 @@
  */
 
 #include <app/clusters/user-label-server/UserLabelCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/UserLabel.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DeviceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,7 +42,14 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
+        DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+        VerifyOrDie(deviceInfoProvider != nullptr);
+
+        gServers[clusterInstanceIndex].Create(endpointId,
+                                              UserLabelCluster::Context{
+                                                  .deviceInfoProvider = *deviceInfoProvider,
+                                                  .fabricTable        = Server::GetInstance().GetFabricTable(),
+                                              });
         return gServers[clusterInstanceIndex].Registration();
     }
 

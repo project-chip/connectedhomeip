@@ -309,9 +309,9 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """Callback function called when a local ICE candidate is received."""
         self._local_events[Events.ICE_CANDIDATE].put(IceCandidate(candidate=candidate, sdpMid=mid))
 
-    def on_local_description_cb(self, sdp: str, type: str) -> None:
+    def on_local_description_cb(self, sdp: str, event_type: str) -> None:
         """Callback function called when a local SDP description is received."""
-        event = Events.OFFER if type.lower() == "offer" else Events.ANSWER
+        event = Events.OFFER if event_type.lower() == "offer" else Events.ANSWER
         self._local_events[event].put(sdp)
 
     def on_gathering_complete_cb(self) -> None:
@@ -338,7 +338,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         Also stores them in the event queue for tests that may need to wait for and verify them.
         """
         # Immediately apply candidates for trickle ICE support
-        LOGGER.debug(f"Applying {len(candidates)} candidates for trickle ICE support: {candidates}")
+        LOGGER.debug("Applying %s candidates for trickle ICE support: %s", len(candidates), candidates)
         self.set_remote_ice_candidates(candidates)
 
         # Also put in event queue for any waiting consumers

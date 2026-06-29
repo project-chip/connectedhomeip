@@ -91,7 +91,7 @@ satisfied with the following command:
 sudo apt-get install git gcc g++ pkg-config cmake curl libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
-     default-jre
+     libevent-dev default-jre
 ```
 
 #### Upgrading Python on Ubuntu 22.04
@@ -234,7 +234,7 @@ up in `$PATH`.
 
 ZAP releases are copied to CIPD by an automated bot. You can check if a release
 was copied by looking at tags created for
-[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/3pp/zap)
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/experimental/matter/zap)
 in various platforms.
 
 ### Custom ZAP
@@ -420,15 +420,16 @@ To compile, use:
 After which tests should be located in
 `out/linux-x64-tests-clang-asan-libfuzzer/tests/`.
 
-#### `ossfuzz` configurations
+#### OSS-Fuzz builds (`oss_fuzz=true`)
 
-`ossfuzz` configurations are not stand-alone fuzzing and instead serve as an
-integration point with external fuzzing automated builds.
+The `oss_fuzz=true` GN build is not stand-alone fuzzing; it is the integration
+point for the external OSS-Fuzz automation, which drives it from its own
+`build.sh` and supplies environment variables such as `$CFLAGS`, `$CXXFLAGS` and
+`$LIB_FUZZING_ENGINE`. It is not exposed as a local `build_examples.py` target.
 
-They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
-`$LIB_FUZZING_ENGINE`.
-
-You likely want `libfuzzer` + `asan` builds instead for local testing.
+For local testing you likely want `libfuzzer` + `asan` builds, or -- for the
+`pw_fuzzer` `FuzzTests` below -- the `-ossfuzz` modifier, which reproduces the
+OSS-Fuzz (libFuzzer-compatibility) build with the local toolchain.
 
 ### `pw_fuzzer` `FuzzTests`
 
@@ -452,6 +453,14 @@ executed manually.
 >     `linux-x64-tests-clang-pw-fuzztest-coverage`
 > -   Details:
 >     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
+> -   Append `-ossfuzz` to build in libFuzzer-compatibility mode (the mode
+>     OSS-Fuzz drives) instead of FuzzTest's native engine, e.g.
+>     `linux-x64-tests-clang-pw-fuzztest-ossfuzz`. Useful to reproduce the
+>     OSS-Fuzz build locally, or to use libFuzzer corpus/merge/minimize
+>     features.
+> -   Append `-ubsan` to add UndefinedBehaviorSanitizer on top of the default
+>     `asan`, e.g. `linux-x64-tests-clang-pw-fuzztest-ubsan` (can be combined
+>     with `-ossfuzz`).
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where

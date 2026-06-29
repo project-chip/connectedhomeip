@@ -22,8 +22,14 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
+#include <app/data-model/WrappedStructEncoder.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/util/util.h>
 #include <assert.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -90,6 +96,8 @@ PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
+    VerifyOrDie(mCluster != nullptr);
+
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
 }
@@ -128,39 +136,58 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
 
     if (it != mCurrentConnections.end())
     {
-        *it    = transportConfiguration;
-        result = UpsertResultEnum::kUpdated;
+        TransportConfigurationStorage oldValue = *it;
+        *it                                    = transportConfiguration;
+        result                                 = UpsertResultEnum::kUpdated;
+        CHIP_ERROR err                         = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store updated connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            *it = oldValue; // Revert
+            return UpsertResultEnum::kFailed;
+        }
     }
     else
     {
         mCurrentConnections.push_back(transportConfiguration);
-        result = UpsertResultEnum::kInserted;
+        result         = UpsertResultEnum::kInserted;
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store new connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections.pop_back(); // Revert
+            return UpsertResultEnum::kFailed;
+        }
     }
 
-    MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                           PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
     return result;
 }
 
-void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
+CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
 {
-    size_t originalSize = mCurrentConnections.size();
+    auto it = std::find_if(
+        mCurrentConnections.begin(), mCurrentConnections.end(),
+        [transportConnectionId](const TransportConfigurationStorage & s) { return s.connectionID == transportConnectionId; });
 
-    // Erase-Remove idiom
-    mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
-                                             [transportConnectionId](const TransportConfigurationStorage & s) {
-                                                 return s.connectionID == transportConnectionId;
-                                             }),
-                              mCurrentConnections.end());
-
-    // If a connection was removed, the size will be smaller.
-    if (mCurrentConnections.size() < originalSize)
+    if (it != mCurrentConnections.end())
     {
+        TransportConfigurationStorage removedValue = *it;
+        mCurrentConnections.erase(it);
+
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections.push_back(removedValue); // Revert
+            return err;
+        }
+
         // Notify the stack that the CurrentConnections attribute has changed.
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
     }
+    return CHIP_NO_ERROR;
 }
 
 void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connectionID)
@@ -183,8 +210,7 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
 void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
-    ChipLogFailure(mDelegate->LoadCurrentConnections(mCurrentConnections), Zcl,
-                   "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
+    LogErrorOnFailure(LoadCurrentConnections());
 
     // Signal delegate that all persistent configuration attributes have been loaded.
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
@@ -251,7 +277,11 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
         ChipLogProgress(Zcl, "Push AV Stream Transport Deallocate timer expired. %s", "Deallocating");
 
         // Remove connection from CurrentConnections
-        transportDeallocateContext->instance->RemoveStreamTransportConnection(connectionID);
+        CHIP_ERROR err = transportDeallocateContext->instance->RemoveStreamTransportConnection(connectionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to remove transport connection: %" CHIP_ERROR_FORMAT, err.Format());
+        }
         transportDeallocateContext->instance->RemoveTimerAppState(connectionID);
     }
     else
@@ -362,9 +392,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid streamUsage ", mEndpointId));
 
-    // Check for video stream name length constraints
+    // Check for video stream list count constraint (spec: max 16)
     if (transportOptions.videoStreams.HasValue())
     {
+        size_t vsCount   = 0;
+        CHIP_ERROR vsErr = transportOptions.videoStreams.Value().ComputeSize(&vsCount);
+        VerifyOrReturnValue(vsErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: VideoStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, vsErr.Format()));
+        VerifyOrReturnValue(vsCount <= kMaxVideoStreams, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: VideoStreams count %u "
+                                         "exceeds max %u",
+                                         mEndpointId, static_cast<unsigned>(vsCount), static_cast<unsigned>(kMaxVideoStreams)));
+
         for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
         {
             auto streamName = iter.GetValue().videoStreamName;
@@ -377,9 +420,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         }
     }
 
-    // Check for audio stream name length constraints
+    // Check for audio stream list count constraint (spec: max 16)
     if (transportOptions.audioStreams.HasValue())
     {
+        size_t asCount   = 0;
+        CHIP_ERROR asErr = transportOptions.audioStreams.Value().ComputeSize(&asCount);
+        VerifyOrReturnValue(asErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: AudioStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, asErr.Format()));
+        VerifyOrReturnValue(asCount <= kMaxAudioStreams, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: AudioStreams count %u "
+                                         "exceeds max %u",
+                                         mEndpointId, static_cast<unsigned>(asCount), static_cast<unsigned>(kMaxAudioStreams)));
+
         for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
         {
             auto streamName = iter.GetValue().audioStreamName;
@@ -571,23 +627,11 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
 
         uint16_t chunkDuration = containerOptions.CMAFContainerOptions.Value().chunkDuration;
 
-        VerifyOrReturnValue(chunkDuration >= 0 && chunkDuration <= segmentDuration / 2, Status::ConstraintError,
+        VerifyOrReturnValue(chunkDuration <= segmentDuration / 2, Status::ConstraintError,
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: CMAF Container Options Chunk "
                                          "Duration field not within allowed range",
                                          mEndpointId));
-
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key constraint "
-                             "Error, actual length: %" PRIu32 " not "
-                             "equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size())));
-        }
 
         if (!mFeatures.Has(Feature::kMetadata))
         {
@@ -595,33 +639,6 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                 ChipLogError(Zcl,
                                              "Transport Options verification from command data[ep=%d]: Found CMAF Container "
                                              "Options MetadataEnabled which is not expected.",
-                                             mEndpointId));
-        }
-
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: Missing CMAF Container Options CENC Key ID ",
-                             mEndpointId));
-
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() == kMaxCENCKeyIDLength,
-                Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key ID "
-                             "constraint Error, actual "
-                             "length: %" PRIu32 " not equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size())));
-        }
-        else
-        {
-            VerifyOrReturnValue(!containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                                ChipLogError(Zcl,
-                                             "Transport Options verification from command data[ep=%d]: Found CMAF Container "
-                                             "Options CENC Key ID which is not expected",
                                              mEndpointId));
         }
     }
@@ -796,11 +813,12 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
 
             // Create new video stream entry with name 'video' and the provided or selected VideoStreamID i.e; finalVideoStreamID
             Structs::VideoStreamStruct::Type newVideoStream;
-            newVideoStream.videoStreamName = CharSpan::fromCharString("video");
+            newVideoStream.videoStreamName = "video"_span;
             newVideoStream.videoStreamID   = finalVideoStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddVideoStream(newVideoStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddVideoStream(newVideoStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add video stream", mEndpointId));
         }
 
         if (transportOptions.audioStreamID.HasValue())
@@ -838,11 +856,12 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
 
             // Create new audio stream entry with name 'audio' and the provided or selected AudioStreamID i.e; finalAudioStreamID
             Structs::AudioStreamStruct::Type newAudioStream;
-            newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
+            newAudioStream.audioStreamName = "audio"_span;
             newAudioStream.audioStreamID   = finalAudioStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddAudioStream(newAudioStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddAudioStream(newAudioStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add audio stream", mEndpointId));
         }
     }
 
@@ -856,6 +875,24 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     if (IsNullDelegateWithLogging(commandPath.mEndpointId))
     {
         handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
+    }
+
+    // Enforce CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS as a per-fabric limit.
+    size_t numConnectionsForFabric = 0;
+    for (const auto & entry : mCurrentConnections)
+    {
+        // Each entry is keyed by connection ID; the value stores the fabric index.
+        if (entry.GetFabricIndex() == handler.GetAccessingFabricIndex())
+        {
+            ++numConnectionsForFabric;
+        }
+    }
+
+    if (numConnectionsForFabric >= CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Maximum number of connections reached for fabric", mEndpointId);
+        handler.AddStatus(commandPath, Status::ResourceExhausted);
         return std::nullopt;
     }
 
@@ -874,8 +911,10 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     // Validate the TLS Endpoint
     if (mTLSClientManagementDelegate != nullptr)
     {
+        // Note: TLS clusters are always on EP0, per spec
+        //
         CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
+            kRootEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
             [&](auto & TLSEndpoint) -> CHIP_ERROR {
                 // Use heap allocation for large certificate buffers to reduce stack usage
                 auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
@@ -1148,7 +1187,11 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         outTransportConfiguration.SetFabricIndex(accessingFabricIndex);
 
-        UpsertStreamTransportConnection(outTransportConfiguration);
+        if (UpsertStreamTransportConnection(outTransportConfiguration) == UpsertResultEnum::kFailed)
+        {
+            handler.AddStatus(commandPath, Status::Failure);
+            return std::nullopt;
+        }
 
         response.transportConfiguration = outTransportConfiguration;
 
@@ -1201,7 +1244,12 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     if (delegateStatus.IsSuccess())
     {
         // Remove connection from CurrentConnections
-        RemoveStreamTransportConnection(connectionID);
+        CHIP_ERROR err = RemoveStreamTransportConnection(connectionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::Failure);
+            return std::nullopt;
+        }
         RemoveTimerAppState(connectionID);
     }
 
@@ -1273,10 +1321,20 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
 
     if (status == Status::Success)
     {
+        auto oldTransportOptionsPtr = transportConfiguration->GetTransportOptionsPtr();
         transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
 
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store modified connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            transportConfiguration->SetTransportOptionsPtr(oldTransportOptionsPtr); // Revert
+            status = Status::Failure;                                               // Reflect storage failure
+        }
+        else
+        {
+            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        }
     }
 
     handler.AddStatus(commandPath, status);
@@ -1334,6 +1392,8 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
     status = mDelegate->SetTransportStatus(connectionIDList, transportStatus);
     if (status == Status::Success)
     {
+        auto originalConnections = mCurrentConnections; // Keep a copy for potential revert
+
         for (auto & connID : connectionIDList)
         {
             for (auto & transportConnection : mCurrentConnections)
@@ -1345,8 +1405,17 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
             }
         }
 
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store status update, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections = originalConnections; // Revert
+            status              = Status::Failure;     // Reflect storage failure
+        }
+        else
+        {
+            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        }
     }
     handler.AddStatus(commandPath, status);
 
@@ -1449,33 +1518,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
 
     // Call the delegate
     status = mDelegate->ManuallyTriggerTransport(connectionID, activationReason, timeControl);
-
-    if (status == Status::Success)
-    {
-        // Get container type from transport configuration
-        ContainerFormatEnum containerType = transportConfiguration->transportOptions.Value().containerOptions.containerType;
-
-        // For CMAF container type, we need to provide CMAF session number
-        Optional<uint64_t> cmafSessionNumber;
-        if (containerType == ContainerFormatEnum::kCmaf)
-        {
-            uint64_t sessionNumber = 0;
-            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
-            {
-                cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
-            }
-            else
-            {
-                ChipLogError(Zcl, "GeneratePushTransportBeginEvent: Unable to get CMAF session number for connection %u",
-                             connectionID);
-                // Don't include the session number if we can't get it
-                cmafSessionNumber = Optional<uint64_t>();
-            }
-        }
-
-        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
-                                        containerType, cmafSessionNumber);
-    }
 
     handler.AddStatus(commandPath, status);
 
@@ -1608,10 +1650,10 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
 
-    event.connectionID      = connectionID;
-    event.triggerType       = triggerType;
-    event.activationReason  = activationReason;
-    event.containerType     = containerType;
+    event.connectionID     = connectionID;
+    event.triggerType      = triggerType;
+    event.activationReason = activationReason;
+    event.containerType.SetValue(containerType);
     event.CMAFSessionNumber = cmafSessionNumber;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
@@ -1635,7 +1677,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
     if (transportConfig != nullptr)
     {
-        event.containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+        event.containerType.SetValue(transportConfig->transportOptions.Value().containerOptions.containerType);
 
         // For CMAF container type, we need to provide CMAF session number
         if (event.containerType == ContainerFormatEnum::kCmaf)
@@ -1661,7 +1703,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     else
     {
         // Fallback values if transport config not found
-        event.containerType     = ContainerFormatEnum::kCmaf; // Default fallback
+        event.containerType.SetValue(ContainerFormatEnum::kCmaf); // Default fallback
         event.CMAFSessionNumber = Optional<uint64_t>();
     }
 
@@ -1728,6 +1770,104 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 
     // Generate the PushTransportEnd event
     return GeneratePushTransportEndEvent(connectionID);
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
+{
+    Platform::ScopedMemoryBuffer<uint8_t> currentConns;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
+
+    if (!currentConns.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    bufferSpan = MutableByteSpan{ currentConns.Get(), maxBufferSize };
+    TLV::TLVWriter writer;
+    writer.Init(bufferSpan);
+
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+
+    for (const auto & connection : mCurrentConnections)
+    {
+        // Use the EncodeForRead() API to also TLV-encode the fabric index for storage.
+        ReturnErrorOnFailure(connection.EncodeForRead(writer, TLV::AnonymousTag(), connection.GetFabricIndex()));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan));
+
+    ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
+{
+    Platform::ScopedMemoryBuffer<uint8_t> currentConns;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
+
+    if (!currentConns.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    bufferSpan = MutableByteSpan{ currentConns.Get(), maxBufferSize };
+
+    // Clear the list before attempting to load
+    mCurrentConnections.clear();
+
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogProgress(Zcl, "No persisted CurrentConnections found.");
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        // Decode into a temporary DecodableType first.
+        Structs::TransportConfigurationStruct::DecodableType decodedTransportConfig;
+        ReturnErrorOnFailure(decodedTransportConfig.Decode(reader));
+
+        // Now, create the storage version which will perform a deep copy of the data.
+        std::shared_ptr<TransportOptionsStorage> transportOptionsStorage;
+        if (decodedTransportConfig.transportOptions.HasValue())
+        {
+            transportOptionsStorage = std::make_shared<TransportOptionsStorage>(decodedTransportConfig.transportOptions.Value());
+            if (!transportOptionsStorage)
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        TransportConfigurationStorage connection(decodedTransportConfig.connectionID, transportOptionsStorage);
+        connection.transportStatus = decodedTransportConfig.transportStatus;
+        connection.fabricIndex     = decodedTransportConfig.fabricIndex;
+        mCurrentConnections.push_back(connection);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    ChipLogProgress(Zcl, "Loaded %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
+
+    return reader.VerifyEndOfContainer();
 }
 
 } // namespace Clusters

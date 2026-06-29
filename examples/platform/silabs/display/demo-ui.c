@@ -26,7 +26,7 @@
 #include "sl_component_catalog.h"
 #include "sl_memlcd.h"
 #include <app/icd/server/ICDServerConfig.h>
-#if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
+#if defined(SL_WIFI) && SL_WIFI && !SLI_SI91X_MCU_INTERFACE
 #include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI && !SLI_SI91X_MCU_INTERFACE
 #include <string.h>
@@ -107,26 +107,26 @@ sl_status_t updateDisplay(void)
 {
     sl_status_t status = SL_STATUS_OK;
 
-#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
     // In sleep, memlcd will not be retained so re-initialize MEMLCD interface after sleep wakeup
     sl_memlcd_post_wakeup_init();
 #endif // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED && CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     status = sl_wfx_host_pre_lcd_spi_transfer();
     if (status != SL_STATUS_OK)
         return status;
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     status = DMD_updateDisplay();
     if (status != DMD_OK)
         return SL_STATUS_FAIL;
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     status = sl_wfx_host_post_lcd_spi_transfer();
     if (status != SL_STATUS_OK)
         return status;
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 
-#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
     // MEMLCD is not a UULP component and not available in sleep so powering down before sleep and need to be re-initialized after
     // sleep-wakeup
     sl_memlcd_power_on(NULL, false);

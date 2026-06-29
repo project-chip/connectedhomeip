@@ -32,6 +32,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/clusters/push-av-stream-transport-server",
     "${chip_root}/src/app/clusters/tls-client-management-server",
     "${chip_root}/src/app/server-cluster/testing",

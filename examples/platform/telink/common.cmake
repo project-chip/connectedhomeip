@@ -128,8 +128,10 @@ endif()
 
 if(${CONFIG_COMPRESS_LZMA} MATCHES y)
   set(BOOT_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader_compress_lzma.conf")
+  set(FLASH_LAYOUT_SUFFIX "_lzma")
 else()
   set(BOOT_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader.conf")
+  set(FLASH_LAYOUT_SUFFIX "")
 endif()
 if(NOT EXISTS "${BOOT_CONF_OVERLAY_FILE}")
   message(FATAL_ERROR "${BOOT_CONF_OVERLAY_FILE} doesn't exist")
@@ -164,7 +166,7 @@ if(NOT EXISTS "${GLOBAL_DTC_OVERLAY_FILE}")
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
-set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash.overlay")
+set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash${FLASH_LAYOUT_SUFFIX}.overlay")
 if(NOT EXISTS "${FLASH_DTC_OVERLAY_FILE}")
   message(STATUS "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
   unset(FLASH_DTC_OVERLAY_FILE)
@@ -186,3 +188,10 @@ endif()
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
+
+# deep-sleep platform workaround
+if(CONFIG_PM AND (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+zephyr_link_libraries(
+  -Wl,--wrap,bt_is_ready
+)
+endif()

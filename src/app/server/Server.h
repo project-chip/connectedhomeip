@@ -21,7 +21,9 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 #include <access/AccessControl.h>
+#include <access/GroupAuxiliaryAccessControlDelegate.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegateImpl.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -44,6 +46,7 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -158,6 +161,16 @@ struct ServerInitParams
     // Interface on which to run daemon
     Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Number of sequential port retries if binding fails with "address in use"
+    // When > 0, if binding to operationalServicePort (or userDirectedCommissioningPort) fails,
+    // the system will automatically try portRetryCount additional sequential ports.
+    // For example: if operationalServicePort=5540 and portRetryCount=10, it will try
+    // ports 5540, 5541, 5542, ... up to 5550 until one succeeds.
+    // When set to 0 (default), no retry is attempted - implements single port behavior.
+    uint16_t portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
     // Persistent storage delegate: MUST be injected. Used to maintain storage by much common code.
     // Must be initialized before being provided.
     PersistentStorageDelegate * persistentStorageDelegate = nullptr;
@@ -178,6 +191,12 @@ struct ServerInitParams
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    // Access control auxiliary delegate: Optional. Used to look up auxiliary access control rules.
+    // May be either pre-initialized (Initialize already called) or default-constructed:
+    // Server::Init will call Initialize with its own FabricTable on a not-yet-initialized
+    // delegate before registering it. Applications may substitute their own subclass of
+    // Access::GroupAuxiliaryAccessControlDelegate rather than reusing the default Impl.
+    Access::GroupAuxiliaryAccessControlDelegate * groupAuxiliaryAccessControlDelegate = nullptr;
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
@@ -351,6 +370,16 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         }
 #endif
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+        if (this->groupAuxiliaryAccessControlDelegate == nullptr)
+        {
+            // The delegate is left uninitialized here on purpose: Server::Init will call
+            // Initialize on it with the Server-owned FabricTable, which is not reachable
+            // from this scope.
+            this->groupAuxiliaryAccessControlDelegate = &mGroupAuxiliaryAccessControlDelegate;
+        }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+
         return CHIP_NO_ERROR;
     }
 
@@ -378,6 +407,12 @@ private:
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     app::DefaultICDCheckInBackOffStrategy mICDCheckInBackOffStrategy;
+#endif
+
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    // Default delegate used when the application does not provide its own. Concrete Impl,
+    // exposed through the abstract base via groupAuxiliaryAccessControlDelegate above.
+    Access::Examples::GroupAuxiliaryAccessControlDelegateImpl mGroupAuxiliaryAccessControlDelegate;
 #endif
 };
 
@@ -422,6 +457,8 @@ public:
     void RejoinExistingMulticastGroups();
 
     FabricTable & GetFabricTable() { return mFabrics; }
+
+    Access::AccessControl & GetAccessControl() { return mAccessControl; }
 
     CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
 
@@ -539,8 +576,11 @@ private:
                 return;
             }
 
-            if (mServer->GetTransportManager().MulticastGroupJoinLeave(
-                    Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id), true) != CHIP_NO_ERROR)
+            const Transport::PeerAddress & address = new_group.UsePerGroupAddress()
+                ? Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), new_group.group_id)
+                : Transport::PeerAddress::BuildMatterIanaMulticastAddress();
+
+            if (CHIP_NO_ERROR != mServer->GetTransportManager().MulticastGroupJoinLeave(address, true))
             {
                 ChipLogError(AppServer, "Unable to listen to group");
             }
@@ -548,15 +588,46 @@ private:
 
         void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
         {
-            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
-            if (fabric == nullptr)
+            if (old_group.UsePerGroupAddress())
             {
-                ChipLogError(AppServer, "Group removed from nonexistent fabric?");
-                return;
+                // Per group address no longer in use, unsubscribe
+                const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+                if (fabric == nullptr)
+                {
+                    ChipLogError(AppServer, "Group removed from nonexistent fabric?");
+                    return;
+                }
+                const Transport::PeerAddress & address =
+                    Transport::PeerAddress::BuildMatterPerGroupMulticastAddress(fabric->GetFabricId(), old_group.group_id);
+                VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
             }
-
-            TEMPORARY_RETURN_IGNORED mServer->GetTransportManager().MulticastGroupJoinLeave(
-                Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id), false);
+            else
+            {
+                // Check if the address is still in use
+                Credentials::GroupDataProvider * provider = mServer->GetGroupDataProvider();
+                bool in_use                               = false;
+                if (nullptr != provider)
+                {
+                    // Check all groups from all fabrics
+                    Credentials::GroupDataProvider::GroupInfo group;
+                    for (const FabricInfo & fabric : mServer->GetFabricTable())
+                    {
+                        chip::AutoRelease iter(provider->IterateGroupInfo(fabric.GetFabricIndex()));
+                        while (!iter.IsNull() && iter->Next(group) && !in_use)
+                        {
+                            in_use = !group.UsePerGroupAddress();
+                        }
+                        if (in_use)
+                            break;
+                    }
+                }
+                if (!in_use)
+                {
+                    // Groupcast address no longer in use, unsubscribe
+                    const Transport::PeerAddress & address = Transport::PeerAddress::BuildMatterIanaMulticastAddress();
+                    VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
+                }
+            }
         };
 
     private:

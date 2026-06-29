@@ -15,16 +15,13 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/silabs/tests/args.gni")
+import("${chip_root}/src/platform/silabs/tests/tests.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 declare_args() {
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   sl_wfx_config_softap = false
-
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = true
 
   #default WiFi SSID
   chip_default_wifi_ssid = ""
@@ -77,11 +74,6 @@ config("wifi-platform-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
 
-  if (rs91x_wpa3_transition) {
-    # TODO: Change this macro once WF200 support is provided
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
-  }
-
   # TODO: This defines needs to be here for the spi_multiplex.h configuration header.
   # We need to find a better way to handle this.
   if (!disable_lcd) {
@@ -91,6 +83,7 @@ config("wifi-platform-config") {
     include_dirs += [
       "${chip_root}/src/platform/silabs/SiWx/ble",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+      "${wifi_sdk_root}/components/protocol/wifi/inc",
     ]
   }
 }
@@ -120,19 +113,9 @@ source_set("wifi-platform") {
     "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
 
-  if (use_SiWx917) {
+  if (use_SiWx917 && !wifi_soc) {
     public_deps += [ "${silabs_platform_dir}/wifi/SiWx/ncp:siwx-ncp" ]
     sources += [ "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp" ]
-  } else if (use_wf200) {
-    sources += wf200_plat_src
-    sources += [
-      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.h",
-      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
-      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
-    ]
   }
 
   if (wifi_soc) {
