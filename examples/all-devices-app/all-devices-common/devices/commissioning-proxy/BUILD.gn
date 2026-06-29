@@ -58,7 +58,9 @@ source_set("commissioning-proxy") {
   ]
 
   if (chip_device_config_enable_wifipaf) {
-    deps += [ "${chip_root}/examples/all-devices-app/posix/app_options:app-options" ]
+    deps += [
+      "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+    ]
   }
 
   include_dirs = [ "." ]
