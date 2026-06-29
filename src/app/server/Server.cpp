@@ -564,7 +564,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
     // Maximum size of the TCP payload that the node is capable of receiving
     // from its peer. Make sure we subtract the framing length prefix.
-    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - SessionParameters::kTCPFramingHeaderSize);
+    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                            SessionParameters::kTCPFramingHeaderSize);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
