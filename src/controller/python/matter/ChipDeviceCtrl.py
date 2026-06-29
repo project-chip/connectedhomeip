@@ -499,6 +499,11 @@ DiscoveryType: typing.TypeAlias = discovery.DiscoveryType
 
 
 class ChipDeviceControllerBase:
+    # GroupInfo flags bitmask
+    GROUP_INFO_FLAG_NONE = 0x00
+    GROUP_INFO_FLAG_HAS_AUXILIARY_ACL = 0x01
+    GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY = 0x02
+
     activeList: set = set()
 
     def __init__(self, name: str = ''):
@@ -2573,7 +2578,7 @@ class ChipDeviceControllerBase:
                 epoch_key2, epoch_start_time2)
         ).raise_on_error()
 
-    def SetGroupInfo(self, group_id: int, group_name: str, flags: int = 0x02):
+    def SetGroupInfo(self, group_id: int, group_name: str, flags: int = GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY):
         '''
         Adds or updates a group entry in the controller's GroupDataProvider for this fabric.
 
