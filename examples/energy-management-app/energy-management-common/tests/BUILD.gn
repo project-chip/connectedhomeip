@@ -21,12 +21,20 @@ config("tests_config") {
   include_dirs = [ "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include" ]
 }
 
+<<<<<<< HEAD:examples/energy-management-app/energy-management-common/tests/BUILD.gn
 chip_test_suite("tests") {
   output_name = "libEnergyTest"
 
   public_configs = [ ":tests_config" ]
 
   test_sources = [ "TestEvseTargetsStorage.cpp" ]
+=======
+  test_sources = [
+    "TestCastingPlayerFabricCleanup.cpp",
+    "TestCastingPlayerNullPointerFix.cpp",
+    "TestTargetVideoPlayerInfoCopy.cpp",
+  ]
+>>>>>>> 28142cded5 ([tv-casting] Fix dangling MAC-address span when copying TargetVideoPlayerInfo (#72760)):examples/tv-casting-app/tv-casting-common/core/tests/BUILD.gn
 
   cflags = [ "-Wconversion" ]
 
