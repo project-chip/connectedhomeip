@@ -138,7 +138,7 @@ CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & pres
     {
         CHIP_ERROR err = delegate->GetPresetAtIndex(i, matchingPreset);
 
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED || err == CHIP_ERROR_NOT_FOUND)
         {
             break;
         }
@@ -325,19 +325,16 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         }
 
         Optional<int16_t> coolingSetpointValue = matchingPreset.GetCoolingSetpoint();
-        if (coolingSetpointValue.HasValue())
-        {
-            int16_t constrainedCoolingSetpoint = EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint);
-            Status status                      = OccupiedCoolingSetpoint::Set(endpoint, constrainedCoolingSetpoint);
-            if (status != Status::Success)
-            {
-                ChipLogError(Zcl, "Failed to set OccupiedCoolingSetpoint with status %u", to_underlying(status));
-                return status;
-            }
-        }
-
         Optional<int16_t> heatingSetpointValue = matchingPreset.GetHeatingSetpoint();
-        if (heatingSetpointValue.HasValue())
+
+        // Write the heating setpoint first when both setpoints are moving down to avoid
+        // transiently violating the deadband (cooling - heating >= MinSetpointDeadBand).
+        int16_t currentHeating  = 0;
+        bool hasCurrentHeating  = (OccupiedHeatingSetpoint::Get(endpoint, &currentHeating) == Status::Success);
+        bool writeHeatingFirst  = heatingSetpointValue.HasValue() && coolingSetpointValue.HasValue() && hasCurrentHeating &&
+            EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint) < currentHeating;
+
+        if (writeHeatingFirst)
         {
             int16_t constrainedHeatingSetpoint = EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint);
             Status status                      = OccupiedHeatingSetpoint::Set(endpoint, constrainedHeatingSetpoint);
@@ -345,6 +342,37 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
             {
                 ChipLogError(Zcl, "Failed to set OccupiedHeatingSetpoint with status %u", to_underlying(status));
                 return status;
+            }
+            int16_t constrainedCoolingSetpoint = EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint);
+            status                             = OccupiedCoolingSetpoint::Set(endpoint, constrainedCoolingSetpoint);
+            if (status != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set OccupiedCoolingSetpoint with status %u", to_underlying(status));
+                return status;
+            }
+        }
+        else
+        {
+            if (coolingSetpointValue.HasValue())
+            {
+                int16_t constrainedCoolingSetpoint = EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint);
+                Status status                      = OccupiedCoolingSetpoint::Set(endpoint, constrainedCoolingSetpoint);
+                if (status != Status::Success)
+                {
+                    ChipLogError(Zcl, "Failed to set OccupiedCoolingSetpoint with status %u", to_underlying(status));
+                    return status;
+                }
+            }
+
+            if (heatingSetpointValue.HasValue())
+            {
+                int16_t constrainedHeatingSetpoint = EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint);
+                Status status                      = OccupiedHeatingSetpoint::Set(endpoint, constrainedHeatingSetpoint);
+                if (status != Status::Success)
+                {
+                    ChipLogError(Zcl, "Failed to set OccupiedHeatingSetpoint with status %u", to_underlying(status));
+                    return status;
+                }
             }
         }
     }
