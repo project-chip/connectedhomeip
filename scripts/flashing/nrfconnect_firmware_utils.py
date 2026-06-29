@@ -171,7 +171,7 @@ def verify_platform_args(platform_args):
     required_args = ['application']
     for r in required_args:
         if r not in platform_args:
-            raise ValueError("Required argument %s missing" % r)
+            raise ValueError(f"Required argument {r} missing")
 
 
 def create_platform(platform_args):

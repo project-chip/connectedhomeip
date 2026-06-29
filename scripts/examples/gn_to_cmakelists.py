@@ -614,8 +614,7 @@ def WriteTarget(out, target, project):
     out.write('\n')
 
     if target.cmake_type is None:
-        print('Target %s has unknown target type %s, skipping.' %
-              (target.gn_name,            target.gn_type))
+        print(f'Target {target.gn_name} has unknown target type {target.gn_type}, skipping.')
         return
 
     SetVariable(out, 'target', target.cmake_name)

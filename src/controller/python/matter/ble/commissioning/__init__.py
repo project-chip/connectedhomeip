@@ -100,8 +100,7 @@ class Connection:
 
         if step.type == PairNotificationType.COMPLETE:
             if step.error_code != 0:
-                raise Exception('Pairing ended with error code %d' %
-                                step.error_code)
+                raise Exception(f'Pairing ended with error code {step.error_code}')
 
 
 def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = None) -> Connection:

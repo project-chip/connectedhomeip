@@ -36,13 +36,12 @@ def main() -> int:
     try:
         path = subprocess.check_output(cmd, text=True).strip()
     except (OSError, subprocess.SubprocessError) as e:
-        sys.stderr.write("error: failed to run '%s': %s\n" % (" ".join(cmd), e))
+        sys.stderr.write("error: failed to run '{}': {}\n".format(" ".join(cmd), e))
         return 1
     # clang echoes the bare filename back when it cannot locate the library;
     # fail loudly rather than emitting a bogus linker input.
     if path == libname or not path:
-        sys.stderr.write(
-            "error: %s could not locate %s\n" % (compiler, libname))
+        sys.stderr.write(f"error: {compiler} could not locate {libname}\n")
         return 1
     sys.stdout.write(path)
     return 0

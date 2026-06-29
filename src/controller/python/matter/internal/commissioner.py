@@ -83,7 +83,7 @@ class Commissioner:
         result = self._handle.pychip_internal_Commissioner_BleConnectForPairing(
             self._native, remoteDeviceId, pinCode, discriminator)
         if result != 0:
-            raise Exception("Failed to pair. CHIP Error code %d" % result)
+            raise Exception(f"Failed to pair. CHIP Error code {result}")
 
         self.pairing_state = PairingState.PAIRING
 
@@ -91,7 +91,7 @@ class Commissioner:
         result = self._handle.pychip_internal_Commissioner_Unpair(
             self._native, remoteDeviceId)
         if result != 0:
-            raise Exception("Failed to unpair. CHIP Error code %d" % result)
+            raise Exception(f"Failed to unpair. CHIP Error code {result}")
 
     def _OnPairingComplete(self, err: int):
         self.pairing_state = PairingState.INITIALIZED

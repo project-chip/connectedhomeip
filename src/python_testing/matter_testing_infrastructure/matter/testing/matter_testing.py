@@ -2585,7 +2585,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint = self.get_endpoint()
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
+        err_msg = f"Did not see expected error when reading {str(cluster)}:{str(attribute)}"
         error_type_ok = attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
         if assert_on_error:
@@ -2646,7 +2646,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if not os.path.exists(app_pipe_out):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+            raise FileNotFoundError(f"CANNOT FIND {app_pipe_out!r}")
 
         dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
 
@@ -2744,7 +2744,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if not os.path.exists(app_pipe):
             LOGGER.error("Named pipe %r does NOT exist", app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
+            raise FileNotFoundError(f"CANNOT FIND {app_pipe!r}")
 
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
@@ -2770,7 +2770,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info("Using DUT user name: %s", dut_uname)
             command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            cmd = f"echo \"{command_fixed}\" | ssh {dut_uname}@{dut_ip} \'cat > {app_pipe}\'"
             os.system(cmd)
 
     async def send_single_cmd(

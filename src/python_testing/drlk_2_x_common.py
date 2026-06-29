@@ -38,13 +38,13 @@ class DRLK_COMMON:
     async def write_drlk_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.DoorLock
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute)])
-        err_msg = "Received error status {} when writing {}:{}".format(str(result[0].Status), str(cluster), str(attribute))
+        err_msg = f"Received error status {str(result[0].Status)} when writing {str(cluster)}:{str(attribute)}"
         asserts.assert_equal(result[0].Status, Status.Success, err_msg)
 
     async def write_drlk_attribute_expect_error(self, attribute, error):
         cluster = Clusters.Objects.DoorLock
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute)])
-        err_msg = "Did not see expected error {} when writing {}:{}".format(str(error), str(cluster), str(attribute))
+        err_msg = f"Did not see expected error {str(error)} when writing {str(cluster)}:{str(attribute)}"
         asserts.assert_equal(result[0].Status, error, err_msg)
 
     async def send_drlk_cmd_expect_success(self, command) -> None:
@@ -69,7 +69,7 @@ class DRLK_COMMON:
                                          timedRequestTimeoutMs=1000)
         asserts.assert_true(matchers.is_type(ret, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                             "Unexpected return type for SetCredential")
-        asserts.assert_true(ret.status == Status.Success, "Error sending SetCredential command, status={}".format(str(ret.status)))
+        asserts.assert_true(ret.status == Status.Success, f"Error sending SetCredential command, status={str(ret.status)}")
         return ret
 
     async def send_clear_credential_cmd(self, credential) -> None:
@@ -169,14 +169,14 @@ class DRLK_COMMON:
                     False, "RequirePINforRemoteOperation is a mandatory attribute if DRLK.S.F07(COTA) & DRLK.S.F00(PIN)")
 
         if self.check_pics(lockUnlockCmdRspPICS):
-            self.print_step("3", "TH sends %s Command to the DUT without PINCode" % lockUnlockText)
+            self.print_step("3", f"TH sends {lockUnlockText} Command to the DUT without PINCode")
             command = lockUnlockCommand(PINCode=None)
             if requirePinForRemoteOperation_dut:
                 await self.send_drlk_cmd_expect_error(command=command, error=Status.Failure)
             else:
                 await self.send_drlk_cmd_expect_success(command=command)
         else:
-            asserts.assert_true(False, "%sResponse is a mandatory command response and must be supported in PICS" % lockUnlockText)
+            asserts.assert_true(False, f"{lockUnlockText}Response is a mandatory command response and must be supported in PICS")
 
         if self.check_pics("DRLK.S.F08"):
             if self.check_pics("DRLK.S.C1a.Rsp"):
@@ -238,11 +238,11 @@ class DRLK_COMMON:
                     break
             log.info(" pin_code=%s, Invalid PinCode=%s", pin_code, invalidPincodeString)
         if self.check_pics("DRLK.S.F00") and self.check_pics(lockUnlockCmdRspPICS) and self.check_pics("DRLK.S.A0033"):
-            self.print_step("7", "TH sends %s Command to the DUT with an invalid PINCode" % lockUnlockText)
+            self.print_step("7", f"TH sends {lockUnlockText} Command to the DUT with an invalid PINCode")
             command = lockUnlockCommand(PINCode=invalidPincode)
             await self.send_drlk_cmd_expect_error(command=command, error=Status.Failure)
 
-            self.print_step("8", "TH sends %s Command to the DUT without PINCode" % lockUnlockText)
+            self.print_step("8", f"TH sends {lockUnlockText} Command to the DUT without PINCode")
             command = lockUnlockCommand(PINCode=None)
             if requirePinForRemoteOperation_dut:
                 await self.send_drlk_cmd_expect_error(command=command, error=Status.Failure)
@@ -250,7 +250,7 @@ class DRLK_COMMON:
                 await self.send_drlk_cmd_expect_success(command=command)
 
         if self.check_pics(lockUnlockCmdRspPICS) and self.check_pics("DRLK.S.A0033"):
-            self.print_step("9", "TH sends %s Command to the DUT with valid PINCode" % lockUnlockText)
+            self.print_step("9", f"TH sends {lockUnlockText} Command to the DUT with valid PINCode")
             command = lockUnlockCommand(PINCode=pin_code)
             await self.send_drlk_cmd_expect_success(command=command)
 
@@ -280,13 +280,13 @@ class DRLK_COMMON:
             asserts.assert_in(userCodeTemporaryDisableTime_dut, range(1, 255), "UserCodeTemporaryDisableTime value is out of range")
 
         if self.check_pics(lockUnlockCmdRspPICS) and self.check_pics("DRLK.S.F00"):
-            self.print_step("12", "TH sends {} Command to the DUT with an invalid PINCode, repeated {} times".format(
-                lockUnlockText, wrongCodeEntryLimit_dut))
+            self.print_step(
+                "12", f"TH sends {lockUnlockText} Command to the DUT with an invalid PINCode, repeated {wrongCodeEntryLimit_dut} times")
             for i in range(wrongCodeEntryLimit_dut):
                 command = lockUnlockCommand(PINCode=invalidPincode)
                 await self.send_drlk_cmd_expect_error(command=command, error=Status.Failure)
 
-            self.print_step("13", "TH sends %s Command to the DUT with valid PINCode. Verify failure or no response" % lockUnlockText)
+            self.print_step("13", f"TH sends {lockUnlockText} Command to the DUT with valid PINCode. Verify failure or no response")
             command = lockUnlockCommand(PINCode=pin_code)
             await self.send_drlk_cmd_expect_error(command=command, error=Status.Failure)
 
@@ -295,7 +295,7 @@ class DRLK_COMMON:
                 await asyncio.sleep(userCodeTemporaryDisableTime_dut)
 
             if not doAutoRelockTest:
-                self.print_step("15", "Send %s with valid Pincode and verify success" % lockUnlockText)
+                self.print_step("15", f"Send {lockUnlockText} with valid Pincode and verify success")
                 credentials = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
                                                                credentialType=Clusters.DoorLock.Enums.CredentialTypeEnum.kPin)
                 command = lockUnlockCommand(PINCode=pin_code)
@@ -318,7 +318,7 @@ class DRLK_COMMON:
                 log.info("AutoRelockTime value is %s", autoRelockTime_dut)
 
                 if self.check_pics(lockUnlockCmdRspPICS):
-                    self.print_step("17", "Send %s with valid Pincode and verify success" % lockUnlockText)
+                    self.print_step("17", f"Send {lockUnlockText} with valid Pincode and verify success")
                     command = lockUnlockCommand(PINCode=pin_code)
                     await self.send_drlk_cmd_expect_success(command=command)
 

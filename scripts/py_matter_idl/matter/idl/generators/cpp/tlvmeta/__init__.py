@@ -65,14 +65,14 @@ class ClusterTablesGenerator:
 
     def FieldEntry(self, field: Field, tag_type: str = 'ContextTag', type_override: Optional[str] = None) -> TableEntry:
         data_type_name = type_override or field.data_type.name
-        type_reference = "%s_%s" % (self.cluster.name, data_type_name)
+        type_reference = f"{self.cluster.name}_{data_type_name}"
 
         if type_reference not in self.known_types:
             type_reference = None
 
         item_type = self.item_type_map.get(data_type_name, 'kDefault')
 
-        real_type = "%s::%s" % (self.cluster.name, data_type_name)
+        real_type = f"{self.cluster.name}::{data_type_name}"
         if field.is_list:
             real_type = real_type + "[]"
             item_type = "kList"
@@ -95,18 +95,18 @@ class ClusterTablesGenerator:
         self.known_types.clear()
 
         for s in self.cluster.structs:
-            self.known_types.add("%s_%s" % (self.cluster.name, s.name))
+            self.known_types.add(f"{self.cluster.name}_{s.name}")
 
         # Events are structures
         for e in self.cluster.events:
             if e.fields:
-                self.known_types.add("%s_%s" % (self.cluster.name, e.name))
+                self.known_types.add(f"{self.cluster.name}_{e.name}")
 
         for e in self.cluster.enums:
-            self.known_types.add("%s_%s" % (self.cluster.name, e.name))
+            self.known_types.add(f"{self.cluster.name}_{e.name}")
 
         for b in self.cluster.bitmaps:
-            self.known_types.add("%s_%s" % (self.cluster.name, b.name))
+            self.known_types.add(f"{self.cluster.name}_{b.name}")
 
     def CommandEntries(self) -> Generator[TableEntry, None, None]:
         # yield entries for every command input
@@ -115,18 +115,15 @@ class ClusterTablesGenerator:
                 yield TableEntry(
                     name=c.name,
                     code=f'CommandTag({c.code})',
-                    reference="%s_%s" % (
-                        self.cluster.name, c.input_param),
-                    real_type="%s::%s::%s" % (
-                        self.cluster.name, c.name, c.input_param)
+                    reference=f"{self.cluster.name}_{c.input_param}",
+                    real_type=f"{self.cluster.name}::{c.name}::{c.input_param}"
                 )
             else:
                 yield TableEntry(
                     name=c.name,
                     code=f'CommandTag({c.code})',
                     reference=None,
-                    real_type="%s::%s::()" % (
-                        self.cluster.name, c.name)
+                    real_type=f"{self.cluster.name}::{c.name}::()"
                 )
 
         # yield entries for every command output. We use "respons struct"
@@ -137,9 +134,8 @@ class ClusterTablesGenerator:
             yield TableEntry(
                 name=c.name,
                 code=f'CommandTag({c.code})',
-                reference="%s_%s" % (
-                    self.cluster.name, c.name),
-                real_type="%s::%s" % (self.cluster.name, c.name),
+                reference=f"{self.cluster.name}_{c.name}",
+                real_type=f"{self.cluster.name}::{c.name}",
             )
 
     def GenerateTables(self) -> Generator[Table, None, None]:
@@ -166,8 +162,8 @@ class ClusterTablesGenerator:
             TableEntry(
                 code=f'EventTag({e.code})',
                 name=e.name,
-                reference="%s_%s" % (self.cluster.name, e.name),
-                real_type='%s::%s' % (self.cluster.name, e.name)
+                reference=f"{self.cluster.name}_{e.name}",
+                real_type=f'{self.cluster.name}::{e.name}'
             )
             for e in self.cluster.events if e.fields
         ])
@@ -180,41 +176,40 @@ class ClusterTablesGenerator:
 
         for s in self.cluster.structs:
             yield Table(
-                full_name="%s_%s" % (self.cluster.name, s.name),
+                full_name=f"{self.cluster.name}_{s.name}",
                 entries=[self.FieldEntry(field) for field in s.fields]
             )
 
         for e in self.cluster.events:
             if e.fields:
                 yield Table(
-                    full_name="%s_%s" % (self.cluster.name, e.name),
+                    full_name=f"{self.cluster.name}_{e.name}",
                     entries=[self.FieldEntry(field) for field in e.fields]
                 )
 
         # some items have lists, create an intermediate item for those
         for name in self.list_types:
             yield Table(
-                full_name="%s_list_" % name,
+                full_name=f"{name}_list_",
                 entries=[
                     TableEntry(
                         code="AnonymousTag()",
                         name="Anonymous<>",
                         reference=name,
-                        real_type="%s[]" % name,
+                        real_type=f"{name}[]",
                     )
                 ]
             )
 
         for e in self.cluster.enums:
             yield Table(
-                full_name="%s_%s" % (self.cluster.name, e.name),
+                full_name=f"{self.cluster.name}_{e.name}",
                 entries=[
                     TableEntry(
-                        code="ConstantValueTag(0x%X)" % entry.code,
+                        code=f"ConstantValueTag(0x{entry.code:X})",
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (
-                            self.cluster.name, e.name, entry.name)
+                        real_type=f"{self.cluster.name}::{e.name}::{entry.name}"
                     )
                     for entry in e.entries
                 ]
@@ -222,14 +217,13 @@ class ClusterTablesGenerator:
 
         for e in self.cluster.bitmaps:
             yield Table(
-                full_name="%s_%s" % (self.cluster.name, e.name),
+                full_name=f"{self.cluster.name}_{e.name}",
                 entries=[
                     TableEntry(
-                        code="ConstantValueTag(0x%X)" % entry.code,
+                        code=f"ConstantValueTag(0x{entry.code:X})",
                         name=entry.name,
                         reference=None,
-                        real_type="%s::%s::%s" % (
-                            self.cluster.name, e.name, entry.name)
+                        real_type=f"{self.cluster.name}::{e.name}::{entry.name}"
                     )
                     for entry in e.entries
                 ]
@@ -258,9 +252,9 @@ def IndexInTable(name: Optional[str], table: list[Table]) -> str:
     for idx, t in enumerate(table):
         if t.full_name == name:
             # Index skipping hard-coded items
-            return "%d" % (idx + 2)
+            return str(idx + 2)
 
-    raise Exception("Name %r not found in table" % name)
+    raise Exception(f"Name {name!r} not found in table")
 
 
 class TLVMetaDataGenerator(CodeGenerator):

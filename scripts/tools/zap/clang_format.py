@@ -66,8 +66,8 @@ def getClangFormatBinary():
 
             if sha not in version_string:
                 print('WARNING: clang-format may not be the right version:')
-                print('   PIGWEED TAG:    %s' % clang_config['tags'][0])
-                print('   ACTUAL VERSION: %s' % version_string)
+                print('   PIGWEED TAG:    {}'.format(clang_config['tags'][0]))
+                print(f'   ACTUAL VERSION: {version_string}')
         except Exception:
             print("Failed to validate clang version.")
             traceback.print_last()

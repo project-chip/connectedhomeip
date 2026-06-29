@@ -384,7 +384,7 @@ class CHIPVirtualHome:
         self.logger.info("device: %s: writing ssid, psk to wpa_supplicant config", self.get_device_pretty_id(device_id))
 
         write_psk_command = "".join(
-            ["sh -c 'wpa_passphrase {} {} >> ".format(ssid, psk),
+            [f"sh -c 'wpa_passphrase {ssid} {psk} >> ",
              "/etc/wpa_supplicant/wpa_supplicant.conf'"])
 
         return self.execute_device_cmd(device_id, write_psk_command)
@@ -403,7 +403,7 @@ class CHIPVirtualHome:
         return "<unknown>"
 
     def get_device_pretty_id(self, device_id):
-        return "{}({}...)".format(self.get_device_pretty_name(device_id), device_id[:8])
+        return f"{self.get_device_pretty_name(device_id)}({device_id[:8]}...)"
 
     @property
     def default_base_image(cls):

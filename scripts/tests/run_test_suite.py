@@ -285,7 +285,7 @@ def cmd_list(context: click.Context) -> None:
         if tags:
             tags = f" ({tags})"
 
-        print("%s%s" % (test.name, tags))
+        print(f"{test.name}{tags}")
 
 
 class CommissioningMethod(enum.StrEnum):

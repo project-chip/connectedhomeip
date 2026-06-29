@@ -75,7 +75,7 @@ def _ExecuteProcess(cmd, cwd):
 
     exitcode = process.wait()
     if exitcode != 0:
-        raise Exception("Error executing process: %d" % exitcode)
+        raise Exception(f"Error executing process: {exitcode}")
 
 
 def _SetupSourceZap(install_directory: str, zap_version: str):

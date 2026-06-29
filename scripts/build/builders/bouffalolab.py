@@ -37,14 +37,14 @@ class BouffalolabApp(Enum):
             return 'lighting-app'
         if self == BouffalolabApp.CONTACT:
             return 'contact-sensor-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
-            return ('chip-%s-lighting-example' % chip_name)
+            return (f'chip-{chip_name}-lighting-example')
         if self == BouffalolabApp.CONTACT:
-            return ('chip-%s-contact-sensor-example' % chip_name)
-        raise Exception('Unknown app type: %r' % self)
+            return (f'chip-{chip_name}-contact-sensor-example')
+        raise Exception(f'Unknown app type: {self!r}')
 
 
 class BouffalolabBoard(Enum):
@@ -72,7 +72,7 @@ class BouffalolabBoard(Enum):
             return 'BL602-NIGHT-LIGHT'
         if self == BouffalolabBoard.BL706_NIGHT_LIGHT:
             return 'BL706-NIGHT-LIGHT'
-        raise Exception('Unknown board #: %r' % self)
+        raise Exception(f'Unknown board #: {self!r}')
 
 
 class BouffalolabThreadType(Enum):
@@ -106,7 +106,7 @@ def _RunAutoOta(builder, mode, app, chip_name, **kwargs):
         _ProjectConfigPath(builder.chip_dir, app, chip_name),
     ]
     for key, value in kwargs.items():
-        cmd.extend(["--%s" % key.replace("_", "-"), value])
+        cmd.extend([f"--{key.replace('_', '-')}", value])
     builder._Execute(cmd, title="Generating Bouffalo Matter OTA image")
 
 
@@ -299,7 +299,7 @@ class _BouffalolabGnBuilder(GnBuilder):
         self.argsOpt.append("chip_generate_link_map_file=true")
 
         try:
-            self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
+            self.argsOpt.append('bouffalolab_sdk_root="{}"'.format(os.environ['BOUFFALOLAB_SDK_ROOT']))
         except KeyError as err:
             self.print_enviroment_error()
             raise err
@@ -349,10 +349,10 @@ class _BouffalolabGnBuilder(GnBuilder):
 
     @lock_output_dir
     def PreBuildCommand(self):
-        os.system("rm -rf {}/config".format(self.output_dir))
-        os.system("rm -rf {}/ota_images".format(self.output_dir))
+        os.system(f"rm -rf {self.output_dir}/config")
+        os.system(f"rm -rf {self.output_dir}/ota_images")
         os.system("rm -rf {}".format(os.path.join(self.output_dir, 'boot2*.bin')))
-        os.system("rm -rf {}".format(os.path.join(self.output_dir, '%s*' % self.app.AppNamePrefix(self.chip_name))))
+        os.system("rm -rf {}".format(os.path.join(self.output_dir, f'{self.app.AppNamePrefix(self.chip_name)}*')))
 
     @lock_output_dir
     def PostBuildCommand(self):
@@ -489,7 +489,7 @@ class BouffalolabBflbBuilder(Builder):
         self.board_name = {
             'bl616': 'bl616dk',
             'bl616cl': 'bl616cldk',
-        }.get(self.chip_name, "%sdk" % self.chip_name)
+        }.get(self.chip_name, f"{self.chip_name}dk")
         self.enable_wifi = enable_wifi
         self.enable_thread = enable_thread
         self.enable_ethernet = enable_ethernet
@@ -502,9 +502,9 @@ class BouffalolabBflbBuilder(Builder):
 
     def _make_args(self):
         args = [
-            'CHIP=%s' % self.chip_name,
-            'BOARD=%s' % self.board_name,
-            'CROSS_COMPILE=%s' % self._cross_compile_prefix(),
+            f'CHIP={self.chip_name}',
+            f'BOARD={self.board_name}',
+            f'CROSS_COMPILE={self._cross_compile_prefix()}',
             'CONFIG_WIFI=%s' % ('y' if self.enable_wifi else 'n'),
             'CONFIG_THREAD=%s' % ('y' if self.enable_thread else 'n'),
             'CONFIG_ETHERNET=%s' % ('y' if self.enable_ethernet else 'n'),
@@ -535,7 +535,7 @@ class BouffalolabBflbBuilder(Builder):
         prefix = self._cross_compile_prefix()
         if os.path.isabs(prefix):
             toolchain_bin = os.path.dirname(prefix.rstrip(os.sep))
-            return '%s%s%s' % (toolchain_bin, os.pathsep, os.environ.get('PATH', ''))
+            return f'{toolchain_bin}{os.pathsep}{os.environ.get("PATH", "")}'
         return os.environ.get('PATH', '')
 
     def _build_path(self):
@@ -550,9 +550,9 @@ class BouffalolabBflbBuilder(Builder):
         with open(wrapper_path, 'w') as wrapper:
             wrapper.write('#!/bin/sh\n')
             wrapper.write('unset MAKEFLAGS\n')
-            wrapper.write('exec "%s" "$@"\n' % ninja_path)
+            wrapper.write(f'exec "{ninja_path}" "$@"\n')
         os.chmod(wrapper_path, 0o755)
-        return '%s%s%s' % (tools_dir, os.pathsep, base_path)
+        return f'{tools_dir}{os.pathsep}{base_path}'
 
     def _sdk_build_dir(self):
         return os.path.join('build', self.identifier)
@@ -575,9 +575,9 @@ class BouffalolabBflbBuilder(Builder):
             shutil.rmtree(stale_shared_build_dir)
         log.info('Building %s cmake-hybrid bflb at %s', self.chip_name, self.root)
         self._Execute(
-            ['env', 'PATH=%s' % self._build_path(),
-             'make', '-C', self.root, 'BUILD_DIR=%s' % build_dir] + self._make_args(),
-            title='Building %s bflb %s' % (self.chip_name, self.app.ExampleName()),
+            ['env', f'PATH={self._build_path()}',
+             'make', '-C', self.root, f'BUILD_DIR={build_dir}'] + self._make_args(),
+            title=f'Building {self.chip_name} bflb {self.app.ExampleName()}',
         )
         self._post_build()
 
@@ -592,7 +592,7 @@ class BouffalolabBflbBuilder(Builder):
         }[self.app]
         # SDK produces: self.root/<build_dir>/build_out/<proj_name>_<chip>.{bin,elf}
         sdk_out = os.path.join(self.root, self._sdk_build_dir(), 'build_out')
-        sdk_bin = os.path.join(sdk_out, '%s_%s.bin' % (sdk_proj_name, chip_name))
+        sdk_bin = os.path.join(sdk_out, f'{sdk_proj_name}_{chip_name}.bin')
         if not os.path.isfile(sdk_bin):
             return
 
@@ -603,9 +603,9 @@ class BouffalolabBflbBuilder(Builder):
         # and users find GN-consistent names alongside the GN builder layout.
         os.makedirs(self.output_dir, exist_ok=True)
         for ext in ('bin', 'elf'):
-            gn_name = '%s.%s' % (app_prefix, ext)
+            gn_name = f'{app_prefix}.{ext}'
             gn_link = os.path.join(self.output_dir, gn_name)
-            sdk_file = os.path.join(sdk_out, '%s_%s.%s' % (sdk_proj_name, chip_name, ext))
+            sdk_file = os.path.join(sdk_out, f'{sdk_proj_name}_{chip_name}.{ext}')
             try:
                 if os.path.islink(gn_link) or os.path.isfile(gn_link):
                     os.remove(gn_link)
@@ -616,14 +616,14 @@ class BouffalolabBflbBuilder(Builder):
         # Generate flash.py that references the GN-style bin name.
         matter_root = os.path.dirname(os.path.dirname(os.path.dirname(self.root)))
         gen_script = os.path.join(matter_root, 'scripts', 'flashing', 'gen_flashing_script.py')
-        flash_py_name = '%s.flash.py' % app_prefix
+        flash_py_name = f'{app_prefix}.flash.py'
         flash_py_path = os.path.join(self.output_dir, flash_py_name)
 
         flash_args = [
             'python3', gen_script, 'bouffalolab',
             '--chipname', chip_name,
             '--baudrate', '2000000',
-            '--application', os.path.join(self.output_dir, '%s.bin' % app_prefix),
+            '--application', os.path.join(self.output_dir, f'{app_prefix}.bin'),
             '--output', flash_py_path,
         ]
         if chip_name in ('bl616', 'bl616cl'):
@@ -663,7 +663,7 @@ class BouffalolabBflbBuilder(Builder):
                 shutil.copy2(os.path.join(board_config_dir, config_file), config_dir)
 
         rel = os.path.relpath(flash_py_path, matter_root)
-        gn_bin_rel = os.path.relpath(os.path.join(self.output_dir, '%s.bin' % app_prefix), matter_root)
+        gn_bin_rel = os.path.relpath(os.path.join(self.output_dir, f'{app_prefix}.bin'), matter_root)
         log.info('*' * 80)
         log.info('Firmware:     %s', gn_bin_rel)
         log.info('Flash script: %s', rel)
@@ -691,7 +691,7 @@ class BouffalolabBflbBuilder(Builder):
         chip_name = self.chip_name
         app_prefix = self.app.AppNamePrefix(chip_name)
         for ext in ('bin', 'elf'):
-            name = '%s.%s' % (app_prefix, ext)
+            name = f'{app_prefix}.{ext}'
             yield BuilderOutput(os.path.join(self.output_dir, name), name)
         for image in _MatterOtaOutputs(self.output_dir):
             yield BuilderOutput(str(image), os.path.join('ota_images', image.name))

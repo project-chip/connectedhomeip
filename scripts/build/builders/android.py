@@ -43,7 +43,7 @@ class AndroidBoard(Enum):
             return "x64"
         if self == AndroidBoard.X86 or self == AndroidBoard.AndroidStudio_X86:
             return "x86"
-        raise Exception("Unknown board type: %r" % self)
+        raise Exception(f"Unknown board type: {self!r}")
 
     def AbiName(self):
         if self.TargetCpuName() == "arm":
@@ -54,7 +54,7 @@ class AndroidBoard(Enum):
             return "x86_64"
         if self.TargetCpuName() == "x86":
             return "x86"
-        raise Exception("Unknown board type: %r" % self)
+        raise Exception(f"Unknown board type: {self!r}")
 
     def IsIde(self):
         return (self == AndroidBoard.AndroidStudio_ARM
@@ -81,7 +81,7 @@ class AndroidApp(Enum):
             return "tv-casting"
         if self == AndroidApp.VIRTUAL_DEVICE_APP:
             return "virtual-device-app"
-        raise Exception("Unknown app type: %r" % self)
+        raise Exception(f"Unknown app type: {self!r}")
 
     def AppGnArgs(self):
         gn_args = {}
@@ -187,8 +187,8 @@ class AndroidBuilder(Builder):
 
         if sdk_manager_for_licenses:
             self._Execute(
-                ["bash", "-c", "yes | %s --licenses >/dev/null" % sdk_manager_for_licenses],
-                title="Accepting NDK licenses using: %s" % sdk_manager_for_licenses,
+                ["bash", "-c", f"yes | {sdk_manager_for_licenses} --licenses >/dev/null"],
+                title=f"Accepting NDK licenses using: {sdk_manager_for_licenses}",
             )
         else:
             log.warning("No SDK manager found for license acceptance - licenses may need to be accepted manually")
@@ -205,7 +205,7 @@ class AndroidBuilder(Builder):
         for k in ["ANDROID_NDK_HOME", "ANDROID_HOME"]:
             if k not in os.environ:
                 raise Exception(
-                    "Environment %s missing, cannot build android libraries" % k
+                    f"Environment {k} missing, cannot build android libraries"
                 )
 
         # SDK manager must be runnable to 'accept licenses'
@@ -237,15 +237,11 @@ class AndroidBuilder(Builder):
             # Initial install may not have licenses at all
             if not os.access(android_home, os.W_OK):
                 raise Exception(
-                    "'%s' is NOT writable by the current user (needed to create licenses folder for accept)"
-                    % android_home
+                    f"'{android_home}' is NOT writable by the current user (needed to create licenses folder for accept)"
                 )
 
         elif not os.access(licenses, os.W_OK):
-            raise Exception(
-                "'%s' is NOT writable by the current user (needed to accept licenses)"
-                % licenses
-            )
+            raise Exception(f"'{licenses}' is NOT writable by the current user (needed to accept licenses)")
 
     def copyToSrcAndroid(self):
         # JNILibs will be copied as long as they reside in src/main/jniLibs/ABI:
@@ -340,13 +336,12 @@ class AndroidBuilder(Builder):
         # App compilation
         self._Execute(
             [
-                "%s/examples/android/%s/gradlew" % (
-                    self.root, self.app.AppName()),
+                f"{self.root}/examples/android/{self.app.AppName()}/gradlew",
                 "-p",
-                "%s/examples/android/%s" % (self.root, self.app.AppName()),
-                "-PmatterBuildSrcDir=%s" % self.output_dir,
+                f"{self.root}/examples/android/{self.app.AppName()}",
+                f"-PmatterBuildSrcDir={self.output_dir}",
                 "-PmatterSdkSourceBuild=false",
-                "-PbuildDir=%s" % self.output_dir,
+                f"-PbuildDir={self.output_dir}",
                 "assembleDebug",
             ],
             title="Building APP " + self.identifier,
@@ -361,31 +356,26 @@ class AndroidBuilder(Builder):
             for module in self.app.Modules():
                 self._Execute(
                     [
-                        "%s/examples/%s/android/App/gradlew"
-                        % (self.root, self.app.ExampleName()),
+                        f"{self.root}/examples/{self.app.ExampleName()}/android/App/gradlew",
                         "-p",
-                        "%s/examples/%s/android/App/"
-                        % (self.root, self.app.ExampleName()),
-                        "-PmatterBuildSrcDir=%s" % self.output_dir,
+                        f"{self.root}/examples/{self.app.ExampleName()}/android/App/",
+                        f"-PmatterBuildSrcDir={self.output_dir}",
                         "-PmatterSdkSourceBuild=false",
-                        "-PbuildDir=%s/%s" % (self.output_dir, module),
+                        f"-PbuildDir={self.output_dir}/{module}",
                         optimize_flag,
-                        ":%s:assembleDebug" % module,
+                        f":{module}:assembleDebug",
                     ],
-                    title="Building Example %s, module %s" % (
-                        self.identifier, module),
+                    title=f"Building Example {self.identifier}, module {module}",
                 )
         else:
             self._Execute(
                 [
-                    "%s/examples/%s/android/App/gradlew"
-                    % (self.root, self.app.ExampleName()),
+                    f"{self.root}/examples/{self.app.ExampleName()}/android/App/gradlew",
                     "-p",
-                    "%s/examples/%s/android/App/" % (self.root,
-                                                     self.app.ExampleName()),
-                    "-PmatterBuildSrcDir=%s" % self.output_dir,
+                    f"{self.root}/examples/{self.app.ExampleName()}/android/App/",
+                    f"-PmatterBuildSrcDir={self.output_dir}",
                     "-PmatterSdkSourceBuild=false",
-                    "-PbuildDir=%s" % self.output_dir,
+                    f"-PbuildDir={self.output_dir}",
                     optimize_flag,
                     "assembleDebug",
                 ],
@@ -467,12 +457,12 @@ class AndroidBuilder(Builder):
             for key, value in gn_args.items():
                 if type(value) is bool:
                     if value:
-                        args_str += "%s=true " % (key)
+                        args_str += f"{key}=true "
                     else:
-                        args_str += "%s=false " % (key)
+                        args_str += f"{key}=false "
                 else:
-                    args_str += '%s="%s" ' % (key, shlex.quote(value))
-            args = "--args=%s" % (args_str)
+                    args_str += f'{key}="{shlex.quote(value)}" '
+            args = f"--args={args_str}"
 
             gn_gen = [
                 "gn",
@@ -485,10 +475,9 @@ class AndroidBuilder(Builder):
 
             rootName = self.app.BuildRoot(self.root)
             if rootName is not None:
-                gn_gen += ["--root=%s" % rootName]
+                gn_gen += [f"--root={rootName}"]
             elif exampleName is not None:
-                gn_gen += ["--root=%s/examples/%s/android/" %
-                           (self.root, exampleName)]
+                gn_gen += [f"--root={self.root}/examples/{exampleName}/android/"]
 
             if self.board.IsIde():
                 gn_gen += [
@@ -525,13 +514,12 @@ class AndroidBuilder(Builder):
             # TODO: Android Gradle with module and -PbuildDir= will caused issue, remove -PbuildDir=
             self._Execute(
                 [
-                    "%s/examples/android/%s/gradlew" % (
-                        self.root, self.app.AppName()),
+                    f"{self.root}/examples/android/{self.app.AppName()}/gradlew",
                     "-p",
-                    "%s/examples/android/%s" % (self.root, self.app.AppName()),
-                    "-PmatterBuildSrcDir=%s" % self.output_dir,
+                    f"{self.root}/examples/android/{self.app.AppName()}",
+                    f"-PmatterBuildSrcDir={self.output_dir}",
                     "-PmatterSdkSourceBuild=true",
-                    "-PmatterSourceBuildAbiFilters=%s" % self.board.AbiName(),
+                    f"-PmatterSourceBuildAbiFilters={self.board.AbiName()}",
                     "assembleDebug",
                 ],
                 title="Building APP " + self.identifier,
@@ -708,7 +696,7 @@ class AndroidBuilder(Builder):
                 "CHIPClusterID.jar")
             yield BuilderOutput(
                 os.path.join(self.output_dir, "lib", "jni", self.board.AbiName(), "libCHIPController.so"),
-                "jni/%s/libCHIPController.so" % self.board.AbiName())
+                f"jni/{self.board.AbiName()}/libCHIPController.so")
             yield BuilderOutput(
                 os.path.join(self.output_dir, "lib", "jni", self.board.AbiName(), "libc++_shared.so"),
-                "jni/%s/libc++_shared.so" % self.board.AbiName())
+                f"jni/{self.board.AbiName()}/libc++_shared.so")

@@ -36,18 +36,18 @@ GN_CFLAG_EXCLUDES = [
 
 def write_gn_args(args):
     if args.module:
-        sys.stdout.write('import("{}")\n'.format(args.module))
+        sys.stdout.write(f'import("{args.module}")\n')
 
     for key, value in args.arg:
-        sys.stdout.write('{} = {}\n'.format(key, value))
+        sys.stdout.write(f'{key} = {value}\n')
 
     for key, value in args.arg_string:
         # Escaped quote and dollar sign characters
         filtered_value = value.replace('"', '\\"')
         filtered_value = filtered_value.replace('$', '\\$')
-        sys.stdout.write('{} = "{}"\n'.format(key, filtered_value))
+        sys.stdout.write(f'{key} = "{filtered_value}"\n')
 
-    cflag_excludes = ', '.join(['"{}"'.format(exclude)
+    cflag_excludes = ', '.join([f'"{exclude}"'
                                for exclude in GN_CFLAG_EXCLUDES])
 
     for key, value in args.arg_cflags:
@@ -66,7 +66,7 @@ def write_gn_args(args):
         filtered_value = list(dict.fromkeys(filtered_value))
 
         sys.stdout.write('{} = filter_exclude(string_split("{}", "{}"), [{}])\n'.format(
-            key, "{}-".format(GN_SPECIAL_SEPARATOR).join(filtered_value), GN_SPECIAL_SEPARATOR, cflag_excludes))
+            key, f"{GN_SPECIAL_SEPARATOR}-".join(filtered_value), GN_SPECIAL_SEPARATOR, cflag_excludes))
 
 
 def main():

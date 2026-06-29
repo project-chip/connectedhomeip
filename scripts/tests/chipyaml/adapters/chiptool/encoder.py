@@ -467,7 +467,7 @@ class Encoder:
             value = {key: self.__encode_octet_strings(
                 value[key]) for key in value}
         elif isinstance(value, bytes):
-            value = 'hex:' + ''.join("{:02x}".format(c) for c in value)
+            value = 'hex:' + ''.join(f"{c:02x}" for c in value)
         return value
 
     def __lower_camel_case_member_fields(self, value):
