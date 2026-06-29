@@ -194,8 +194,8 @@
 	excluded-platforms = esp32
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
-	url = https://github.com/RyanHo-MTK/genio-matter-bsp.git
-	branch = mtk-1.5-filogic
+	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
+	branch = main
 	platforms = genio
 [submodule "third_party/mt793x_sdk/mDNSResponder"]
 	path = third_party/mt793x_sdk/mDNSResponder
