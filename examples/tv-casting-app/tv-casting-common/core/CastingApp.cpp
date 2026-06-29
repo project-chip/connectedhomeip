@@ -24,13 +24,11 @@
 #include "support/ChipDeviceEventHandler.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace {
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -125,13 +123,7 @@ CHIP_ERROR CastingApp::Start()
     // Start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();
     VerifyOrReturnError(serverInitParams != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    CHIP_ERROR initError = chip::Server::GetInstance().Init(*serverInitParams);
-    if (initError != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "CastingApp::Start() Server::Init failed: %s", initError.AsString());
-        return initError;
-    }
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(*serverInitParams));
 
     // Perform post server startup registrations
     ReturnErrorOnFailure(PostStartRegistrations());
@@ -150,7 +142,6 @@ CHIP_ERROR CastingApp::Start()
         CastingPlayer::GetTargetCastingPlayer()->VerifyOrEstablishConnection(connectionCallbacks);
     }
 
-    ChipLogProgress(Discovery, "CastingApp::Start() completed");
     return CHIP_NO_ERROR;
 }
 
@@ -179,8 +170,11 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Set a handler for Commissioner's CommissionerDeclaration messages. This is set in
     // connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioning.h
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        CommissionerDeclarationHandler::GetInstance());
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(CommissionerDeclarationHandler::GetInstance());
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
@@ -194,24 +188,17 @@ CHIP_ERROR CastingApp::Stop()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+    auto * client = chip::Server::GetInstance().GetUserDirectedCommissioningClient();
+    if (client != nullptr)
+    {
+        client->SetCommissionerDeclarationHandler(nullptr);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    // Shutdown the Matter server to clean up active sessions
+    // Shutdown the Matter server
     chip::Server::GetInstance().Shutdown();
 
-    // Shutdown the CodegenDataModelProvider to reset mContext
-    CHIP_ERROR providerShutdownErr = chip::app::CodegenDataModelProvider::Instance().Shutdown();
-    if (providerShutdownErr != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "CastingApp::Stop() CodegenDataModelProvider::Shutdown failed: %s", providerShutdownErr.AsString());
-    }
-
-    // Destroy EventManagement to reset its state
-    chip::app::EventManagement::DestroyEventManagement();
-
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
-    ChipLogProgress(Discovery, "CastingApp::Stop() completed");
 
     return CHIP_NO_ERROR;
 }

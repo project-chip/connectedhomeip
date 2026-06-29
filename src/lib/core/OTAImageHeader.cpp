@@ -23,7 +23,7 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 #include <string.h>
@@ -79,6 +79,13 @@ void OTAImageHeaderParser::Clear()
 CHIP_ERROR OTAImageHeaderParser::AccumulateAndDecode(ByteSpan & buffer, OTAImageHeader & header)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+
+    // Init() may have left mBuffer null on alloc failure.
+    if (mState != State::kNotInitialized && mBuffer.Get() == nullptr)
+    {
+        Clear();
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
     if (mState == State::kInitialized)
     {

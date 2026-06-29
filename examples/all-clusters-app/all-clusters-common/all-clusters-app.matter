@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 5;
+  revision 4;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -772,7 +772,7 @@ cluster Descriptor = 29 {
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
   readonly attribute optional SemanticTagStruct tagList[] = 4;
-  readonly attribute optional char_string<32> endpointUniqueID = 5;
+  provisional readonly attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -906,7 +906,7 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+  provisional fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
     nullable node_id adminNodeID = 0;
     fabric_idx fabricIndex = 254;
   }
@@ -918,7 +918,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1204,7 +1204,8 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
-  readonly attribute optional int32u configurationVersion = 24;
+  provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  provisional readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1214,9 +1215,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Provides an interface for providing OTA software updates */
+/** This cluster implements the Provider role in the OTA process. */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -1252,18 +1253,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional octet_string<512> metadataForProvider = 7;
+    optional long_octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional char_string<256> imageURI = 2;
+    optional long_char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional octet_string<512> metadataForRequestor = 7;
+    optional long_octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -1281,17 +1282,17 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Determine availability of a new Software Image */
+  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** Determine next action to take for a downloaded Software Image */
+  /** This command requests the specified version be installed on the device. */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** Notify OTA Provider that an update was applied */
+  /** This command tells the Provider that the specified update has been applied. */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
+/** This cluster implements the Requestor role in the OTA process. */
 cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
@@ -1358,11 +1359,11 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
     AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
+    optional long_octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  /** Announce the presence of an OTA Provider */
+  /** This command MAY be invoked by Administrators to announce the presence of a particular OTA Provider. */
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
@@ -2790,9 +2791,9 @@ cluster OperationalCredentials = 62 {
   }
 
   fabric_scoped struct NOCStruct {
-    octet_string<400> noc = 1;
-    nullable octet_string<400> icac = 2;
-    optional octet_string<400> vvsc = 3;
+    long_octet_string<400> noc = 1;
+    nullable long_octet_string<400> icac = 2;
+    optional long_octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2813,7 +2814,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string attestationElements = 0;
+    long_octet_string<900> attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -2822,7 +2823,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string<600> certificate = 0;
+    long_octet_string<600> certificate = 0;
   }
 
   request struct CSRRequestRequest {
@@ -2831,21 +2832,21 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CSRResponse = 5 {
-    octet_string NOCSRElements = 0;
+    long_octet_string<900> NOCSRElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
     octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
 
   request struct UpdateNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -2863,13 +2864,13 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string<400> rootCACertificate = 0;
+    long_octet_string<400> rootCACertificate = 0;
   }
 
   request struct SetVIDVerificationStatementRequest {
     optional vendor_id vendorID = 0;
     optional octet_string<85> VIDVerificationStatement = 1;
-    optional octet_string<400> vvsc = 2;
+    optional long_octet_string<400> vvsc = 2;
   }
 
   request struct SignVIDVerificationRequestRequest {
@@ -2883,31 +2884,31 @@ cluster OperationalCredentials = 62 {
     octet_string signature = 2;
   }
 
-  /** Sender is requesting attestation information from the receiver. */
+  /** This command is used to perform an attestation request. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  /** Sender is requesting a device attestation certificate from the receiver. */
+  /** This command is used to request a certificate from the device attestation certificate chain. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
+  /** This command is used to perform a CSR request. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  /** Sender is requesting to add the new node operational certificates. */
+  /** This command is used to add a new NOC to the device. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
+  /** This command is used to update an existing NOC on the device. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
+  /** This command is used to set the user-visible fabric label for a given Fabric. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
+  /** This command is used to remove a Fabric from the device. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
+  /** This command is used to add a trusted root certificate to the device. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  /** This command is used to manage the VendorID and VIDVerificationStatement fields of the Fabrics attribute, and the VVSC field of an entry in the NOCs attribute. */
   fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
-  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  /** This command is used to authenticate the fabric associated with the FabricIndex. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2946,7 +2947,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -2958,7 +2958,7 @@ cluster GroupKeyManagement = 63 {
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
+  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3224,7 +3224,6 @@ cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-  readonly attribute optional int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     int8u newMode = 0;
@@ -3232,8 +3231,6 @@ cluster ModeSelect = 80 {
 
   /** On receipt of this command, if the NewMode field indicates a valid mode transition within the supported list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
-  /** Sample manufacturer specific extension command */
-  command SampleMfgExtensionCommand(): DefaultSuccess = 4293984257;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -3342,7 +3339,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
 /** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
-  revision 1;
+  revision 2;
 
   enum NumberOfRinsesEnum : enum8 {
     kNone = 0;
@@ -4296,7 +4293,7 @@ cluster BooleanStateConfiguration = 128 {
 
 /** This cluster is used to configure a valve. */
 cluster ValveConfigurationAndControl = 129 {
-  revision 2;
+  revision 1;
 
   enum StatusCodeEnum : enum8 {
     kFailureDueToFault = 2;
@@ -4485,10 +4482,10 @@ cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
-  readonly attribute optional int16u physicalClosedLimitLift = 1;
-  readonly attribute optional int16u physicalClosedLimitTilt = 2;
-  readonly attribute optional nullable int16u currentPositionLift = 3;
-  readonly attribute optional nullable int16u currentPositionTilt = 4;
+  provisional readonly attribute optional int16u physicalClosedLimitLift = 1;
+  provisional readonly attribute optional int16u physicalClosedLimitTilt = 2;
+  provisional readonly attribute optional nullable int16u currentPositionLift = 3;
+  provisional readonly attribute optional nullable int16u currentPositionTilt = 4;
   readonly attribute optional int16u numberOfActuationsLift = 5;
   readonly attribute optional int16u numberOfActuationsTilt = 6;
   readonly attribute ConfigStatus configStatus = 7;
@@ -4500,10 +4497,10 @@ cluster WindowCovering = 258 {
   readonly attribute EndProductType endProductType = 13;
   readonly attribute optional nullable percent100ths currentPositionLiftPercent100ths = 14;
   readonly attribute optional nullable percent100ths currentPositionTiltPercent100ths = 15;
-  readonly attribute optional int16u installedOpenLimitLift = 16;
-  readonly attribute optional int16u installedClosedLimitLift = 17;
-  readonly attribute optional int16u installedOpenLimitTilt = 18;
-  readonly attribute optional int16u installedClosedLimitTilt = 19;
+  provisional readonly attribute optional int16u installedOpenLimitLift = 16;
+  provisional readonly attribute optional int16u installedClosedLimitLift = 17;
+  provisional readonly attribute optional int16u installedOpenLimitTilt = 18;
+  provisional readonly attribute optional int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
   readonly attribute optional SafetyStatus safetyStatus = 26;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4528,19 +4525,19 @@ cluster WindowCovering = 258 {
     percent100ths tiltPercent100thsValue = 0;
   }
 
-  /** Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt */
+  /** Upon receipt of this command, the window covering will adjust its position so the physical lift/slide and tilt is at the maximum open/up position. */
   command UpOrOpen(): DefaultSuccess = 0;
-  /** Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt */
+  /** Upon receipt of this command, the window covering will adjust its position so the physical lift/slide and tilt is at the maximum closed/down position. */
   command DownOrClose(): DefaultSuccess = 1;
-  /** Stop any adjusting of window covering */
+  /** Upon receipt of this command, the window covering will stop any adjusting to the physical tilt and lift/slide that is currently occurring. */
   command StopMotion(): DefaultSuccess = 2;
   /** Go to lift value specified */
   command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
-  /** Go to lift percentage specified */
+  /** This command is used to set the target lift position of the window covering to the percentage value specified in the command. */
   command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
   /** Go to tilt value specified */
   command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
-  /** Go to tilt percentage specified */
+  /** This command is used to set the target tilt position of the window covering to the percentage value specified in the command. */
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
@@ -4669,7 +4666,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 9;
+  revision 11;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -5084,7 +5081,7 @@ cluster Thermostat = 513 {
     optional int16u timeout = 2;
   }
 
-  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
+  /** This command will raise or lower the setpoint based on the provided values. */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
@@ -5092,11 +5089,13 @@ cluster Thermostat = 513 {
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** This command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
+  /** This command will set the active schedule to the provided schedule handle. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
-  /** ID */
+  /** This command will set the active preset to the provided preset handle. */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command will add a new suggestion based on the specified values. */
   command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
@@ -5214,6 +5213,73 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster specifies an interface to control the humidity of an environment. */
+provisional cluster Humidistat = 517 {
+  revision 1;
+
+  enum ModeEnum : enum8 {
+    kOff = 0;
+    kHumidifier = 1;
+    kDehumidifier = 2;
+    kAuto = 3;
+    kFanOnly = 4;
+  }
+
+  enum SystemStateEnum : enum8 {
+    kOff = 0;
+    kHumidifying = 1;
+    kDehumidifying = 2;
+    kFan = 3;
+    kIdle = 4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kHumidifier = 0x1;
+    kDehumidifier = 0x2;
+    kContinuous = 0x4;
+    kSensor = 0x8;
+    kAuto = 0x10;
+    kFanOnly = 0x20;
+    kOptimal = 0x40;
+    kWarmMist = 0x80;
+    kColdMist = 0x100;
+  }
+
+  bitmap MistTypeBitmap : bitmap8 {
+    kMistCold = 0x1;
+    kMistWarm = 0x2;
+  }
+
+  readonly attribute ModeEnum mode = 0;
+  readonly attribute SystemStateEnum systemState = 1;
+  readonly attribute optional percent userSetpoint = 2;
+  readonly attribute optional percent minSetpoint = 3;
+  readonly attribute optional percent maxSetpoint = 4;
+  readonly attribute optional percent step = 5;
+  readonly attribute optional percent targetSetpoint = 6;
+  readonly attribute optional MistTypeBitmap mistType = 7;
+  readonly attribute optional boolean continuous = 8;
+  readonly attribute optional boolean sleep = 9;
+  readonly attribute optional boolean optimal = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetSettingsRequest {
+    optional percent userSetpoint = 0;
+    optional ModeEnum mode = 1;
+    optional MistTypeBitmap mistType = 2;
+    optional boolean continuous = 3;
+    optional boolean sleep = 4;
+    optional boolean optimal = 5;
+  }
+
+  /** This command will set the specified settings to new values. */
+  command SetSettings(SetSettingsRequest): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
@@ -5503,43 +5569,43 @@ cluster ColorControl = 768 {
     OptionsBitmap optionsOverride = 6;
   }
 
-  /** Move to specified hue. */
+  /** This command will move the device to the requested hue using a transition. */
   command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
-  /** Move hue up or down at specified rate. */
+  /** This command will change the hue of the device with a requested rate. */
   command MoveHue(MoveHueRequest): DefaultSuccess = 1;
-  /** Step hue up or down by specified size at specified rate. */
+  /** This command will change the hue of the device using a step and transition. */
   command StepHue(StepHueRequest): DefaultSuccess = 2;
-  /** Move to specified saturation. */
+  /** This command will move the device to the requested saturation using a transition. */
   command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
-  /** Move saturation up or down at specified rate. */
+  /** This command will change the saturation of the device with a requested rate. */
   command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
-  /** Step saturation up or down by specified size at specified rate. */
+  /** This command will change the saturation of the device using a step and transition. */
   command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
-  /** Move to hue and saturation. */
+  /** This command will move the device to the requested hue and saturation using a transition. */
   command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
-  /** Move to specified color. */
+  /** This command will move the device to the requested color using a transition. */
   command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
-  /** Moves the color. */
+  /** This command will change the color of the device with a requested rate. */
   command MoveColor(MoveColorRequest): DefaultSuccess = 8;
-  /** Steps the lighting to a specific color. */
+  /** This command will change the color of the device using a step and transition. */
   command StepColor(StepColorRequest): DefaultSuccess = 9;
-  /** Move to a specific color temperature. */
+  /** This command will move the device to the requested color temperate using a transition. */
   command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
-  /** Command description for EnhancedMoveToHue */
+  /** This command allows the light to be moved in a smooth continuous transition from their current hue to a target hue. */
   command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
-  /** Command description for EnhancedMoveHue */
+  /** This command allows the light to start a continuous transition starting from their current hue. */
   command EnhancedMoveHue(EnhancedMoveHueRequest): DefaultSuccess = 65;
-  /** Command description for EnhancedStepHue */
+  /** This command allows the device to be moved in a stepped transition from their current hue. */
   command EnhancedStepHue(EnhancedStepHueRequest): DefaultSuccess = 66;
-  /** Command description for EnhancedMoveToHueAndSaturation */
+  /** This command allows the light to be moved in a smooth continuous transition from their current hue to a target hue and from their current saturation to a target saturation. */
   command EnhancedMoveToHueAndSaturation(EnhancedMoveToHueAndSaturationRequest): DefaultSuccess = 67;
-  /** Command description for ColorLoopSet */
+  /** This command allows a color loop to be activated such that the color light cycles through its range of hues. */
   command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
-  /** Command description for StopMoveStep */
+  /** This command is provided to allow MoveTo and Step commands to be stopped. */
   command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
-  /** Command description for MoveColorTemperature */
+  /** This command allows the color temperature of the light to be moved at a specified rate. */
   command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
-  /** Command description for StepColorTemperature */
+  /** This command allows the color temperature of the light to be stepped with a specified step size. */
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
@@ -5742,7 +5808,7 @@ cluster OccupancySensing = 1030 {
 
 /** Attributes for reporting carbon monoxide concentration measurements */
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -5767,6 +5833,8 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -5798,7 +5866,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 
 /** Attributes for reporting carbon dioxide concentration measurements */
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -5823,6 +5891,8 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -5854,7 +5924,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -5879,6 +5949,8 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -5910,7 +5982,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 
 /** Attributes for reporting ozone concentration measurements */
 cluster OzoneConcentrationMeasurement = 1045 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -5935,6 +6007,8 @@ cluster OzoneConcentrationMeasurement = 1045 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -5966,7 +6040,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
 
 /** Attributes for reporting PM2.5 concentration measurements */
 cluster Pm25ConcentrationMeasurement = 1066 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -5991,6 +6065,8 @@ cluster Pm25ConcentrationMeasurement = 1066 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -6022,7 +6098,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
 
 /** Attributes for reporting formaldehyde concentration measurements */
 cluster FormaldehydeConcentrationMeasurement = 1067 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -6047,6 +6123,8 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -6078,7 +6156,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
 
 /** Attributes for reporting PM1 concentration measurements */
 cluster Pm1ConcentrationMeasurement = 1068 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -6103,6 +6181,8 @@ cluster Pm1ConcentrationMeasurement = 1068 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -6134,7 +6214,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
 
 /** Attributes for reporting PM10 concentration measurements */
 cluster Pm10ConcentrationMeasurement = 1069 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -6159,6 +6239,8 @@ cluster Pm10ConcentrationMeasurement = 1069 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -6190,7 +6272,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -6215,6 +6297,8 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -6246,7 +6330,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 
 /** Attributes for reporting radon concentration measurements */
 cluster RadonConcentrationMeasurement = 1071 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -6271,6 +6355,8 @@ cluster RadonConcentrationMeasurement = 1071 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -6349,7 +6435,7 @@ cluster Chime = 1366 {
     char_string<48> name = 1;
   }
 
-  info event ChimeStartedPlaying = 0 {
+  provisional info event ChimeStartedPlaying = 0 {
     int8u chimeID = 0;
   }
 
@@ -7105,6 +7191,18 @@ internal cluster FaultInjection = 4294048774 {
   command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
 }
 
+/** Test cluster for validating manufacturer-specific cluster handling without controller-side implementation */
+internal cluster TestHiddenManufacturerSpecific = 4294048801 {
+  revision 1; // NOTE: Default/not specifically set
+
+  readonly attribute boolean testAttribute = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 5;
   device type ma_powersource = 17, version 1;
@@ -7197,11 +7295,11 @@ endpoint 0 {
     emits event VersionApplied;
     emits event DownloadError;
     callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute updatePossible;
+    callback attribute updateState;
+    callback attribute updateStateProgress;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AnnounceOTAProvider;
   }
@@ -7560,11 +7658,47 @@ endpoint 0 {
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster TlsCertificateManagement {
+    callback attribute maxRootCertificates;
+    callback attribute provisionedRootCertificates;
+    callback attribute maxClientCertificates;
+    callback attribute provisionedClientCertificates;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
+
+    handle command ProvisionRootCertificate;
+    handle command FindRootCertificate;
+    handle command LookupRootCertificate;
+    handle command RemoveRootCertificate;
+    handle command ClientCSR;
+    handle command ProvisionClientCertificate;
+    handle command FindClientCertificate;
+    handle command LookupClientCertificate;
+    handle command RemoveClientCertificate;
+  }
+
+  server cluster TlsClientManagement {
+    callback attribute maxProvisioned;
+    callback attribute provisionedEndpoints;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+
+    handle command ProvisionEndpoint;
+    handle command FindEndpoint;
+    handle command RemoveEndpoint;
   }
 
   server cluster FaultInjection {
@@ -7623,7 +7757,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -7649,7 +7783,7 @@ endpoint 1 {
     ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;
@@ -7764,12 +7898,12 @@ endpoint 1 {
 
   server cluster OvenMode {
     callback attribute supportedModes;
-    ram      attribute currentMode;
+    callback attribute currentMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command ChangeToMode;
   }
@@ -7796,7 +7930,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 2;
-    ram      attribute manufacturerExtension default = 255;
 
     handle command ChangeToMode;
   }
@@ -7808,7 +7941,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -7820,7 +7953,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -7834,7 +7967,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
   }
 
   server cluster RvcRunMode {
@@ -7844,7 +7977,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -7856,7 +7989,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command ChangeToMode;
   }
@@ -7868,7 +8001,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command SetTemperature;
   }
@@ -7892,7 +8025,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -7903,7 +8036,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster SmokeCoAlarm {
@@ -7930,10 +8063,10 @@ endpoint 1 {
     ram      attribute interconnectCOAlarm default = 0;
     ram      attribute contaminationState default = 0;
     ram      attribute smokeSensitivityLevel default = 1;
-    ram      attribute expiryDate default = 0;
+    ram      attribute expiryDate default = 3976214400;
     ram      attribute unmounted default = 0;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command SelfTestRequest;
   }
@@ -7961,7 +8094,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
   }
 
   server cluster OperationalState {
@@ -8177,7 +8310,7 @@ endpoint 1 {
     ram      attribute operationMode default = 0x00;
     ram      attribute controlMode default = 0x00;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster Thermostat {
@@ -8193,7 +8326,7 @@ endpoint 1 {
     ram      attribute maxHeatSetpointLimit default = 0x0BB8;
     ram      attribute minCoolSetpointLimit default = 0x0640;
     ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x19;
+    ram      attribute minSetpointDeadBand default = 0x14;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
     ram      attribute temperatureSetpointHold default = 0;
@@ -8208,33 +8341,39 @@ endpoint 1 {
     callback attribute presets;
     callback attribute schedules;
     ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute maxThermostatSuggestions;
+    callback attribute thermostatSuggestions;
+    callback attribute currentThermostatSuggestion;
+    callback attribute thermostatSuggestionNotFollowingReason;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0123;
+    ram      attribute featureMap default = 0x0523;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
     handle command SetActiveScheduleRequest;
     handle command SetActivePresetRequest;
+    handle command AddThermostatSuggestion;
+    handle command RemoveThermostatSuggestion;
     handle command AtomicRequest;
   }
 
   server cluster FanControl {
-    ram      attribute fanMode default = 0x00;
+    callback attribute fanMode;
     ram      attribute fanModeSequence default = 0x02;
-    ram      attribute percentSetting default = 0x00;
-    ram      attribute percentCurrent default = 0x00;
+    callback attribute percentSetting;
+    callback attribute percentCurrent;
     ram      attribute speedMax default = 100;
-    ram      attribute speedSetting default = 0x00;
-    ram      attribute speedCurrent default = 0x00;
+    callback attribute speedSetting;
+    callback attribute speedCurrent;
     ram      attribute rockSupport default = 0x03;
-    ram      attribute rockSetting default = 0x00;
+    callback attribute rockSetting;
     ram      attribute windSupport default = 0x03;
-    ram      attribute windSetting default = 0x00;
-    ram      attribute airflowDirection default = 0;
+    callback attribute windSetting;
+    callback attribute airflowDirection;
     ram      attribute featureMap default = 0x3F;
-    ram      attribute clusterRevision default = 4;
+    callback attribute clusterRevision;
 
     handle command Step;
   }
@@ -8245,6 +8384,27 @@ endpoint 1 {
     ram      attribute scheduleProgrammingVisibility;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster Humidistat {
+    ram      attribute mode default = 0;
+    ram      attribute systemState default = 0;
+    ram      attribute userSetpoint default = 40;
+    ram      attribute minSetpoint default = 40;
+    ram      attribute maxSetpoint default = 60;
+    ram      attribute step default = 5;
+    ram      attribute targetSetpoint default = 0;
+    ram      attribute mistType default = 0;
+    ram      attribute continuous default = 0;
+    ram      attribute sleep default = 0;
+    ram      attribute optimal default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 511;
+    callback attribute clusterRevision default = 1;
+
+    handle command SetSettings;
   }
 
   server cluster ColorControl {
@@ -8301,7 +8461,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 0x0009;
 
     handle command MoveToHue;
     handle command MoveHue;
@@ -8366,29 +8526,29 @@ endpoint 1 {
   }
 
   server cluster PressureMeasurement {
-    ram      attribute measuredValue default = 0x0000;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 32767;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 0x0004;
   }
 
   server cluster FlowMeasurement {
-    ram      attribute measuredValue default = 5;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 100;
     ram      attribute tolerance default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute tolerance;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster OccupancySensing {
@@ -8418,7 +8578,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -8437,7 +8597,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -8456,7 +8616,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -8475,7 +8635,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -8494,7 +8654,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -8513,7 +8673,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -8532,7 +8692,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -8551,7 +8711,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -8570,7 +8730,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -8589,7 +8749,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster SoilMeasurement {
@@ -8626,42 +8786,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command PlayChimeSound;
-  }
-
-  server cluster TlsCertificateManagement {
-    callback attribute maxRootCertificates;
-    callback attribute provisionedRootCertificates;
-    callback attribute maxClientCertificates;
-    callback attribute provisionedClientCertificates;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
-
-    handle command ProvisionRootCertificate;
-    handle command FindRootCertificate;
-    handle command LookupRootCertificate;
-    handle command RemoveRootCertificate;
-    handle command ClientCSR;
-    handle command ProvisionClientCertificate;
-    handle command FindClientCertificate;
-    handle command LookupClientCertificate;
-    handle command RemoveClientCertificate;
-  }
-
-  server cluster TlsClientManagement {
-    callback attribute maxProvisioned;
-    callback attribute provisionedEndpoints;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision;
-
-    handle command ProvisionEndpoint;
-    handle command FindEndpoint;
-    handle command RemoveEndpoint;
   }
 
   server cluster UnitTesting {
@@ -8784,6 +8908,15 @@ endpoint 1 {
     handle command TestCheckCommandFlags;
     handle command TestDifferentVendorMeiRequest;
   }
+
+  server cluster TestHiddenManufacturerSpecific {
+    ram      attribute testAttribute default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
 }
 endpoint 2 {
   device type ma_powersource = 17, version 1;
@@ -8829,7 +8962,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;

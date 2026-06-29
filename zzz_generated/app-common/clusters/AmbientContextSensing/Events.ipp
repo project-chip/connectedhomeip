@@ -35,7 +35,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAmbientContextType), ambientContextType));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAmbientContextDetected), ambientContextDetected));
+    ReturnErrorOnFailure(
+        DataModel::Encode(aWriter, TLV::ContextTag(Fields::kObjectCountThresholdReached), objectCountThresholdReached));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kObjectCount), objectCount));
     return aWriter.EndContainer(outer);
 }
@@ -50,9 +52,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kAmbientContextType))
+        if (__context_tag == to_underlying(Fields::kAmbientContextDetected))
         {
-            err = DataModel::Decode(reader, ambientContextType);
+            err = DataModel::Decode(reader, ambientContextDetected);
+        }
+        else if (__context_tag == to_underlying(Fields::kObjectCountThresholdReached))
+        {
+            err = DataModel::Decode(reader, objectCountThresholdReached);
         }
         else if (__context_tag == to_underlying(Fields::kObjectCount))
         {
@@ -65,13 +71,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AmbientContextDetectStarted.
+} // namespace AmbientContextDetectStarted
 namespace AmbientContextDetectEnded {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kStartEventNumber), startEventNumber));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEventStartTimePos), eventStartTimePos));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEventStartTimeSys), eventStartTimeSys));
     return aWriter.EndContainer(outer);
 }
 
@@ -85,9 +92,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kStartEventNumber))
+        if (__context_tag == to_underlying(Fields::kEventStartTimePos))
         {
-            err = DataModel::Decode(reader, startEventNumber);
+            err = DataModel::Decode(reader, eventStartTimePos);
+        }
+        else if (__context_tag == to_underlying(Fields::kEventStartTimeSys))
+        {
+            err = DataModel::Decode(reader, eventStartTimeSys);
         }
         else
         {
@@ -96,7 +107,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AmbientContextDetectEnded.
+} // namespace AmbientContextDetectEnded
 } // namespace Events
 } // namespace AmbientContextSensing
 } // namespace Clusters

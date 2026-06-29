@@ -24,17 +24,21 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
 #include "sl_memory_manager.h"
 #include <cmsis_os2.h>
+#include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/support/CHIPMemString.h>
 #include <sl_cmsis_os2_common.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
+using namespace ::chip::DeviceLayer::NetworkCommissioning;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
@@ -335,15 +339,14 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 #if defined(SL_WIFI) && SL_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    constexpr size_t bssIdSize = 6;
-    wfx_wifi_scan_result_t ap  = { 0 };
+    WiFiScanResponse ap = {};
 
-    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(BssId.size() >= kWiFiBSSIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap) == CHIP_NO_ERROR)
     {
-        memcpy(BssId.data(), ap.bssid, bssIdSize);
-        BssId.reduce_size(bssIdSize);
+        memcpy(BssId.data(), ap.bssid, kWiFiBSSIDLength);
+        BssId.reduce_size(kWiFiBSSIDLength);
         return CHIP_NO_ERROR;
     }
 
@@ -355,8 +358,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     using app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
 
-    wfx_wifi_scan_result_t ap = { 0 };
-    CHIP_ERROR error          = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
+    WiFiScanResponse ap = {};
+    CHIP_ERROR error    = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
     VerifyOrReturnError(error == CHIP_NO_ERROR, error);
 
     // Map Matter WiFiSecurityBitmap to WiFiNetworkDiagnostics SecurityTypeEnum (prefer highest)
@@ -395,11 +398,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    wfx_wifi_scan_result_t ap = { 0 };
-    CHIP_ERROR error          = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
+    WiFiScanResponse ap = {};
+    CHIP_ERROR error    = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
     if (error == CHIP_NO_ERROR)
     {
-        channelNumber = ap.chan;
+        channelNumber = ap.channel;
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -407,11 +410,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    wfx_wifi_scan_result_t ap = { 0 };
-    CHIP_ERROR error          = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
+    WiFiScanResponse ap = {};
+    CHIP_ERROR error    = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
     if (error == CHIP_NO_ERROR)
     {
-        rssi = ap.rssi;
+        rssi = ap.signal.strength;
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

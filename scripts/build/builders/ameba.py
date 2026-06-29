@@ -12,10 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import os
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
+
+# All Ameba targets delegate generation to the same Realtek SDK tree
+# ($AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE), whose configure
+# step (asdk/config.cmake's configure_file + the 'linux' GEN_OS scratch dir) is
+# shared across applications rather than scoped to the per-target output_dir.
+# When several Ameba targets generate in parallel they race on this shared tree,
+# producing nondeterministic failures such as
+# "mkdir: cannot create directory 'linux': File exists" and
+# "CMake Error at asdk/config.cmake:20 (configure_file): No such file or
+# directory", which leaves no build.ninja behind. Serialize generation on this
+# constant key (compilation still runs in parallel, each in its own output_dir).
+AMEBA_SDK_GENERATE_LOCK_KEY = 'ameba:realtek_amebaD_va0_example/GCC-RELEASE'
 
 
 class AmebaBoard(Enum):
@@ -26,7 +40,6 @@ class AmebaApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
-    PIGWEED = auto()
     LIGHT_SWITCH = auto()
 
     @property
@@ -39,8 +52,6 @@ class AmebaApp(Enum):
             return 'lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        if self == AmebaApp.PIGWEED:
-            return 'pigweed-app'
         raise Exception('Unknown app type: %r' % self)
 
     @property
@@ -53,35 +64,39 @@ class AmebaApp(Enum):
             return 'chip-ameba-lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'chip-ameba-light-switch-app'
-        if self == AmebaApp.PIGWEED:
-            return 'chip-ameba-pigweed-app'
         raise Exception('Unknown app type: %r' % self)
 
 
 class AmebaBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board: AmebaBoard = AmebaBoard.AMEBAD,
                  app: AmebaApp = AmebaApp.ALL_CLUSTERS):
-        super(AmebaBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.board = board
         self.app = app
 
+    @lock_output_dir
     def generate(self):
         cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh '
-        if self.app.ExampleName == 'pigweed-app':
-            # rpc flag: -r
-            cmd += '-r '
-
         # <build root> <build_system> <output_directory> <application>
+
         cmd += ' '.join([self.root, 'ninja', self.output_dir,
                         self.app.ExampleName])
 
-        self._Execute(['bash', '-c', cmd],
-                      title='Generating ' + self.identifier)
+        # Serialize the Realtek SDK configure step across all Ameba targets: they
+        # share one SDK tree, so concurrent generation races on it (see
+        # AMEBA_SDK_GENERATE_LOCK_KEY). lock_dir() handles a None lock gracefully.
+        shared_lock = self.output_dir_lock.lock_dir(AMEBA_SDK_GENERATE_LOCK_KEY) \
+            if self.output_dir_lock is not None else contextlib.nullcontext()
+        with shared_lock:
+            self._Execute(['bash', '-c', cmd],
+                          title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
         cmd = ['ninja', '-C', self.output_dir]
 
@@ -90,6 +105,7 @@ class AmebaBuilder(Builder):
 
         self._Execute(cmd, title='Building ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         yield BuilderOutput(
             os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),

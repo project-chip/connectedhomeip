@@ -1,0 +1,26 @@
+# UBSan ignorelist for Matter builds.
+#
+# Clang applies this at instrumentation time (compile-time): matching code is
+# NOT compiled with UBSan checks. Matching by `src:` also covers third-party /
+# standard-library code that is inlined from headers into first-party TUs.
+#
+# Why this exists: the `sanitize_undefined_behavior` config enables three checks
+# that are NOT part of `-fsanitize=undefined` and are NOT undefined behavior --
+# `unsigned-integer-overflow`, `implicit-conversion`, and the related unsigned
+# negation. They are pedantic, opt-in checks. Vendored libraries and libc++
+# internals deliberately rely on defined unsigned modular arithmetic / narrowing
+# (hashing, allocators, container resize, std::copy_backward), so they trip these
+# checks as false positives. Under `-fno-sanitize-recover` (the OSS-Fuzz UBSan
+# engine) every such report becomes a bogus crash. Exclude the vendored / stdlib
+# code we do not own; first-party `src/` stays fully instrumented.
+
+# Abseil (hashing, low-level allocator, raw_hash_set) -- defined unsigned overflow.
+src:*third_party/abseil-cpp/*
+
+# FuzzTest framework internals (serialization, container mutation helpers).
+src:*third_party/fuzztest/*
+
+# libc++ standard-library internals (allocator, copy_backward, vector<bool>,
+# <string>, <filesystem>) reached via inlined templates instantiated from
+# first-party code; the non-UB checks above fire on their internal arithmetic.
+src:*/c++/v1/*

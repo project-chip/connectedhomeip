@@ -4,4 +4,4 @@ version = "0"
  
 [dependency]
 # Get a specific version of the package
-wiseconnect = { version = "4.0.0", installer ="conan", prerelease=true }
+wiseconnect = { version = "4.0.1", installer ="conan", prerelease=true }

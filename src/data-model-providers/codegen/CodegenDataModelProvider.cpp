@@ -38,13 +38,14 @@
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <cstdint>
 #include <optional>
@@ -126,6 +127,13 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
+#if CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
+    // Shutdown ember cluster implementations (symmetric to InitDataModelForTesting()
+    // in Startup which creates them). This calls the per-cluster shutdown callbacks
+    // and unregisters AAI/CHI so clusters can be re-created on the next Startup().
+    emAfCallShutdowns(MatterClusterShutdownType::kClusterShutdown);
+    ChipLogProgress(DataManagement, "CodegenDataModelProvider::Shutdown() complete");
+#endif // CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
     Reset();
     mContext.reset();
     mRegistry.ClearContext();
@@ -535,12 +543,7 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnly
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
 {
-    char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
-    MutableCharSpan epUniqueIdSpan(buffer);
-    ReturnErrorOnFailure(emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan));
-
-    memcpy(epUniqueId.data(), epUniqueIdSpan.data(), epUniqueIdSpan.size());
-    return CHIP_NO_ERROR;
+    return emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueId);
 }
 #endif
 

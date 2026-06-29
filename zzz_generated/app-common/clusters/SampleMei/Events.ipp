@@ -65,7 +65,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace PingCountEvent.
+} // namespace PingCountEvent
 } // namespace Events
 } // namespace SampleMei
 } // namespace Clusters

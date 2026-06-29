@@ -458,6 +458,23 @@ void CameraDevice::Init()
     mPushAVTransportManager.Init();
 }
 
+void CameraDevice::Shutdown()
+{
+    // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
+    mWebRTCProviderManager.CloseConnection();
+
+    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
+    // destruction.
+    for (auto & stream : mVideoStreams)
+    {
+        StopVideoStream(stream.videoStreamParams.videoStreamID);
+    }
+    for (auto & stream : mAudioStreams)
+    {
+        StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
@@ -880,10 +897,15 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    const uint16_t framerate = std::clamp(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
+                                          allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
+
+    mCurrentVideoFrameRate = framerate;
+
     // Create Gstreamer video pipeline using the final allocated stream parameters
     CameraError error          = CameraError::SUCCESS;
     GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
-                                                     allocatedStream.minResolution.height, allocatedStream.minFrameRate, error);
+                                                     allocatedStream.minResolution.height, framerate, error);
     if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
@@ -902,7 +924,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
-                    allocatedStream.minResolution.height, allocatedStream.minFrameRate);
+                    allocatedStream.minResolution.height, framerate);
 
     // Start the pipeline
     ChipLogProgress(Camera, "Requesting PLAYING …");
@@ -1636,10 +1658,17 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneId)
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
-    mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
-    mPushAVTransportManager.HandleZoneTrigger(zoneId);
+    // Zone events are per-zone - each zone needs its own event notification
+    for (const auto & zoneId : zoneIds)
+    {
+        mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
+    }
+    // Transport trigger is per-motion-event - all zones are passed together
+    // This deliberate asymmetry reflects that zone events track individual zone activity
+    // while transport triggers coordinate recording across all zones in a single motion event
+    mPushAVTransportManager.HandleZoneTrigger(zoneIds);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)

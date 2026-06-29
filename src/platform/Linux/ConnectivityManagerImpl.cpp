@@ -63,6 +63,25 @@ ConnectivityManagerImpl & ConnectivityManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
+// Linux Implementation-specific Methods
+
+// Mutation
+
+void ConnectivityManagerImpl::SetOneShotConnectCallback(OneShotConnectCallback * inOneShotConnectCallback) noexcept
+{
+    mpOneShotConnectCallback = inOneShotConnectCallback;
+}
+
+void ConnectivityManagerImpl::SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept
+{
+    mpOneShotScanCallback = inOneShotScanCallback;
+}
+
+void ConnectivityManagerImpl::SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept
+{
+    mpStatusChangeCallback = inStatusChangeCallback;
+}
+
 void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
 {
     if (mpStatusChangeCallback != nullptr)
@@ -82,8 +101,13 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 #endif
-    mpConnectCallback = nullptr;
-    mpScanCallback    = nullptr;
+    SetNetworkStatusChangeCallback(nullptr);
+    SetOneShotConnectCallback(nullptr);
+    SetOneShotScanCallback(nullptr);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    ReturnErrorOnFailure(WpaSupplicantClient::Init(*this));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
@@ -127,6 +151,18 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     return CHIP_NO_ERROR;
 #endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+bool ConnectivityManagerImpl::IsWiFiStationConnecting() const noexcept
+{
+    return mpOneShotConnectCallback != nullptr;
+}
+
+bool ConnectivityManagerImpl::IsWiFiStationScanning() const noexcept
+{
+    return mpOneShotScanCallback != nullptr;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
@@ -174,9 +210,39 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 }
 
-ConnectivityManagerImpl & ConnectivityMgrImpl(void)
+ConnectivityManagerImpl & ConnectivityMgrImpl()
 {
     return ConnectivityManagerImpl::GetDefaultInstance();
+}
+
+// Network Commissioning Action Delegation Methods
+
+void ConnectivityManagerImpl::OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
+                                             NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept
+{
+    VerifyOrReturn(mpOneShotScanCallback != nullptr);
+
+    mpOneShotScanCallback->OnFinished(inStatus, inDebugText, inNetworks);
+
+    mpOneShotScanCallback = nullptr;
+}
+
+void ConnectivityManagerImpl::OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText,
+                                              int32_t inConnectStatus) noexcept
+{
+    VerifyOrReturn(mpOneShotConnectCallback != nullptr);
+
+    mpOneShotConnectCallback->OnResult(inCommissioningError, inDebugText, inConnectStatus);
+
+    mpOneShotConnectCallback = nullptr;
+}
+
+void ConnectivityManagerImpl::OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
+                                             Optional<int32_t> inConnectStatus) noexcept
+{
+    VerifyOrReturn(mpStatusChangeCallback != nullptr);
+
+    mpStatusChangeCallback->OnNetworkingStatusChange(inCommissioningError, inNetworkId, inConnectStatus);
 }
 
 } // namespace DeviceLayer

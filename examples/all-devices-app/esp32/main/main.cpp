@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <ESP32DimmableLightDevice.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -24,7 +25,8 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
+#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -38,6 +40,8 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
+
+#include <app_config/enabled_devices.h>
 
 #include <memory>
 #include <string>
@@ -76,10 +80,10 @@ static const char TAG[] = "all-devices-app";
 
 // NVS key for storing the device type across reboots
 static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespace_ChipConfig, "dev-type" };
-
-static std::string gDeviceType = "contact-sensor";
-
+static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
+
+#include "DeviceFactoryPlatformOverride.h"
 
 namespace {
 
@@ -100,7 +104,7 @@ chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
+std::unique_ptr<DeviceInterface> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 DefaultTimerDelegate gTimerDelegate;
 
@@ -247,23 +251,32 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         WifiRootNodeDevice::WifiContext{
             .wifiDriver = sWiFiDriver,
         });
-    err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+
+    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    err = gRootNodeDevice->Register(rootAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
         return nullptr;
     }
 
-    // Default to contact-sensor device type
-    const char * deviceType = gDeviceType.c_str();
-    gConstructedDevice      = DeviceFactory::GetInstance().Create(deviceType);
+    auto & deviceFactory = DeviceFactory::GetInstance();
+
+    // figure out the default
+    if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
+    {
+        gDeviceType = deviceFactory.GetDefaultDevice();
+    }
+    gConstructedDevice = deviceFactory.Create(gDeviceType);
+
     if (gConstructedDevice == nullptr)
     {
-        ESP_LOGE(TAG, "Failed to create device of type: %s", deviceType);
+        ESP_LOGE(TAG, "Failed to create device of type: %s", gDeviceType.c_str());
         return nullptr;
     }
 
-    err = gConstructedDevice->Register(CONFIG_ALL_DEVICES_ENDPOINT, dataModelProvider, kInvalidEndpointId);
+    ConsecutiveEndpointIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
+    err = gConstructedDevice->Register(allocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -275,12 +288,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
 void InitServer(intptr_t context)
 {
-    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .groupDataProvider = gGroupDataProvider,                     //
-        .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = gTimerDelegate,                         //
-    });
-
     static chip::CommonCaseDeviceServerInitParams initParams;
     CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
     if (err != CHIP_NO_ERROR)
@@ -288,6 +295,32 @@ void InitServer(intptr_t context)
         ESP_LOGE(TAG, "InitializeStaticResourcesBeforeServerInit() failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
+
+    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+        .groupDataProvider = gGroupDataProvider,                     //
+        .fabricTable       = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate     = gTimerDelegate,                         //
+        .storageDelegate   = *initParams.persistentStorageDelegate,  //
+    });
+
+#if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
+    // Override dimmable-light with ESP32 hardware implementation that drives a real LED
+    DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return std::make_unique<ESP32DimmableLightDevice>(ESP32DimmableLightDevice::Context{
+            .groupDataProvider = gGroupDataProvider,
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .timerDelegate     = gTimerDelegate,
+        });
+    });
+#endif
+
+    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
+
+    initParams.groupDataProvider = &gGroupDataProvider;
+    gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
+    SuccessOrDie(gGroupDataProvider.Init());
+    Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     initParams.dataModelProvider =
         PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);

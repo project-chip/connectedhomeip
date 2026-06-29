@@ -22,6 +22,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdlib.h>
 
 namespace chip {
@@ -332,6 +333,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
         // next
         ReturnErrorOnFailure(reader.Next(TagNext()));
         ReturnErrorOnFailure(reader.Get(next));
+
         // Groupcast
         CHIP_ERROR err = reader.Next(TagFlags());
         if (CHIP_NO_ERROR == err)
@@ -341,6 +343,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
             ReturnErrorOnFailure(reader.Get(value));
             flags = value;
         }
+
         return reader.ExitContainer(container);
     }
 
@@ -648,7 +651,7 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
     bool first                     = true;
 
     uint16_t keyset_id                       = 0;
-    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kCacheAndSync;
+    GroupDataProvider::SecurityPolicy policy = GroupDataProvider::SecurityPolicy::kTrustFirst;
     uint8_t keys_count                       = 0;
     Crypto::GroupOperationalCredentials operational_keys[KeySet::kEpochKeysMax];
 
@@ -668,9 +671,9 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
 
     void Clear() override
     {
-        policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
+        policy     = GroupDataProvider::SecurityPolicy::kTrustFirst;
         keys_count = 0;
-        memset(operational_keys, 0x00, sizeof(operational_keys));
+        Crypto::ClearSecretData(reinterpret_cast<uint8_t *>(operational_keys), sizeof(operational_keys));
         next = kInvalidKeysetId;
     }
 
@@ -746,6 +749,15 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
         // policy
         ReturnErrorOnFailure(reader.Next(TagPolicy()));
         ReturnErrorOnFailure(reader.Get(policy));
+        // CacheAndSync is unimplemented, and should not have been used as the default security policy.
+        // If a KeySet was saved with this policy, we re-map it here to be TrustFirst.
+        if (policy == GroupDataProvider::SecurityPolicy::kCacheAndSync)
+        {
+            ChipLogDetail(NotSpecified,
+                          "Re-mapping security policy from CacheAndSync to TrustFirst for keyset %u (fabric index %u)", keyset_id,
+                          fabric_index);
+            policy = GroupDataProvider::SecurityPolicy::kTrustFirst;
+        }
         // keys_count
         ReturnErrorOnFailure(reader.Next(TagNumKeys()));
         ReturnErrorOnFailure(reader.Get(keys_count));
@@ -869,6 +881,11 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
     if (group.Find(mStorage, fabric, info.group_id))
     {
         // Existing group_id
+        if (IsGroupcastEnabled() && group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
+        {
+            mAuxAclNotificationNeeded = true;
+        }
+
         group.Copy(info);
         ReturnErrorOnFailure(group.Save(mStorage));
         GroupModified(fabric_index, info.group_id);
@@ -925,6 +942,10 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     if (found)
     {
         // Update existing entry
+        if (IsGroupcastEnabled() && group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
+        {
+            mAuxAclNotificationNeeded = true;
+        }
         return group.Save(mStorage);
     }
     if (index < fabric.group_count)
@@ -944,7 +965,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     {
         // Insert last
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
 
@@ -994,6 +1015,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(group.Get(mStorage, fabric, index), CHIP_ERROR_NOT_FOUND);
 
+    bool notifyNeeded = (IsGroupcastEnabled() && group.HasAuxiliaryACL() && group.endpoint_count > 0);
+
     // Remove endpoints
     EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
     size_t count = 0;
@@ -1008,6 +1031,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     }
 
     ReturnErrorOnFailure(group.Delete(mStorage));
+
+    if (notifyNeeded)
+    {
+        mAuxAclNotificationNeeded = true;
+    }
+
     if (group.first)
     {
         // Remove first group
@@ -1058,7 +1087,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(fabric.group_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
@@ -1068,6 +1097,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
         group.next           = fabric.first_group;
         group.prev           = kUndefinedGroupId;
         ReturnErrorOnFailure(group.Save(mStorage));
+
+        if (IsGroupcastEnabled() && group.HasAuxiliaryACL())
+        {
+            mAuxAclNotificationNeeded = true;
+        }
+
         // Update fabric
         fabric.first_group = group.group_id;
         fabric.group_count++;
@@ -1083,6 +1118,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     // New endpoint, insert last
     endpoint.endpoint_id = endpoint_id;
     ReturnErrorOnFailure(endpoint.Save(mStorage));
+
+    if (IsGroupcastEnabled() && group.HasAuxiliaryACL())
+    {
+        mAuxAclNotificationNeeded = true;
+    }
+
     if (endpoint.first)
     {
         // First endpoint of group
@@ -1118,6 +1159,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 
     // Existing endpoint
     TEMPORARY_RETURN_IGNORED endpoint.Delete(mStorage);
+
+    if (IsGroupcastEnabled() && group.HasAuxiliaryACL())
+    {
+        mAuxAclNotificationNeeded = true;
+    }
 
     if (endpoint.first)
     {
@@ -1354,6 +1400,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(group.Find(mStorage, fabric, group_id), CHIP_ERROR_KEY_NOT_FOUND);
 
+    bool notifyNeeded = (IsGroupcastEnabled() && group.HasAuxiliaryACL() && group.endpoint_count > 0);
+
     EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
     size_t endpoint_index = 0;
     while (endpoint_index < group.endpoint_count)
@@ -1366,6 +1414,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     group.first_endpoint = kInvalidEndpointId;
     group.endpoint_count = 0;
     ReturnErrorOnFailure(group.Save(mStorage));
+
+    if (notifyNeeded)
+    {
+        mAuxAclNotificationNeeded = true;
+    }
+
     GroupModified(fabric_index, group.group_id);
     return CHIP_NO_ERROR;
 }
@@ -1433,7 +1487,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabric.map_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(fabric.map_count < GetMaxGroupsPerFabric(), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1608,7 +1662,13 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
                                             const KeySet & in_keyset)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
-
+    VerifyOrReturnError(in_keyset.num_keys_used >= 1 && in_keyset.num_keys_used <= KeySet::kEpochKeysMax,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    if (in_keyset.policy != SecurityPolicy::kTrustFirst)
+    {
+        ChipLogError(NotSpecified, "Unsupported group key security policy: %d", static_cast<int>(in_keyset.policy));
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
     FabricData fabric(fabric_index);
     KeySetData keyset;
 
@@ -1623,13 +1683,11 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     keyset.policy     = in_keyset.policy;
     keyset.keys_count = in_keyset.num_keys_used;
     memset(keyset.operational_keys, 0x00, sizeof(keyset.operational_keys));
-    keyset.operational_keys[0].start_time = in_keyset.epoch_keys[0].start_time;
-    keyset.operational_keys[1].start_time = in_keyset.epoch_keys[1].start_time;
-    keyset.operational_keys[2].start_time = in_keyset.epoch_keys[2].start_time;
 
     // Store the operational keys and hash instead of the epoch keys
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
+        keyset.operational_keys[i].start_time = in_keyset.epoch_keys[i].start_time;
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
         ReturnErrorOnFailure(
             Crypto::DeriveGroupOperationalCredentials(epoch_key, compressed_fabric_id, keyset.operational_keys[i]));
@@ -1818,8 +1876,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
         keyset_count++;
     }
 
-    // Remove fabric
-    return fabric.Delete(mStorage);
+    // Remove fabric, and ensure no auxiliary acl changed
+    // event will be emitted from this action
+    err                       = fabric.Delete(mStorage);
+    mAuxAclNotificationNeeded = false;
+    return err;
 }
 
 //

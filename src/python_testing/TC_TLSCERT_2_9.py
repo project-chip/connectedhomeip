@@ -26,7 +26,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --endpoint 1
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -46,6 +46,8 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_TLSCERT_2_9(TC_TLSCERT_Base):
+    disable_wildcard_subscription = True
+
     def desc_TC_TLSCERT_2_9(self) -> str:
         return "[TC-TLSCERT-2.9] ProvisionClientCertificate command verification"
 

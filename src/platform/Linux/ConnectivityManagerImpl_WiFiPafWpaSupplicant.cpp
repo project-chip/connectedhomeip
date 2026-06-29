@@ -23,6 +23,7 @@
 
 #include <glib.h>
 
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
@@ -31,6 +32,7 @@
 #include <platform/PlatformManager.h>
 
 #include "ConnectivityManagerImpl.h"
+#include "WpaSupplicantClient.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 using namespace ::chip::WiFiPAF;
@@ -198,7 +200,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     value = g_variant_lookup_value(discov_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -210,7 +212,8 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     gsize bufferLen;
     value = g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
     GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
@@ -291,7 +294,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     value = g_variant_lookup_value(reply_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -303,7 +306,8 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     gsize bufferLen;
     value = g_variant_lookup_value(reply_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
 
     /*
@@ -344,7 +348,11 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     pPafInfo->id      = publish_id;
     pPafInfo->peer_id = peer_subscribe_id;
     memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
-    TEMPORARY_RETURN_IGNORED WiFiPafLayer.HandleTransportConnectionInitiated(*pPafInfo);
+    auto handleInitiated = [](intptr_t arg) {
+        WiFiPAF::WiFiPAFSession * pInfo = reinterpret_cast<WiFiPAF::WiFiPAFSession *>(arg);
+        LogErrorOnFailure(WiFiPAFLayer::GetWiFiPAFLayer().HandleTransportConnectionInitiated(*pInfo));
+    };
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(handleInitiated, reinterpret_cast<intptr_t>(pPafInfo)));
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
@@ -370,7 +378,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     value = g_variant_lookup_value(obj, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1], &RxInfo.peer_addr[2],
            &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]);
 
@@ -382,7 +390,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     dataValue.reset(value);
 
     auto rxbuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-    ChipLogProgress(DeviceLayer, "WiFi-PAF: wpa_supplicant: nan-rx: [len: %" G_GSIZE_FORMAT "]", bufferLen);
+    ChipLogProgress(DeviceLayer, "WiFi-PAF: " WPA_SUPPLICANT_CLIENT_LOG_PREFIX "nan-rx: [len: %" G_GSIZE_FORMAT "]", bufferLen);
     buf = System::PacketBufferHandle::NewWithData(rxbuf, bufferLen);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
@@ -411,6 +419,33 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     */
     ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect };
     PlatformMgr().PostEventOrDie(&event);
+}
+
+void ConnectivityManagerImpl::_WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam)
+{
+    mPafAdvParam.freq_list_len = pafAdvParam.freq_list_len;
+    mPafAdvParam.freq_list     = std::make_unique<uint16_t[]>(mPafAdvParam.freq_list_len);
+    for (size_t i = 0; i < mPafAdvParam.freq_list_len; i++)
+    {
+        mPafAdvParam.freq_list[i] = pafAdvParam.freq_list[i];
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId)
+{
+    if (enabled)
+    {
+        VerifyOrReturnError(mPafAdvParam.freq_list_len > 0, CHIP_ERROR_INCORRECT_STATE);
+        auto res = WiFiPAFPublish(mPafAdvParam);
+        if ((res == CHIP_NO_ERROR) && (mPafAdvParam.publish_id != kUndefinedWiFiPafSessionId))
+        {
+            publishId = mPafAdvParam.publish_id;
+        }
+        return res;
+    }
+    // Cancel paf_publish, publish_id should be valid
+    VerifyOrReturnError((publishId != 0) && (publishId != WiFiPAF::kUndefinedWiFiPafSessionId), CHIP_ERROR_INCORRECT_STATE);
+    return WiFiPAFCancelPublish(publishId);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
@@ -579,6 +614,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
+    VerifyOrReturnError(((id != kUndefinedWiFiPafSessionId) && (id != 0)), CHIP_ERROR_INTERNAL);
     switch (role)
     {
     case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:

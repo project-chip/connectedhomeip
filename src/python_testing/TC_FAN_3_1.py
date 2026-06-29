@@ -33,6 +33,21 @@
 #       --timeout 600
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --timeout 600
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -49,6 +64,16 @@ from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+
+# FanMode rejected when not supported by FanModeSequence may return CONSTRAINT_ERROR. In-range
+# PercentSetting writes rejected per Fan Control SHALL use INVALID_IN_STATE; do not accept
+# CONSTRAINT_ERROR for PercentSetting iterations.
+# Initialization always writes Off or High, which are always present in get_fan_modes() — only
+# SUCCESS/INVALID_IN_STATE apply (per cluster spec: CONSTRAINT_ERROR for unsupported sequence).
+_FAN_MODE_INIT_ALLOWED_WRITE_STATUSES: tuple[Status, ...] = (Status.Success, Status.InvalidInState)
+_FAN_MODE_ALLOWED_WRITE_STATUSES: tuple[Status, ...] = (
+    Status.Success, Status.InvalidInState, Status.ConstraintError)
+_PERCENT_OR_SPEED_ALLOWED_WRITE_STATUSES: tuple[Status, ...] = (Status.Success, Status.InvalidInState)
 
 
 class OrderEnum(Enum):
@@ -70,25 +95,25 @@ class TC_FAN_3_1(MatterBaseTest):
                 TestStep(3, "[FC] TH checks the DUT for support of the MultiSpeed feature.",
                          "If the MultiSpeed feature is supported the SpeedSetting attribute will be present."),
                 TestStep(4, "[FC] TH tests the following scenario: - Attribute to update: PercentSetting - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present) - Update order: Ascending. Actions: * Initialize the DUT to `FanMode` Off and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `PercentSetting` attribute iteratively, in ascending order, from 1 to 100.",
-                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one)."),
+                         "For each PercentSetting update, the DUT shall return either SUCCESS or INVALID_IN_STATE. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequentially in ascending order (each new value greater than the previous one)."),
                 TestStep(5, "[FC] TH tests the following scenario: - Attribute to update: PercentSetting - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present) - Update order: Descending. Actions: * Initialize the DUT to `FanMode` High and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `PercentSetting` attribute iteratively, in descending order, from 99 to 0.",
-                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one)."),
+                         "For each PercentSetting update, the DUT shall return either SUCCESS or INVALID_IN_STATE. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequentially in descending order (each new value less than the previous one)."),
                 TestStep(6, "[FC] TH tests the following scenario: - Attribute to update: FanMode - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present) - Update order: Ascending. Actions: * Initialize the DUT to `FanMode` Off and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `FanMode` attribute iteratively, in ascending order, from 0 (Off) to the number of available fan modes specified by the `FanModeSequence` attribute, excluding modes beyond 3 (High).",
-                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in ascending order (each new value greater than the previous one). Verify that the number of FanMode reports matches the number of PercentSetting reports"),
-                TestStep(7, "[FC] TH tests the following scenario: - Attribute to update: FanMode - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present) - Update order: Descending. Actions: * Initialize the DUT to `FanMode` High and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `FanMode` attribute iteratively, in ascending order, from the number of available fan modes specified by the `FanModeSequence` attribute, excluding modes beyond 3 (High), to 0 (Off).",
-                         "For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequencially in descending order (each new value less than the previous one). Verify that the number of FanMode reports matches the number of PercentSetting reports"),
+                         "For the initialization FanMode write to Off or High, the DUT shall return SUCCESS or INVALID_IN_STATE. For each iterative FanMode update, the DUT shall return either SUCCESS, INVALID_IN_STATE, or CONSTRAINT_ERROR (CONSTRAINT_ERROR when the written FanMode is not supported by FanModeSequence). After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequentially in ascending order (each new value greater than the previous one). Verify that the number of FanMode reports matches the number of PercentSetting reports"),
+                TestStep(7, "[FC] TH tests the following scenario: - Attribute to update: FanMode - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present) - Update order: Descending. Actions: * Initialize the DUT to `FanMode` High and read back the value to verify written value. * Individually subscribe to the `PercentSetting`, `FanMode`, and `SpeedSetting` (if supported) attributes * Update the value of the `FanMode` attribute iteratively, in descending order, from the number of available fan modes specified by the `FanModeSequence` attribute, excluding modes beyond 3 (High), to 0 (Off).",
+                         "For the initialization FanMode write to Off or High, the DUT shall return SUCCESS or INVALID_IN_STATE. For each iterative FanMode update, the DUT shall return either SUCCESS, INVALID_IN_STATE, or CONSTRAINT_ERROR (CONSTRAINT_ERROR when the written FanMode is not supported by FanModeSequence). After all updates have been performed, verify that the value of the attribute reports from the subscription of each attribute came in sequentially in descending order (each new value less than the previous one). Verify that the number of FanMode reports matches the number of PercentSetting reports"),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def write_and_verify_attribute(self, attribute, value) -> Status:
+    async def write_and_verify_attribute(self, attribute, value, allowed_write_statuses: tuple[Status, ...]) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         write_status = result[0].Status
-        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
+        allowed_names = ", ".join(s.name for s in allowed_write_statuses)
+        asserts.assert_in(write_status, allowed_write_statuses,
+                          f"[FC] {attribute.__name__} write returned {write_status.name}, expected one of {allowed_names}")
 
         if write_status == Status.Success:
             value_read = await self.read_setting(attribute)
@@ -143,18 +168,18 @@ class TC_FAN_3_1(MatterBaseTest):
     def log_scenario(self, attr_to_update, value_range, order) -> None:
         # Logging support info
         log.info("[FC] ====================================================================")
-        log.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
-        log.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
+        log.info("[FC] *** Supported fan modes: %s", self.fan_mode_sequence.name)
+        log.info("[FC] *** MultiSpeed feature supported: %s", self.supports_multispeed)
 
         # Logging initial FanMode state
         init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
-        log.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
+        log.info("[FC] *** Initial FanMode: %s", init_fan_mode)
 
         # Logging the scenario being tested
         attr_to_verify = "FanMode" if attr_to_update == Clusters.FanControl.Attributes.PercentSetting else "PercentSetting, PercentCurrent"
         speed_setting_scenario = ", SpeedSetting, and SpeedCurrent" if self.supports_multispeed else ""
-        log.info(f"[FC] *** Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify}{speed_setting_scenario}")
-        log.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
+        log.info("[FC] *** Update %s %s, verify %s%s", attr_to_update.__name__, order.name, attr_to_verify, speed_setting_scenario)
+        log.info("[FC] *** Value range to update: %s - %s", value_range[0], value_range[-1])
         log.info("[FC]")
 
     async def subscribe_to_attributes(self) -> None:
@@ -178,9 +203,9 @@ class TC_FAN_3_1(MatterBaseTest):
 
     def log_results(self) -> None:
         for sub in self.subscriptions:
-            log.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
+            log.info("[FC] - %s Sub -", sub._expected_attribute.__name__)
             for q in sub.attribute_queue.queue:
-                log.info(f"[FC] {q.attribute.__name__}: {q.value}")
+                log.info("[FC] %s: %s", q.attribute.__name__, q.value)
             log.info("[FC]")
 
     def verify_attribute_progression(self, order) -> None:
@@ -219,7 +244,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         # Initialize FanMode to Off or High based on the order
         init_fan_mode = fm_enum.kOff if order == OrderEnum.Ascending else fm_enum.kHigh
-        await self.write_and_verify_attribute(attr.FanMode, init_fan_mode)
+        await self.write_and_verify_attribute(attr.FanMode, init_fan_mode, _FAN_MODE_INIT_ALLOWED_WRITE_STATUSES)
 
         # Subscribe to the PercentSetting, PercentCurrent, FanMode, and if supported, SpeedSetting and SpeedCurrent attributes
         await self.subscribe_to_attributes()
@@ -231,8 +256,10 @@ class TC_FAN_3_1(MatterBaseTest):
         self.log_scenario(attr_to_update, value_range, order)
 
         # Write value to attribute and read back to verify the result
+        allowed_update = (_FAN_MODE_ALLOWED_WRITE_STATUSES if attr_to_update == attr.FanMode
+                          else _PERCENT_OR_SPEED_ALLOWED_WRITE_STATUSES)
         for value_to_write in value_range:
-            await self.write_and_verify_attribute(attr_to_update, value_to_write)
+            await self.write_and_verify_attribute(attr_to_update, value_to_write, allowed_update)
 
         # Log results of attribute reports per subscription
         self.log_results()

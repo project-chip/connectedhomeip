@@ -26,48 +26,17 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 
 #include <lib/support/CodeUtils.h>
 
-using namespace chip::app;
-void OnTriggerEffect(::Identify * identify)
-{
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-        return;
-    }
-}
-
-Identify gIdentify1 = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
-    OnTriggerEffect,
-};
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 void AllClustersApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId,

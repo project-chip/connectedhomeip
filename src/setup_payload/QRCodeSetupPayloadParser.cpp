@@ -34,7 +34,7 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <protocols/Protocols.h>
 
 namespace chip {
@@ -56,7 +56,7 @@ static CHIP_ERROR readBits(std::vector<uint8_t> buf, size_t & index, uint64_t & 
     {
         if (buf[currentIndex / 8] & (1 << (currentIndex % 8)))
         {
-            dest |= (1 << bitsRead);
+            dest |= (static_cast<uint64_t>(1) << bitsRead);
         }
         currentIndex++;
     }

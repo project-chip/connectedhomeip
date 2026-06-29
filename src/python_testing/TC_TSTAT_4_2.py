@@ -340,10 +340,10 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             # Read the PresetTypes to get the preset scenarios supported by the Thermostat.
             presetTypes = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes)
-            log.info(f"Rx'd Preset Types: {presetTypes}")
+            log.info("Rx'd Preset Types: %s", presetTypes)
 
             current_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-            log.info(f"Rx'd Presets: {current_presets}")
+            log.info("Rx'd Presets: %s", current_presets)
 
             presetScenarioCounts = self.count_preset_scenarios(current_presets)
 
@@ -373,7 +373,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Read the presets attribute and verify it was updated by the write
                 saved_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-                log.info(f"Rx'd Presets: {saved_presets}")
+                log.info("Rx'd Presets: %s", saved_presets)
                 self.check_returned_presets(test_presets, saved_presets)
 
                 await self.send_atomic_request_rollback_command()
@@ -412,7 +412,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Read the presets attribute and verify it was updated since AtomicRequest commit was called after writing presets
                 current_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-                log.info(f"Rx'd Presets: {current_presets}")
+                log.info("Rx'd Presets: %s", current_presets)
                 self.check_returned_presets(test_presets, current_presets)
 
                 presetScenarioCounts = self.count_preset_scenarios(current_presets)
@@ -455,7 +455,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Read the active preset handle attribute and verify it was updated to preset handle
                 activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-                log.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
+                log.info("Rx'd ActivePresetHandle: %s", activePresetHandle)
                 asserts.assert_equal(activePresetHandle, activePreset.presetHandle,
                                      "Active preset handle was not updated as expected")
 
@@ -464,7 +464,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
                 # Write to the presets attribute after removing the preset that was set as the active preset handle.
                 test_presets = [preset for preset in current_presets if preset.presetHandle != activePresetHandle]
-                log.info(f"Sending Presets: {test_presets}")
+                log.info("Sending Presets: %s", test_presets)
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
 
                 # Send the AtomicRequest commit command and expect InvalidInState for presets.
@@ -486,7 +486,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                     await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint+1), endpoint_id=endpoint)
 
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            log.info(f"Rx'd ActivePresetHandle: {activePresetHandle}")
+            log.info("Rx'd ActivePresetHandle: %s", activePresetHandle)
             asserts.assert_equal(activePresetHandle, NullValue, "Active preset handle was not cleared as expected")
 
         self.step("7")

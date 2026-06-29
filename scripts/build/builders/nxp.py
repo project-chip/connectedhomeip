@@ -15,10 +15,15 @@
 import importlib.util
 import logging
 import os
+import shlex
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
+
+log = logging.getLogger(__name__)
 
 
 class NxpOsUsed(Enum):
@@ -49,7 +54,6 @@ class NxpBoard(Enum):
     RT1060 = auto()
     RT1170 = auto()
     RW61X = auto()
-    MCXW71 = auto()
     MCXW72 = auto()
 
     def Name(self, os_env):
@@ -61,8 +65,6 @@ class NxpBoard(Enum):
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'frdm_rw612'
             return 'rw61x'
-        if self == NxpBoard.MCXW71:
-            return 'mcxw71'
         if self == NxpBoard.MCXW72:
             return 'mcxw72'
         raise Exception('Unknown board type: %r' % self)
@@ -76,8 +78,6 @@ class NxpBoard(Enum):
             if os_env == NxpOsUsed.ZEPHYR:
                 return 'zephyr'
             return 'rt/rw61x'
-        if self == NxpBoard.MCXW71:
-            return 'mcxw71'
         if self == NxpBoard.MCXW72:
             return 'mcxw72'
         raise Exception('Unknown board type: %r' % self)
@@ -133,6 +133,10 @@ class NxpApp(Enum):
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board, os_env, build_system):
+        if os_env == NxpOsUsed.ZEPHYR:
+            if self.ExampleName() == "unit-test":
+                return os.path.join(root, 'src', 'test_driver', 'nxp', 'zephyr')
+            return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
         if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
             if (self.ExampleName() == "unit-test"):
                 return os.path.join(root, 'src', 'test_driver', 'nxp')
@@ -151,10 +155,11 @@ class NxpLogLevel(Enum):
 class NxpBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: NxpApp = NxpApp.LIGHTING,
-                 board: NxpBoard = NxpBoard.MCXW71,
+                 board: NxpBoard = NxpBoard.MCXW72,
                  board_variant: NxpBoardVariant = None,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
                  build_system: NxpBuildSystem = NxpBuildSystem.CMAKE,
@@ -181,9 +186,10 @@ class NxpBuilder(GnBuilder):
                  se05x_enable: bool = False,
                  log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
                  ):
-        super(NxpBuilder, self).__init__(
+        super().__init__(
             root=app.BuildRoot(root, board, os_env, build_system),
-            runner=runner)
+            runner=runner,
+            output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
         self.board = board
@@ -215,7 +221,7 @@ class NxpBuilder(GnBuilder):
         self.iw610_transceiver = iw610_transceiver
         self.se05x_enable = se05x_enable
         if self.low_power and log_level != NxpLogLevel.NONE:
-            logging.warning("Switching log level to 'NONE' for low power build")
+            log.warning("Switching log level to 'NONE' for low power build")
             log_level = NxpLogLevel.NONE
         self.log_level = log_level
 
@@ -232,10 +238,6 @@ class NxpBuilder(GnBuilder):
                 return "evkbmimxrt1060"
             case NxpBoard.RT1170:
                 return "evkbmimxrt1170"
-            case NxpBoard.MCXW71:
-                if board_variant is NxpBoardVariant.FRDM:
-                    return "frdmmcxw71"
-                return "mcxw71evk"
             case NxpBoard.MCXW72:
                 if board_variant is NxpBoardVariant.FRDM:
                     return "frdmmcxw72"
@@ -245,7 +247,7 @@ class NxpBuilder(GnBuilder):
                 raise Exception("Unknown NXP board")
 
     def GnBuildArgs(self):
-        args = []
+        args = super().GnBuildArgs()
 
         if self.low_power:
             args.append('nxp_use_low_power=true')
@@ -367,10 +369,8 @@ class NxpBuilder(GnBuilder):
         if self.se05x_enable:
             flags.append('-DCONFIG_CHIP_SE05X=y')
 
-        if self.board in (NxpBoard.MCXW71, NxpBoard.MCXW72):
-            flags.append('-DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n')
-
         if self.board == NxpBoard.MCXW72:
+            flags.append('-DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n')
             flags.append('-Dcore_id=cm33_core0')
 
         return " ".join(flags)
@@ -395,6 +395,7 @@ class NxpBuilder(GnBuilder):
             return prj_file
         raise Exception("Configuration not supported, no conf file available: %s" % prj_file_abs_path)
 
+    @lock_output_dir
     def generate(self):
         if self.build_system is NxpBuildSystem.CMAKE:
             build_flags = self.CmakeBuildFlags()
@@ -435,26 +436,12 @@ class NxpBuilder(GnBuilder):
             # add empty space at the end to avoid concatenation issue when there is no --args
             cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
-            extra_args = []
-
-            if self.options.pw_command_launcher:
-                extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-            if self.options.enable_link_map_file:
-                extra_args.append('chip_generate_link_map_file=true')
-
-            if self.options.pregen_dir:
-                extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-            extra_args.extend(self.GnBuildArgs() or [])
-            if extra_args:
-                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
+            if args := self.GnBuildArgs():
+                cmd += " --args=%s " % shlex.quote(" ".join(args))
 
             cmd += self.output_dir
 
-            title = 'Generating ' + self.identifier
-
-            self._Execute(['bash', '-c', cmd], title=title)
+            self._Execute(['bash', '-c', cmd], title=f"Generating {self.identifier}")
         else:
             cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_flags}'.format(
                 board_name=self.BoardVariantName(self.board, self.os_env, self.board_variant),
@@ -463,6 +450,7 @@ class NxpBuilder(GnBuilder):
                 build_flags=build_flags)
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(self.os_env), self.app.NameSuffix())
         if self.os_env == NxpOsUsed.ZEPHYR:

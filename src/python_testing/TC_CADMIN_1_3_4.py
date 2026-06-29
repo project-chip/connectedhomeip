@@ -25,7 +25,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 0
-#       --timeout 200
+#       --timeout 300
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -66,6 +66,13 @@ nonce = random.randbytes(32)
 
 
 class TC_CADMIN(CADMINBaseTest):
+    # Opt out of the framework background subscription: it joins the existing fabric as a
+    # second operational node (controller_node_id + 123456), which adds a second operational
+    # mDNS SRV record per fabric. Combined with the fabrics this test commissions, that pushes
+    # minimal-mDNS past its parser limit, truncating responses and causing address resolution
+    # to time out, a false failure unrelated to the behavior under test.
+    disable_wildcard_subscription = True
+
     async def combined_commission_val_steps(self, commission_type: str):
         """
         Combined test function for commissioning tests.
@@ -111,13 +118,13 @@ class TC_CADMIN(CADMINBaseTest):
                 expected_cm_value=2,
                 expected_discriminator=1234
             )
-            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info("Successfully found service with CM=%s, D=%s", service.txt.get('CM'), service.txt.get('D'))
         elif commission_type == "BCM":
             service = await self.wait_for_correct_cm_value(
                 expected_cm_value=1,
                 expected_discriminator=setupPayloadInfo[0].filter_value
             )
-            log.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+            log.info("Successfully found service with CM=%s, D=%s", service.txt.get('CM'), service.txt.get('D'))
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation

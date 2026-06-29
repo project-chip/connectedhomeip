@@ -73,9 +73,10 @@ public:
     {}
     ~RootNodeDevice() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
 
 protected:
     Context mContext;
@@ -88,7 +89,9 @@ private:
         mAdministratorCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;
     LazyRegisteredServerCluster<Clusters::GroupKeyManagementCluster> mGroupKeyManagementCluster;
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     LazyRegisteredServerCluster<Clusters::GroupcastCluster> mGroupcastCluster;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;

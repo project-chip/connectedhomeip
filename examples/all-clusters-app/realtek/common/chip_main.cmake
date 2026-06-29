@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 
 project(chip_main)
 
-set(chip_dir "${bee_matter_root}")
+set(chip_dir "${matter_root}")
 set(chip_dir_output "${matter_output_path}/chip")
 set(chip_main chip_main)
 set(list_chip_main_sources chip_main_sources)
@@ -144,7 +144,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestorCluster.cpp
     ${chip_dir}/examples/platform/realtek/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
@@ -152,14 +151,13 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/src/app/clusters/microwave-oven-control-server/microwave-oven-control-server.cpp
+    ${chip_dir}/src/app/clusters/microwave-oven-control-server/MicrowaveOvenControlCluster.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
@@ -170,15 +168,20 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/all-clusters-energy-mode-stubs.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/test-hidden-manufacturer-specific-stub.cpp
 
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/AppTask.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/LightingManager.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/realtek/common/main/CHIPDeviceManager.cpp
-    ${chip_dir}/examples/all-clusters-app/realtek/common/main/Globals.cpp 
+    ${chip_dir}/examples/all-clusters-app/realtek/common/main/Globals.cpp
     ${chip_dir}/examples/platform/realtek/util/LEDWidget.cpp
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
     ${chip_dir}/examples/platform/realtek/dac_provider/CommonDACProvider.cpp

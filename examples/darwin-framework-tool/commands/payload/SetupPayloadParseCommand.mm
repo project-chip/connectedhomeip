@@ -69,6 +69,20 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
 
 CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
 {
+    // If the top-level payload is concatenated, we recurse with the subpayloads
+    //  which will have `isConcatenated` as `false`.
+    if (payload.isConcatenated) {
+        bool firstPayload = true;
+        for (MTRSetupPayload * subPayload in payload.subPayloads) {
+            if (!firstPayload) {
+                NSLog(@"----------");
+            }
+            ReturnErrorOnFailure(Print(subPayload));
+            firstPayload = false;
+        }
+        return CHIP_NO_ERROR;
+    }
+
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
     NSLog(@"ProductID:     %@", payload.productID);

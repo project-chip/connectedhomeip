@@ -17,16 +17,17 @@
 
 from typing import Callable
 
-import DefaultChecker as DefaultChecker
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.default_checker as DefaultChecker
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 
 class TestDefaultChecker(MatterBaseTest):
     ''' This is a unit-style test of the defaults test. It runs the individual test functions against mocks.'''
+    requires_dut = False
 
     def setup_test(self):
         self.test = DefaultChecker.DefaultChecker()

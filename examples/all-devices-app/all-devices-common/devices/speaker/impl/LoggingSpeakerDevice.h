@@ -22,11 +22,8 @@ namespace chip {
 namespace app {
 
 /**
- * @brief An implementation of a Speaker Device.
- *
- * This class serves as a simple example. It implements the LevelControlDelegate and OnOffDelegate
- * interfaces and logs messages when speaker actions occur (Mute/Unmute, Volume Change).
- * It also handles the interaction between OnOff (Mute) and LevelControl (Volume) clusters.
+ * Concrete implementation of SpeakerDevice that logs volume and mute state transitions,
+ * handling the interaction between the OnOff and LevelControl clusters.
  */
 class LoggingSpeakerDevice : public SpeakerDevice, public Clusters::LevelControlDelegate, public Clusters::OnOffDelegate
 {

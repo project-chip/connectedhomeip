@@ -1,4 +1,6 @@
 #include "DeviceTypes.h"
+#include "FakeAttributeAccess.h"
+#include "multi_column_switch_tags.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
@@ -8,6 +10,7 @@
 #include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h> // For chip::Platform
+#include <lib/support/TypeTraits.h>
 
 using chip::app::DataModel::Nullable;
 
@@ -77,8 +80,13 @@ void InitIdentifyCluster()
         if (epIndex >= kIdentifyTableSize)
             continue;
 
-        gIdentifyInstanceTable[epIndex] =
-            std::make_unique<struct Identify>(endpointId, nullptr, nullptr, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone);
+        chip::app::Clusters::Identify::IdentifyTypeEnum idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kNone;
+        if (endpointId == 1)
+        {
+            idType = chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator;
+        }
+
+        gIdentifyInstanceTable[epIndex] = std::make_unique<struct Identify>(endpointId, nullptr, nullptr, idType);
     }
 }
 } // namespace
@@ -96,6 +104,26 @@ void InitIdentifyCluster()
 #include "application-launch/chef-application-launch-delegate.h"
 #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
 
+#if MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-management/chef-water-heater-management.h"
+#endif
+
+#if MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-mode/chef-water-heater-mode.h"
+#endif
+
+#include "clusters/mode-base/chef-mode-base-default.h"
+
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/chime/chef-chime-delegate.h"
+#include <app/clusters/chime-server/CodegenIntegration.h>
+#endif
+
+#if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
+#include <smoke-co-alarm/chef-smoke-co-alarm.h>
+#endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -112,12 +140,22 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]  
 
 namespace PostionSemanticTag {
 
-constexpr const uint8_t kNamespace                                   = 0x08; // Common Position Namespace
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft   = { .namespaceID = kNamespace, .tag = 0x00 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight  = { .namespaceID = kNamespace, .tag = 0x01 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namespaceID = kNamespace, .tag = 0x02 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
+constexpr const uint8_t kNamespace                                 = 0x08; // Common Position Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft = {
+    .namespaceID = kNamespace, .tag = 0x00, .label = MakeOptional(Nullable<Span<const char>>("left"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight = {
+    .namespaceID = kNamespace, .tag = 0x01, .label = MakeOptional(Nullable<Span<const char>>("right"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop = {
+    .namespaceID = kNamespace, .tag = 0x02, .label = MakeOptional(Nullable<Span<const char>>("top"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = {
+    .namespaceID = kNamespace, .tag = 0x03, .label = MakeOptional(Nullable<Span<const char>>("bottom"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = {
+    .namespaceID = kNamespace, .tag = 0x04, .label = MakeOptional(Nullable<Span<const char>>("middle"_span))
+};
 
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
@@ -125,14 +163,37 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 
 namespace NumberSemanticTag {
 constexpr const uint8_t kNamespace                                = 0x07; // Common Number Namespace
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = { .namespaceID = kNamespace, .tag = 0x01 };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = { .namespaceID = kNamespace, .tag = 0x02 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = {
+    .namespaceID = kNamespace, .tag = 0x01, .label = MakeOptional(Nullable<Span<const char>>("one"_span))
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = {
+    .namespaceID = kNamespace, .tag = 0x02, .label = MakeOptional(Nullable<Span<const char>>("two"_span))
+};
 } // namespace NumberSemanticTag
 
-namespace GenericSwitch { // Tag lists for rootnode_genericswitch_9866e35d0b app
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { PostionSemanticTag::kBottom,
-                                                                               NumberSemanticTag::kTwo };
+namespace GenericSwitch {
+
+// These are generic tags
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottomTagList[] = { PostionSemanticTag::kBottom,
+                                                                                  NumberSemanticTag::kTwo };
+// These are representative tags.
+// Note: this tries to emulate data as seen in a real product, hence using the namespace.
+namespace BilresaRotary {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRotaryTagList[] = {
+    { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
+    { .namespaceID = 0x43, .tag = 0x04 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("rotary"_span)) },
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kButtonTagList[] = {
+    { .namespaceID = 0x08, .tag = 0x06, .label = MakeOptional(Nullable<Span<const char>>("1"_span)) },
+    { .namespaceID = 0x43, .tag = 0x02 },
+    { .namespaceID = 0x43, .tag = 0x06 },
+    { .namespaceID = 0x43, .tag = 0x05 },
+    { .namespaceID = 0x43, .tag = 0x08, .label = MakeOptional(Nullable<Span<const char>>("button"_span)) },
+};
+} // namespace BilresaRotary
+
 } // namespace GenericSwitch
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
@@ -182,6 +243,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { P
 #include "microwave-oven-control/chef-microwave-oven-control.h"
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/mode-select/chef-supported-modes-manager.h"
+#endif
+
 #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "laundry-dryer-controls/chef-laundry-dryer-controls-delegate.h"
 #endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
@@ -223,31 +288,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-    case chip::app::Clusters::RvcRunMode::Id:
-        return chefRvcRunModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-    case chip::app::Clusters::RvcCleanMode::Id:
-        return chefRvcCleanModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(endpoint, clusterId, attributeMetadata,
-                                                                                       buffer, maxReadLength);
-#endif
-#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-    case chip::app::Clusters::DishwasherMode::Id:
-        return chefDishwasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-    case chip::app::Clusters::LaundryWasherMode::Id:
-        return chefLaundryWasherModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
@@ -305,31 +349,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return chefResourceMonitoringExternalWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-    case chip::app::Clusters::RvcRunMode::Id:
-        return chefRvcRunModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-    case chip::app::Clusters::RvcCleanMode::Id:
-        return chefRvcCleanModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
-    case chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        return chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(endpoint, clusterId, attributeMetadata,
-                                                                                        buffer);
-#endif
-#ifdef MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-    case chip::app::Clusters::DishwasherMode::Id:
-        return chefDishwasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif // MATTER_DM_PLUGIN_DISHWASHER_MODE_SERVER
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-    case chip::app::Clusters::LaundryWasherMode::Id:
-        return chefLaundryWasherModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
 #ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::OperationalState::Id:
         return chefOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
@@ -339,8 +362,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     }
     return Protocols::InteractionModel::Status::Success;
 }
-
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -392,6 +413,19 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         HandleFanControlAttributeChange(attributeId, type, size, value);
     }
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    if (clusterId == Thermostat::Id &&
+        (attributeId == Thermostat::Attributes::OccupiedHeatingSetpoint::Id ||
+         attributeId == Thermostat::Attributes::LocalTemperature::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankVolume::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankPercentage::Id) &&
+        DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        MatterReportingAttributeChangeCallback(attributePath.mEndpointId, WaterHeaterManagement::Id,
+                                               WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id);
+    }
+#endif
 }
 
 /** @brief OnOff Cluster Init
@@ -577,9 +611,6 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
         TEMPORARY_RETURN_IGNORED SetTagList(
             kTemperatureControlledCabinetEpId,
             Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
-#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
-        Clusters::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
-#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
     }
     CooktopCookSurfaceInit(kCooktopEpId);
 }
@@ -590,14 +621,26 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
  */
 void GenericSwitchInit()
 {
-    if (DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId))
+    if (!DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(3, Device::kGenericSwitchDeviceTypeId))
     {
-        LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::kEp1TagList)));
+        return;
     }
-    if (DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId))
+
+    if (chef::isMultiColumnSwitch())
     {
-        LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kEp2TagList)));
+        return;
     }
+
+    // Rotary endpoint
+    LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::BilresaRotary::kRotaryTagList)));
+
+    // This is just a momentary switch endpoint with no multi press.
+    LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kTopTagList)));
+
+    // Button endpoint
+    LogErrorOnFailure(SetTagList(3, Span(GenericSwitch::BilresaRotary::kButtonTagList)));
 }
 
 /**
@@ -671,6 +714,88 @@ void CastingvideoplayerContentappInit()
 #endif
 }
 
+/*
+ * This initializer is for the water heater application rootnode_waterheater_21bd13d651. To not have this initialiser
+ * affect new water heater applications, use different endpoints.
+ */
+void WaterHeaterInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: WaterHeaterInit called more than once");
+    called = true;
+
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    if (!DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        return;
+    }
+    // WaterHeaterManagement initialisation
+    static WaterHeaterManagement::Chef::ChefDelegate delegate;
+    delegate.SetEndpointId(1);
+    static WaterHeaterManagement::Instance instance(
+        1, delegate,
+        WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
+                                       to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
+    VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
+#endif
+}
+
+/**
+ * This initializer is for the chime application.
+ */
+void ChimeInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: ChimeInit called more than once");
+    called = true;
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kChimeDeviceTypeId))
+    {
+        static auto * delegate  = Platform::New<Chime::ChefChimeDelegate>();
+        static auto chimeServer = Platform::New<ChimeServer>(1, *delegate);
+        VerifyOrDieWithMsg(chimeServer->Init() == CHIP_NO_ERROR, Zcl, "Error: ChimeServer::Init failed");
+        uint8_t defaultChimeID = 0;
+        VerifyOrDieWithMsg(delegate->GetChimeIDByIndex(0, defaultChimeID) == CHIP_NO_ERROR, Zcl,
+                           "Initialisation Error: Failed to get chime ID from chef delegate");
+        VerifyOrDieWithMsg(chimeServer->SetSelectedChime(defaultChimeID) == Protocols::InteractionModel::Status::Success, Zcl,
+                           "Initialisation Error: Failed to set default chime ID to %d", defaultChimeID);
+    }
+#endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
+void SmokeCoAlarmInit()
+{
+#if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kSmokeCoAlarmDeviceTypeId))
+    {
+        static SmokeCoAlarm::ChefSmokeCoAlarmDelegate delegate;
+        SmokeCoAlarmCluster::Config config;
+        config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
+        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        VerifyOrDieWithMsg(SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
+                           "Error: SmokeCoAlarmServer::Init failed");
+    }
+#endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+}
+
+void InitModeSelect()
+{
+#if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kModeSelectDeviceTypeId))
+    {
+        using namespace chip::app::Clusters::ModeSelect;
+        using namespace chip::app::Clusters::ModeSelect::Chef;
+        static ChefSupportedModesManager supportedModesManager;
+        static SupportedModesManager::ModeOptionsProvider modeOptions(
+            kDefaultModeOptions, kDefaultModeOptions + (sizeof(kDefaultModeOptions) / sizeof(kDefaultModeOptions[0])));
+        VerifyOrDieWithMsg(supportedModesManager.AddModeOptionsProvider(1, modeOptions) == CHIP_NO_ERROR, Zcl,
+                           "InitModeSelect: Failed to AddModeOptionsProvider");
+        setSupportedModesManager(&supportedModesManager);
+    }
+#endif // MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -680,6 +805,11 @@ void ApplicationInit()
     GenericSwitchInit();
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
+    WaterHeaterInit();
+    ChimeInit();
+    SmokeCoAlarmInit();
+    InitModeSelect();
+    chef::InitMultiColumnSwitch();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
@@ -692,16 +822,6 @@ void ApplicationInit()
     ChefWindowCovering::InitChefWindowCoveringCluster();
 #endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
 
-#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
-    ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
-    ChefOvenMode::InitChefOvenModeCluster();
-#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
-
-#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
-    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenMode cluster.");
-    ChefMicrowaveOvenMode::InitChefMicrowaveOvenModeCluster();
-#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
-
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
     ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenControl cluster.");
     InitChefMicrowaveOvenControlCluster();
@@ -710,11 +830,16 @@ void ApplicationInit()
 #if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     InitIdentifyCluster();
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+
+    chip::app::Clusters::Chef::RegisterAttributeAccessor();
 }
 
 void ApplicationShutdown()
 {
     ChipLogProgress(NotSpecified, "Chef Application Down !!!");
+#if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    SmokeCoAlarmShutdown();
+#endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 }
 
 // No-op function, used to force linking this file,

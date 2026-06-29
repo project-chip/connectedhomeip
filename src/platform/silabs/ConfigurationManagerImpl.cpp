@@ -299,8 +299,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    GetPlatform().WatchdogDisable();
     error = SilabsConfig::FactoryResetConfig();
     if (error != CHIP_NO_ERROR)
     {
@@ -315,11 +313,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    error = WifiInterface::GetInstance().TriggerDisconnection();
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format());
-    }
+    WifiInterface::GetInstance().TriggerDisconnection();
 
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
     WifiInterface::GetInstance().ClearWifiCredentials();

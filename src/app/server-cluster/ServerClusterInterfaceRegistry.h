@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
@@ -87,7 +88,16 @@ public:
 
     void Destroy()
     {
-        VerifyOrDie(IsConstructed());
+        if (!IsConstructed())
+        {
+            // Should not happen — Init/Shutdown are paired at the CodegenDataModelProvider level.
+#if CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
+            ChipLogError(AppServer, "Destroy() called on already-destroyed cluster — this should not happen");
+#else
+            chipDie();
+#endif
+            return;
+        }
         Registration().~ServerClusterRegistration();
         memset(mRegistration, 0, sizeof(mRegistration));
 
@@ -98,14 +108,7 @@ public:
     template <typename... Args>
     void Create(Args &&... args)
     {
-        // Handle idempotent Create() - if already constructed, this is a no-op.
-        // The cluster remains registered and functional. This supports the Stop() → Start() lifecycle
-        // where clusters are shutdown but remain constructed.
-        if (IsConstructed())
-        {
-            ChipLogDetail(DataManagement, "LazyRegisteredServerCluster::Create: Cluster already constructed, skipping re-creation");
-            return;
-        }
+        VerifyOrDie(!IsConstructed());
 
         new (mCluster) SERVER_CLUSTER(std::forward<Args>(args)...);
         new (mRegistration) ServerClusterRegistration(Cluster());

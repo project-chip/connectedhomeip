@@ -391,6 +391,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 
     // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
     mpConnectCallback = nullptr;
+
+#if defined(CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH) && CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
+    if (callback == nullptr && dataset.IsCommissioned() && current_dataset.IsCommissioned() &&
+        !dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && Impl()->IsThreadEnabled())
+    {
+        ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
     ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
 
@@ -703,6 +713,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 
     mOTInst = otInst;
 
+    // Lock the OpenThread stack to prevent race conditions with OpenThread's internal operations.
+    // On some platforms (e.g., Zephyr), OpenThread may already be running before Matter initialization completes.
+    Impl()->LockThreadStack();
+
     // Arrange for OpenThread to call the OnOpenThreadStateChange method whenever a
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
     // on the concrete implementation class so that that class can override the default
@@ -738,6 +752,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 
 exit:
 
+    Impl()->UnlockThreadStack();
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
     return err;
 }
@@ -867,6 +882,9 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_CancelRendezvousAnnouncement()
 {
     DeviceLayer::SystemLayer().CancelTimer(_HandleRendezvousRetransmissionTimer, this);
+#if CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS > 0
+    DeviceLayer::SystemLayer().CancelTimer(_HandleSeekerRestartTimer, this);
+#endif
     mRendezvousRetransmissionCount = 0;
 }
 
@@ -946,21 +964,36 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::TryNextNetwork()
 {
     otSockAddr targetAddr;
+    bool isRunning = otSeekerIsRunning(mOTInst);
 
     if (otSeekerSetUpNextConnection(mOTInst, &targetAddr) == OT_ERROR_NONE)
     {
         mRendezvousPeerAddr =
-            chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, Inet::InterfaceId::Null());
+            chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, mRendezvousInterface);
 
         DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
     }
-    else if (otSeekerIsRunning(mOTInst))
+    else if (isRunning)
     {
         otSeekerStop(mOTInst);
 
-        auto err = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this));
+#if CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS > 0
+        CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS), _HandleSeekerRestartTimer, this);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to start Thread discovery timer: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "Restart Thread discovery in %d ms", CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS);
+        }
 
-        ChipLogProgress(DeviceLayer, "Restart rendezvous: %s", chip::ErrorStr(err));
+#else
+        auto err      = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this));
+
+        ChipLogProgress(DeviceLayer, "Thread Discovery restarted, no delay: %s", chip::ErrorStr(err));
+#endif
     }
 }
 
@@ -980,9 +1013,14 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::SendRendezvousAnnounce
         if (mRendezvousRetransmissionCount < kMaxRendezvousRetransmissions)
         {
             const uint32_t kRendezvousRetransmissionIntervalMs = 1250;
-            ChipLogProgress(DeviceLayer, "Try the current Thread network #%u", mRendezvousRetransmissionCount);
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRendezvousRetransmissionIntervalMs),
-                                                  _HandleRendezvousRetransmissionTimer, this);
+            ChipLogProgress(DeviceLayer, "Try the current Thread network #%u in %d ms", mRendezvousRetransmissionCount,
+                            kRendezvousRetransmissionIntervalMs);
+            err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRendezvousRetransmissionIntervalMs),
+                                                        _HandleRendezvousRetransmissionTimer, this);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to start rendezvous retransmission timer: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
         else
         {
@@ -1005,6 +1043,18 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HandleRendezvousRetra
     auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread *>(aAppState);
     self->SendRendezvousAnnouncement();
 }
+
+#if CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS > 0
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HandleSeekerRestartTimer(System::Layer * aLayer, void * aAppState)
+{
+    auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread *>(aAppState);
+    self->Impl()->LockThreadStack();
+    auto err = MapOpenThreadError(otSeekerStart(self->mOTInst, _HandleSeekerScanEvaluator, self));
+    self->Impl()->UnlockThreadStack();
+    ChipLogProgress(DeviceLayer, "Thread Discovery restarted: %s", chip::ErrorStr(err));
+}
+#endif
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
 template <class ImplClass>
@@ -1368,7 +1418,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
     {
         if (service.IsUsed() && service.mIsInvalid)
         {
-            ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", service.mService.mInstanceName, service.mService.mName);
+            ChipLogProgress(DeviceLayer, "removing invalid srp service: %s.%s", service.mService.mInstanceName,
+                            service.mService.mName);
             error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
             SuccessOrExit(error);
         }

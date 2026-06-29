@@ -36,11 +36,28 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:200
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+            - name: Mark workspace as safe for Git
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - name: Check CodeQL action pins are consistent
+              if: always()
+              # All github/codeql-action pins (init, analyze, upload-sarif) must
+              # share one SHA; a mismatch breaks CodeQL with a CLI/config version skew.
+              run: |
+                  shas=$(grep -rhoE '^[[:space:]]*uses:[[:space:]]+github/codeql-action/[^@[:space:]]+@[0-9a-f]{40}' \
+                      .github/workflows .github/actions | grep -oE '[0-9a-f]{40}' | sort -u)
+                  if [ "$(printf '%s\n' "$shas" | grep -c .)" -gt 1 ]; then
+                      echo "::error::github/codeql-action pins diverge across workflows/actions:"
+                      printf '%s\n' "$shas"
+                      exit 1
+                  fi
+                  echo "codeql-action pinned consistently: ${shas:-<none>}"
 
             - name: Check for orphaned gn files
               if: always()
@@ -94,7 +111,6 @@ jobs:
                      --known-failure app/app-platform/ContentAppPlatform.h \
                      --known-failure controller/ExamplePersistentStorage.cpp \
                      --known-failure controller/ExamplePersistentStorage.h \
-                     --known-failure app/AttributeAccessToken.h \
                      --known-failure app/CommandResponseSender.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/ReadHandler.h \
@@ -130,7 +146,7 @@ jobs:
                      scripts/py_matter_idl
                   scripts/tools/not_known_to_gn.py \
                      -e py -e cpp -e cc -e c -e h -e hpp -e mm \
-                     --known-failure build-matter-wheel.py \
+                     --known-failure matter-repl.py \
                      --known-failure tests/scripts/base.py \
                      --known-failure tests/scripts/cirque_restart_remote_device.py \
                      --known-failure tests/scripts/cluster_objects.py \
@@ -157,7 +173,7 @@ jobs:
               # On-push disabled until the job can run fully green
               # At that point the step should be enabled.
               if: github.event_name == 'workflow_dispatch'
-              uses: gaurav-nelson/github-action-markdown-link-check@v1
+              uses: gaurav-nelson/github-action-markdown-link-check@5c5dfc0ac2e225883c0e5f03a85311ec2830d368 # v1
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -182,7 +198,11 @@ jobs:
             - name:
                   Check for use of PRI*16, which are not supported on some
                   libcs.
+              # Keep this check running so violations remain visible in CI
+              # while the underlying issue is being addressed.
+              # https://github.com/project-chip/connectedhomeip/issues/71536
               if: always()
+              continue-on-error: true
               run: |
                   git grep -I -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
 
@@ -192,7 +212,11 @@ jobs:
             - name:
                   Check for use of PRI*64, which are not supported on some
                   libcs.
+              # Keep this check running so violations remain visible in CI
+              # while the underlying issue is being addressed.
+              # https://github.com/project-chip/connectedhomeip/issues/71537
               if: always()
+              continue-on-error: true
               run: |
                   # TODO: MessageDefHelper should ideally not be excluded here.
                   # TODO: chip_im_initiatore should ideally not be excluded here.
@@ -205,7 +229,11 @@ jobs:
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name: Check for use of %zu, which are not supported on some libcs.
+              # Keep this check running so violations remain visible in CI
+              # while the underlying issue is being addressed.
+              # https://github.com/project-chip/connectedhomeip/issues/71538
               if: always()
+              continue-on-error: true
               run: |
                   git grep -I -n "%zu" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
@@ -220,10 +248,11 @@ jobs:
                   clusters
               if: always()
               run: |
-                  git grep -I -n "void emberAf.*Cluster\(Init\|Shutdown\)Callback("  -- \
-                  src/app/clusters \
-                  ':(exclude).github/workflows/lint.yml' \
-                  ':(exclude)src/app/clusters/pump-configuration-and-control-client' \
+                  git grep -I -n "void emberAf.*Cluster\(Init\|Shutdown\)Callback("  --             \
+                  src/app/clusters                                                                  \
+                  ':(exclude).github/workflows/lint.yml'                                            \
+                  ':(exclude)src/app/clusters/pump-configuration-and-control-client'                \
+                  ':(exclude)src/app/clusters/wifi-network-management-server/CodegenIntegration.h'  \
                   && exit 1 || exit 0
 
             # Comments like '{{! ... }}' should be used in zap files
@@ -233,12 +262,27 @@ jobs:
                   git grep -n 'TODO:' -- ./zzz_generated './*/zap-generated/*' && exit 1 || exit 0
 
             - name: Check for disallowed include files
+              # Keep this check running so violations remain visible in CI
+              # while the underlying issue is being addressed.
+              # https://github.com/project-chip/connectedhomeip/issues/71539
               if: always()
+              continue-on-error: true
               run: scripts/tools/check_includes.sh
 
             - name: Check for zcl.json and extension sync status
               if: always()
               run: scripts/tools/check_zcl_file_sync.py .
+
+            - name: Check that ZAP XML data-model files are generated by Alchemy
+              if: always()
+              run: scripts/tools/zap/check_alchemy_metadata.py --root .
+
+            - name: Check for hand-edited Alchemy XML files
+              if: always() && github.event_name == 'pull_request'
+              run: |
+                  git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+                  scripts/tools/zap/check_alchemy_metadata.py --root . \
+                    --diff-base origin/${{ github.base_ref }}
 
             - name: Ensure all PICS are set for tests (to true or false)
               if: always()
@@ -315,7 +359,20 @@ jobs:
                   type-safe getters
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp' ':(exclude)src/data-model-providers/codegen/ClusterIntegration.cpp' ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm' && exit 1 || exit 0
+                  git grep -I -n 'emberAfReadAttribute' -- './*'                                                    \
+                      ':(exclude).agents/skills/'                                                                   \
+                      ':(exclude).github/workflows/lint.yml'                                                        \
+                      ':(exclude)AGENTS.md'                                                                  \
+                      ':(exclude)examples/tv-casting-app/tv-casting-common/Accessors-override.cpp'                   \
+                      ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                                      \
+                      ':(exclude)src/app/util/attribute-table.cpp'                                                  \
+                      ':(exclude)src/app/util/attribute-table.h'                                                    \
+                      ':(exclude)src/app/util/mock/CodegenEmberMocks.cpp'                                           \
+                      ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt'                 \
+                      ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm'                         \
+                      ':(exclude)src/data-model-providers/codegen/ClusterIntegration.cpp'                           \
+                      ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp'        \
+                      && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -329,10 +386,14 @@ jobs:
               run: |
                   git grep -I -n 'emberAfWriteAttribute' -- './*'                                            \
                       ':(exclude).github/workflows/lint.yml'                                                 \
+                      ':(exclude).agents/skills/'                                                            \
+                      ':(exclude)AGENTS.md'                                                                  \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
                       ':(exclude)examples/common/server-cluster-shim/ServerClusterShim.cpp'                  \
+                      ':(exclude)examples/tv-casting-app/tv-casting-common/Accessors-override.cpp'            \
                       ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'        \
                       ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'          \
+                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.h'            \
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                               \
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \
@@ -369,7 +430,11 @@ jobs:
                   Check for use of
                   "SuccessOrExit(something-without-assignment(", which should
                   probably be "SuccessOrExit(err = something("
+              # Keep this check running so violations remain visible in CI
+              # while the underlying issue is being addressed.
+              # https://github.com/project-chip/connectedhomeip/issues/71541
               if: always()
+              continue-on-error: true
               run: |
                   git grep -I -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
@@ -425,3 +490,8 @@ jobs:
 
 # NOTE: Actions which do not require bootstrapping the build environment
 #       should be added above the "Checkout submodules & Bootstrap" step.
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

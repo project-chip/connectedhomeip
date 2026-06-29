@@ -112,20 +112,20 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
 
         self.step(3)
         aSnapshotCapabilities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
         )
-        log.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
+        log.info("Rx'd SnapshotCapabilities: %s", aSnapshotCapabilities)
 
         self.step(4)
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
         log.info("Fetch feature map to check if WMark and OSD are supported")
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         try:
             watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
             osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
@@ -144,7 +144,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
                 OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            log.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            log.info("Rx'd SnapshotStreamAllocateResponse: %s", snpStreamAllocateResponse)
             asserts.assert_is_not_none(
                 snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
             )
@@ -157,7 +157,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
 
         self.step(6)
@@ -177,7 +177,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
                 OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            log.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            log.info("Rx'd SnapshotStreamAllocateResponse: %s", snpStreamAllocateResponse)
             asserts.assert_is_not_none(
                 snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
             )
@@ -191,7 +191,7 @@ class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         asserts.assert_equal(aAllocatedSnapshotStreams[0].minResolution,
                              newMinResolution, "MinResolution does not match expected value")

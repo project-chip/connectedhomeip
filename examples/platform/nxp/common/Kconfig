@@ -32,7 +32,21 @@ config CHIP_APP_COMMON
 config CHIP_APP_CLUSTERS
     bool "App Clusters"
     help
-        Enable application common clusters implementation for the Identify and the ZCLCallbacks.
+        Enable application common clusters implementation for the ZCLCallbacks.
+
+config CHIP_APP_IDENTIFY
+    bool "App Identify"
+    default y
+    help
+        Enable application common clusters implementation for the Identify cluster.
+        Registers the Identify Clusters only for CHIP_APP_IDENTIFY_ENDPOINT.
+        If needed, specific application code must register the cluster for the other endpoints.
+
+config CHIP_APP_IDENTIFY_ENDPOINT
+	int "Endpoint ID for Identify cluster"
+	default 1
+	help
+        Set the endpoint ID for the Identify cluster implementation.
 
 config CHIP_APP_ASSERT
     bool "Application Assert"
@@ -75,6 +89,31 @@ if CHIP_APP_BLE_MANAGER
     endchoice # CHIP_APP_BLE_MANAGER
 
 endif # CHIP_APP_BLE_MANAGER
+
+config CHIP_APP_BATTERY_MANAGER
+    bool "App Battery Manager"
+    default n
+    help
+        Enable Application Battery Manager Implementation.
+
+if CHIP_APP_BATTERY_MANAGER
+    choice CHIP_APP_BATTERY_MANAGER_SELECTION
+        prompt "Select Application Battery Manager"
+        default CHIP_APP_BATTERY_MANAGER_EMPTY
+
+        config CHIP_APP_BATTERY_MANAGER_FREERTOS
+            bool "App FreeRTOS Battery Manager"
+            help
+                Enable application battery manager FreeRTOS implementation.
+
+        config CHIP_APP_BATTERY_MANAGER_EMPTY
+            bool "App Battery Manager Empty"
+            help
+                Enable application battery manager empty implementation.
+
+    endchoice # CHIP_APP_BATTERY_MANAGER_SELECTION
+
+endif # CHIP_APP_BATTERY_MANAGER
 
 config CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
     bool "Enable customization of GATT service on MCXW platform"
@@ -212,7 +251,7 @@ config CHIP_APP_CLI
 
 config CHIP_APP_OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
-	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
+	default y if (CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X) && !CHIP_CRYPTO_PSA
 	default y if CHIP_SE05X
 	help
 		Use custom implementation of operational keystore.
@@ -245,11 +284,6 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
                 Enable application Operational keystore SE05X implementation.
 
     endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
-
-    config PRIVATE_ECC_KEY_BLOB_SIZE
-        int "Operational private ECC key blob size"
-        default 120 if CHIP_APP_OPERATIONAL_KEYSTORE_S200
-        default 48 if CHIP_APP_OPERATIONAL_KEYSTORE_S50
 
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
 

@@ -48,8 +48,9 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kAmbientContextType = 0,
-    kObjectCount        = 1,
+    kAmbientContextDetected      = 0,
+    kObjectCountThresholdReached = 1,
+    kObjectCount                 = 2,
 };
 
 struct Type
@@ -60,7 +61,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    Optional<DataModel::List<const Structs::AmbientContextTypeStruct::Type>> ambientContextType;
+    Optional<Structs::AmbientContextTypeStruct::Type> ambientContextDetected;
+    Optional<bool> objectCountThresholdReached;
     Optional<uint16_t> objectCount;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -73,7 +75,8 @@ public:
     static constexpr EventId GetEventId() { return Events::AmbientContextDetectStarted::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
 
-    Optional<DataModel::DecodableList<Structs::AmbientContextTypeStruct::DecodableType>> ambientContextType;
+    Optional<Structs::AmbientContextTypeStruct::DecodableType> ambientContextDetected;
+    Optional<bool> objectCountThresholdReached;
     Optional<uint16_t> objectCount;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -84,7 +87,8 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kStartEventNumber = 0,
+    kEventStartTimePos = 0,
+    kEventStartTimeSys = 1,
 };
 
 struct Type
@@ -95,7 +99,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    chip::EventNumber startEventNumber = static_cast<chip::EventNumber>(0);
+    Optional<uint64_t> eventStartTimePos;
+    Optional<uint64_t> eventStartTimeSys;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -107,7 +112,8 @@ public:
     static constexpr EventId GetEventId() { return Events::AmbientContextDetectEnded::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
 
-    chip::EventNumber startEventNumber = static_cast<chip::EventNumber>(0);
+    Optional<uint64_t> eventStartTimePos;
+    Optional<uint64_t> eventStartTimeSys;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

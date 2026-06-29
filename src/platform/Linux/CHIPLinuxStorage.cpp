@@ -33,7 +33,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -230,7 +230,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueStr(const char * key, const char * val)
 
 CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * data, size_t dataLen)
 {
-    static const size_t kMaxBlobSize = 10 * 1024;
+    static const size_t kMaxBlobSize = static_cast<size_t>(10) * 1024;
 
     CHIP_ERROR retval = CHIP_NO_ERROR;
     chip::Platform::ScopedMemoryBuffer<char> encodedData;
