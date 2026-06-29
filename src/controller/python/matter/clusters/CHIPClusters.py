@@ -13761,8 +13761,20 @@ class ChipClusters:
                     "node": "int",
                 },
             },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetDeviceAuthURI",
+                "args": {
+                },
+            },
         },
         "attributes": {
+            0x00000000: {
+                "attributeName": "LoggedIn",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

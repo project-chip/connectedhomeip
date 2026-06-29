@@ -18757,6 +18757,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
+            LoggedIn(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18805,7 +18806,8 @@ public class ClusterIDMapping {
         public enum Command {
             GetSetupPIN(0L),
             Login(2L),
-            Logout(3L),;
+            Logout(3L),
+            GetDeviceAuthURI(4L),;
             private final long id;
             Command(long id) {
                 this.id = id;
