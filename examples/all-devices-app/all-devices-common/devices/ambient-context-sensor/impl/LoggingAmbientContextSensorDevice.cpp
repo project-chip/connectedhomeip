@@ -37,24 +37,12 @@ LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelega
                               .holdTimeMax     = 300,
                               .holdTimeDefault = 10,
                           }),
-        timerDelegate)
+        timerDelegate),
+    mAmbientContextTypeSupportedBuf{},
+    mPredictActivityBuf{},
+    mPredictedActivityList(mPredictActivityBuf, 0),
+    mAmbientContextTypeListUsed{}
 {
-    // AmbientContextSensingDelegate
-    for (auto & v : mAmbientContextTypeSupportedBuf)
-    {
-        v = SemanticTagType{};
-    }
-
-    for (auto & v : mPredictActivityBuf)
-    {
-        v = PredictActivity{};
-    }
-
-    mPredictedActivityList = Span<PredictActivity>(mPredictActivityBuf, 0);
-    for (auto & v : mAmbientContextTypeListUsed)
-    {
-        v = false;
-    }
 }
 
 CHIP_ERROR LoggingAmbientContextSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
