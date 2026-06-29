@@ -38,12 +38,9 @@ LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelega
                               .holdTimeDefault = 10,
                           }),
         timerDelegate),
-    mAmbientContextTypeSupportedBuf{},
-    mPredictActivityBuf{},
-    mPredictedActivityList(mPredictActivityBuf, 0),
+    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0),
     mAmbientContextTypeListUsed{}
-{
-}
+{}
 
 CHIP_ERROR LoggingAmbientContextSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                        EndpointComposition composition)
