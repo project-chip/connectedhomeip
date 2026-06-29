@@ -33,12 +33,9 @@ AmbientContextSensingDelegate & AmbientContextSensingDelegate::AllocateInstance(
     return *instances.back();
 }
 
-AmbientContextSensingDelegateImpl::AmbientContextSensingDelegateImpl()
-    : mAmbientContextTypeSupportedBuf{},
-      mPredictActivityBuf{},
-      mPredictedActivityList(mPredictActivityBuf, 0)
-{
-}
+AmbientContextSensingDelegateImpl::AmbientContextSensingDelegateImpl() :
+    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0)
+{}
 
 SemanticTagType * AmbientContextSensingDelegateImpl::GetAmbientContextTypeSupportedBuf(size_t size)
 {
@@ -88,9 +85,9 @@ AmbientContextSensed * AmbientContextSensingDelegateImpl::AllocDetection()
     {
         if (mAmbientContextTypeList[id] == nullptr)
         {
-            auto ptr = std::make_unique<AmbientContextSensed>();
-            ptr->id = id;
-            auto raw = ptr.get();
+            auto ptr                    = std::make_unique<AmbientContextSensed>();
+            ptr->id                     = id;
+            auto raw                    = ptr.get();
             mAmbientContextTypeList[id] = std::move(ptr);
             return raw;
         }
@@ -103,9 +100,8 @@ CHIP_ERROR AmbientContextSensingDelegateImpl::DelDetection(AmbientContextSensed 
     VerifyOrReturnError(pitem != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     const uint8_t id = pitem->id;
     VerifyOrReturnError(id < kMaxSimultaneousDetectionLimit, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((mAmbientContextTypeList[id] != nullptr) &&
-        (mAmbientContextTypeList[id].get() == pitem),
-        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((mAmbientContextTypeList[id] != nullptr) && (mAmbientContextTypeList[id].get() == pitem),
+                        CHIP_ERROR_INVALID_ARGUMENT);
     mAmbientContextTypeList[id].reset();
 
     return CHIP_NO_ERROR;
