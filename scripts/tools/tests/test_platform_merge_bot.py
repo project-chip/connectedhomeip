@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+import json
 import os
 import sys
 import tempfile
@@ -71,7 +72,11 @@ esp32:
         self.mock_commit.get_combined_status.return_value.state = "success"
         self.mock_commit.get_combined_status.return_value.total_count = 0
         self.mock_commit.get_combined_status.return_value.statuses = []
-        self.mock_commit.get_check_suites.return_value = []
+        # Default mock 10 successful check suites to pass the minimum checks count guard
+        mock_suite = MagicMock()
+        mock_suite.status = "completed"
+        mock_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] * 10
         self.mock_repo.get_commit.return_value = self.mock_commit
 
         # Initialize bot under test
@@ -595,7 +600,10 @@ esp32:
         mock_suite = MagicMock()
         mock_suite.status = "completed"
         mock_suite.conclusion = "failure"
-        self.mock_commit.get_check_suites.return_value = [mock_suite]
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -612,7 +620,10 @@ esp32:
         mock_suite = MagicMock()
         mock_suite.status = "in_progress"
         mock_suite.conclusion = None
-        self.mock_commit.get_check_suites.return_value = [mock_suite]
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -638,7 +649,11 @@ esp32:
         mock_suite3.status = "completed"
         mock_suite3.conclusion = "skipped"
 
-        self.mock_commit.get_check_suites.return_value = [mock_suite1, mock_suite2, mock_suite3]
+        self.mock_commit.get_check_suites.return_value = [
+            mock_suite1,
+            mock_suite2,
+            mock_suite3,
+        ] + [mock_suite1] * 7
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -795,7 +810,6 @@ esp32:
     @patch("urllib.request.urlopen")
     def test_get_unresolved_threads_pagination_gating(self, mock_urlopen: MagicMock) -> None:
         """Tests that _get_unresolved_threads appends a system blocker when hasNextPage is True."""
-        import json
         mock_response = MagicMock()
         mock_response.read.return_value = json.dumps({
             "data": {
@@ -823,7 +837,6 @@ esp32:
     @patch("urllib.request.urlopen")
     def test_get_unresolved_threads_malformed_graphql_response(self, mock_urlopen: MagicMock) -> None:
         """Tests that _get_unresolved_threads raises RuntimeError if the JSON payload is missing key data structures."""
-        import json
         mock_response = MagicMock()
         mock_response.read.return_value = json.dumps({
             "data": {
@@ -837,6 +850,26 @@ esp32:
             PlatformMergeBot._get_unresolved_threads(self.bot, mock_pr)
 
         self.assertIn("missing PR repository/pullRequest data", str(ctx.exception))
+
+    def test_check_and_process_pr_ci_insufficient_checks_does_not_merge(self) -> None:
+        """Tests that a commit with fewer than 10 CI checks is treated as pending and does not merge."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock only 2 check suites (fewer than the required 10)
+        mock_suite = MagicMock()
+        mock_suite.status = "completed"
+        mock_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] * 2
+        self.mock_commit.get_combined_status.return_value.statuses = []
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_called_once()
+        comment_body = mock_pr.create_issue_comment.call_args[0][0]
+        self.assertIn("CI checks are pending or failed", comment_body)
 
 
 if __name__ == "__main__":

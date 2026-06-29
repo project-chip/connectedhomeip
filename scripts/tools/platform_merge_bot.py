@@ -15,8 +15,10 @@
 # limitations under the License.
 #
 
+import json
 import logging
 import os
+import urllib.request
 from enum import Enum
 from typing import Iterable, NamedTuple
 
@@ -386,9 +388,6 @@ class PlatformMergeBot:
         """
         variables = {"owner": owner, "name": repo_name, "number": pr.number}
 
-        import json
-        import urllib.request
-
         req = urllib.request.Request(
             "https://api.github.com/graphql",
             data=json.dumps({"query": query, "variables": variables}).encode("utf-8"),
@@ -473,6 +472,20 @@ class PlatformMergeBot:
     def _has_ci_passed(self, pr: PullRequest, commit: Commit) -> bool:
         """Checks if all CI checks (combined status and check runs) have passed on the PR's latest commit."""
         combined_status = commit.get_combined_status()
+        check_suites = list(commit.get_check_suites())
+
+        # Guard against empty checks / premature success when commit is fresh.
+        # A normal PR run has at least 10 combined statuses and check suites.
+        total_checks = len(combined_status.statuses) + len(check_suites)
+        if total_checks < 10:
+            log.info(
+                "PR #%d HEAD commit %s has only %d CI checks registered (expected >= 10). Treating as pending.",
+                pr.number,
+                commit.sha[:8],
+                total_checks,
+            )
+            return False
+
         # pullapprove is ignored because it delegates normal PR approvals. Since this
         # bot bypasses standard reviews for platform-restricted changes, PullApprove
         # will remain pending forever.
@@ -491,7 +504,6 @@ class PlatformMergeBot:
                 )
                 return False
 
-        check_suites = commit.get_check_suites()
         for suite in check_suites:
             if suite.status != "completed":
                 log.info(
