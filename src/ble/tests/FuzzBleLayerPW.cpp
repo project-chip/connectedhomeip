@@ -51,8 +51,8 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
-#include <ble/Ble.h>
 #include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <ble/BleConfig.h>
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
@@ -96,8 +96,7 @@ public:
     }
     CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override { return CHIP_NO_ERROR; }
     uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 247; }
-    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *,
-                              System::PacketBufferHandle) override
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, System::PacketBufferHandle) override
     {
         return CHIP_NO_ERROR;
     }
@@ -300,8 +299,7 @@ void DispatchOne(BleLayer & layer, const Op & op)
 void PreconnectCentral(BleLayer & layer, BLE_CONNECTION_OBJECT connObj)
 {
     BLEEndPoint * ep = nullptr;
-    if (layer.NewBleEndPoint(&ep, connObj, chip::Ble::kBleRole_Central, /* autoClose */ true) != CHIP_NO_ERROR ||
-        ep == nullptr)
+    if (layer.NewBleEndPoint(&ep, connObj, chip::Ble::kBleRole_Central, /* autoClose */ true) != CHIP_NO_ERROR || ep == nullptr)
         return;
     if (ep->StartConnect() != CHIP_NO_ERROR)
         return;
@@ -312,7 +310,7 @@ void PreconnectCentral(BleLayer & layer, BLE_CONNECTION_OBJECT connObj)
     resp.mSelectedProtocolVersion = chip::Ble::kBleTransportProtocolVersion_V4;
     resp.mFragmentSize            = 247;
     resp.mWindowSize              = 4;
-    PacketBufferHandle buf = PacketBufferHandle::New(chip::Ble::kCapabilitiesResponseLength);
+    PacketBufferHandle buf        = PacketBufferHandle::New(chip::Ble::kCapabilitiesResponseLength);
     if (!buf.IsNull() && resp.Encode(buf) == CHIP_NO_ERROR)
         (void) ep->Receive(std::move(buf));
 }
@@ -396,10 +394,16 @@ std::vector<Ops> SeedSequences()
     });
 
     // Handshake field-validation boundaries (windowSize / mtu sweeps).
-    const uint8_t windowSizes[]  = { 0, 1, 2, 3, static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE - 1),
+    const uint8_t windowSizes[] = { 0,
+                                    1,
+                                    2,
+                                    3,
+                                    static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE - 1),
                                     static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE),
-                                    static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE + 1), 0xFE, 0xFF };
-    const uint16_t mtus[]        = { 0, 1, 2, 3, 4, 20, 23, 100, 185, 247, 512, 1024, 0xFFFE, 0xFFFF };
+                                    static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE + 1),
+                                    0xFE,
+                                    0xFF };
+    const uint16_t mtus[]       = { 0, 1, 2, 3, 4, 20, 23, 100, 185, 247, 512, 1024, 0xFFFE, 0xFFFF };
     for (uint8_t ws : windowSizes)
     {
         for (uint16_t mtu : mtus)
@@ -411,9 +415,7 @@ std::vector<Ops> SeedSequences()
 
     // Disconnect during an in-progress reassembly.
     seeds.push_back({
-        MkOp(kWriteReceived, 0, CapReq(6, 247)),
-        MkOp(kSubscribeReceived, 0, {}),
-        MkOp(kWriteReceived, 0, startOnly),
+        MkOp(kWriteReceived, 0, CapReq(6, 247)), MkOp(kSubscribeReceived, 0, {}), MkOp(kWriteReceived, 0, startOnly),
         MkOp(kConnectionError, 0, { 0 }), // BLE_ERROR_REMOTE_DEVICE_DISCONNECTED
     });
 
@@ -456,16 +458,18 @@ auto AnyBlePayload()
 {
     return OneOf(
         // Capabilities REQUEST (peripheral, CHAR_1 write): magic(2) versions(4) mtu(2 LE) ws(1)
-        Map([](uint16_t mtu, uint8_t ws) {
-            return std::vector<uint8_t>{ 0x65, 0x6C, 0x04, 0x00, 0x00, 0x00, static_cast<uint8_t>(mtu),
-                                         static_cast<uint8_t>(mtu >> 8), ws };
-        },
+        Map(
+            [](uint16_t mtu, uint8_t ws) {
+                return std::vector<uint8_t>{
+                    0x65, 0x6C, 0x04, 0x00, 0x00, 0x00, static_cast<uint8_t>(mtu), static_cast<uint8_t>(mtu >> 8), ws
+                };
+            },
             Arbitrary<uint16_t>(), Arbitrary<uint8_t>()),
         // Capabilities RESPONSE (central, CHAR_2 indication): 65 6C 04 fragLo fragHi ws
-        Map([](uint16_t frag, uint8_t ws) {
-            return std::vector<uint8_t>{ 0x65, 0x6C, 0x04, static_cast<uint8_t>(frag), static_cast<uint8_t>(frag >> 8),
-                                         ws };
-        },
+        Map(
+            [](uint16_t frag, uint8_t ws) {
+                return std::vector<uint8_t>{ 0x65, 0x6C, 0x04, static_cast<uint8_t>(frag), static_cast<uint8_t>(frag >> 8), ws };
+            },
             Arbitrary<uint16_t>(), Arbitrary<uint8_t>()),
         // Arbitrary / malformed bytes.
         Arbitrary<std::vector<uint8_t>>());

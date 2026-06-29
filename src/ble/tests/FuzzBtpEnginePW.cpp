@@ -134,8 +134,8 @@ void BtpEngineDoesNotCrash(bool expectFirstAck, const std::vector<FragSpec> & fr
 FUZZ_TEST(FuzzBtpEnginePW, BtpEngineDoesNotCrash)
     .WithDomains(Arbitrary<bool>(),
                  // Per-fragment: (headerFlags from the data-fragment set, declaredLen, payload).
-                 VectorOf(TupleOf(ElementOf<uint8_t>({ 0x01, 0x02, 0x04, 0x05, 0x06, 0x03, 0x07, 0x00 }),
-                                  Arbitrary<uint16_t>(), Arbitrary<std::vector<uint8_t>>()))
+                 VectorOf(TupleOf(ElementOf<uint8_t>({ 0x01, 0x02, 0x04, 0x05, 0x06, 0x03, 0x07, 0x00 }), Arbitrary<uint16_t>(),
+                                  Arbitrary<std::vector<uint8_t>>()))
                      .WithMaxSize(10)
                      .WithSeeds(BtpSeedSequences()));
 

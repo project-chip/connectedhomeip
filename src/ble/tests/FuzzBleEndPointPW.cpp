@@ -35,11 +35,11 @@
 #include <pw_fuzzer/fuzztest.h>
 #include <pw_unit_test/framework.h>
 
-#include <ble/Ble.h>
 #include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
+#include <ble/BleConfig.h>
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
-#include <ble/BleConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -74,8 +74,7 @@ public:
     }
     CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT) override { return CHIP_NO_ERROR; }
     uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 23; }
-    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *,
-                              System::PacketBufferHandle) override
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, System::PacketBufferHandle) override
     {
         return CHIP_NO_ERROR;
     }
@@ -99,12 +98,12 @@ namespace {
 
 using chip::Ble::BLEEndPoint;
 using chip::Ble::BleLayer;
+using chip::Ble::BleRole;
 using chip::Ble::FuzzBleApplicationDelegate;
 using chip::Ble::FuzzBleLayerDelegate;
 using chip::Ble::FuzzBlePlatformDelegate;
 using chip::Ble::kBleRole_Central;
 using chip::Ble::kBleRole_Peripheral;
-using chip::Ble::BleRole;
 using chip::System::PacketBufferHandle;
 using namespace fuzztest;
 
@@ -122,19 +121,19 @@ void EnsureInitialized()
 [[maybe_unused]] PacketBufferHandle BuildCapabilitiesRequest(uint8_t windowSize, uint16_t mtu)
 {
     constexpr size_t kReqLen = 9;
-    auto buf = PacketBufferHandle::New(kReqLen);
+    auto buf                 = PacketBufferHandle::New(kReqLen);
     if (buf.IsNull())
         return buf;
     uint8_t * p = buf->Start();
-    p[0] = 0x65; // CHECK_BYTE_1
-    p[1] = 0x6C; // CHECK_BYTE_2
-    p[2] = 0x04; // version
-    p[3] = 0x00;
-    p[4] = 0x00;
-    p[5] = static_cast<uint8_t>(mtu);
-    p[6] = static_cast<uint8_t>(mtu >> 8);
-    p[7] = windowSize;
-    p[8] = 0x00;
+    p[0]        = 0x65; // CHECK_BYTE_1
+    p[1]        = 0x6C; // CHECK_BYTE_2
+    p[2]        = 0x04; // version
+    p[3]        = 0x00;
+    p[4]        = 0x00;
+    p[5]        = static_cast<uint8_t>(mtu);
+    p[6]        = static_cast<uint8_t>(mtu >> 8);
+    p[7]        = windowSize;
+    p[8]        = 0x00;
     buf->SetDataLength(kReqLen);
     return buf;
 }
@@ -142,16 +141,16 @@ void EnsureInitialized()
 [[maybe_unused]] PacketBufferHandle BuildCapabilitiesResponse(uint8_t windowSize, uint16_t fragmentSize)
 {
     constexpr size_t kRespLen = 6;
-    auto buf = PacketBufferHandle::New(kRespLen);
+    auto buf                  = PacketBufferHandle::New(kRespLen);
     if (buf.IsNull())
         return buf;
     uint8_t * p = buf->Start();
-    p[0] = 0x65;
-    p[1] = 0x6C;
-    p[2] = 0x04;
-    p[3] = static_cast<uint8_t>(fragmentSize);
-    p[4] = static_cast<uint8_t>(fragmentSize >> 8);
-    p[5] = windowSize;
+    p[0]        = 0x65;
+    p[1]        = 0x6C;
+    p[2]        = 0x04;
+    p[3]        = static_cast<uint8_t>(fragmentSize);
+    p[4]        = static_cast<uint8_t>(fragmentSize >> 8);
+    p[5]        = windowSize;
     buf->SetDataLength(kRespLen);
     return buf;
 }
@@ -191,10 +190,10 @@ auto AnyMtu()
         3,
         4,
         20,
-        23,    // BLE 4.0 ATT_MTU floor
+        23, // BLE 4.0 ATT_MTU floor
         100,
-        185,   // BLE 4.2 default
-        247,   // BLE 5.x extended
+        185, // BLE 4.2 default
+        247, // BLE 5.x extended
         512,
         1024,
         0xFFFE,
@@ -218,8 +217,7 @@ std::vector<std::vector<EpFrag>> EpFragSeeds()
     };
 }
 
-void BleEndpointReceiveDoesNotCrash(uint8_t windowSize, uint16_t fragmentSize, bool seqBaseOne,
-                                    const std::vector<EpFrag> & frags)
+void BleEndpointReceiveDoesNotCrash(uint8_t windowSize, uint16_t fragmentSize, bool seqBaseOne, const std::vector<EpFrag> & frags)
 {
     EnsureInitialized();
 
@@ -255,8 +253,8 @@ void BleEndpointReceiveDoesNotCrash(uint8_t windowSize, uint16_t fragmentSize, b
 
         chip::Ble::BleTransportCapabilitiesResponseMessage resp;
         resp.mSelectedProtocolVersion = chip::Ble::kBleTransportProtocolVersion_V4; // negotiation OK
-        resp.mFragmentSize            = fragmentSize;                                       // fuzzed field
-        resp.mWindowSize              = windowSize;                                         // fuzzed field
+        resp.mFragmentSize            = fragmentSize;                               // fuzzed field
+        resp.mWindowSize              = windowSize;                                 // fuzzed field
 
         PacketBufferHandle respBuf = PacketBufferHandle::New(chip::Ble::kCapabilitiesResponseLength);
         if (!respBuf.IsNull() && resp.Encode(respBuf) == CHIP_NO_ERROR)
@@ -297,8 +295,8 @@ void BleEndpointReceiveDoesNotCrash(uint8_t windowSize, uint16_t fragmentSize, b
 
 FUZZ_TEST(FuzzBleEndPointPW, BleEndpointReceiveDoesNotCrash)
     .WithDomains(AnyWindowSize(), /* fragmentSize */ AnyMtu(), /* seqBaseOne */ Arbitrary<bool>(),
-                 VectorOf(TupleOf(ElementOf<uint8_t>({ 0x01, 0x02, 0x04, 0x05, 0x06, 0x03, 0x07, 0x00 }),
-                                  Arbitrary<uint16_t>(), Arbitrary<std::vector<uint8_t>>()))
+                 VectorOf(TupleOf(ElementOf<uint8_t>({ 0x01, 0x02, 0x04, 0x05, 0x06, 0x03, 0x07, 0x00 }), Arbitrary<uint16_t>(),
+                                  Arbitrary<std::vector<uint8_t>>()))
                      .WithMaxSize(8)
                      .WithSeeds(EpFragSeeds()));
 
