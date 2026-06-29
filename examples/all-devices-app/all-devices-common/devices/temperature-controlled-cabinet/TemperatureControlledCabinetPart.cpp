@@ -49,12 +49,22 @@ CHIP_ERROR TemperatureControlledCabinetPart::Register(EndpointId endpoint, CodeD
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureControlCluster.Registration()));
 
+    mOperationalStateCluster.Create(endpoint, &mOperationalStateDelegate);
+    mOperationalStateDelegate.SetCluster(&mOperationalStateCluster.Cluster());
+    ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
+
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
 void TemperatureControlledCabinetPart::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+
+    if (mOperationalStateCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
+        mOperationalStateCluster.Destroy();
+    }
 
     if (mTemperatureControlCluster.IsConstructed())
     {
