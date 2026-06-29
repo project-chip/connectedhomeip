@@ -24,6 +24,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <clusters/WebRTCTransportRequestor/Attributes.h>
 #include <clusters/WebRTCTransportRequestor/Commands.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
@@ -221,6 +222,44 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestReadUnsupportedAttribute)
     auto status = tester.ReadAttribute(0xFFFF /* Invalid attribute ID */, dummyValue);
     EXPECT_FALSE(status.IsSuccess());
     EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// HandleOffer converts the wire ICEServers list into OfferArgs::iceServers
+// (an Optional<std::vector>). Exercises an Offer carrying a non-empty
+// ICEServers list and verifies it is handled successfully.
+TEST_F(TestWebRTCTransportRequestorCluster, TestHandleOfferWithICEServers)
+{
+    TestServerClusterContext context;
+    MockWebRTCTransportRequestorDelegate mockDelegate;
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Seed a session matching the ClusterTester's default subject so
+    // FindSession() succeeds and HandleOffer reaches the ICEServers conversion.
+    static constexpr uint16_t kSessionId = 42;
+    WebRTCSessionStruct session;
+    session.id          = kSessionId;
+    session.peerNodeID  = Testing::kTestNodeId;
+    session.fabricIndex = Testing::kTestFabricIndex;
+    session.streamUsage = StreamUsageEnum::kLiveView;
+    ASSERT_EQ(server.UpsertSession(session), WebRTCTransportRequestorCluster::UpsertResultEnum::kInserted);
+
+    ClusterTester tester(server);
+
+    // A single ICEServers entry exercises the conversion loop; its fields are
+    // not inspected by the cluster.
+    Globals::Structs::ICEServerStruct::Type iceServer;
+    Commands::Offer::Type request;
+    request.webRTCSessionID = kSessionId;
+    request.sdp             = chip::CharSpan::fromCharString("v=0");
+    request.ICEServers.SetValue(
+        DataModel::List<const Globals::Structs::ICEServerStruct::Type>(&iceServer, 1));
+
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_TRUE(result.status->IsSuccess());
 
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
