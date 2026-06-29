@@ -6991,6 +6991,8 @@ private:
 | Attributes:                                                         |        |
 | * Messages                                                          | 0x0000 |
 | * ActiveMessageIDs                                                  | 0x0001 |
+| * SupportedLanguageCodes                                            | 0x0002 |
+| * SupportedMimeTypes                                                | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -7001,6 +7003,7 @@ private:
 | * MessageQueued                                                     | 0x0000 |
 | * MessagePresented                                                  | 0x0001 |
 | * MessageComplete                                                   | 0x0002 |
+| * MessageNotPresented                                               | 0x0003 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -7019,6 +7022,8 @@ public:
         AddArgument("Duration", 0, UINT64_MAX, &mRequest.duration);
         AddArgument("MessageText", &mRequest.messageText);
         AddArgument("Responses", &mComplex_Responses, "", Argument::kOptional);
+        AddArgument("LanguageCode", &mRequest.languageCode);
+        AddArgument("MessageURI", &mRequest.messageURI);
         ClusterCommand::AddArguments();
     }
 
@@ -26425,20 +26430,27 @@ void registerClusterMessages(Commands & commands, CredentialIssuerCommands * cre
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "messages", Attributes::Messages::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "messages", Attributes::Messages::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "supported-language-codes", Attributes::SupportedLanguageCodes::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
         make_unique<
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>>(
             Id, "messages", Attributes::Messages::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
             Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CharSpan>>>(
+            Id, "supported-language-codes", Attributes::SupportedLanguageCodes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CharSpan>>>(
+            Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -26449,10 +26461,13 @@ void registerClusterMessages(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "messages", Attributes::Messages::Id, credsIssuerConfig),                           //
-        make_unique<SubscribeAttribute>(Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, credsIssuerConfig),         //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, "messages", Attributes::Messages::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supported-language-codes", Attributes::SupportedLanguageCodes::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -26461,14 +26476,16 @@ void registerClusterMessages(Commands & commands, CredentialIssuerCommands * cre
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                         //
-        make_unique<ReadEvent>(Id, "message-queued", Events::MessageQueued::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "message-presented", Events::MessagePresented::Id, credsIssuerConfig),      //
-        make_unique<ReadEvent>(Id, "message-complete", Events::MessageComplete::Id, credsIssuerConfig),        //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
-        make_unique<SubscribeEvent>(Id, "message-queued", Events::MessageQueued::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "message-presented", Events::MessagePresented::Id, credsIssuerConfig), //
-        make_unique<SubscribeEvent>(Id, "message-complete", Events::MessageComplete::Id, credsIssuerConfig),   //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                //
+        make_unique<ReadEvent>(Id, "message-queued", Events::MessageQueued::Id, credsIssuerConfig),                   //
+        make_unique<ReadEvent>(Id, "message-presented", Events::MessagePresented::Id, credsIssuerConfig),             //
+        make_unique<ReadEvent>(Id, "message-complete", Events::MessageComplete::Id, credsIssuerConfig),               //
+        make_unique<ReadEvent>(Id, "message-not-presented", Events::MessageNotPresented::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeEvent>(Id, "message-queued", Events::MessageQueued::Id, credsIssuerConfig),              //
+        make_unique<SubscribeEvent>(Id, "message-presented", Events::MessagePresented::Id, credsIssuerConfig),        //
+        make_unique<SubscribeEvent>(Id, "message-complete", Events::MessageComplete::Id, credsIssuerConfig),          //
+        make_unique<SubscribeEvent>(Id, "message-not-presented", Events::MessageNotPresented::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

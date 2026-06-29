@@ -6155,6 +6155,60 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        case Events::MessageNotPresented::Id: {
+            Events::MessageNotPresented::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_messageID;
+            jbyteArray value_messageIDByteArray = env->NewByteArray(static_cast<jsize>(cppValue.messageID.size()));
+            env->SetByteArrayRegion(value_messageIDByteArray, 0, static_cast<jsize>(cppValue.messageID.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
+            value_messageID = value_messageIDByteArray;
+
+            jobject value_removedFromQueue;
+            std::string value_removedFromQueueClassName     = "java/lang/Boolean";
+            std::string value_removedFromQueueCtorSignature = "(Z)V";
+            jboolean jnivalue_removedFromQueue              = static_cast<jboolean>(cppValue.removedFromQueue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                value_removedFromQueueClassName.c_str(), value_removedFromQueueCtorSignature.c_str(), jnivalue_removedFromQueue,
+                value_removedFromQueue);
+
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_fabricIndexClassName.c_str(), value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                value_fabricIndex);
+
+            jclass messageNotPresentedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessageNotPresentedEvent",
+                messageNotPresentedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MessagesClusterMessageNotPresentedEvent");
+                return nullptr;
+            }
+
+            jmethodID messageNotPresentedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, messageNotPresentedStructClass, "<init>",
+                                                                "([BLjava/lang/Boolean;Ljava/lang/Integer;)V",
+                                                                &messageNotPresentedStructCtor);
+            if (err != CHIP_NO_ERROR || messageNotPresentedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessageNotPresentedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(messageNotPresentedStructClass, messageNotPresentedStructCtor, value_messageID,
+                                           value_removedFromQueue, value_fabricIndex);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

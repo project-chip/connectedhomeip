@@ -24227,6 +24227,8 @@ class Messages(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="messages", Tag=0x00000000, Type=typing.List[Messages.Structs.MessageStruct]),
                 ClusterObjectFieldDescriptor(Label="activeMessageIDs", Tag=0x00000001, Type=typing.List[bytes]),
+                ClusterObjectFieldDescriptor(Label="supportedLanguageCodes", Tag=0x00000002, Type=typing.Optional[typing.List[str]]),
+                ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=0x00000003, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -24236,6 +24238,8 @@ class Messages(Cluster):
 
     messages: typing.List[Messages.Structs.MessageStruct] = field(default_factory=lambda: [])
     activeMessageIDs: typing.List[bytes] = field(default_factory=lambda: [])
+    supportedLanguageCodes: typing.Optional[typing.List[str]] = None
+    supportedMimeTypes: typing.Optional[typing.List[str]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -24272,6 +24276,9 @@ class Messages(Cluster):
             kConfirmationResponse = 0x2
             kConfirmationReply = 0x4
             kProtectedMessages = 0x8
+            kSpokenMessages = 0x10
+            kAudioMessages = 0x20
+            kMultiModalMessages = 0x40
 
         class MessageControlBitmap(IntFlag):
             kConfirmationRequired = 0x1
@@ -24279,6 +24286,8 @@ class Messages(Cluster):
             kReplyMessage = 0x4
             kMessageConfirmed = 0x8
             kMessageProtected = 0x10
+            kSpokenMessage = 0x20
+            kAudioMessage = 0x40
 
     class Structs:
         @dataclass
@@ -24307,6 +24316,8 @@ class Messages(Cluster):
                         ClusterObjectFieldDescriptor(Label="duration", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="messageText", Tag=5, Type=str),
                         ClusterObjectFieldDescriptor(Label="responses", Tag=6, Type=typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]),
+                        ClusterObjectFieldDescriptor(Label="languageCode", Tag=7, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="messageURI", Tag=8, Type=typing.Optional[str]),
                     ])
 
             messageID: 'bytes' = b""
@@ -24316,6 +24327,8 @@ class Messages(Cluster):
             duration: 'typing.Union[Nullable, uint]' = NullValue
             messageText: 'str' = ""
             responses: 'typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]' = None
+            languageCode: 'typing.Optional[str]' = None
+            messageURI: 'typing.Optional[str]' = None
 
     class Commands:
         @dataclass
@@ -24336,6 +24349,8 @@ class Messages(Cluster):
                         ClusterObjectFieldDescriptor(Label="duration", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="messageText", Tag=5, Type=str),
                         ClusterObjectFieldDescriptor(Label="responses", Tag=6, Type=typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]),
+                        ClusterObjectFieldDescriptor(Label="languageCode", Tag=7, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="messageURI", Tag=8, Type=typing.Optional[str]),
                     ])
 
             messageID: bytes = b""
@@ -24345,6 +24360,8 @@ class Messages(Cluster):
             duration: typing.Union[Nullable, uint] = NullValue
             messageText: str = ""
             responses: typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]] = None
+            languageCode: typing.Optional[str] = None
+            messageURI: typing.Optional[str] = None
 
         @dataclass
         class CancelMessagesRequest(ClusterCommand):
@@ -24394,6 +24411,38 @@ class Messages(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
 
             value: typing.List[bytes] = field(default_factory=lambda: [])
+
+        @dataclass
+        class SupportedLanguageCodes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000097
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[str]])
+
+            value: typing.Optional[typing.List[str]] = None
+
+        @dataclass
+        class SupportedMimeTypes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000097
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[str]])
+
+            value: typing.Optional[typing.List[str]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -24538,6 +24587,29 @@ class Messages(Cluster):
             responseID: typing.Union[None, Nullable, uint] = None
             reply: typing.Union[None, Nullable, str] = None
             futureMessagesPreference: typing.Union[Nullable, Messages.Enums.FutureMessagePreferenceEnum] = NullValue
+
+        @dataclass
+        class MessageNotPresented(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000097
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="messageID", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="removedFromQueue", Tag=1, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            messageID: bytes = b""
+            removedFromQueue: bool = False
+            fabricIndex: uint = 0
 
 
 @dataclass

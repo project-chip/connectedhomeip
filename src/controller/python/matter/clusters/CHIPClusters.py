@@ -6482,6 +6482,8 @@ class ChipClusters:
                     "duration": "int",
                     "messageText": "str",
                     "responses": "MessageResponseOptionStruct",
+                    "languageCode": "str",
+                    "messageURI": "str",
                 },
             },
             0x00000001: {
@@ -6503,6 +6505,18 @@ class ChipClusters:
                 "attributeName": "ActiveMessageIDs",
                 "attributeId": 0x00000001,
                 "type": "bytes",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "SupportedLanguageCodes",
+                "attributeId": 0x00000002,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "SupportedMimeTypes",
+                "attributeId": 0x00000003,
+                "type": "str",
                 "reportable": True,
             },
             0x0000FFF8: {

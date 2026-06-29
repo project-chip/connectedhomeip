@@ -3057,6 +3057,12 @@ static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
     case Attributes::ActiveMessageIDs::Id: {
         return YES;
     }
+    case Attributes::SupportedLanguageCodes::Id: {
+        return YES;
+    }
+    case Attributes::SupportedMimeTypes::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

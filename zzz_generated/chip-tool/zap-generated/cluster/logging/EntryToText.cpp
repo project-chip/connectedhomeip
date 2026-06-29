@@ -2440,6 +2440,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Messages";
         case chip::app::Clusters::Messages::Attributes::ActiveMessageIDs::Id:
             return "ActiveMessageIDs";
+        case chip::app::Clusters::Messages::Attributes::SupportedLanguageCodes::Id:
+            return "SupportedLanguageCodes";
+        case chip::app::Clusters::Messages::Attributes::SupportedMimeTypes::Id:
+            return "SupportedMimeTypes";
         case chip::app::Clusters::Messages::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Messages::Attributes::AcceptedCommandList::Id:
