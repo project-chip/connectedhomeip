@@ -42,9 +42,9 @@ public:
             VerifyOrDie(mFeatures.HasAny()); // At least one feature must be set.
         }
 
-        // This config will make the class fail when setting spin speed or number of rinses if a delegate is not set after construction.
-        explicit Config(BitFlags<LaundryWasherControls::Feature> features) :
-            mFeatures(features), mDelegate(nullptr)
+        // This config will make the class fail when setting spin speed or number of rinses if a delegate is not set after
+        // construction.
+        explicit Config(BitFlags<LaundryWasherControls::Feature> features) : mFeatures(features), mDelegate(nullptr)
         {
             VerifyOrDie(mFeatures.HasAny()); // At least one feature must be set.
         }
