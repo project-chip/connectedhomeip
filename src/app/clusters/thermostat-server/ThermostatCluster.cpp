@@ -510,7 +510,7 @@ void EnsureDeadband(const ConcreteAttributePath & attributePath)
     }
 }
 
-bool GetTrackedSetpointIndex(AttributeId attributeId, size_t & index)
+static bool GetTrackedSetpointIndex(AttributeId attributeId, size_t & index)
 {
     switch (attributeId)
     {
@@ -1208,7 +1208,11 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
                                                          std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit), DeadBandTemp);
             if (status == Status::Success)
             {
-                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedHeatingSetpoint);
+                int16_t currentValue = 0;
+                if (OccupiedHeatingSetpoint::Get(endpoint, &currentValue) == Status::Success)
+                {
+                    gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, currentValue);
+                }
             }
             return status;
         }
@@ -1226,7 +1230,11 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
                                                          std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit), DeadBandTemp);
             if (status == Status::Success)
             {
-                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedCoolingSetpoint);
+                int16_t currentValue = 0;
+                if (OccupiedCoolingSetpoint::Get(endpoint, &currentValue) == Status::Success)
+                {
+                    gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, currentValue);
+                }
             }
             return status;
         }
@@ -1244,7 +1252,11 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
                                                          std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit), DeadBandTemp);
             if (status == Status::Success)
             {
-                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedHeatingSetpoint);
+                int16_t currentValue = 0;
+                if (UnoccupiedHeatingSetpoint::Get(endpoint, &currentValue) == Status::Success)
+                {
+                    gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, currentValue);
+                }
             }
             return status;
         }
@@ -1261,7 +1273,11 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
                                                          std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit), DeadBandTemp);
             if (status == Status::Success)
             {
-                gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedCoolingSetpoint);
+                int16_t currentValue = 0;
+                if (UnoccupiedCoolingSetpoint::Get(endpoint, &currentValue) == Status::Success)
+                {
+                    gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, currentValue);
+                }
             }
             return status;
         }
