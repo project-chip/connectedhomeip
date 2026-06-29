@@ -19,9 +19,9 @@
  * @file wifi_config.h
  * @brief Matter SiWx Wi-Fi device configuration.
  *
- * Configuration is built from a base value, then optional parameters are applied:
+ * Configuration is built from a default value, then optional parameters are applied:
  *
- *   config = MatterWifiGetBaseDeviceConfiguration();
+ *   config = MatterWifiGetDefaultDeviceConfiguration();
  *   MatterWifiApplyOptionalDeviceConfiguration(&config);
  *
  * Include ble_config.h before this header.
@@ -33,9 +33,15 @@
 #include "sl_wifi_constants.h"
 #include "sl_wifi_device.h"
 
+#ifndef REGION_CODE
+#define REGION_CODE US
+#endif // !REGION_CODE
+
 #if (SL_SI91X_ACX_MODULE == 1)
+#define REGION_CODE_BITMAP IGNORE_REGION
 #define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_INTERNAL_SWITCH
 #else
+#define REGION_CODE_BITMAP REGION_CODE
 #define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
 #endif // SL_SI91X_ACX_MODULE
 
@@ -45,34 +51,13 @@
 #define SL_SI91X_CLK SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1)
 #endif // USE_BYPASS_CLOCK
 
-#ifndef REGION_CODE
-#define REGION_CODE US
-#endif // !REGION_CODE
-
-#ifdef SL_SI91X_ACX_MODULE
-#define REGION_CODE_BITMAP IGNORE_REGION
-#else
-#define REGION_CODE_BITMAP REGION_CODE
-#endif
-
-#ifdef SLI_SI917
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
-    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_CLK | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV | FRONT_END_SWITCH_CTRL |              \
-     SL_SI91X_EXT_FEAT_IEEE_80211W)
-#else
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
-#endif // SLI_SI917
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-sl_wifi_device_configuration_t MatterWifiGetBaseDeviceConfiguration(void);
-void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
 sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void);
-void MatterWifiSetDeviceConfiguration(const sl_wifi_device_configuration_t * configuration);
-const sl_wifi_device_configuration_t * MatterWifiGetDeviceConfiguration(void);
-sl_status_t SiWxPlatformInit(const sl_wifi_device_configuration_t * configuration);
+void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
+sl_status_t SiWxPlatformInit(void);
 
 #ifdef __cplusplus
 }

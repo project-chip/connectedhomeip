@@ -43,12 +43,6 @@ extern "C" {
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
-#if SL_MBEDTLS_USE_TINYCRYPT
-#include "sl_si91x_constants.h"
-#include "sl_si91x_trng.h"
-#else
-#include <psa/crypto.h>
-#endif // SL_MBEDTLS_USE_TINYCRYPT
 
 #include <sl_net.h>
 #include <sl_net_constants.h>
@@ -435,8 +429,7 @@ void WifiInterfaceImpl::MatterWifiTask(void * arg)
     WifiPlatformEvent event;
     sl_status_t status = SL_STATUS_OK;
 
-    sl_wifi_device_configuration_t configuration = MatterWifiGetDefaultDeviceConfiguration();
-    status                                     = SiWxPlatformInit(&configuration);
+    status = SiWxPlatformInit();
     VerifyOrReturn(status == SL_STATUS_OK,
                    ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%lx", static_cast<uint32_t>(status)));
 
@@ -470,11 +463,11 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    const sl_wifi_device_configuration_t * deviceConfiguration = MatterWifiGetDeviceConfiguration();
-    VerifyOrReturnError(deviceConfiguration != nullptr, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(DeviceLayer, "Wi-Fi device configuration is not set"));
+    // The device configuration must be fully built before sl_net_init, which consumes it.
+    sl_wifi_device_configuration_t deviceConfiguration = MatterWifiGetDefaultDeviceConfiguration();
+    MatterWifiApplyOptionalDeviceConfiguration(&deviceConfiguration);
 
-    status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, deviceConfiguration, &wifi_client_context, nullptr);
+    status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &deviceConfiguration, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
 
     // Create Sempaphore for scan completion

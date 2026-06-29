@@ -26,24 +26,21 @@ extern "C" {
 #include "sl_si91x_driver.h"
 #include "sl_si91x_types.h"
 #include "sl_wifi.h"
+#if SL_MBEDTLS_USE_TINYCRYPT
+#include "sl_si91x_constants.h"
+#include "sl_si91x_trng.h"
+#else
+#include <psa/crypto.h>
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 
 #if SLI_SI91X_MCU_INTERFACE
 #include "rsi_wisemcu_hardware_setup.h"
 #endif // SLI_SI91X_MCU_INTERFACE
 
-#if SL_MBEDTLS_USE_TINYCRYPT
-#include "sl_si91x_trng.h"
-#endif // SL_MBEDTLS_USE_TINYCRYPT
-
 extern WfxRsi_t wfx_rsi;
 
-namespace {
-sl_wifi_device_configuration_t sWifiDeviceConfiguration;
-bool sWifiDeviceConfigurationSet = false;
-} // namespace
-
-sl_wifi_device_configuration_t MatterWifiGetBaseDeviceConfiguration(void)
+sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void)
 {
     return {
         .boot_option = LOAD_NWP_FW,
@@ -52,12 +49,12 @@ sl_wifi_device_configuration_t MatterWifiGetBaseDeviceConfiguration(void)
         .region_code = REGION_CODE_BITMAP,
         .boot_config = { .oper_mode                  = SL_SI91X_CLIENT_MODE,
                          .coex_mode                  = 0,
-                         .feature_bit_map            = SL_SI91X_FEAT_SECURITY_OPEN,
+                         .feature_bit_map            = SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_WPS_DISABLE,
                          .tcp_ip_feature_bit_map     = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT |
                                                         SL_SI91X_TCP_IP_FEAT_SSL | SL_SI91X_TCP_IP_FEAT_BYPASS |
                                                         SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
                          .custom_feature_bit_map     = SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID,
-                         .ext_custom_feature_bit_map = RSI_EXT_CUSTOM_FEATURE_BIT_MAP,
+                         .ext_custom_feature_bit_map = SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_CLK | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV | FRONT_END_SWITCH_CTRL | SL_SI91X_EXT_FEAT_IEEE_80211W,
                          .bt_feature_bit_map         = 0,
                          .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENTION_VALID,
                          .ble_feature_bit_map        = 0,
@@ -73,12 +70,9 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
         return;
     }
 
-#ifdef SLI_SI91X_MCU_INTERFACE
-    configuration->boot_config.feature_bit_map |= SL_SI91X_FEAT_WPS_DISABLE;
-#else
-    configuration->boot_config.feature_bit_map |=
-        (SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1);
-#endif
+#ifndef SLI_SI91X_MCU_INTERFACE
+    configuration->boot_config.feature_bit_map |= SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1 | SL_SI91X_FEAT_HOST_TO_DEV_ULP_GPIO_1;
+#endif // SLI_SI91X_MCU_INTERFACE
 
 #ifdef ipv6_FEATURE_REQUIRED
     configuration->boot_config.tcp_ip_feature_bit_map |=
@@ -131,34 +125,9 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
 #endif
 }
 
-sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void)
-{
-    sl_wifi_device_configuration_t configuration = MatterWifiGetBaseDeviceConfiguration();
-    MatterWifiApplyOptionalDeviceConfiguration(&configuration);
-    return configuration;
-}
-
-void MatterWifiSetDeviceConfiguration(const sl_wifi_device_configuration_t * configuration)
-{
-    if (configuration == nullptr)
-    {
-        return;
-    }
-
-    sWifiDeviceConfiguration    = *configuration;
-    sWifiDeviceConfigurationSet = true;
-}
-
-const sl_wifi_device_configuration_t * MatterWifiGetDeviceConfiguration(void)
-{
-    return sWifiDeviceConfigurationSet ? &sWifiDeviceConfiguration : nullptr;
-}
-
-sl_status_t SiWxPlatformInit(const sl_wifi_device_configuration_t * configuration)
+sl_status_t SiWxPlatformInit(void)
 {
     sl_status_t status = SL_STATUS_OK;
-
-    MatterWifiSetDeviceConfiguration(configuration);
 
 #ifdef SLI_SI91X_MCU_INTERFACE
     uint8_t xtal_enable = 1;
