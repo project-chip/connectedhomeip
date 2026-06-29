@@ -35,26 +35,10 @@ DataModel::ActionReturnStatus LaundryWasherControlsCluster::ReadAttribute(const 
         return encoder.Encode(mFeatures);
     case SpinSpeeds::Id:
         return ReadSpinSpeeds(request.path, encoder);
-    case SpinSpeedCurrent::Id: {
-        CHIP_ERROR err = SpinSpeedIndexValidity(mSpinSpeedCurrent);
-        if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
-        {
-            // Fallback to null when reading.
-            return encoder.EncodeNull();
-        }
-        ReturnErrorOnFailure(err);
+    case SpinSpeedCurrent::Id:
         return encoder.Encode(mSpinSpeedCurrent);
-    }
-    case NumberOfRinses::Id: {
-        CHIP_ERROR err = NumberOfRinsesValidity(mNumberOfRinses);
-        if (err == CHIP_IM_GLOBAL_STATUS(InvalidInState))
-        {
-            // Fallback to default value when reading.
-            return encoder.Encode(NumberOfRinsesEnum::kNone);
-        }
-        ReturnErrorOnFailure(err);
+    case NumberOfRinses::Id:
         return encoder.Encode(mNumberOfRinses);
-    }
     case SupportedRinses::Id:
         return ReadSupportedRinses(request.path, encoder);
     default:
@@ -124,13 +108,16 @@ CHIP_ERROR LaundryWasherControlsCluster::SetNumberOfRinses(NumberOfRinsesEnum nu
 
 CHIP_ERROR LaundryWasherControlsCluster::SpinSpeedIndexValidity(const DataModel::Nullable<uint8_t> & spinSpeedCurrent)
 {
-    char buffer[kMaxSpinSpeedLength];
-    MutableCharSpan dummy(buffer);
     if (spinSpeedCurrent.IsNull())
     {
         return CHIP_NO_ERROR;
     }
+
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(spinSpeedCurrent.Value() < kMaxSpinSpeedsLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    char buffer[kMaxSpinSpeedLength];
+    MutableCharSpan dummy(buffer);
     CHIP_ERROR err = mDelegate->GetSpinSpeedAtIndex(spinSpeedCurrent.Value(), dummy);
     VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     return err;
@@ -138,6 +125,7 @@ CHIP_ERROR LaundryWasherControlsCluster::SpinSpeedIndexValidity(const DataModel:
 
 CHIP_ERROR LaundryWasherControlsCluster::NumberOfRinsesValidity(NumberOfRinsesEnum numberOfRinses)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_IM_GLOBAL_STATUS(InvalidInState));
     NumberOfRinsesEnum supportedRinse;
     for (size_t i = 0; i < kMaxSupportedRinsesLength && mDelegate->GetSupportedRinseAtIndex(i, supportedRinse) == CHIP_NO_ERROR;
          ++i)
@@ -152,6 +140,7 @@ CHIP_ERROR LaundryWasherControlsCluster::NumberOfRinsesValidity(NumberOfRinsesEn
 
 CHIP_ERROR LaundryWasherControlsCluster::ReadSpinSpeeds(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; i < kMaxSpinSpeedsLength; i++)
         {
@@ -171,6 +160,7 @@ CHIP_ERROR LaundryWasherControlsCluster::ReadSpinSpeeds(const ConcreteAttributeP
 
 CHIP_ERROR LaundryWasherControlsCluster::ReadSupportedRinses(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; i < kMaxSupportedRinsesLength; i++)
         {

@@ -36,60 +36,17 @@ constexpr size_t kLaundryWasherControlsMaxClusterCount =
 
 LazyRegisteredServerCluster<LaundryWasherControlsCluster> gServers[kLaundryWasherControlsMaxClusterCount];
 
-// We will use this to be able to set some values got from `Accessors::GetDefault` functions without failing, since the cluster will
-// check the values to be valid using the delegate. After this the delegate will be set to the default delegate, which will make all
-// subsequent `.Set*()` calls and write requests on the cluster to fail. Which will enforces the user to set a custom delegate
-// before using the cluster.
-struct AlwaysSuccessDelegate : public LaundryWasherControls::Delegate
-{
-    CHIP_ERROR GetSpinSpeedAtIndex(size_t, MutableCharSpan & spinSpeed) override
-    {
-        spinSpeed.reduce_size(0);
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR GetSupportedRinseAtIndex(size_t, NumberOfRinsesEnum & numberOfRinses) override
-    {
-        numberOfRinses = NumberOfRinsesEnum::kNone;
-        return CHIP_NO_ERROR;
-    }
-};
-AlwaysSuccessDelegate gAlwaysSuccessDelegate;
-
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         BitFlags<Feature> features(featureMap);
-        LaundryWasherControlsCluster::Config config(features, gAlwaysSuccessDelegate);
+        LaundryWasherControlsCluster::Config config(features);
 
-        auto & server = gServers[clusterInstanceIndex];
-        server.Create(endpointId, config);
+        gServers[clusterInstanceIndex].Create(endpointId, config);
 
-        // Set values from ember storage.
-        if (features.Has(Feature::kSpin))
-        {
-            DataModel::Nullable<uint8_t> spinSpeedCurrent;
-            if (SpinSpeedCurrent::GetDefault(endpointId, spinSpeedCurrent) == Status::Success)
-            {
-                LogErrorOnFailure(server.Cluster().SetSpinSpeedCurrent(spinSpeedCurrent));
-            }
-        }
-
-        if (features.Has(Feature::kRinse))
-        {
-            NumberOfRinsesEnum numberOfRinses;
-            if (NumberOfRinses::GetDefault(endpointId, &numberOfRinses) == Status::Success)
-            {
-                LogErrorOnFailure(server.Cluster().SetNumberOfRinses(numberOfRinses));
-            }
-        }
-
-        // Set the delegate to a default delegate, which will make all `.Set*()` calls and write requests on the cluster to fail.
-        // This enforces the user to set a custom delegate before using the cluster.
-        server.Cluster().SetDelegate(LaundryWasherControls::Delegate::DefaultInstance());
-
-        return server.Registration();
+        return gServers[clusterInstanceIndex].Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
@@ -139,25 +96,30 @@ namespace chip::app::Clusters::LaundryWasherControls {
 
 namespace LaundryWasherControlsServer {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+// Delegate should be valid until cluster on the endpoint is destroyed. This will probably happen at the end of the program.
+void SetDelegate(EndpointId endpoint, Delegate & delegate)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
     if (cluster != nullptr)
     {
-        cluster->SetDelegate(*delegate);
+        cluster->SetDelegate(delegate);
+    }
+    else
+    {
+        ChipLogError(Zcl, "LaundryWasherControls cluster on endpoint %d not found", endpoint);
     }
 }
 
 CHIP_ERROR SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
     auto cluster = FindClusterOnEndpoint(endpointId);
-    return cluster != nullptr ? cluster->SetSpinSpeedCurrent(spinSpeedCurrent) : CHIP_ERROR_INVALID_ARGUMENT;
+    return cluster != nullptr ? cluster->SetSpinSpeedCurrent(spinSpeedCurrent) : CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
 {
     auto cluster = FindClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     spinSpeedCurrent = cluster->GetSpinSpeedCurrent();
     return CHIP_NO_ERROR;
 }
@@ -165,13 +127,13 @@ CHIP_ERROR GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_
 CHIP_ERROR SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
 {
     auto cluster = FindClusterOnEndpoint(endpointId);
-    return cluster != nullptr ? cluster->SetNumberOfRinses(newNumberOfRinses) : CHIP_ERROR_INVALID_ARGUMENT;
+    return cluster != nullptr ? cluster->SetNumberOfRinses(newNumberOfRinses) : CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
 {
     auto cluster = FindClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     numberOfRinses = cluster->GetNumberOfRinses();
     return CHIP_NO_ERROR;
 }

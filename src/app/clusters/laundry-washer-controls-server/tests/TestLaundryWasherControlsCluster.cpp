@@ -278,8 +278,8 @@ TEST_F(TestLaundryWasherControlsCluster, TestSetDelegate)
     LaundryWasherControlsCluster::Config configWithDefaultDelegate{ BitFlags<Feature>(Feature::kSpin, Feature::kRinse) };
     LaundryWasherControlsCluster cluster(kTestEndpointId, configWithDefaultDelegate);
 
-    // Default delegate returns CHIP_ERROR_PROVIDER_LIST_EXHAUSTED for all indexes, so writing any value should fail with error
-    // besides `Null` for spinSpeeds.
+    // If delegate is not set, writing to `spinSpeedCurrent` and `numberOfRinses` should fail.
+    // Expect for writing `Null` to `spinSpeedCurrent`.
     EXPECT_EQ(cluster.SetSpinSpeedCurrent(DataModel::NullNullable), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetSpinSpeedCurrent(0), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     EXPECT_EQ(cluster.SetNumberOfRinses(NumberOfRinsesEnum::kNone), CHIP_IM_GLOBAL_STATUS(InvalidInState));

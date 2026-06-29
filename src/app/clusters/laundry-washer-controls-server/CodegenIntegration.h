@@ -24,11 +24,12 @@ namespace chip::app::Clusters::LaundryWasherControls {
 namespace LaundryWasherControlsServer {
 
 /**
- * Set the default delegate of laundry washer server at endpoint x
+ * Set the delegate of laundry washer server at endpoint x
  * @param endpoint ID of the endpoint
- * @param delegate The default delegate at the endpoint
+ * @param delegate The delegate at the endpoint
+ * @note This function can be called only after Server::Init is called
  */
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+void SetDelegate(EndpointId endpoint, Delegate & delegate);
 
 /**
  * API to set/get the SpinSpeedCurrent attribute

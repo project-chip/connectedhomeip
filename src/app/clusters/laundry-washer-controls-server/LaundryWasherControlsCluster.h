@@ -41,9 +41,13 @@ public:
         {
             VerifyOrDie(mFeatures.HasAny()); // At least one feature must be set.
         }
+
+        // This config will make the class fail when setting spin speed or number of rinses if a delegate is not set after construction.
         explicit Config(BitFlags<LaundryWasherControls::Feature> features) :
-            Config(features, LaundryWasherControls::Delegate::DefaultInstance())
-        {}
+            mFeatures(features), mDelegate(nullptr)
+        {
+            VerifyOrDie(mFeatures.HasAny()); // At least one feature must be set.
+        }
 
         BitFlags<LaundryWasherControls::Feature> GetFeatures() const { return mFeatures; }
         LaundryWasherControls::Delegate * GetDelegate() const { return mDelegate; }
@@ -66,11 +70,27 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    void SetDelegate(LaundryWasherControls::Delegate & delegate) { mDelegate = &delegate; }
+    // Delegate should be valid until the cluster is destroyed.
+    void SetDelegate(LaundryWasherControls::Delegate & delegate)
+    {
+        mDelegate = &delegate;
+
+        // delegate change implies change in these attributes.
+        NotifySpinSpeedsAttributeChanged();
+        NotifySupportedRinsesAttributeChanged();
+    }
     CHIP_ERROR SetSpinSpeedCurrent(const DataModel::Nullable<uint8_t> & spinSpeedCurrent);
     CHIP_ERROR SetNumberOfRinses(LaundryWasherControls::NumberOfRinsesEnum numberOfRinses);
     DataModel::Nullable<uint8_t> GetSpinSpeedCurrent() const { return mSpinSpeedCurrent; }
     LaundryWasherControls::NumberOfRinsesEnum GetNumberOfRinses() const { return mNumberOfRinses; }
+
+    // Notify the data model that the SpinSpeeds attribute has changed.
+    // This is expected to be called when the delegate will return a different value for any index of the SpinSpeeds attribute.
+    void NotifySpinSpeedsAttributeChanged() { NotifyAttributeChanged(LaundryWasherControls::Attributes::SpinSpeeds::Id); }
+
+    // Notify the data model that the SupportedRinses attribute has changed.
+    // This is expected to be called when the delegate will return a different value for any index of the SupportedRinses attribute.
+    void NotifySupportedRinsesAttributeChanged() { NotifyAttributeChanged(LaundryWasherControls::Attributes::SupportedRinses::Id); }
 
 private:
     CHIP_ERROR SpinSpeedIndexValidity(const DataModel::Nullable<uint8_t> & spinSpeedCurrent);
