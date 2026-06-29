@@ -334,7 +334,13 @@ class PlatformMergeBot:
         if ValidationCheck.CI not in self.skip_checks:
             ci_passed = self._has_ci_passed(pr, commit)
 
-        is_ready = not missing_approvals and not unresolved_threads and ci_passed
+        is_mergeable = pr.mergeable
+        is_ready = (
+            not missing_approvals
+            and not unresolved_threads
+            and ci_passed
+            and is_mergeable is True
+        )
 
         if not is_ready:
             log.info(
@@ -342,7 +348,12 @@ class PlatformMergeBot:
                 pr.number,
             )
             self.post_eligibility_comment(
-                pr, active_groups, missing_approvals, unresolved_threads, ci_passed
+                pr,
+                active_groups,
+                missing_approvals,
+                unresolved_threads,
+                ci_passed,
+                is_mergeable,
             )
             return
 
@@ -543,6 +554,7 @@ class PlatformMergeBot:
         missing_approvals: dict[str, PlatformGroup],
         unresolved_threads: list[dict],
         ci_passed: bool,
+        mergeable: bool | None,
     ) -> None:
         """Posts or updates a comment stating the auto-merge status of the PR."""
         # Generate comment body first so we can compare it
@@ -567,7 +579,7 @@ class PlatformMergeBot:
                 comment_body += f"    * `{glob}`\n"
 
         comment_body += "\n### Merge Requirements Status\n"
-        if not missing_approvals and not unresolved_threads and ci_passed:
+        if not missing_approvals and not unresolved_threads and ci_passed and mergeable is True:
             comment_body += "✅ **All checks passed. PR is ready for merge.**\n"
         else:
             comment_body += "⚠️ **PR is not ready to merge yet:**\n"
@@ -589,6 +601,13 @@ class PlatformMergeBot:
                 comment_body += "- ✅ All CI status and check suites passed.\n"
             else:
                 comment_body += "- ❌ CI checks are pending or failed.\n"
+
+            if mergeable is True:
+                comment_body += "- ✅ No merge conflicts.\n"
+            elif mergeable is False:
+                comment_body += "- ❌ PR has merge conflicts (resolve conflicts before merge).\n"
+            else:
+                comment_body += "- ⚠️ Mergeability state is computing on GitHub.\n"
 
         bot_comments = self._find_bot_comments(pr)
         if bot_comments:
