@@ -29,9 +29,9 @@ ChimeDevice::ChimeDevice(TimerDelegate & timerDelegate, Span<const Sound> sounds
     mSounds(sounds)
 {}
 
-CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -44,7 +44,7 @@ CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
 
 void ChimeDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mChimeCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mChimeCluster.Cluster()));

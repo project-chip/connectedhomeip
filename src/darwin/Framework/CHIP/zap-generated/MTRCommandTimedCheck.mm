@@ -1160,6 +1160,15 @@ static BOOL CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(AttributeId a
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommissioningProxyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommissioningProxy;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -1478,6 +1487,15 @@ static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId
 static BOOL CommandNeedsTimedInvokeInSampleMEICluster(AttributeId aAttributeId)
 {
     using namespace Clusters::SampleMei;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInTestHiddenManufacturerSpecificCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TestHiddenManufacturerSpecific;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1839,6 +1857,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ThreadNetworkDirectory::Id: {
         return CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(commandID);
     }
+    case Clusters::CommissioningProxy::Id: {
+        return CommandNeedsTimedInvokeInCommissioningProxyCluster(commandID);
+    }
     case Clusters::WakeOnLan::Id: {
         return CommandNeedsTimedInvokeInWakeOnLANCluster(commandID);
     }
@@ -1937,6 +1958,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::SampleMei::Id: {
         return CommandNeedsTimedInvokeInSampleMEICluster(commandID);
+    }
+    case Clusters::TestHiddenManufacturerSpecific::Id: {
+        return CommandNeedsTimedInvokeInTestHiddenManufacturerSpecificCluster(commandID);
     }
     default: {
         return NO;

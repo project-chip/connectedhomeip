@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 
 ESP32DimmableLightDevice::ESP32DimmableLightDevice(const Context & context) :
-    DimmableLightDevice(*this, *this, *this, *this, context)
+    DimmableLightDevice(context, { .onOff = *this, .levelControl = *this, .effect = *this, .identify = *this })
 {
     mLED.Init();
 }
@@ -86,21 +86,21 @@ DataModel::ActionReturnStatus ESP32DimmableLightDevice::TriggerDyingLight(OnOff:
 
 // IdentifyDelegate
 
-void ESP32DimmableLightDevice::OnIdentifyStart(IdentifyCluster & cluster)
+void ESP32DimmableLightDevice::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: Identify START");
     mLED.Blink(500);
     StartBlinkTimer();
 }
 
-void ESP32DimmableLightDevice::OnIdentifyStop(IdentifyCluster & cluster)
+void ESP32DimmableLightDevice::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: Identify STOP");
     StopBlinkTimer();
     mLED.Set(mLED.IsTurnedOn());
 }
 
-void ESP32DimmableLightDevice::OnTriggerEffect(IdentifyCluster & cluster)
+void ESP32DimmableLightDevice::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 {
     ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: TriggerEffect");
     mLED.Blink(250);

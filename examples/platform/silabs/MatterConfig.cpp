@@ -447,7 +447,7 @@ extern "C" void sl_matter_em4_check(uint32_t expected_idle_time_ms)
     if (chip::ICDConfigurationData::GetInstance().GetICDMode() == chip::ICDConfigurationData::ICDMode::LIT)
     {
         uint32_t idleDuration_seconds = chip::ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration().count();
-        uint32_t threshold_ms         = idleDuration_seconds * SL_EM4_THRESHOLD_PERCENTAGE * 10;
+        uint32_t threshold_ms         = idleDuration_seconds * SL_MATTER_EM4_THRESHOLD_PERCENTAGE * 10;
         // Since the sleep timer will never match the actual idle time (hardware latency, etc), we set a threshold
         // Multiply by 10 to converts seconds into milliseconds (e.g. 90% of 1000sec in ms is 1000*90*10 = 900000ms)
         if (expected_idle_time_ms >= threshold_ms)
