@@ -88,6 +88,13 @@ jobs:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
+            - name: Build ASAN libcxx
+              # Required by the asan-clang build variant: libc++/libc++abi/libunwind
+              # rebuilt with -fsanitize-address-field-padding=1 so intra-object writes
+              # that overflow class members are detected. Idempotent; first-time
+              # build is ~3-5 min.
+              run: ./scripts/run_in_build_env.sh "scripts/build/build_asan_libcxx.sh"
+
             - name: Set ASAN symbolizer path
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
 
@@ -818,6 +825,13 @@ jobs:
               with:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Build ASAN libcxx
+              # Required by the ipv6only-no-ble-no-wifi-asan variant: libc++/libc++abi/libunwind
+              # rebuilt with -fsanitize-address-field-padding=1 so intra-object writes
+              # that overflow class members are detected. Idempotent; first-time
+              # build is ~3-5 min.
+              run: ./scripts/run_in_build_env.sh "scripts/build/build_asan_libcxx.sh"
 
             - name: Setup and Restore Cache
               id: ccache
