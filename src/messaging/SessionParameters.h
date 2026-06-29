@@ -61,6 +61,7 @@ public:
         kMaxTCPPayloadSize        = 9,
     };
 
+    // From Table 7. "Supported Transport Mode Values" in chapter "Secure Channel".
     enum class SupportedTransport : uint16_t
     {
         kTcpClient = 0x02,

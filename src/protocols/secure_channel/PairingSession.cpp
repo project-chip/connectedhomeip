@@ -146,10 +146,10 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionPa
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     uint16_t supportedTransports = sessionParams.GetSupportedTransports();
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSupportedTransports), supportedTransports));
-
     if (supportedTransports != 0)
     {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSupportedTransports), supportedTransports));
+
         uint32_t maxTCPPayloadSize = sessionParams.GetMaxTCPPayloadSize();
         ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxTCPPayloadSize), maxTCPPayloadSize));
     }
