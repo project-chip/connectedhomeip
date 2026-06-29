@@ -125,7 +125,7 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
             # Wait until a device is found or the timeout expires
             try:
                 await asyncio.wait_for(found_event.wait(), timeout=MDNS_DISCOVERY_TIMEOUT)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             for browser in browsers:
