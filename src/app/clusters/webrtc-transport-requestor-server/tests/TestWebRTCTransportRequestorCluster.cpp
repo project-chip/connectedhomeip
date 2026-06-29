@@ -257,8 +257,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestHandleOfferWithICEServers)
     request.ICEServers.SetValue(DataModel::List<const Globals::Structs::ICEServerStruct::Type>(&iceServer, 1));
 
     auto result = tester.Invoke(request);
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
 
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
