@@ -34,22 +34,10 @@ AmbientContextSensingDelegate & AmbientContextSensingDelegate::AllocateInstance(
 }
 
 AmbientContextSensingDelegateImpl::AmbientContextSensingDelegateImpl()
+    : mAmbientContextTypeSupportedBuf{},
+      mPredictActivityBuf{},
+      mPredictedActivityList(mPredictActivityBuf, 0)
 {
-    for (auto & v : mAmbientContextTypeSupportedBuf)
-    {
-        v = SemanticTagType{};
-    }
-
-    for (auto & v : mPredictActivityBuf)
-    {
-        v = PredictActivity{};
-    }
-
-    mPredictedActivityList = Span<PredictActivity>(mPredictActivityBuf, 0);
-    for (auto & v : mAmbientContextTypeListUsed)
-    {
-        v = false;
-    }
 }
 
 SemanticTagType * AmbientContextSensingDelegateImpl::GetAmbientContextTypeSupportedBuf(size_t size)
@@ -94,37 +82,31 @@ CHIP_ERROR AmbientContextSensingDelegateImpl::SetPredictedActivity(const Span<Pr
     return CHIP_NO_ERROR;
 }
 
-DetectFuncResult AmbientContextSensingDelegateImpl::FindAndUseAvailableDetection()
+AmbientContextSensed * AmbientContextSensingDelegateImpl::AllocDetection()
 {
-    uint8_t i;
-    for (i = 0; i < kMaxSimultaneousDetectionLimit; i++)
+    for (uint8_t id = 0; id < kMaxSimultaneousDetectionLimit; id++)
     {
-        if (mAmbientContextTypeListUsed[i] == false)
+        if (mAmbientContextTypeList[id] == nullptr)
         {
-            break;
+            auto ptr = std::make_unique<AmbientContextSensed>();
+            ptr->id = id;
+            auto raw = ptr.get();
+            mAmbientContextTypeList[id] = std::move(ptr);
+            return raw;
         }
     }
-    if (i >= kMaxSimultaneousDetectionLimit)
-    {
-        // Can't find the available space
-        return { .res = CHIP_ERROR_INCORRECT_STATE };
-    }
-    mAmbientContextTypeListUsed[i] = true;
-
-    return { .res = CHIP_NO_ERROR, .id = i };
+    return nullptr;
 }
 
-AmbientContextSensed * AmbientContextSensingDelegateImpl::GetAllocedDetection(const uint8_t id)
+CHIP_ERROR AmbientContextSensingDelegateImpl::DelDetection(AmbientContextSensed * pitem)
 {
-    VerifyOrReturnError(id < kMaxSimultaneousDetectionLimit, nullptr);
-    VerifyOrReturnError(mAmbientContextTypeListUsed[id] == true, nullptr);
-    return &mAmbientContextTypeList[id];
-}
-
-CHIP_ERROR AmbientContextSensingDelegateImpl::DelDetection(const uint8_t & id)
-{
+    VerifyOrReturnError(pitem != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    const uint8_t id = pitem->id;
     VerifyOrReturnError(id < kMaxSimultaneousDetectionLimit, CHIP_ERROR_INVALID_ARGUMENT);
-    mAmbientContextTypeListUsed[id] = false;
+    VerifyOrReturnError((mAmbientContextTypeList[id] != nullptr) &&
+        (mAmbientContextTypeList[id].get() == pitem),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    mAmbientContextTypeList[id].reset();
 
     return CHIP_NO_ERROR;
 }

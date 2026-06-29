@@ -40,9 +40,8 @@ public:
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
     Span<PredictActivity> & GetPredictedActivity() override { return mPredictedActivityList; };
 
-    DetectFuncResult FindAndUseAvailableDetection() override;
-    AmbientContextSensed * GetAllocedDetection(const uint8_t id) override;
-    CHIP_ERROR DelDetection(const uint8_t & id) override;
+    AmbientContextSensed * AllocDetection() override;
+    CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;
 
     uint64_t GetEpochNow() override;
 
@@ -58,8 +57,7 @@ private:
     Span<PredictActivity> mPredictedActivityList;
 
     // From spec, constraint of AmbientContextType is 1 to SimultaneousDetectionLimit.
-    AmbientContextSensed mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
-    bool mAmbientContextTypeListUsed[kMaxSimultaneousDetectionLimit];
+    std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
 };
 
 } // namespace Clusters
