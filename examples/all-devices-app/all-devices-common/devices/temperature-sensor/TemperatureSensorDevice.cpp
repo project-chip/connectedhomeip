@@ -43,6 +43,8 @@ CHIP_ERROR TemperatureSensorDevice::Register(EndpointId endpoint, CodeDrivenData
 
     // Create the temperature measurement cluster
     TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributeSet{ 0 };
+    optionalAttributeSet.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
+    mTempConfig.tolerance = 50; // Set tolerance to 0.50 °C
     mTemperatureMeasurementCluster.Create(endpoint, optionalAttributeSet, mTempConfig);
     ReturnErrorOnFailure(provider.AddCluster(mTemperatureMeasurementCluster.Registration()));
 
