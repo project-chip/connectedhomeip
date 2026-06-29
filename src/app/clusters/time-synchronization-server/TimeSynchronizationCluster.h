@@ -100,6 +100,12 @@ public:
                                const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config,
                                Context context);
 
+    // mTimeZoneObj / mDstOffsetObj hold list views into this object's own mTz[] / mDst[] arrays, so a
+    // copy would alias the source's. Forbid copying explicitly (closes the still-open copy ctor; assign
+    // is already implicitly deleted).
+    TimeSynchronizationCluster(const TimeSynchronizationCluster &)             = delete;
+    TimeSynchronizationCluster & operator=(const TimeSynchronizationCluster &) = delete;
+
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
 
