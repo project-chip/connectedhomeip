@@ -17,7 +17,7 @@ static mtk_route_entry_t * find_route_entry(const mtk_route_entry_t * route_entr
     {
         if (s_route_entries[i].netif == NULL)
         {
-            break;
+            continue;
         }
         if (s_route_entries[i].netif == route_entry->netif && s_route_entries[i].prefix_length == route_entry->prefix_length &&
             memcmp(s_route_entries[i].gateway.addr, route_entry->gateway.addr, sizeof(route_entry->gateway.addr)) == 0 &&
@@ -89,16 +89,8 @@ int8_t mtk_route_table_remove_route_entry(mtk_route_entry_t * route_entry)
     {
         return -1;
     }
+    sys_untimeout(route_timeout_handler, route_entry);
     route_entry->netif = NULL;
-    for (mtk_route_entry_t * moved = route_entry; moved < &s_route_entries[LWIP_ARRAYSIZE(s_route_entries) - 1]; moved++)
-    {
-        *moved = *(moved + 1);
-        if (moved->netif == NULL)
-        {
-            break;
-        }
-    }
-    s_route_entries[LWIP_ARRAYSIZE(s_route_entries) - 1].netif = NULL;
     return 0;
 }
 
@@ -118,7 +110,23 @@ static inline bool is_better_route(const mtk_route_entry_t * lhs, const mtk_rout
 
 static inline bool route_match(const mtk_route_entry_t * route, const ip6_addr_t * dest)
 {
-    return memcmp(dest, route->prefix.addr, route->prefix_length / 8) == 0;
+    uint8_t bytes = route->prefix_length / 8;
+    uint8_t bits  = route->prefix_length % 8;
+    if (memcmp(dest->addr, route->prefix.addr, bytes) != 0)
+    {
+        return false;
+    }
+    if (bits > 0)
+    {
+        uint8_t mask      = (uint8_t)(0xFF << (8 - bits));
+        const uint8_t * d = (const uint8_t *) dest->addr;
+        const uint8_t * p = (const uint8_t *) route->prefix.addr;
+        if ((d[bytes] & mask) != (p[bytes] & mask))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 struct netif * lwip_hook_ip6_route(const ip6_addr_t * src, const ip6_addr_t * dest)
@@ -129,7 +137,7 @@ struct netif * lwip_hook_ip6_route(const ip6_addr_t * src, const ip6_addr_t * de
     {
         if (s_route_entries[i].netif == NULL)
         {
-            break;
+            continue;
         }
         if (route_match(&s_route_entries[i], dest) && is_better_route(&s_route_entries[i], route))
         {
@@ -155,7 +163,7 @@ const ip6_addr_t * lwip_hook_nd6_get_gw(struct netif * netif, const ip6_addr_t *
     {
         if (s_route_entries[i].netif == NULL)
         {
-            break;
+            continue;
         }
         if (s_route_entries[i].netif == netif && route_match(&s_route_entries[i], dest) &&
             is_better_route(&s_route_entries[i], route))
