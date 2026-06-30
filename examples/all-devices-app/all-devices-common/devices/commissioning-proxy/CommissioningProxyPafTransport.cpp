@@ -301,7 +301,7 @@ static void FailPendingPafConnect(PafConnectCtx * ctx, chip::Protocols::Interact
     // PAFTP endpoint the handshake created; otherwise it leaks from the 2-slot
     // pool until its own timer self-closes.  CloseEndPoint is a no-op if none.
     chip::WiFiPAF::WiFiPAFSession endpointSession{};
-    bool haveEndpoint                    = false;
+    bool haveEndpoint                     = false;
     chip::WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccDisc, key);
     if (pInfo != nullptr)
     {

@@ -171,7 +171,7 @@ void Report(const ScanResultEntry & result, CommissioningProxyCluster * cluster)
 
     uint16_t cacheTimeout =
         (cluster != nullptr) ? static_cast<uint16_t>(cluster->GetDelegate().GetCacheTimeout()) : kDefaultCacheTimeoutSecs;
-    auto expiresAt        = chip::System::SystemClock().GetMonotonicTimestamp() + chip::System::Clock::Seconds16(cacheTimeout);
+    auto expiresAt = chip::System::SystemClock().GetMonotonicTimestamp() + chip::System::Clock::Seconds16(cacheTimeout);
 
     auto it = sCache.find(key);
     if (it != sCache.end())
