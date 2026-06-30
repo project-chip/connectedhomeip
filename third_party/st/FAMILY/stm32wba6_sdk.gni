@@ -16,30 +16,32 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("//build_overrides/freertos.gni")
-import("//build_overrides/mbedtls.gni")
 import("//build_overrides/lwip.gni")
+import("//build_overrides/mbedtls.gni")
 
 declare_args() {
-
   # CSMSIS PATHS #
   cmsis = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS"
 
   ## PATHS FOR STM32WB FAMILY ##
   stm32_wb_sdk = "${chip_root}/third_party/st/STM32CubeWBA/Drivers"
-  stm32_wb_hal = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/STM32WBAxx_HAL_Driver"
+  stm32_wb_hal =
+      "${chip_root}/third_party/st/STM32CubeWBA/Drivers/STM32WBAxx_HAL_Driver"
   cmsis_device_wb = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS/Device/ST/STM32WBAxx"
-  stm32_wpan_sdk = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/STM32_WPAN"
+  stm32_wpan_sdk =
+      "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/STM32_WPAN"
   stm32_wpan_sdk_patch = "${chip_root}/third_party/st/STM32CubeWBAPatch"
-  stm32_config_files = "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
+  stm32_config_files =
+      "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
   stm32_system = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Modules"
   stm32_system_interfaces = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Interfaces"
   stm32_system_Config = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Config"
   stm32_mbedtls_alt = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/mbedtls_alt/interfaces/patterns"
 
-  ## PATHS FOR FREERTOS ##  
+  ## PATHS FOR FREERTOS ##
   freertos_st = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/Third_Party/FreeRTOS/Source"
-  mbedtls_st = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/Third_Party/mbedtls"
-  
+  mbedtls_st =
+      "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/Third_Party/mbedtls"
 }
 
 SOURCES = [
@@ -81,13 +83,12 @@ SOURCES = [
   "${stm32_wb_hal}/Src/stm32wbaxx_hal.c",
   "${stm32_wb_hal}/Src/stm32wbaxx_ll_tim.c",
 
-  
-  #WPAN 
+  #WPAN
   "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_cs.c",
   "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_dp_slp.c",
   "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_intf.c",
   "${stm32_wpan_sdk}/link_layer/ll_sys/src/ll_sys_startup.c",
-  
+
   "${stm32_wpan_sdk}/thread/openthread/platform/alarm.c",
   "${stm32_wpan_sdk}/thread/openthread/platform/diag.c",
   "${stm32_wpan_sdk}/thread/openthread/platform/entropy_renamed.c",
@@ -96,7 +97,7 @@ SOURCES = [
   "${stm32_wpan_sdk}/thread/openthread/platform/spi-stubs.c",
   "${stm32_wpan_sdk}/thread/openthread/platform/system.c",
   "${stm32_wpan_sdk}/ble/svc/Src/svc_ctl.c",
-  
+
   "${stm32_mbedtls_alt}/aes_alt.c",
   "${stm32_mbedtls_alt}/ecdh_alt.c",
   "${stm32_mbedtls_alt}/ecdsa_alt.c",
@@ -106,7 +107,7 @@ SOURCES = [
   "${stm32_mbedtls_alt}/gcm_alt.c",
   "${stm32_mbedtls_alt}/rsa_alt.c",
   "${stm32_mbedtls_alt}/sha256_alt.c",
-  
+
   #FREERTOS
   "${stm32_config_files}/FreeRTOSConfig.h",
   "${freertos_st}/CMSIS_RTOS_V2/cmsis_os2.c",
@@ -120,7 +121,7 @@ SOURCES = [
   "${freertos_st}/stream_buffer.c",
   "${freertos_st}/tasks.c",
   "${freertos_st}/timers.c",
-  
+
   #SYSTEM
   "${stm32_system}/adc_ctrl.c",
   "${stm32_system}/app_sys.c",
@@ -161,101 +162,100 @@ SOURCES = [
   "${stm32_system_Config}/Flash/simple_nvm_arbiter_conf.c",
   "${stm32_system_Config}/LowPower/peripheral_init.c",
   "${stm32_system_Config}/LowPower/user_low_power_config.c",
-  
-  #mbedtls
-      "${mbedtls_st}/library/aes.c",
-      "${mbedtls_st}/library/aesce.c",
-      "${mbedtls_st}/library/aesni.c",
-      "${mbedtls_st}/library/aria.c",
-      "${mbedtls_st}/library/asn1parse.c",
-      "${mbedtls_st}/library/asn1write.c",
-      "${mbedtls_st}/library/base64.c",
-      "${mbedtls_st}/library/bignum.c",
-      "${mbedtls_st}/library/bignum_core.c",
-      "${mbedtls_st}/library/bignum_mod_raw.c",
-      "${mbedtls_st}/library/block_cipher.c",
-      "${mbedtls_st}/library/camellia.c",
-      "${mbedtls_st}/library/ccm.c",
-      "${mbedtls_st}/library/chacha20.c",
-      "${mbedtls_st}/library/chachapoly.c",
-      "${mbedtls_st}/library/cipher.c",
-      "${mbedtls_st}/library/cipher_wrap.c",
-      "${mbedtls_st}/library/cmac.c",
-      "${mbedtls_st}/library/constant_time.c",
-      "${mbedtls_st}/library/ctr_drbg.c",
-      "${mbedtls_st}/library/debug.c",
-      "${mbedtls_st}/library/des.c",
-      "${mbedtls_st}/library/dhm.c",
-      "${mbedtls_st}/library/ecdh.c",
-      "${mbedtls_st}/library/ecdsa.c",
-      "${mbedtls_st}/library/ecjpake.c",
-      "${mbedtls_st}/library/ecp.c",
-      "${mbedtls_st}/library/ecp_curves.c",
-      "${mbedtls_st}/library/ecp_curves_new.c",
-      "${mbedtls_st}/library/entropy_poll.c",
-      "${mbedtls_st}/library/entropy.c",
-      "${mbedtls_st}/library/error.c",
-      "${mbedtls_st}/library/gcm.c",
-      "${mbedtls_st}/library/hkdf.c",
-      "${mbedtls_st}/library/hmac_drbg.c",
-      "${mbedtls_st}/library/lmots.c",
-      "${mbedtls_st}/library/lms.c",
-      "${mbedtls_st}/library/md.c",
-      "${mbedtls_st}/library/md5.c",
-      "${mbedtls_st}/library/memory_buffer_alloc.c",
-      "${mbedtls_st}/library/mps_reader.c",
-      "${mbedtls_st}/library/mps_trace.c",
-      "${mbedtls_st}/library/net_sockets.c",
-      "${mbedtls_st}/library/nist_kw.c",
-      "${mbedtls_st}/library/oid.c",
-      "${mbedtls_st}/library/padlock.c",
-      "${mbedtls_st}/library/pem.c",
-      "${mbedtls_st}/library/pk_ecc.c",
-      "${mbedtls_st}/library/pk.c",
-      "${mbedtls_st}/library/pk_wrap.c",
-      "${mbedtls_st}/library/pkcs5.c",
-      "${mbedtls_st}/library/pkcs7.c",
-      "${mbedtls_st}/library/pkparse.c",
-      "${mbedtls_st}/library/pkwrite.c",
-      "${mbedtls_st}/library/platform.c",
-      "${mbedtls_st}/library/platform_util.c",
-      "${mbedtls_st}/library/poly1305.c",
-      "${mbedtls_st}/library/ripemd160.c",
-      "${mbedtls_st}/library/rsa_alt_helpers.c",
-      "${mbedtls_st}/library/rsa.c",
-      "${mbedtls_st}/library/sha1.c",
-      "${mbedtls_st}/library/sha256.c",
-      "${mbedtls_st}/library/sha3.c",
-      "${mbedtls_st}/library/sha512.c",
-      "${mbedtls_st}/library/ssl_cache.c",
-      "${mbedtls_st}/library/ssl_ciphersuites.c",
-      "${mbedtls_st}/library/ssl_client.c",
-      "${mbedtls_st}/library/ssl_cookie.c",
-      "${mbedtls_st}/library/ssl_debug_helpers_generated.c",
-      "${mbedtls_st}/library/ssl_msg.c",
-      "${mbedtls_st}/library/ssl_ticket.c",
-      "${mbedtls_st}/library/ssl_tls.c",
-      "${mbedtls_st}/library/ssl_tls12_client.c",
-      "${mbedtls_st}/library/ssl_tls12_server.c",
-      "${mbedtls_st}/library/ssl_tls13_client.c",
-      "${mbedtls_st}/library/ssl_tls13_generic.c",
-      "${mbedtls_st}/library/ssl_tls13_keys.c",
-      "${mbedtls_st}/library/ssl_tls13_server.c",
-      "${mbedtls_st}/library/threading.c",
-      "${mbedtls_st}/library/timing.c",
-      "${mbedtls_st}/library/version_features.c",
-      "${mbedtls_st}/library/version.c",
-      "${mbedtls_st}/library/x509.c",
-      "${mbedtls_st}/library/x509_create.c",
-      "${mbedtls_st}/library/x509_crl.c",
-      "${mbedtls_st}/library/x509_crt.c",
-      "${mbedtls_st}/library/x509_csr.c",
-      "${mbedtls_st}/library/x509write_crt.c",
-      "${mbedtls_st}/library/x509write_csr.c",
-      "${mbedtls_st}/library/x509write.c",
 
+  #mbedtls
+  "${mbedtls_st}/library/aes.c",
+  "${mbedtls_st}/library/aesce.c",
+  "${mbedtls_st}/library/aesni.c",
+  "${mbedtls_st}/library/aria.c",
+  "${mbedtls_st}/library/asn1parse.c",
+  "${mbedtls_st}/library/asn1write.c",
+  "${mbedtls_st}/library/base64.c",
+  "${mbedtls_st}/library/bignum.c",
+  "${mbedtls_st}/library/bignum_core.c",
+  "${mbedtls_st}/library/bignum_mod_raw.c",
+  "${mbedtls_st}/library/block_cipher.c",
+  "${mbedtls_st}/library/camellia.c",
+  "${mbedtls_st}/library/ccm.c",
+  "${mbedtls_st}/library/chacha20.c",
+  "${mbedtls_st}/library/chachapoly.c",
+  "${mbedtls_st}/library/cipher.c",
+  "${mbedtls_st}/library/cipher_wrap.c",
+  "${mbedtls_st}/library/cmac.c",
+  "${mbedtls_st}/library/constant_time.c",
+  "${mbedtls_st}/library/ctr_drbg.c",
+  "${mbedtls_st}/library/debug.c",
+  "${mbedtls_st}/library/des.c",
+  "${mbedtls_st}/library/dhm.c",
+  "${mbedtls_st}/library/ecdh.c",
+  "${mbedtls_st}/library/ecdsa.c",
+  "${mbedtls_st}/library/ecjpake.c",
+  "${mbedtls_st}/library/ecp.c",
+  "${mbedtls_st}/library/ecp_curves.c",
+  "${mbedtls_st}/library/ecp_curves_new.c",
+  "${mbedtls_st}/library/entropy_poll.c",
+  "${mbedtls_st}/library/entropy.c",
+  "${mbedtls_st}/library/error.c",
+  "${mbedtls_st}/library/gcm.c",
+  "${mbedtls_st}/library/hkdf.c",
+  "${mbedtls_st}/library/hmac_drbg.c",
+  "${mbedtls_st}/library/lmots.c",
+  "${mbedtls_st}/library/lms.c",
+  "${mbedtls_st}/library/md.c",
+  "${mbedtls_st}/library/md5.c",
+  "${mbedtls_st}/library/memory_buffer_alloc.c",
+  "${mbedtls_st}/library/mps_reader.c",
+  "${mbedtls_st}/library/mps_trace.c",
+  "${mbedtls_st}/library/net_sockets.c",
+  "${mbedtls_st}/library/nist_kw.c",
+  "${mbedtls_st}/library/oid.c",
+  "${mbedtls_st}/library/padlock.c",
+  "${mbedtls_st}/library/pem.c",
+  "${mbedtls_st}/library/pk_ecc.c",
+  "${mbedtls_st}/library/pk.c",
+  "${mbedtls_st}/library/pk_wrap.c",
+  "${mbedtls_st}/library/pkcs5.c",
+  "${mbedtls_st}/library/pkcs7.c",
+  "${mbedtls_st}/library/pkparse.c",
+  "${mbedtls_st}/library/pkwrite.c",
+  "${mbedtls_st}/library/platform.c",
+  "${mbedtls_st}/library/platform_util.c",
+  "${mbedtls_st}/library/poly1305.c",
+  "${mbedtls_st}/library/ripemd160.c",
+  "${mbedtls_st}/library/rsa_alt_helpers.c",
+  "${mbedtls_st}/library/rsa.c",
+  "${mbedtls_st}/library/sha1.c",
+  "${mbedtls_st}/library/sha256.c",
+  "${mbedtls_st}/library/sha3.c",
+  "${mbedtls_st}/library/sha512.c",
+  "${mbedtls_st}/library/ssl_cache.c",
+  "${mbedtls_st}/library/ssl_ciphersuites.c",
+  "${mbedtls_st}/library/ssl_client.c",
+  "${mbedtls_st}/library/ssl_cookie.c",
+  "${mbedtls_st}/library/ssl_debug_helpers_generated.c",
+  "${mbedtls_st}/library/ssl_msg.c",
+  "${mbedtls_st}/library/ssl_ticket.c",
+  "${mbedtls_st}/library/ssl_tls.c",
+  "${mbedtls_st}/library/ssl_tls12_client.c",
+  "${mbedtls_st}/library/ssl_tls12_server.c",
+  "${mbedtls_st}/library/ssl_tls13_client.c",
+  "${mbedtls_st}/library/ssl_tls13_generic.c",
+  "${mbedtls_st}/library/ssl_tls13_keys.c",
+  "${mbedtls_st}/library/ssl_tls13_server.c",
+  "${mbedtls_st}/library/threading.c",
+  "${mbedtls_st}/library/timing.c",
+  "${mbedtls_st}/library/version_features.c",
+  "${mbedtls_st}/library/version.c",
+  "${mbedtls_st}/library/x509.c",
+  "${mbedtls_st}/library/x509_create.c",
+  "${mbedtls_st}/library/x509_crl.c",
+  "${mbedtls_st}/library/x509_crt.c",
+  "${mbedtls_st}/library/x509_csr.c",
+  "${mbedtls_st}/library/x509write_crt.c",
+  "${mbedtls_st}/library/x509write_csr.c",
+  "${mbedtls_st}/library/x509write.c",
 ]
-  
+
 INCLUDE_DIRS = [
   "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
   "${chip_root}/src/include/",
@@ -287,7 +287,7 @@ INCLUDE_DIRS = [
   "${stm32_wpan_sdk}/thread/openthread/config",
   "${stm32_wpan_sdk}/thread/openthread/platform",
   "${stm32_mbedtls_alt}/",
- 
+
   #SYSTEM
   "${stm32_system}/",
   "${stm32_system}/BasicAES",
@@ -308,8 +308,6 @@ INCLUDE_DIRS = [
   "${stm32_system_Config}/LowPower",
   "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/STM32_WPAN/Target",
 
-
-  
   #FREERTOS INCLUDES
   "${freertos_st}/include",
   "${stm32_config_files}/",
@@ -318,11 +316,11 @@ INCLUDE_DIRS = [
   "${freertos_st}/CMSIS_RTOS_V2",
   "${stm32_wb_sdk}/CMSIS/Include",
   "${stm32_wb_sdk}/CMSIS/RTOS2/Include",
-
 ]
 
 DEFINES = [
   "CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+
   #"CHIP_PLATFORM_CONFIG_INCLUDE=<CHIPPlatformConfig.h>",
   "CHIP_HAVE_CONFIG_H",
   "OPENTHREAD_PROJECT_CORE_CONFIG_FILE=<stm32wba-openthread-light-no-tcp-config.h>",
@@ -347,6 +345,5 @@ LIBS = [
   "${stm32_wpan_sdk}/ble/stack/lib/stm32wba_ble_stack_basic.a",
   "${stm32_wpan_sdk}/thread/openthread/openthread_lib/stm32wba_mtd_light_no_tcp_matter_lib.a",
 ]
-  
-FLAGS = [ 
-]
+
+FLAGS = []

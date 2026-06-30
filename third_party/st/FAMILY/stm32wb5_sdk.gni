@@ -16,23 +16,25 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("//build_overrides/freertos.gni")
-import("//build_overrides/mbedtls.gni")
 import("//build_overrides/lwip.gni")
+import("//build_overrides/mbedtls.gni")
 
 declare_args() {
-
   # CSMSIS PATHS #
   cmsis = "${chip_root}/third_party/st/STM32CubeWB/Drivers/CMSIS"
 
   ## PATHS FOR STM32WB FAMILY ##
   stm32_wb_sdk = "${chip_root}/third_party/st/STM32CubeWB/Drivers"
-  stm32_wb_hal = "${chip_root}/third_party/st/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver"
+  stm32_wb_hal =
+      "${chip_root}/third_party/st/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver"
   cmsis_device_wb = "${chip_root}/third_party/st/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx"
-  stm32_wpan_sdk = "${chip_root}/third_party/st/STM32CubeWB/Middlewares/ST/STM32_WPAN"
-  stm32_config_files = "${chip_root}/examples/platform/stm32/config_files/STM32WB5"
+  stm32_wpan_sdk =
+      "${chip_root}/third_party/st/STM32CubeWB/Middlewares/ST/STM32_WPAN"
+  stm32_config_files =
+      "${chip_root}/examples/platform/stm32/config_files/STM32WB5"
 
-  ## PATHS FOR FREERTOS ##  
-  freertos_st = "${chip_root}/third_party/st/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source" 
+  ## PATHS FOR FREERTOS ##
+  freertos_st = "${chip_root}/third_party/st/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source"
 }
 
 SOURCES = [
@@ -59,8 +61,8 @@ SOURCES = [
   "${stm32_wb_hal}/Src/stm32wbxx_hal_uart_ex.c",
   "${stm32_wb_hal}/Src/stm32wbxx_hal_uart.c",
   "${stm32_wb_hal}/Src/stm32wbxx_hal.c",
-  
-  #WPAN 
+
+  #WPAN
   "${stm32_wpan_sdk}/ble/core/auto/ble_events.c",
   "${stm32_wpan_sdk}/ble/core/auto/ble_gap_aci.c",
   "${stm32_wpan_sdk}/ble/core/auto/ble_gatt_aci.c",
@@ -125,7 +127,7 @@ SOURCES = [
   "${freertos_st}/tasks.c",
   "${freertos_st}/timers.c",
 ]
-  
+
 INCLUDE_DIRS = [
   "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
   "${chip_root}/src/include/",
@@ -155,15 +157,13 @@ INCLUDE_DIRS = [
   "${stm32_wpan_sdk}/thread/openthread/",
   "${stm32_wpan_sdk}/interface/patterns/ble-thread/tl/",
   "${stm32_wpan_sdk}/utilities/",
-  
+
   #FREERTOS INCLUDES
   "${freertos_st}/include",
   "${stm32_config_files}/",
   "${freertos_st}/portable/GCC/ARM_CM4F",
   "${freertos_st}/portable",
   "${freertos_st}/CMSIS_RTOS_V2",
-
-
 ]
 
 DEFINES = [
@@ -180,6 +180,5 @@ DEFINES = [
 LIBS = [
   # add any .o/.a library here
 ]
-  
-FLAGS = [ 
-]
+
+FLAGS = []
