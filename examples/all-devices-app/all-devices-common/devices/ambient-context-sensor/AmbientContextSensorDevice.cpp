@@ -36,11 +36,8 @@ CHIP_ERROR AmbientContextSensorDevice::Register(chip::EndpointId endpoint, CodeD
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // Update the config with the actual endpoint ID
-    mConfig.mEndpointId = endpoint;
-
     // Create the ambient context sensing cluster
-    mAmbientContextSensingCluster.Create(mConfig);
+    mAmbientContextSensingCluster.Create(endpoint, mConfig);
     ReturnErrorOnFailure(provider.AddCluster(mAmbientContextSensingCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

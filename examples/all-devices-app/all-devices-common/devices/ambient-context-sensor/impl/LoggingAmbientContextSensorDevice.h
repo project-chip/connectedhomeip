@@ -23,10 +23,6 @@
 
 namespace chip::app::Clusters::AmbientContextSensing {
 
-// Use the smaller value for not consuming too much resources
-constexpr uint8_t kMaxACTypeSupported_s   = 20;
-constexpr uint8_t kMaxPredictedActivity_s = 3;
-
 /**
  * @brief A basic implementation of an Ambient Context Sensor Device.
  *
@@ -44,20 +40,29 @@ public:
     SemanticTagType * GetAmbientContextTypeSupportedBuf(size_t size) override;
     CHIP_ERROR SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList) override;
     Span<PredictActivity> & GetPredictedActivity() override { return mPredictedActivityList; };
-    DetectFuncResult FindAndUseAvailableDetection() override;
-    AmbientContextSensed * GetAllocedDetection(const uint8_t id) override;
-    CHIP_ERROR DelDetection(const uint8_t & id) override;
+    AmbientContextSensed * AllocDetection() override;
+    CHIP_ERROR DelDetection(AmbientContextSensed * pitem) override;
     uint64_t GetEpochNow() override;
 
-private:
-    SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupported_s];
+    // Use the smaller value for not consuming too much resources
+    static constexpr uint8_t kMaxACTypeSupportedForLog   = 20;
+    static constexpr uint8_t kMaxPredictedActivityForLog = 3;
+    static constexpr BitFlags<Feature> kFeatureAllForLog {
+        Feature::kHumanActivity,
+        Feature::kObjectCounting,
+        Feature::kObjectIdentification,
+        Feature::kSoundIdentification,
+        Feature::kPredictedActivity
+    };
 
-    PredictActivity mPredictActivityBuf[kMaxPredictedActivity_s];
+private:
+    SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupportedForLog];
+
+    PredictActivity mPredictActivityBuf[kMaxPredictedActivityForLog];
     Span<PredictActivity> mPredictedActivityList;
 
     // From spec, constraint of AmbientContextType is 1 to SimultaneousDetectionLimit.
-    AmbientContextSensed mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
-    bool mAmbientContextTypeListUsed[kMaxSimultaneousDetectionLimit];
+    std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];
 };
 
 } // namespace chip::app::Clusters::AmbientContextSensing

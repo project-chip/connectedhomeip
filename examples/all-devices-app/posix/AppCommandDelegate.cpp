@@ -351,7 +351,7 @@ public:
         }
         Span<AmbientContextSensing::Structs::PredictedActivityStruct::Type> predictedActivityArray =
             Span<AmbientContextSensing::Structs::PredictedActivityStruct::Type>(predictArrayBuf.get(), predictArray.size());
-        TEMPORARY_RETURN_IGNORED cluster->SetPredictedActivity(predictedActivityArray);
+        LogErrorOnFailure(cluster->SetPredictedActivity(predictedActivityArray));
     }
 };
 
@@ -377,7 +377,7 @@ public:
             return;
         }
         objCount = static_cast<uint16_t>(json["ObjectCount"].asUInt());
-        TEMPORARY_RETURN_IGNORED cluster->SetObjectCount(objCount);
+        LogErrorOnFailure(cluster->SetObjectCount(objCount));
     }
 };
 

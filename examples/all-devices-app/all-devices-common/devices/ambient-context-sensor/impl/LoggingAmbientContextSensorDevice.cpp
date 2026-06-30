@@ -21,16 +21,10 @@
 
 namespace chip::app::Clusters::AmbientContextSensing {
 
-constexpr uint32_t g_kFeatures_all = static_cast<uint32_t>(Feature::kHumanActivity) |
-    static_cast<uint32_t>(Feature::kObjectCounting) | static_cast<uint32_t>(Feature::kObjectIdentification) |
-    static_cast<uint32_t>(Feature::kSoundIdentification) | static_cast<uint32_t>(Feature::kPredictedActivity);
-
 LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelegate & timerDelegate) :
     AmbientContextSensorDevice(
-        // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
-        // when Register() is called by the application with a valid endpoint ID.
-        AmbientContextSensingConfig{ kInvalidEndpointId, *this, timerDelegate }
-            .WithFeatures(AmbientContextSensing::Feature(g_kFeatures_all))
+        AmbientContextSensingConfig{ *this, timerDelegate }
+            .WithFeatures(AmbientContextSensing::Feature(kFeatureAllForLog))
             .WithHoldTime(10,
                           {
                               .holdTimeMin     = 1,
@@ -38,8 +32,7 @@ LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelega
                               .holdTimeDefault = 10,
                           }),
         timerDelegate),
-    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0),
-    mAmbientContextTypeListUsed{}
+    mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0)
 {}
 
 CHIP_ERROR LoggingAmbientContextSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -56,13 +49,13 @@ void LoggingAmbientContextSensorDevice::Unregister(CodeDrivenDataModelProvider &
 // AmbientContextSensingDelegate implementation
 SemanticTagType * LoggingAmbientContextSensorDevice::GetAmbientContextTypeSupportedBuf(size_t size)
 {
-    VerifyOrReturnError(size <= kMaxACTypeSupported_s, nullptr);
+    VerifyOrReturnError(size <= kMaxACTypeSupportedForLog, nullptr);
     return mAmbientContextTypeSupportedBuf;
 }
 
 CHIP_ERROR LoggingAmbientContextSensorDevice::SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList)
 {
-    VerifyOrReturnError(predictedActivityList.size() <= kMaxPredictedActivity_s, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(predictedActivityList.size() <= kMaxPredictedActivityForLog, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Copy the input predicted activity to local array
     for (size_t i = 0; i < predictedActivityList.size(); i++)
@@ -96,37 +89,30 @@ CHIP_ERROR LoggingAmbientContextSensorDevice::SetPredictedActivity(const Span<Pr
     return CHIP_NO_ERROR;
 }
 
-DetectFuncResult LoggingAmbientContextSensorDevice::FindAndUseAvailableDetection()
+AmbientContextSensed * LoggingAmbientContextSensorDevice::AllocDetection()
 {
-    uint8_t i;
-    for (i = 0; i < kMaxSimultaneousDetectionLimit; i++)
+    for (uint8_t id = 0; id < kMaxSimultaneousDetectionLimit; id++)
     {
-        if (mAmbientContextTypeListUsed[i] == false)
+        if (mAmbientContextTypeList[id] == nullptr)
         {
-            break;
+            auto ptr                    = std::make_unique<AmbientContextSensed>();
+            ptr->id                     = id;
+            auto raw                    = ptr.get();
+            mAmbientContextTypeList[id] = std::move(ptr);
+            return raw;
         }
     }
-    if (i >= kMaxSimultaneousDetectionLimit)
-    {
-        // Can't find the available space
-        return { .res = CHIP_ERROR_INCORRECT_STATE };
-    }
-    mAmbientContextTypeListUsed[i] = true;
-
-    return { .res = CHIP_NO_ERROR, .id = i };
+    return nullptr;
 }
 
-AmbientContextSensed * LoggingAmbientContextSensorDevice::GetAllocedDetection(const uint8_t id)
+CHIP_ERROR LoggingAmbientContextSensorDevice::DelDetection(AmbientContextSensed * pitem)
 {
-    VerifyOrReturnError(id < kMaxSimultaneousDetectionLimit, nullptr);
-    VerifyOrReturnError(mAmbientContextTypeListUsed[id] == true, nullptr);
-    return &mAmbientContextTypeList[id];
-}
-
-CHIP_ERROR LoggingAmbientContextSensorDevice::DelDetection(const uint8_t & id)
-{
+    VerifyOrReturnError(pitem != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    const uint8_t id = pitem->id;
     VerifyOrReturnError(id < kMaxSimultaneousDetectionLimit, CHIP_ERROR_INVALID_ARGUMENT);
-    mAmbientContextTypeListUsed[id] = false;
+    VerifyOrReturnError((mAmbientContextTypeList[id] != nullptr) && (mAmbientContextTypeList[id].get() == pitem),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    mAmbientContextTypeList[id].reset();
 
     return CHIP_NO_ERROR;
 }
