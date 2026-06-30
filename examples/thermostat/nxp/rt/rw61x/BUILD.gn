@@ -107,6 +107,10 @@ rt_sdk("sdk") {
 
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+    # CONFIG_CHIP_CRYPTO_PSA=1 is required to propagate the PSA crypto backend
+    # selection to the Matter port layer. It is consumed by NXP Matter port files
+    # (e.g. src/platform/nxp) to conditionally compile PSA-based crypto paths.
+    "CONFIG_CHIP_CRYPTO_PSA=1",
   ]
 }
 
@@ -125,6 +129,18 @@ rt_executable("thermostat") {
 
   if (chip_enable_thread) {
     defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
+    # CONFIG_CHIP_OPENTHREAD_FTD is propagated here so that it is visible to
+    # mbedtls/config/nxp_matter_mbedtls_config.h, which gates OpenThread FTD
+    # specific mbedTLS configuration on this macro.
+    defines += [ "CONFIG_CHIP_OPENTHREAD_FTD" ]
+  }
+
+  if (chip_enable_wifi)
+  {
+    # CONFIG_CHIP_WIFI is propagated here so that it is visible to
+    # mbedtls/config/nxp_matter_mbedtls_config.h, which gates Wi-Fi specific
+    # mbedTLS configuration on this macro.
+    defines += [ "CONFIG_CHIP_WIFI" ]
   }
 
   if (chip_with_diag_logs_demo) {
@@ -201,7 +217,6 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_callbacks/include",
     "${common_example_dir}/app_task/include",
     "${common_example_dir}/factory_data/include",
-    "${common_example_dir}/operational_keystore/include",
   ]
 
   sources += [
@@ -211,18 +226,15 @@ rt_executable("thermostat") {
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
-    "${common_example_dir}/operational_keystore/source/OperationalKeystoreS50.cpp",
   ]
 
   deps = [
     "${chip_root}/examples/${app_common_folder}",
     "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
-
-  # Operational key secure storage
-  defines += [ "CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE=1" ]
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
