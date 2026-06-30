@@ -56,7 +56,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET || CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <bl_route_hook.h>
+#include "bflb_route_hook.h"
 #include <lwip/netif.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_LAYER_TARGET_BL602
 #include <wifi_mgmr_ext.h>
@@ -95,7 +95,7 @@ Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericT
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 chip::app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BflbEthernetDriver::GetInstance()));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 namespace {
@@ -135,7 +135,7 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
             chip::app::DnssdServer::Instance().StartServer();
 
-            bl_route_hook_init();
+            bflb_route_hook_init();
 
             TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
                 chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), OTAConfig::InitOTARequestorHandler, nullptr);
@@ -301,7 +301,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;

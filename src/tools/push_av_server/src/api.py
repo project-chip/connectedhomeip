@@ -14,7 +14,7 @@ from cryptography.hazmat.primitives import serialization
 from fastapi import APIRouter, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from models import SignClientCertificate, SupportedIngestInterface, TrackNameRequest
+from models import ExpectedTrackNamesRequest, SignClientCertificate, SupportedIngestInterface
 from streams import StreamService
 from utils import templates_path
 from validation import MatterCMAFUploadValidator
@@ -52,7 +52,8 @@ class PushAvServer:
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}.{ext}", self.handle_upload, methods=["PUT"])
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_download, methods=["GET"])
-        self.router.add_api_route("/streams/{stream_id}/trackName", self.update_track_name, methods=["POST"], status_code=202)
+        self.router.add_api_route("/streams/{stream_id}/expectedTrackNames",
+                                  self.update_expected_track_names, methods=["POST"], status_code=202)
 
         # Certificate routes
         self.router.add_api_route("/certs", self.list_certs, methods=["GET"], status_code=200)
@@ -210,13 +211,13 @@ class PushAvServer:
         """Download a media segment."""
         return FileResponse(self.stream_service.wd.path("streams", str(stream_id), file_path))
 
-    async def update_track_name(self, stream_id: int, track_request: TrackNameRequest):
-        """Update the track_name for a given stream_id."""
+    async def update_expected_track_names(self, stream_id: int, request: ExpectedTrackNamesRequest):
+        """Update the expected_track_names for a given stream_id."""
         stream = self.stream_service.get_stream(stream_id)
         if stream is None:
             raise HTTPException(status_code=400, detail="Stream ID doesn't exist")
 
-        stream.track_name = track_request.track_name
+        stream.expected_track_names = request.expected_track_names
         self.stream_service.update_stream(stream)
 
     # Certificate API endpoints

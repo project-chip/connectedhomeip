@@ -51,9 +51,9 @@ IncreasingPressureSensorDevice::~IncreasingPressureSensorDevice()
 }
 
 CHIP_ERROR IncreasingPressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                    EndpointId parentId)
+                                                    EndpointComposition composition)
 {
-    ReturnErrorOnFailure(PressureSensorDevice::Register(endpoint, provider, parentId));
+    ReturnErrorOnFailure(PressureSensorDevice::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
     mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();

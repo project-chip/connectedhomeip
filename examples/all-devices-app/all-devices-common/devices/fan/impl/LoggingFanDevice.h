@@ -16,39 +16,19 @@
 
 #pragma once
 
-#include <app/clusters/fan-control-server/fan-control-delegate.h>
-#include <app/clusters/on-off-server/OnOffDelegate.h>
-#include <devices/fan/FanDevice.h>
+#include <devices/capabilities/fan-load/impl/LoggingFanLoadDevice.h>
 
 namespace chip {
 namespace app {
 
-/**
- * @brief An implementation of a Fan Device.
- *
- * This class serves as a simple example. It implements FanControlDelegate and, when
- * `FanDevice::Context::includeOnOffCluster` is true (default), OnOffDelegate. It logs messages when
- * fan actions occur (On/Off callbacks, step, fan drive state, rock/wind, airflow direction).
- */
-class LoggingFanDevice : public Clusters::OnOffDelegate, public Clusters::FanControl::Delegate, public FanDevice
+class LoggingFanDevice : public LoggingFanLoadDevice
 {
 public:
     LoggingFanDevice(const Context & context);
-    ~LoggingFanDevice() override;
+    ~LoggingFanDevice() override = default;
 
-    // FanControlDelegate
-
-    Protocols::InteractionModel::Status HandleStep(Clusters::FanControl::StepDirectionEnum aDirection, bool aWrap,
-                                                   bool aLowestOff) override;
-
-    void OnFanDriveStateChanged(const Clusters::FanControl::FanDriveState & newState) override;
-    void OnRockSettingChanged(BitMask<Clusters::FanControl::RockBitmap> newValue) override;
-    void OnWindSettingChanged(BitMask<Clusters::FanControl::WindBitmap> newValue) override;
-    void OnAirflowDirectionChanged(Clusters::FanControl::AirflowDirectionEnum newValue) override;
-
-    // OnOffDelegate
-    void OnOffStartup(bool on) override;
-    void OnOnOffChanged(bool on) override;
+protected:
+    LoggingFanDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context);
 };
 
 } // namespace app

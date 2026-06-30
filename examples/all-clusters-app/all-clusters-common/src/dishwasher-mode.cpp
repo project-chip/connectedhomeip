@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -102,7 +102,7 @@ void DishwasherMode::Shutdown()
     }
 }
 
-void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
@@ -111,7 +111,7 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gDishwasherModeInstance->Init();
 }
 
-void emberAfDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     if (gDishwasherModeInstance)

@@ -385,6 +385,9 @@ public class ClusterIDMapping {
         if (clusterId == ThreadNetworkDirectory.ID) {
             return new ThreadNetworkDirectory();
         }
+        if (clusterId == CommissioningProxy.ID) {
+            return new CommissioningProxy();
+        }
         if (clusterId == WakeOnLan.ID) {
             return new WakeOnLan();
         }
@@ -16869,6 +16872,221 @@ public class ClusterIDMapping {
                     }
                     public static GetOperationalDatasetCommandField value(int id) throws NoSuchFieldError {
                         for (GetOperationalDatasetCommandField field : GetOperationalDatasetCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class CommissioningProxy implements BaseCluster {
+        public static final long ID = 1109L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Transport(0L),
+            ScanMaxTime(1L),
+            MaxSessions(2L),
+            MaxCachedResults(3L),
+            NumCachedResults(4L),
+            CacheTimeout(5L),
+            CachedResults(6L),
+            WiFiBand(7L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ProxyConnectRequest(0L),
+            ProxyDisconnectRequest(2L),
+            ProxyScanRequest(3L),
+            ProxyBackGroundScanStartRequest(5L),
+            ProxyBackGroundScanStopRequest(6L),
+            ProxyMessageRequest(7L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum ProxyConnectRequestCommandField {Address(0),Transport(1),Discriminator(2),VendorID(3),ProductID(4),Timeout(5),WiFiBand(6),;
+                    private final int id;
+                    ProxyConnectRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProxyConnectRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (ProxyConnectRequestCommandField field : ProxyConnectRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ProxyDisconnectRequestCommandField {SessionID(0),;
+                    private final int id;
+                    ProxyDisconnectRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProxyDisconnectRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (ProxyDisconnectRequestCommandField field : ProxyDisconnectRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ProxyScanRequestCommandField {Transport(0),WiFiBands(1),;
+                    private final int id;
+                    ProxyScanRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProxyScanRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (ProxyScanRequestCommandField field : ProxyScanRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ProxyBackGroundScanStartRequestCommandField {Transport(0),Timeout(1),WiFiBands(2),;
+                    private final int id;
+                    ProxyBackGroundScanStartRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProxyBackGroundScanStartRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (ProxyBackGroundScanStartRequestCommandField field : ProxyBackGroundScanStartRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ProxyBackGroundScanStopRequestCommandField {Transport(0),WiFiBands(1),;
+                    private final int id;
+                    ProxyBackGroundScanStopRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProxyBackGroundScanStopRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (ProxyBackGroundScanStopRequestCommandField field : ProxyBackGroundScanStopRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ProxyMessageRequestCommandField {SessionID(0),ResponseTimeout(1),Message(2),;
+                    private final int id;
+                    ProxyMessageRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProxyMessageRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (ProxyMessageRequestCommandField field : ProxyMessageRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
