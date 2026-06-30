@@ -798,7 +798,11 @@ void InitModeSelect()
 
 void ApplicationInit()
 {
+#ifdef CONFIG_CHEF_SAMPLE_NAME
+    ChipLogProgress(NotSpecified, "Chef Application Init for sample: %s !!!", CONFIG_CHEF_SAMPLE_NAME);
+#else
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
+#endif
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();

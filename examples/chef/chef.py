@@ -720,7 +720,8 @@ def main() -> int:
                         set(CONFIG_DEVICE_PRODUCT_NAME \"{options.pname}\")
                         set(CONFIG_ENABLE_PW_RPC {"1" if options.do_rpc else "0"})
                         set(SAMPLE_NAME {options.sample_device_type_name})
-                        set(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING \"{sw_ver_string}\")"""))
+                        set(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING \"{sw_ver_string}\")
+                        add_compile_definitions(CONFIG_CHEF_SAMPLE_NAME=\"{options.sample_device_type_name}\")"""))
 
         if options.build_target == "esp32":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
@@ -768,6 +769,8 @@ def main() -> int:
             nrf_build_cmds.append(
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
             nrf_build_cmds.append(
+                f"-DCONFIG_CHEF_SAMPLE_NAME='\"{options.sample_device_type_name}\"'")
+            nrf_build_cmds.append(
                 "-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
             if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
                 nrf_build_cmds.append(
@@ -806,6 +809,8 @@ def main() -> int:
             efr32_cmd_args.append(f'{silabs_board}')
             efr32_cmd_args.append(
                 f'\'sample_name=\"{options.sample_device_type_name}\"\'')
+            efr32_cmd_args.append(
+                f'\'target_defines=[\"CONFIG_CHEF_SAMPLE_NAME=\\\"{options.sample_device_type_name}\\\"\"]\'')
             if sw_ver_string:
                 efr32_cmd_args.append(
                     f'\'chip_device_config_device_software_version_string=\"{sw_ver_string}\"\'')
@@ -840,6 +845,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_VENDOR_ID={options.vid}
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
+                        CHEF_FLAGS += -DCONFIG_CHEF_SAMPLE_NAME=\\"{options.sample_device_type_name}\\"
                         """
                     ))
                 if options.do_clean:
@@ -877,7 +883,8 @@ def main() -> int:
                 (f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
-                 f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
+                 f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\"", '
+                 f'"CONFIG_CHEF_SAMPLE_NAME=\\"{options.sample_device_type_name}\\""]'),
                 'chip_app_data_model_target = "//:chef-data-model"',
                 'shell_use_all_clusters_data_model = false',
             ])
