@@ -33,16 +33,14 @@ sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void)
         .boot_config = { .oper_mode                  = SL_SI91X_CLIENT_MODE,
                          .coex_mode                  = 0,
                          .feature_bit_map            = SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_WPS_DISABLE,
-                         .tcp_ip_feature_bit_map     = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT |
-                                                        SL_SI91X_TCP_IP_FEAT_SSL | SL_SI91X_TCP_IP_FEAT_BYPASS |
-                                                        SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
+                         .tcp_ip_feature_bit_map     = (SL_SI91X_TCP_IP_FEAT_BYPASS | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
                          .custom_feature_bit_map     = SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID,
                          .ext_custom_feature_bit_map = SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_CLK | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV | FRONT_END_SWITCH_CTRL | SL_SI91X_EXT_FEAT_IEEE_80211W,
                          .bt_feature_bit_map         = 0,
                          .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENTION_VALID,
                          .ble_feature_bit_map        = 0,
                          .ble_ext_feature_bit_map    = 0,
-                         .config_feature_bit_map     = SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP }
+                         .config_feature_bit_map     = SL_SI91X_ENABLE_ENHANCED_MAX_PSP }
     };
 }
 
@@ -55,6 +53,7 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
 
 #ifndef SLI_SI91X_MCU_INTERFACE
     configuration->boot_config.feature_bit_map |= SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1 | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE;
+    configuration->boot_config.config_feature_bit_map |= SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP;
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #ifdef ipv6_FEATURE_REQUIRED
@@ -98,10 +97,6 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
 #endif
         ;
 #endif // SLI_SI91X_ENABLE_BLE
-
-#if (defined A2DP_POWER_SAVE_ENABLE)
-    configuration->boot_config.ext_custom_feature_bit_map |= SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2);
-#endif
 
 #ifdef RSI_PROCESS_MAX_RX_DATA
     configuration->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_EXT_TCP_MAX_RECV_LENGTH;

@@ -390,7 +390,7 @@ sl_status_t SetWifiConfigurations()
  *
  * @return sl_wifi_system_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
  *                                        kHighPerformance: HIGH_PERFORMANCE
- *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE
+ *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE_LOW_LATENCY
  *                                        kDeepSleep: DEEP_SLEEP_WITH_RAM_RETENTION
  */
 sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
@@ -403,7 +403,7 @@ sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInte
         profile = HIGH_PERFORMANCE;
         break;
     case PowerSaveInterface::PowerSaveConfiguration::kConnectedSleep:
-        profile = ASSOCIATED_POWER_SAVE;
+        profile = ASSOCIATED_POWER_SAVE_LOW_LATENCY;
         break;
     case PowerSaveInterface::PowerSaveConfiguration::kDeepSleep:
         profile = DEEP_SLEEP_WITH_RAM_RETENTION;
