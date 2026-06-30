@@ -42,13 +42,9 @@ static_library("nxp_crypto_lib") {
   ]
 
   if (chip_device_platform != "linux") {
-    sources += [
-      "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
-    ]
+    sources += [ "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp" ]
   } else {
-    sources += [
-      "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack_MbedTLS.cpp",
-    ]
+    sources += [ "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack_MbedTLS.cpp" ]
   }
 
   if (chip_crypto != "psa") {

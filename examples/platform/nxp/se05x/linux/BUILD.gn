@@ -231,9 +231,7 @@ source_set("app-main") {
     "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt",
   ]
 
-  defines += [
-    "CONFIG_CHIP_SE05X=1",
-  ]
+  defines += [ "CONFIG_CHIP_SE05X=1" ]
 
   sources = [
     "../../../linux/AppMain.h",
