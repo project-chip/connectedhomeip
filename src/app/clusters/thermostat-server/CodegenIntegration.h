@@ -29,6 +29,15 @@ namespace Thermostat {
 /// nullptr if no cluster is registered there.
 ThermostatCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+namespace Attributes {
+
+namespace LocalTemperature {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, DataModel::Nullable<int16_t> value);
+} // namespace LocalTemperature
+
+} // namespace Attributes
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

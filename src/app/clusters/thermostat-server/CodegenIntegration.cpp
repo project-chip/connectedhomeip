@@ -207,7 +207,34 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
         gServers[index].Cluster().SetDelegate(delegate);
     }
 }
+namespace Attributes {
 
+namespace LocalTemperature {
+
+Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetLocalTemperature();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, DataModel::Nullable<int16_t> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetLocalTemperature(value);
+    return Status::Success;
+}
+
+} // namespace FanMode
+} // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
