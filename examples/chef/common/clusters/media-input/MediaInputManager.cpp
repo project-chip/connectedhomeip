@@ -16,6 +16,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <map>
 
@@ -108,6 +109,7 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
         if (inputData.index == index)
         {
             inputData.Rename(newName);
+            MatterReportingAttributeChangeCallback(mEndpoint, MediaInput::Id, MediaInput::Attributes::InputList::Id);
             return true;
         }
     }
