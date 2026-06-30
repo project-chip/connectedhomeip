@@ -841,6 +841,7 @@ keyset
 kGroup
 kInvalidCommandId
 KitProg
+Prog
 kManage
 kNewButton
 kNodeIdNotSpecified
@@ -850,6 +851,7 @@ kPAKEParameterError
 kPase
 kView
 KVS
+Kinesis
 kWindowNotOpen
 LabelList
 LabelStruct
@@ -1295,6 +1297,7 @@ recommanded
 Reconnection
 reconnections
 recurse
+reflash
 refrigeratoralarm
 regen
 registerAttributeAccessOverride

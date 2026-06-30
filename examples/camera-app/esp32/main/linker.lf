@@ -1,0 +1,7 @@
+[mapping:CHIP]
+archive: libCHIP.a
+entries:
+  if ESP_ALLOW_BSS_SEG_EXTERNAL_MEMORY = y:
+    * (extram_bss)
+  else:
+    * (default)
