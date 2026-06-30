@@ -301,7 +301,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         uint8_t * messageEnd       = (message->Start() + message->TotalLength());
 
         // Other fields such as message flags and session ID should exist in the header BEFORE the privacy fields,
-        // so they start of the privacy header must be strictly after the message start
+        // so the start of the privacy header must be strictly after the message start
         VerifyOrReturnError(privacyHeader > message->Start(), CHIP_ERROR_INTERNAL);
 
         // When the message extensions (MX) security flag is set, this indicates that there will be a message extensions
