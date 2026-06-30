@@ -47,13 +47,9 @@ public:
     // Use the smaller value for not consuming too much resources
     static constexpr uint8_t kMaxACTypeSupportedForLog   = 20;
     static constexpr uint8_t kMaxPredictedActivityForLog = 3;
-    static constexpr BitFlags<Feature> kFeatureAllForLog {
-        Feature::kHumanActivity,
-        Feature::kObjectCounting,
-        Feature::kObjectIdentification,
-        Feature::kSoundIdentification,
-        Feature::kPredictedActivity
-    };
+    static constexpr BitFlags<Feature> kFeatureAllForLog{ Feature::kHumanActivity, Feature::kObjectCounting,
+                                                          Feature::kObjectIdentification, Feature::kSoundIdentification,
+                                                          Feature::kPredictedActivity };
 
 private:
     SemanticTagType mAmbientContextTypeSupportedBuf[kMaxACTypeSupportedForLog];
