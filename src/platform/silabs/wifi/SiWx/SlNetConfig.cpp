@@ -15,10 +15,8 @@
  *    limitations under the License.
  */
 
-#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
-#include "ble_config.h"
-#endif // SLI_SI91X_ENABLE_BLE
 #include "SlNetConfig.h"
+#include "ble_config.h"
 
 #include <lib/support/CodeUtils.h>
 
@@ -68,6 +66,7 @@ void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configurati
 void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
 {
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+
     VerifyOrReturn(configuration != nullptr);
     configuration->boot_config.coex_mode = SL_SI91X_WLAN_BLE_MODE;
     configuration->boot_config.ext_custom_feature_bit_map |= SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE;
@@ -100,8 +99,8 @@ void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuratio
 #endif // RSI_BLE_DISABLE_CODED_PHY_FROM_HOST
 #if BLE_SIMPLE_GATT
         | SL_SI91X_BLE_GATT_INIT
-#endif
+#endif // BLE_SIMPLE_GATT
         ;
+
 #endif // SLI_SI91X_ENABLE_BLE
 }
-#endif // SLI_SI91X_ENABLE_BLE
