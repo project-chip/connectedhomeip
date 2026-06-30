@@ -66,10 +66,10 @@ template("stm32_sdk") {
   sdk_target_name = target_name
 
   slist_stm32_board =
-      read_file("${stm32_sdk_root}/FAMILY/BOARD/${stm32_board}_sdk.gn_helper",
+      read_file("${stm32_sdk_root}/FAMILY/BOARD/${stm32_board}_sdk.gni",
                 "scope")
   slist_stm32_family =
-      read_file("${stm32_sdk_root}/FAMILY/${stm32_family}_sdk.gn_helper",
+      read_file("${stm32_sdk_root}/FAMILY/${stm32_family}_sdk.gni",
                 "scope")
 
   config("${sdk_target_name}_config") {
