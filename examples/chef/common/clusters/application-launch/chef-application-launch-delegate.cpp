@@ -98,7 +98,8 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
         auto status = app->GetApplicationStatus();
         if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
             status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus ||
+            status == ApplicationBasic::ApplicationStatusEnum::kStopped)
         {
             app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kStopped);
             MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
