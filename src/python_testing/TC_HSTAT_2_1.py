@@ -52,6 +52,11 @@ log = logging.getLogger(__name__)
 
 
 class TC_HSTAT_2_1(MatterBaseTest):
+    def pics_TC_BOOLCFG_2_1(self) -> list[str]:
+        return [
+            "HSTAT.S",
+        ]
+
     def desc_TC_HSTAT_2_1(self) -> str:
         return "[TC-HSTAT-2.1] Primary functionality with DUT as Server
 
@@ -70,72 +75,72 @@ class TC_HSTAT_2_1(MatterBaseTest):
                 TestStep(6, "TH reads from the DUT the Step attribute.",
                             "Store the value as StepValue. " +
                             "StepValue is between 1 and (MaxSetpointValue - MinSetpointValue) inclusive. " +
-                            "StepValue is such that (MaxSetpointValue - MinSetpointValue) % value == 0."),
+                            "StepValue is such that (MaxSetpointValue - MinSetpointValue) % value == 0."),
                 TestStep(7, "Store the value as StepValue.",
                             "Store the value as SetpointValue. " +
                             "SetpointValue is between MinSetpointValue and MaxSetpointValue inclusive. " +
-                            "SetpointValue is such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
+                            "SetpointValue is such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
                 TestStep(8, "Store the value as SetpointValue.",
                             "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive."),
-                TestStep(9, "TH reads from the DUT the MistType attribute.",
+                TestStep(9, "TH reads from the DUT the MistType attribute.",
                             "Verify that the DUT response contains a value or 0 or 1"),
-                TestStep(10, "TH reads from the DUT the Continuous attribute.",
+                TestStep(10, "TH reads from the DUT the Continuous attribute.",
                              "Verify that the DUT response contains a value or True or False."),
                 TestStep(11, "Verify that the DUT response contains a value or True or False",
                              "Verify that the DUT response contains a value or True or False."),
-                TestStep(12, "TH reads from the DUT the Optimal attribute.",
+                TestStep(12, "TH reads from the DUT the Optimal attribute.",
                              "Verify that the DUT response contains a value or True or False"),
-                TestStep(13, "TH writes to the DUT the Mode attribute with a value of Off",
+                TestStep(13, "TH writes to the DUT the Mode attribute with a value of Off",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(14, "TH writes to the DUT the Mode attribute with a value of Humidifier"
+                TestStep(14, "TH writes to the DUT the Mode attribute with a value of Humidifier"
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(15, "TH reads from the DUT the Mode attribute.",
+                TestStep(15, "TH reads from the DUT the Mode attribute.",
                              "Verify that the DUT response contains Humidifier."),
-                TestStep(16, "TH reads from the DUT the SystemState attribute.",
+                TestStep(16, "TH reads from the DUT the SystemState attribute.",
                              "Verify that the DUT response contains Humidifying."),
-                TestStep(17, "TH writes to the DUT the Mode attribute with a value of Dehumidifier",
+                TestStep(17, "TH writes to the DUT the Mode attribute with a value of Dehumidifier",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(18, "TH reads from the DUT the Mode attribute.",
+                TestStep(18, "TH reads from the DUT the Mode attribute.",
                              "Verify that the DUT response contains Dehumidifier."),
-                TestStep(19, "TH reads from the DUT the SystemState attribute.",
+                TestStep(19, "TH reads from the DUT the SystemState attribute.",
                              "Verify that the DUT response contains Dehumidifying."),
-                TestStep(20, "TH writes to the DUT the Mode attribute with a value of Auto",
+                TestStep(20, "TH writes to the DUT the Mode attribute with a value of Auto",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(21, "TH writes to the DUT the Mode attribute with a value of FanOnly",
+                TestStep(21, "TH writes to the DUT the Mode attribute with a value of FanOnly",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(22, "TH reads from the DUT the SystemState attribute.",
+                TestStep(22, "TH reads from the DUT the SystemState attribute.",
                              "Verify that the DUT response contains Fan."),
-                TestStep(23, "TH writes to the DUT the Mode attribute with a value of Humidifier",
+                TestStep(23, "TH writes to the DUT the Mode attribute with a value of Humidifier",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(24, "TH writes to the DUT the Mode attribute with a value of Dehumidifier",
+                TestStep(24, "TH writes to the DUT the Mode attribute with a value of Dehumidifier",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(25, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue."
+                TestStep(25, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue."
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(26, "TH reads from the DUT the UserSetpoint attribute.",
+                TestStep(26, "TH reads from the DUT the UserSetpoint attribute.",
                              "Verify that the DUT response contains MinSetpointValue."),
-                TestStep(27, "TH writes to the DUT the UserSetpoint attribute with value MaxSetpointValue."
+                TestStep(27, "TH writes to the DUT the UserSetpoint attribute with value MaxSetpointValue."
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(28, "TH reads from the DUT the UserSetpoint attribute.",
+                TestStep(28, "TH reads from the DUT the UserSetpoint attribute.",
                              "Verify that the DUT response contains MaxSetpointValue."),
-                TestStep(29, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue + StepValue.",
+                TestStep(29, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue + StepValue.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(30, "TH reads from the DUT the UserSetpoint attribute.",
+                TestStep(30, "TH reads from the DUT the UserSetpoint attribute.",
                              "Verify that the DUT response contains MinSetpointValue + StepValue."),
-                TestStep(31, "TH reads from the DUT the Continuous attribute."
+                TestStep(31, "TH reads from the DUT the Continuous attribute."
                              "Store the value as ContState"),
-                TestStep(32, "TH writes to the DUT the Continuous attribute with a value of !ContState.",
+                TestStep(32, "TH writes to the DUT the Continuous attribute with a value of !ContState.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(33, "TH reads from the DUT the Continuous attribute.",
+                TestStep(33, "TH reads from the DUT the Continuous attribute.",
                              "Verify that the DUT response contains !ContState."),
-                TestStep(34, "TH writes to the DUT the Continuous attribute with a value of False.",
+                TestStep(34, "TH writes to the DUT the Continuous attribute with a value of False.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(35, "TH reads from the DUT the Sleep attribute.",
+                TestStep(35, "TH reads from the DUT the Sleep attribute.",
                              "Store the value as SleepState"),
-                TestStep(36, "TH writes to the DUT the Sleep attribute with a value of !SleepState.",
+                TestStep(36, "TH writes to the DUT the Sleep attribute with a value of !SleepState.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(37, "TH reads from the DUT the Sleep attribute.",
+                TestStep(37, "TH reads from the DUT the Sleep attribute.",
                              "Verify that the DUT response contains !SleepState."),
-                TestStep(38, "TH writes to the DUT the Sleep attribute with a value of False.",
+                TestStep(38, "TH writes to the DUT the Sleep attribute with a value of False.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(39, "TH reads from the DUT the Optimal attribute.",
                              "Store the value as OptState"),
@@ -143,31 +148,52 @@ class TC_HSTAT_2_1(MatterBaseTest):
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(41, "Store the value as OptState",
                              "Verify that the DUT response contains !OptState.")
-                TestStep(42, "TH writes to the DUT the Optimal attribute with a value of False.",
+                TestStep(42, "TH writes to the DUT the Optimal attribute with a value of False.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(43, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue + StepValue/2.",
+                TestStep(43, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue + StepValue/2.",
                              "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(44, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue - 1.",
+                TestStep(44, "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue - 1.",
                              "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(45, "TH writes to the DUT the UserSetpoint attribute with value MaxSetpointValue + 1.",
+                TestStep(45, "TH writes to the DUT the UserSetpoint attribute with value MaxSetpointValue + 1.",
                              "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(46, "TH writes to the DUT the Mode attribute with a value of Humidifier",
+                TestStep(46, "TH writes to the DUT the Mode attribute with a value of Humidifier",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(47, "TH writes to the DUT the MistType attribute with a value of MistWarm",
+                TestStep(47, "TH writes to the DUT the MistType attribute with a value of MistWarm",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(48, "TH reads from the DUT the MistType attribute.",
+                TestStep(48, "TH reads from the DUT the MistType attribute.",
                              "Verify that the DUT response contains MistWarm."),
-                TestStep(49, "TH writes to the DUT the MistType attribute with a value of MistCold",
+                TestStep(49, "TH writes to the DUT the MistType attribute with a value of MistCold",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(50, "TH reads from the DUT the MistType attribute.",
+                TestStep(50, "TH reads from the DUT the MistType attribute.",
                              "Verify that the DUT response contains a value of MistCold."),
-                TestStep(51, "TH writes to the DUT the MistType attribute with a value of MistWarm.",
+                TestStep(51, "TH writes to the DUT the MistType attribute with a value of MistWarm.",
                              "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(52, "TH writes to the DUT the MistType attribute with a value of MistCold.",
+                TestStep(52, "TH writes to the DUT the MistType attribute with a value of MistCold.",
                              "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                ]
 
-        ]
+    async def read_hstat_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.Humidistat
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
+    @async_test_body
+    async def test_TC_HSTAT_2_1(self):
+
+        endpoint = self.get_endpoint()
+
+        self.step(1)
+        # Commissioning already done.
+        attributes = Clusters.Humidistat.Attributes
+
+        self.step(2)
+        dut_mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
+        asserts.assert_greater_equal(dut_mode, 0, "Mode attribute is out of range")
+        asserts.assert_less_equal(dut_mode, 4, "Mode attribute is out of range")
 
 
-
-                
+if __name__ == "__main__":
+    default_matter_test_main()
