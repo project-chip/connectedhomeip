@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from sys import stderr, stdout
-from typing import Any, BinaryIO, Optional, Union
+from typing import Any, BinaryIO, Optional
 
 from matter.testing.tasks import Subprocess
 
@@ -40,9 +40,9 @@ class OTAProviderSubprocess(AppServerSubprocess):
     PREFIX: bytes
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
+                 passcode: int, ota_source: OtaImagePath | ImageListPath,
                  port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
-                 log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer): ...
+                 log_file: str | BinaryIO = stdout.buffer, err_log_file: str | BinaryIO = stderr.buffer): ...
 
     def kill(self) -> None: ...
 

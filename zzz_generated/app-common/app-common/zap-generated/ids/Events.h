@@ -27,6 +27,7 @@
 #include <clusters/AdministratorCommissioning/EventIds.h>
 #include <clusters/AirQuality/EventIds.h>
 #include <clusters/AmbientContextSensing/EventIds.h>
+#include <clusters/AmbientSensingUnion/EventIds.h>
 #include <clusters/ApplicationBasic/EventIds.h>
 #include <clusters/ApplicationLauncher/EventIds.h>
 #include <clusters/AudioOutput/EventIds.h>
@@ -47,6 +48,7 @@
 #include <clusters/ClosureDimension/EventIds.h>
 #include <clusters/ColorControl/EventIds.h>
 #include <clusters/CommissionerControl/EventIds.h>
+#include <clusters/CommissioningProxy/EventIds.h>
 #include <clusters/CommodityMetering/EventIds.h>
 #include <clusters/CommodityPrice/EventIds.h>
 #include <clusters/CommodityTariff/EventIds.h>
@@ -146,7 +148,9 @@
 #include <clusters/Switch/EventIds.h>
 #include <clusters/TargetNavigator/EventIds.h>
 #include <clusters/TemperatureControl/EventIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/EventIds.h>
 #include <clusters/TemperatureMeasurement/EventIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/EventIds.h>
 #include <clusters/Thermostat/EventIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EventIds.h>
 #include <clusters/ThreadBorderRouterManagement/EventIds.h>

@@ -15,97 +15,61 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
+#include <app/clusters/proximity-ranging-server/CodegenIntegration.h>
+
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CodeUtils.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ProximityRanging;
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ProximityRanging {
 
-namespace {
-
-constexpr uint16_t kProximityRangingFixedClusterCount = FIXED_ENDPOINT_COUNT;
-constexpr uint16_t kProximityRangingMaxClusterCount =
-    kProximityRangingFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-LazyRegisteredServerCluster<ProximityRangingCluster> gServers[kProximityRangingMaxClusterCount];
-
-class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+ProximityRangingServer::~ProximityRangingServer()
 {
-public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
-    {
-        ProximityRangingCluster::Config config;
-        config.WithFeatures(BitMask<Feature>(featureMap));
-
-        gServers[clusterInstanceIndex].Create(endpointId, config);
-        return gServers[clusterInstanceIndex].Registration();
-    }
-
-    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
-    {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
-    }
-
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
-};
-
-} // namespace
-
-void MatterProximityRangingClusterInitCallback(EndpointId endpointId)
-{
-    IntegrationDelegate integrationDelegate;
-
-    CodegenClusterIntegration::RegisterServer(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = ProximityRanging::Id,
-            .fixedClusterInstanceCount = kProximityRangingFixedClusterCount,
-            .maxClusterInstanceCount   = kProximityRangingMaxClusterCount,
-            .fetchFeatureMap           = true,
-            .fetchOptionalAttributes   = false,
-        },
-        integrationDelegate);
+    Deinit();
 }
 
-void MatterProximityRangingClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+CHIP_ERROR ProximityRangingServer::Init(BitMask<Feature> features)
 {
-    IntegrationDelegate integrationDelegate;
+    VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_ALREADY_INITIALIZED);
 
-    CodegenClusterIntegration::UnregisterServer(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = ProximityRanging::Id,
-            .fixedClusterInstanceCount = kProximityRangingFixedClusterCount,
-            .maxClusterInstanceCount   = kProximityRangingMaxClusterCount,
-        },
-        integrationDelegate, shutdownType);
+    mCluster.Create(mEndpointId, ProximityRangingCluster::Config(mTimerDelegate).WithFeatures(features).WithAdapters(mAdapters));
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        mCluster.Destroy();
+        return err;
+    }
+    return CHIP_NO_ERROR;
 }
+
+void ProximityRangingServer::Deinit()
+{
+    if (!mCluster.IsConstructed())
+    {
+        return;
+    }
+
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
+    mCluster.Destroy();
+}
+
+} // namespace ProximityRanging
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+// The Proximity Ranging cluster requires a TimerDelegate and an adapter set
+// at construction. The auto-generated init callbacks fire before the
+// application has supplied either, so cluster construction and registration
+// are deferred to the application via ProximityRangingServer (declared above).
+// These callbacks are intentional no-ops.
+void MatterProximityRangingClusterInitCallback(chip::EndpointId) {}
+void MatterProximityRangingClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
 
 void MatterProximityRangingPluginServerInitCallback() {}
 void MatterProximityRangingPluginServerShutdownCallback() {}
-
-namespace chip::app::Clusters::ProximityRanging {
-
-ProximityRangingCluster * FindClusterOnEndpoint(EndpointId endpointId)
-{
-    IntegrationDelegate integrationDelegate;
-
-    ServerClusterInterface * cluster = CodegenClusterIntegration::FindClusterOnEndpoint(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = ProximityRanging::Id,
-            .fixedClusterInstanceCount = kProximityRangingFixedClusterCount,
-            .maxClusterInstanceCount   = kProximityRangingMaxClusterCount,
-        },
-        integrationDelegate);
-
-    return static_cast<ProximityRangingCluster *>(cluster);
-}
-
-} // namespace chip::app::Clusters::ProximityRanging

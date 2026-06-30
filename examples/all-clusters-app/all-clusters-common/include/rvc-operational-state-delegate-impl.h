@@ -33,19 +33,16 @@ namespace RvcOperationalState {
 class RvcOperationalStateDelegate : public Delegate
 {
 private:
-    const Clusters::OperationalState::GenericOperationalState rvcOpStateList[7] = {
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
-        OperationalState::GenericOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
+    static constexpr uint8_t kRvcOpStateIds[] = {
+        to_underlying(OperationalState::OperationalStateEnum::kStopped),
+        to_underlying(OperationalState::OperationalStateEnum::kRunning),
+        to_underlying(OperationalState::OperationalStateEnum::kPaused),
+        to_underlying(OperationalState::OperationalStateEnum::kError),
+        to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger),
+        to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging),
+        to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked),
     };
 
-    Span<const OperationalState::GenericOperationalState> mOperationalStateList =
-        Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
     Span<const CharSpan> mOperationalPhaseList;
 
 public:

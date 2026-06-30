@@ -143,8 +143,8 @@ class TC_OCC_3_1(MatterBaseTest):
 
         occupancy_event_supported = has_occevent_feature or self.check_pics("OCC.S.E00")
 
-        log.info(f"Feature map: 0x{feature_map:x}, OCCEVENT feature: {has_occevent_feature}")
-        log.info(f"HoldTime supported: {has_hold_time}, OccupancyChanged event supported: {occupancy_event_supported}")
+        log.info("Feature map: 0x%x, OCCEVENT feature: %s", feature_map, has_occevent_feature)
+        log.info("HoldTime supported: %s, OccupancyChanged event supported: %s", has_hold_time, occupancy_event_supported)
 
         self.step(3)
         if has_hold_time:
@@ -237,7 +237,7 @@ class TC_OCC_3_1(MatterBaseTest):
                 prompt_msg="Ensure the sensor no longer detects occupancy, then press ENTER")
 
         if has_hold_time:
-            log.info(f"Waiting for HoldTime duration ({hold_time} seconds) plus buffer...")
+            log.info("Waiting for HoldTime duration (%s seconds) plus buffer...", hold_time)
             await asyncio.sleep(hold_time + 2.0)  # add extra 2 seconds buffer
 
         self.step(15)

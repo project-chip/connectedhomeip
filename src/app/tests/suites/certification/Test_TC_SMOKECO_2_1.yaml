@@ -14,6 +14,13 @@
 
 name: 4.2.1. [TC-SMOKECO-2.1] Attributes with DUT as Server
 
+CI:
+    - name: "Test against all-devices/smoke-co-alarm"
+      app: all-devices
+      args:
+          - --device
+          - smoke-co-alarm
+
 PICS:
     - SMOKECO.S
 

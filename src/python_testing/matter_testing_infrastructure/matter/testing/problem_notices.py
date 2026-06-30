@@ -17,7 +17,7 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Optional, Union
+from typing import Optional, TypeAlias
 
 from matter.testing.conversions import cluster_id_with_name, format_decimal_and_hex
 from matter.testing.global_attribute_ids import GlobalAttributeIds
@@ -147,7 +147,7 @@ class UnknownProblemLocation:
         return '\n      Unknown Locations - see message for more details'
 
 
-ProblemLocation = Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation, NamespacePathLocation]
+ProblemLocation: TypeAlias = ClusterPathLocation | DeviceTypePathLocation | UnknownProblemLocation | NamespacePathLocation
 
 
 class ProblemSeverity(StrEnum):

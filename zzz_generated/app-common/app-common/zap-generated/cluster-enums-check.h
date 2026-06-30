@@ -29,6 +29,7 @@
 #include <clusters/AdministratorCommissioning/EnumsCheck.h>
 #include <clusters/AirQuality/EnumsCheck.h>
 #include <clusters/AmbientContextSensing/EnumsCheck.h>
+#include <clusters/AmbientSensingUnion/EnumsCheck.h>
 #include <clusters/ApplicationBasic/EnumsCheck.h>
 #include <clusters/ApplicationLauncher/EnumsCheck.h>
 #include <clusters/AudioOutput/EnumsCheck.h>
@@ -49,6 +50,7 @@
 #include <clusters/ClosureDimension/EnumsCheck.h>
 #include <clusters/ColorControl/EnumsCheck.h>
 #include <clusters/CommissionerControl/EnumsCheck.h>
+#include <clusters/CommissioningProxy/EnumsCheck.h>
 #include <clusters/CommodityMetering/EnumsCheck.h>
 #include <clusters/CommodityPrice/EnumsCheck.h>
 #include <clusters/CommodityTariff/EnumsCheck.h>
@@ -148,7 +150,9 @@
 #include <clusters/Switch/EnumsCheck.h>
 #include <clusters/TargetNavigator/EnumsCheck.h>
 #include <clusters/TemperatureControl/EnumsCheck.h>
+#include <clusters/TemperatureControlledCabinetTopology/EnumsCheck.h>
 #include <clusters/TemperatureMeasurement/EnumsCheck.h>
+#include <clusters/TestHiddenManufacturerSpecific/EnumsCheck.h>
 #include <clusters/Thermostat/EnumsCheck.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EnumsCheck.h>
 #include <clusters/ThreadBorderRouterManagement/EnumsCheck.h>

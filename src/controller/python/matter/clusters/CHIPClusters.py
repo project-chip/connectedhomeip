@@ -4162,6 +4162,56 @@ class ChipClusters:
             },
         },
     }
+    _TEMPERATURE_CONTROLLED_CABINET_TOPOLOGY_CLUSTER_INFO = {
+        "clusterName": "TemperatureControlledCabinetTopology",
+        "clusterId": 0x0000004B,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "DisabledCabinets",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Topology",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _MODE_SELECT_CLUSTER_INFO = {
         "clusterName": "ModeSelect",
         "clusterId": 0x00000050,
@@ -6551,6 +6601,22 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "PowerRangeAdjustRequest",
+                "args": {
+                    "minPower": "int",
+                    "maxPower": "int",
+                    "duration": "int",
+                    "cause": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "CancelPowerRangeAdjustRequest",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -6599,6 +6665,12 @@ class ChipClusters:
                 "attributeName": "OptOutState",
                 "attributeId": 0x00000007,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "PowerRangeAdjustment",
+                "attributeId": 0x00000008,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -12054,6 +12126,63 @@ class ChipClusters:
             },
         },
     }
+    _AMBIENT_SENSING_UNION_CLUSTER_INFO = {
+        "clusterName": "AmbientSensingUnion",
+        "clusterId": 0x00000432,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "UnionName",
+                "attributeId": 0x00000000,
+                "type": "str",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000001: {
+                "attributeName": "UnionHealth",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "UnionContributorList",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _PROXIMITY_RANGING_CLUSTER_INFO = {
         "clusterName": "ProximityRanging",
         "clusterId": 0x00000433,
@@ -12285,6 +12414,7 @@ class ChipClusters:
                 "args": {
                     "networkIdentityIndex": "int",
                     "networkIdentityType": "int",
+                    "clientIndex": "int",
                     "identifier": "bytes",
                 },
             },
@@ -12553,6 +12683,148 @@ class ChipClusters:
             0x00000002: {
                 "attributeName": "ThreadNetworkTableSize",
                 "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _COMMISSIONING_PROXY_CLUSTER_INFO = {
+        "clusterName": "CommissioningProxy",
+        "clusterId": 0x00000455,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ProxyConnectRequest",
+                "args": {
+                    "address": "bytes",
+                    "transport": "int",
+                    "discriminator": "int",
+                    "vendorID": "int",
+                    "productID": "int",
+                    "timeout": "int",
+                    "wiFiBand": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ProxyDisconnectRequest",
+                "args": {
+                    "sessionID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "ProxyScanRequest",
+                "args": {
+                    "transport": "int",
+                    "wiFiBands": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "ProxyBackGroundScanStartRequest",
+                "args": {
+                    "transport": "int",
+                    "timeout": "int",
+                    "wiFiBands": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "ProxyBackGroundScanStopRequest",
+                "args": {
+                    "transport": "int",
+                    "wiFiBands": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "ProxyMessageRequest",
+                "args": {
+                    "sessionID": "int",
+                    "responseTimeout": "int",
+                    "message": "bytes",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Transport",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ScanMaxTime",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxSessions",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "MaxCachedResults",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "NumCachedResults",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "CacheTimeout",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000006: {
+                "attributeName": "CachedResults",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "WiFiBand",
+                "attributeId": 0x00000007,
                 "type": "int",
                 "reportable": True,
             },
@@ -16911,6 +17183,50 @@ class ChipClusters:
             },
         },
     }
+    _TEST_HIDDEN_MANUFACTURER_SPECIFIC_CLUSTER_INFO = {
+        "clusterName": "TestHiddenManufacturerSpecific",
+        "clusterId": 0xFFF1FC21,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "TestAttribute",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
 
     _CLUSTER_ID_DICT = {
         0x00000003: _IDENTIFY_CLUSTER_INFO,
@@ -16954,6 +17270,7 @@ class ChipClusters:
         0x00000048: _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000049: _OVEN_MODE_CLUSTER_INFO,
         0x0000004A: _LAUNDRY_DRYER_CONTROLS_CLUSTER_INFO,
+        0x0000004B: _TEMPERATURE_CONTROLLED_CABINET_TOPOLOGY_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
@@ -17024,12 +17341,14 @@ class ChipClusters:
         0x0000042F: _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000430: _SOIL_MEASUREMENT_CLUSTER_INFO,
         0x00000431: _AMBIENT_CONTEXT_SENSING_CLUSTER_INFO,
+        0x00000432: _AMBIENT_SENSING_UNION_CLUSTER_INFO,
         0x00000433: _PROXIMITY_RANGING_CLUSTER_INFO,
         0x00000434: _SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000450: _NETWORK_IDENTITY_MANAGEMENT_CLUSTER_INFO,
         0x00000451: _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         0x00000452: _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         0x00000453: _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
+        0x00000455: _COMMISSIONING_PROXY_CLUSTER_INFO,
         0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
         0x00000504: _CHANNEL_CLUSTER_INFO,
         0x00000505: _TARGET_NAVIGATOR_CLUSTER_INFO,
@@ -17064,6 +17383,7 @@ class ChipClusters:
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
+        0xFFF1FC21: _TEST_HIDDEN_MANUFACTURER_SPECIFIC_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -17108,6 +17428,7 @@ class ChipClusters:
         "OvenCavityOperationalState": _OVEN_CAVITY_OPERATIONAL_STATE_CLUSTER_INFO,
         "OvenMode": _OVEN_MODE_CLUSTER_INFO,
         "LaundryDryerControls": _LAUNDRY_DRYER_CONTROLS_CLUSTER_INFO,
+        "TemperatureControlledCabinetTopology": _TEMPERATURE_CONTROLLED_CABINET_TOPOLOGY_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
@@ -17178,12 +17499,14 @@ class ChipClusters:
         "RadonConcentrationMeasurement": _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "SoilMeasurement": _SOIL_MEASUREMENT_CLUSTER_INFO,
         "AmbientContextSensing": _AMBIENT_CONTEXT_SENSING_CLUSTER_INFO,
+        "AmbientSensingUnion": _AMBIENT_SENSING_UNION_CLUSTER_INFO,
         "ProximityRanging": _PROXIMITY_RANGING_CLUSTER_INFO,
         "SmokeConcentrationMeasurement": _SMOKE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "NetworkIdentityManagement": _NETWORK_IDENTITY_MANAGEMENT_CLUSTER_INFO,
         "WiFiNetworkManagement": _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         "ThreadBorderRouterManagement": _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         "ThreadNetworkDirectory": _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
+        "CommissioningProxy": _COMMISSIONING_PROXY_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "Channel": _CHANNEL_CLUSTER_INFO,
         "TargetNavigator": _TARGET_NAVIGATOR_CLUSTER_INFO,
@@ -17218,6 +17541,7 @@ class ChipClusters:
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,
+        "TestHiddenManufacturerSpecific": _TEST_HIDDEN_MANUFACTURER_SPECIFIC_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

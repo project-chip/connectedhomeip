@@ -20,6 +20,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
+#include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
@@ -47,7 +48,7 @@ public:
     ~NetworkInfrastructureManagerDevice() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // ThreadBorderRouterManagementDelegate
@@ -64,9 +65,22 @@ public:
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
+    // Public getters for programmatic control
+    Clusters::ThreadBorderRouterManagementCluster & ThreadBorderRouterManagementCluster()
+    {
+        return mThreadBorderRouterManagementCluster.Cluster();
+    }
+    Clusters::WiFiNetworkManagementCluster & WiFiNetworkManagementCluster() { return mWiFiNetworkManagementCluster.Cluster(); }
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
+    Clusters::ThreadNetworkDiagnosticsCluster & ThreadNetworkDiagnosticsCluster()
+    {
+        return mThreadNetworkDiagnosticsCluster.Cluster();
+    }
+
 protected:
     SimpleBreadCrumbTracker mBreadCrumbTracker;
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
+    Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider mThreadDiagnosticsProvider;
 
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
