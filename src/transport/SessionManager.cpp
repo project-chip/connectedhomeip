@@ -179,11 +179,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 {
     MATTER_TRACE_SCOPE("PrepareMessage", "SessionManager");
 
-    if (message->HasChainedBuffer())
-    {
-        ChipLogError(ExchangeManager, "PrepareMessage: Chained buffers are not supported");
-        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-    }
+    VerifyOrReturnError(!message->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     bool headerEncoded = false;
     PacketHeader packetHeader;
@@ -268,12 +264,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Begin privacy encrypt for appropriate header fields
 
         // Since we are not using chained buffers, the message data length should be equal to the total length
-        if (message->TotalLength() != message->DataLength())
-        {
-            ChipLogError(ExchangeManager, "PrepareMessage: Total length of message does not match the data length.");
-            return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-        }
-
+        VerifyOrReturnError(message->TotalLength() == message->DataLength(),  CHIP_ERROR_INVALID_MESSAGE_LENGTH);
         uint8_t * data     = message->Start();
         size_t len         = message->TotalLength();
         uint16_t footerLen = packetHeader.MICTagLength();
@@ -309,22 +300,16 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // portion of the header (with a non-zero length). This portion of the header exists after the privacy header end.
         // If the flag is not set, the end of the privacy header should be the end of the header itself.
         bool mxEnabled = packetHeader.GetSecurityFlags() & to_underlying(Header::SecFlagValues::kMsgExtensionFlag);
-        if (mxEnabled && (privacyHeaderEnd >= headerEnd))
+        if (mxEnabled)
         {
-            ChipLogError(ExchangeManager, "PrepareMessage: Privacy header exceeds header bounds (MX set)");
-            return CHIP_ERROR_INTERNAL;
+            VerifyOrReturnError(privacyHeaderEnd < headerEnd, CHIP_ERROR_INTERNAL);
         }
-        else if (!mxEnabled && (privacyHeaderEnd != headerEnd))
+        else
         {
-            ChipLogError(ExchangeManager, "PrepareMessage: Privacy header length mismatch with header bounds");
-            return CHIP_ERROR_INTERNAL;
+            VerifyOrReturnError(privacyHeaderEnd == headerEnd, CHIP_ERROR_INTERNAL);
         }
 
-        if (headerEnd >= messageEnd)
-        {
-            ChipLogError(ExchangeManager, "PrepareMessage: Message header exceeds its expected size");
-            return CHIP_ERROR_INTERNAL;
-        }
+        VerifyOrReturnError(headerEnd < messageEnd, CHIP_ERROR_INTERNAL);
         ReturnErrorOnFailure(cryptoContext.PrivacyEncrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
 
 #if CHIP_PROGRESS_LOGGING
@@ -1138,11 +1123,7 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
 
         // Bounds check: we decrypt in place a privacy header located inside the packet.
         // Validate that we are still within the packet as the length is based on header flags.
-        if ((privacyHeader + privacyLength) > (msgCopy->Start() + msgCopy->TotalLength()))
-        {
-            ChipLogError(ExchangeManager, "GroupKeyDecryptAttempt: Privacy header exceeds message bounds");
-            return false;
-        }
+        VerifyOrReturnValue(privacyHeader + privacyLength <= msgCopy->Start() + msgCopy->TotalLength(), false);
 
         if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, partialPacketHeader, mac))
         {
@@ -1178,11 +1159,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 {
     MATTER_TRACE_SCOPE("Group Message Dispatch", "SessionManager");
 
-    if (msg->HasChainedBuffer())
-    {
-        ChipLogError(ExchangeManager, "SecureGroupMessageDispatch: Chained buffers are not supported");
-        return;
-    }
+    VerifyOrReturn(!msg->HasChainedBuffer());
 
     // Capture length before consuming headers.
     [[maybe_unused]] size_t messageTotalSize = msg->TotalLength();
