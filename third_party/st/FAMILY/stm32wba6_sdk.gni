@@ -345,7 +345,7 @@ LIBS = [
   # add any .o/.a library here
   "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Thread_lib.a",
   "${stm32_wpan_sdk}/ble/stack/lib/stm32wba_ble_stack_basic.a",
-  "${stm32_wpan_sdk_patch}/thread/openthread_lib/stm32wba_ot_mtd_lib_matter.a",
+  "${stm32_wpan_sdk}/thread/openthread/openthread_lib/stm32wba_mtd_light_no_tcp_matter_lib.a",
 ]
   
 FLAGS = [ 
