@@ -17,7 +17,7 @@
  */
 
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
-#include <app/clusters/camera-av-stream-management-server/MigrateCameraAVStreamManagementStorage.h>
+#include <app/clusters/camera-av-stream-management-server/MigratorCameraAVStreamManagementStorage.h>
 #include <app/persistence/AttributePersistenceMigration.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
 
@@ -26,7 +26,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 
-CHIP_ERROR CameraAvStreamManagement::MigrateCameraAVStreamManagementStorage(EndpointId endpointId,
+CHIP_ERROR CameraAvStreamManagement::MigratorCameraAVStreamManagementStorage(EndpointId endpointId,
                                                                             SafeAttributePersistenceProvider & safeProvider,
                                                                             AttributePersistenceProvider & dstProvider)
 {

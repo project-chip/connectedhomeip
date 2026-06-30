@@ -34,7 +34,7 @@ namespace CameraAvStreamManagement {
  * Only scalar attributes and Viewport/StreamUsagePriorities are migrated. Allocated stream
  * lists are excluded because they are large and ephemeral.
  */
-CHIP_ERROR MigrateCameraAVStreamManagementStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
+CHIP_ERROR MigratorCameraAVStreamManagementStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
                                                   AttributePersistenceProvider & dstProvider);
 
 } // namespace CameraAvStreamManagement

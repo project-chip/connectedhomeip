@@ -17,7 +17,7 @@
  */
 
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/camera-av-stream-management-server/MigrateCameraAVStreamManagementStorage.h>
+#include <app/clusters/camera-av-stream-management-server/MigratorCameraAVStreamManagementStorage.h>
 #include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
 #include <lib/support/CodeUtils.h>
 
@@ -27,7 +27,7 @@ chip::app::Clusters::CameraAvStreamManagement::MigrationCameraAVStreamManagement
     SafeAttributePersistenceProvider * srcProvider = GetSafeAttributePersistenceProvider();
     if (srcProvider != nullptr)
     {
-        LogErrorOnFailure(MigrateCameraAVStreamManagementStorage(mPath.mEndpointId, *srcProvider, context.attributeStorage));
+        LogErrorOnFailure(MigratorCameraAVStreamManagementStorage(mPath.mEndpointId, *srcProvider, context.attributeStorage));
     }
     return DefaultServerCluster::Startup(context);
 }
