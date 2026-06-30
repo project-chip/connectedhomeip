@@ -37,7 +37,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <protocols/echo/Echo.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -677,7 +677,7 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
 
     // Create the test payload header, data, and buffer
     PayloadHeader payloadHeader;
-    payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
     const char testPayload[] = "PrivacyTest";
     System::PacketBufferHandle payloadBuf =
         MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
