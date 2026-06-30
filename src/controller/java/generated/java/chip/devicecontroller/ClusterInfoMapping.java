@@ -20000,6 +20000,111 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedAudioControlClusterStartUpMutedAttributeCallback implements ChipClusters.AudioControlCluster.StartUpMutedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Boolean value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Boolean");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterStartUpVolumeAttributeCallback implements ChipClusters.AudioControlCluster.StartUpVolumeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.AudioControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.AudioControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterAttributeListAttributeCallback implements ChipClusters.AudioControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedZoneManagementClusterCreateTwoDCartesianZoneResponseCallback implements ChipClusters.ZoneManagementCluster.CreateTwoDCartesianZoneResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -25269,6 +25374,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ContentAppObserverCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("contentAppObserver", contentAppObserverClusterInfo);
 
+    ClusterInfo audioControlClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.AudioControlCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("audioControl", audioControlClusterInfo);
+
     ClusterInfo zoneManagementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ZoneManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("zoneManagement", zoneManagementClusterInfo);
@@ -25491,6 +25600,7 @@ public class ClusterInfoMapping {
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("contentControl").combineCommands(source.get("contentControl"));
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
+    destination.get("audioControl").combineCommands(source.get("audioControl"));
     destination.get("zoneManagement").combineCommands(source.get("zoneManagement"));
     destination.get("cameraAvStreamManagement").combineCommands(source.get("cameraAvStreamManagement"));
     destination.get("cameraAvSettingsUserLevelManagement").combineCommands(source.get("cameraAvSettingsUserLevelManagement"));
@@ -32644,6 +32754,117 @@ public class ClusterInfoMapping {
     contentAppObserverClusterInteractionInfoMap.put("contentAppMessage", contentAppObservercontentAppMessageInteractionInfo);
 
     commandMap.put("contentAppObserver", contentAppObserverClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> audioControlClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> audioControlmuteCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo audioControlmuteInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .mute((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlmuteCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("mute", audioControlmuteInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControlunmuteCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo audioControlunmuteInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .unmute((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlunmuteCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("unmute", audioControlunmuteInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControltoggleMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo audioControltoggleMutedInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .toggleMuted((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControltoggleMutedCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("toggleMuted", audioControltoggleMutedInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControlsetVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo audioControlsetVolumenewVolumeCommandParameterInfo = new CommandParameterInfo("newVolume", Integer.class, Integer.class);
+    audioControlsetVolumeCommandParams.put("newVolume",audioControlsetVolumenewVolumeCommandParameterInfo);
+
+    CommandParameterInfo audioControlsetVolumeunmutePolicyCommandParameterInfo = new CommandParameterInfo("unmutePolicy", Optional.class, Integer.class);
+    audioControlsetVolumeCommandParams.put("unmutePolicy",audioControlsetVolumeunmutePolicyCommandParameterInfo);
+    InteractionInfo audioControlsetVolumeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .setVolume((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("newVolume")
+        , (Optional<Integer>)
+        commandArguments.get("unmutePolicy")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlsetVolumeCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("setVolume", audioControlsetVolumeInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControlincreaseVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo audioControlincreaseVolumestepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", Optional.class, Integer.class);
+    audioControlincreaseVolumeCommandParams.put("stepSize",audioControlincreaseVolumestepSizeCommandParameterInfo);
+
+    CommandParameterInfo audioControlincreaseVolumeunmutePolicyCommandParameterInfo = new CommandParameterInfo("unmutePolicy", Optional.class, Integer.class);
+    audioControlincreaseVolumeCommandParams.put("unmutePolicy",audioControlincreaseVolumeunmutePolicyCommandParameterInfo);
+
+    CommandParameterInfo audioControlincreaseVolumeunmuteVolumeCommandParameterInfo = new CommandParameterInfo("unmuteVolume", Optional.class, Integer.class);
+    audioControlincreaseVolumeCommandParams.put("unmuteVolume",audioControlincreaseVolumeunmuteVolumeCommandParameterInfo);
+    InteractionInfo audioControlincreaseVolumeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .increaseVolume((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("stepSize")
+        , (Optional<Integer>)
+        commandArguments.get("unmutePolicy")
+        , (Optional<Integer>)
+        commandArguments.get("unmuteVolume")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlincreaseVolumeCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("increaseVolume", audioControlincreaseVolumeInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControldecreaseVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo audioControldecreaseVolumestepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", Optional.class, Integer.class);
+    audioControldecreaseVolumeCommandParams.put("stepSize",audioControldecreaseVolumestepSizeCommandParameterInfo);
+
+    CommandParameterInfo audioControldecreaseVolumeunmutePolicyCommandParameterInfo = new CommandParameterInfo("unmutePolicy", Optional.class, Integer.class);
+    audioControldecreaseVolumeCommandParams.put("unmutePolicy",audioControldecreaseVolumeunmutePolicyCommandParameterInfo);
+    InteractionInfo audioControldecreaseVolumeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .decreaseVolume((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("stepSize")
+        , (Optional<Integer>)
+        commandArguments.get("unmutePolicy")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControldecreaseVolumeCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("decreaseVolume", audioControldecreaseVolumeInteractionInfo);
+
+    commandMap.put("audioControl", audioControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> zoneManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 

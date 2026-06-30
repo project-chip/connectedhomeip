@@ -10926,6 +10926,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::AudioControl::Id: {
+        using namespace app::Clusters::AudioControl;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::ZoneManagement::Id: {
         using namespace app::Clusters::ZoneManagement;
         switch (aPath.mEventId)

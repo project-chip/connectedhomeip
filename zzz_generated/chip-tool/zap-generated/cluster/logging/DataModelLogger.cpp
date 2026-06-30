@@ -24387,6 +24387,132 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case AudioControl::Id: {
+        switch (path.mAttributeId)
+        {
+        case AudioControl::Attributes::SoftMuted::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftMuted", 1, value);
+        }
+        case AudioControl::Attributes::PhysicallyMuted::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PhysicallyMuted", 1, value);
+        }
+        case AudioControl::Attributes::Volume::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Volume", 1, value);
+        }
+        case AudioControl::Attributes::MinDeviceVolume::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinDeviceVolume", 1, value);
+        }
+        case AudioControl::Attributes::MaxDeviceVolume::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxDeviceVolume", 1, value);
+        }
+        case AudioControl::Attributes::MaxDeviceVolumeDB::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxDeviceVolumeDB", 1, value);
+        }
+        case AudioControl::Attributes::MaxUserVolume::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxUserVolume", 1, value);
+        }
+        case AudioControl::Attributes::DefaultStepSize::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultStepSize", 1, value);
+        }
+        case AudioControl::Attributes::SetVolumeUnmutePolicy::Id: {
+            chip::app::Clusters::AudioControl::UnmutePolicyEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SetVolumeUnmutePolicy", 1, value);
+        }
+        case AudioControl::Attributes::IncreaseVolumeUnmutePolicy::Id: {
+            chip::app::Clusters::AudioControl::UnmutePolicyEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IncreaseVolumeUnmutePolicy", 1, value);
+        }
+        case AudioControl::Attributes::IncreaseVolumeUnmuteVolume::Id: {
+            chip::app::Clusters::AudioControl::UnmuteVolumeEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IncreaseVolumeUnmuteVolume", 1, value);
+        }
+        case AudioControl::Attributes::DecreaseVolumeUnmutePolicy::Id: {
+            chip::app::Clusters::AudioControl::UnmutePolicyEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DecreaseVolumeUnmutePolicy", 1, value);
+        }
+        case AudioControl::Attributes::StartUpMuted::Id: {
+            chip::app::DataModel::Nullable<bool> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMuted", 1, value);
+        }
+        case AudioControl::Attributes::StartUpVolume::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpVolume", 1, value);
+        }
+        case AudioControl::Attributes::Bass::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Bass", 1, value);
+        }
+        case AudioControl::Attributes::Mid::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Mid", 1, value);
+        }
+        case AudioControl::Attributes::Treble::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Treble", 1, value);
+        }
+        case AudioControl::Attributes::MinCorrection::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinCorrection", 1, value);
+        }
+        case AudioControl::Attributes::MaxCorrection::Id: {
+            int16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxCorrection", 1, value);
+        }
+        case AudioControl::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AudioControl::Id);
+        }
+        case AudioControl::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AudioControl::Id);
+        }
+        case AudioControl::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AudioControl::Id);
+        }
+        case AudioControl::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case AudioControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case ZoneManagement::Id: {
         switch (path.mAttributeId)
         {
