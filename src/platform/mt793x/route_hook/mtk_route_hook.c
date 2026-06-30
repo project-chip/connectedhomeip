@@ -13,6 +13,8 @@
 #include "mtk_route_table.h"
 #include <lwip/tcpip.h>
 
+extern void mt793xLog(const char * aFormat, ...);
+
 typedef struct mtk_route_hook_t
 {
     struct netif * netif;
@@ -83,7 +85,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             const uint8_t * rio_data = &icmp_payload[sizeof(rio_header_t)];
             uint8_t rio_data_len     = opt_len - sizeof(rio_header_t);
 
-            printf("Received RIO\n");
+            mt793xLog("Received RIO");
             if (rio_data_len >= prefix_len_bytes)
             {
                 ip6_addr_t prefix;
@@ -97,14 +99,14 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
                 route.prefix           = prefix;
                 route.preference       = preference;
                 route.lifetime_seconds = lwip_ntohl(rio_header.route_lifetime);
-                printf("prefix %s lifetime %lu\n", ip6addr_ntoa(&prefix), route.lifetime_seconds);
+                mt793xLog("prefix %s lifetime %lu", ip6addr_ntoa(&prefix), route.lifetime_seconds);
                 if (mtk_route_table_add_route_entry(&route) == NULL)
                 {
-                    printf("Failed to add route table entry\n");
+                    mt793xLog("Failed to add route table entry");
                 }
                 else
                 {
-                    printf("Added entry to route table\n");
+                    mt793xLog("Added entry to route table");
                 }
             }
         }
@@ -131,12 +133,12 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
 
     if (p->tot_len != p->len)
     {
-        printf("Ignore segmented ICMP packet\n");
+        mt793xLog("Ignore segmented ICMP packet");
         return 0;
     }
     if (p->tot_len <= sizeof(struct ip6_hdr) + sizeof(struct icmp6_hdr))
     {
-        printf("Ignore invalid ICMP packet\n");
+        mt793xLog("Ignore invalid ICMP packet");
         return 0;
     }
     if (!ip6_addr_islinklocal(&dest) && !ip6_addr_isallnodes_linklocal(&dest) && !ip6_addr_isallrouters_linklocal(&dest))
@@ -166,7 +168,7 @@ int8_t mtk_route_hook_init()
 
     if (lwip_netif == NULL)
     {
-        printf("Invalid network interface\n");
+        mt793xLog("Invalid network interface");
         ret = -1;
         goto exit;
     }
@@ -175,7 +177,7 @@ int8_t mtk_route_hook_init()
     {
         if (iter->netif == lwip_netif)
         {
-            printf("Hook already installed on netif, skip...\n");
+            mt793xLog("Hook already installed on netif, skip...");
             ret = 0;
             goto exit;
         }
@@ -184,14 +186,14 @@ int8_t mtk_route_hook_init()
     hook = (mtk_route_hook_t *) malloc(sizeof(mtk_route_hook_t));
     if (hook == NULL)
     {
-        printf("Cannot allocate hook\n");
+        mt793xLog("Cannot allocate hook");
         ret = -1;
         goto exit;
     }
 
     if (mld6_joingroup_netif(lwip_netif, ip_2_ip6(&router_group)) != ERR_OK)
     {
-        printf("Failed to join multicast group\n");
+        mt793xLog("Failed to join multicast group");
         ret = -1;
         goto exit;
     }
@@ -199,6 +201,12 @@ int8_t mtk_route_hook_init()
 
     hook->netif = lwip_netif;
     hook->pcb   = raw_new_ip_type(IPADDR_TYPE_V6, IP6_NEXTH_ICMP6);
+    if (hook->pcb == NULL)
+    {
+        mt793xLog("Failed to allocate route hook raw PCB");
+        ret = -1;
+        goto exit;
+    }
     hook->pcb->flags |= RAW_FLAGS_MULTICAST_LOOP;
     hook->pcb->chksum_reqd = 1;
     // The ICMPv6 header checksum offset
