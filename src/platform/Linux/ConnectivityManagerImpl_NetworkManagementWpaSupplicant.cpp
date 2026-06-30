@@ -120,7 +120,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     VerifyOrReturnValue(mWpaSupplicant.iface, false);
-    GAutoPtr<char> state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
+    GCharPtr state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
     // The "completed" state indicates that we are associated with the access point.
     return g_strcmp0(state.get(), "completed") == 0;
 }
@@ -936,7 +936,7 @@ static CHIP_ERROR AddOrReplaceBlob(WpaSupplicant1Interface * iface, const char *
     GAutoPtr<GError> err;
     if (!wpa_supplicant_1_interface_call_remove_blob_sync(iface, name, nullptr, &err.GetReceiver()))
     {
-        GAutoPtr<char> remoteError(g_dbus_error_get_remote_error(err.get()));
+        GCharPtr remoteError(g_dbus_error_get_remote_error(err.get()));
         if (!(remoteError && strcmp(remoteError.get(), kWpaSupplicantBlobUnknown) == 0))
         {
             ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to remove blob: %s",
@@ -1429,7 +1429,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
         {
             return res;
         }
-        GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
+        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
         const gchar ** keyMgmtsHandle = keyMgmts.get();
 
         VerifyOrReturnError(keyMgmtsHandle != nullptr, res);
@@ -1460,7 +1460,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
         {
             return res;
         }
-        GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
+        GBorrowedStrvPtr keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
         const gchar ** keyMgmtsHandle = keyMgmts.get();
 
         VerifyOrReturnError(keyMgmtsHandle != nullptr, res);

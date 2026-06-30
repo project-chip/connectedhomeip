@@ -6493,6 +6493,88 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInAudioControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AudioControl;
+    switch (aAttributeId) {
+    case Attributes::SoftMuted::Id: {
+        return YES;
+    }
+    case Attributes::PhysicallyMuted::Id: {
+        return YES;
+    }
+    case Attributes::Volume::Id: {
+        return YES;
+    }
+    case Attributes::MinDeviceVolume::Id: {
+        return YES;
+    }
+    case Attributes::MaxDeviceVolume::Id: {
+        return YES;
+    }
+    case Attributes::MaxDeviceVolumeDB::Id: {
+        return YES;
+    }
+    case Attributes::MaxUserVolume::Id: {
+        return YES;
+    }
+    case Attributes::DefaultStepSize::Id: {
+        return YES;
+    }
+    case Attributes::SetVolumeUnmutePolicy::Id: {
+        return YES;
+    }
+    case Attributes::IncreaseVolumeUnmutePolicy::Id: {
+        return YES;
+    }
+    case Attributes::IncreaseVolumeUnmuteVolume::Id: {
+        return YES;
+    }
+    case Attributes::DecreaseVolumeUnmutePolicy::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMuted::Id: {
+        return YES;
+    }
+    case Attributes::StartUpVolume::Id: {
+        return YES;
+    }
+    case Attributes::Bass::Id: {
+        return YES;
+    }
+    case Attributes::Mid::Id: {
+        return YES;
+    }
+    case Attributes::Treble::Id: {
+        return YES;
+    }
+    case Attributes::MinCorrection::Id: {
+        return YES;
+    }
+    case Attributes::MaxCorrection::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AudioControl attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ZoneManagement;
@@ -8037,6 +8119,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ContentAppObserver::Id: {
         return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
+    }
+    case Clusters::AudioControl::Id: {
+        return AttributeIsSpecifiedInAudioControlCluster(aAttributeId);
     }
     case Clusters::ZoneManagement::Id: {
         return AttributeIsSpecifiedInZoneManagementCluster(aAttributeId);
