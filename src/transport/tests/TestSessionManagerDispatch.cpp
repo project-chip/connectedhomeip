@@ -692,7 +692,8 @@ TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
 
     // Prepare the group message
     EncryptedPacketBufferHandle preparedMessage;
-    CHIP_ERROR err = sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+    CHIP_ERROR err =
+        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     // Unwraps the buffer and verifies PrepareMessage set the privacy flag bit high and set the group session type.
@@ -754,7 +755,8 @@ TEST_F(TestSessionManagerDispatch, TestGroupIncomingPrivacyBoundsCheck)
 
     // Prepare the group message
     EncryptedPacketBufferHandle preparedMessage;
-    CHIP_ERROR err = sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+    CHIP_ERROR err =
+        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
     EXPECT_EQ(CHIP_NO_ERROR, err);
 
     System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
