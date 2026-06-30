@@ -338,7 +338,8 @@ CHIP_ERROR AppTask::Init()
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    (void) chip::Server::GetInstance().Init(initParams);
+    error = chip::Server::GetInstance().Init(initParams);
+    SuccessOrExit(error);
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -374,6 +375,7 @@ CHIP_ERROR AppTask::Init()
     RegisterLightCommands();
 #endif
 
+exit:
     return error;
 }
 

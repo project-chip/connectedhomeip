@@ -117,19 +117,27 @@ void __wrap__wlan_printf(int skip, int level, const char * fmt, ...)
 extern int __io_getchar(void) __attribute__((weak));
 int _read(int file, char * ptr, int len)
 {
-    int DataIdx;
-
     if (!__io_getchar)
     {
         return 0;
     }
 
-    for (DataIdx = 0; DataIdx < len; DataIdx++)
+    int DataIdx = 0;
+    for (; DataIdx < len; DataIdx++)
     {
-        *ptr++ = __io_getchar();
+        int c = __io_getchar();
+        if (c < 0)
+        {
+            if (DataIdx == 0)
+            {
+                return -1;
+            }
+            break;
+        }
+        *ptr++ = (char) c;
     }
 
-    return len;
+    return DataIdx;
 }
 
 int _close(int file)
