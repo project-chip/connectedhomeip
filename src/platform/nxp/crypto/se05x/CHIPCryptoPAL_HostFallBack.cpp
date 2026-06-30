@@ -300,16 +300,18 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
     CHIP_ERROR error    = CHIP_NO_ERROR;
     psa_key_id_t key_id = PSA_KEY_ID_NULL;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    PsaP256KeyContext * ctx = NULL;
+    const uint8_t * privkey = NULL;
 
     VerifyOrExit(input.Length() == mPublicKey->Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Extract private key bytes
-    const uint8_t * privkey = input.ConstBytes() + mPublicKey->Length();
+    privkey = input.ConstBytes() + mPublicKey->Length();
 
     pk->Clear();
 
     // Initialize the context
-    PsaP256KeyContext * ctx = to_psa_context(mKeypair);
+    ctx = to_psa_context(mKeypair);
     memset(ctx, 0, sizeof(PsaP256KeyContext));
 
     // Set up PSA key attributes for importing the private key
