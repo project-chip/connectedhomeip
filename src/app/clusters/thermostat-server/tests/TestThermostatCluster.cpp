@@ -293,11 +293,12 @@ TEST_F(TestThermostatCluster, AutoModeRejectsSetpointWhenDeadbandInfeasible)
 {
     // Constrain the cooling ceiling so the deadband cannot be preserved.
     ThermostatCluster::StartupConfiguration config = DefaultConfig();
-    config.maxCoolSetpointLimit                    = 2500;
     config.absMaxCoolSetpointLimit                 = 2500;
-    config.occupiedCoolingSetpoint                 = 2400;
 
     ClusterFixture fixture(kHeatCoolAuto, config);
+
+    fixture.cluster.SetMaxCoolSetpointLimit(2500);
+    fixture.cluster.SetOccupiedCoolingSetpoint(2400);
 
     // Heating 2400 would require cooling >= 2600, but cooling is capped at 2500 -> rejected, nothing changes.
     EXPECT_EQ(fixture.tester.WriteAttribute(OccupiedHeatingSetpoint::Id, static_cast<int16_t>(2400)), Status::InvalidValue);

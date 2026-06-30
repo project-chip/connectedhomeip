@@ -64,7 +64,6 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
@@ -72,7 +71,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Pump Configuration and Control
-    - Thermostat
     - Window Covering
     # keep-sorted end
 
@@ -84,7 +82,6 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Thermostat
     # keep-sorted end
 
 ClustersWithPreAttributeChangeFunctions:
@@ -95,7 +92,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Laundry Washer Controls
     - Mode Select
     - Pump Configuration and Control
-    - Thermostat
     - Thermostat User Interface Configuration
     # keep-sorted end
 

@@ -47,8 +47,7 @@ LazyRegisteredServerCluster<ThermostatCluster> gServers[kThermostatMaxClusterCou
 // retained here and also pushed onto the live cluster instance when available.
 Thermostat::Delegate * gDelegateTable[kThermostatMaxClusterCount] = { nullptr };
 
-/// Reads the Ember/ZAP-configured default for a single int16_t attribute, leaving the existing value
-/// untouched if no default is configured (so the spec default from StartupConfiguration is kept).
+/// Reads the Ember/ZAP configured default for a single int16_t attribute.
 void SeedFromDefault(Status (*getDefault)(EndpointId, int16_t *), EndpointId endpointId, int16_t & target)
 {
     int16_t value = target;
@@ -66,9 +65,7 @@ public:
     {
         ThermostatCluster::StartupConfiguration config;
 
-        // Seed the setpoint family and mode attributes from the Ember/ZAP defaults. Other optional
-        // scalar attributes fall back to their spec defaults from StartupConfiguration (TODO(3a-follow-up):
-        // seed the remaining optional scalars from ZAP for full parity).
+        // Seed the setpoint family and mode attributes from the Ember/ZAP defaults.
         SeedFromDefault(AbsMinHeatSetpointLimit::GetDefault, endpointId, config.absMinHeatSetpointLimit);
         SeedFromDefault(AbsMaxHeatSetpointLimit::GetDefault, endpointId, config.absMaxHeatSetpointLimit);
         SeedFromDefault(AbsMinCoolSetpointLimit::GetDefault, endpointId, config.absMinCoolSetpointLimit);
@@ -79,11 +76,13 @@ public:
         {
             config.numberOfSchedules = numberOfSchedules;
         }
+
         uint8_t numberOfScheduleTransitions = config.numberOfScheduleTransitions;
         if (NumberOfScheduleTransitions::GetDefault(endpointId, &numberOfScheduleTransitions) == Status::Success)
         {
             config.numberOfScheduleTransitions = numberOfScheduleTransitions;
         }
+
         DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay = config.numberOfScheduleTransitionPerDay;
         if (NumberOfScheduleTransitionPerDay::GetDefault(endpointId, numberOfScheduleTransitionPerDay) == Status::Success)
         {
@@ -137,30 +136,10 @@ void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterCluste
         integrationDelegate, shutdownType);
 }
 
-// Each per-endpoint ThermostatCluster now registers itself as a FabricTable::Delegate in its Startup(),
-// so there is no global fabric-delegate registration to do here.
+
 void MatterThermostatPluginServerInitCallback() {}
 
 void MatterThermostatPluginServerShutdownCallback() {}
-
-// The generated endpoint_config function array (chipFuncArrayThermostatServer) still references these
-// Ember per-cluster lifecycle hooks because the Thermostat attributes remain ZAP/RAM-declared. For the
-// code-driven cluster they are no-ops: endpoint init/registration happens in MatterThermostatClusterInitCallback,
-// attribute validation / change reporting now happen in ThermostatCluster::WriteAttribute, and atomic-write
-// teardown happens in ThermostatCluster::Shutdown (the Ember write path is no longer used for this cluster once
-// it is registered with the codegen data model provider).
-void emberAfThermostatClusterServerInitCallback(EndpointId endpoint) {}
-
-void MatterThermostatClusterServerShutdownCallback(EndpointId endpoint) {}
-
-void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-
-chip::Protocols::InteractionModel::Status
-MatterThermostatClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
 
 namespace chip {
 namespace app {
