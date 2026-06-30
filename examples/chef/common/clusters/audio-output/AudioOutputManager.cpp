@@ -70,7 +70,8 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
         if (outputData.index == index)
         {
             outputData.Rename(newName);
-            MatterReportingAttributeChangeCallback(mEndpoint, AudioOutput::Id, AudioOutput::Attributes::OutputList::Id);
+            MatterReportingAttributeChangeCallback(mEndpoint, chip::app::Clusters::AudioOutput::Id,
+                                                   chip::app::Clusters::AudioOutput::Attributes::OutputList::Id);
             return true;
         }
     }

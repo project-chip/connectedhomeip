@@ -109,7 +109,8 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
         if (inputData.index == index)
         {
             inputData.Rename(newName);
-            MatterReportingAttributeChangeCallback(mEndpoint, MediaInput::Id, MediaInput::Attributes::InputList::Id);
+            MatterReportingAttributeChangeCallback(mEndpoint, chip::app::Clusters::MediaInput::Id,
+                                                   chip::app::Clusters::MediaInput::Attributes::InputList::Id);
             return true;
         }
     }
