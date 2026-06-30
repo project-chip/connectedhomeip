@@ -1123,7 +1123,7 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
 
         // Bounds check: we decrypt in place a privacy header located inside the packet.
         // Validate that we are still within the packet as the length is based on header flags.
-        VerifyOrReturnValue(privacyHeader + privacyLength <= msgCopy->Start() + msgCopy->TotalLength(), false);
+        VerifyOrReturnValue((privacyHeader + privacyLength) <= (msgCopy->Start() + msgCopy->TotalLength()), false);
 
         if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, partialPacketHeader, mac))
         {
