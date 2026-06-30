@@ -199,23 +199,51 @@ public:
 
     CHIP_ERROR WiFiPAFCloseSession(chip::WiFiPAF::WiFiPAFSession & SessionInfo) override
     {
-        // If the PAF session closes while a ProxyMessageRequest is in flight (e.g.
-        // the ED disconnects from NAN when ConnectNetwork causes it to switch to
-        // infrastructure WiFi), the ack-received timer fires after PAFTP_ACK_TIMEOUT
-        // and the PAFTP layer calls here to close the session.  Without this
-        // handler the pending IM exchange would silently wait for the full 30-second
-        // commissioner-side timeout.  Resolve it immediately with Failure so the
-        // commissioner gets a timely error response.
-        for (auto & [sid, sess] : sPafSessions)
+        // The PAF session closed on its own — e.g. the ED dropped NAN when
+        // ConnectNetwork switched it to infrastructure WiFi, so the PAFTP
+        // ack-received timer fired and the layer is closing the session here.
+        // There is no ProxyDisconnectRequest, so this handler must run the same
+        // teardown the dispatcher would on disconnect: fail any in-flight
+        // ProxyMessage, drop the session from every map, terminate the NAN
+        // subscribe, and resume a background scan that was paused for the connect.
+        // (Mirrors the BLE transport's OnEndPointConnectionClosed handler.)
+        uint16_t sid                             = 0;
+        bool found                               = false;
+        chip::WiFiPAF::WiFiPAFSession pafSession = {};
+        for (auto & [id, sess] : sPafSessions)
         {
             if (sess.peer_id == SessionInfo.peer_id)
             {
-                ChipLogError(AppServer,
-                             "WiFiPAFCloseSession: PAF session closed with pending ProxyMessageRequest "
-                             "for proxy session %u — returning Failure to commissioner",
-                             sid);
-                ProxyDispatcher::DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
+                sid        = id;
+                pafSession = sess;
+                found      = true;
                 break;
+            }
+        }
+        if (found)
+        {
+            ChipLogError(AppServer, "WiFiPAFCloseSession: PAF session for proxy session %u closed by peer — cleaning up", sid);
+            // Resolve any in-flight ProxyMessageRequest so the commissioner gets a
+            // timely error instead of waiting out its 30 s timeout.
+            ProxyDispatcher::DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
+            sPafSessions.erase(sid);
+            chip::WiFiPAF::WiFiPAFLayer & layer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+            (void) layer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccSessionId, pafSession);
+            // Terminate the NAN subscribe (the subscriber session id IS the
+            // subscribe_id) so it does not linger in wpa_supplicant — same leak
+            // the ProxyDisconnect path guards against.  Do NOT CloseEndPoint here:
+            // the layer is already closing the endpoint (that is why we were called).
+            if (pafSession.id != 0)
+            {
+                (void) chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pafSession.id);
+            }
+            ProxyDispatcher::RemoveSession(sid);
+            // This path does not run through the dispatcher's OnAllSessionsClosed(),
+            // so resume a bg-scan paused for the connect once the last session is
+            // gone and no connect is mid-flight.
+            if (sPafSessions.empty() && sPafPendingConnect == nullptr)
+            {
+                OnAllSessionsClosed();
             }
         }
         if (mOriginalTransport != nullptr)
@@ -278,15 +306,38 @@ static void OnProxyConnectTimeout(chip::System::Layer * /*layer*/, void * /*appS
     chip::WiFiPAF::WiFiPAFSession keyNodeInfo{};
     keyNodeInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
     keyNodeInfo.discriminator = ctx->discriminator;
-    CHIP_ERROR rmErr          = pafLayer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyNodeInfo);
+
+    // If the PAFTP handshake already created an endpoint, capture the session
+    // (with peer_id/peer_addr) before RmPafSession clears the slot so we can also
+    // close the endpoint; otherwise it leaks from the 2-slot pool until its own
+    // connect/ack timer self-closes.  CloseEndPoint is a no-op if none exists.
+    chip::WiFiPAF::WiFiPAFSession endpointSession{};
+    bool haveEndpoint                     = false;
+    chip::WiFiPAF::WiFiPAFSession * pInfo  = pafLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccDisc, keyNodeInfo);
+    if (pInfo != nullptr)
+    {
+        endpointSession = *pInfo;
+        haveEndpoint    = true;
+    }
+
+    CHIP_ERROR rmErr = pafLayer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyNodeInfo);
     if (rmErr != CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "OnProxyConnectTimeout: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+    }
+    if (haveEndpoint)
+    {
+        pafLayer.CloseEndPoint(endpointSession);
     }
 
     if (cmd != nullptr)
         cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Timeout);
     delete ctx;
+
+    // The connect freed the NAN subscribe slot; resume a background scan that was
+    // paused or deferred for this connect (no session was ever registered, so the
+    // dispatcher's OnAllSessionsClosed path does not run for a failed connect).
+    OnAllSessionsClosed();
 }
 
 static void OnPafConnectSuccess(void * /*context*/)
@@ -357,14 +408,31 @@ static void OnPafConnectError(void * /*context*/, CHIP_ERROR err)
     chip::app::CommandHandler * cmd = ctx->handle.Get();
     ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAF connect failed: %" CHIP_ERROR_FORMAT, err.Format());
 
+    chip::WiFiPAF::WiFiPAFLayer & pafLayer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
     chip::WiFiPAF::WiFiPAFSession keyInfo{};
     keyInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
     keyInfo.discriminator = ctx->discriminator;
-    CHIP_ERROR rmErr =
-        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyInfo);
+
+    // Capture the session (with peer_id/peer_addr) before RmPafSession clears the
+    // slot so we can also close any PAFTP endpoint the handshake created; otherwise
+    // it leaks from the 2-slot pool.  CloseEndPoint is a no-op if none exists.
+    chip::WiFiPAF::WiFiPAFSession endpointSession{};
+    bool haveEndpoint                    = false;
+    chip::WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccDisc, keyInfo);
+    if (pInfo != nullptr)
+    {
+        endpointSession = *pInfo;
+        haveEndpoint    = true;
+    }
+
+    CHIP_ERROR rmErr = pafLayer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyInfo);
     if (rmErr != CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "OnPafConnectError: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+    }
+    if (haveEndpoint)
+    {
+        pafLayer.CloseEndPoint(endpointSession);
     }
 
     if (ctx->subscribeId != 0)
@@ -380,6 +448,11 @@ static void OnPafConnectError(void * /*context*/, CHIP_ERROR err)
     if (cmd != nullptr)
         cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
     delete ctx;
+
+    // The connect freed the NAN subscribe slot; resume a background scan that was
+    // paused or deferred for this connect (a failed connect registers no session,
+    // so the dispatcher's OnAllSessionsClosed path does not run).
+    OnAllSessionsClosed();
 }
 
 static void OnPafScanDone(void * /*context*/, const std::vector<chip::DeviceLayer::NanPeerInfo> & peers)
@@ -582,6 +655,10 @@ chip::Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex
         cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
     delete ctx;
 
+    // Cancelling freed the NAN subscribe slot; resume a background scan paused or
+    // deferred for this connect.
+    OnAllSessionsClosed();
+
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
@@ -693,7 +770,17 @@ chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transpo
     if (sBgScanCluster == nullptr)
         sBgScanCluster = cluster;
 
-    if (wasEmpty || sBgScanPaused)
+    if (sPafPendingConnect != nullptr)
+    {
+        // A ProxyConnect is in flight and has taken the single NAN subscribe slot
+        // (Connect pauses any background scan for exactly this reason).  Register
+        // this fabric but defer starting the hardware scan, and mark it paused so
+        // OnAllSessionsClosed() starts it once the connect resolves — starting it
+        // now would re-create the subscribe-slot contention the pause avoids.
+        sBgScanPaused = true;
+        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: connect in flight, deferring hardware scan start");
+    }
+    else if (wasEmpty || sBgScanPaused)
     {
         CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
         if (err != CHIP_NO_ERROR)

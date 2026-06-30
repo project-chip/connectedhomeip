@@ -96,8 +96,10 @@ static void ProxyMessageResponseTimeoutCallback(chip::System::Layer *, void * ap
     sPendingProxyMsgCtx.erase(it);
     ChipLogProgress(AppServer, "ProxyMessageRequest: responseTimeout expired for session %u", sessionId);
     chip::app::CommandHandler * cmd = ctx->handle.Get();
+    // Per CommissioningProxy spec: when the ProxyMessageRequest ResponseTimeout
+    // expires, the TIMEOUT status SHALL be returned (not a generic Failure).
     if (cmd != nullptr)
-        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
+        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Timeout);
     delete ctx;
 }
 

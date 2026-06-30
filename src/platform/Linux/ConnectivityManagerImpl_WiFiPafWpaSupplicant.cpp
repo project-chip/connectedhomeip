@@ -861,11 +861,15 @@ void ConnectivityManagerImpl::ScanNanSubscribeTerminated(guint subscribe_id, gch
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbContext)
 {
-    // Cannot start a one-shot scan while a background scan is running.
-    VerifyOrReturnError(mBgScanCb == nullptr, CHIP_ERROR_BUSY);
-
-    mScanCb        = cb;
-    mScanCbContext = cbContext;
+    // Read/modify the shared scan-callback state under the lock; ScanDiscoveryResult
+    // reads these members on the GLib/D-Bus thread under the same lock.
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        // Cannot start a one-shot scan while a background scan is running.
+        VerifyOrReturnError(mBgScanCb == nullptr, CHIP_ERROR_BUSY);
+        mScanCb        = cb;
+        mScanCbContext = cbContext;
+    }
 
     CHIP_ERROR result = StartWiFiManagementSync();
     VerifyOrReturnError(result == CHIP_NO_ERROR, result);
@@ -987,14 +991,19 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)
 {
     VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mScanCb == nullptr, CHIP_ERROR_BUSY);
 
-    // Already running — update callback and return success.
-    if (mBgScanCb != nullptr)
+    // Read/modify the shared scan-callback state under the lock; ScanDiscoveryResult
+    // reads these members on the GLib/D-Bus thread under the same lock.
     {
-        mBgScanCb    = cb;
-        mBgScanCbCtx = cbCtx;
-        return CHIP_NO_ERROR;
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        VerifyOrReturnError(mScanCb == nullptr, CHIP_ERROR_BUSY);
+        // Already running — update callback and return success.
+        if (mBgScanCb != nullptr)
+        {
+            mBgScanCb    = cb;
+            mBgScanCbCtx = cbCtx;
+            return CHIP_NO_ERROR;
+        }
     }
 
     CHIP_ERROR result = StartWiFiManagementSync();
@@ -1058,30 +1067,36 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
 
 void ConnectivityManagerImpl::WiFiPAFStopBackgroundScan()
 {
-    if (mBgScanCb == nullptr)
-        return;
-
-    ChipLogProgress(DeviceLayer, "WiFiPAFStopBackgroundScan: stopping subscribe_id=%u", mBgScanSubscribeId);
-
-    DisconnectScanSignals();
+    // Snapshot and clear the shared bg-scan state under the lock so a
+    // ScanDiscoveryResult running on the GLib/D-Bus thread (which reads these
+    // members under the same lock) cannot observe a half-torn-down scan.  Once
+    // mBgScanCb/mBgScanSubscribeId are cleared, a late discovery is discarded.
+    uint32_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-        mScanFreq = 0;
+        if (mBgScanCb == nullptr)
+            return;
+        subscribeId        = mBgScanSubscribeId;
+        mBgScanCb          = nullptr;
+        mBgScanCbCtx       = nullptr;
+        mBgScanSubscribeId = 0;
+        mScanFreq          = 0;
     }
 
-    CHIP_ERROR cancelErr = _WiFiPAFCancelSubscribe(mBgScanSubscribeId);
+    ChipLogProgress(DeviceLayer, "WiFiPAFStopBackgroundScan: stopping subscribe_id=%u", subscribeId);
+
+    // DisconnectScanSignals() and _WiFiPAFCancelSubscribe() each take
+    // mWpaSupplicantMutex internally, so they MUST be called without holding it.
+    DisconnectScanSignals();
+    CHIP_ERROR cancelErr = _WiFiPAFCancelSubscribe(subscribeId);
     if (cancelErr != CHIP_NO_ERROR)
         ChipLogDetail(DeviceLayer, "WiFiPAFStopBackgroundScan: CancelSubscribe: %" CHIP_ERROR_FORMAT, cancelErr.Format());
 
-    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = mBgScanSubscribeId };
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribeId };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
     CHIP_ERROR rmErr            = WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
     if (rmErr != CHIP_NO_ERROR)
         ChipLogDetail(DeviceLayer, "WiFiPAFStopBackgroundScan: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
-
-    mBgScanCb          = nullptr;
-    mBgScanCbCtx       = nullptr;
-    mBgScanSubscribeId = 0;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
