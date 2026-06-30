@@ -62,6 +62,6 @@ void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
     VerifyOrDie(endpoint == 1); // this cluster is only enabled for endpoint 1.
     LaundryWasherControlsServer::SetDelegate(endpoint, LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 
-    LaundryWasherControlsServer::SetNumberOfRinses(endpoint, NumberOfRinsesEnum::kNormal);
-    LaundryWasherControlsServer::SetSpinSpeedCurrent(endpoint, 1);
+    LogErrorOnFailure(LaundryWasherControlsServer::SetNumberOfRinses(endpoint, NumberOfRinsesEnum::kNormal));
+    LogErrorOnFailure(LaundryWasherControlsServer::SetSpinSpeedCurrent(endpoint, 1));
 }
