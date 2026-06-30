@@ -268,7 +268,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Begin privacy encrypt for appropriate header fields
 
         // Since we are not using chained buffers, the message data length should be equal to the total length
-        if(message->TotalLength() != message->DataLength()) {
+        if (message->TotalLength() != message->DataLength())
+        {
             ChipLogError(ExchangeManager, "PrepareMessage: Total length of message does not match the data length.");
             return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
         }
