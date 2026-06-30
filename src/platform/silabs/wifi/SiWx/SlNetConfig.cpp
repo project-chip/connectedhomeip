@@ -15,15 +15,20 @@
  *    limitations under the License.
  */
 
+
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "ble_config.h"
-#include "wifi_config.h"
+#endif // SLI_SI91X_ENABLE_BLE
+#include "SlNetConfig.h"
+
+#include <lib/support/CodeUtils.h>
 
 extern "C" {
 #include "sl_si91x_types.h"
 #include "sl_wifi.h"
 }
 
-sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void)
+sl_wifi_device_configuration_t SLNetGetDefaultDeviceConfiguration(void)
 {
     return {
         .boot_option = LOAD_NWP_FW,
@@ -44,13 +49,9 @@ sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void)
     };
 }
 
-void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
+void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
 {
-    if (configuration == nullptr)
-    {
-        return;
-    }
-
+    VerifyOrReturn(configuration != nullptr);
 #ifndef SLI_SI91X_MCU_INTERFACE
     configuration->boot_config.feature_bit_map |= SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1 | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE;
     configuration->boot_config.config_feature_bit_map |= SL_SI91X_FEAT_SLEEP_GPIO_SEL_BITMAP;
@@ -59,15 +60,19 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
 #ifdef ipv6_FEATURE_REQUIRED
     configuration->boot_config.tcp_ip_feature_bit_map |=
         (SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6);
-#endif
+#endif // ipv6_FEATURE_REQUIRED
+}
 
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
+{
+    VerifyOrReturn(configuration != nullptr);
     configuration->boot_config.coex_mode = SL_SI91X_WLAN_BLE_MODE;
     configuration->boot_config.ext_custom_feature_bit_map |= SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE;
     configuration->boot_config.bt_feature_bit_map = RSI_BT_FEATURE_BITMAP;
 #if (RSI_BT_GATT_ON_CLASSIC)
     configuration->boot_config.bt_feature_bit_map |= SL_SI91X_BT_ATT_OVER_CLASSIC_ACL;
-#endif
+#endif // RSI_BT_GATT_ON_CLASSIC
     configuration->boot_config.ble_feature_bit_map =
         ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS) |
           SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS) | SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV) |
@@ -76,29 +81,29 @@ void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t *
          SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS) | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
 #if RSI_BLE_GATT_ASYNC_ENABLE
          | SL_SI91X_BLE_GATT_ASYNC_ENABLE
-#endif
+#endif // RSI_BLE_GATT_ASYNC_ENABLE
         );
     configuration->boot_config.ble_ext_feature_bit_map =
         (SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS) | SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES))
 #if RSI_BLE_INDICATE_CONFIRMATION_FROM_HOST
         | SL_SI91X_BLE_INDICATE_CONFIRMATION_FROM_HOST
-#endif
+#endif // RSI_BLE_INDICATE_CONFIRMATION_FROM_HOST
 #if RSI_BLE_MTU_EXCHANGE_FROM_HOST
         | SL_SI91X_BLE_MTU_EXCHANGE_FROM_HOST
-#endif
+#endif // RSI_BLE_MTU_EXCHANGE_FROM_HOST
 #if RSI_BLE_SET_SCAN_RESP_DATA_FROM_HOST
         | SL_SI91X_BLE_SET_SCAN_RESP_DATA_FROM_HOST
-#endif
+#endif // RSI_BLE_SET_SCAN_RESP_DATA_FROM_HOST
 #if RSI_BLE_DISABLE_CODED_PHY_FROM_HOST
         | SL_SI91X_BLE_DISABLE_CODED_PHY_FROM_HOST
-#endif
+#endif // RSI_BLE_DISABLE_CODED_PHY_FROM_HOST
 #if BLE_SIMPLE_GATT
         | SL_SI91X_BLE_GATT_INIT
 #endif
         ;
-#endif // SLI_SI91X_ENABLE_BLE
 
 #ifdef RSI_PROCESS_MAX_RX_DATA
     configuration->boot_config.ext_tcp_ip_feature_bit_map |= SL_SI91X_EXT_TCP_MAX_RECV_LENGTH;
-#endif
+#endif // RSI_PROCESS_MAX_RX_DATA
 }
+#endif // SLI_SI91X_ENABLE_BLE

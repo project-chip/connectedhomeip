@@ -20,7 +20,7 @@
 #endif // SL_MATTER_GN_BUILD
 
 #include "ble_config.h"
-#include "wifi_config.h"
+#include "SlNetConfig.h"
 #include "sl_status.h"
 #include "sl_wifi_device.h"
 
@@ -233,6 +233,48 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     return SL_STATUS_OK;
 }
 
+sl_status_t SiWxPlatformInit(void)
+{
+    sl_status_t status = SL_STATUS_OK;
+
+#ifdef SLI_SI91X_MCU_INTERFACE
+    // SoC Configurations
+    uint8_t xtal_enable = 1;
+    status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, nullptr);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status)));
+#endif // SLI_SI91X_MCU_INTERFACE
+
+    sl_wifi_firmware_version_t version = { 0 };
+    status                             = sl_wifi_get_firmware_version(&version);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_get_firmware_version failed: 0x%lx", static_cast<uint32_t>(status)));
+
+    ChipLogDetail(DeviceLayer, "Firmware version is: %x%x.%d.%d.%d.%d.%d.%d", version.chip_id, version.rom_id, version.major,
+                  version.minor, version.security_version, version.patch_num, version.customer_id, version.build_num);
+
+    status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, reinterpret_cast<sl_mac_address_t *>(wfx_rsi.sta_mac.data()));
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_wifi_get_mac_address failed: 0x%lx", static_cast<uint32_t>(status)));
+
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+    constexpr uint32_t trngKey[TRNG_KEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+
+    // To check the Entropy of TRNG and verify TRNG functioning.
+    status = sl_si91x_trng_entropy();
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_trng_entropy failed: 0x%lx", static_cast<uint32_t>(status)));
+
+    // Initiate and program the key required for TRNG hardware engine
+    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNG_KEY_SIZE);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%lx", static_cast<uint32_t>(status)));
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+
+    wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationInit);
+    return status;
+}
+
 sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_result, uint32_t result_length, void * arg)
 {
     sl_status_t status = SL_STATUS_OK;
@@ -416,48 +458,6 @@ sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInte
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-sl_status_t SiWxPlatformInit(void)
-{
-    sl_status_t status = SL_STATUS_OK;
-
-#ifdef SLI_SI91X_MCU_INTERFACE
-    // SoC Configurations
-    uint8_t xtal_enable = 1;
-    status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_si91x_m4_ta_secure_handshake failed: 0x%lx", static_cast<uint32_t>(status)));
-#endif // SLI_SI91X_MCU_INTERFACE
-
-    sl_wifi_firmware_version_t version = { 0 };
-    status                             = sl_wifi_get_firmware_version(&version);
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_wifi_get_firmware_version failed: 0x%lx", static_cast<uint32_t>(status)));
-
-    ChipLogDetail(DeviceLayer, "Firmware version is: %x%x.%d.%d.%d.%d.%d.%d", version.chip_id, version.rom_id, version.major,
-                  version.minor, version.security_version, version.patch_num, version.customer_id, version.build_num);
-
-    status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, reinterpret_cast<sl_mac_address_t *>(wfx_rsi.sta_mac.data()));
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_wifi_get_mac_address failed: 0x%lx", static_cast<uint32_t>(status)));
-
-#ifdef SL_MBEDTLS_USE_TINYCRYPT
-    constexpr uint32_t trngKey[TRNG_KEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
-
-    // To check the Entropy of TRNG and verify TRNG functioning.
-    status = sl_si91x_trng_entropy();
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_si91x_trng_entropy failed: 0x%lx", static_cast<uint32_t>(status)));
-
-    // Initiate and program the key required for TRNG hardware engine
-    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNG_KEY_SIZE);
-    VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_si91x_trng_program_key failed: 0x%lx", static_cast<uint32_t>(status)));
-#endif // SL_MBEDTLS_USE_TINYCRYPT
-
-    wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationInit);
-    return status;
-}
-
 } // namespace
 
 namespace chip {
@@ -512,8 +512,11 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // The device configuration must be fully built before sl_net_init, which consumes it.
-    sl_wifi_device_configuration_t deviceConfiguration = MatterWifiGetDefaultDeviceConfiguration();
-    MatterWifiApplyOptionalDeviceConfiguration(&deviceConfiguration);
+    sl_wifi_device_configuration_t deviceConfiguration = SLNetGetDefaultDeviceConfiguration();
+    SLWiFiApplyDeviceConfiguration(&deviceConfiguration);
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+    SLBLEApplyDeviceConfiguration(&deviceConfiguration);
+#endif // SLI_SI91X_ENABLE_BLE
 
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &deviceConfiguration, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));

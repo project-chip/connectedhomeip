@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
  */
 
 /**
- * @file wifi_config.h
+ * @file SlNetConfig.h
  * @brief Matter SiWx Wi-Fi device configuration.
  *
  * Configuration is built from a default value, then optional parameters are applied:
  *
- *   config = MatterWifiGetDefaultDeviceConfiguration();
- *   MatterWifiApplyOptionalDeviceConfiguration(&config);
- *
- * Include ble_config.h before this header.
+ *   config = SLNetGetDefaultDeviceConfiguration();
+ *   SLWiFiApplyDeviceConfiguration(&config);
+ *   SLBLEApplyDeviceConfiguration(&config);
  */
 
 #pragma once
@@ -33,30 +32,38 @@
 #include "sl_wifi_constants.h"
 #include "sl_wifi_device.h"
 
-#ifndef REGION_CODE
-#define REGION_CODE US
-#endif // !REGION_CODE
 
 #if (SL_SI91X_ACX_MODULE == 1)
 #define REGION_CODE_BITMAP IGNORE_REGION
 #define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_INTERNAL_SWITCH
-#else
-#define REGION_CODE_BITMAP REGION_CODE
-#define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
 #endif // SL_SI91X_ACX_MODULE
 
 #if (USE_BYPASS_CLOCK == 1)
 #define SL_SI91X_CLK SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
-#else
-#define SL_SI91X_CLK SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1)
 #endif // USE_BYPASS_CLOCK
+
+#ifndef REGION_CODE_BITMAP
+#define REGION_CODE_BITMAP US
+#endif // !REGION_CODE_BITMAP
+
+#ifndef FRONT_END_SWITCH_CTRL
+#define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
+#endif // !FRONT_END_SWITCH_CTRL
+
+#ifndef SL_SI91X_CLK
+#define SL_SI91X_CLK SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1)
+#endif // !SL_SI91X_CLK
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-sl_wifi_device_configuration_t MatterWifiGetDefaultDeviceConfiguration(void);
-void MatterWifiApplyOptionalDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
+sl_wifi_device_configuration_t SLNetGetDefaultDeviceConfiguration(void);
+void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
+
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
+#endif // SLI_SI91X_ENABLE_BLE
 
 #ifdef __cplusplus
 }
