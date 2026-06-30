@@ -193,11 +193,41 @@ public:
     uint32_t GetSetpointChangeSourceTimestamp();
 
     // EmergencyHeatDelta
-    void SetEmergencyHeatDelta(uint32_t value);
-    uint32_t GetEmergencyHeatDelta();
+    void SetEmergencyHeatDelta(uint8_t value);
+    uint8_t GetEmergencyHeatDelta();
 
+    // ACType
+    void SetACType(ACTypeEnum value);
+    ACTypeEnum GetACType();
 
+    // ACCapacity
+    void SetACCapacity(uint16_t value);
+    uint16_t GetACCapacity();
+
+    // ACCapacity
+    void SetACRefrigerantType(ACRefrigerantTypeEnum value);
+    ACRefrigerantTypeEnum GetACRefrigerantType();
+
+    // ACCompressorType
+    void SetACCompressorType(ACCompressorTypeEnum value);
+    ACCompressorTypeEnum GetACCompressorType();
+
+    // ACErrorCode
+    void SetACErrorCode(BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> value);
+    BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> GetACErrorCode();
+
+    // ACLouverPosition
+    void SetACLouverPosition(ACLouverPositionEnum value);
+    ACLouverPositionEnum GetACLouverPosition();
+
+    // ACCoilTemperature
     void SetACCoilTemperature(DataModel::Nullable<int16_t> value);
+    DataModel::Nullable<int16_t> GetACCoilTemperature();
+
+    // ACCapacityFormat
+    void SetACCapacityFormat(ACCapacityFormatEnum value);
+    ACCapacityFormatEnum GetACCapacityFormat();
+
     // Handle setters also persist their values across reboots.
     void SetActivePresetHandle(DataModel::Nullable<ByteSpan> value);
     void SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> value);
@@ -355,19 +385,19 @@ private:
     DataModel::Nullable<uint16_t> mTemperatureSetpointHoldDuration{};
     BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> mThermostatRunningState{};
     SetpointChangeSourceEnum mSetpointChangeSource{};
-    Attributes::SetpointChangeAmount::TypeInfo::Type mSetpointChangeAmount{};
+    DataModel::Nullable<int16_t> mSetpointChangeAmount{};
     uint32_t mSetpointChangeSourceTimestamp{};
-    Attributes::EmergencyHeatDelta::TypeInfo::Type mEmergencyHeatDelta{};
-    Attributes::ACType::TypeInfo::Type mACType{};
-    Attributes::ACCapacity::TypeInfo::Type mACCapacity{};
-    Attributes::ACRefrigerantType::TypeInfo::Type mACRefrigerantType{};
-    Attributes::ACCompressorType::TypeInfo::Type mACCompressorType{};
-    Attributes::ACErrorCode::TypeInfo::Type mACErrorCode{};
+    uint8_t mEmergencyHeatDelta{};
+    ACTypeEnum mACType{};
+    uint16_t mACCapacity{};
+    ACRefrigerantTypeEnum mACRefrigerantType{};
+    ACCompressorTypeEnum mACCompressorType{};
+    BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> mACErrorCode{};
     // ACLouverPositionEnum has no 0 value (0 == kUnknownEnumValue, which must never be transmitted), so
     // default to the first valid value rather than {} to avoid emitting a constraint-invalid enum.
-    Attributes::ACLouverPosition::TypeInfo::Type mACLouverPosition{ ACLouverPositionEnum::kClosed };
-    Attributes::ACCoilTemperature::TypeInfo::Type mACCoilTemperature{};
-    Attributes::ACCapacityformat::TypeInfo::Type mACCapacityformat{};
+    ACLouverPositionEnum mACLouverPosition{ ACLouverPositionEnum::kClosed };
+    DataModel::Nullable<int16_t> mACCoilTemperature{};
+    ACCapacityFormatEnum mACCapacityFormat{};
     Attributes::NumberOfSchedules::TypeInfo::Type mNumberOfSchedules{};
     Attributes::NumberOfScheduleTransitions::TypeInfo::Type mNumberOfScheduleTransitions{};
     Attributes::NumberOfScheduleTransitionPerDay::TypeInfo::Type mNumberOfScheduleTransitionPerDay{};

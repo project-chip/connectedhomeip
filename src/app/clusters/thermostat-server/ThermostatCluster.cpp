@@ -147,7 +147,7 @@ void ThermostatCluster::LoadPersistentAttributes()
     const auto defaultACRefrigerantType = mACRefrigerantType;
     const auto defaultACCompressorType  = mACCompressorType;
     const auto defaultACLouverPos       = mACLouverPosition;
-    const auto defaultACCapacityFmt     = mACCapacityformat;
+    const auto defaultACCapacityFmt     = mACCapacityFormat;
 
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
                                           mLocalTemperatureCalibration, defaultLocalTempCalib);
@@ -166,7 +166,7 @@ void ThermostatCluster::LoadPersistentAttributes()
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
                                           mACLouverPosition, defaultACLouverPos);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
-                                          mACCapacityformat, defaultACCapacityFmt);
+                                          mACCapacityFormat, defaultACCapacityFmt);
 
     // Load binary handle attributes using raw ReadValue (ByteSpan is not an arithmetic/enum type).
     {
@@ -509,7 +509,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
     case ACCoilTemperature::Id:
         return encoder.Encode(mACCoilTemperature);
     case ACCapacityformat::Id:
-        return encoder.Encode(mACCapacityformat);
+        return encoder.Encode(mACCapacityFormat);
     case NumberOfSchedules::Id:
         return encoder.Encode(mNumberOfSchedules);
     case NumberOfScheduleTransitions::Id:
@@ -828,9 +828,121 @@ uint32_t ThermostatCluster::GetSetpointChangeSourceTimestamp()
     return mSetpointChangeSourceTimestamp;
 }
 
+void ThermostatCluster::SetEmergencyHeatDelta(uint8_t value)
+{
+    VerifyOrReturn(SetAttributeValue(mEmergencyHeatDelta, value, EmergencyHeatDelta::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, EmergencyHeatDelta::Id },
+        { reinterpret_cast<const uint8_t *>(&mEmergencyHeatDelta), sizeof(mEmergencyHeatDelta) }));
+}
+
+uint8_t ThermostatCluster::GetEmergencyHeatDelta()
+{
+    return mEmergencyHeatDelta;
+}
+
+void ThermostatCluster::SetACType(ACTypeEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACType, value, ACType::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACType::Id },
+        { reinterpret_cast<const uint8_t *>(&mACType), sizeof(mACType) }));
+
+}
+
+ACTypeEnum ThermostatCluster::GetACType()
+{
+    return mACType;
+}
+
+void ThermostatCluster::SetACCapacity(uint16_t value)
+{
+    VerifyOrReturn(SetAttributeValue(mACCapacity, value, ACCapacity::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACCapacity::Id },
+        { reinterpret_cast<const uint8_t *>(&mACCapacity), sizeof(mACCapacity) }));
+
+}
+
+uint16_t ThermostatCluster::GetACCapacity()
+{
+    return mACCapacity;
+}
+
+void ThermostatCluster::SetACRefrigerantType(ACRefrigerantTypeEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACRefrigerantType, value, ACRefrigerantType::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id },
+        { reinterpret_cast<const uint8_t *>(&mACRefrigerantType), sizeof(mACRefrigerantType) }));
+
+}
+
+ACRefrigerantTypeEnum ThermostatCluster::GetACRefrigerantType()
+{
+    return mACRefrigerantType;
+}
+
+void ThermostatCluster::SetACCompressorType(ACCompressorTypeEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACCompressorType, value, ACCompressorType::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id },
+        { reinterpret_cast<const uint8_t *>(&mACCompressorType), sizeof(mACCompressorType) }));
+
+}
+
+ACCompressorTypeEnum ThermostatCluster::GetACCompressorType()
+{
+    return mACCompressorType;
+}
+
+void ThermostatCluster::SetACErrorCode(BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> value)
+{
+    VerifyOrReturn(SetAttributeValue(mACErrorCode, value, ACErrorCode::Id));
+}
+
+BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> ThermostatCluster::GetACErrorCode()
+{
+    return mACErrorCode;
+}
+
+void ThermostatCluster::SetACLouverPosition(ACLouverPositionEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACLouverPosition, value, ACLouverPosition::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
+        { reinterpret_cast<const uint8_t *>(&mACLouverPosition), sizeof(mACLouverPosition) }));
+
+}
+
+ACLouverPositionEnum ThermostatCluster::GetACLouverPosition()
+{
+    return mACLouverPosition;
+}
+
 void ThermostatCluster::SetACCoilTemperature(DataModel::Nullable<int16_t> value)
 {
     SetAttributeValue(mACCoilTemperature, value, ACCoilTemperature::Id);
+}
+
+DataModel::Nullable<int16_t> ThermostatCluster::GetACCoilTemperature()
+{
+    return mACCoilTemperature;
+}
+
+void ThermostatCluster::SetACCapacityFormat(ACCapacityFormatEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACCapacityFormat, value, ACCapacityformat::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
+        { reinterpret_cast<const uint8_t *>(&mACCapacityFormat), sizeof(mACCapacityFormat) }));
+
+}
+
+ACCapacityFormatEnum ThermostatCluster::GetACCapacityFormat()
+{
+    return mACCapacityFormat;
 }
 
 void ThermostatCluster::SetActivePresetHandle(DataModel::Nullable<ByteSpan> value)
@@ -1175,7 +1287,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACLouverPosition));
     case ACCapacityformat::Id:
         return NotifyAttributeChangedIfSuccess(ACCapacityformat::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacityformat));
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacityFormat));
     default:
         return Status::UnsupportedWrite;
     }
