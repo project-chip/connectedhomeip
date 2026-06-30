@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "ble_config.h"
 #endif // SLI_SI91X_ENABLE_BLE
@@ -30,23 +29,23 @@ extern "C" {
 
 sl_wifi_device_configuration_t SLNetGetDefaultDeviceConfiguration(void)
 {
-    return {
-        .boot_option = LOAD_NWP_FW,
-        .mac_address = nullptr,
-        .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
-        .region_code = REGION_CODE_BITMAP,
-        .boot_config = { .oper_mode                  = SL_SI91X_CLIENT_MODE,
-                         .coex_mode                  = 0,
-                         .feature_bit_map            = SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_WPS_DISABLE,
-                         .tcp_ip_feature_bit_map     = (SL_SI91X_TCP_IP_FEAT_BYPASS | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
-                         .custom_feature_bit_map     = SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID,
-                         .ext_custom_feature_bit_map = SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_CLK | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV | FRONT_END_SWITCH_CTRL | SL_SI91X_EXT_FEAT_IEEE_80211W,
-                         .bt_feature_bit_map         = 0,
-                         .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENTION_VALID,
-                         .ble_feature_bit_map        = 0,
-                         .ble_ext_feature_bit_map    = 0,
-                         .config_feature_bit_map     = SL_SI91X_ENABLE_ENHANCED_MAX_PSP }
-    };
+    return { .boot_option = LOAD_NWP_FW,
+             .mac_address = nullptr,
+             .band        = SL_SI91X_WIFI_BAND_2_4GHZ,
+             .region_code = REGION_CODE_BITMAP,
+             .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
+                              .coex_mode = 0,
+                              .feature_bit_map =
+                                  SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_WPS_DISABLE,
+                              .tcp_ip_feature_bit_map     = (SL_SI91X_TCP_IP_FEAT_BYPASS | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
+                              .custom_feature_bit_map     = SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID,
+                              .ext_custom_feature_bit_map = SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_CLK |
+                                  SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV | FRONT_END_SWITCH_CTRL | SL_SI91X_EXT_FEAT_IEEE_80211W,
+                              .bt_feature_bit_map         = 0,
+                              .ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENTION_VALID,
+                              .ble_feature_bit_map        = 0,
+                              .ble_ext_feature_bit_map    = 0,
+                              .config_feature_bit_map     = SL_SI91X_ENABLE_ENHANCED_MAX_PSP } };
 }
 
 void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
@@ -58,8 +57,7 @@ void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configurati
 #endif // SLI_SI91X_MCU_INTERFACE
 
 #ifdef ipv6_FEATURE_REQUIRED
-    configuration->boot_config.tcp_ip_feature_bit_map |=
-        (SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6);
+    configuration->boot_config.tcp_ip_feature_bit_map |= (SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6);
 #endif // ipv6_FEATURE_REQUIRED
 }
 
@@ -74,9 +72,8 @@ void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuratio
     configuration->boot_config.bt_feature_bit_map |= SL_SI91X_BT_ATT_OVER_CLASSIC_ACL;
 #endif // RSI_BT_GATT_ON_CLASSIC
     configuration->boot_config.ble_feature_bit_map =
-        ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS) |
-          SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS) | SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV) |
-          SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC)) |
+        ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS) | SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS) |
+          SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV) | SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC)) |
          SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENTION_VALID | SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX) |
          SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS) | SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE
 #if RSI_BLE_GATT_ASYNC_ENABLE

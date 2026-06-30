@@ -32,7 +32,6 @@
 #include "sl_wifi_constants.h"
 #include "sl_wifi_device.h"
 
-
 #if (SL_SI91X_ACX_MODULE == 1)
 #define REGION_CODE_BITMAP IGNORE_REGION
 #define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_INTERNAL_SWITCH

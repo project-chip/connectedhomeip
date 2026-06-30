@@ -19,8 +19,8 @@
 #include "sl_matter_wifi_config.h"
 #endif // SL_MATTER_GN_BUILD
 
-#include "ble_config.h"
 #include "SlNetConfig.h"
+#include "ble_config.h"
 #include "sl_status.h"
 #include "sl_wifi_device.h"
 
@@ -287,7 +287,7 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
         }
         // SET FALLBACK VALUES FOR THE SCAN
         wfx_rsi.ap_chan = SL_WIFI_AUTO_CHANNEL;
-        security = SL_WIFI_WPA3_TRANSITION;
+        security        = SL_WIFI_WPA3_TRANSITION;
     }
     else
     {
