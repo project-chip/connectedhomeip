@@ -36,10 +36,13 @@ source_set("commissioning-proxy") {
     "commissioning-proxy-delegate-impl.h",
   ]
 
-  # Per-transport implementations compiled only when the transport stack is
-  # enabled.  Only the BLE transport ships in this PR; the WiFi-PAF transport
-  # (CommissioningProxyPafTransport.*) and the Linux WiFi-PAF platform support
-  # it depends on land in a follow-up PR.
+  # Per-transport implementations compiled only when the transport stack is enabled.
+  if (chip_device_config_enable_wifipaf) {
+    sources += [
+      "CommissioningProxyPafTransport.cpp",
+      "CommissioningProxyPafTransport.h",
+    ]
+  }
   if (chip_config_network_layer_ble) {
     sources += [
       "CommissioningProxyBleTransport.cpp",
@@ -53,6 +56,12 @@ source_set("commissioning-proxy") {
     "${chip_root}/src/lib",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
+
+  if (chip_device_config_enable_wifipaf) {
+    deps += [
+      "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+    ]
+  }
 
   include_dirs = [ "." ]
 }

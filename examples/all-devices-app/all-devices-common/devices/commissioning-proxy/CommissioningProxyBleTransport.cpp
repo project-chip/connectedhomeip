@@ -87,9 +87,9 @@ static BleLayer * GetBleLayer()
 // ------------------------------------------------------------------
 // Background scan state (ProxyBackGroundScanStartRequest path)
 //
-// Background-scan bookkeeping: a per-fabric record of the requested transport
-// (kBle only here) plus a per-device result cache with TTL.  BLE has a single
-// ChipDeviceScanner shared with the foreground scan
+// Mirrors the PAF transport's background-scan bookkeeping: a per-fabric record
+// of the requested transport (kBle only here) plus a per-device result cache
+// with TTL.  BLE has a single ChipDeviceScanner shared with the foreground scan
 // and with connect (NewBleConnectionByDiscriminator), so the background scan is
 // paused (StopProxyScan) whenever one of those needs the scanner and resumed
 // afterwards — see PauseBleBgScan / ResumeBleBgScanIfNeeded.

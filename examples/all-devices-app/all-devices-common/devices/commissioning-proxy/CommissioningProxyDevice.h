@@ -41,6 +41,10 @@ public:
 private:
     Clusters::CommissioningProxy::MyCPDelegate mDelegate;
     LazyRegisteredServerCluster<Clusters::CommissioningProxy::CommissioningProxyCluster> mCluster;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    static void OnDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+#endif
 };
 
 } // namespace app

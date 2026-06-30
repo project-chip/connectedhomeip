@@ -92,10 +92,9 @@ The application supports the following device types (specified via the
 -   `soil-sensor`
 -   `speaker`
 -   `water-freeze-detector`
--   `water-leak-detector` <<<<<<< cp-pr3-all-devices-app
--   # `commissioning-proxy`
+-   `water-leak-detector`
 -   `water-valve`
-    > > > > > > > master
+-   `commissioning-proxy`
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -106,11 +105,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-<<<<<<< cp-pr3-all-devices-app
-  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|flow-sensor|humidity-sensor|light-sensor|occupancy-sensor|on-off-light|power-source|pressure-sensor|rain-sensor|soil-sensor|speaker|water-freeze-detector|water-leak-detector|commissioning-proxy>
-=======
-  --device <air-purifier|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|mounted-dimmable-load-control|mounted-on-off-control|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|rain-sensor|refrigerator|soil-sensor|speaker|water-freeze-detector|water-leak-detector|water-valve>
->>>>>>> master
+  --device <air-purifier|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|mounted-dimmable-load-control|mounted-on-off-control|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|rain-sensor|refrigerator|soil-sensor|speaker|water-freeze-detector|water-leak-detector|water-valve|commissioning-proxy>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -229,13 +224,22 @@ This example supports the Commissioning Proxy cluster as the
 `commissioning-proxy` device type, with the `MA-commissioning-by-proxy` device
 type. It is enabled by `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY` in
 `posix/include/CHIPProjectAppConfig.h` and lets the app act as a commissioning
-proxy over BLE.
+proxy over WiFi-PAF and/or BLE.
 
-The BLE transport is included when `chip_config_network_layer_ble` is true (so
-it is disabled by the `-no-ble` build variants). `ProxyScanRequest` and the
-proxy connect/message/disconnect flow then operate over BLE.
+The compiled in transport(s) follow this build configuration:
 
-To build on Linux x86-64 run:
+-   **WiFi-PAF** is included when `chip_device_config_enable_wifipaf` is true
+    (the default for Linux builds with WiFi enabled). When WiFi-PAF is compiled
+    in, the cluster advertises the `WiFiNetworkInterface` feature and the
+    `WiFiBand` attribute; the supported bands are derived from the `freq_list`
+    passed via `--wifipaf`.
+-   **BLE** is included when `chip_config_network_layer_ble` is true.
+
+`ProxyScanRequest` and the proxy connect/message/disconnect flow work over
+whichever transport(s) are compiled in.
+
+The `-no-ble` build variants disables the BLE transport. To build with both BLE
+and WiFi-PAF on Linux x86-64 run:
 
 ```
 $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl build"
@@ -247,10 +251,10 @@ And to compile on Linux ARM run:
 $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl build"
 ```
 
-To start the app as a proxy on endpoint 5:
+To start the app as a proxy over WiFi-PAF on channel 6 (2437 MHz) on endpoint 5:
 
 ```
-$ ./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5
+$ ./out/linux-x64-all-devices-boringssl/all-devices-app --device commissioning-proxy:5 --wifi --wifipaf freq_list=2437
 ```
 
 The cluster's attributes and commands can then be exercised on endpoint 5.

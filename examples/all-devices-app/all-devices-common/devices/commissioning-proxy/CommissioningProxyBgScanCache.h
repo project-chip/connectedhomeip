@@ -38,8 +38,8 @@ class CommissioningProxyCluster;
 // one timer per cached device.
 //
 // Thread/locking: every entry point must be called with the CHIP stack lock held
-// (BLE discovery arrives via the platform ProxyScanForwarder which locks; all
-// timer/attribute callbacks already run on the Matter thread).
+// (BLE discovery arrives via the platform ProxyScanForwarder which locks; PAF
+// discovery and all timer/attribute callbacks already run on the Matter thread).
 namespace BgScanCache {
 
 using ScanResultEntry = Structs::ScanResultStruct::Type;

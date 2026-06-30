@@ -32,6 +32,9 @@
 #include <map>
 #include <vector>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include "CommissioningProxyPafTransport.h"
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
 #include "CommissioningProxyBleTransport.h"
 #endif
@@ -50,8 +53,8 @@ constexpr uint8_t kMaxProxySessions = 1;
 // Proxy session tracking (transport-agnostic)
 //
 // Maps a proxy sessionId to its owning transport + fabric.  Per-transport
-// state (BLE: BLEEndPoint *) lives in the corresponding per-transport module's
-// own map.
+// state (PAF: WiFiPAFSession; BLE: BLEEndPoint *) lives in the corresponding
+// per-transport module's own map.
 // ------------------------------------------------------------------
 
 struct ProxySessionInfo
@@ -69,8 +72,8 @@ static uint16_t sNextProxySessionId = 1;
 // ProxyMessageRequest response routing
 //
 // One in-flight ProxyMessageRequest per session: keeps the IM exchange open
-// until the commissionee replies (over BLE) and the per-transport module hands
-// the bytes back via ProxyDispatcher::DispatchMessageResponse.
+// until the commissionee replies (over PAF or BLE) and the per-transport
+// module hands the bytes back via ProxyDispatcher::DispatchMessageResponse.
 // ------------------------------------------------------------------
 
 struct ProxyMsgCtx
@@ -311,6 +314,11 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 
     switch (transport)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case CapabilitiesBitmap::kWiFiPAF:
+        return Paf::Connect(commandObj, request, discriminator, timeout, mServer);
+#endif
+
 #if CONFIG_NETWORK_LAYER_BLE
     case CapabilitiesBitmap::kBle:
         return Ble::Connect(commandObj, request, discriminator, timeout, mServer);
@@ -353,6 +361,16 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     // Success so the first real failure (from either branch) is recorded.
     auto firstError = chip::Protocols::InteractionModel::Status::Success;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (requested.Has(CapabilitiesBitmap::kWiFiPAF))
+    {
+        auto s = Paf::Scan(scanMaxTime);
+        if (s == chip::Protocols::InteractionModel::Status::Success)
+            agg->pending++;
+        else if (firstError == chip::Protocols::InteractionModel::Status::Success)
+            firstError = s;
+    }
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     if (requested.Has(CapabilitiesBitmap::kBle))
     {
@@ -460,6 +478,11 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
         CHIP_ERROR sendErr = CHIP_ERROR_INCORRECT_STATE;
         switch (sessTransport)
         {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        case CapabilitiesBitmap::kWiFiPAF:
+            sendErr = Paf::SendMessage(sessionId, std::move(buf));
+            break;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
         case CapabilitiesBitmap::kBle:
             sendErr = Ble::SendMessage(sessionId, std::move(buf));
@@ -493,6 +516,11 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyMessageRequest(uint16_t session
     CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
     switch (sessTransport)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case CapabilitiesBitmap::kWiFiPAF:
+        err = Paf::SendMessage(sessionId, std::move(buf));
+        break;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     case CapabilitiesBitmap::kBle:
         err = Ble::SendMessage(sessionId, std::move(buf));
@@ -558,6 +586,13 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyDisconnectRequest(uint16_t sess
 
     switch (sessTransport)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case CapabilitiesBitmap::kWiFiPAF:
+        Paf::Disconnect(sessionId);
+        if (sProxySessions.empty())
+            Paf::OnAllSessionsClosed();
+        break;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     case CapabilitiesBitmap::kBle:
         Ble::Disconnect(sessionId);
@@ -576,16 +611,25 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyDisconnectRequest(uint16_t sess
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::CancelPendingConnect(chip::FabricIndex fabricIndex)
 {
     // A null-SessionID ProxyDisconnectRequest cancels the invoking fabric's own
-    // pending connect. The transport returns:
-    //   Success        — a connect owned by this fabric was cancelled
-    //   NotFound       — a connect is pending but owned by a different fabric
-    //   InvalidInState — no connect pending
-    // Cancellation stays strictly same-fabric — a foreign connect is never
-    // touched; it only affects the returned status.  The cancelledOwn /
-    // sawForeignPending bookkeeping is kept transport-agnostic so additional
-    // transports can be folded in without reworking the status reduction.
+    // pending connect(s). Each transport returns:
+    //   Success       — a connect owned by this fabric was cancelled
+    //   NotFound      — a connect is pending but owned by a different fabric
+    //   InvalidInState — no connect pending on that transport
+    // Every transport is checked (no early return): the spec says null cancels
+    // *any* ongoing ProxyConnectRequest for the fabric, so a connect pending on
+    // a second transport must also be cancelled, and a foreign connect on one
+    // transport must not mask this fabric's connect on another. Cancellation
+    // stays strictly same-fabric — a foreign connect is never touched; it only
+    // affects the returned status.
     bool cancelledOwn      = false;
     bool sawForeignPending = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    auto pafStatus = Paf::CancelPendingConnect(fabricIndex);
+    if (pafStatus == chip::Protocols::InteractionModel::Status::Success)
+        cancelledOwn = true;
+    else if (pafStatus == chip::Protocols::InteractionModel::Status::NotFound)
+        sawForeignPending = true;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     auto bleStatus = Ble::CancelPendingConnect(fabricIndex);
     if (bleStatus == chip::Protocols::InteractionModel::Status::Success)
@@ -608,6 +652,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 
     [[maybe_unused]] const WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
     const uint8_t tbits                             = transport.Raw();
+    const bool needsPaf                             = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF)) != 0;
     const bool needsBle                             = (tbits & static_cast<uint8_t>(CapabilitiesBitmap::kBle)) != 0;
 
     // A background scan may select multiple transports (spec: "Multiple
@@ -617,6 +662,18 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     // already verified every requested bit is supported.
     bool anyHandled = false;
     auto result     = chip::Protocols::InteractionModel::Status::Success;
+
+    if (needsPaf)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        anyHandled = true;
+        auto s     = Paf::BgScanStart(CapabilitiesBitmap::kWiFiPAF, timeout, wiFiBands, fabricIndex, nodeId, mServer);
+        if (s != chip::Protocols::InteractionModel::Status::Success)
+            result = s;
+#else
+        return chip::Protocols::InteractionModel::Status::InvalidTransportType;
+#endif
+    }
 
     if (needsBle)
     {
@@ -653,6 +710,17 @@ Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(chip:
     bool matched = false;
     auto err     = chip::Protocols::InteractionModel::Status::Success;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    {
+        auto pafStatus = Paf::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+        if (pafStatus != chip::Protocols::InteractionModel::Status::NotFound)
+        {
+            matched = true;
+            if (pafStatus != chip::Protocols::InteractionModel::Status::Success)
+                err = pafStatus;
+        }
+    }
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     {
         auto bleStatus = Ble::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
@@ -677,6 +745,10 @@ uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetActiveSessionCount()
     // Count established sessions AND any in-flight connect per transport so
     // the cluster's MaxSessions gate covers both established and pending paths.
     uint8_t count = static_cast<uint8_t>(sProxySessions.size());
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    if (Paf::IsConnectPending())
+        ++count;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     if (Ble::IsConnectPending())
         ++count;

@@ -27,11 +27,11 @@ namespace Clusters {
 namespace CommissioningProxy {
 
 // Private API exposed by CommissioningProxyCommandDelegate.cpp (the dispatcher)
-// to the per-transport module (CommissioningProxyBleTransport.cpp).  All
-// transport-agnostic session and pending-response bookkeeping lives in the
-// dispatcher; the per-transport module calls these helpers to register / clean
-// up sessions and to route commissionee responses back to the original
-// ProxyMessageRequest exchange.
+// to the per-transport modules (CommissioningProxyPafTransport.cpp,
+// CommissioningProxyBleTransport.cpp).  All transport-agnostic session and
+// pending-response bookkeeping lives in the dispatcher; the per-transport
+// modules call these helpers to register / clean up sessions and to route
+// commissionee responses back to the original ProxyMessageRequest exchange.
 namespace ProxyDispatcher {
 
 // Allocate the next free proxy session ID (skips 0 and any already-active session).
@@ -47,7 +47,7 @@ void RemoveSession(uint16_t sessionId);
 
 // Forward a commissionee reply to the commissioner as a ProxyMessageResponse.
 // If no ProxyMessageRequest is currently pending for the sessionId, the call
-// is silently dropped (matches the transport receive-callback behaviour).
+// is silently dropped (matches existing PAF receive-callback behaviour).
 void DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length);
 
 // Fail a pending ProxyMessageRequest with the given status (e.g. transport

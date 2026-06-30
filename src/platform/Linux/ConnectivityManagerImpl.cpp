@@ -43,6 +43,17 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#if __has_include(<app-common/zap-generated/cluster-objects.h>)
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#else
+// Some builds expose the generated headers under zzz_generated
+#include <zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.h>
+#include <zzz_generated/app-common/app-common/zap-generated/cluster-objects.h>
+#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
 #include "ConnectivityManagerImpl.h"
 #include "ConnectivityUtils.h"
 
@@ -51,6 +62,16 @@ using namespace ::chip::DeviceLayer::NetworkCommissioning;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 using namespace ::chip::WiFiPAF;
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+using chip::app::DataModel::List;
+
+// ExtendedData is optional, See core R1.4.2 5.4.2.6.3
+// The 7 bytes are mandatory, <8-bits, Device OpCode>,
+// <16-bits, Device Information>, <16-bits, Vendor ID>,
+// <16-bits, Product ID>,
+#define PAF_MANDATORY_PUBLISH_LENGTH 7
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 namespace chip {
 namespace DeviceLayer {
