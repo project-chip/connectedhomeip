@@ -132,7 +132,8 @@ void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType>
     {
         auto status = app->GetApplicationStatus();
         if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus ||
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden)
         {
             app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
             MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
