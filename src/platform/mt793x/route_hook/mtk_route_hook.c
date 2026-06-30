@@ -78,10 +78,23 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             // skip if prefix is longer than IPv6 address.
             if (rio_header.prefix_length > 128)
             {
-                break;
+                icmp_payload += opt_len;
+                payload_len -= opt_len;
+                continue;
             }
             uint8_t prefix_len_bytes = (rio_header.prefix_length + 7) / 8;
-            int8_t preference        = -2 * ((rio_header.preference >> 4) & 1) + (((rio_header.preference) >> 3) & 1);
+            // RFC 4191 Section 2.3: Prf=01 High, Prf=11 Low, Prf=00 Medium,
+            // Prf=10 is reserved and MUST be treated as Medium.
+            uint8_t prf       = (rio_header.preference >> 3) & 3;
+            int8_t preference = 0;
+            if (prf == 1)
+            {
+                preference = 1;
+            }
+            else if (prf == 3)
+            {
+                preference = -1;
+            }
             const uint8_t * rio_data = &icmp_payload[sizeof(rio_header_t)];
             uint8_t rio_data_len     = opt_len - sizeof(rio_header_t);
 
