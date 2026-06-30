@@ -608,6 +608,22 @@ chip::Protocols::InteractionModel::Status Disconnect(uint16_t sessionId)
     // fire 30 s later.
     chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseEndPoint(pafSession);
 
+    // Terminate the NAN subscribe instance that backed this session.  For a
+    // subscriber session the WiFiPAFSession id IS the wpa_supplicant subscribe_id
+    // (set in _WiFiPAFSubscribe), so cancelling it closes the PAFTP session per
+    // PAFTP spec section 4.20.3.10.  Without this the subscribe is left
+    // registered in the (long-lived) wpa_supplicant and keeps firing discovery
+    // callbacks for the rest of the proxy's lifetime.
+    if (pafSession.id != 0)
+    {
+        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pafSession.id);
+        if (cancelErr != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(AppServer, "ProxyDisconnectRequest: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT, pafSession.id,
+                          cancelErr.Format());
+        }
+    }
+
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
