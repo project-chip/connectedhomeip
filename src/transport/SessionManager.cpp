@@ -264,7 +264,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Begin privacy encrypt for appropriate header fields
 
         // Since we are not using chained buffers, the message data length should be equal to the total length
-        VerifyOrReturnError(message->TotalLength() == message->DataLength(),  CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+        VerifyOrReturnError(message->TotalLength() == message->DataLength(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
         uint8_t * data     = message->Start();
         size_t len         = message->TotalLength();
         uint16_t footerLen = packetHeader.MICTagLength();
