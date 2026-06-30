@@ -1112,15 +1112,6 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * v
 namespace LaundryWasherControls {
 namespace Attributes {
 
-namespace SpinSpeedCurrent {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
-} // namespace SpinSpeedCurrent
-
-namespace NumberOfRinses {
-Protocols::InteractionModel::Status
-GetDefault(EndpointId endpoint, chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum * value); // NumberOfRinsesEnum
-} // namespace NumberOfRinses
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap

@@ -8612,8 +8612,8 @@ endpoint 1 {
 
   server cluster LaundryWasherControls {
     callback attribute spinSpeeds;
-    ram      attribute spinSpeedCurrent;
-    ram      attribute numberOfRinses;
+    callback attribute spinSpeedCurrent;
+    callback attribute numberOfRinses;
     callback attribute supportedRinses;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

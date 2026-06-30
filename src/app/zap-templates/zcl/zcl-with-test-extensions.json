@@ -429,6 +429,8 @@
         "Laundry Washer Controls": [
             "ClusterRevision",
             "SpinSpeeds",
+            "SpinSpeedCurrent",
+            "NumberOfRinses",
             "SupportedRinses"
         ],
         "Meter Identification": [
