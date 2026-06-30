@@ -137,7 +137,7 @@ uint64_t LoggingAmbientContextSensorDevice::GetEpochNow()
     Milliseconds64 timestamp_ms(0);
     CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(timestamp_ms);
 
-    return (err == CHIP_NO_ERROR) ? (timestamp_ms.count()) : (0);
+    return (err == CHIP_NO_ERROR) ? timestamp_ms.count() : 0;
 }
 
 } // namespace chip::app::Clusters::AmbientContextSensing
