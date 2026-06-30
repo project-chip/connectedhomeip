@@ -78,18 +78,9 @@ public:
         int16_t absMaxHeatSetpointLimit   = 3000; // 30C (86 F) is the default
         int16_t absMinCoolSetpointLimit   = 1600; // 16C (61 F) is the default
         int16_t absMaxCoolSetpointLimit   = 3200; // 32C (90 F) is the default
-        int16_t minHeatSetpointLimit         = 700; // 7C (44.5 F) is the default
-        int16_t maxHeatSetpointLimit         = 3000; // 30C (86 F) is the default
-        int16_t minCoolSetpointLimit         = 1600; // 16C (61 F) is the default
-        int16_t maxCoolSetpointLimit         = 3200; // 32C (90 F) is the default
-        Attributes::OccupiedHeatingSetpoint::TypeInfo::Type occupiedHeatingSetpoint   = 2000;
-        Attributes::OccupiedCoolingSetpoint::TypeInfo::Type occupiedCoolingSetpoint   = 2600;
-        Attributes::UnoccupiedHeatingSetpoint::TypeInfo::Type unoccupiedHeatingSetpoint = 2000;
-        Attributes::UnoccupiedCoolingSetpoint::TypeInfo::Type unoccupiedCoolingSetpoint = 2600;
-        int8_t minSetpointDeadBand           = 20; // 2.0C is the default
-        Attributes::ControlSequenceOfOperation::TypeInfo::Type controlSequenceOfOperation =
-            ControlSequenceOfOperationEnum::kCoolingAndHeating;
-        Attributes::SystemMode::TypeInfo::Type systemMode = SystemModeEnum::kAuto;
+        uint8_t numberOfSchedules;
+        uint8_t numberOfScheduleTransitions;
+        DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay;
     };
 
     ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config, const Context & context);
@@ -227,6 +218,22 @@ public:
     // ACCapacityFormat
     void SetACCapacityFormat(ACCapacityFormatEnum value);
     ACCapacityFormatEnum GetACCapacityFormat();
+
+    // NumberOfSchedules
+    void SetNumberOfSchedules(uint8_t value);
+    uint8_t GetNumberOfSchedules();
+
+    // NumberOfScheduleTransitions
+    void SetNumberOfScheduleTransitions(uint8_t value);
+    uint8_t GetNumberOfScheduleTransitions();
+
+    // NumberOfScheduleTransitionPerDay
+    void SetNumberOfScheduleTransitionPerDay(DataModel::Nullable<uint8_t> value);
+    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionPerDay();
+
+    // SetpointHoldExpiryTimestamp
+    void SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> value);
+    DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp();
 
     // Handle setters also persist their values across reboots.
     void SetActivePresetHandle(DataModel::Nullable<ByteSpan> value);
@@ -368,16 +375,16 @@ private:
     int16_t mAbsMinCoolSetpointLimit;
     int16_t mAbsMaxCoolSetpointLimit;
     int8_t mLocalTemperatureCalibration{ 0 };
-    int16_t mOccupiedCoolingSetpoint;
-    int16_t mOccupiedHeatingSetpoint;
-    int16_t mUnoccupiedCoolingSetpoint;
-    int16_t mUnoccupiedHeatingSetpoint;
+    int16_t mOccupiedCoolingSetpoint { 2600 };
+    int16_t mOccupiedHeatingSetpoint { 2000 };
+    int16_t mUnoccupiedCoolingSetpoint { 2600 };
+    int16_t mUnoccupiedHeatingSetpoint { 2000 };
     int16_t mMinHeatSetpointLimit;
     int16_t mMaxHeatSetpointLimit;
     int16_t mMinCoolSetpointLimit;
     int16_t mMaxCoolSetpointLimit;
-    int8_t mMinSetpointDeadBand;
-    BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{};
+    int8_t mMinSetpointDeadBand { 20 };
+    BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{ 0 };
     ControlSequenceOfOperationEnum mControlSequenceOfOperation;
     SystemModeEnum mSystemMode;
     ThermostatRunningModeEnum mThermostatRunningMode{};
@@ -398,16 +405,16 @@ private:
     ACLouverPositionEnum mACLouverPosition{ ACLouverPositionEnum::kClosed };
     DataModel::Nullable<int16_t> mACCoilTemperature{};
     ACCapacityFormatEnum mACCapacityFormat{};
-    Attributes::NumberOfSchedules::TypeInfo::Type mNumberOfSchedules{};
-    Attributes::NumberOfScheduleTransitions::TypeInfo::Type mNumberOfScheduleTransitions{};
-    Attributes::NumberOfScheduleTransitionPerDay::TypeInfo::Type mNumberOfScheduleTransitionPerDay{};
+    uint8_t mNumberOfSchedules{};
+    uint8_t mNumberOfScheduleTransitions{};
+    DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionPerDay{};
     // mActivePresetHandle and mActiveScheduleHandle hold non-owning ByteSpans; the backing
     // buffers below own the bytes so the spans remain valid for the lifetime of the cluster.
     uint8_t mActivePresetHandleBuffer[kPresetHandleSize]{};
     uint8_t mActiveScheduleHandleBuffer[kPresetHandleSize]{};
     Attributes::ActivePresetHandle::TypeInfo::Type mActivePresetHandle{};
     Attributes::ActiveScheduleHandle::TypeInfo::Type mActiveScheduleHandle{};
-    Attributes::SetpointHoldExpiryTimestamp::TypeInfo::Type mSetpointHoldExpiryTimestamp{};
+    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp{};
 };
 
 /**

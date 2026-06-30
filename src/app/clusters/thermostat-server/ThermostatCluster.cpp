@@ -107,17 +107,9 @@ ThermostatCluster::ThermostatCluster(EndpointId endpointId, uint32_t featureMap,
     mAbsMaxHeatSetpointLimit    = config.absMaxHeatSetpointLimit;
     mAbsMinCoolSetpointLimit    = config.absMinCoolSetpointLimit;
     mAbsMaxCoolSetpointLimit    = config.absMaxCoolSetpointLimit;
-    mMinHeatSetpointLimit       = config.minHeatSetpointLimit;
-    mMaxHeatSetpointLimit       = config.maxHeatSetpointLimit;
-    mMinCoolSetpointLimit       = config.minCoolSetpointLimit;
-    mMaxCoolSetpointLimit       = config.maxCoolSetpointLimit;
-    mOccupiedHeatingSetpoint    = config.occupiedHeatingSetpoint;
-    mOccupiedCoolingSetpoint    = config.occupiedCoolingSetpoint;
-    mUnoccupiedHeatingSetpoint  = config.unoccupiedHeatingSetpoint;
-    mUnoccupiedCoolingSetpoint  = config.unoccupiedCoolingSetpoint;
-    mMinSetpointDeadBand        = config.minSetpointDeadBand;
-    mControlSequenceOfOperation = config.controlSequenceOfOperation;
-    mSystemMode                 = config.systemMode;
+    mNumberOfSchedules           = config.numberOfSchedules;
+    mNumberOfScheduleTransitions = config.numberOfScheduleTransitions;
+    mNumberOfScheduleTransitionPerDay = config.numberOfScheduleTransitionPerDay;
 }
 
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
@@ -139,6 +131,14 @@ void ThermostatCluster::LoadPersistentAttributes()
     AttributePersistence attrPersistence{ DefaultServerCluster::mContext->attributeStorage };
 
     const auto defaultLocalTempCalib    = mLocalTemperatureCalibration;
+    const auto defaultOccupiedCoolingSetpoint = mOccupiedCoolingSetpoint;
+    const auto defaultOccupiedHeatingSetpoint = mOccupiedHeatingSetpoint;
+    const auto defaultUnoccupiedCoolingSetpoint = mUnoccupiedCoolingSetpoint;
+    const auto defaultUnoccupiedHeatingSetpoint = mUnoccupiedHeatingSetpoint;
+    const auto defaultMinSetpointDeadBand = mMinSetpointDeadBand;
+    const auto defaultRemoteSensing = mRemoteSensing.Raw();
+    const auto defaultControlSequenceOfOperation = mControlSequenceOfOperation;
+    const auto defaultSystemMode = mSystemMode;
     const auto defaultTsph              = mTemperatureSetpointHold;
     const auto defaultTsphDuration      = mTemperatureSetpointHoldDuration;
     const auto defaultEhd               = mEmergencyHeatDelta;
@@ -151,6 +151,32 @@ void ThermostatCluster::LoadPersistentAttributes()
 
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
                                           mLocalTemperatureCalibration, defaultLocalTempCalib);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, OccupiedCoolingSetpoint::Id },
+                                          mOccupiedCoolingSetpoint, defaultOccupiedCoolingSetpoint);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, OccupiedHeatingSetpoint::Id },
+                                          mOccupiedHeatingSetpoint, defaultOccupiedHeatingSetpoint);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, UnoccupiedCoolingSetpoint::Id },
+                                          mUnoccupiedCoolingSetpoint, defaultUnoccupiedCoolingSetpoint);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, UnoccupiedHeatingSetpoint::Id },
+                                          mUnoccupiedHeatingSetpoint, defaultUnoccupiedHeatingSetpoint);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinHeatSetpointLimit::Id },
+                                          mMinHeatSetpointLimit, mAbsMinHeatSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id },
+                                          mMaxHeatSetpointLimit, mAbsMaxHeatSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinCoolSetpointLimit::Id },
+                                          mMinCoolSetpointLimit, mAbsMinCoolSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id },
+                                          mMaxCoolSetpointLimit, mAbsMaxCoolSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id },
+                                          mMinSetpointDeadBand, defaultMinSetpointDeadBand);
+    uint8_t tempRemoteSensing;
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, RemoteSensing::Id },
+                                          tempRemoteSensing, defaultRemoteSensing);
+    mRemoteSensing.Set(static_cast<RemoteSensingBitmap>(tempRemoteSensing));
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id },
+                                          mControlSequenceOfOperation, defaultControlSequenceOfOperation);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SystemMode::Id },
+                                          mSystemMode, defaultSystemMode);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
                                           mTemperatureSetpointHold, defaultTsph);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
@@ -518,15 +544,14 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mNumberOfScheduleTransitionPerDay);
     case ActiveScheduleHandle::Id:
         return encoder.Encode(mActiveScheduleHandle);
-    case ActivePresetHandle::Id:
-        return encoder.Encode(mActivePresetHandle);
     case SetpointHoldExpiryTimestamp::Id:
         return encoder.Encode(mSetpointHoldExpiryTimestamp);
     // Delegate-backed list / preset / schedule / suggestion attributes are still served by the retained helper.
     case PresetTypes::Id:
-    case NumberOfPresets::Id:
-    case Presets::Id:
     case ScheduleTypes::Id:
+    case NumberOfPresets::Id:
+    case ActivePresetHandle::Id:
+    case Presets::Id:
     case Schedules::Id:
     case MaxThermostatSuggestions::Id:
     case ThermostatSuggestions::Id:
@@ -943,6 +968,52 @@ void ThermostatCluster::SetACCapacityFormat(ACCapacityFormatEnum value)
 ACCapacityFormatEnum ThermostatCluster::GetACCapacityFormat()
 {
     return mACCapacityFormat;
+}
+
+void ThermostatCluster::SetNumberOfSchedules(uint8_t value)
+{
+    SetAttributeValue(mNumberOfSchedules, value, NumberOfSchedules::Id);
+}
+
+uint8_t ThermostatCluster::GetNumberOfSchedules()
+{
+    return mNumberOfSchedules;
+}
+
+void ThermostatCluster::SetNumberOfScheduleTransitions(uint8_t value)
+{
+    SetAttributeValue(mNumberOfScheduleTransitions, value, NumberOfScheduleTransitions::Id);
+}
+
+uint8_t ThermostatCluster::GetNumberOfScheduleTransitions()
+{
+    return mNumberOfScheduleTransitions;
+}
+
+void ThermostatCluster::SetNumberOfScheduleTransitionPerDay(DataModel::Nullable<uint8_t> value)
+{
+    SetAttributeValue(mNumberOfScheduleTransitionPerDay, value, NumberOfScheduleTransitionPerDay::Id);
+}
+
+DataModel::Nullable<uint8_t> ThermostatCluster::GetNumberOfScheduleTransitionPerDay()
+{
+    return mNumberOfScheduleTransitionPerDay;
+}
+
+void ThermostatCluster::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> value)
+{
+    SetAttributeValue(mSetpointHoldExpiryTimestamp, value, SetpointHoldExpiryTimestamp::Id);
+
+    NumericAttributeTraits<uint32_t>::StorageType storageValue;
+    DataModel::NullableToStorage(value, storageValue);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
+        { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
+}
+
+DataModel::Nullable<uint32_t> ThermostatCluster::GetSetpointHoldExpiryTimestamp()
+{
+    return mSetpointHoldExpiryTimestamp;
 }
 
 void ThermostatCluster::SetActivePresetHandle(DataModel::Nullable<ByteSpan> value)

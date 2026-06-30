@@ -73,31 +73,21 @@ public:
         SeedFromDefault(AbsMaxHeatSetpointLimit::GetDefault, endpointId, config.absMaxHeatSetpointLimit);
         SeedFromDefault(AbsMinCoolSetpointLimit::GetDefault, endpointId, config.absMinCoolSetpointLimit);
         SeedFromDefault(AbsMaxCoolSetpointLimit::GetDefault, endpointId, config.absMaxCoolSetpointLimit);
-        SeedFromDefault(MinHeatSetpointLimit::GetDefault, endpointId, config.minHeatSetpointLimit);
-        SeedFromDefault(MaxHeatSetpointLimit::GetDefault, endpointId, config.maxHeatSetpointLimit);
-        SeedFromDefault(MinCoolSetpointLimit::GetDefault, endpointId, config.minCoolSetpointLimit);
-        SeedFromDefault(MaxCoolSetpointLimit::GetDefault, endpointId, config.maxCoolSetpointLimit);
-        SeedFromDefault(OccupiedHeatingSetpoint::GetDefault, endpointId, config.occupiedHeatingSetpoint);
-        SeedFromDefault(OccupiedCoolingSetpoint::GetDefault, endpointId, config.occupiedCoolingSetpoint);
-        SeedFromDefault(UnoccupiedHeatingSetpoint::GetDefault, endpointId, config.unoccupiedHeatingSetpoint);
-        SeedFromDefault(UnoccupiedCoolingSetpoint::GetDefault, endpointId, config.unoccupiedCoolingSetpoint);
 
-        int8_t deadBand = config.minSetpointDeadBand;
-        if (MinSetpointDeadBand::GetDefault(endpointId, &deadBand) == Status::Success)
+        uint8_t numberOfSchedules = config.numberOfSchedules;
+        if (NumberOfSchedules::GetDefault(endpointId, &numberOfSchedules) == Status::Success)
         {
-            config.minSetpointDeadBand = deadBand;
+            config.numberOfSchedules = numberOfSchedules;
         }
-
-        ControlSequenceOfOperationEnum controlSeq = config.controlSequenceOfOperation;
-        if (ControlSequenceOfOperation::GetDefault(endpointId, &controlSeq) == Status::Success)
+        uint8_t numberOfScheduleTransitions = config.numberOfScheduleTransitions;
+        if (NumberOfScheduleTransitions::GetDefault(endpointId, &numberOfScheduleTransitions) == Status::Success)
         {
-            config.controlSequenceOfOperation = controlSeq;
+            config.numberOfScheduleTransitions = numberOfScheduleTransitions;
         }
-
-        SystemModeEnum systemMode = config.systemMode;
-        if (SystemMode::GetDefault(endpointId, &systemMode) == Status::Success)
+        DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay = config.numberOfScheduleTransitionPerDay;
+        if (NumberOfScheduleTransitionPerDay::GetDefault(endpointId, numberOfScheduleTransitionPerDay) == Status::Success)
         {
-            config.systemMode = systemMode;
+            config.numberOfScheduleTransitionPerDay = numberOfScheduleTransitionPerDay;
         }
 
         ThermostatCluster::Context clusterContext{ Server::GetInstance().GetFabricTable() };
