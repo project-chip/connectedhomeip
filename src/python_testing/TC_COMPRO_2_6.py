@@ -94,7 +94,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
     @property
     def default_timeout(self) -> int:
         # Step 10 ProxyConnect: up to proxy_connect_timeout (default 120 s) + margin
-        # Step 11 BUSY test: ResponseTimeout=30 s + 5 s IM margin + 2 s sleep
+        # Step 11 BUSY test: ResponseTimeout=10 s + IM margin + 2 s sleep
         # PASE window operations + other steps: ~30 s
         return 300
 
@@ -351,10 +351,14 @@ class TC_COMPRO_2_6(COMPROBaseTest):
         # ----------------------------------------------------------------
         # Step 11: BUSY — two concurrent ProxyMessageRequests for session_a.
         #
-        # _first_msg sends with ResponseTimeout=30 and hangs waiting for the
-        # commissione.e reply (up to 30 s).  _second_msg waits 2 s (ensuring
-        # the first is in-flight) then sends an identical request; the DUT
-        # MUST reject it with BUSY.  asyncio.gather waits for both to finish.
+        # _first_msg sends with a short ResponseTimeout and hangs waiting for
+        # the commissionee reply.  The ResponseTimeout must be shorter than the
+        # transport's keep-alive/ack window so the message resolves with TIMEOUT
+        # while the proxy session stays open (letting step 12 disconnect it);
+        # otherwise the transport's ack timer could close the session first.
+        # _second_msg waits 2 s (ensuring the first is in-flight) then sends an
+        # identical request; the DUT MUST reject it with BUSY.  asyncio.gather
+        # waits for both to finish.
         # ----------------------------------------------------------------
         self.step(11)
 
@@ -365,7 +369,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
                     endpoint=self.cp_endpoint,
                     payload=cp.Commands.ProxyMessageRequest(
                         sessionID=session_a,
-                        responseTimeout=30,
+                        responseTimeout=10,
                         message=_MINIMAL_MATTER_MSG,
                     ),
                     interactionTimeoutMs=35000,
@@ -381,7 +385,7 @@ class TC_COMPRO_2_6(COMPROBaseTest):
                     endpoint=self.cp_endpoint,
                     payload=cp.Commands.ProxyMessageRequest(
                         sessionID=session_a,
-                        responseTimeout=30,
+                        responseTimeout=10,
                         message=_MINIMAL_MATTER_MSG,
                     ),
                     interactionTimeoutMs=5000,
