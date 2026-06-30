@@ -826,16 +826,11 @@ void SmokeCoAlarmInit()
 
 void InitModeSelect()
 {
-#if CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_modeselect_6860d3a65a"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping InitModeSelect as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
 #if MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kModeSelectDeviceTypeId))
     {
