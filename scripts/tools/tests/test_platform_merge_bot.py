@@ -121,6 +121,7 @@ esp32:
         mock_pr.user.login = author
         mock_pr.draft = draft
         mock_pr.state = "open"
+        mock_pr.mergeable = True
         mock_pr.get_files.return_value = files
         mock_pr.get_reviews.return_value = reviews
         mock_pr.get_issue_comments.return_value = comments or []
@@ -870,6 +871,34 @@ esp32:
         mock_pr.create_issue_comment.assert_called_once()
         comment_body = mock_pr.create_issue_comment.call_args[0][0]
         self.assertIn("CI checks are pending or failed", comment_body)
+
+    def test_check_and_process_pr_merge_conflicts_does_not_merge(self) -> None:
+        """Tests that a PR with merge conflicts is blocked from auto-merging."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+        mock_pr.mergeable = False
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_called_once()
+        comment_body = mock_pr.create_issue_comment.call_args[0][0]
+        self.assertIn("PR has merge conflicts", comment_body)
+
+    def test_check_and_process_pr_merge_conflicts_computing(self) -> None:
+        """Tests that a PR whose mergeability state is still computing is blocked."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+        mock_pr.mergeable = None
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_called_once()
+        comment_body = mock_pr.create_issue_comment.call_args[0][0]
+        self.assertIn("Mergeability state is computing", comment_body)
 
 
 if __name__ == "__main__":

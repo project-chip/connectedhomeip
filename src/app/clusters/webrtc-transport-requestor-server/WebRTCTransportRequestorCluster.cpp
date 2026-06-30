@@ -159,6 +159,8 @@ DataModel::ActionReturnStatus WebRTCTransportRequestorCluster::HandleOffer(const
     // Convert ICE servers list from DecodableList to vector.
     if (req.ICEServers.HasValue())
     {
+        // Engage the Optional with an empty vector before populating it below.
+        args.iceServers.Emplace();
         auto iterator = req.ICEServers.Value().begin();
         while (iterator.Next())
         {

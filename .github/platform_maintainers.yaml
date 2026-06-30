@@ -24,13 +24,13 @@ nxp:
 silabs:
   maintainers:
     - jmartinez-silabs
+    - jepenven-silabs
+    - lpbeliveau-silabs
     # Proposed maintainers (uncomment to activate):
-    # - mkardous-silabs
     # - chirag-silabs
     # - arun-silabs
     # - rosahay-silabs
-    # - jepenven-silabs
-    # - lpbeliveau-silabs
+
   paths:
     - "src/platform/silabs/**"
     - "examples/platform/silabs/**"
