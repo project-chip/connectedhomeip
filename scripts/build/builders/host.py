@@ -507,8 +507,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
             if chip_casting_simplified:
                 self.extra_gn_options.append(
-                    'chip_cluster_objects_source_override='
-                    '"${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"'
+                    'chip_data_model_overrides_dir='
+                    '"${chip_root}/examples/tv-casting-app/tv-casting-common"'
                 )
 
         if terms_and_conditions_required is not None:
