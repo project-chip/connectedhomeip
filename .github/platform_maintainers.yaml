@@ -7,18 +7,21 @@
 nxp:
   maintainers:
     - doru91
+    - dinabenamar
+    - chapongatien
     # Proposed maintainers (uncomment to activate):
     # - Martin-NXP
-    # - dinabenamar
     # - marian-chereji-nxp
-    # - chapongatien
-    # - andrei-menzopol
     # - sujaygkulkarni-nxp
   paths:
     - "src/platform/nxp/**"
     - "examples/platform/nxp/**"
     - "examples/**/nxp/**"
     - "third_party/nxp/**"
+    - "src/test_driver/nxp/**"
+    - "docs/platforms/nxp/**"
+    - "third_party/simw-top-mini/**"
+    - "third_party/openthread/platforms/nxp/**"
     - "config/nxp/**"
 
 silabs:

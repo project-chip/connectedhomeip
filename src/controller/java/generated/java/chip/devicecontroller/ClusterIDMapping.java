@@ -430,6 +430,9 @@ public class ClusterIDMapping {
         if (clusterId == ContentAppObserver.ID) {
             return new ContentAppObserver();
         }
+        if (clusterId == AudioControl.ID) {
+            return new AudioControl();
+        }
         if (clusterId == ZoneManagement.ID) {
             return new ZoneManagement();
         }
@@ -19240,6 +19243,181 @@ public class ClusterIDMapping {
                     }
                     public static ContentAppMessageCommandField value(int id) throws NoSuchFieldError {
                         for (ContentAppMessageCommandField field : ContentAppMessageCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class AudioControl implements BaseCluster {
+        public static final long ID = 1298L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            SoftMuted(0L),
+            PhysicallyMuted(1L),
+            Volume(2L),
+            MinDeviceVolume(3L),
+            MaxDeviceVolume(4L),
+            MaxDeviceVolumeDB(5L),
+            MaxUserVolume(6L),
+            DefaultStepSize(7L),
+            SetVolumeUnmutePolicy(8L),
+            IncreaseVolumeUnmutePolicy(9L),
+            IncreaseVolumeUnmuteVolume(10L),
+            DecreaseVolumeUnmutePolicy(11L),
+            StartUpMuted(12L),
+            StartUpVolume(13L),
+            Bass(14L),
+            Mid(15L),
+            Treble(16L),
+            MinCorrection(17L),
+            MaxCorrection(18L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            Mute(0L),
+            Unmute(1L),
+            ToggleMuted(2L),
+            SetVolume(3L),
+            IncreaseVolume(4L),
+            DecreaseVolume(5L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum SetVolumeCommandField {NewVolume(0),UnmutePolicy(1),;
+                    private final int id;
+                    SetVolumeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetVolumeCommandField value(int id) throws NoSuchFieldError {
+                        for (SetVolumeCommandField field : SetVolumeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum IncreaseVolumeCommandField {StepSize(0),UnmutePolicy(1),UnmuteVolume(2),;
+                    private final int id;
+                    IncreaseVolumeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static IncreaseVolumeCommandField value(int id) throws NoSuchFieldError {
+                        for (IncreaseVolumeCommandField field : IncreaseVolumeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum DecreaseVolumeCommandField {StepSize(0),UnmutePolicy(1),;
+                    private final int id;
+                    DecreaseVolumeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static DecreaseVolumeCommandField value(int id) throws NoSuchFieldError {
+                        for (DecreaseVolumeCommandField field : DecreaseVolumeCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

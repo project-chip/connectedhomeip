@@ -293,6 +293,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentControl";
     case chip::app::Clusters::ContentAppObserver::Id:
         return "ContentAppObserver";
+    case chip::app::Clusters::AudioControl::Id:
+        return "AudioControl";
     case chip::app::Clusters::ZoneManagement::Id:
         return "ZoneManagement";
     case chip::app::Clusters::CameraAvStreamManagement::Id:
@@ -4752,6 +4754,61 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::AudioControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AudioControl::Attributes::SoftMuted::Id:
+            return "SoftMuted";
+        case chip::app::Clusters::AudioControl::Attributes::PhysicallyMuted::Id:
+            return "PhysicallyMuted";
+        case chip::app::Clusters::AudioControl::Attributes::Volume::Id:
+            return "Volume";
+        case chip::app::Clusters::AudioControl::Attributes::MinDeviceVolume::Id:
+            return "MinDeviceVolume";
+        case chip::app::Clusters::AudioControl::Attributes::MaxDeviceVolume::Id:
+            return "MaxDeviceVolume";
+        case chip::app::Clusters::AudioControl::Attributes::MaxDeviceVolumeDB::Id:
+            return "MaxDeviceVolumeDB";
+        case chip::app::Clusters::AudioControl::Attributes::MaxUserVolume::Id:
+            return "MaxUserVolume";
+        case chip::app::Clusters::AudioControl::Attributes::DefaultStepSize::Id:
+            return "DefaultStepSize";
+        case chip::app::Clusters::AudioControl::Attributes::SetVolumeUnmutePolicy::Id:
+            return "SetVolumeUnmutePolicy";
+        case chip::app::Clusters::AudioControl::Attributes::IncreaseVolumeUnmutePolicy::Id:
+            return "IncreaseVolumeUnmutePolicy";
+        case chip::app::Clusters::AudioControl::Attributes::IncreaseVolumeUnmuteVolume::Id:
+            return "IncreaseVolumeUnmuteVolume";
+        case chip::app::Clusters::AudioControl::Attributes::DecreaseVolumeUnmutePolicy::Id:
+            return "DecreaseVolumeUnmutePolicy";
+        case chip::app::Clusters::AudioControl::Attributes::StartUpMuted::Id:
+            return "StartUpMuted";
+        case chip::app::Clusters::AudioControl::Attributes::StartUpVolume::Id:
+            return "StartUpVolume";
+        case chip::app::Clusters::AudioControl::Attributes::Bass::Id:
+            return "Bass";
+        case chip::app::Clusters::AudioControl::Attributes::Mid::Id:
+            return "Mid";
+        case chip::app::Clusters::AudioControl::Attributes::Treble::Id:
+            return "Treble";
+        case chip::app::Clusters::AudioControl::Attributes::MinCorrection::Id:
+            return "MinCorrection";
+        case chip::app::Clusters::AudioControl::Attributes::MaxCorrection::Id:
+            return "MaxCorrection";
+        case chip::app::Clusters::AudioControl::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AudioControl::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AudioControl::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AudioControl::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AudioControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ZoneManagement::Id: {
         switch (id)
         {
@@ -6720,6 +6777,25 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Id:
             return "ContentAppMessage";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AudioControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AudioControl::Commands::Mute::Id:
+            return "Mute";
+        case chip::app::Clusters::AudioControl::Commands::Unmute::Id:
+            return "Unmute";
+        case chip::app::Clusters::AudioControl::Commands::ToggleMuted::Id:
+            return "ToggleMuted";
+        case chip::app::Clusters::AudioControl::Commands::SetVolume::Id:
+            return "SetVolume";
+        case chip::app::Clusters::AudioControl::Commands::IncreaseVolume::Id:
+            return "IncreaseVolume";
+        case chip::app::Clusters::AudioControl::Commands::DecreaseVolume::Id:
+            return "DecreaseVolume";
         default:
             return "Unknown";
         }
