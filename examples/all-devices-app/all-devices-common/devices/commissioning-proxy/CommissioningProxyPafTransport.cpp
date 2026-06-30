@@ -268,76 +268,79 @@ static ProxyWiFiPAFDelegate sProxyWiFiPAFDelegate;
 // PAF connect callbacks (success / error / timeout)
 // ------------------------------------------------------------------
 
-static void OnProxyConnectTimeout(chip::System::Layer * /*layer*/, void * /*appState*/)
+static void OnProxyConnectTimeout(chip::System::Layer * layer, void * appState);
+
+// Common teardown for an in-flight PAF connect that did not succeed (timeout,
+// transport error, or commissioner-initiated cancel).  Cancels the timeout timer
+// and NAN subscribe, closes any PAFTP endpoint the handshake created, drops the
+// session, resolves the originating ProxyConnectRequest with `status`, frees the
+// context, and resumes a background scan that was deferred/paused for the connect.
+// `cancelTimer` is false only when called from the timeout handler itself (the
+// timer has already fired).
+static void FailPendingPafConnect(PafConnectCtx * ctx, chip::Protocols::InteractionModel::Status status, bool cancelTimer)
 {
-    auto * ctx = sPafPendingConnect;
-    if (ctx == nullptr)
-    {
-        // Success or error callback already fired first; nothing to do.
-        return;
-    }
     sPafPendingConnect = nullptr;
 
-    chip::app::CommandHandler * cmd = ctx->handle.Get();
-    ChipLogError(AppServer, "ProxyConnectRequest: timeout waiting for WiFiPAF connect (disc %u)", ctx->discriminator);
+    if (cancelTimer)
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnProxyConnectTimeout, nullptr);
 
-    uint32_t subscribeId = ctx->subscribeId;
-
-    // Null out the platform callbacks FIRST so the kCHIPoWiFiPAFCancelConnect
-    // event posted by OnNanSubscribeTerminated does not call OnPafConnectError.
+    // Null the platform connect callbacks before cancelling the subscribe so the
+    // kCHIPoWiFiPAFCancelConnect event posted by OnNanSubscribeTerminated does not
+    // re-enter OnPafConnectError.
     CHIP_ERROR cancelIncompleteErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
     if (cancelIncompleteErr != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "OnProxyConnectTimeout: WiFiPAFCancelIncompleteSubscribe: %" CHIP_ERROR_FORMAT,
+        ChipLogDetail(AppServer, "FailPendingPafConnect: WiFiPAFCancelIncompleteSubscribe: %" CHIP_ERROR_FORMAT,
                       cancelIncompleteErr.Format());
-    }
-
-    if (subscribeId != 0)
-    {
-        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(subscribeId);
-        if (cancelErr != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(AppServer, "OnProxyConnectTimeout: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT, subscribeId,
-                          cancelErr.Format());
-        }
-    }
 
     chip::WiFiPAF::WiFiPAFLayer & pafLayer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    chip::WiFiPAF::WiFiPAFSession keyNodeInfo{};
-    keyNodeInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
-    keyNodeInfo.discriminator = ctx->discriminator;
+    chip::WiFiPAF::WiFiPAFSession key{};
+    key.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
+    key.discriminator = ctx->discriminator;
 
-    // If the PAFTP handshake already created an endpoint, capture the session
-    // (with peer_id/peer_addr) before RmPafSession clears the slot so we can also
-    // close the endpoint; otherwise it leaks from the 2-slot pool until its own
-    // connect/ack timer self-closes.  CloseEndPoint is a no-op if none exists.
+    // Capture the session before RmPafSession clears the slot so we can close any
+    // PAFTP endpoint the handshake created; otherwise it leaks from the 2-slot
+    // pool until its own timer self-closes.  CloseEndPoint is a no-op if none.
     chip::WiFiPAF::WiFiPAFSession endpointSession{};
-    bool haveEndpoint                     = false;
-    chip::WiFiPAF::WiFiPAFSession * pInfo  = pafLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccDisc, keyNodeInfo);
+    bool haveEndpoint                    = false;
+    chip::WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccDisc, key);
     if (pInfo != nullptr)
     {
         endpointSession = *pInfo;
         haveEndpoint    = true;
     }
 
-    CHIP_ERROR rmErr = pafLayer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyNodeInfo);
+    CHIP_ERROR rmErr = pafLayer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, key);
     if (rmErr != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "OnProxyConnectTimeout: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
-    }
+        ChipLogDetail(AppServer, "FailPendingPafConnect: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
     if (haveEndpoint)
-    {
         pafLayer.CloseEndPoint(endpointSession);
+
+    if (ctx->subscribeId != 0)
+    {
+        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx->subscribeId);
+        if (cancelErr != CHIP_NO_ERROR)
+            ChipLogDetail(AppServer, "FailPendingPafConnect: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT, ctx->subscribeId,
+                          cancelErr.Format());
     }
 
+    chip::app::CommandHandler * cmd = ctx->handle.Get();
     if (cmd != nullptr)
-        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Timeout);
+        cmd->AddStatus(ctx->path, status);
     delete ctx;
 
     // The connect freed the NAN subscribe slot; resume a background scan that was
-    // paused or deferred for this connect (no session was ever registered, so the
-    // dispatcher's OnAllSessionsClosed path does not run for a failed connect).
+    // deferred or paused for this connect (a failed connect registers no session,
+    // so the dispatcher's OnAllSessionsClosed path does not run).
     OnAllSessionsClosed();
+}
+
+static void OnProxyConnectTimeout(chip::System::Layer * /*layer*/, void * /*appState*/)
+{
+    if (sPafPendingConnect == nullptr)
+        return; // Success or error callback already fired first; nothing to do.
+    ChipLogError(AppServer, "ProxyConnectRequest: timeout waiting for WiFiPAF connect (disc %u)",
+                 sPafPendingConnect->discriminator);
+    FailPendingPafConnect(sPafPendingConnect, chip::Protocols::InteractionModel::Status::Timeout, /*cancelTimer=*/false);
 }
 
 static void OnPafConnectSuccess(void * /*context*/)
@@ -402,57 +405,8 @@ static void OnPafConnectError(void * /*context*/, CHIP_ERROR err)
                         err.Format());
         return;
     }
-    sPafPendingConnect = nullptr;
-    chip::DeviceLayer::SystemLayer().CancelTimer(OnProxyConnectTimeout, nullptr);
-
-    chip::app::CommandHandler * cmd = ctx->handle.Get();
     ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAF connect failed: %" CHIP_ERROR_FORMAT, err.Format());
-
-    chip::WiFiPAF::WiFiPAFLayer & pafLayer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
-    chip::WiFiPAF::WiFiPAFSession keyInfo{};
-    keyInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
-    keyInfo.discriminator = ctx->discriminator;
-
-    // Capture the session (with peer_id/peer_addr) before RmPafSession clears the
-    // slot so we can also close any PAFTP endpoint the handshake created; otherwise
-    // it leaks from the 2-slot pool.  CloseEndPoint is a no-op if none exists.
-    chip::WiFiPAF::WiFiPAFSession endpointSession{};
-    bool haveEndpoint                    = false;
-    chip::WiFiPAF::WiFiPAFSession * pInfo = pafLayer.GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccDisc, keyInfo);
-    if (pInfo != nullptr)
-    {
-        endpointSession = *pInfo;
-        haveEndpoint    = true;
-    }
-
-    CHIP_ERROR rmErr = pafLayer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyInfo);
-    if (rmErr != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "OnPafConnectError: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
-    }
-    if (haveEndpoint)
-    {
-        pafLayer.CloseEndPoint(endpointSession);
-    }
-
-    if (ctx->subscribeId != 0)
-    {
-        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx->subscribeId);
-        if (cancelErr != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(AppServer, "OnPafConnectError: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT, ctx->subscribeId,
-                          cancelErr.Format());
-        }
-    }
-
-    if (cmd != nullptr)
-        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
-    delete ctx;
-
-    // The connect freed the NAN subscribe slot; resume a background scan that was
-    // paused or deferred for this connect (a failed connect registers no session,
-    // so the dispatcher's OnAllSessionsClosed path does not run).
-    OnAllSessionsClosed();
+    FailPendingPafConnect(sPafPendingConnect, chip::Protocols::InteractionModel::Status::Failure, /*cancelTimer=*/true);
 }
 
 static void OnPafScanDone(void * /*context*/, const std::vector<chip::DeviceLayer::NanPeerInfo> & peers)
@@ -619,45 +573,8 @@ chip::Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex
         return chip::Protocols::InteractionModel::Status::NotFound;
     }
 
-    auto * ctx         = sPafPendingConnect;
-    sPafPendingConnect = nullptr;
-
-    chip::DeviceLayer::SystemLayer().CancelTimer(OnProxyConnectTimeout, nullptr);
-
-    CHIP_ERROR cancelIncompleteErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
-    if (cancelIncompleteErr != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "CancelPendingConnect: WiFiPAFCancelIncompleteSubscribe: %" CHIP_ERROR_FORMAT,
-                      cancelIncompleteErr.Format());
-    }
-    if (ctx->subscribeId != 0)
-    {
-        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx->subscribeId);
-        if (cancelErr != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(AppServer, "CancelPendingConnect: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT, ctx->subscribeId,
-                          cancelErr.Format());
-        }
-    }
-
-    chip::WiFiPAF::WiFiPAFSession keyInfo{};
-    keyInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
-    keyInfo.discriminator = ctx->discriminator;
-    CHIP_ERROR rmErr =
-        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyInfo);
-    if (rmErr != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(AppServer, "CancelPendingConnect: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
-    }
-
-    chip::app::CommandHandler * cmd = ctx->handle.Get();
-    if (cmd != nullptr)
-        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
-    delete ctx;
-
-    // Cancelling freed the NAN subscribe slot; resume a background scan paused or
-    // deferred for this connect.
-    OnAllSessionsClosed();
+    ChipLogProgress(AppServer, "CancelPendingConnect: cancelling pending PAF connect for fabric %u", fabricIndex);
+    FailPendingPafConnect(sPafPendingConnect, chip::Protocols::InteractionModel::Status::Failure, /*cancelTimer=*/true);
 
     return chip::Protocols::InteractionModel::Status::Success;
 }
