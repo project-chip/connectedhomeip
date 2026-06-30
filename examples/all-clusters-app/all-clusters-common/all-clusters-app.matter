@@ -6426,6 +6426,83 @@ cluster LowPower = 1288 {
   command Sleep(): DefaultSuccess = 0;
 }
 
+/** This cluster provides attributes and commands to control the audio output volume and frequency corrections of a device. */
+provisional cluster AudioControl = 1298 {
+  revision 1;
+
+  enum UnmutePolicyEnum : enum8 {
+    kUnmuteOrChangeVolume = 0;
+    kUnmuteOrDoNotChangeVolume = 1;
+    kDoNotUnmuteAndChangeVolume = 2;
+    kDoNotUnmuteAndDoNotChangeVolume = 3;
+  }
+
+  enum UnmuteVolumeEnum : enum8 {
+    kMinDeviceVolume = 0;
+    kVolume = 1;
+    kVolumePlusStepSize = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDecibel = 0x1;
+    kBasicEqualizer = 0x2;
+  }
+
+  readonly attribute boolean softMuted = 0;
+  readonly attribute optional boolean physicallyMuted = 1;
+  readonly attribute int16u volume = 2;
+  readonly attribute int16u minDeviceVolume = 3;
+  readonly attribute int16u maxDeviceVolume = 4;
+  readonly attribute optional int16u maxDeviceVolumeDB = 5;
+  attribute access(write: manage) optional int16u maxUserVolume = 6;
+  attribute access(write: manage) int16u defaultStepSize = 7;
+  attribute access(write: manage) UnmutePolicyEnum setVolumeUnmutePolicy = 8;
+  attribute access(write: manage) UnmutePolicyEnum increaseVolumeUnmutePolicy = 9;
+  attribute access(write: manage) UnmuteVolumeEnum increaseVolumeUnmuteVolume = 10;
+  attribute access(write: manage) UnmutePolicyEnum decreaseVolumeUnmutePolicy = 11;
+  attribute optional nullable boolean startUpMuted = 12;
+  attribute optional nullable int16u startUpVolume = 13;
+  attribute optional int16s bass = 14;
+  attribute optional int16s mid = 15;
+  attribute optional int16s treble = 16;
+  readonly attribute optional int16s minCorrection = 17;
+  readonly attribute optional int16s maxCorrection = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetVolumeRequest {
+    int16u newVolume = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  request struct IncreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+    optional UnmuteVolumeEnum unmuteVolume = 2;
+  }
+
+  request struct DecreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  /** This command SHALL set the value of the SoftMuted attribute to TRUE. */
+  command Mute(): DefaultSuccess = 0;
+  /** This command SHALL set the value of the SoftMuted attribute to FALSE. */
+  command Unmute(): DefaultSuccess = 1;
+  /** This command SHALL toggle the state of the SoftMuted attribute. */
+  command ToggleMuted(): DefaultSuccess = 2;
+  /** Sets the volume to a specified level. */
+  command SetVolume(SetVolumeRequest): DefaultSuccess = 3;
+  /** Increases the volume by a specified level. */
+  command IncreaseVolume(IncreaseVolumeRequest): DefaultSuccess = 4;
+  /** Decreases the volume by a specified level. */
+  command DecreaseVolume(DecreaseVolumeRequest): DefaultSuccess = 5;
+}
+
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 cluster Chime = 1366 {
   revision 2;
@@ -8773,6 +8850,30 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Sleep;
+  }
+
+  server cluster AudioControl {
+    ram      attribute softMuted default = 0;
+    ram      attribute volume default = 1;
+    ram      attribute minDeviceVolume default = 1;
+    ram      attribute maxDeviceVolume default = 100;
+    ram      attribute defaultStepSize default = 1;
+    ram      attribute setVolumeUnmutePolicy default = 0x00;
+    ram      attribute increaseVolumeUnmutePolicy default = 0x00;
+    ram      attribute increaseVolumeUnmuteVolume default = 0x01;
+    ram      attribute decreaseVolumeUnmutePolicy default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Mute;
+    handle command Unmute;
+    handle command ToggleMuted;
+    handle command SetVolume;
+    handle command IncreaseVolume;
+    handle command DecreaseVolume;
   }
 
   server cluster Chime {

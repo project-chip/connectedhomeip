@@ -182,7 +182,7 @@
         "AMBIENT_SENSING_UNION_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
-        "AUDIO_CONTROL_CLUSTER": [],
+        "AUDIO_CONTROL_CLUSTER": ["audio-control-server"],
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
         "AV_ANALYSIS_CLUSTER": [],
         "BALLAST_CONFIGURATION_CLUSTER": [],

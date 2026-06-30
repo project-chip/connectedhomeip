@@ -61,6 +61,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/ambient-context-sensing-server/tests",
       "${chip_root}/src/app/clusters/air-quality-server/tests",
+      "${chip_root}/src/app/clusters/audio-control-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/actions-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
