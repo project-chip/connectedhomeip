@@ -1508,7 +1508,10 @@ class ChipDeviceControllerBase:
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        if baHost is None or baPort is None:
+        if (baHost is None) != (baPort is None):
+            raise ValueError("Both baHost and baPort must be provided, or both must be None")
+
+        if baHost is None and baPort is None:
             await self.EstablishPASESession(setupCode, nodeId)
         else:
             await self.EstablishPASESessionThreadMeshcop(baHost, setupCode, nodeId, baPort)
