@@ -95,7 +95,6 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
     }
     else
     {
-        auto status = app->GetApplicationStatus();
         app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kStopped);
         MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
                                                ApplicationBasic::Attributes::Status::Id);
