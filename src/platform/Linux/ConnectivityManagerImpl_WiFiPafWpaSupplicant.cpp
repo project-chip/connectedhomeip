@@ -653,11 +653,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
-// ExtendedData is optional, See core R1.4.2 5.4.2.6.3
-// The 7 bytes are mandatory: <8-bits, Device OpCode>, <16-bits, Device Information>,
-// <16-bits, Vendor ID>, <16-bits, Product ID>
-#define PAF_MANDATORY_PUBLISH_LENGTH 7
-
 static uint16_t FreqToBand(uint32_t freq)
 {
     // 2.4 GHz: channels 1–13 (2412–2472 MHz) plus channel 14 (2484 MHz).
@@ -777,10 +772,12 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
     peer.opcode        = pPublishSSI->DevOpCode;
     peer.discriminator = pPublishSSI->DevInfo;
     std::memcpy(peer.mac, peer_addr, sizeof(peer_addr));
-    if (bufferLen > PAF_MANDATORY_PUBLISH_LENGTH)
+    // ExtendedData (optional, core R1.4.2 5.4.2.6.3) follows the mandatory
+    // PAFPublishSSI struct.
+    if (bufferLen > sizeof(PAFPublishSSI))
     {
         const auto * bytes = static_cast<const uint8_t *>(ssibuf);
-        peer.storage.assign(bytes + PAF_MANDATORY_PUBLISH_LENGTH, bytes + bufferLen);
+        peer.storage.assign(bytes + sizeof(PAFPublishSSI), bytes + bufferLen);
         peer.hasExtendedData = true;
     }
 

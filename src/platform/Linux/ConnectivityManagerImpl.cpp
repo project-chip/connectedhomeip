@@ -65,12 +65,6 @@ using namespace ::chip::WiFiPAF;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 using chip::app::DataModel::List;
-
-// ExtendedData is optional, See core R1.4.2 5.4.2.6.3
-// The 7 bytes are mandatory, <8-bits, Device OpCode>,
-// <16-bits, Device Information>, <16-bits, Vendor ID>,
-// <16-bits, Product ID>,
-#define PAF_MANDATORY_PUBLISH_LENGTH 7
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 namespace chip {

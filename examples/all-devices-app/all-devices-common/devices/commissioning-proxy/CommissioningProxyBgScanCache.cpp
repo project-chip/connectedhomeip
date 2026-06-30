@@ -70,6 +70,11 @@ std::map<Key, Entry> sCache;
 CommissioningProxyCluster * sCluster = nullptr;
 bool sSweepArmed                     = false;
 
+// Fallbacks used only on the defensive cluster == nullptr path; they mirror the
+// spec CacheTimeout default and the delegate's MaxCachedResults.
+constexpr uint16_t kDefaultCacheTimeoutSecs = 120;
+constexpr uint8_t kDefaultMaxCachedResults  = 10;
+
 // One periodic sweep (1 s granularity) reaps expired entries while the cache is
 // non-empty — far cheaper than a per-device TTL timer re-armed on every advert.
 constexpr chip::System::Clock::Timeout kSweepInterval = chip::System::Clock::Seconds16(1);
@@ -164,7 +169,8 @@ void Report(const ScanResultEntry & result, CommissioningProxyCluster * cluster)
     Key key{ static_cast<uint8_t>(result.transport.Raw()), result.discriminator, static_cast<uint16_t>(result.vendorID),
              result.productID };
 
-    uint16_t cacheTimeout = (cluster != nullptr) ? static_cast<uint16_t>(cluster->GetDelegate().GetCacheTimeout()) : 120;
+    uint16_t cacheTimeout =
+        (cluster != nullptr) ? static_cast<uint16_t>(cluster->GetDelegate().GetCacheTimeout()) : kDefaultCacheTimeoutSecs;
     auto expiresAt        = chip::System::SystemClock().GetMonotonicTimestamp() + chip::System::Clock::Seconds16(cacheTimeout);
 
     auto it = sCache.find(key);
@@ -176,7 +182,7 @@ void Report(const ScanResultEntry & result, CommissioningProxyCluster * cluster)
         return;
     }
 
-    uint8_t maxResults = (cluster != nullptr) ? cluster->GetDelegate().GetMaxCachedResults() : 10;
+    uint8_t maxResults = (cluster != nullptr) ? cluster->GetDelegate().GetMaxCachedResults() : kDefaultMaxCachedResults;
     if (sCache.size() >= static_cast<size_t>(maxResults))
     {
         ChipLogDetail(AppServer, "BgScanCache: full (%u entries), dropping discriminator %u", maxResults, key.discriminator);
