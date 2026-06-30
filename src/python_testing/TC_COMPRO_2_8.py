@@ -132,7 +132,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
                      "DUT returns SUCCESS (the proxy allows background scans from different "
                      "fabrics simultaneously)"),
             TestStep(13, "TH1 (Fabric A) and TH2 (Fabric B) each read NumCachedResults and "
-                     "CachedResults over up to 40 s",
+                     "CachedResults over up to 70 s",
                      "Each fabric independently reports NumCachedResults >= 1 and the ED present "
                      "in CachedResults; each fabric receives only its own response"),
             TestStep(14, "TH2 (Fabric B) sends ProxyBackGroundScanStopRequest",
@@ -301,8 +301,15 @@ class TC_COMPRO_2_8(COMPROBaseTest):
         # ----------------------------------------------------------------
         # Steps 10-16 — BGS fabric isolation (conditional on BGS feature)
         # ----------------------------------------------------------------
-        async def _poll_num_cached_ge1(controller, name, timeout_sec=40):
-            """Poll NumCachedResults on `controller` until >= 1, up to timeout_sec."""
+        async def _poll_num_cached_ge1(controller, name, timeout_sec=70):
+            """Poll NumCachedResults on `controller` until >= 1, up to timeout_sec.
+
+            The window must exceed the publisher's NAN-USD pauseState: after the
+            ProxyConnect in steps 6-9 solicits the ED, its NAN publisher enters a
+            ~60 s pause during which it stops unsolicited announcements (Wi-Fi
+            Aware USD), so a passive background-scan subscribe cannot rediscover
+            it until the pause ends. 70 s leaves margin over the observed ~62 s.
+            """
             deadline = asyncio.get_event_loop().time() + timeout_sec
             num = 0
             while asyncio.get_event_loop().time() < deadline:
@@ -382,7 +389,7 @@ class TC_COMPRO_2_8(COMPROBaseTest):
 
             # Step 13 — Both fabrics independently see the ED in their cache.
             self.step(13)
-            logger.info("Step 13: polling NumCachedResults on both fabrics (up to 40 s each)")
+            logger.info("Step 13: polling NumCachedResults on both fabrics (up to 70 s each)")
             await _poll_num_cached_ge1(self.default_controller, "TH1 (Fabric A)")
             await _poll_num_cached_ge1(th2, "TH2 (Fabric B)")
 
