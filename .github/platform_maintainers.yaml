@@ -1,0 +1,172 @@
+# Platform groups defining maintainers and their corresponding paths.
+# Git-style wildmatch globs are supported (via python pathspec).
+#
+# Platforms must OPT-IN to this system. Active platforms are listed
+# uncommented below. Proposals/examples for other platforms are commented out.
+
+nxp:
+  maintainers:
+    - doru91
+    # Proposed maintainers (uncomment to activate):
+    # - Martin-NXP
+    # - dinabenamar
+    # - marian-chereji-nxp
+    # - chapongatien
+    # - andrei-menzopol
+    # - sujaygkulkarni-nxp
+  paths:
+    - "src/platform/nxp/**"
+    - "examples/platform/nxp/**"
+    - "examples/**/nxp/**"
+    - "third_party/nxp/**"
+    - "config/nxp/**"
+
+silabs:
+  maintainers:
+    - jmartinez-silabs
+    - jepenven-silabs
+    - lpbeliveau-silabs
+    # Proposed maintainers (uncomment to activate):
+    # - chirag-silabs
+    # - arun-silabs
+    # - rosahay-silabs
+
+  paths:
+    - "src/platform/silabs/**"
+    - "examples/platform/silabs/**"
+    - "examples/**/silabs/**"
+    - "third_party/silabs/**"
+    - "config/silabs/**"
+    - "config/efr32/**"
+
+# --- Proposals / Opt-In Templates ---
+
+# esp32:
+#   maintainers:
+#     - shubhamdp
+#     - wqx6
+#     - shripad621git
+#     - jadhavrohit924
+#   paths:
+#     - "src/platform/ESP32/**"
+#     - "examples/platform/esp32/**"
+#     - "examples/**/esp32/**"
+#     - "config/esp32/**"
+# 
+# telink:
+#   maintainers:
+#     - s07641069
+#     - interfer
+#   paths:
+#     - "src/platform/telink/**"
+#     - "examples/platform/telink/**"
+#     - "examples/**/telink/**"
+#     - "config/telink/**"
+# 
+# nrfconnect:
+#   maintainers:
+#     - ArekBalysNordic
+#     - adigie
+#     - kkasperczyk-no
+#   paths:
+#     - "src/platform/nrfconnect/**"
+#     - "examples/platform/nrfconnect/**"
+#     - "examples/**/nrfconnect/**"
+#     - "config/nrfconnect/**"
+# 
+# tizen:
+#   maintainers:
+#     - enkiusz
+#     - arkq
+#   paths:
+#     - "src/platform/Tizen/**"
+#     - "examples/platform/tizen/**"
+#     - "examples/**/tizen/**"
+#     - "config/tizen/**"
+# 
+# realtek:
+#   maintainers:
+#     - pankore
+#   paths:
+#     - "src/platform/realtek/**"
+#     - "src/platform/Ameba/**"
+#     - "examples/platform/realtek/**"
+#     - "examples/platform/ameba/**"
+#     - "examples/**/realtek/**"
+#     - "examples/**/ameba/**"
+#     - "config/realtek/**"
+#     - "config/ameba/**"
+# 
+# asr:
+#   maintainers:
+#     - tx2rx
+#   paths:
+#     - "src/platform/ASR/**"
+#     - "examples/platform/asr/**"
+#     - "examples/**/asr/**"
+#     - "config/asr/**"
+# 
+# beken:
+#   maintainers:
+#     - zhengyaohan
+#   paths:
+#     - "src/platform/Beken/**"
+#     - "examples/platform/beken/**"
+#     - "examples/**/beken/**"
+#     - "config/beken/**"
+# 
+# bouffalolab:
+#   maintainers:
+#     - wy-hh
+#   paths:
+#     - "src/platform/bouffalolab/**"
+#     - "examples/platform/bouffalolab/**"
+#     - "examples/**/bouffalolab/**"
+#     - "config/bouffalolab/**"
+# 
+# qpg:
+#   maintainers:
+#     - dvdm-qorvo
+#     - kliffwong
+#     - tima-q
+#   paths:
+#     - "src/platform/qpg/**"
+#     - "examples/platform/qpg/**"
+#     - "examples/**/qpg/**"
+#     - "config/qpg/**"
+# 
+# stm32:
+#   maintainers:
+#     - STYoannZamaron
+#   paths:
+#     - "src/platform/stm32/**"
+#     - "examples/platform/stm32/**"
+#     - "examples/**/stm32/**"
+#     - "config/stm32/**"
+# 
+# webos:
+#   maintainers:
+#     - joonhaengHeo
+#   paths:
+#     - "src/platform/webos/**"
+# 
+# mt793x:
+#   maintainers:
+#     - pakls
+#   paths:
+#     - "src/platform/mt793x/**"
+#     - "examples/platform/mt793x/**"
+# 
+# ti:
+#   maintainers:
+#     - s-jain2022
+#     - abiradarti
+#   paths:
+#     - "src/platform/ti/**"
+#     - "src/platform/cc32xx/**"
+#     - "examples/platform/ti/**"
+#     - "examples/platform/cc32xx/**"
+#     - "examples/**/ti/**"
+#     - "examples/**/cc32xx/**"
+#     - "config/ti/**"
+#     - "config/cc32xx/**"

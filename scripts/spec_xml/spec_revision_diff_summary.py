@@ -213,7 +213,8 @@ REVISIONS = {'1.3': PrebuiltDataModelDirectory.k1_3,
              '1.4.2': PrebuiltDataModelDirectory.k1_4_2,
              '1.5': PrebuiltDataModelDirectory.k1_5,
              '1.5.1': PrebuiltDataModelDirectory.k1_5_1,
-             '1.6': PrebuiltDataModelDirectory.k1_6}
+             '1.6': PrebuiltDataModelDirectory.k1_6,
+             '1.6.1': PrebuiltDataModelDirectory.k1_6_1}
 
 
 @click.command()

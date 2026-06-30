@@ -48,6 +48,7 @@
 #include <clusters/ClosureDimension/ClusterId.h>
 #include <clusters/ColorControl/ClusterId.h>
 #include <clusters/CommissionerControl/ClusterId.h>
+#include <clusters/CommissioningProxy/ClusterId.h>
 #include <clusters/CommodityMetering/ClusterId.h>
 #include <clusters/CommodityPrice/ClusterId.h>
 #include <clusters/CommodityTariff/ClusterId.h>
@@ -149,6 +150,7 @@
 #include <clusters/TemperatureControl/ClusterId.h>
 #include <clusters/TemperatureControlledCabinetTopology/ClusterId.h>
 #include <clusters/TemperatureMeasurement/ClusterId.h>
+#include <clusters/TestHiddenManufacturerSpecific/ClusterId.h>
 #include <clusters/Thermostat/ClusterId.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/ClusterId.h>
 #include <clusters/ThreadBorderRouterManagement/ClusterId.h>

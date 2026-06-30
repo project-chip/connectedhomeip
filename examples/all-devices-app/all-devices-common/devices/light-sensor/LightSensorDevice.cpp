@@ -29,9 +29,12 @@ LightSensorDevice::LightSensorDevice(TimerDelegate & timerDelegate, IlluminanceM
     mTimerDelegate(timerDelegate), mLightConfig(lightConfig), mOptionalAttributes(optionalAttributes)
 {}
 
-CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -39,12 +42,14 @@ CHIP_ERROR LightSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelP
     mIlluminanceMeasurementCluster.Create(endpoint, mOptionalAttributes, mLightConfig);
     ReturnErrorOnFailure(provider.AddCluster(mIlluminanceMeasurementCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void LightSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mIlluminanceMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mIlluminanceMeasurementCluster.Cluster()));

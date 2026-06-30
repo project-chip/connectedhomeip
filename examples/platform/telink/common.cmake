@@ -188,3 +188,10 @@ endif()
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
+
+# deep-sleep platform workaround
+if(CONFIG_PM AND (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+zephyr_link_libraries(
+  -Wl,--wrap,bt_is_ready
+)
+endif()

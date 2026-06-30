@@ -496,9 +496,27 @@ config NET_IPV6_FRAGMENT_TIMEOUT
 	default 3
 
 # options managed by IP4/IP6 simultaneous support
-# aligned here to match OpenThread config
+
+# IPv6 Neighbor Discovery table sizing for dense networks. Where many routers
+# advertise continuously (an "RA storm"), each is pinned in the neighbor cache
+# as a non-evictable router entry; size the tables above the expected router
+# count so peers are never evicted under churn.
+
+# Neighbor cache: must hold all routers plus active peers without eviction.
+config NET_IPV6_MAX_NEIGHBORS
+	default 32
+
+# Route table: must hold all advertised routes plus the in-use route.
+config NET_MAX_ROUTES
+	default 16
+
+# Default-router list: track all advertising routers.
 config NET_MAX_ROUTERS
-	default 1
+	default 16
+
+# On-link prefixes (SLAAC): headroom for more than one advertised prefix.
+config NET_IF_IPV6_PREFIX_COUNT
+	default 4
 
 config NET_MAX_CONN
 	default 10

@@ -50,7 +50,8 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 
                # all-devices common sources (interfaces, root node base, supported devices)
-               ${ALL_DEVICES_DEVICE_SOURCES})
+               ${ALL_DEVICES_DEVICE_SOURCES}
+               ${ALL_DEVICES_CLUSTER_SOURCES})
 
 target_sources(app PRIVATE
                src/AppTask.cpp
@@ -66,7 +67,8 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c)
 
 if(CONFIG_NET_L2_OPENTHREAD)
   target_sources(app PRIVATE ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/ThreadRootNodeDevice.cpp)

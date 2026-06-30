@@ -37,7 +37,18 @@ class SingleEndpointDevice : public DeviceInterface
 public:
     virtual ~SingleEndpointDevice() = default;
 
+    /// Implements DeviceInterface::Register by allocating an endpoint via allocator.
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override
+    {
+        return Register(allocator.Allocate(), provider, composition);
+    }
+
     EndpointId GetEndpointId() const { return mEndpointId; }
+
+    /// Subclasses implement this to perform single-endpoint registration on a specific endpoint ID.
+    virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                EndpointComposition composition = {}) = 0;
 
 protected:
     /// The caller creating a SingleEndpointDevice MUST ensure that the underlying data for the Span of
@@ -48,17 +59,21 @@ protected:
     /// Device subclasses are expected to, and must only call this as part of their own device specific Register()
     /// functions. This allows creation of common and device-specific clusters to be done together and
     /// also to complete endpoint registration.
-    CHIP_ERROR SingleEndpointRegistration(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId);
+    CHIP_ERROR RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                  EndpointComposition composition = {}) override;
+
+    /// make this visible to not have the overload below error out. Should not be used directly.
+    using DeviceInterface::UnregisterDescriptor;
 
     /// Internal function to unregister a single endpoint device. This will destroy the clusters part of
     /// this class, and must be called in a subclass' device-specific Unregister() function. This allows
     /// for the destruction of the general SingleEndpointDevice clusters and device-specific clusters from
     /// the subclass, as well as removal of the device endpoint from the provider to happen together.
-    void SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider);
+    void UnregisterDescriptor(CodeDrivenDataModelProvider & provider);
 
     /// A default value of kInvalidEndpointId is used for the endpoint ID. When this is the value of the endpoint ID,
     /// it signifies that endpoint registration (and cluster creation) has not yet been completed. The endpoint
-    /// ID will be set after a call to SingleEndpointRegistration() has been made.
+    /// ID will be set after a call to RegisterDescriptor() has been made.
     EndpointId mEndpointId = kInvalidEndpointId;
 };
 

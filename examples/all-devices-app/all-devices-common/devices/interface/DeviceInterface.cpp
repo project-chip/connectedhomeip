@@ -35,4 +35,36 @@ CHIP_ERROR DeviceInterface::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & ou
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceInterface::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                               EndpointComposition composition)
+{
+    VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // TODO: Allow mDescriptorCluster to be initialized with custom optional attribute sets.
+    mDescriptorCluster.Create(endpoint, DescriptorCluster::OptionalAttributesSet(0), composition.tagList);
+    CHIP_ERROR err = provider.AddCluster(mDescriptorCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        mDescriptorCluster.Destroy();
+        return err;
+    }
+
+    mEndpointRegistration.endpointEntry = DataModel::EndpointEntry{
+        .id                 = endpoint,
+        .parentId           = composition.parentId,
+        .compositionPattern = composition.pattern,
+    };
+    return CHIP_NO_ERROR;
+}
+
+void DeviceInterface::UnregisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    LogErrorOnFailure(provider.RemoveEndpoint(endpoint, ClusterShutdownType::kClusterShutdown));
+    if (mDescriptorCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mDescriptorCluster.Cluster()));
+        mDescriptorCluster.Destroy();
+    }
+}
+
 } // namespace chip::app
