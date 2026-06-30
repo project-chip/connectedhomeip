@@ -39,7 +39,7 @@ DataModel::ActionReturnStatus DynamicLightingCluster::ReadAttribute(const DataMo
     case AvailableEffects::Id:
         return encoder.EncodeEmptyList();
     case CurrentEffectID::Id:
-        return encoder.Encode(DataModel::Nullable<uint16_t>{ DataModel::NullNullable });
+        return encoder.EncodeNull();
     case CurrentSpeed::Id:
         return encoder.Encode(DataModel::Nullable<uint16_t>{ DataModel::NullNullable });
     default:

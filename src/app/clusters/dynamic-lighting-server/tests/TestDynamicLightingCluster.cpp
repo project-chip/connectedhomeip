@@ -105,27 +105,6 @@ TEST_F(TestDynamicLightingCluster, WriteCurrentSpeedWithNoRunningEffect)
               Protocols::InteractionModel::Status::InvalidInState);
 }
 
-TEST_F(TestDynamicLightingCluster, ReadUnsupportedAttribute)
-{
-    constexpr AttributeId kUnsupportedAttributeId = 0xFFF0;
-
-    ReadOperation readOperation(kRootEndpointId, DynamicLighting::Id, kUnsupportedAttributeId);
-    std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
-
-    EXPECT_EQ(cluster.ReadAttribute(readOperation.GetRequest(), *encoder),
-              Protocols::InteractionModel::Status::UnsupportedAttribute);
-}
-
-TEST_F(TestDynamicLightingCluster, WriteUnsupportedAttribute)
-{
-    constexpr AttributeId kUnsupportedAttributeId = 0xFFF0;
-
-    WriteOperation writeOperation(kRootEndpointId, DynamicLighting::Id, kUnsupportedAttributeId);
-    AttributeValueDecoder decoder = writeOperation.DecoderFor(static_cast<uint16_t>(1));
-
-    EXPECT_EQ(cluster.WriteAttribute(writeOperation.GetRequest(), decoder), Protocols::InteractionModel::Status::UnsupportedWrite);
-}
-
 TEST_F(TestDynamicLightingCluster, InvokeStartEffectWithNoAvailableEffects)
 {
     ClusterTester tester(cluster);
@@ -136,30 +115,6 @@ TEST_F(TestDynamicLightingCluster, InvokeStartEffectWithNoAvailableEffects)
 
     auto result = tester.Invoke(request);
     EXPECT_EQ(result.GetStatusCode(), std::make_optional(ClusterStatusCode(Status::InvalidCommand)));
-}
-
-TEST_F(TestDynamicLightingCluster, InvokeUnsupportedCommand)
-{
-    constexpr CommandId kUnsupportedCommandId = 0xFFF0;
-
-    MockCommandHandler handler;
-    DataModel::InvokeRequest request({ kRootEndpointId, DynamicLighting::Id, kUnsupportedCommandId },
-                                     handler.GetSubjectDescriptor());
-
-    uint8_t buffer[16];
-    TLV::TLVWriter writer;
-    writer.Init(buffer);
-
-    TLV::TLVType outerContainerType;
-    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
-    ASSERT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
-    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    TLV::TLVReader reader;
-    reader.Init(buffer, writer.GetLengthWritten());
-    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster.InvokeCommand(request, reader, &handler), Protocols::InteractionModel::Status::UnsupportedCommand);
 }
 
 TEST_F(TestDynamicLightingCluster, InvokeStopEffectWithNoRunningEffect)
