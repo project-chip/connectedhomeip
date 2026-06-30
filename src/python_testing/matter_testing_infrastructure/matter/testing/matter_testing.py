@@ -1046,7 +1046,8 @@ class MatterBaseTest(base_test.BaseTestClass):
            snapshot exists but no fabrics were added during the test.
         """
         if self._original_fabrics is None:
-            LOGGER.info("[CLN] No fabric snapshot (DUT not reachable at setup): skipping fabric removal (cannot distinguish test-added from pre-existing fabrics)")
+            LOGGER.info(
+                "[CLN] No fabric snapshot (DUT not reachable at setup): skipping fabric removal (cannot distinguish test-added from pre-existing fabrics)")
             return
 
         try:
