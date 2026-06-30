@@ -22,6 +22,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+#define CONFIG_CHEF_SAMPLE_NAME ""
+
 namespace chef {
 namespace DeviceTypes {
 

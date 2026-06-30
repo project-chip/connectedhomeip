@@ -514,17 +514,13 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
  */
 void RefrigeratorTemperatureControlledCabinetInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME,
                "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping RefrigeratorTemperatureControlledCabinetInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
     EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
     EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
     EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
@@ -604,16 +600,12 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
  */
 void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_oven_temperaturecontrolledcabinet_cooktop_cooksurface_738dd18832"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping OvenTemperatureControlledCabinetCooktopCookSurfaceInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
     EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
     EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
     EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
@@ -641,16 +633,12 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
  */
 void GenericSwitchInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_genericswitch_9866e35d0b"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping GenericSwitchInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
     if (!DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId) ||
         !DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId) ||
         !DeviceTypes::EndpointHasDeviceType(3, Device::kGenericSwitchDeviceTypeId))
@@ -678,16 +666,12 @@ void GenericSwitchInit()
  */
 void LaundryDryerInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_laundrydryer_01796fe396"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping LaundryDryerInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: LaundryDryerInit called more than once");
     called = true;
@@ -705,16 +689,12 @@ void LaundryDryerInit()
  */
 void CastingvideoplayerContentappInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_castingvideoplayer_contentapp_34699714e7"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping CastingvideoplayerContentappInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: CastingvideoplayerContentappInit called more than once");
     called = true;
@@ -767,16 +747,12 @@ void CastingvideoplayerContentappInit()
  */
 void WaterHeaterInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_waterheater_21bd13d651"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping WaterHeaterInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: WaterHeaterInit called more than once");
     called = true;
@@ -803,16 +779,12 @@ void WaterHeaterInit()
  */
 void ChimeInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_chime_9991598b3f"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping ChimeInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
     static bool called = false;
     VerifyOrDieWithMsg(!called, Zcl, "Error: ChimeInit called more than once");
     called = true;
@@ -833,16 +805,12 @@ void ChimeInit()
 
 void SmokeCoAlarmInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_smokecoalarm_686fe0dcb8"))
     {
         return;
     }
     ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(Zcl, "Skipping SmokeCoAlarmInit as CONFIG_CHEF_SAMPLE_NAME is not set.");
-    return;
-#endif
+
 #if MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kSmokeCoAlarmDeviceTypeId))
     {
@@ -858,7 +826,7 @@ void SmokeCoAlarmInit()
 
 void InitModeSelect()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
+#if CONFIG_CHEF_SAMPLE_NAME
     if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_modeselect_6860d3a65a"))
     {
         return;
@@ -885,11 +853,7 @@ void InitModeSelect()
 
 void ApplicationInit()
 {
-#ifdef CONFIG_CHEF_SAMPLE_NAME
     ChipLogProgress(NotSpecified, "Chef Application Init for sample: %s !!!", CONFIG_CHEF_SAMPLE_NAME);
-#else
-    ChipLogProgress(NotSpecified, "Chef Application Init !!!");
-#endif
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
