@@ -756,7 +756,7 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
     value = g_variant_lookup_value(discov_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    strncpy(addr_str, paddr, sizeof(addr_str));
+    chip::Platform::CopyString(addr_str, paddr);
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
     value = g_variant_lookup_value(discov_info, "srv_proto_type", G_VARIANT_TYPE_UINT32);
@@ -767,7 +767,8 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
     size_t bufferLen;
     value = g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: ScanDiscoveryResult SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
 
     NanPeerInfo peer;
@@ -951,7 +952,10 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
     ChipLogProgress(DeviceLayer, "FinishWiFiPAFScan: subscribe_id %u", ctx->subscribe_id);
     DisconnectScanSignals();
     TEMPORARY_RETURN_IGNORED _WiFiPAFCancelSubscribe(ctx->subscribe_id);
-    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelIncompleteSubscribe();
+    // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
+    // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
+    // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
+    // scan's subscribe_id above is sufficient to tear down the scan.
 
     WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();

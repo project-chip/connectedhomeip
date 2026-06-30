@@ -840,6 +840,48 @@ bool IsConnectPending()
     return sPafPendingConnect != nullptr;
 }
 
+void Shutdown()
+{
+    // Tear down an in-flight ProxyConnect: cancel its timeout timer, cancel the
+    // NAN subscribe, drop the PAF session and free the context so neither the
+    // timer nor the heap context outlive the cluster.
+    if (sPafPendingConnect != nullptr)
+    {
+        auto * ctx         = sPafPendingConnect;
+        sPafPendingConnect = nullptr;
+
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnProxyConnectTimeout, nullptr);
+        (void) chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+        if (ctx->subscribeId != 0)
+            (void) chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(ctx->subscribeId);
+
+        chip::WiFiPAF::WiFiPAFSession keyInfo{};
+        keyInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
+        keyInfo.discriminator = ctx->discriminator;
+        (void) chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyInfo);
+        delete ctx;
+    }
+
+    // Cancel every outstanding per-fabric lifetime timer and free its context.
+    for (auto & [key, rec] : sBgScanFabrics)
+    {
+        if (rec.lifetimeCtx != nullptr)
+        {
+            chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanLifetimeExpiry, rec.lifetimeCtx);
+            delete rec.lifetimeCtx;
+            rec.lifetimeCtx = nullptr;
+        }
+    }
+
+    // Stop the hardware background scan only if it currently owns the radio.
+    if (!sBgScanFabrics.empty() && !sBgScanPaused)
+        (void) chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
+
+    sBgScanFabrics.clear();
+    sBgScanPaused  = false;
+    sBgScanCluster = nullptr;
+}
+
 } // namespace Paf
 } // namespace CommissioningProxy
 } // namespace Clusters
