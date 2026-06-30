@@ -223,7 +223,7 @@ CHIP_ERROR P256KeypairSE05x::ECDSA_sign_msg(const uint8_t * msg, size_t msg_leng
     SuccessOrExit(error);
 
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
@@ -339,7 +339,6 @@ CHIP_ERROR P256KeypairSE05x::ECDH_derive_secret(const P256PublicKey & remote_pub
     ChipLogDetail(Crypto, "ECDH_derive_secret : Using se05x for ecdh");
 
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
 
     const uint8_t * const rem_pubKey = Uint8::to_const_uchar(remote_public_key);
     const size_t rem_pubKeyLen       = remote_public_key.Length();

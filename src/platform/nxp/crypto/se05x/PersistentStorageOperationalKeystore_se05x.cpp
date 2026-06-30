@@ -75,6 +75,7 @@ PersistentStorageOpKeystorese05x::ExtractKeyIdFromSerializedKeypair(const Crypto
     {
         /** Check only for Magic Number. Return Success when key not present in SE05x.  */
         ChipLogDetail(Crypto, "Not a ref key, Key not present in SE05x.");
+        outKeyId = 0;
         return CHIP_NO_ERROR;
     }
 

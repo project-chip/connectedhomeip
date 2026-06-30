@@ -274,7 +274,7 @@ CHIP_ERROR Serialize_H(const P256KeypairContext mKeypair, const P256PublicKey mP
     // Write the public key to the output buffer
     bbuf.Put(mPublicKey, mPublicKey.Length());
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
-    
+
     // Export private key from PSA key storage
     result = psa_export_key(ctx->key_id,
                             Uint8::to_uchar(privkey),
@@ -282,7 +282,7 @@ CHIP_ERROR Serialize_H(const P256KeypairContext mKeypair, const P256PublicKey mP
                             &privkey_size);
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(privkey_size == kP256_PrivateKey_Length, error = CHIP_ERROR_INTERNAL);
-    
+
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     TEMPORARY_RETURN_IGNORED output.SetLength(bbuf.Needed());
@@ -295,16 +295,18 @@ exit:
 CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256KeypairContext * mKeypair, P256SerializedKeypair & input)
 {
     Encoding::BufferWriter bbuf(*mPublicKey, mPublicKey->Length());
-    
+
     psa_status_t result = PSA_SUCCESS;
     CHIP_ERROR error    = CHIP_NO_ERROR;
     psa_key_id_t key_id = PSA_KEY_ID_NULL;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
 
+    VerifyOrExit(input.Length() == mPublicKey->Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+
     // Extract private key bytes
     const uint8_t * privkey = input.ConstBytes() + mPublicKey->Length();
 
-    pk->Clear(); 
+    pk->Clear();
 
     // Initialize the context
     PsaP256KeyContext * ctx = to_psa_context(mKeypair);
@@ -319,11 +321,11 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
                             PSA_KEY_USAGE_VERIFY_HASH |
                             PSA_KEY_USAGE_DERIVE |
                             PSA_KEY_USAGE_EXPORT);
-    
+
     psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
     // psa_set_key_enrollment_algorithm(&attributes, PSA_ALG_ECDH);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_VOLATILE);
-    
+
     // Import the raw private key scalar into PSA
     result = psa_import_key(&attributes,
                             privkey,
@@ -331,7 +333,7 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
                             &key_id);
     psa_reset_key_attributes(&attributes);
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     // Extract public key from serialized input
     bbuf.Put(input.ConstBytes(), mPublicKey->Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -339,7 +341,7 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
     // Store key ID in context - ownership transferred
     ctx->key_id = key_id;
     key_id = PSA_KEY_ID_NULL;
-    
+
 exit:
     if (key_id != PSA_KEY_ID_NULL)
     {
