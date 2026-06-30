@@ -6,7 +6,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,45 +14,21 @@
  *    limitations under the License.
  */
 
-
-
-/*
- * slot0 must match slot1 in size for MCUboot's boot_slots_compatible()
- * check to pass in overwrite-only mode.
- */
 &slot0_partition {
-    reg = <0x0000c000 DT_SIZE_K(1024)>;
-};
-
-&flash0 {
-    partitions {
-        factory_partition: partition@10c000 {
-                reg = <0x0010c000 DT_SIZE_K(32)>;
-        };
-    };
+    reg = <0x0000c000 DT_SIZE_K(1544)>;
 };
 
 /delete-node/ &slot1_partition;
 
-&mx25r80 {
+&flash0 {
     partitions {
-        compatible = "fixed-partitions";
-        #address-cells = <1>;
-        #size-cells = <1>;
-
-        slot1_partition: partition@0 {
+        slot1_partition: partition@18e000 {
             label = "image-1";
-            reg = <0x00000000 DT_SIZE_K(1024)>;
+            reg = <0x0018e000 DT_SIZE_K(1544)>;
+        };
+
+        factory_partition: partition@310000 {
+            reg = <0x00310000 DT_SIZE_K(32)>;
         };
     };
-};
-
-&dma0 {
-	status = "okay";
-};
-
-&usart0 {
-    dmas = <&dma0 DMA_REQSEL_USART0TXBL>,
-           <&dma0 DMA_REQSEL_USART0RXDATAV>;
-    dma-names = "tx", "rx";
 };
