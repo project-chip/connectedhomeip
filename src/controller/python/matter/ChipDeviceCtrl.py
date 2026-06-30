@@ -1489,7 +1489,7 @@ class ChipDeviceControllerBase:
 
         return self._Cluster
 
-    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: typing.Optional[int] = None) -> typing.Optional[DeviceProxyWrapper]:
+    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: typing.Optional[int] = None, baHost: typing.Optional[str] = None, baPort: typing.Optional[int] = None) -> typing.Optional[DeviceProxyWrapper]:
         '''
         Find or establish a PASE session.
 
@@ -1508,7 +1508,10 @@ class ChipDeviceControllerBase:
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        await self.EstablishPASESession(setupCode, nodeId)
+        if baHost is None or baPort is None:
+            await self.EstablishPASESession(setupCode, nodeId)
+        else:
+            await self.EstablishPASESessionThreadMeshcop(baHost, setupCode, nodeId, baPort)
 
         res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
