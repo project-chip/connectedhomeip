@@ -76,7 +76,8 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     mCurrentTarget     = static_cast<uint8_t>(target);
     if (targetChanged && mEndpoint != chip::kInvalidEndpointId)
     {
-        MatterReportingAttributeChangeCallback(mEndpoint, TargetNavigator::Id, TargetNavigator::Attributes::CurrentTarget::Id);
+        MatterReportingAttributeChangeCallback(mEndpoint, chip::app::Clusters::TargetNavigator::Id,
+                                               chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id);
     }
 
     response.data   = chip::MakeOptional("data response"_span);
