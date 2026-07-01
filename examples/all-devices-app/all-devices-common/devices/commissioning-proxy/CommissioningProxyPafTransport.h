@@ -82,6 +82,11 @@ void OnAllSessionsClosed();
 // to combine pending connects across transports against MaxSessions.
 bool IsConnectPending();
 
+// Cancel all outstanding PAF state (pending connect + per-fabric background-scan
+// lifetime timers) and stop the hardware scan.  Must be called before the cluster
+// is destroyed so no timer or cached cluster pointer outlives it.
+void Shutdown();
+
 } // namespace Paf
 } // namespace CommissioningProxy
 } // namespace Clusters

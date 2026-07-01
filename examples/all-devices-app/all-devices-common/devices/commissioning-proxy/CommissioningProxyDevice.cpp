@@ -30,6 +30,7 @@
 #include <platform/PlatformManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include "CommissioningProxyPafTransport.h"
 #include <app_options/AppOptions.h>
 #include <cstring>
 #include <platform/Linux/ConnectivityManagerImpl.h>
@@ -116,6 +117,9 @@ void CommissioningProxyDevice::Unregister(CodeDrivenDataModelProvider & provider
         Clusters::CommissioningProxy::BgScanCache::Unregister(&mCluster.Cluster());
 #if CONFIG_NETWORK_LAYER_BLE
         Clusters::CommissioningProxy::Ble::Shutdown();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        Clusters::CommissioningProxy::Paf::Shutdown();
 #endif
         LogErrorOnFailure(provider.RemoveCluster(&mCluster.Cluster()));
         mCluster.Destroy();

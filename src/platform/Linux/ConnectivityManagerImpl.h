@@ -76,14 +76,16 @@ struct NanPeerInfo
     bool hasExtendedData = false;
     uint16_t band        = 0; // WiFiBandBitmap value derived from scan frequency; 0 = unknown
 
-    // Used in the std::set<NanPeerInfo> to determine uniqueness
+    // Strict weak ordering over (mac, discriminator) so std::set<NanPeerInfo>
+    // treats a peer with the same MAC and discriminator as a duplicate.
     bool operator<(const NanPeerInfo & o) const
     {
-        if ((memcmp(mac, o.mac, 6) == 0) && (discriminator == o.discriminator))
+        int macCmp = memcmp(mac, o.mac, sizeof(mac));
+        if (macCmp != 0)
         {
-            return false;
+            return macCmp < 0;
         }
-        return true;
+        return discriminator < o.discriminator;
     }
 };
 
