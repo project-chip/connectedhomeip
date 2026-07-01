@@ -38,7 +38,6 @@
 
 import logging
 from itertools import count
-from typing import Any
 
 from mobly import asserts
 
@@ -100,6 +99,8 @@ class TC_HSTAT_2_1(MatterBaseTest):
                              "Verify that the DUT response contains a value or True or False"),
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Off",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH reads from the DUT the Mode attribute.",
+                             "Verify that the DUT response contains Off."),
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Humidifier"
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
@@ -112,24 +113,20 @@ class TC_HSTAT_2_1(MatterBaseTest):
                              "Verify that the DUT response contains Dehumidifier."),
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
                              "Verify that the DUT response contains Dehumidifying."),
-
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Auto",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
                              "Verify that the DUT response is Auto."),
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
                              "Verify that the DUT response contains Idle, Humidifying, or Dehumidifying."),
-
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of FanOnly",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
                              "Verify that the DUT response is FanOnly."),
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
                              "Verify that the DUT response contains Fan."),
-
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Humidifier or Dehumidifier",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
-
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue."
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
@@ -259,8 +256,9 @@ class TC_HSTAT_2_1(MatterBaseTest):
             asserts.assert_true(supports_humidifier and supports_dehumidifier and supports_sensor,
                                 "Must support Humidifier, Dehumidifier, and Sensor if Auto is supported")
         if supports_optimal:
-            asserts_assert_true(supports_sensor, "Must support Sensor if Optimal is supported")
-        asserts.assert_true(supports_warm or supports_cold, "Must support Warm and/or Cold")
+            asserts.assert_true(supports_sensor, "Must support Sensor if Optimal is supported")
+        if supports_humidifier:
+            asserts.assert_true(supports_warm or supports_cold, "Must support Warm and/or Cold")
 
         self.step(next(step)) # Check MinSetpoint attribute
         if supports_sensor:
@@ -318,6 +316,10 @@ class TC_HSTAT_2_1(MatterBaseTest):
 
         self.step(next(step)) # Write Mode to Off
         await self.write_single_attribute(attribute_value=attributes.Mode(modeOff), endpoint_id=endpoint)
+
+        self.step(next(step)) # Read Mode, should be Off
+        dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
+        asserts.assert_equal(dut_Mode, modeOff, "Mode attribute is not Off")
 
         self.step(next(step)) # Write Mode to Humidifier
         if supports_humidifier:
