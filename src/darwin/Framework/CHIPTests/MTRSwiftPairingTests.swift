@@ -45,7 +45,16 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
 }
 
 class MTRSwiftPairingTests : MTRTestCase {
-    func test001_BasicPairing() {
+    func test001_BasicPairing() throws {
+        // PASE pair-setup here is flaky under TSAN and the leaks harness on macos-26;
+        // ASAN is fast enough to keep. (Swift has no `__has_feature` macro; detect via
+        // the TSAN runtime envvar the test harness injects when -enableThreadSanitizer
+        // is in effect, and the leaks-job define exposed via Info.plist or build env.)
+        if ProcessInfo.processInfo.environment["TSAN_OPTIONS"] != nil
+            || ProcessInfo.processInfo.environment["ENABLE_LEAK_DETECTION"] != nil {
+            throw XCTSkip("MTRSwiftPairingTests test001_BasicPairing is flaky under TSAN/leaks")
+        }
+
         let started = self.startApp(withName: "all-clusters", arguments: [], payload: PairingConstants.onboardingPayload)
         XCTAssertTrue(started);
         

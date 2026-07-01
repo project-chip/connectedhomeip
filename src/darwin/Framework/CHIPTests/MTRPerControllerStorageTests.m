@@ -2857,6 +2857,13 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
+        // Bypass the 1s first-Thread-subscribe coldstart deferral (PR #72268)
+        // for this test.  The fake-Thread devices here are real local fixtures
+        // that are already reachable, and the deferral skews subscription-pool
+        // dequeue timing in a way that breaks the
+        // (subscriptionDequeueCount <= orderedDeviceIDs.count - subscriptionPoolSize)
+        // ordering invariant this test asserts.
+        delegate.suppressFirstThreadSubscribeDeferral = YES;
         // By default MTRDeviceTestDelegate sets a 2s MaxInterval.  But for this test, we don't
         // really want that.  We don't care about getting incremental updates in this test, nor do
         // we care about detecting subscription drops (and in fact, a subscription drop would mess
@@ -2916,6 +2923,10 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         // fake device does, so keep it out of the @autoreleasepool block.
         MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
         fakeDeviceDelegate.pretendThreadEnabled = YES;
+        // Bypass the first-Thread-subscribe coldstart deferral (PR #72268) so
+        // the fake device's subscription pool work item enqueues immediately;
+        // we explicitly want the work item queued so it can be deallocated.
+        fakeDeviceDelegate.suppressFirstThreadSubscribeDeferral = YES;
         // See comments in the loop that sets up the other delegates above for why we are overriding
         // subscriptionMaxIntervalOverride.
         fakeDeviceDelegate.subscriptionMaxIntervalOverride = @(3600); // seconds

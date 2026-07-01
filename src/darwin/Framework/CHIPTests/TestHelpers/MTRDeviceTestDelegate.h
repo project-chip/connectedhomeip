@@ -35,6 +35,13 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic) BOOL forceAttributeReportsIfMatchingCache;
 @property (atomic, copy, nullable) dispatch_block_t onDeviceConfigurationChanged;
 @property (atomic) BOOL pretendThreadEnabled;
+// When YES, the MTRDevice's first-Thread-subscribe coldstart deferral (the 1s
+// gate added in PR #72268) is suppressed for this device.  Set this on tests
+// that mock Thread but rely on subscription-pool dequeue ordering — the
+// deferral skews dequeue timing enough to break the
+// MTRPerControllerStorageTests pool tests.  Tests that intentionally exercise
+// the deferral path (in MTRDeviceTests) leave this NO.
+@property (atomic) BOOL suppressFirstThreadSubscribeDeferral;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolDequeue;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
 @property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
