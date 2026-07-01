@@ -45672,6 +45672,76 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             return value;
         }
+        case Attributes::Movable::Id: {
+            using TypeInfo = Attributes::Movable::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
+        case Attributes::Presets::Id: {
+            using TypeInfo = Attributes::Presets::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_presetID;
+                std::string newElement_0_presetIDClassName     = "java/lang/Integer";
+                std::string newElement_0_presetIDCtorSignature = "(I)V";
+                jint jninewElement_0_presetID                  = static_cast<jint>(entry_0.presetID);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_presetIDClassName.c_str(), newElement_0_presetIDCtorSignature.c_str(), jninewElement_0_presetID,
+                    newElement_0_presetID);
+                jobject newElement_0_presetName;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.presetName, newElement_0_presetName));
+
+                {
+                    jclass contentPresetStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ContentLauncherClusterContentPresetStruct",
+                        contentPresetStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ContentLauncherClusterContentPresetStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID contentPresetStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, contentPresetStructStructClass_1, "<init>",
+                                                                        "(Ljava/lang/Integer;Ljava/lang/String;)V",
+                                                                        &contentPresetStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || contentPresetStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$ContentLauncherClusterContentPresetStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 = env->NewObject(contentPresetStructStructClass_1, contentPresetStructStructCtor_1,
+                                                  newElement_0_presetID, newElement_0_presetName);
+                }
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

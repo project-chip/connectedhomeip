@@ -19289,6 +19289,50 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
         value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
         return value;
     }
+    case Attributes::Movable::Id: {
+        using TypeInfo = Attributes::Movable::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::Presets::Id: {
+        using TypeInfo = Attributes::Presets::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRContentLauncherClusterContentPresetStruct * newElement_0;
+                newElement_0 = [MTRContentLauncherClusterContentPresetStruct new];
+                newElement_0.presetID = [NSNumber numberWithUnsignedChar:entry_0.presetID];
+                newElement_0.presetName = AsString(entry_0.presetName);
+                if (newElement_0.presetName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known ContentLauncher attribute.
         break;

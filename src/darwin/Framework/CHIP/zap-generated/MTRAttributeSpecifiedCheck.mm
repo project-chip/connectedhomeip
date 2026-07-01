@@ -6253,6 +6253,12 @@ static BOOL AttributeIsSpecifiedInContentLauncherCluster(AttributeId aAttributeI
     case Attributes::SupportedStreamingProtocols::Id: {
         return YES;
     }
+    case Attributes::Movable::Id: {
+        return YES;
+    }
+    case Attributes::Presets::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

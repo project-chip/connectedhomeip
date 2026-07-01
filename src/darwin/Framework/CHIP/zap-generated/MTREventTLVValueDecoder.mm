@@ -5705,6 +5705,23 @@ static id _Nullable DecodeEventPayloadForContentLauncherCluster(EventId aEventId
 {
     using namespace Clusters::ContentLauncher;
     switch (aEventId) {
+    case Events::ContentReplication::Id: {
+        Events::ContentReplication::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRContentLauncherClusterContentReplicationEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.status)];
+            value.status = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known ContentLauncher event.
         break;

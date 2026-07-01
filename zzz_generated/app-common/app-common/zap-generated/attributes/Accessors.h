@@ -4740,6 +4740,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint,
                                         MarkAttributeDirty markDirty);
 } // namespace SupportedStreamingProtocols
 
+namespace Movable {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace Movable
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);

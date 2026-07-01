@@ -8641,6 +8641,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SupportedStreamingProtocols";
             break;
 
+        case MTRAttributeIDTypeClusterContentLauncherAttributeMovableID:
+            result = @"Movable";
+            break;
+
+        case MTRAttributeIDTypeClusterContentLauncherAttributePresetsID:
+            result = @"Presets";
+            break;
+
         case MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -12932,6 +12940,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"LaunchURL";
             break;
 
+        case MTRCommandIDTypeClusterContentLauncherCommandContentReplicationRequestID:
+            result = @"ContentReplicationRequest";
+            break;
+
+        case MTRCommandIDTypeClusterContentLauncherCommandPlayPresetID:
+            result = @"PlayPreset";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -15366,6 +15382,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"LauncherResponse";
             break;
 
+        case MTRCommandIDTypeClusterContentLauncherCommandContentReplicationResponseID:
+            result = @"ContentReplicationResponse";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -17667,6 +17687,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeContentLauncherID:
 
         switch (eventID) {
+
+            // Cluster ContentLauncher events
+        case MTREventIDTypeClusterContentLauncherEventContentReplicationID:
+            result = @"ContentReplication";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
