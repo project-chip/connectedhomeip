@@ -52,6 +52,10 @@ namespace chip {
 
 class OperationalSessionSetup;
 
+namespace Testing {
+class OperationalSessionSetupTestAccess;
+} // namespace Testing
+
 /**
  * @brief Delegate provided when creating OperationalSessionSetup.
  *
@@ -156,6 +160,8 @@ typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & pee
  */
 class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
+    friend class Testing::OperationalSessionSetupTestAccess;
+
 public:
     struct ConnectionFailureInfo
     {
@@ -494,6 +500,7 @@ private:
      * Returns nullptr if not available.
      */
     System::Layer * GetSystemLayer();
+
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 };
 
