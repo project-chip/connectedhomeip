@@ -22,6 +22,7 @@
  *
  */
 
+#include <algorithm>
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
@@ -30,6 +31,7 @@
 #include <assert.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
+#include <limits>
 #include <messaging/ReliableMessageMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
@@ -473,7 +475,15 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
     ReturnErrorOnFailure(
         mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList));
 
-    if (!aEncodedDataVersionList)
+    // The callback (e.g. ClusterStateCache) only knows about the cluster versions it has
+    // received in this process lifetime, so for clients that persist data versions across
+    // resubscribes (such as MTRDevice) we must also encode the caller-supplied list. This lets
+    // the resubscribe SubscribeRequest carry filters for clusters whose ReportData arrived
+    // before the current process started, avoiding a full attribute-tree replay on every
+    // network-recovery resubscribe. Duplicate DVFs are tolerated by the Matter spec.
+    // BuildDataVersionFilterList honours the existing packet-full Checkpoint/Rollback path,
+    // so this cannot grow the request beyond the wire MTU.
+    if (!aDataVersionFilters.empty())
     {
         ReturnErrorOnFailure(BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters,
                                                         aEncodedDataVersionList));
@@ -1428,19 +1438,73 @@ void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPat
 
 CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin)
 {
-    if (aReadPrepareParams.mEventNumber.HasValue())
+    // Two independent sources may know which events the client has already received:
+    //   1. aReadPrepareParams.mEventNumber - caller-supplied (e.g. a value persisted to disk
+    //      across process restarts).
+    //   2. mpCallback.GetHighestReceivedEventNumber() - in-RAM tracking on the Callback (e.g.
+    //      ClusterStateCache, optionally seeded with a persisted value at construction time).
+    //
+    // Always consult both and take the maximum so a higher value from either source filters
+    // out events the client has already seen. Picking only one (as previous code did when
+    // mEventNumber was set) can cause the resubscribe SubscribeRequest to ask for events the
+    // client has already acknowledged, leading to redundant event delivery on the resubscribe.
+    // The EventFilter conveys a *minimum* EventNumber; a larger value is strictly more
+    // restrictive on what the server returns.
+    Optional<EventNumber> callbackEventNumber;
+    CHIP_ERROR cbErr = mpCallback.GetHighestReceivedEventNumber(callbackEventNumber);
+    if (cbErr != CHIP_NO_ERROR)
+    {
+        // Round-2 review fix: treat callback errors as advisory when the caller has supplied
+        // a persisted mEventNumber. Pre-PR the callback was bypassed entirely on this path, so
+        // a callback that started returning errors would have been invisible. Failing the
+        // entire subscribe in that case would be a silent regression for callers that already
+        // have their own persisted progress value. Fall back to the caller value and log; if
+        // the caller value is also absent, propagate the error since we have nothing to use.
+        if (aReadPrepareParams.mEventNumber.HasValue())
+        {
+            ChipLogError(DataManagement,
+                         "GetHighestReceivedEventNumber returned %" CHIP_ERROR_FORMAT
+                         ", falling back to caller-supplied mEventNumber",
+                         cbErr.Format());
+            callbackEventNumber.ClearValue();
+        }
+        else
+        {
+            return cbErr;
+        }
+    }
+    if (callbackEventNumber.HasValue())
+    {
+        // We want to start with the first event _after_ the last one we received. Guard against
+        // wraparound when the callback returns UINT64_MAX (operationally impossible per spec but
+        // now reachable on the always-called path) — wrapping would silently set eventMin=0 and
+        // request a full event-log replay. Saturating to "no value" disables the filter, which
+        // matches the spec semantic of "no minimum".
+        if (callbackEventNumber.Value() == std::numeric_limits<chip::EventNumber>::max())
+        {
+            callbackEventNumber.ClearValue();
+        }
+        else
+        {
+            callbackEventNumber.SetValue(callbackEventNumber.Value() + 1);
+        }
+    }
+
+    if (aReadPrepareParams.mEventNumber.HasValue() && callbackEventNumber.HasValue())
+    {
+        aEventMin = MakeOptional(std::max(aReadPrepareParams.mEventNumber.Value(), callbackEventNumber.Value()));
+    }
+    else if (aReadPrepareParams.mEventNumber.HasValue())
     {
         aEventMin = aReadPrepareParams.mEventNumber;
     }
     else
     {
-        ReturnErrorOnFailure(mpCallback.GetHighestReceivedEventNumber(aEventMin));
-        if (aEventMin.HasValue())
-        {
-            // We want to start with the first event _after_ the last one we received.
-            aEventMin.SetValue(aEventMin.Value() + 1);
-        }
+        aEventMin = callbackEventNumber;
     }
+    ChipLogDetail(DataManagement, "GetMinEventNumber: caller=%s callback(+1)=%s computed=%s",
+                  aReadPrepareParams.mEventNumber.HasValue() ? "set" : "unset", callbackEventNumber.HasValue() ? "set" : "unset",
+                  aEventMin.HasValue() ? "set" : "unset");
     return CHIP_NO_ERROR;
 }
 
