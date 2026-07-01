@@ -731,11 +731,13 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     Commands::GetTariffComponentResponse::Type response;
     Status status = Status::Failure;
 
-    if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
+    if (mServerTariffAttrsCtx.mTariffProvider == nullptr ||
+        mServerTariffAttrsCtx.mTariffProvider->GetTariffComponents().IsNull())
     {
         ChipLogError(AppServer, "The tariff is not available");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
     }
-    else
     {
         status         = Status::NotFound;
         auto component = Utils::GetListEntryById<Structs::TariffComponentStruct::Type>(
@@ -844,11 +846,13 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     Commands::GetDayEntryResponse::Type response;
     Status status = Status::Failure;
 
-    if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
+    if (mServerTariffAttrsCtx.mTariffProvider == nullptr ||
+        mServerTariffAttrsCtx.mTariffProvider->GetDayEntries().IsNull())
     {
         ChipLogError(AppServer, "The tariff is not available");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
     }
-    else
     {
         status     = Status::NotFound;
         auto entry = Utils::GetListEntryById<Structs::DayEntryStruct::Type>(
