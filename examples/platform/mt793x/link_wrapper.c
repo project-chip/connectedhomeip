@@ -20,10 +20,10 @@ int __wrap__write(int file, char * ptr, int len)
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include <sys/time.h>
-#include <sys/times.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/times.h>
 
 int __wrap__gettimeofday(struct timeval * tv, void * ptz)
 {

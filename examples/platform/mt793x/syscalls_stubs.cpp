@@ -47,7 +47,6 @@ int _lseek(int file, int ptr, int dir);
 int _read(int file, char * ptr, int len);
 int _write(int file, const char * ptr, int len);
 
-
 int __attribute__((weak)) _open(char * path, int flags, ...)
 {
     (void) path;

@@ -1,10 +1,10 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "mtk_route_table.h"
 #include "lwip/ip6_addr.h"
 #include "lwip/netif.h"
 #include "lwip/timeouts.h"
+#include "mtk_route_table.h"
 
 #define MAX_RIO_ROUTE 20
 #define MAX_RIO_TIMEOUT UINT32_MAX / (1000 * 4) // lwIP defined reasonable timeout value
@@ -118,7 +118,7 @@ static inline bool route_match(const mtk_route_entry_t * route, const ip6_addr_t
     }
     if (bits > 0)
     {
-        uint8_t mask      = (uint8_t)(0xFF << (8 - bits));
+        uint8_t mask      = (uint8_t) (0xFF << (8 - bits));
         const uint8_t * d = (const uint8_t *) dest->addr;
         const uint8_t * p = (const uint8_t *) route->prefix.addr;
         if ((d[bytes] & mask) != (p[bytes] & mask))
