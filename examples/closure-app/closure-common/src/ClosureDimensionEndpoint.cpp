@@ -56,7 +56,8 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
         .Set(Feature::kUnit)
         .Set(Feature::kLimitation)
         .Set(Feature::kSpeed)
-        .Set(Feature::kRotation);
+        .Set(Feature::kRotation)
+        .Set(Feature::kAccess);
 
     ClusterInitParameters clusterInitParameters;
     clusterInitParameters.resolution           = 100;
