@@ -899,10 +899,11 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     Transport::SecureSession * secureSession  = session.Value()->AsSecureSession();
     Transport::PeerAddress mutablePeerAddress = peerAddress;
     CorrectPeerAddressInterfaceID(mutablePeerAddress);
-    if (secureSession->GetPeerAddress() != mutablePeerAddress)
-    {
-        secureSession->SetPeerAddress(mutablePeerAddress);
-    }
+    // Guarded restamp: a non-routable IPv6 source (e.g. relay-mangled OMR address from a
+    // different host on Thread) would silently break outbound replies with ERR_RTE. Defer the
+    // address change to SecureSession, which compares the candidate /64 against the anchor
+    // captured at session establishment.
+    secureSession->RestampPeerAddressIfRoutable(mutablePeerAddress);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Associate the secure session with the connection, if not done already.
