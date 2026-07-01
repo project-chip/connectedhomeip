@@ -284,8 +284,7 @@ TEST_F(TestClosureControlCluster, TestCalibrationFeatureMapAndAcceptedCommands)
 
 TEST_F(TestClosureControlCluster, TestAccessFeatureMapAndAcceptedCommands)
 {
-    ClosureControlCluster accessCluster(
-        Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning().WithAccess());
+    ClosureControlCluster accessCluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning().WithAccess());
     ClusterTester tester(accessCluster);
     BitFlags<Feature> featureMap;
     EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
