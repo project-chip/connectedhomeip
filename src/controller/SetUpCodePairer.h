@@ -210,6 +210,22 @@ private:
     // RendezvousParameters in the future.
     bool DiscoveryInProgress() const;
 
+    // True if we are still waiting on any *non-network* (i.e. non-IP)
+    // transport's discovery to possibly produce new RendezvousParameters.
+    //
+    // This deliberately excludes kIPTransport because Connect() always starts
+    // DNS-SD discovery for every payload ("any node that has already been
+    // commissioned will use on-network regardless of the QR code flag"), so
+    // mWaitingForDiscovery[kIPTransport] is effectively always set during a
+    // commissioning attempt and never self-clears for a freshly-tapped NFC
+    // target (which does not advertise on DNS-SD until after commissioning).
+    // Gating the NFC fast-fail in OnStatusUpdate on DiscoveryInProgress()
+    // would therefore always observe true and never fire. Excluding the IP
+    // transport lets the fast-fail propagate an NFC PASE failure while still
+    // deferring to any genuinely-pending BLE/Wi-Fi PAF/Thread/NFC discovery
+    // that could surface an alternative candidate.
+    bool NonNetworkDiscoveryInProgress() const;
+
     // If there is nothing left to try (no PASE in progress, no queued discovered
     // parameters, no discovery in progress), notify the commissioner that pairing
     // has failed.  err is used as the failure error only if no PASE attempt has
@@ -295,6 +311,14 @@ private:
     // EstablishPASEConnection or PairDevice on mCommissioner and are now just
     // waiting to see whether that works.
     bool mWaitingForPASE = false;
+
+    // mLastPASETransportWasNfc is true iff the most recently started PASE
+    // attempt used the NFC transport. NFC pairs us with a specific tag the
+    // user tapped — if that PASE fails (e.g. SPAKE2+ MAC verify mismatch),
+    // there is no "other discovered device" that can satisfy the request,
+    // so we should propagate the failure immediately rather than waiting
+    // for further BLE/mDNS discovery to time out. See OnStatusUpdate.
+    bool mLastPASETransportWasNfc = false;
 
     // mLastPASEError is the error from the last OnPairingComplete call we got.
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
