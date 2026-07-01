@@ -320,11 +320,11 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(next(step))  # Write Mode to Off
         await self.write_single_attribute(attribute_value=attributes.Mode(modeOff), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Mode, should be Off
+        self.step(next(step))  # Read Mode, should be Off
         dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
         asserts.assert_equal(dut_Mode, modeOff, "Mode attribute is not Off")
 
-        self.step(next(step)) # Write Mode to Humidifier
+        self.step(next(step))  # Write Mode to Humidifier
         if supports_humidifier:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeHumidifier), endpoint_id=endpoint)
 
