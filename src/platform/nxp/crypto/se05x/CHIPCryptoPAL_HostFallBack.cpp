@@ -23,22 +23,21 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/CHIPCryptoPALmbedTLS.h>
 
-#include <type_traits>
 #include <psa/crypto.h>
+#include <type_traits>
 
 #include <mbedtls/error.h>
 #include <mbedtls/md.h>
-#include <mbedtls/pkcs5.h>
-#include <mbedtls/sha256.h>
 #include <mbedtls/oid.h>
 #include <mbedtls/pk.h>
+#include <mbedtls/pkcs5.h>
+#include <mbedtls/sha256.h>
 #include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
-
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
@@ -59,8 +58,7 @@ struct PsaP256KeyContext
     psa_key_id_t key_id;
 };
 
-static_assert(sizeof(PsaP256KeyContext) <= sizeof(P256KeypairContext),
-              "PsaP256KeyContext must fit in P256KeypairContext");
+static_assert(sizeof(PsaP256KeyContext) <= sizeof(P256KeypairContext), "PsaP256KeyContext must fit in P256KeypairContext");
 
 static inline PsaP256KeyContext * to_psa_context(P256KeypairContext * context)
 {
@@ -88,11 +86,10 @@ static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
 
 CHIP_ERROR Initialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256KeypairContext * mKeypair)
 {
-    CHIP_ERROR error     = CHIP_NO_ERROR;
-    psa_status_t result  = PSA_SUCCESS;
-    size_t pubkey_size   = 0;
-    psa_key_id_t key_id  = PSA_KEY_ID_NULL;
-
+    CHIP_ERROR error    = CHIP_NO_ERROR;
+    psa_status_t result = PSA_SUCCESS;
+    size_t pubkey_size  = 0;
+    psa_key_id_t key_id = PSA_KEY_ID_NULL;
 
     pk->Clear();
 
@@ -105,10 +102,7 @@ CHIP_ERROR Initialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypai
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
     psa_set_key_usage_flags(&attributes,
-                            PSA_KEY_USAGE_SIGN_HASH |
-                            PSA_KEY_USAGE_VERIFY_HASH |
-                            PSA_KEY_USAGE_DERIVE |
-                            PSA_KEY_USAGE_EXPORT);
+                            PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_DERIVE | PSA_KEY_USAGE_EXPORT);
     psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
     psa_set_key_enrollment_algorithm(&attributes, PSA_ALG_ECDH);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_VOLATILE);
@@ -118,16 +112,13 @@ CHIP_ERROR Initialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypai
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     // Export the public key
-    result = psa_export_public_key(key_id,
-                                    Uint8::to_uchar(mPublicKey->Bytes()),
-                                    mPublicKey->Length(),
-                                    &pubkey_size);
+    result = psa_export_public_key(key_id, Uint8::to_uchar(mPublicKey->Bytes()), mPublicKey->Length(), &pubkey_size);
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(pubkey_size == mPublicKey->Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Store the key ID in the context
     ctx->key_id = key_id;
-    key_id = PSA_KEY_ID_NULL;
+    key_id      = PSA_KEY_ID_NULL;
 
 exit:
     if (key_id != PSA_KEY_ID_NULL)
@@ -145,25 +136,19 @@ CHIP_ERROR ECDSA_sign_msg_H(P256KeypairContext * mKeypair, const uint8_t * msg, 
 {
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
-
     uint8_t digest[kSHA256_Hash_Length];
     memset(&digest[0], 0, sizeof(digest));
     ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
 
-    CHIP_ERROR error       = CHIP_NO_ERROR;
-    psa_status_t result    = PSA_SUCCESS;
+    CHIP_ERROR error        = CHIP_NO_ERROR;
+    psa_status_t result     = PSA_SUCCESS;
     size_t signature_length = 0;
 
     const PsaP256KeyContext * ctx = to_const_psa_context(mKeypair);
 
     // PSA sign hash - directly produces signature in r||s format
-    result = psa_sign_hash(ctx->key_id,
-                           PSA_ALG_ECDSA(PSA_ALG_SHA_256),
-                           digest,
-                           sizeof(digest),
-                           out_signature.Bytes(),
-                           out_signature.Capacity(),
-                           &signature_length);
+    result = psa_sign_hash(ctx->key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest, sizeof(digest), out_signature.Bytes(),
+                           out_signature.Capacity(), &signature_length);
 
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(signature_length == kP256_ECDSA_Signature_Length_Raw, error = CHIP_ERROR_INTERNAL);
@@ -177,19 +162,14 @@ exit:
 CHIP_ERROR ECDH_derive_secret_H(P256KeypairContext * mKeypair, const P256PublicKey & remote_public_key,
                                 P256ECDHDerivedSecret & out_secret)
 {
-    CHIP_ERROR error     = CHIP_NO_ERROR;
-    psa_status_t result  = PSA_SUCCESS;
-    size_t secret_length = 0;
+    CHIP_ERROR error              = CHIP_NO_ERROR;
+    psa_status_t result           = PSA_SUCCESS;
+    size_t secret_length          = 0;
     const PsaP256KeyContext * ctx = to_const_psa_context(mKeypair);
 
     // Perform ECDH key agreement directly with peer public key bytes
-    result = psa_raw_key_agreement(PSA_ALG_ECDH,
-                                   ctx->key_id,
-                                   Uint8::to_const_uchar(remote_public_key),
-                                   remote_public_key.Length(),
-                                   out_secret.Bytes(),
-                                   out_secret.Capacity(),
-                                   &secret_length);
+    result = psa_raw_key_agreement(PSA_ALG_ECDH, ctx->key_id, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(),
+                                   out_secret.Bytes(), out_secret.Capacity(), &secret_length);
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     TEMPORARY_RETURN_IGNORED out_secret.SetLength(secret_length);
 
@@ -276,10 +256,7 @@ CHIP_ERROR Serialize_H(const P256KeypairContext mKeypair, const P256PublicKey mP
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
 
     // Export private key from PSA key storage
-    result = psa_export_key(ctx->key_id,
-                            Uint8::to_uchar(privkey),
-                            sizeof(privkey),
-                            &privkey_size);
+    result = psa_export_key(ctx->key_id, Uint8::to_uchar(privkey), sizeof(privkey), &privkey_size);
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(privkey_size == kP256_PrivateKey_Length, error = CHIP_ERROR_INTERNAL);
 
@@ -296,12 +273,12 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
 {
     Encoding::BufferWriter bbuf(*mPublicKey, mPublicKey->Length());
 
-    psa_status_t result = PSA_SUCCESS;
-    CHIP_ERROR error    = CHIP_NO_ERROR;
-    psa_key_id_t key_id = PSA_KEY_ID_NULL;
+    psa_status_t result             = PSA_SUCCESS;
+    CHIP_ERROR error                = CHIP_NO_ERROR;
+    psa_key_id_t key_id             = PSA_KEY_ID_NULL;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    PsaP256KeyContext * ctx = NULL;
-    const uint8_t * privkey = NULL;
+    PsaP256KeyContext * ctx         = NULL;
+    const uint8_t * privkey         = NULL;
 
     VerifyOrExit(input.Length() == mPublicKey->Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -319,20 +296,14 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
     // psa_set_key_bits(&attributes, 256);
     psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
     psa_set_key_usage_flags(&attributes,
-                            PSA_KEY_USAGE_SIGN_HASH |
-                            PSA_KEY_USAGE_VERIFY_HASH |
-                            PSA_KEY_USAGE_DERIVE |
-                            PSA_KEY_USAGE_EXPORT);
+                            PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_DERIVE | PSA_KEY_USAGE_EXPORT);
 
     psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
     // psa_set_key_enrollment_algorithm(&attributes, PSA_ALG_ECDH);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_VOLATILE);
 
     // Import the raw private key scalar into PSA
-    result = psa_import_key(&attributes,
-                            privkey,
-                            kP256_PrivateKey_Length,
-                            &key_id);
+    result = psa_import_key(&attributes, privkey, kP256_PrivateKey_Length, &key_id);
     psa_reset_key_attributes(&attributes);
     VerifyOrExit(result == PSA_SUCCESS, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -342,7 +313,7 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
 
     // Store key ID in context - ownership transferred
     ctx->key_id = key_id;
-    key_id = PSA_KEY_ID_NULL;
+    key_id      = PSA_KEY_ID_NULL;
 
 exit:
     if (key_id != PSA_KEY_ID_NULL)

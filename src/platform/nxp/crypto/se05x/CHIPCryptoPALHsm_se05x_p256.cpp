@@ -98,9 +98,9 @@ P256KeypairSE05x::~P256KeypairSE05x()
 
 CHIP_ERROR P256KeypairSE05x::Initialize(ECPKeyTarget key_target)
 {
-    sss_status_t status    = kStatus_SSS_Fail;
+    sss_status_t status       = kStatus_SSS_Fail;
     se_sss_object_t keyObject = { 0 };
-    uint8_t pubkey[128]    = {
+    uint8_t pubkey[128]       = {
         0,
     };
     size_t pubKeyLen   = sizeof(pubkey);
@@ -197,13 +197,13 @@ CHIP_ERROR P256KeypairSE05x::ECDSA_sign_msg(const uint8_t * msg, size_t msg_leng
 
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     uint32_t keyid                    = 0;
-    se_sss_asymmetric_t asymm_ctx        = { 0 };
+    se_sss_asymmetric_t asymm_ctx     = { 0 };
     uint8_t hash[kSHA256_Hash_Length] = {
         0,
     };
     size_t hashLen                                           = sizeof(hash);
     sss_status_t status                                      = kStatus_SSS_Success;
-    se_sss_object_t keyObject                                   = { 0 };
+    se_sss_object_t keyObject                                = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len                               = sizeof(signature_se05x);
     MutableByteSpan out_raw_sig_span(out_signature.Bytes(), out_signature.Capacity());
@@ -231,7 +231,8 @@ CHIP_ERROR P256KeypairSE05x::ECDSA_sign_msg(const uint8_t * msg, size_t msg_leng
     status = se_sss_key_object_get_handle(&keyObject, keyid);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = se_sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
+    status =
+        se_sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_asymmetric_sign_digest(&asymm_ctx, hash, hashLen, signature_se05x, &signature_se05x_len);
@@ -383,8 +384,8 @@ CHIP_ERROR SE05X_Set_ECDSA_Public_Key(se_sss_object_t * keyObject, const uint8_t
     status = se_sss_key_object_init(keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = se_sss_key_object_allocate_handle(keyObject, kKeyId_sha256_ecc_pub_keyid, kSSS_KeyPart_Public, kSE_SSS_CipherType_EC_NIST_P,
-                                            256, kKeyObject_Mode_Transient);
+    status = se_sss_key_object_allocate_handle(keyObject, kKeyId_sha256_ecc_pub_keyid, kSSS_KeyPart_Public,
+                                               kSE_SSS_CipherType_EC_NIST_P, 256, kKeyObject_Mode_Transient);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit((sizeof(nist256_header) + keylen) <= sizeof(public_key), error = CHIP_ERROR_INTERNAL);
@@ -409,14 +410,14 @@ exit:
 CHIP_ERROR P256PublicKeySE05x::ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
                                                             const P256ECDSASignature & signature) const
 {
-    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
-    sss_status_t status        = kStatus_SSS_Success;
+    CHIP_ERROR error              = CHIP_ERROR_INTERNAL;
+    sss_status_t status           = kStatus_SSS_Success;
     se_sss_asymmetric_t asymm_ctx = { 0 };
-    uint8_t hash[32]           = {
+    uint8_t hash[32]              = {
         0,
     };
     size_t hash_length                                       = sizeof(hash);
-    se_sss_object_t keyObject                                   = { 0 };
+    se_sss_object_t keyObject                                = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len                               = sizeof(signature_se05x);
     MutableByteSpan out_der_sig_span(signature_se05x, signature_se05x_len);
@@ -472,8 +473,8 @@ CHIP_ERROR P256PublicKeySE05x::ECDSA_validate_hash_signature(const uint8_t * has
 {
     CHIP_ERROR error                                         = CHIP_ERROR_INTERNAL;
     sss_status_t status                                      = kStatus_SSS_Success;
-    se_sss_asymmetric_t asymm_ctx                               = { 0 };
-    se_sss_object_t keyObject                                   = { 0 };
+    se_sss_asymmetric_t asymm_ctx                            = { 0 };
+    se_sss_object_t keyObject                                = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len                               = sizeof(signature_se05x);
     MutableByteSpan out_der_sig_span(signature_se05x, signature_se05x_len);
@@ -501,7 +502,7 @@ CHIP_ERROR P256PublicKeySE05x::ECDSA_validate_hash_signature(const uint8_t * has
     signature_se05x_len = out_der_sig_span.size();
 
     status = se_sss_asymmetric_verify_digest(&asymm_ctx, const_cast<uint8_t *>(hash), hash_length, (uint8_t *) signature_se05x,
-                                          signature_se05x_len);
+                                             signature_se05x_len);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INVALID_SIGNATURE);
 
     error = CHIP_NO_ERROR;
@@ -575,12 +576,12 @@ static int add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, uin
 
 CHIP_ERROR P256KeypairSE05x::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const
 {
-    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
-    sss_status_t status        = kStatus_SSS_Success;
+    CHIP_ERROR error              = CHIP_ERROR_INTERNAL;
+    sss_status_t status           = kStatus_SSS_Success;
     se_sss_asymmetric_t asymm_ctx = { 0 };
     se_sss_object_t keyObject     = { 0 };
-    uint32_t keyid             = 0;
-    int ret                    = -1;
+    uint32_t keyid                = 0;
+    int ret                       = -1;
 
     uint8_t data_to_hash[128] = { 0 };
     size_t data_to_hash_len   = sizeof(data_to_hash);
@@ -694,7 +695,8 @@ CHIP_ERROR P256KeypairSE05x::NewCertificateSigningRequest(uint8_t * csr, size_t 
     status = se_sss_key_object_get_handle(&keyObject, keyid);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = se_sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
+    status =
+        se_sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_asymmetric_sign_digest(&asymm_ctx, hash, hash_length, Uint8::to_uchar(signature), &signature_len);

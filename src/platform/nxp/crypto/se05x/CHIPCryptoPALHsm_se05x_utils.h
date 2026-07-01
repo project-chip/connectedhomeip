@@ -32,9 +32,9 @@
 
 /* se05x includes */
 #include "ex_sss_boot.h"
+#include "inc/fsl_sss_api.h"
 #include "se051h_nfc_comm_prov.h"
 #include "se05x_host_gpio.h"
-#include "inc/fsl_sss_api.h"
 #include <fsl_sss_se05x_apis.h>
 #include <se05x_APDU.h>
 
@@ -177,7 +177,7 @@ void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
  * @param[out] psize - Pointer to store the object size
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t *psize);
+CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t * psize);
 #ifdef __cplusplus
 }
 #endif

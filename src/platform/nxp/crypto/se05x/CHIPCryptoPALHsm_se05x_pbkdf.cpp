@@ -78,11 +78,11 @@ CHIP_ERROR PBKDF2_sha256_SE05x::pbkdf2_sha256(const uint8_t * password, size_t p
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_object_allocate_handle(&hmacKeyObj, keyid, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC, sizeof(password),
-                                            kKeyObject_Mode_Transient);
+                                               kKeyObject_Mode_Transient);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_store_set_key(&gex_sss_chip_ctx.ks, &hmacKeyObj, password, plen, plen * 8, &policy_for_hmac_key,
-                                   sizeof(policy_for_hmac_key));
+                                      sizeof(policy_for_hmac_key));
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     smStatus = Se05x_API_PBKDF2_extended(

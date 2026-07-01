@@ -34,11 +34,11 @@ CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const uint8_t * key, size_t key_length, c
                                        uint8_t * out_buffer, size_t out_length)
 
 {
-    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
-    uint32_t keyid         = kKeyId_hmac_sha256_keyid;
+    CHIP_ERROR error          = CHIP_ERROR_INTERNAL;
+    uint32_t keyid            = kKeyId_hmac_sha256_keyid;
     se_sss_mac_t ctx_mac      = { 0 };
     se_sss_object_t keyObject = { 0 };
-    sss_status_t status    = kStatus_SSS_Fail;
+    sss_status_t status       = kStatus_SSS_Fail;
 
     ChipLogDetail(Crypto, "HMAC_SHA256 : Using se05x for HMAC");
 
@@ -63,7 +63,7 @@ CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const uint8_t * key, size_t key_length, c
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC, key_length,
-                                            kKeyObject_Mode_Transient);
+                                               kKeyObject_Mode_Transient);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, key, key_length, key_length * 8, NULL, 0);
@@ -106,7 +106,7 @@ exit:
         se_sss_mac_context_free(&ctx_mac);
     }
 
-    if (keyObject.keyStore != nullptr  && keyObject.keyStore->session != NULL)
+    if (keyObject.keyStore != nullptr && keyObject.keyStore->session != NULL)
     {
         se_sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }

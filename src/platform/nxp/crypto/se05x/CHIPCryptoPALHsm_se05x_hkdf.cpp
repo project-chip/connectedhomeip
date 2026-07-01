@@ -32,11 +32,11 @@ CHIP_ERROR HKDF_sha_SE05x::HKDF_SHA256(const uint8_t * secret, const size_t secr
                                        const size_t salt_length, const uint8_t * info, const size_t info_length,
                                        uint8_t * out_buffer, size_t out_length)
 {
-    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
-    uint32_t keyid         = kKeyId_hkdf_sha256_hmac_keyid;
+    CHIP_ERROR error          = CHIP_ERROR_INTERNAL;
+    uint32_t keyid            = kKeyId_hkdf_sha256_hmac_keyid;
     se_sss_object_t keyObject = { 0 };
-    smStatus_t smstatus    = SM_NOT_OK;
-    sss_status_t status    = kStatus_SSS_Fail;
+    smStatus_t smstatus       = SM_NOT_OK;
+    sss_status_t status       = kStatus_SSS_Fail;
 
     if (salt_length > 64 || info_length > 80 || secret_length > 256 || out_length > 768)
     {
@@ -65,7 +65,7 @@ CHIP_ERROR HKDF_sha_SE05x::HKDF_SHA256(const uint8_t * secret, const size_t secr
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC, secret_length,
-                                            kKeyObject_Mode_Transient);
+                                               kKeyObject_Mode_Transient);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, secret, secret_length, secret_length * 8, NULL, 0);
