@@ -65,7 +65,34 @@ class TC_HSTAT_2_2(MatterBaseTest):
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to false",
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH reads from the DUT the MinSetpoint attribute.", "Store the value as MinSetpointValue"),
+                TestStep(next(step), "TH reads from the DUT the MaxSetpoint attribute.", "Store the value as MaxSetpointValue."),
+                TestStep(next(step), "TH reads from the DUT the Step attribute.", "Store the value as StepValue. "),
 
+                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
+                         "Verify that the DUT response contains MinSetpointValue."),
+
+                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue + StepValue",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
+                         "Verify that the DUT response contains MinSetpointValue + StepValue."),
+
+                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue + 1",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
+                         "Verify that the DUT response contains MinSetpointValue."),
+
+                TestStep(next(step), "TH sends command with UserSetpoint set toe MinSetpointValue - 1.",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+
+                TestStep(next(step), "TH sends command with mode set to Humidifier", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with mode set to Dehumidifier", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with mode set to FanOnly", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with mode set to Auto", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with MistType set to Warm", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with MistType set to Cold", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
         ]
 
     async def read_hstat_attribute_expect_success(self, endpoint, attribute):
@@ -120,8 +147,111 @@ class TC_HSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=attributes.Mode(modeDehumidifier), endpoint_id=endpoint)
 
         self.step(next(step))  # Set Continuous, Sleep, and Optimal to false
-        self.send_single_cmd(cmd=cluster.Commands.SetSettings(continuous=False, sleep=False, optimal=False), endpoint=endpoint)
+        await self.send_single_cmd(cmd=cluster.Commands.SetSettings(Continuous=False, Sleep=False, Optimal=False), endpoint=endpoint)
 
+        self.step(next(step))  # Read MinSetpoint attribute
+        if supports_sensor:
+            dut_MinSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinSetpoint)
+
+        self.step(next(step))  # Read MaxSetpoint attribute
+        if supports_sensor:
+            dut_MaxSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxSetpoint)
+
+        self.step(next(step))  # Read Step attribute
+        if supports_sensor:
+            dut_Step = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Step)
+
+        self.step(next(step))  # Set UserSetpoint to MinSetpoint
+        if supports_sensor:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(UserSetpoint=dut_MinSetpoint), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+        self.step(next(step))  # Read UserSetpoint, confirm it is MinSetpoint
+        if supports_sensor:
+            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
+            asserts.assert_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute not equal to MinSetpoint attribute")
+
+        self.step(next(step))  # Set UserSetpoint to MinSetpoint + Step
+        if supports_sensor:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(UserSetpoint=dut_MinSetpoint+dut_Step), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+        self.step(next(step))  # Read UserSetpoint, confirm it is MinSetpoint + Step
+        if supports_sensor:
+            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
+            asserts.assert_equal(dut_UserSetpoint, dut_MinSetpoint+dut_Step, "UserSetpoint attribute not equal to MinSetpoint + StepValue")
+
+        self.step(next(step))  # Set UserSetpoint to MinSetpoint + 1
+        if supports_sensor and dut_Step > 1:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(UserSetpoint=dut_MinSetpoint+1), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+        self.step(next(step))  # Read UserSetpoint, confirm it is MinSetpoint + 1
+        if supports_sensor and dut_Step > 1:
+            dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
+            asserts.assert_equal(dut_UserSetpoint, dut_MinSetpoint+1, "UserSetpoint attribute not equal to MinSetpoint + 1")
+
+        self.step(next(step))  # Set UserSetpoint to MinSetpoint - 1
+        if supports_sensor:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(UserSetpoint=dut_MinSetpoint-1), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.CONSTRAINT_ERROR, "Unexpected error returned")
+                pass
+
+        self.step(next(step))  # Test that unit does not support humidifier
+        if not supports_humidifier:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(Mode=modeHumidifier), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.CONSTRAINT_ERROR, "Unexpected error returned")
+                pass
+
+        self.step(next(step))  # Test that unit does not support dehumidifier
+        if not supports_dehumidifier:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(Mode=modeDehumidifier), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.CONSTRAINT_ERROR, "Unexpected error returned")
+                pass
+
+        self.step(next(step))  # Test that unit does not support fan only
+        if not supports_fan:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(Mode=modeFanOnly), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.CONSTRAINT_ERROR, "Unexpected error returned")
+                pass
+
+        self.step(next(step))  # Test that unit does not support auto
+        if not supports_auto:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(Mode=modeAuto), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.CONSTRAINT_ERROR, "Unexpected error returned")
+                pass
+
+        self.step(next(step))  # Test that unit does not support Warm mist
+        if not supports_warm:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(MistType=mistBitmap.kWarmMist), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.INVALID_IN_STATE, "Unexpected error returned")
+                pass
+
+        self.step(next(step))  # Test that unit does not support Cold mist
+        if not supports_cold:
+            try:
+                await self.send_single_cmd(cmd=cluster.Commands.SetSettings(MistType=mistBitmap.kColdMist), endpoint=endpoint)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.INVALID_IN_STATE, "Unexpected error returned")
+                pass
 
 if __name__ == "__main__":
     default_matter_test_main()
