@@ -1591,8 +1591,17 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL                    CHIP_CORE_ERROR(0xa8)
 
+/**
+ *  @def CHIP_ERROR_CASE_WRONG_FABRIC
+ *
+ *  @brief
+ *    During CASE Sigma2/Sigma3 processing, the peer's NOC fabric ID does not match the
+ *    fabric we are doing CASE on. Distinguishes from generic CHIP_ERROR_INVALID_CASE_PARAMETER,
+ *    which previously collapsed multiple cert/identity failure modes into one.
+ */
+#define CHIP_ERROR_CASE_WRONG_FABRIC                          CHIP_CORE_ERROR(0xaa)
+
 // AVAILABLE: 0xa9
-// AVAILABLE: 0xaa
 
 /**
  * @def CHIP_EVENT_ID_FOUND
@@ -1643,8 +1652,30 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_DECODE_FAILED                               CHIP_CORE_ERROR(0xb0)
 
-// AVAILABLE: 0xb1
-// AVAILABLE: 0xb2
+/**
+ *  @def CHIP_ERROR_CASE_WRONG_PEER_NODEID
+ *
+ *  @brief
+ *    During CASE Sigma2 processing, the peer's NOC node ID does not match the peer node ID
+ *    we expected to talk to. The expected node ID is the one provided to CASE session
+ *    establishment (typically obtained via operational discovery — DNS-SD on IP, or another
+ *    transport's discovery — but the comparison happens regardless of how it was obtained).
+ *    Indicates either a stale operational cache, DNS-SD record poisoning, or other identity
+ *    mismatch (the listed causes are not exhaustive).
+ */
+#define CHIP_ERROR_CASE_WRONG_PEER_NODEID                     CHIP_CORE_ERROR(0xb1)
+
+/**
+ *  @def CHIP_ERROR_CASE_NOCCHAIN_INVALID
+ *
+ *  @brief
+ *    During CASE, the peer's NOC certificate chain failed validation. Used as a single
+ *    code to surface the various ways FabricTable::VerifyCredentials can fail (cert format,
+ *    signature mismatch, expiry, path-length, etc.). The original error from VerifyCredentials
+ *    is logged before this substitution; consumers that need the specific cause should
+ *    consult logs.
+ */
+#define CHIP_ERROR_CASE_NOCCHAIN_INVALID                      CHIP_CORE_ERROR(0xb2)
 
 /**
  *  @def CHIP_ERROR_DNS_SD_UNAUTHORIZED
@@ -1682,8 +1713,26 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB                     CHIP_CORE_ERROR(0xb6)
 
-// AVAILABLE: 0xb7
-// AVAILABLE: 0xb8
+/**
+ *  @def CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE
+ *
+ *  @brief
+ *    During CASE Sigma2 or Sigma3 processing, AES-CCM decryption of the encrypted payload
+ *    failed (MIC mismatch). Indicates ephemeral-key mismatch, IPK derivation divergence,
+ *    or wire corruption. Distinct from CHIP_ERROR_CASE_SIGNATURE_MISMATCH.
+ */
+#define CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE                 CHIP_CORE_ERROR(0xb7)
+
+/**
+ *  @def CHIP_ERROR_CASE_SIGNATURE_MISMATCH
+ *
+ *  @brief
+ *    During CASE Sigma2 or Sigma3 processing, ECDSA signature verification of the peer's
+ *    operational signature failed against the public key in the (validated) NOC.
+ *    Distinguishes from cert-chain failures (CHIP_ERROR_CASE_NOCCHAIN_INVALID) and
+ *    decrypt failures (CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE).
+ */
+#define CHIP_ERROR_CASE_SIGNATURE_MISMATCH                    CHIP_CORE_ERROR(0xb8)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB
@@ -1728,7 +1777,16 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_HSM                                         CHIP_CORE_ERROR(0xbd)
 
-// AVAILABLE: 0xbe
+/**
+ *  @def CHIP_ERROR_CASE_RESUME_MIC_MISMATCH
+ *
+ *  @brief
+ *    During CASE session resumption on the initiator side, AES-CCM MIC verification of the
+ *    Sigma2Resume MIC failed. Only surfaced on the initiator side. On the responder, a failed
+ *    TryResumeSession (e.g. Resume1MIC validation failure) silently falls back to full Sigma2
+ *    and does not produce this code.
+ */
+#define CHIP_ERROR_CASE_RESUME_MIC_MISMATCH                    CHIP_CORE_ERROR(0xbe)
 
 /**
  *  @def CHIP_ERROR_REAL_TIME_NOT_SYNCED
