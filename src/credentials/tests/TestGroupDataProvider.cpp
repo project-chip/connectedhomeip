@@ -1293,6 +1293,67 @@ TEST_F(TestGroupDataProvider, TestGroupDecryption)
     it->Release();
 }
 
+TEST_F(TestGroupDataProvider, TestKeySetRemovalGroupKeyMapUpdates)
+{
+    GroupDataProvider * provider = GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    // Reset test
+    ResetProvider(provider);
+
+    // 1. Set up KeySets
+    ASSERT_EQ(provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet1), CHIP_NO_ERROR);
+    ASSERT_EQ(provider->SetKeySet(kFabric1, kCompressedFabricId1, kKeySet2), CHIP_NO_ERROR);
+
+    // 2. Map Groups to KeySets. This sets group key map entries at specific indices, not "group keys"
+    // Map Group 1 to Keyset 1
+    ASSERT_EQ(provider->SetGroupKeyAt(kFabric1, 0, GroupKey(kGroup1, kKeysetId1)), CHIP_NO_ERROR);
+    // Map Group 2 to Keyset 1 (same keyset)
+    ASSERT_EQ(provider->SetGroupKeyAt(kFabric1, 1, GroupKey(kGroup2, kKeysetId1)), CHIP_NO_ERROR);
+    // Map Group 3 to Keyset 2 (different keyset)
+    ASSERT_EQ(provider->SetGroupKeyAt(kFabric1, 2, GroupKey(kGroup3, kKeysetId2)), CHIP_NO_ERROR);
+
+    // Verify setup matches expectations. These getters get group key map entries at
+    // particular indices, not "group keys"
+    GroupKey pair;
+    EXPECT_EQ(provider->GetGroupKeyAt(kFabric1, 0, pair), CHIP_NO_ERROR);
+    EXPECT_EQ(pair.group_id, kGroup1);
+    EXPECT_EQ(pair.keyset_id, kKeysetId1);
+
+    EXPECT_EQ(provider->GetGroupKeyAt(kFabric1, 1, pair), CHIP_NO_ERROR);
+    EXPECT_EQ(pair.group_id, kGroup2);
+    EXPECT_EQ(pair.keyset_id, kKeysetId1);
+
+    EXPECT_EQ(provider->GetGroupKeyAt(kFabric1, 2, pair), CHIP_NO_ERROR);
+    EXPECT_EQ(pair.group_id, kGroup3);
+    EXPECT_EQ(pair.keyset_id, kKeysetId2);
+
+    // 3. Remove Keyset 1 (used by Group 1 & Group 2)
+    EXPECT_EQ(provider->RemoveKeySet(kFabric1, kKeysetId1), CHIP_NO_ERROR);
+
+    // 4. Verify Keyset 1 is removed
+    KeySet keyset;
+    EXPECT_EQ(provider->GetKeySet(kFabric1, kKeysetId1, keyset), CHIP_ERROR_NOT_FOUND);
+    // Keyset 2 should still exist
+    EXPECT_EQ(provider->GetKeySet(kFabric1, kKeysetId2, keyset), CHIP_NO_ERROR);
+
+    // 5. Verify mappings in group key map using IterateGroupKeys(). This iterates over
+    // individual group key map entries, not "group keys".
+    // Since kKeysetId1 mappings were removed, the only remaining mapping should be (kGroup3 to kKeysetId2).
+    auto it = provider->IterateGroupKeys(kFabric1);
+    ASSERT_TRUE(it);
+    EXPECT_EQ(it->Count(), 1u);
+
+    GroupKey remainingPair;
+    EXPECT_TRUE(it->Next(remainingPair));
+    EXPECT_EQ(remainingPair.group_id, kGroup3);
+    EXPECT_EQ(remainingPair.keyset_id, kKeysetId2);
+
+    // Ensure there are no other mappings returned by the iterator
+    EXPECT_FALSE(it->Next(remainingPair));
+    it->Release();
+}
+
 } // namespace TestGroups
 } // namespace app
 } // namespace chip
