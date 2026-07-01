@@ -47,10 +47,6 @@ PICS:
     - label: "Does the device support communication over Thread ?"
       id: MCORE.COM.THR
 
-    - label:
-          "Does the device support Wi-Fi or Thread interfaces communication ?"
-      id: MCORE.COM.WIRELESS
-
     - label: "Does the device implement a Commissioner ?"
       id: MCORE.ROLE.COMMISSIONER
 
