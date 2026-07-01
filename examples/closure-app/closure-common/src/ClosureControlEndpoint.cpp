@@ -140,7 +140,8 @@ CHIP_ERROR ClosureControlEndpoint::Init()
         .Set(Feature::kPedestrian)
         .Set(Feature::kCalibration)
         .Set(Feature::kProtection)
-        .Set(Feature::kManuallyOperable);
+        .Set(Feature::kManuallyOperable)
+        .Set(Feature::kAccess);
     conformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
 
     ClusterInitParameters initParams;
