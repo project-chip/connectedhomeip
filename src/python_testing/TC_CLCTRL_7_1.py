@@ -224,6 +224,16 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         self.kGroupId = 0x0001
         self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
         self.groupcast_enabled = await is_groupcast_on_root_node(self)
+        if self.groupcast_enabled:
+            dev_controller.SetGroupKeySet(
+                keyset_id=self.kGroupKeysetId,
+                policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+                num_keys=1,
+                epoch_key0=self.kGroupKey,
+                epoch_start_time0=2220000,
+            )
+            dev_controller.SetGroupKey(self.kGroupId, self.kGroupKeysetId)
+            dev_controller.SetGroupInfo(self.kGroupId, "Closure Control Group")
         log.info("Groupcast on root node enabled: %s", self.groupcast_enabled)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
