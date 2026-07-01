@@ -42,7 +42,7 @@ private:
                              CommissioningProxy::Attributes::CachedResults::Id, CommissioningProxy::Attributes::WiFiBand::Id>;
 
 public:
-    enum State_t
+    enum State
     {
         kState_CPDisconnected = 0,
         kState_CPConnected
@@ -50,20 +50,22 @@ public:
 
     struct Config
     {
-        EndpointId endpointId;
         BitMask<CommissioningProxy::Feature> featureFlags;
         CommissioningProxy::Delegate & delegate;
 
-        Config(EndpointId aEndpointId, BitMask<CommissioningProxy::Feature> aFeatures, CommissioningProxy::Delegate & aDelegate) :
-            endpointId(aEndpointId), featureFlags(aFeatures), delegate(aDelegate)
+        Config(BitMask<CommissioningProxy::Feature> aFeatures, CommissioningProxy::Delegate & aDelegate) :
+            featureFlags(aFeatures), delegate(aDelegate)
         {}
     };
 
     // Don't allow the default constructor as this cluster requires a delegate to be set
     CommissioningProxyCluster() = delete;
 
-    CommissioningProxyCluster(const Config & config) :
-        DefaultServerCluster({ config.endpointId, CommissioningProxy::Id }), mDelegate(config.delegate),
+    // The endpoint id is supplied separately from Config: a device's cluster config is
+    // typically fixed up front, but the endpoint is only known when the device is
+    // registered and the clusters are created.
+    CommissioningProxyCluster(EndpointId endpointId, const Config & config) :
+        DefaultServerCluster({ endpointId, CommissioningProxy::Id }), mDelegate(config.delegate),
         mFeatureFlags(config.featureFlags), mEnabledOptionalAttributes([&]() {
             OptionalAttributesSet attrs;
             attrs.Set<CommissioningProxy::Attributes::MaxCachedResults::Id>(
@@ -79,7 +81,7 @@ public:
             return attrs;
         }())
     {
-        mDelegate.SetEndpointId(config.endpointId);
+        mDelegate.SetEndpointId(endpointId);
 
         // Initialize local state
         mMainCommissioningProxyState = kState_CPDisconnected;
@@ -110,8 +112,18 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR SetCPState(State_t state);
-    CommissioningProxyCluster::State_t GetCPState();
+    CHIP_ERROR SetCPState(State state);
+    CommissioningProxyCluster::State GetCPState();
+
+    /**
+     * @brief Current ScanMaxTime / CacheTimeout attribute values.
+     *
+     * These writable attributes are stored and change-reported by the cluster.
+     * A delegate performing a scan reads the live value through these getters
+     * (via its GetServer() back-pointer) rather than caching its own copy.
+     */
+    uint8_t GetScanMaxTime() const { return mScanMaxTime; }
+    uint16_t GetCacheTimeout() const { return mCacheTimeout; }
 
     /**
      * @brief Notify subscribers that CachedResults and NumCachedResults have changed.
@@ -125,18 +137,21 @@ public:
     }
 
 private:
-    DataModel::ActionReturnStatus HandleProxyConnectRequest(const DataModel::InvokeRequest & request,
-                                                            TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleProxyScanRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                         CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleProxyBackGroundScanStartRequest(const DataModel::InvokeRequest & request,
+    std::optional<DataModel::ActionReturnStatus>
+    HandleProxyConnectRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus> HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request,
+                                                                              TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus> HandleProxyScanRequest(const DataModel::InvokeRequest & request,
                                                                         TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
-                                                                       TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleProxyMessageRequest(const DataModel::InvokeRequest & request,
-                                                            TLV::TLVReader & input_arguments, CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus> HandleProxyBackGroundScanStartRequest(const DataModel::InvokeRequest & request,
+                                                                                       TLV::TLVReader & input_arguments,
+                                                                                       CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus> HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
+                                                                                      TLV::TLVReader & input_arguments,
+                                                                                      CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleProxyMessageRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler);
 
     /**
      * @brief Returns the set of transports supported by this proxy instance.
@@ -156,7 +171,13 @@ private:
     CommissioningProxy::Delegate & mDelegate;
     const BitFlags<CommissioningProxy::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
-    State_t mMainCommissioningProxyState;
+    State mMainCommissioningProxyState;
+
+    // Writable attributes owned (stored and change-reported) by the cluster.
+    // ScanMaxTime has no spec fallback; 120 s matches the previous default.
+    // CacheTimeout spec fallback is 120 s.
+    uint8_t mScanMaxTime   = 120;
+    uint16_t mCacheTimeout = 120;
 };
 
 } // namespace CommissioningProxy

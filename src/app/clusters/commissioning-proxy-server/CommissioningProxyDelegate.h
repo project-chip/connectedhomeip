@@ -198,16 +198,15 @@ public:
      * sent, so that two concurrent connect attempts cannot both pass the gate.
      */
     virtual uint8_t GetActiveSessionCount()                                                                = 0;
-    virtual uint8_t GetScanMaxTime()                                                                       = 0;
     virtual uint8_t GetMaxCachedResults()                                                                  = 0;
     virtual uint8_t GetNumCachedResults()                                                                  = 0;
-    virtual uint16_t GetCacheTimeout()                                                                     = 0;
     virtual chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> GetSupportedWiFiBands() = 0;
 
-    // ------------------------------------------------------------------
-    // Set attribute methods
-    virtual void SetScanMaxTime(uint8_t seconds)   = 0;
-    virtual void SetCacheTimeout(uint16_t seconds) = 0;
+    // NOTE: ScanMaxTime and CacheTimeout are writable attributes; their storage and
+    // change-reporting are owned by the cluster (see CommissioningProxyCluster), not
+    // the delegate. A delegate that needs the current value reads it back through its
+    // GetServer() back-pointer. This keeps NotifyAttributeChanged the cluster's
+    // responsibility so a delegate cannot silently change a reportable attribute.
 
     /**
      * @brief Encode the CachedResults attribute.

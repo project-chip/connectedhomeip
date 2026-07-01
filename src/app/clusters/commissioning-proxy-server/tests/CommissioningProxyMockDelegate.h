@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,8 +28,8 @@ namespace CommissioningProxy {
 class CommissioningProxyMockDelegate : public Delegate
 {
 public:
-    CommissioningProxyMockDelegate();
-    ~CommissioningProxyMockDelegate() override; // = default;
+    CommissioningProxyMockDelegate()           = default;
+    ~CommissioningProxyMockDelegate() override = default;
 
     Protocols::InteractionModel::Status
     ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
@@ -64,25 +64,19 @@ public:
     void SetActiveSessionCount(uint8_t v) { mActiveSessionCount = v; } // test helper
     uint8_t GetMaxCachedResults() override { return 10; }
     uint8_t GetNumCachedResults() override { return 0; }
-    uint16_t GetCacheTimeout() override { return mCacheTimeout; }
-    void SetCacheTimeout(uint16_t v) override { mCacheTimeout = v; }
     CHIP_ERROR EncodeCachedResults(app::AttributeValueEncoder &) override { return CHIP_NO_ERROR; }
 
     void SetServer(CommissioningProxyCluster * server) override { mServer = server; }
     CommissioningProxyCluster * GetServer() const override { return mServer; }
 
-    uint8_t GetScanMaxTime() override;
-    void SetScanMaxTime(uint8_t seconds) override;
     chip::BitMask<WiFiBandBitmap> GetSupportedWiFiBands() override { return mSupportedWiFiBands; }
     void SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap> bands) { mSupportedWiFiBands = bands; }
 
 private:
     CommissioningProxyCluster * mServer = nullptr;
-    uint8_t mScanMaxTime                = 120;
     chip::BitMask<WiFiBandBitmap> mSupportedWiFiBands;
     uint8_t mMaxSessions        = 1;
-    uint8_t mActiveSessionCount = 0;   // settable via SetActiveSessionCount() for MaxSessions tests
-    uint16_t mCacheTimeout      = 120; // spec default
+    uint8_t mActiveSessionCount = 0; // settable via SetActiveSessionCount() for MaxSessions tests
 };
 
 } // namespace CommissioningProxy

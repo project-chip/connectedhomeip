@@ -30,9 +30,6 @@ using chip::app::DataModel::Nullable;
 namespace CP     = chip::app::Clusters::CommissioningProxy;
 using ScanResult = CP::Structs::ScanResultStruct::Type;
 
-CommissioningProxyMockDelegate::CommissioningProxyMockDelegate()  = default;
-CommissioningProxyMockDelegate::~CommissioningProxyMockDelegate() = default;
-
 Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyConnectRequest(
     DataModel::Nullable<chip::ByteSpan> address,
     chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport, uint16_t discriminator,
@@ -145,16 +142,6 @@ CommissioningProxyMockDelegate::ProxyBackgroundScanStopRequest(chip::BitMask<CP:
 uint8_t CommissioningProxyMockDelegate::GetMaxSessions()
 {
     return mMaxSessions;
-}
-
-uint8_t CommissioningProxyMockDelegate::GetScanMaxTime()
-{
-    return mScanMaxTime;
-}
-
-void CommissioningProxyMockDelegate::SetScanMaxTime(uint8_t seconds)
-{
-    mScanMaxTime = seconds;
 }
 
 } // namespace CommissioningProxy

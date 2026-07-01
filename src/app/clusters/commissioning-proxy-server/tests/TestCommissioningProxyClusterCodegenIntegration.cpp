@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,22 +19,21 @@
 // =============================================================================
 // Purpose of this separate suite (do not fold into TestCommissioningProxyCluster).
 //
-// This suite exists to exercise CodegenIntegration.cpp / the Instance wrapper,
-// which is the glue between the code-driven CommissioningProxyCluster and the
+// This suite exercises CodegenIntegration.cpp / the Instance wrapper, which is the
+// glue between the code-driven CommissioningProxyCluster and the
 // CodegenDataModelProvider registry. Verifying that glue requires linking
 // mock_model (which transitively pulls in mock_ember).
 //
 // The main TestCommissioningProxyCluster suite intentionally CANNOT link
-// mock_model: it is aggregated into the Zephyr monolithic test binary
-// (via src/BUILD.gn -> ":tests"), where mock_ember collides with real Ember and
-// produces duplicate-symbol linker errors. This suite is therefore built only as
-// a standalone host binary and is the ONLY place CodegenIntegration.cpp is
-// compiled and linked. Deleting it, or moving its coverage into the main suite,
-// would break the Zephyr build and drop all coverage of the Instance wrapper.
+// mock_model: it is aggregated into the monolithic (single-binary) test build,
+// where mock_ember collides with real Ember and produces duplicate-symbol linker
+// errors. This suite is therefore built as a standalone host-only binary
+// (restricted to linux/darwin in src/BUILD.gn) and is the ONLY place
+// CodegenIntegration.cpp is compiled and linked.
 //
-// The "BackwardsCompatibility" name follows the repo-wide convention for "the
-// host-only mock_model suite", even though CommissioningProxy is a new cluster
-// with no legacy Ember API to be compatible with.
+// This is not a backwards-compatibility test: CommissioningProxy is a new cluster
+// with no legacy Ember API. It is grouped alongside the repo's other host-only
+// mock_ember suites purely because it shares that build constraint.
 // =============================================================================
 
 #include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
@@ -56,7 +55,7 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
-struct TestCommissioningProxyClusterBackwardsCompatibility : public ::testing::Test
+struct TestCommissioningProxyClusterCodegenIntegration : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
@@ -66,7 +65,7 @@ struct TestCommissioningProxyClusterBackwardsCompatibility : public ::testing::T
     TestServerClusterContext mContext;
 };
 
-TEST_F(TestCommissioningProxyClusterBackwardsCompatibility, TestInstanceLifecycle)
+TEST_F(TestCommissioningProxyClusterCodegenIntegration, TestInstanceLifecycle)
 {
     // Test 1: Create Instance with all features
     {
