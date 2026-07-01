@@ -783,7 +783,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if args.PICS is None:
         config.pics = {}
     else:
-        config.pics = read_pics_from_file(args.PICS)
+        config.pics = read_pics_from_file(args.PICS, endpoint=args.endpoint)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
