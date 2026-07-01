@@ -133,6 +133,12 @@ public:
     CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader,
                     OTARequestorAttributes & attributes, DefaultOTARequestorEventGenerator & eventGenerator);
 
+    /**
+     * Map a CHIP_ERROR to an IdleStateReason. Public only so unit tests can pin the mapping;
+     * production callers should go through RecordNewUpdateState.
+     */
+    IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
+
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
@@ -223,11 +229,6 @@ private:
         chip::BDXDownloader * mDownloader;
     };
 
-    /**
-     * Map a CHIP_ERROR to an IdleStateReason enum type
-     */
-    IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
-
     ScopedNodeId GetProviderScopedId() const
     {
         return ScopedNodeId(mProviderLocation.Value().providerNodeID, mProviderLocation.Value().fabricIndex);
@@ -237,6 +238,13 @@ private:
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
      */
     void RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error = CHIP_NO_ERROR);
+
+    /**
+     * Same as RecordNewUpdateState but with an explicit IdleStateReason instead of deriving it from a
+     * generic CHIP_ERROR, so OnDownloadStateChanged can use BDXDownloader::GetLastFailureCause() to
+     * separate peer-driven aborts from local download failures (both arrive as kFailure).
+     */
+    void RecordNewUpdateStateWithIdleReason(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, IdleStateReason idleReason);
 
     /**
      * Record the error update state and transition to the idle state
@@ -278,6 +286,24 @@ private:
      * Called to tear down a session to provider indicated by mProviderLocation
      */
     void DisconnectFromProvider();
+
+    /**
+     * If `error` indicates the peer disappeared mid-exchange (currently CHIP_ERROR_TIMEOUT on a
+     * request/response invocation), tear down the CASE session and rewrite the error to
+     * CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY so the driver sees an IdleStateReason::kInvalidSession
+     * (1-shot quick retry) rather than IdleStateReason::kUnknown (24h periodic).
+     *
+     * Called ONLY from OnQueryImageFailure, which preserves the pre-existing upstream behavior of
+     * the QueryImage path. OnApplyUpdateFailure and OnNotifyUpdateAppliedFailure deliberately do NOT
+     * call this helper and instead fall through to the periodic-query (kUnknown) path: an Apply
+     * timeout may mean the accessory is mid-apply/rebooting (restarting OTA could abandon a
+     * successful update), and NotifyUpdateApplied runs after Reset() has cleared mProviderLocation
+     * (so a teardown here would emit a spurious double idle transition). See the inline rationale on
+     * those handlers and in the .cpp body of this helper.
+     *
+     * Returns the (possibly reclassified) CHIP_ERROR for the caller to record.
+     */
+    CHIP_ERROR ReclassifyPeerDisappearedError(CHIP_ERROR error, const char * phase);
 
     /**
      * Start download of the software image returned in QueryImageResponse
