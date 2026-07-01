@@ -183,6 +183,7 @@ class XmlDataTypeComponent:
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
     constraints: Optional[Constraints] = None  # For min/max values, lists, etc.
+    instruction_dependency: Optional[str] = None  # M/O/no — bitmap bits only
 
 
 @dataclass
@@ -837,6 +838,8 @@ class ClusterParser:
             # Extract additional field attributes
             summary = xml_field.attrib.get('summary', None)
             type_info = xml_field.attrib.get('type', None) if component_type == DataTypeEnum.kStruct else None
+            instruction_dependency = xml_field.attrib.get(
+                'instructionDependency', None) if component_type == DataTypeEnum.kBitmap else None
 
             # Check for duplicate IDs to detect invalid XML data
             if aid in components:
@@ -860,7 +863,8 @@ class ClusterParser:
                 type_info=type_info,
                 is_optional=is_optional,
                 is_nullable=is_nullable,
-                constraints=constraints
+                constraints=constraints,
+                instruction_dependency=instruction_dependency
             )
         return components
 
@@ -1275,6 +1279,7 @@ class DataModelLevel(Enum):
     kDeviceType = auto()
     kGlobal = auto()
     kNamespace = auto()
+    kDiscovery = auto()
 
     @property
     def dirname(self):
@@ -1286,6 +1291,8 @@ class DataModelLevel(Enum):
             return "globals"
         if self == DataModelLevel.kNamespace:
             return "namespaces"
+        if self == DataModelLevel.kDiscovery:
+            return "discovery"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -1984,6 +1991,73 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
         raise SpecParsingException(f'Did not find all 3 global data model files in specified directory {top:!r}')
 
     return global_data_types, problems
+
+
+def build_xml_discovery_bitmaps(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[str, XmlDataType], list[ProblemNotice]]:
+    """
+    Build XML bitmaps from the discovery data model directory.
+
+    Args:
+        data_model_directory: The data model directory to parse.
+
+    Returns:
+        Tuple of (bitmaps, problems) where bitmaps is a dict mapping bitmap name to XmlDataType.
+    """
+    bitmaps: dict[str, XmlDataType] = {}
+    problems: list[ProblemNotice] = []
+
+    top = get_data_model_directory(data_model_directory, DataModelLevel.kDiscovery)
+    # Defensive: older/unpackaged data models have no discovery/ directory, so there is nothing to parse.
+    if not top.is_dir():
+        return bitmaps, problems
+    LOGGER.info("Reading XML discovery bitmaps from %r", top)
+
+    for f in top.iterdir():
+        if not f.name.endswith('.xml'):
+            continue
+        with f.open("r", encoding="utf8") as file:
+            root = ElementTree.parse(file).getroot()
+            for element in root.iter('bitmap'):
+                try:
+                    name = element.attrib['name']
+                except KeyError:
+                    location = ClusterPathLocation(0, 0)
+                    problems.append(ProblemNotice("Discovery XML Parsing", location=location,
+                                                  severity=ProblemSeverity.WARNING,
+                                                  problem=f"Discovery bitmap with no name in {f.name}"))
+                    continue
+                temp_parser = ClusterParser(ElementTree.Element('cluster'), None, 'DiscoveryDataTypes')
+                components = temp_parser._parse_components(element, DataTypeEnum.kBitmap)
+                bitmaps[name] = XmlDataType(
+                    data_type=DataTypeEnum.kBitmap,
+                    name=name,
+                    components=components,
+                    cluster_ids=None
+                )
+
+    return bitmaps, problems
+
+
+def instruction_dependency_masks(bitmap: XmlDataType) -> tuple[int, int]:
+    """Derive (dependent, mandatory) bitmasks from a bitmap's instructionDependency column.
+
+    A bit is in the dependent mask if its instructionDependency is "M" or "O", and in the
+    mandatory mask only if it is "M". Raises if the bitmap carries no instructionDependency
+    data at all, which means the source XML predates the scraped Instruction Dependency column
+    (e.g. a stale prebuilt data model) rather than a spec where the column is genuinely empty.
+    """
+    dependent = 0
+    mandatory = 0
+    for bit, component in bitmap.components.items():
+        if component.instruction_dependency in ("M", "O"):
+            dependent |= (1 << int(bit))
+        if component.instruction_dependency == "M":
+            mandatory |= (1 << int(bit))
+    if all(component.instruction_dependency is None for component in bitmap.components.values()):
+        raise SpecParsingException(
+            f"Bitmap {bitmap.name!r} has no instructionDependency data; the data model XML is "
+            "missing the scraped Instruction Dependency column")
+    return dependent, mandatory
 
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
