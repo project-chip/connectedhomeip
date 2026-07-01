@@ -25,6 +25,7 @@
  */
 
 #include <cstdint>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -94,10 +95,11 @@ void BtpEngineDoesNotCrash(bool expectFirstAck, const std::vector<FragSpec> & fr
         return;
     }
 
-    // Mirror the engine's expected-rx counter (uint8 wrap); matches BtpEngine::Init
-    // (0 normally, 1 when expect_first_ack). Every fragment we build carries the
-    // header+seq bytes, so the engine consumes the seq and increments in lockstep.
-    SequenceNumber_t seq = expectFirstAck ? 1 : 0;
+    // Mirror the engine's expected-rx counter (uint8 wrap); matches BtpEngine::Init,
+    // which sets mRxNextSeqNum = 0 when expect_first_ack, else 1. Every fragment we
+    // build carries the header+seq bytes, so the engine consumes the seq and
+    // increments in lockstep.
+    SequenceNumber_t seq = expectFirstAck ? 0 : 1;
 
     for (const auto & f : frags)
     {

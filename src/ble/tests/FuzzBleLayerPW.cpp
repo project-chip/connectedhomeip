@@ -44,6 +44,7 @@
  */
 
 #include <cstdint>
+#include <cstdlib>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -148,46 +149,6 @@ BleLayer & PersistentLayer()
         return layer;
     }();
     return *sLayer;
-}
-
-// ---------------------------------------------------------------------------
-// Frame builders (copied verbatim from FuzzBleEndPointPW.cpp).
-// ---------------------------------------------------------------------------
-[[maybe_unused]] PacketBufferHandle BuildCapabilitiesRequest(uint8_t windowSize, uint16_t mtu)
-{
-    constexpr size_t kReqLen = 9;
-    auto buf                 = PacketBufferHandle::New(kReqLen);
-    if (buf.IsNull())
-        return buf;
-    uint8_t * p = buf->Start();
-    p[0]        = 0x65; // CHECK_BYTE_1
-    p[1]        = 0x6C; // CHECK_BYTE_2
-    p[2]        = 0x04; // version
-    p[3]        = 0x00;
-    p[4]        = 0x00;
-    p[5]        = static_cast<uint8_t>(mtu);
-    p[6]        = static_cast<uint8_t>(mtu >> 8);
-    p[7]        = windowSize;
-    p[8]        = 0x00;
-    buf->SetDataLength(kReqLen);
-    return buf;
-}
-
-[[maybe_unused]] PacketBufferHandle BuildCapabilitiesResponse(uint8_t windowSize, uint16_t fragmentSize)
-{
-    constexpr size_t kRespLen = 6;
-    auto buf                  = PacketBufferHandle::New(kRespLen);
-    if (buf.IsNull())
-        return buf;
-    uint8_t * p = buf->Start();
-    p[0]        = 0x65;
-    p[1]        = 0x6C;
-    p[2]        = 0x04;
-    p[3]        = static_cast<uint8_t>(fragmentSize);
-    p[4]        = static_cast<uint8_t>(fragmentSize >> 8);
-    p[5]        = windowSize;
-    buf->SetDataLength(kRespLen);
-    return buf;
 }
 
 // ---------------------------------------------------------------------------
@@ -344,7 +305,7 @@ void BleLayerDispatchDoesNotCrash(const Ops & ops)
 // ---------------------------------------------------------------------------
 std::vector<uint8_t> CapReq(uint8_t windowSize, uint16_t mtu)
 {
-    // Wire bytes of a BTP capabilities request (mirrors BuildCapabilitiesRequest).
+    // Wire bytes of a BTP capabilities request.
     // Built directly so seed construction (which runs at static-init time via
     // .WithSeeds(SeedSequences())) never calls chip::Platform::MemoryAlloc before
     // Platform::MemoryInit() — that ordering aborts in VerifyInitialized().
@@ -356,7 +317,7 @@ std::vector<uint8_t> CapReq(uint8_t windowSize, uint16_t mtu)
 }
 std::vector<uint8_t> CapResp(uint8_t windowSize, uint16_t fragmentSize)
 {
-    // Wire bytes of a BTP capabilities response (mirrors BuildCapabilitiesResponse).
+    // Wire bytes of a BTP capabilities response.
     return { 0x65, 0x6C, 0x04, static_cast<uint8_t>(fragmentSize), static_cast<uint8_t>(fragmentSize >> 8), windowSize };
 }
 
