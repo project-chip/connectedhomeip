@@ -235,6 +235,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    SessionParameters localSessionParams;
+#endif
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
     mOperationalServicePort        = initParams.operationalServicePort;
@@ -550,6 +553,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Enable the TCP Server based on the TCPListenParameters setting.
     app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+
+    {
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        if (tcpListenParams.IsServerListenEnabled())
+        {
+            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        }
+        localSessionParams.SetSupportedTransports(supportedTransports);
+    }
+    // Maximum size of the TCP payload that the node is capable of receiving
+    // from its peer. Make sure we subtract the framing length prefix.
+    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                            SessionParameters::kTCPFramingHeaderSize);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
@@ -583,6 +599,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             // Don't provide an MRP local config, so each CASE initiation will use
             // the then-current value.
             .mrpLocalConfig = NullOptional,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+            .localSessionParams = localSessionParams,
+#endif
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,
@@ -594,6 +613,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mCASEServer.SetLocalSessionParameters(localSessionParams);
+#endif
 
     err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
                                                            mSubscriptionResumptionStorage);

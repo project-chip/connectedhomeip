@@ -69,6 +69,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mEnableTCPServer           = params.enableTCPServer;
     mPreventDnssdPortOverwrite = params.preventDnssdPortOverwrite;
     mDataModelProvider         = params.dataModelProvider;
 
@@ -97,6 +98,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.interfaceId               = mInterfaceId;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
+    params.enableTCPServer           = mEnableTCPServer;
     params.preventDnssdPortOverwrite = mPreventDnssdPortOverwrite;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
     params.sessionKeystore           = mSystemState->GetSessionKeystore();
@@ -138,7 +140,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     auto tcpListenParams = Transport::TcpListenParameters(stateParams.tcpEndPointManager)
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(params.listenPort)
-                               .SetServerListenEnabled(false); // Initialize as a TCP Client
+                               .SetServerListenEnabled(params.enableTCPServer);
 #endif
 
     if (params.dataModelProvider == nullptr)
@@ -199,7 +201,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                         Transport::TcpListenParameters(stateParams.tcpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
                                                             .SetListenPort(params.listenPort)
-                                                            .SetServerListenEnabled(false)
+                                                            .SetServerListenEnabled(params.enableTCPServer)
 #endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -339,6 +341,21 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .mrpLocalConfig            = NullOptional,
         .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    {
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        if (params.enableTCPServer)
+        {
+            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        }
+        sessionInitParams.localSessionParams.SetSupportedTransports(supportedTransports);
+        // Maximum size of the TCP payload that the node is capable of receiving
+        // from its peer. Make sure we subtract the framing length prefix.
+        sessionInitParams.localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                                                  SessionParameters::kTCPFramingHeaderSize);
+    }
+#endif
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = sessionInitParams,
