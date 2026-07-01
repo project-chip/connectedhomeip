@@ -31,6 +31,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstring>
+#include <functional>
 #include <lib/support/Span.h>
 #include <mutex>
 #include <queue>
@@ -56,11 +57,11 @@ private:
     // Pointer to the NFC Tag instance to communicate with
     std::shared_ptr<TagInstance> mTagInstance;
 
-    // Data to send to the NFC Tag
-    chip::ByteSpan mDataToSend;
-
     // Dynamically allocated buffer to store the duplicated message data
     std::unique_ptr<uint8_t[]> mDataToSendBuffer;
+
+    // Size of the duplicated message data
+    size_t mDataToSendSize = 0;
 
     bool mIsMessageValid = false;
 
@@ -69,16 +70,12 @@ public:
     NFCMessage(std::shared_ptr<TagInstance> instance, System::PacketBufferHandle && msgBuf) : mTagInstance(std::move(instance))
     {
         // Duplicate the data from the PacketBufferHandle
-        size_t dataSize = msgBuf->DataLength();
-        mDataToSendBuffer.reset(new (std::nothrow) uint8_t[dataSize]);
+        mDataToSendSize = msgBuf->DataLength();
+        mDataToSendBuffer.reset(new (std::nothrow) uint8_t[mDataToSendSize]);
 
         if (mDataToSendBuffer != nullptr)
         {
-            std::memcpy(mDataToSendBuffer.get(), msgBuf->Start(), dataSize);
-
-            // Initialize mDataToSend ByteSpan to point to the duplicated buffer
-            mDataToSend = chip::ByteSpan(mDataToSendBuffer.get(), dataSize);
-
+            std::memcpy(mDataToSendBuffer.get(), msgBuf->Start(), mDataToSendSize);
             mIsMessageValid = true;
         }
         else
@@ -89,31 +86,10 @@ public:
     }
 
     // Move Constructor
-    NFCMessage(NFCMessage && other) noexcept :
-        mTagInstance(other.mTagInstance), mDataToSend(other.mDataToSend), mDataToSendBuffer(std::move(other.mDataToSendBuffer)),
-        mIsMessageValid(other.mIsMessageValid)
-    {
-        other.mTagInstance    = nullptr;
-        other.mDataToSend     = chip::ByteSpan();
-        other.mIsMessageValid = false;
-    }
+    NFCMessage(NFCMessage &&) noexcept = default;
 
     // Move Assignment Operator
-    NFCMessage & operator=(NFCMessage && other) noexcept
-    {
-        if (this != &other)
-        {
-            mTagInstance      = other.mTagInstance;
-            mDataToSend       = other.mDataToSend;
-            mDataToSendBuffer = std::move(other.mDataToSendBuffer);
-            mIsMessageValid   = other.mIsMessageValid;
-
-            other.mTagInstance    = nullptr;
-            other.mDataToSend     = chip::ByteSpan();
-            other.mIsMessageValid = false;
-        }
-        return *this;
-    }
+    NFCMessage & operator=(NFCMessage &&) noexcept = default;
 
     // Deleted Copy Constructor
     NFCMessage(const NFCMessage &) = delete;
@@ -125,19 +101,49 @@ public:
     ~NFCMessage() = default;
 
     // Get the TagInstance
-    std::shared_ptr<TagInstance> GetTagInstance() { return mTagInstance; }
+    std::shared_ptr<TagInstance> GetTagInstance() const { return mTagInstance; }
 
     // Get the data to send
-    chip::ByteSpan GetDataToSend() { return mDataToSend; }
+    chip::ByteSpan GetDataToSend() const { return chip::ByteSpan(mDataToSendBuffer.get(), mDataToSendSize); }
 
     // Check if the message is valid
     bool IsMessageValid() const { return mIsMessageValid; }
 };
 
+// Context used to synchronize a synchronous work item with the caller thread.
+struct SyncWorkContext
+{
+    std::mutex mutex;
+    std::condition_variable cv;
+    bool done         = false;
+    CHIP_ERROR result = CHIP_NO_ERROR;
+};
+
+// Work types handled by the processing thread
+enum class NfcWorkType
+{
+    kScan, // Scan every NFC Readers
+    kSend, // Send NFC commands to a Card
+};
+
+// Work item processed by the NFC worker thread.
+struct NfcWorkItem
+{
+    NfcWorkType type;
+    Nfc::NFCTag::Identifier targetIdentifier;
+    std::unique_ptr<NFCMessage> message;
+
+    // If not null, the worker thread must signal completion of this work item
+    // through this synchronization context.
+    SyncWorkContext * syncCtx = nullptr;
+};
+
 /**
  * Concrete implementation of the NFCCommissioningManagerImpl singleton object for the Linux platforms.
  */
-class NFCCommissioningManagerImpl final : public NFCCommissioningManager, private Nfc::NfcApplicationDelegate
+class NFCCommissioningManagerImpl final : public NFCCommissioningManager,
+                                          public Nfc::NFCReaderTransport,
+                                          private Nfc::NfcApplicationDelegate
 {
     // Allow the NFCCommissioningManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -152,12 +158,31 @@ public:
 
     CHIP_ERROR SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
 
+    // ===== Members that implement virtual methods on NFCReaderTransport.
+
+    void SetDelegate(Nfc::NFCReaderTransportDelegate * delegate) override;
+
+    CHIP_ERROR StartDiscoveringTagMatchingAddress(const Nfc::NFCTag::Identifier & tagIdentifier) override;
+
+    CHIP_ERROR StopDiscoveringTags() override;
+
+    bool FindTagMatchingIdentifier(const Nfc::NFCTag::Identifier & tagIdentifier) override;
+
+    CHIP_ERROR SendMessage(System::PacketBufferHandle && message, const Nfc::NFCTag::Identifier & tagIdentifier,
+                           std::function<void(System::PacketBufferHandle &&, CHIP_ERROR)> onResponse) override
+    {
+        static_cast<void>(message);
+        static_cast<void>(tagIdentifier);
+        static_cast<void>(onResponse);
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
 private:
     // ===== Members that implement the NFCCommissioningManager internal interface.
 
     CHIP_ERROR _Init();
     void _Shutdown();
-    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return nullptr; }
+    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return const_cast<NFCCommissioningManagerImpl *>(this); }
     void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport) {}
 
     // ===== Members for internal use by the following friends.
@@ -171,27 +196,54 @@ private:
     std::shared_ptr<TagInstance> SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName, SCARDHANDLE cardHandle);
     std::shared_ptr<TagInstance> SearchTagInstanceFromDiscriminator(uint16_t discriminator);
 
-    CHIP_ERROR ScanAllReaders(uint16_t nfcShortId);
-    CHIP_ERROR ScanReader(uint16_t nfcShortId, char * readerName);
+    // Start scan on all available readers and scan for NFC Tags.
+    CHIP_ERROR ScanAllReaders(void);
 
+    // Start scan on a given reader
+    CHIP_ERROR ScanReader(char * readerName);
+
+    // Protected by mNFCBaseMutex
     Transport::NFCBase * mNFCBase = nullptr;
+    std::mutex mNFCBaseMutex;
 
+    // PC/SC context owned by the NFC worker thread.
     SCARDCONTEXT mPcscContext = 0;
+
+    // Cache of discovered NFC tag instances.
     std::shared_ptr<TagInstance> mLastTagInstanceUsed;
     std::vector<std::shared_ptr<TagInstance>> mTagInstances;
+    std::mutex mTagInstancesMutex;
 
-    // Thread and synchronization primitives
-    std::thread mNfcThread;
-    std::queue<std::unique_ptr<NFCMessage>> mMessageQueue;
-    std::mutex mQueueMutex;
-    std::condition_variable mQueueCondition;
-    std::atomic<bool> mThreadRunning;
+    // NFC worker Thread and synchronization primitives
+    std::thread mNfcWorkerThread;
+    std::queue<NfcWorkItem> mWorkQueue;
+    std::mutex mWorkQueueMutex;
+    std::condition_variable mWorkQueueCondition;
+    std::atomic<bool> mNfcWorkerThreadRunning{ false };
+
+    // Mutex protecting the worker thread startup sequence
+    std::mutex mWorkerStartMutex;
+
+    // Synchronization primitives used to wait until the worker thread has finished
+    // its initialization, including PC/SC context creation.
+    std::mutex mWorkerInitMutex;
+    std::condition_variable mWorkerInitCondition;
+    bool mWorkerInitCompleted    = false;
+    CHIP_ERROR mWorkerInitResult = CHIP_ERROR_INCORRECT_STATE;
+
+    // NFCReaderTransport state
+    Nfc::NFCReaderTransportDelegate * mDelegate = nullptr;
+    std::mutex mDelegateMutex;
 
     // Private methods
-    void NfcThreadMain();
-    void EnqueueMessage(std::unique_ptr<NFCMessage> message);
+    void NfcWorkerThreadMain();
+    void EnqueueWork(NfcWorkItem && item);
 
-    CHIP_ERROR EnsureProcessingThreadStarted();
+    CHIP_ERROR EnsureWorkerThreadStarted();
+    CHIP_ERROR RunSyncOnWorker(NfcWorkItem && item);
+    Transport::NFCBase * GetNFCBase();
+
+    static void DispatchTagDiscovery(intptr_t arg);
 };
 
 /**
