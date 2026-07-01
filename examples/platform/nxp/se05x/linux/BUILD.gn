@@ -49,6 +49,7 @@ config("app-main-config") {
     "../",
     "../../../linux",
     "${chip_root}/src/platform/nxp/crypto/se05x",
+    "${chip_root}/examples/platform/nxp/common/app_se05x/include",
   ]
 }
 
@@ -179,6 +180,35 @@ source_set("app-options") {
   public_configs = [ ":app-main-config" ]
 }
 
+source_set("named-pipes") {
+  sources = [
+    "../../../linux/NamedPipeCommands.cpp",
+    "../../../linux/NamedPipeCommands.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("commissionable-init") {
+  sources = [
+    "../../../linux/CommissionableInit.cpp",
+    "../../../linux/CommissionableInit.h",
+  ]
+
+  public_deps = [
+    ":app-options",
+    ":linux-commissionable-data-provider",
+    "${chip_root}/src/lib",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
 source_set("app-main") {
   defines = [
     "ENABLE_TRACING=${matter_enable_tracing_support}",
@@ -201,12 +231,10 @@ source_set("app-main") {
     "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt",
   ]
 
+  defines += [ "CONFIG_CHIP_SE05X=1" ]
+
   sources = [
     "../../../linux/AppMain.h",
-    "../../../linux/CommissionableInit.cpp",
-    "../../../linux/CommissionableInit.h",
-    "../../../linux/NamedPipeCommands.cpp",
-    "../../../linux/NamedPipeCommands.h",
     "../DeviceAttestationSe05xCredsExample.cpp",
     "AppMain.cpp",
   ]
@@ -215,6 +243,7 @@ source_set("app-main") {
     ":app-main-loop",
     ":app-options",
     ":boolean-state-configuration-test-event-trigger",
+    ":commissionable-init",
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
     ":commodity-price-test-event-trigger",
@@ -225,6 +254,7 @@ source_set("app-main") {
     ":energy-reporting-test-event-trigger",
     ":linux-commissionable-data-provider",
     ":meter-identification-test-event-trigger",
+    ":named-pipes",
     ":smco-test-event-trigger",
     ":software-diagnostics-test-event-trigger",
     ":water-heater-management-test-event-trigger",
@@ -237,6 +267,7 @@ source_set("app-main") {
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:all_clusters_device_info_provider",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/server",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
