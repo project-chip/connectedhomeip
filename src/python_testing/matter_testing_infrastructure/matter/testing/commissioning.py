@@ -184,17 +184,16 @@ class Commission:
             )
 
         if self.commissioning_info.commissioning_method == "thread-meshcop":
-            if self.commissioning_info.thread_ba_host is None:
-                raise ValueError("Thread MeshCoP PASE requires a border agent host")
+            thread_ba_host = self.commissioning_info.thread_ba_host
+            thread_ba_port = self.commissioning_info.thread_ba_port
 
-            if self.commissioning_info.thread_ba_port is None:
-                raise ValueError("Thread MeshCoP PASE requires a border agent port")
+            if thread_ba_host is None or thread_ba_port is None:
+                raise ValueError("Thread MeshCoP PASE requires both border agent host and port")
 
             commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
                 setupCode=setup_code,
                 nodeId=self.node_id,
-                baHost=self.commissioning_info.thread_ba_host,
-                baPort=self.commissioning_info.thread_ba_port,
+                threadMeshCoPConfig=(thread_ba_host, thread_ba_port),
             )
         else:
             commissionee = await self.dev_ctrl.FindOrEstablishPASESession(

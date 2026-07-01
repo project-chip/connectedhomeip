@@ -1489,7 +1489,7 @@ class ChipDeviceControllerBase:
 
         return self._Cluster
 
-    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: typing.Optional[int] = None, baHost: typing.Optional[str] = None, baPort: typing.Optional[int] = None) -> typing.Optional[DeviceProxyWrapper]:
+    async def FindOrEstablishPASESession(self, setupCode: str, nodeId: int, timeoutMs: typing.Optional[int] = None, threadMeshCoPConfig: tuple[str, int] | None = None) -> typing.Optional[DeviceProxyWrapper]:
         '''
         Find or establish a PASE session.
 
@@ -1497,6 +1497,7 @@ class ChipDeviceControllerBase:
             setUpCode (str): The setup code of the device.
             nodeId (int): The node ID of the device.
             timeoutMs (Optional[int]): Optional timeout in milliseconds.
+            threadMeshCoPConfig (Optional[tuple[str, int]]): Optional Border Agent host and port for Thread MeshCoP PASE.
 
         Returns:
             DeviceProxyWrapper on success, if not is None.
@@ -1508,14 +1509,11 @@ class ChipDeviceControllerBase:
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-        if baHost is None:
-            if baPort is not None:
-                raise ValueError("Both baHost and baPort must be provided, or both must be None")
+        if threadMeshCoPConfig is None:
             await self.EstablishPASESession(setupCode, nodeId)
         else:
-            if baPort is None:
-                raise ValueError("Both baHost and baPort must be provided, or both must be None")
-            await self.EstablishPASESessionThreadMeshcop(baHost, setupCode, nodeId, baPort)
+            threadBorderAgentHost, threadBorderAgentPort = threadMeshCoPConfig
+            await self.EstablishPASESessionThreadMeshcop(threadBorderAgentHost, setupCode, nodeId, threadBorderAgentPort)
 
         res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeId, byref(returnDevice)), timeoutMs)
