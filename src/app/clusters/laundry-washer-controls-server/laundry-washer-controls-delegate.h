@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 #pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/LaundryWasherControls/Enums.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
