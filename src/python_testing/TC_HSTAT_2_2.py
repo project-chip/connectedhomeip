@@ -39,15 +39,13 @@
 import logging
 from itertools import count
 
-from mobly import asserts
-
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
+
 
 class TC_HSTAT_2_2(MatterBaseTest):
     def pics_TC_HSTAT_2_2(self) -> list[str]:
@@ -66,7 +64,7 @@ class TC_HSTAT_2_2(MatterBaseTest):
                 TestStep(next(step), "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to false",
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
 
-        ]
+                ]
 
     async def read_hstat_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.Humidistat
