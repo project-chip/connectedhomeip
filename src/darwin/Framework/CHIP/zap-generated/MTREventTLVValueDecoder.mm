@@ -5481,6 +5481,19 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId a
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForCommissioningProxyCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CommissioningProxy;
+    switch (aEventId) {
+    default: {
+        // Not a known CommissioningProxy event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForWakeOnLANCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WakeOnLan;
@@ -5820,6 +5833,19 @@ static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEven
     switch (aEventId) {
     default: {
         // Not a known ContentAppObserver event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForAudioControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::AudioControl;
+    switch (aEventId) {
+    default: {
+        // Not a known AudioControl event.
         break;
     }
     }
@@ -6739,6 +6765,19 @@ static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV:
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForTestHiddenManufacturerSpecificCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TestHiddenManufacturerSpecific;
+    switch (aEventId) {
+    default: {
+        // Not a known TestHiddenManufacturerSpecific event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 
 id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -7091,6 +7130,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ThreadNetworkDirectory::Id: {
         return DecodeEventPayloadForThreadNetworkDirectoryCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::CommissioningProxy::Id: {
+        return DecodeEventPayloadForCommissioningProxyCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::WakeOnLan::Id: {
         return DecodeEventPayloadForWakeOnLANCluster(aPath.mEventId, aReader, aError);
     }
@@ -7132,6 +7174,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::AudioControl::Id: {
+        return DecodeEventPayloadForAudioControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ZoneManagement::Id: {
         return DecodeEventPayloadForZoneManagementCluster(aPath.mEventId, aReader, aError);
@@ -7189,6 +7234,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::SampleMei::Id: {
         return DecodeEventPayloadForSampleMEICluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::TestHiddenManufacturerSpecific::Id: {
+        return DecodeEventPayloadForTestHiddenManufacturerSpecificCluster(aPath.mEventId, aReader, aError);
     }
     default: {
         break;

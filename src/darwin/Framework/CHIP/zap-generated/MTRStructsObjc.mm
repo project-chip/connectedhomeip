@@ -3337,8 +3337,6 @@ NS_ASSUME_NONNULL_BEGIN
         _epochKey2 = nil;
 
         _epochStartTime2 = nil;
-
-        _groupKeyMulticastPolicy = @(0);
     }
     return self;
 }
@@ -3355,14 +3353,13 @@ NS_ASSUME_NONNULL_BEGIN
     other.epochStartTime1 = self.epochStartTime1;
     other.epochKey2 = self.epochKey2;
     other.epochStartTime2 = self.epochStartTime2;
-    other.groupKeyMulticastPolicy = self.groupKeyMulticastPolicy;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; groupKeyMulticastPolicy:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2, _groupKeyMulticastPolicy];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2];
     return descriptionString;
 }
 
@@ -9892,6 +9889,51 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: extendedPanID:%@; networkName:%@; channel:%@; activeTimestamp:%@; >", NSStringFromClass([self class]), [_extendedPanID base64EncodedStringWithOptions:0], _networkName, _channel, _activeTimestamp];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCommissioningProxyClusterScanResultStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _address = nil;
+
+        _transport = @(0);
+
+        _discriminator = @(0);
+
+        _vendorID = @(0);
+
+        _productID = @(0);
+
+        _extendedData = nil;
+
+        _wiFiBand = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRCommissioningProxyClusterScanResultStruct alloc] init];
+
+    other.address = self.address;
+    other.transport = self.transport;
+    other.discriminator = self.discriminator;
+    other.vendorID = self.vendorID;
+    other.productID = self.productID;
+    other.extendedData = self.extendedData;
+    other.wiFiBand = self.wiFiBand;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorID:%@; productID:%@; extendedData:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorID, _productID, [_extendedData base64EncodedStringWithOptions:0], _wiFiBand];
     return descriptionString;
 }
 

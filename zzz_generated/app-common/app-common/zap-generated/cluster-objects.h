@@ -63,6 +63,10 @@
 #include <clusters/ApplicationLauncher/Commands.h>
 #include <clusters/ApplicationLauncher/Events.h>
 #include <clusters/ApplicationLauncher/Structs.h>
+#include <clusters/AudioControl/Attributes.h>
+#include <clusters/AudioControl/Commands.h>
+#include <clusters/AudioControl/Events.h>
+#include <clusters/AudioControl/Structs.h>
 #include <clusters/AudioOutput/Attributes.h>
 #include <clusters/AudioOutput/Commands.h>
 #include <clusters/AudioOutput/Events.h>
@@ -135,6 +139,10 @@
 #include <clusters/CommissionerControl/Commands.h>
 #include <clusters/CommissionerControl/Events.h>
 #include <clusters/CommissionerControl/Structs.h>
+#include <clusters/CommissioningProxy/Attributes.h>
+#include <clusters/CommissioningProxy/Commands.h>
+#include <clusters/CommissioningProxy/Events.h>
+#include <clusters/CommissioningProxy/Structs.h>
 #include <clusters/CommodityMetering/Attributes.h>
 #include <clusters/CommodityMetering/Commands.h>
 #include <clusters/CommodityMetering/Events.h>
@@ -539,6 +547,10 @@
 #include <clusters/TemperatureMeasurement/Commands.h>
 #include <clusters/TemperatureMeasurement/Events.h>
 #include <clusters/TemperatureMeasurement/Structs.h>
+#include <clusters/TestHiddenManufacturerSpecific/Attributes.h>
+#include <clusters/TestHiddenManufacturerSpecific/Commands.h>
+#include <clusters/TestHiddenManufacturerSpecific/Events.h>
+#include <clusters/TestHiddenManufacturerSpecific/Structs.h>
 #include <clusters/Thermostat/Attributes.h>
 #include <clusters/Thermostat/Commands.h>
 #include <clusters/Thermostat/Events.h>

@@ -27,7 +27,7 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 
 import construct  # type: ignore
 from rich.pretty import pprint  # type: ignore
@@ -188,7 +188,7 @@ class EventHeader:
 @dataclass
 class AttributeStatus:
     Path: AttributePath
-    Status: Union[InteractionModelStatus, int]
+    Status: InteractionModelStatus | int
 
 
 @dataclass
@@ -324,7 +324,7 @@ class AttributeCache:
     _attributeCache: dict[int, list[Cluster]] = field(
         default_factory=lambda: {})
 
-    def UpdateTLV(self, path: AttributePath, dataVersion: int, data: Union[bytes, ValueDecodeFailure]):
+    def UpdateTLV(self, path: AttributePath, dataVersion: int, data: bytes | ValueDecodeFailure):
         ''' Store data in TLV since that makes it easiest to eventually convert to either the
             cluster or attribute view representations (see below in GetUpdatedAttributeCache()).
         '''
@@ -1031,7 +1031,7 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def _prepare_write_attributes_data(attributes: list[AttributeWriteRequest], must_use_timed_write_check: bool = True, timedRequestTimeoutMs: Union[None, int] = None) -> tuple[ctypes.Array[PyWriteAttributeData], int]:
+def _prepare_write_attributes_data(attributes: list[AttributeWriteRequest], must_use_timed_write_check: bool = True, timedRequestTimeoutMs: None | int = None) -> tuple[ctypes.Array[PyWriteAttributeData], int]:
     """Helper function to prepare PyWriteAttributeData array from AttributeWriteRequest list."""
     numberOfAttributes = len(attributes)
     pyWriteAttributesArrayType = PyWriteAttributeData * numberOfAttributes
@@ -1056,8 +1056,8 @@ def _prepare_write_attributes_data(attributes: list[AttributeWriteRequest], must
 
 
 def WriteAttributes(future: Future, eventLoop, device,
-                    attributes: list[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
+                    attributes: list[AttributeWriteRequest], timedRequestTimeoutMs: None | int = None,
+                    interactionTimeoutMs: None | int = None, busyWaitMs: None | int = None,
                     forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 
@@ -1086,8 +1086,8 @@ def TestOnlyWriteAttributeWithMismatchedTimedRequestField(future: Future, eventL
                                                           attributes: list[AttributeWriteRequest],
                                                           timedRequestTimeoutMs: int,
                                                           timedRequestFieldValue: bool,
-                                                          interactionTimeoutMs: Union[None, int] = None,
-                                                          busyWaitMs: Union[None, int] = None) -> PyChipError:
+                                                          interactionTimeoutMs: None | int = None,
+                                                          busyWaitMs: None | int = None) -> PyChipError:
     '''
     ONLY TO BE USED FOR TEST: Writes attributes with decoupled Timed Request action and TimedRequest field.
     This allows testing TIMED_REQUEST_MISMATCH scenarios:
@@ -1119,7 +1119,7 @@ def TestOnlyWriteAttributeWithMismatchedTimedRequestField(future: Future, eventL
     return res
 
 
-def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: list[AttributeWriteRequest], busyWaitMs: Union[None, int] = None) -> PyChipError:
+def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: list[AttributeWriteRequest], busyWaitMs: None | int = None) -> PyChipError:
     handle = GetLibraryHandle()
 
     numberOfAttributes = len(attributes)
@@ -1166,7 +1166,7 @@ def Read(transaction: AsyncReadTransaction, device,
          attributes: Optional[list[AttributePath]] = None, dataVersionFilters: Optional[list[DataVersionFilter]] = None,
          events: Optional[list[EventPath]] = None, eventNumberFilter: Optional[int] = None,
          subscriptionParameters: Optional[SubscriptionParameters] = None,
-         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: Union[None, bool] = None) -> PyChipError:
+         fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True, allowLargePayload: None | bool = None) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")

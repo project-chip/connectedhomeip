@@ -73,10 +73,7 @@ static_library("nxp_platform") {
     "-Wno-sign-compare",
   ]
   deps = []
-  defines = [
-    "NXP_DEVICE_MCXW7X=1",
-    "NXP_USE_MML=1",
-  ]
+  defines = [ "NXP_DEVICE_MCXW7X=1" ]
 
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
@@ -119,6 +116,7 @@ static_library("nxp_platform") {
     if (chip_crypto_spake2p == "custom") {
       sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
     }
+    sources += [ "../common/crypto/S200/S200KeyAllocator.h" ]
   }
 
   if (chip_enable_ble) {
@@ -134,6 +132,10 @@ static_library("nxp_platform") {
   if (nxp_external_sdk && chip_enable_ota_requestor) {
     sources += ota_sources
     deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+    sources += [
+      "OTAFuseVerifier.cpp",
+      "OTAFuseVerifier.h",
+    ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]

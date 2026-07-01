@@ -5959,6 +5959,55 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDirectoryCluster(AttributeId aAtt
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCommissioningProxyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommissioningProxy;
+    switch (aAttributeId) {
+    case Attributes::Transport::Id: {
+        return YES;
+    }
+    case Attributes::ScanMaxTime::Id: {
+        return YES;
+    }
+    case Attributes::MaxSessions::Id: {
+        return YES;
+    }
+    case Attributes::MaxCachedResults::Id: {
+        return YES;
+    }
+    case Attributes::NumCachedResults::Id: {
+        return YES;
+    }
+    case Attributes::CacheTimeout::Id: {
+        return YES;
+    }
+    case Attributes::CachedResults::Id: {
+        return YES;
+    }
+    case Attributes::WiFiBand::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known CommissioningProxy attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -6440,6 +6489,88 @@ static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttribu
     }
     default: {
         // Not a known ContentAppObserver attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInAudioControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AudioControl;
+    switch (aAttributeId) {
+    case Attributes::SoftMuted::Id: {
+        return YES;
+    }
+    case Attributes::PhysicallyMuted::Id: {
+        return YES;
+    }
+    case Attributes::Volume::Id: {
+        return YES;
+    }
+    case Attributes::MinDeviceVolume::Id: {
+        return YES;
+    }
+    case Attributes::MaxDeviceVolume::Id: {
+        return YES;
+    }
+    case Attributes::MaxDeviceVolumeDB::Id: {
+        return YES;
+    }
+    case Attributes::MaxUserVolume::Id: {
+        return YES;
+    }
+    case Attributes::DefaultStepSize::Id: {
+        return YES;
+    }
+    case Attributes::SetVolumeUnmutePolicy::Id: {
+        return YES;
+    }
+    case Attributes::IncreaseVolumeUnmutePolicy::Id: {
+        return YES;
+    }
+    case Attributes::IncreaseVolumeUnmuteVolume::Id: {
+        return YES;
+    }
+    case Attributes::DecreaseVolumeUnmutePolicy::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMuted::Id: {
+        return YES;
+    }
+    case Attributes::StartUpVolume::Id: {
+        return YES;
+    }
+    case Attributes::Bass::Id: {
+        return YES;
+    }
+    case Attributes::Mid::Id: {
+        return YES;
+    }
+    case Attributes::Treble::Id: {
+        return YES;
+    }
+    case Attributes::MinCorrection::Id: {
+        return YES;
+    }
+    case Attributes::MaxCorrection::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AudioControl attribute.
         return NO;
     }
     }
@@ -7564,6 +7695,34 @@ static BOOL AttributeIsSpecifiedInSampleMEICluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInTestHiddenManufacturerSpecificCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TestHiddenManufacturerSpecific;
+    switch (aAttributeId) {
+    case Attributes::TestAttribute::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known TestHiddenManufacturerSpecific attribute.
+        return NO;
+    }
+    }
+}
 
 BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
 {
@@ -7916,6 +8075,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ThreadNetworkDirectory::Id: {
         return AttributeIsSpecifiedInThreadNetworkDirectoryCluster(aAttributeId);
     }
+    case Clusters::CommissioningProxy::Id: {
+        return AttributeIsSpecifiedInCommissioningProxyCluster(aAttributeId);
+    }
     case Clusters::WakeOnLan::Id: {
         return AttributeIsSpecifiedInWakeOnLANCluster(aAttributeId);
     }
@@ -7957,6 +8119,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ContentAppObserver::Id: {
         return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
+    }
+    case Clusters::AudioControl::Id: {
+        return AttributeIsSpecifiedInAudioControlCluster(aAttributeId);
     }
     case Clusters::ZoneManagement::Id: {
         return AttributeIsSpecifiedInZoneManagementCluster(aAttributeId);
@@ -8014,6 +8179,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::SampleMei::Id: {
         return AttributeIsSpecifiedInSampleMEICluster(aAttributeId);
+    }
+    case Clusters::TestHiddenManufacturerSpecific::Id: {
+        return AttributeIsSpecifiedInTestHiddenManufacturerSpecificCluster(aAttributeId);
     }
     default: {
         return NO;

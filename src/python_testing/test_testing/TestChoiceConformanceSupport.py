@@ -176,6 +176,8 @@ def create_cluster_with_o_and_xxx_choice(more: bool):
 
 
 class TestConformanceSupport(MatterBaseTest):
+    requires_dut = False
+
     def setup_class(self):
         super().setup_class()
 
