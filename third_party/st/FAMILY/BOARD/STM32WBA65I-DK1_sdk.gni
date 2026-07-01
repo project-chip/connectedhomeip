@@ -1,0 +1,79 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  ## PATHS FOR STM32WB BOARD ##
+  stm32_board_src =
+      "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1"
+  stm32_wb_bsp = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/BSP"
+
+  ## PATHS FOR ST UTILITIES ##
+  stm32_util = "${chip_root}/third_party/st/STM32CubeWBA/Utilities"
+}
+
+SOURCES = [
+  # BOARD APPLICATION SRC(in examples/platform/stm32/common/STM32WBA65I-DK1/)
+  "${stm32_board_src}/Src/app_nvm.c",
+  "${stm32_board_src}/Src/app_freertos.c",
+  "${stm32_board_src}/Src/stm32wbaxx_hal_msp.c",
+  "${stm32_board_src}/Src/stm32wbaxx_it.c",
+  "${stm32_board_src}/Src/syscalls.c",
+  "${stm32_board_src}/Src/sysmem.c",
+  "${stm32_board_src}/Src/system_stm32wbaxx.c",
+  "${stm32_board_src}/Src/stm32_factorydata.c",
+  "${stm32_board_src}/Src/entropy_hardware_poll.c",
+
+  "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/matter_config.h",
+  "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/FreeRTOSConfig.h",
+
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_bus.c",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery_lcd.c",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1/stm32wba65i_discovery.c",
+  "${stm32_wb_bsp}/Components/ssd1315/ssd1315.c",
+  "${stm32_wb_bsp}/Components/ssd1315/ssd1315_reg.c",
+
+  # BOARD UTILITIES
+  "${stm32_util}/trace/adv_trace/stm32_adv_trace.c",
+  "${stm32_util}/lpm/tiny_lpm/stm32_lpm.c",
+  "${stm32_util}/misc/stm32_mem.c",
+  "${stm32_util}/misc/stm32_systime.c",
+  "${stm32_util}/misc/stm32_tiny_sscanf.c",
+  "${stm32_util}/misc/stm32_tiny_vsnprintf.c",
+  "${stm32_util}/tim_serv/stm32_timer.c",
+  "${stm32_util}/LCD/stm32_lcd.c",
+]
+
+INCLUDE_DIRS = [
+  "${stm32_util}",
+  "${stm32_board_src}/Inc",
+  "${stm32_board_src}/STM32_WPAN/App",
+  "${stm32_util}/trace/adv_trace",
+  "${stm32_util}/lpm/tiny_lpm",
+  "${stm32_util}/misc",
+  "${stm32_util}/tim_serv",
+  "${stm32_util}/sequencer",
+  "${stm32_util}/LCD",
+  "${stm32_wb_bsp}/STM32WBA65I-DK1",
+  "${stm32_wb_bsp}/Components/ssd1315",
+  "${stm32_wb_bsp}/Components/Common",
+]
+
+DEFINES = []
+
+LIBS = []
+
+FLAGS = []
