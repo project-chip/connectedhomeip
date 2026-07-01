@@ -580,7 +580,18 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, s
     // results in setup payload order.  If we do this, we might want to restrict it to
     // cases when the different payloads have different vendor/product IDs, since if
     // they are all the same product presumably ordering really does not matter.
-    mDiscoveredParameters.emplace_front(connObj, matchedLongDiscriminator);
+    if (mWaitingForPASE)
+    {
+        SetUpCodePairerParameters params;
+        params.SetPeerAddress(Transport::PeerAddress::BLE());
+        params.mLongDiscriminator = matchedLongDiscriminator;
+        mDiscoveredParameters.emplace_front(params);
+    }
+    else
+    {
+        mDiscoveredParameters.emplace_front(connObj, matchedLongDiscriminator);
+    }
+
     ConnectToDiscoveredDevice();
 }
 
