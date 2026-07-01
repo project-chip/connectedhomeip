@@ -65,7 +65,6 @@ ClustersWithAttributeChangedFunctions:
     - Door Lock
     - Pump Configuration and Control
     - Thermostat
-    - Window Covering
     # keep-sorted end
 
 ClustersWithShutdownFunctions:
@@ -174,4 +173,5 @@ CodeDrivenClusters:
     - Water Heater Mode
     - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
+    - Window Covering
     # keep-sorted end

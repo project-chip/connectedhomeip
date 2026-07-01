@@ -11,50 +11,23 @@
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
+ *    See the License for the specific language governing permissions o,and
  *    limitations under the License.
  */
 
-#include "window-covering-server.h"
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/reporting/reporting.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
+#include "WindowCoveringCluster.h"
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WindowCovering/Metadata.h>
 #include <lib/support/TypeTraits.h>
-#include <string.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WindowCovering;
 using chip::Protocols::InteractionModel::Status;
 
-#define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
-#define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
-
-#define FAKE_MOTION_DELAY_MS 5000
-
 namespace {
-
-constexpr size_t kWindowCoveringDelegateTableSize =
-    MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
-
-WindowCoverAttrAccess gAttrAccess;
-
-WindowCoveringDelegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
-
-WindowCoveringDelegate * GetDelegate(EndpointId endpoint)
-{
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kWindowCoveringDelegateTableSize ? nullptr : gDelegateTable[ep]);
-}
 
 /*
  * ConvertValue: Converts values from one range to another
@@ -100,10 +73,6 @@ uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t 
     return outputMax;
 }
 
-Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
-{
-    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
-}
 } // namespace
 
 namespace chip {
@@ -111,217 +80,396 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-CHIP_ERROR WindowCoverAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
+    DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mDelegate(config.mDelegate),
+    mFeatureMap(config.mFeatures), mOptionalAttributes(config.mOptionalAttributes)
 {
-    switch (aPath.mAttributeId)
+    // Lift or Tilt must be enabled.
+    VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift) || mFeatureMap.Has(Feature::kTilt), AppServer,
+                       "Validation failed: Neither Lift nor Tilt is enabled.");
+
+    if (mFeatureMap.Has(Feature::kPositionAwareLift))
     {
-    case Attributes::ClusterRevision::Id:
-        return aEncoder.Encode(WindowCovering::kRevision);
-    default:
-        break;
+        VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift), AppServer,
+                           "Validation failed: PositionAwareLift requires Lift feature.");
     }
+
+    if (mFeatureMap.Has(Feature::kPositionAwareTilt))
+    {
+        VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kTilt), AppServer,
+                           "Validation failed: PositionAwareTilt requires Tilt feature.");
+    }
+}
+
+CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    AttributePersistence attributePersistence(context.attributeStorage);
+
+    // Load persistent attributes from storage. If a value is not present in storage, the
+    // existing member value (set by the constructor) is kept.
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsLift::Id),
+        mNumberOfActuationsLift, mNumberOfActuationsLift);
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsTilt::Id),
+        mNumberOfActuationsTilt, mNumberOfActuationsTilt);
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercentage::Id),
+        mCurrentPositionLiftPercentage, mCurrentPositionLiftPercentage);
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercentage::Id),
+        mCurrentPositionTiltPercentage, mCurrentPositionTiltPercentage);
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercent100ths::Id),
+        mCurrentPositionLiftPercent100ths, mCurrentPositionLiftPercent100ths);
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercent100ths::Id),
+        mCurrentPositionTiltPercent100ths, mCurrentPositionTiltPercent100ths);
+
     return CHIP_NO_ERROR;
 }
 
-bool HasFeature(chip::EndpointId endpoint, Feature feature)
+void WindowCoveringCluster::SetNumberOfActuationsLift(uint16_t numOfLifts)
 {
-    bool hasFeature     = false;
-    uint32_t featureMap = 0;
+    VerifyOrReturn(SetAttributeValue(mNumberOfActuationsLift, numOfLifts, Attributes::NumberOfActuationsLift::Id));
+    VerifyOrReturn(mContext != nullptr);
 
-    Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (Status::Success == status)
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsLift::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&mNumberOfActuationsLift), sizeof(mNumberOfActuationsLift))));
+}
+
+void WindowCoveringCluster::SetNumberOfActuationsTilt(uint16_t numOfTilts)
+{
+    VerifyOrReturn(SetAttributeValue(mNumberOfActuationsTilt, numOfTilts, Attributes::NumberOfActuationsTilt::Id));
+    VerifyOrReturn(mContext != nullptr);
+
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::NumberOfActuationsTilt::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&mNumberOfActuationsTilt), sizeof(mNumberOfActuationsTilt))));
+}
+
+void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
+{
+    SetAttributeValue(mConfigStatus, status, Attributes::ConfigStatus::Id);
+}
+
+void WindowCoveringCluster::SetCurrentPositionLiftPercentage(NPercent curLiftPercentage)
+{
+    VerifyOrReturn(
+        SetAttributeValue(mCurrentPositionLiftPercentage, curLiftPercentage, Attributes::CurrentPositionLiftPercentage::Id));
+    VerifyOrReturn(mContext != nullptr);
+
+    NumericAttributeTraits<Percent>::StorageType storageValue;
+    DataModel::NullableToStorage(curLiftPercentage, storageValue);
+
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercentage::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+}
+
+void WindowCoveringCluster::SetCurrentPositionTiltPercentage(NPercent curTiltPercentage)
+{
+    VerifyOrReturn(
+        SetAttributeValue(mCurrentPositionTiltPercentage, curTiltPercentage, Attributes::CurrentPositionTiltPercentage::Id));
+    VerifyOrReturn(mContext != nullptr);
+
+    NumericAttributeTraits<Percent>::StorageType storageValue;
+    DataModel::NullableToStorage(curTiltPercentage, storageValue);
+
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercentage::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+}
+
+void WindowCoveringCluster::SetOperationalStatus(chip::BitMask<OperationalStatus> newStatus)
+{
+    SetAttributeValue(mOperationalStatus, newStatus, Attributes::OperationalStatus::Id);
+}
+
+void WindowCoveringCluster::SetTargetPositionLiftPercent100ths(NPercent100ths newTargetLift)
+{
+    VerifyOrReturn(
+        SetAttributeValue(mTargetPositionLiftPercent100ths, newTargetLift, Attributes::TargetPositionLiftPercent100ths::Id));
+
+    OperationalState opLift = OperationalState::Stall;
+    if (!mTargetPositionLiftPercent100ths.IsNull() && !mCurrentPositionLiftPercent100ths.IsNull() &&
+        mCurrentPositionLiftPercent100ths.Value() != mTargetPositionLiftPercent100ths.Value())
     {
-        hasFeature = (featureMap & chip::to_underlying(feature));
+        opLift = (mCurrentPositionLiftPercent100ths.Value() < mTargetPositionLiftPercent100ths.Value())
+            ? OperationalState::MovingDownOrClose
+            : OperationalState::MovingUpOrOpen;
+    }
+    UpdateOperationalStateForField(OperationalStatus::kLift, opLift);
+}
+
+void WindowCoveringCluster::SetTargetPositionTiltPercent100ths(NPercent100ths newTargetTilt)
+{
+    VerifyOrReturn(
+        SetAttributeValue(mTargetPositionTiltPercent100ths, newTargetTilt, Attributes::TargetPositionTiltPercent100ths::Id));
+
+    OperationalState opTilt = OperationalState::Stall;
+    if (!mTargetPositionTiltPercent100ths.IsNull() && !mCurrentPositionTiltPercent100ths.IsNull() &&
+        mCurrentPositionTiltPercent100ths.Value() != mTargetPositionTiltPercent100ths.Value())
+    {
+        opTilt = (mCurrentPositionTiltPercent100ths.Value() < mTargetPositionTiltPercent100ths.Value())
+            ? OperationalState::MovingDownOrClose
+            : OperationalState::MovingUpOrOpen;
+    }
+    UpdateOperationalStateForField(OperationalStatus::kTilt, opTilt);
+}
+
+void WindowCoveringCluster::SetEndProductType(EndProductType type)
+{
+    SetAttributeValue(mEndProductType, type, Attributes::EndProductType::Id);
+}
+
+void WindowCoveringCluster::SetCurrentPositionLiftPercent100ths(NPercent100ths curLiftPercent100ths)
+{
+    VerifyOrReturn(SetAttributeValue(mCurrentPositionLiftPercent100ths, curLiftPercent100ths,
+                                     Attributes::CurrentPositionLiftPercent100ths::Id));
+    VerifyOrReturn(mContext != nullptr);
+
+    NumericAttributeTraits<Percent100ths>::StorageType storageValue;
+    DataModel::NullableToStorage(curLiftPercent100ths, storageValue);
+
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionLiftPercent100ths::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+
+    OperationalState opLift = static_cast<OperationalState>(mOperationalStatus.GetField(OperationalStatus::kLift));
+    if ((OperationalState::Stall != opLift) && (mCurrentPositionLiftPercent100ths == mTargetPositionLiftPercent100ths))
+    {
+        UpdateOperationalStateForField(OperationalStatus::kLift, OperationalState::Stall);
+    }
+}
+
+void WindowCoveringCluster::SetCurrentPositionTiltPercent100ths(NPercent100ths curTiltPercent100ths)
+{
+    VerifyOrReturn(SetAttributeValue(mCurrentPositionTiltPercent100ths, curTiltPercent100ths,
+                                     Attributes::CurrentPositionTiltPercent100ths::Id));
+    VerifyOrReturn(mContext != nullptr);
+
+    NumericAttributeTraits<Percent100ths>::StorageType storageValue;
+    DataModel::NullableToStorage(curTiltPercent100ths, storageValue);
+
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::CurrentPositionTiltPercent100ths::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+
+    OperationalState opTilt = static_cast<OperationalState>(mOperationalStatus.GetField(OperationalStatus::kTilt));
+    if ((OperationalState::Stall != opTilt) && (mCurrentPositionTiltPercent100ths == mTargetPositionTiltPercent100ths))
+    {
+        UpdateOperationalStateForField(OperationalStatus::kTilt, OperationalState::Stall);
+    }
+}
+
+void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
+{
+    if (mode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
+    {
+        mode.Clear(Mode::kCalibrationMode);
     }
 
-    return hasFeature;
+    VerifyOrReturn(SetAttributeValue(mMode, mode, Attributes::Mode::Id));
+
+    chip::BitMask<ConfigStatus> newStatus = mConfigStatus;
+    newStatus.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    newStatus.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
+    SetConfigStatus(newStatus);
 }
 
-bool HasFeaturePaLift(chip::EndpointId endpoint)
+void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)
 {
-    return (HasFeature(endpoint, Feature::kLift) && HasFeature(endpoint, Feature::kPositionAwareLift));
+    SetAttributeValue(mSafetyStatus, status, Attributes::SafetyStatus::Id);
 }
 
-bool HasFeaturePaTilt(chip::EndpointId endpoint)
+DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                   AttributeValueEncoder & encoder)
 {
-    return (HasFeature(endpoint, Feature::kTilt) && HasFeature(endpoint, Feature::kPositionAwareTilt));
-}
-
-void TypeSet(chip::EndpointId endpoint, Type type)
-{
-    Attributes::Type::Set(endpoint, type);
-}
-
-Type TypeGet(chip::EndpointId endpoint)
-{
-    Type value;
-    Attributes::Type::Get(endpoint, &value);
-    return value;
-}
-
-void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus)
-{
-    ChipLogProgress(Zcl, "ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
-                    configStatus.Has(ConfigStatus::kOperational), configStatus.Has(ConfigStatus::kOnlineReserved));
-
-    ChipLogProgress(Zcl, "Lift(PA=%u Encoder=%u Reversed=%u) Tilt(PA=%u Encoder=%u)",
-                    configStatus.Has(ConfigStatus::kLiftPositionAware), configStatus.Has(ConfigStatus::kLiftEncoderControlled),
-                    configStatus.Has(ConfigStatus::kLiftMovementReversed), configStatus.Has(ConfigStatus::kTiltPositionAware),
-                    configStatus.Has(ConfigStatus::kTiltEncoderControlled));
-}
-
-void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus> & configStatus)
-{
-    Attributes::ConfigStatus::Set(endpoint, configStatus);
-}
-
-chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<ConfigStatus> configStatus;
-    Attributes::ConfigStatus::Get(endpoint, &configStatus);
-
-    return configStatus;
-}
-
-void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
-{
-    chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
-
-    configStatus.Set(ConfigStatus::kLiftPositionAware, HasFeaturePaLift(endpoint));
-    configStatus.Set(ConfigStatus::kTiltPositionAware, HasFeaturePaTilt(endpoint));
-
-    if (!HasFeaturePaLift(endpoint))
-        configStatus.Clear(ConfigStatus::kLiftEncoderControlled);
-
-    if (!HasFeaturePaTilt(endpoint))
-        configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
-
-    ConfigStatusSet(endpoint, configStatus);
-}
-
-void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus)
-{
-    ChipLogProgress(Zcl, "OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u", opStatus.Raw(),
-                    opStatus.GetField(OperationalStatus::kGlobal), opStatus.GetField(OperationalStatus::kLift),
-                    opStatus.GetField(OperationalStatus::kTilt));
-}
-
-chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<OperationalStatus> status;
-
-    Attributes::OperationalStatus::Get(endpoint, &status);
-
-    return status;
-}
-
-void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalStatus> newStatus)
-{
-    chip::BitMask<OperationalStatus> prevStatus;
-    Attributes::OperationalStatus::Get(endpoint, &prevStatus);
-
-    // Filter changes
-    if (newStatus != prevStatus)
+    switch (request.path.mAttributeId)
     {
-        OperationalStatusPrint(newStatus);
-        Attributes::OperationalStatus::Set(endpoint, newStatus);
+    case Attributes::ClusterRevision::Id:
+        return encoder.Encode(WindowCovering::kRevision);
+    case Attributes::FeatureMap::Id:
+        return encoder.Encode(GetFeatureMap());
+    case Attributes::Type::Id:
+        return encoder.Encode(GetType());
+    case Attributes::NumberOfActuationsLift::Id:
+        return encoder.Encode(GetNumberOfActuationsLift());
+    case Attributes::NumberOfActuationsTilt::Id:
+        return encoder.Encode(GetNumberOfActuationsTilt());
+    case Attributes::ConfigStatus::Id:
+        return encoder.Encode(GetConfigStatus());
+    case Attributes::CurrentPositionLiftPercentage::Id:
+        return encoder.Encode(GetCurrentPositionLiftPercentage());
+    case Attributes::CurrentPositionTiltPercentage::Id:
+        return encoder.Encode(GetCurrentPositionTiltPercentage());
+    case Attributes::OperationalStatus::Id:
+        return encoder.Encode(GetOperationalStatus());
+    case Attributes::TargetPositionLiftPercent100ths::Id:
+        return encoder.Encode(GetTargetPositionLiftPercent100ths());
+    case Attributes::TargetPositionTiltPercent100ths::Id:
+        return encoder.Encode(GetTargetPositionTiltPercent100ths());
+    case Attributes::EndProductType::Id:
+        return encoder.Encode(GetEndProductType());
+    case Attributes::CurrentPositionLiftPercent100ths::Id:
+        return encoder.Encode(GetCurrentPositionLiftPercent100ths());
+    case Attributes::CurrentPositionTiltPercent100ths::Id:
+        return encoder.Encode(GetCurrentPositionTiltPercent100ths());
+    case Attributes::Mode::Id:
+        return encoder.Encode(GetMode());
+    case Attributes::SafetyStatus::Id:
+        return encoder.Encode(GetSafetyStatus());
+    default:
+        return Status::UnsupportedAttribute;
     }
 }
 
-void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field, OperationalState state)
+DataModel::ActionReturnStatus WindowCoveringCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                    AttributeValueDecoder & decoder)
 {
-    chip::BitMask<OperationalStatus> status;
-    Attributes::OperationalStatus::Get(endpoint, &status);
+    switch (request.path.mAttributeId)
+    {
+    case Attributes::Mode::Id: {
+        chip::BitMask<Mode> mode;
+        ReturnErrorOnFailure(decoder.Decode(mode));
+        VerifyOrReturnValue(mode.Raw() <= 0x0F, Status::ConstraintError);
+        // TODO: Spec 5.3.6.14.2: "In a write interaction, setting this bit to 0, while the device
+        // is in calibration mode, is not allowed and SHALL generate a FAILURE error status. In order
+        // to leave calibration mode, the device must perform its calibration routine, either as a
+        // self-calibration or assisted by external tool(s), depending on the device/manufacturer
+        // implementation."
+        // Disabled because Test_TC_WNCV_2_3 Step 2d writes Mode=0x00 to exit calibration,
+        // which contradicts the spec. Needs test update
+        // VerifyOrReturnValue(!mMode.Has(Mode::kCalibrationMode) || mode.Has(Mode::kCalibrationMode), Status::Failure);
+        SetMode(mode);
+        return Status::Success;
+    }
+    default:
+        return Status::UnsupportedWrite;
+    }
+}
 
-    /* Filter only Lift or Tilt action since we cannot allow global reflecting a state alone */
+CHIP_ERROR WindowCoveringCluster::Attributes(const ConcreteClusterPath & path,
+                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mOptionalAttributes.IsSet(Attributes::NumberOfActuationsLift::Id), Attributes::NumberOfActuationsLift::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::NumberOfActuationsTilt::Id), Attributes::NumberOfActuationsTilt::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::CurrentPositionLiftPercentage::Id),
+          Attributes::CurrentPositionLiftPercentage::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareLift), Attributes::TargetPositionLiftPercent100ths::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareLift), Attributes::CurrentPositionLiftPercent100ths::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::CurrentPositionTiltPercentage::Id),
+          Attributes::CurrentPositionTiltPercentage::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareTilt), Attributes::TargetPositionTiltPercent100ths::kMetadataEntry },
+        { GetFeatureMap().Has(Feature::kPositionAwareTilt), Attributes::CurrentPositionTiltPercent100ths::kMetadataEntry },
+        { mOptionalAttributes.IsSet(Attributes::SafetyStatus::Id), Attributes::SafetyStatus::kMetadataEntry },
+    };
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
+}
+
+CHIP_ERROR WindowCoveringCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    static constexpr DataModel::AcceptedCommandEntry kMandatoryCommands[] = {
+        Commands::UpOrOpen::kMetadataEntry,
+        Commands::DownOrClose::kMetadataEntry,
+        Commands::StopMotion::kMetadataEntry,
+    };
+
+    static constexpr DataModel::AcceptedCommandEntry kGoToLiftPercentageCommand[] = {
+        Commands::GoToLiftPercentage::kMetadataEntry,
+    };
+
+    static constexpr DataModel::AcceptedCommandEntry kGoToTiltPercentageCommand[] = {
+        Commands::GoToTiltPercentage::kMetadataEntry,
+    };
+
+    if (GetFeatureMap().Has(Feature::kLift))
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kGoToLiftPercentageCommand));
+    }
+
+    if (GetFeatureMap().Has(Feature::kTilt))
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kGoToTiltPercentageCommand));
+    }
+
+    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
+
+    return CHIP_NO_ERROR;
+}
+
+std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                  chip::TLV::TLVReader & input_arguments,
+                                                                                  CommandHandler * handler)
+{
+    VerifyOrReturnValue(handler != nullptr, Status::Failure);
+
+    switch (request.path.mCommandId)
+    {
+    case Commands::UpOrOpen::Id:
+        return HandleUpOrOpen();
+    case Commands::DownOrClose::Id:
+        return HandleDownOrClose();
+    case Commands::StopMotion::Id: {
+        Commands::StopMotion::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandleStopMotion(commandData);
+    }
+    case Commands::GoToLiftPercentage::Id: {
+        Commands::GoToLiftPercentage::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandleGoToLiftPercentage(commandData);
+    }
+    case Commands::GoToTiltPercentage::Id: {
+        Commands::GoToTiltPercentage::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandleGoToTiltPercentage(commandData);
+    }
+    default:
+        return Status::UnsupportedCommand;
+    }
+}
+
+void WindowCoveringCluster::UpdateOperationalStateForField(chip::BitMask<OperationalStatus> field, OperationalState state)
+{
     if ((OperationalStatus::kLift == field) || (OperationalStatus::kTilt == field))
     {
+        chip::BitMask<OperationalStatus> status = mOperationalStatus;
         status.SetField(field, static_cast<uint8_t>(state));
-        status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
-
-        /* Global Always follow Lift by priority or therefore fallback to Tilt */
         chip::BitMask<OperationalStatus> opGlobal =
             status.HasAny(OperationalStatus::kLift) ? OperationalStatus::kLift : OperationalStatus::kTilt;
         status.SetField(OperationalStatus::kGlobal, status.GetField(opGlobal));
-
-        OperationalStatusSet(endpoint, status);
+        SetOperationalStatus(status);
     }
 }
 
-OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field)
+std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::GetMotionLockStatus() const
 {
-    chip::BitMask<OperationalStatus> status;
-
-    Attributes::OperationalStatus::Get(endpoint, &status);
-
-    return static_cast<OperationalState>(status.GetField(field));
-}
-
-void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
-{
-    Attributes::EndProductType::Set(endpoint, type);
-}
-
-EndProductType EndProductTypeGet(chip::EndpointId endpoint)
-{
-    EndProductType value;
-    Attributes::EndProductType::Get(endpoint, &value);
-
-    return value;
-}
-
-void ModePrint(const chip::BitMask<Mode> & mode)
-{
-    ChipLogProgress(Zcl, "Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
-                    mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback), mode.Has(Mode::kMaintenanceMode),
-                    mode.Has(Mode::kCalibrationMode));
-}
-
-void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
-{
-    chip::BitMask<ConfigStatus> newStatus;
-
-    chip::BitMask<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
-    chip::BitMask<Mode> oldMode           = ModeGet(endpoint);
-
-    newStatus = oldStatus;
-
-    // Attribute: ConfigStatus reflects the following current mode flags
-    newStatus.Set(ConfigStatus::kOperational, !newMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
-    newStatus.Set(ConfigStatus::kLiftMovementReversed, newMode.Has(Mode::kMotorDirectionReversed));
-
-    // Verify only one mode supported at once and maintenance lock goes over calibration
-    if (newMode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
+    // Is the device locked?
+    if (!mConfigStatus.Has(ConfigStatus::kOperational))
     {
-        newMode.Clear(Mode::kCalibrationMode);
+        if (mMode.Has(Mode::kMaintenanceMode))
+        {
+            // Maintenance Mode
+            return Status::Busy;
+        }
+
+        if (mMode.Has(Mode::kCalibrationMode))
+        {
+            // Calibration Mode
+            return Status::Failure;
+        }
     }
 
-    if (oldMode != newMode)
-        Attributes::Mode::Set(endpoint, newMode);
-
-    if (oldStatus != newStatus)
-        ConfigStatusSet(endpoint, newStatus);
-}
-
-chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<Mode> mode;
-
-    Attributes::Mode::Get(endpoint, &mode);
-    return mode;
-}
-
-void SafetyStatusSet(chip::EndpointId endpoint, chip::BitMask<SafetyStatus> & newSafetyStatus)
-{
-    Attributes::SafetyStatus::Set(endpoint, newSafetyStatus);
-}
-
-chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<SafetyStatus> safetyStatus;
-
-    Attributes::SafetyStatus::Get(endpoint, &safetyStatus);
-    return safetyStatus;
+    return Status::Success;
 }
 
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
@@ -345,12 +493,19 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
     return LimitStatus::Intermediate;
 }
 
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
+{
+    return ConvertValue(kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, limits.open, limits.closed, relative);
+}
+
+uint16_t ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
+{
+    return ConvertValue(limits.open, limits.closed, kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, absolute);
+}
+
 bool IsPercent100thsValid(Percent100ths percent100ths)
 {
-    if (CHECK_BOUNDS_VALID(WC_PERCENT100THS_MIN_OPEN, percent100ths, WC_PERCENT100THS_MAX_CLOSED))
-        return true;
-
-    return false;
+    return (percent100ths >= kWcPercent100thsMinOpen) && (percent100ths <= kWcPercent100thsMaxClosed);
 }
 
 bool IsPercent100thsValid(NPercent100ths percent100ths)
@@ -363,629 +518,153 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
     return true;
 }
 
-uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
+std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOpen()
 {
-    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
-}
+    ChipLogProgress(Zcl, "UpOrOpen command received");
 
-uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
+    VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
 
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-    return ValueToPercent100ths(limits, lift);
-}
-
-uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-    return Percent100thsToValue(limits, percent100ths);
-}
-
-void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
-{
-    NPercent percent;
-    NAbsolute rawpos;
-
-    if (percent100ths.IsNull())
+    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
-        percent.SetNull();
-        rawpos.SetNull();
-        ChipLogProgress(Zcl, "Lift[%u] Position Set to Null", endpoint);
-    }
-    else
-    {
-        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
-        rawpos.SetNonNull(Percent100thsToLift(endpoint, percent100ths.Value()));
-        ChipLogProgress(Zcl, "Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
-    }
-    Attributes::CurrentPositionLift::Set(endpoint, rawpos);
-    Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
-    Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, percent100ths);
-}
-
-uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-
-    return ValueToPercent100ths(limits, tilt);
-}
-
-uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-
-    return Percent100thsToValue(limits, percent100ths);
-}
-
-void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
-{
-    NPercent percent;
-    NAbsolute rawpos;
-
-    if (percent100ths.IsNull())
-    {
-        percent.SetNull();
-        rawpos.SetNull();
-        ChipLogProgress(Zcl, "Tilt[%u] Position Set to Null", endpoint);
-    }
-    else
-    {
-        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
-        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
-        ChipLogProgress(Zcl, "Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
-    }
-    Attributes::CurrentPositionTilt::Set(endpoint, rawpos);
-    Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
-    Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
-}
-
-OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
-{
-    OperationalState opState = OperationalState::Stall;
-
-    if (current != target)
-    {
-        opState = (current < target) ? OperationalState::MovingDownOrClose : OperationalState::MovingUpOrOpen;
-    }
-    return opState;
-}
-
-OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current)
-{
-    if (!current.IsNull() && !target.IsNull())
-    {
-        return ComputeOperationalState(target.Value(), current.Value());
-    }
-    return OperationalState::Stall;
-}
-
-Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths previous, Percent100ths delta)
-{
-    Percent100ths percent100ths = previous;
-
-    switch (direction)
-    {
-    case OperationalState::MovingDownOrClose:
-        if (percent100ths < (WC_PERCENT100THS_MAX_CLOSED - delta))
-        {
-            percent100ths = static_cast<Percent100ths>(percent100ths + delta);
-        }
-        else
-        {
-            percent100ths = WC_PERCENT100THS_MAX_CLOSED;
-        }
-        break;
-    case OperationalState::MovingUpOrOpen:
-        if (percent100ths > (WC_PERCENT100THS_MIN_OPEN + delta))
-        {
-            percent100ths = static_cast<Percent100ths>(percent100ths - delta);
-        }
-        else
-        {
-            percent100ths = WC_PERCENT100THS_MIN_OPEN;
-        }
-        break;
-    default:
-        // nothing to do we keep previous value, simple passthrought
-        break;
+        SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
 
-    if (percent100ths > WC_PERCENT100THS_MAX_CLOSED)
-        return WC_PERCENT100THS_MAX_CLOSED;
-
-    return percent100ths;
-}
-
-void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
-{
-    // all-cluster-app: simulation for the CI testing
-    // otherwise it is defined for manufacturer specific implementation */
-    BitMask<Mode> mode;
-    BitMask<ConfigStatus> configStatus;
-    NPercent100ths current, target;
-
-    ChipLogProgress(Zcl, "WC POST ATTRIBUTE=%u", (unsigned int) attributeId);
-
-    OperationalState opLift = OperationalStateGet(endpoint, OperationalStatus::kLift);
-    OperationalState opTilt = OperationalStateGet(endpoint, OperationalStatus::kTilt);
-
-    switch (attributeId)
+    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
     {
-    /* ============= Positions for Position Aware ============= */
-    case Attributes::CurrentPositionLiftPercent100ths::Id:
-        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
-        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-        if ((OperationalState::Stall != opLift) && (current == target))
-        {
-            ChipLogProgress(Zcl, "Lift stop");
-            OperationalStateSet(endpoint, OperationalStatus::kLift, OperationalState::Stall);
-        }
-        break;
-    case Attributes::CurrentPositionTiltPercent100ths::Id:
-        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
-        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-        if ((OperationalState::Stall != opTilt) && (current == target))
-        {
-            ChipLogProgress(Zcl, "Tilt stop");
-            OperationalStateSet(endpoint, OperationalStatus::kTilt, OperationalState::Stall);
-        }
-        break;
-    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
-    case Attributes::TargetPositionLiftPercent100ths::Id:
-        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
-        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-        opLift = ComputeOperationalState(target, current);
-        OperationalStateSet(endpoint, OperationalStatus::kLift, opLift);
-        break;
-    /* For a device supporting Position Awareness : Changing the Target triggers motions on the real or simulated device */
-    case Attributes::TargetPositionTiltPercent100ths::Id:
-        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
-        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-        opTilt = ComputeOperationalState(target, current);
-        OperationalStateSet(endpoint, OperationalStatus::kTilt, opTilt);
-        break;
-    /* Mode change is either internal from the application or external from a write request */
-    case Attributes::Mode::Id:
-        mode = ModeGet(endpoint);
-        ModePrint(mode);
-        ModeSet(endpoint, mode); // refilter mode if needed
-        break;
-    case Attributes::ConfigStatus::Id:
-        configStatus = ConfigStatusGet(endpoint);
-        ConfigStatusPrint(configStatus);
-        break;
-    default:
-        break;
-    }
-}
-
-Status GetMotionLockStatus(chip::EndpointId endpoint)
-{
-    BitMask<Mode> mode = ModeGet(endpoint);
-
-    if (mode.Has(Mode::kMaintenanceMode))
-    {
-        // Mainterance Mode
-        return Status::Busy;
+        SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMinOpen));
     }
 
-    if (mode.Has(Mode::kCalibrationMode))
+    if (GetFeatureMap().Has(Feature::kLift))
     {
-        // Calibration Mode
-        return Status::Failure;
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
+    }
+    if (GetFeatureMap().Has(Feature::kTilt))
+    {
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
     }
 
     return Status::Success;
 }
 
-void SetDefaultDelegate(EndpointId endpoint, WindowCoveringDelegate * delegate)
+std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleDownOrClose()
 {
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
+    ChipLogProgress(Zcl, "DownOrClose command received");
 
-    // if endpoint is found
-    if (ep < kWindowCoveringDelegateTableSize)
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
+    VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
+
+    if (GetFeatureMap().Has(Feature::kPositionAwareLift))
     {
-        gDelegateTable[ep] = delegate;
+        SetTargetPositionLiftPercent100ths(NPercent100ths(kWcPercent100thsMaxClosed));
+    }
+    if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    {
+        SetTargetPositionTiltPercent100ths(NPercent100ths(kWcPercent100thsMaxClosed));
+    }
+
+    if (GetFeatureMap().Has(Feature::kLift))
+    {
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
+    }
+    if (GetFeatureMap().Has(Feature::kTilt))
+    {
+        LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
+    }
+
+    return Status::Success;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleStopMotion(const Commands::StopMotion::DecodableType & fields)
+{
+    ChipLogProgress(Zcl, "StopMotion command received");
+
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
+    VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
+
+    bool changeTarget = true;
+
+    CHIP_ERROR err = mDelegate.HandleStopMotion();
+    if (err == CHIP_ERROR_IN_PROGRESS)
+    {
+        changeTarget = false;
     }
     else
     {
-        ChipLogProgress(Zcl, "Failed to set WindowCovering delegate for endpoint:%u", endpoint);
+        LogErrorOnFailure(err);
     }
+
+    if (changeTarget)
+    {
+        if (GetFeatureMap().Has(Feature::kPositionAwareLift))
+        {
+            SetTargetPositionLiftPercent100ths(GetCurrentPositionLiftPercent100ths());
+        }
+        if (GetFeatureMap().Has(Feature::kPositionAwareTilt))
+        {
+            SetTargetPositionTiltPercent100ths(GetCurrentPositionTiltPercent100ths());
+        }
+    }
+
+    return Status::Success;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields)
+{
+    const Percent100ths percent100ths = fields.liftPercent100thsValue;
+
+    ChipLogProgress(Zcl, "GoToLiftPercentage %u command received", percent100ths);
+
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
+    VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
+
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kLift), Status::UnsupportedCommand,
+                        ChipLogProgress(Zcl, "Err Device is tilt-only"));
+
+    if (!GetFeatureMap().Has(Feature::kPositionAwareLift))
+    {
+        return (percent100ths == 0) ? HandleUpOrOpen() : HandleDownOrClose();
+    }
+
+    VerifyOrReturnValue(IsPercent100thsValid(percent100ths), Status::ConstraintError);
+
+    SetTargetPositionLiftPercent100ths(NPercent100ths(percent100ths));
+
+    LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Lift));
+
+    return Status::Success;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+WindowCoveringCluster::HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields)
+{
+    const Percent100ths percent100ths = fields.tiltPercent100thsValue;
+
+    ChipLogProgress(Zcl, "GoToTiltPercentage %u command received", percent100ths);
+
+    std::optional<DataModel::ActionReturnStatus> lockStatus = GetMotionLockStatus();
+    VerifyOrReturnValue(lockStatus == Status::Success, lockStatus, ChipLogProgress(Zcl, "Err device locked"));
+
+    VerifyOrReturnValue(GetFeatureMap().Has(Feature::kTilt), Status::UnsupportedCommand,
+                        ChipLogProgress(Zcl, "Err Device is lift-only"));
+
+    if (!GetFeatureMap().Has(Feature::kPositionAwareTilt))
+    {
+        return (percent100ths == 0) ? HandleUpOrOpen() : HandleDownOrClose();
+    }
+
+    VerifyOrReturnValue(IsPercent100thsValid(percent100ths), Status::ConstraintError);
+
+    SetTargetPositionTiltPercent100ths(NPercent100ths(percent100ths));
+
+    LogErrorOnFailure(mDelegate.HandleMovement(WindowCoveringType::Tilt));
+
+    return Status::Success;
 }
 
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-//------------------------------------------------------------------------------
-// Callbacks
-//------------------------------------------------------------------------------
-
-/**
- * @brief  Cluster UpOrOpen Command callback (from client)
- */
-bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                  const Commands::UpOrOpen::DecodableType & commandData)
-{
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "UpOrOpen command received");
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeature(endpoint, Feature::kPositionAwareLift))
-    {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
-    }
-    if (HasFeature(endpoint, Feature::kPositionAwareTilt))
-    {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
-    }
-
-    WindowCoveringDelegate * delegate = GetDelegate(endpoint);
-    if (delegate)
-    {
-        if (HasFeature(endpoint, Feature::kPositionAwareLift))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-        }
-
-        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-    }
-
-    commandObj->AddStatus(commandPath, Status::Success);
-
-    return true;
-}
-
-/**
- * @brief  Cluster DownOrClose Command callback (from client)
- */
-bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::DownOrClose::DecodableType & commandData)
-{
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "DownOrClose command received");
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeature(endpoint, Feature::kPositionAwareLift))
-    {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
-    }
-    if (HasFeature(endpoint, Feature::kPositionAwareTilt))
-    {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
-    }
-    commandObj->AddStatus(commandPath, Status::Success);
-
-    WindowCoveringDelegate * delegate = GetDelegate(endpoint);
-    if (delegate)
-    {
-        if (HasFeature(endpoint, Feature::kPositionAwareLift))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-        }
-
-        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-    }
-
-    return true;
-}
-
-/**
- * @brief  Cluster StopMotion Command callback (from client)
- */
-bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::StopMotion::DecodableType & fields)
-{
-    app::DataModel::Nullable<Percent100ths> current;
-    chip::EndpointId endpoint = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "StopMotion command received");
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    bool changeTarget = true;
-
-    WindowCoveringDelegate * delegate = GetDelegate(endpoint);
-    if (delegate)
-    {
-        CHIP_ERROR err = delegate->HandleStopMotion();
-        if (err == CHIP_ERROR_IN_PROGRESS)
-        {
-            changeTarget = false;
-        }
-        else
-        {
-            LogErrorOnFailure(err);
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-    }
-
-    if (changeTarget)
-    {
-        if (HasFeaturePaLift(endpoint))
-        {
-            (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-            (void) Attributes::TargetPositionLiftPercent100ths::Set(endpoint, current);
-        }
-
-        if (HasFeaturePaTilt(endpoint))
-        {
-            (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-            (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
-        }
-    }
-
-    commandObj->AddStatus(commandPath, Status::Success);
-    return true;
-}
-
-/**
- * @brief  Cluster GoToLiftValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GoToLiftValue::DecodableType & commandData)
-{
-    auto & liftValue = commandData.liftValue;
-
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "GoToLiftValue %u command received", liftValue);
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
-    {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
-        WindowCoveringDelegate * delegate = GetDelegate(endpoint);
-        if (delegate)
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-        }
-        else
-        {
-            ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-        }
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Err Device is not PA LF");
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
-    return true;
-}
-
-/**
- * @brief  Cluster GoToLiftPercentage Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler * commandObj,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::GoToLiftPercentage::DecodableType & commandData)
-{
-    Percent100ths percent100ths = commandData.liftPercent100thsValue;
-    EndpointId endpoint         = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "GoToLiftPercentage %u command received", percent100ths);
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeaturePaLift(endpoint))
-    {
-        if (IsPercent100thsValid(percent100ths))
-        {
-            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, percent100ths);
-            WindowCoveringDelegate * delegate = GetDelegate(endpoint);
-            if (delegate)
-            {
-                LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-            }
-            else
-            {
-                ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-            }
-            commandObj->AddStatus(commandPath, Status::Success);
-        }
-        else
-        {
-            commandObj->AddStatus(commandPath, Status::ConstraintError);
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Err Device is not PA LF");
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
-    return true;
-}
-
-/**
- * @brief  Cluster GoToTiltValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GoToTiltValue::DecodableType & commandData)
-{
-    auto & tiltValue = commandData.tiltValue;
-
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "GoToTiltValue %u command received", tiltValue);
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
-    {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
-        WindowCoveringDelegate * delegate = GetDelegate(endpoint);
-        if (delegate)
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-        }
-        else
-        {
-            ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-        }
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Err Device is not PA TL");
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
-    return true;
-}
-
-/**
- * @brief  Cluster GoToTiltPercentage Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler * commandObj,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::GoToTiltPercentage::DecodableType & commandData)
-{
-    Percent100ths percent100ths = commandData.tiltPercent100thsValue;
-    EndpointId endpoint         = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "GoToTiltPercentage %u command received", percent100ths);
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeaturePaTilt(endpoint))
-    {
-        if (IsPercent100thsValid(percent100ths))
-        {
-            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, percent100ths);
-            WindowCoveringDelegate * delegate = GetDelegate(endpoint);
-            if (delegate)
-            {
-                LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-            }
-            else
-            {
-                ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-            }
-            commandObj->AddStatus(commandPath, Status::Success);
-        }
-        else
-        {
-            commandObj->AddStatus(commandPath, Status::ConstraintError);
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Err Device is not PA TL");
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
-    return true;
-}
-
-/**
- * @brief Cluster Attribute Changed Callback
- *
- * The method is implemented by default as a weak function and it takes care of updating
- * the server attribute values by calling the PostAttributeChange method. If the application overrides
- * this method, it needs to handle updating attributes (ideally by calling PostAttributeChange).
- *
- */
-void __attribute__((weak))
-MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
-{
-    PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
-}
-
-/**
- * @brief Cluster Plugin Init Callback
- */
-void MatterWindowCoveringPluginServerInitCallback()
-{
-    app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-}
-
-void MatterWindowCoveringPluginServerShutdownCallback()
-{
-    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
-}

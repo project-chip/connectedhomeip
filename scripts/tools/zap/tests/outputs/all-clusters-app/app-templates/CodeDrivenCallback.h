@@ -226,6 +226,10 @@ void MatterDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpoi
 
 void MatterDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterWindowCoveringClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterWindowCoveringClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterFanControlClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterFanControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
