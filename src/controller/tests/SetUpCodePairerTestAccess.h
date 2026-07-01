@@ -46,7 +46,10 @@ public:
     CHIP_ERROR GetLastPASEError() const { return mPairer->mLastPASEError; }
 
     size_t GetDiscoveredParametersCount() const { return mPairer->mDiscoveredParameters.size(); }
-    const Controller::SetUpCodePairerParameters & FrontDiscoveredParameters() const { return mPairer->mDiscoveredParameters.front(); }
+    const Controller::SetUpCodePairerParameters & FrontDiscoveredParameters() const
+    {
+        return mPairer->mDiscoveredParameters.front();
+    }
 
     bool HasCurrentPASEParameters() const { return mPairer->mCurrentPASEParameters.HasValue(); }
     void SetCurrentPASEParameters(const Controller::SetUpCodePairerParameters & params)
