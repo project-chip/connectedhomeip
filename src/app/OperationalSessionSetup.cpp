@@ -63,12 +63,12 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
         }
 #endif
 
-        mState = aTargetState;
-
         if (aTargetState != State::Connecting)
         {
             CleanupCASEClient();
         }
+
+        mState = aTargetState;
     }
 }
 
@@ -504,6 +504,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, error);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
 
+    CleanupCASEClient();
     DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -531,6 +532,7 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
     {
         // Got an invalid session, just dispatch an error.  We have to do this
         // so we don't leak.
+        CleanupCASEClient();
         DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
 
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
@@ -544,10 +546,35 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
 
 void OperationalSessionSetup::CleanupCASEClient()
 {
-    if (mCASEClient)
+    CASEClient * caseClient = mCASEClient;
+    if (caseClient == nullptr)
     {
-        mClientPool->Release(mCASEClient);
-        mCASEClient = nullptr;
+        return;
+    }
+
+    CASEClientPoolDelegate * clientPool = mClientPool;
+    mCASEClient                       = nullptr;
+
+    VerifyOrReturn(clientPool != nullptr, ChipLogError(Discovery, "Cannot release CASEClient without a client pool"));
+
+    auto releaseClient = [clientPool, caseClient]() { clientPool->Release(caseClient); };
+
+    if (mState != State::Connecting)
+    {
+        releaseClient();
+        return;
+    }
+
+    auto * systemLayer = mInitParams.sessionManager == nullptr ? nullptr : mInitParams.sessionManager->SystemLayer();
+    VerifyOrReturn(systemLayer != nullptr,
+                   ChipLogError(Discovery, "Cannot schedule deferred CASEClient release without a SystemLayer"));
+
+    CHIP_ERROR err = systemLayer->ScheduleLambda(releaseClient);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to schedule deferred CASEClient release: %" CHIP_ERROR_FORMAT
+                                "; leaking client to avoid re-entrant destruction",
+                     err.Format());
     }
 }
 
@@ -571,8 +598,10 @@ OperationalSessionSetup::~OperationalSessionSetup()
 
     if (mCASEClient)
     {
-        // Make sure we don't leak it.
+        // Make sure we don't leak it. CASESession delegate callbacks detach
+        // mCASEClient before releasing this object.
         mClientPool->Release(mCASEClient);
+        mCASEClient = nullptr;
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
