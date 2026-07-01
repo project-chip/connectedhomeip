@@ -51,7 +51,7 @@ log = logging.getLogger(__name__)
 
 
 class TC_HSTAT_2_1(MatterBaseTest):
-    def pics_TC_BOOLCFG_2_1(self) -> list[str]:
+    def pics_TC_HSTAT_2_1(self) -> list[str]:
         return [
             "HSTAT.S",
         ]
@@ -59,7 +59,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
     def desc_TC_HSTAT_2_1(self) -> str:
         return "[TC-HSTAT-2.1] Primary functionality with DUT as Server"
 
-    def steps_TC_FAN_2_1(self):
+    def steps_TC_HSTAT_2_1(self):
         step = count(1)
         return [TestStep(next(step), "Commissioning already done.", is_commissioning=True),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
