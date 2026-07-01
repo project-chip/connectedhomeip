@@ -185,7 +185,7 @@ void ThermostatCluster::LoadPersistentAttributes()
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
                                           mACCapacityFormat, defaultACCapacityFmt);
 
-    // Load binary handle attributes using raw ReadValue (ByteSpan is not an arithmetic/enum type).
+    // Load binary handle attributes using raw ReadValue.
     {
         MutableByteSpan buf(mActivePresetHandleBuffer);
         if (DefaultServerCluster::mContext->attributeStorage.ReadValue(
@@ -537,7 +537,7 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mActiveScheduleHandle);
     case SetpointHoldExpiryTimestamp::Id:
         return encoder.Encode(mSetpointHoldExpiryTimestamp);
-    // Delegate-backed list / preset / schedule / suggestion attributes are still served by the retained helper.
+    // Delegate-backed list / preset / schedule / suggestion attributes are still served by the retained delegate.
     case PresetTypes::Id:
     case ScheduleTypes::Id:
     case NumberOfPresets::Id:
@@ -769,7 +769,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
     const AttributeId attributeId = request.path.mAttributeId;
     AttributePersistence persistence{ DefaultServerCluster::mContext->attributeStorage };
 
-    // Preset / Schedule writes (and their atomic-write semantics) are still owned by the retained helper.
+    // Preset / Schedule writes (and their atomic-write semantics) are still owned by the retained delegate.
     if (attributeId == Presets::Id || attributeId == Schedules::Id)
     {
         return WriteDelegateAttribute(request.path, decoder);
@@ -835,7 +835,6 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         ReturnErrorOnFailure(decoder.Decode(requested));
         return HandleSystemMode(requested);
     }
-    // Writable attributes without cross-attribute validation — decode, persist, and notify in one step.
     case LocalTemperatureCalibration::Id:
         return NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id,
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalTemperatureCalibration));
@@ -1148,9 +1147,6 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
     const bool tevt = mFeatures.Has(Feature::kEvents);
 
     using Entry = AttributeListBuilder::OptionalAttributeEntry;
-    // NOTE(3a): deprecated attributes (PI*Demand, HVACSystemTypeConfiguration, ThermostatProgrammingOperationMode,
-    // *Setback*) are intentionally not advertised. Plain-optional non-feature attributes are advertised
-    // unconditionally for now; matching them exactly to each application's ZAP configuration is a follow-up.
     const Entry optionalAttributes[] = {
         { mOptionalAttributes.Has(OptionalAttributesBits::kOutdoorTemperature), OutdoorTemperature::kMetadataEntry },
         { occ, Occupancy::kMetadataEntry },

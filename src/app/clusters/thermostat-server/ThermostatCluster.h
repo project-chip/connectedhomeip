@@ -89,8 +89,16 @@ enum class OptionalAttributesBits : uint32_t
 class ThermostatCluster : public DefaultServerCluster, public chip::FabricTable::Delegate
 {
 public:
-    /// External dependencies injected at construction (see CodegenIntegration.cpp). Kept as a struct so
-    /// additional dependencies can be threaded in by later migration steps without churning call sites.
+    static constexpr uint16_t kAbsMinHeatSetpointLimitDefault = 700; // 7C (44.5 F) is the default
+    static constexpr uint16_t kAbsMaxHeatSetpointLimitDefault = 3000; // 30C (86 F) is the default
+    static constexpr uint16_t kAbsMinCoolSetpointLimitDefault = 1600; // 16C (61 F) is the default
+    static constexpr uint16_t kAbsMaxCoolSetpointLimitDefault = 3200; // 32C (90 F) is the default
+    static constexpr uint16_t kOccupancyCoolingSetpointDefault = 2600; // 26C (78.8 F) is the default
+    static constexpr uint16_t kOccupancyHeatingSetpointDefault = 2000; // 20C (68 F) is the default
+    static constexpr uint8_t kMinSetpointDeadbancDefault = 20; // 2C is the default
+    static constexpr uint8_t kEmergencyHeatDeltaDefault = 255; // 25.5C is the default
+
+    /// External dependencies injected at construction.
     struct Context
     {
         chip::FabricTable & fabricTable;
@@ -98,10 +106,10 @@ public:
 
     struct StartupConfiguration
     {
-        int16_t absMinHeatSetpointLimit   = 700; // 7C (44.5 F) is the default
-        int16_t absMaxHeatSetpointLimit   = 3000; // 30C (86 F) is the default
-        int16_t absMinCoolSetpointLimit   = 1600; // 16C (61 F) is the default
-        int16_t absMaxCoolSetpointLimit   = 3200; // 32C (90 F) is the default
+        int16_t absMinHeatSetpointLimit   = kAbsMinHeatSetpointLimitDefault; 
+        int16_t absMaxHeatSetpointLimit   = kAbsMaxHeatSetpointLimitDefault;
+        int16_t absMinCoolSetpointLimit   = kAbsMinCoolSetpointLimitDefault; 
+        int16_t absMaxCoolSetpointLimit   = kAbsMaxCoolSetpointLimitDefault;
         uint8_t numberOfSchedules;
         uint8_t numberOfScheduleTransitions;
         DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay;
@@ -114,7 +122,7 @@ public:
 
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
-    // Setters
+    // Setters and Getters
     // LocalTemperature
     void SetLocalTemperature(DataModel::Nullable<int16_t> value);
     DataModel::Nullable<int16_t> GetLocalTemperature();
@@ -342,11 +350,10 @@ private:
     bool HandleRemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                           const Commands::RemoveThermostatSuggestion::DecodableType & commandData);
 
-    // SetpointRaiseLower handling (ported from emberAfThermostatClusterSetpointRaiseLowerCallback).
+    // SetpointRaiseLower handling
     Protocols::InteractionModel::Status HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
 
-    // Setpoint limit enforcement (ported from the free functions in the legacy implementation), reading
-    // the authoritative limits from this instance's members.
+    // Setpoint limit enforcement
     int16_t EnforceHeatingSetpointLimits(int16_t heatingSetpoint) const;
     int16_t EnforceCoolingSetpointLimits(int16_t coolingSetpoint) const;
 
@@ -356,9 +363,9 @@ private:
         return mFeatures.Has(Feature::kAutoMode) ? static_cast<int16_t>(mMinSetpointDeadBand * 10) : 0;
     }
 
-    // Post-write side effects for a setpoint attribute (replaces MatterThermostatClusterServerAttributeChangedCallback):
-    // shifts the paired setpoint to maintain the deadband, emits change events, and clears the active preset.
+    // Post-write side effects for a setpoint attribute
     void HandleSetpointPostWrite(AttributeId attributeId);
+
     Protocols::InteractionModel::Status HandleOccupancyHeatingSetpoint(int16_t value, AttributeId attributeId);
     Protocols::InteractionModel::Status HandleOccupancyCoolingSetpoint(int16_t value, AttributeId attributeId);
     Protocols::InteractionModel::Status HandleMinHeatSetpointLimit(int16_t value);
@@ -391,7 +398,7 @@ private:
     };
     AtomicWriteSession mAtomicWriteSession;
 
-    // Scalar attribute state (formerly Ember RAM-backed). Typed through the generated TypeInfo.
+    // Attributes
     DataModel::Nullable<int16_t> mLocalTemperature{};
     DataModel::Nullable<int16_t> mOutdoorTemperature{};
     BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> mOccupancy{};
@@ -399,16 +406,16 @@ private:
     int16_t mAbsMaxHeatSetpointLimit;
     int16_t mAbsMinCoolSetpointLimit;
     int16_t mAbsMaxCoolSetpointLimit;
-    int8_t mLocalTemperatureCalibration{ 0 };
-    int16_t mOccupiedCoolingSetpoint { 2600 };
-    int16_t mOccupiedHeatingSetpoint { 2000 };
-    int16_t mUnoccupiedCoolingSetpoint { 2600 };
-    int16_t mUnoccupiedHeatingSetpoint { 2000 };
+    int8_t mLocalTemperatureCalibration {};
+    int16_t mOccupiedCoolingSetpoint { kOccupancyCoolingSetpointDefault };
+    int16_t mOccupiedHeatingSetpoint { kOccupancyHeatingSetpointDefault };
+    int16_t mUnoccupiedCoolingSetpoint { kOccupancyCoolingSetpointDefault };
+    int16_t mUnoccupiedHeatingSetpoint { kOccupancyHeatingSetpointDefault };
     int16_t mMinHeatSetpointLimit;
     int16_t mMaxHeatSetpointLimit;
     int16_t mMinCoolSetpointLimit;
     int16_t mMaxCoolSetpointLimit;
-    int8_t mMinSetpointDeadBand { 20 };
+    int8_t mMinSetpointDeadBand { kMinSetpointDeadbancDefault };
     BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{ 0 };
     ControlSequenceOfOperationEnum mControlSequenceOfOperation;
     SystemModeEnum mSystemMode;
@@ -419,14 +426,12 @@ private:
     SetpointChangeSourceEnum mSetpointChangeSource{};
     DataModel::Nullable<int16_t> mSetpointChangeAmount{};
     uint32_t mSetpointChangeSourceTimestamp{};
-    uint8_t mEmergencyHeatDelta{};
+    uint8_t mEmergencyHeatDelta{ kEmergencyHeatDeltaDefault };
     ACTypeEnum mACType{};
     uint16_t mACCapacity{};
     ACRefrigerantTypeEnum mACRefrigerantType{};
     ACCompressorTypeEnum mACCompressorType{};
     BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> mACErrorCode{};
-    // ACLouverPositionEnum has no 0 value (0 == kUnknownEnumValue, which must never be transmitted), so
-    // default to the first valid value rather than {} to avoid emitting a constraint-invalid enum.
     ACLouverPositionEnum mACLouverPosition{ ACLouverPositionEnum::kClosed };
     DataModel::Nullable<int16_t> mACCoilTemperature{};
     ACCapacityFormatEnum mACCapacityFormat{};
