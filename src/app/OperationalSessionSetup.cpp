@@ -515,6 +515,18 @@ void OperationalSessionSetup::OnResponderBusy(System::Clock::Milliseconds16 requ
     // retry or communicate it to our API consumer.
     mRequestedBusyDelay = requestedDelay;
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    if (!mGrantedBusyRetryAfterAttemptExhaustion && mRemainingAttempts == 0)
+    {
+        mRemainingAttempts = 1;
+        if (mResolveAttemptsAllowed == 0)
+        {
+            mResolveAttemptsAllowed = 1;
+        }
+        mGrantedBusyRetryAfterAttemptExhaustion = true;
+    }
+#endif
 }
 
 void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session)
@@ -820,10 +832,6 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
     timerDelay = std::chrono::duration_cast<System::Clock::Seconds16>(actualTimerDelay);
 
     CHIP_ERROR err = mInitParams.exchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(actualTimerDelay, TrySetupAgain, this);
-
-    // TODO: If responseWasBusy, should we increment, mRemainingAttempts and
-    // mResolveAttemptsAllowed, since we were explicitly told to retry?  Hard to
-    // tell what consumers expect out of a capped retry count here.
 
     // The cast on count() is needed because the type count() returns might not
     // actually be uint16_t; on some platforms it's int.
