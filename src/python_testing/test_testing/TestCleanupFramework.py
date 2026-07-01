@@ -125,11 +125,13 @@ class TestCleanupFramework(MatterBaseTest):
         await self._run_framework_cleanup()
         super().teardown_test()
 
-    async def _find_endpoint_with_cluster(self, cluster) -> int | None:
+    def _find_endpoint_with_cluster(self, cluster) -> int | None:
         """Returns the first endpoint that has the given cluster, or None."""
-        await self._populate_wildcard()
-        for ep in self.stored_global_wildcard.attributes:
-            if _has_cluster(self.stored_global_wildcard, ep, cluster):
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None:
+            return None
+        for ep in wildcard.attributes:
+            if _has_cluster(wildcard, ep, cluster):
                 return ep
         return None
 
@@ -235,7 +237,7 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_group_membership_cleanup(self):
         logger.info("--- Scenario: group membership (Groups cluster) ---")
-        ep = await self._find_endpoint_with_cluster(Clusters.Groups)
+        ep = self._find_endpoint_with_cluster(Clusters.Groups)
         if ep is None:
             logger.info("Groups cluster not present on DUT — skipping")
             return
@@ -252,11 +254,12 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_scenes_cleanup(self):
         logger.info("--- Scenario: scene entry (ScenesManagement cluster) ---")
-        ep = await self._find_endpoint_with_cluster(Clusters.ScenesManagement)
+        ep = self._find_endpoint_with_cluster(Clusters.ScenesManagement)
         if ep is None:
             logger.info("ScenesManagement cluster not present on DUT — skipping")
             return
-        if not _has_cluster(self.stored_global_wildcard, ep, Clusters.Groups):
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None or not _has_cluster(wildcard, ep, Clusters.Groups):
             logger.info("Groups cluster not present on endpoint %d — skipping scenes scenario", ep)
             return
 
@@ -281,7 +284,7 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_doorlock_cleanup(self):
         logger.info("--- Scenario: DoorLock credential and user ---")
-        ep = await self._find_endpoint_with_cluster(Clusters.DoorLock)
+        ep = self._find_endpoint_with_cluster(Clusters.DoorLock)
         if ep is None:
             logger.info("DoorLock cluster not present on DUT — skipping")
             return
@@ -308,8 +311,8 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_icd_client_cleanup(self):
         logger.info("--- Scenario: ICD client registration ---")
-        await self._populate_wildcard()
-        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0,
+        wildcard = self._optional_stored_global_wildcard()
+        if not _has_attribute(wildcard=wildcard, endpoint=0,
                               attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
             logger.info("ICD Management cluster not present on DUT — skipping")
             return
@@ -331,11 +334,12 @@ class TestCleanupFramework(MatterBaseTest):
     @async_test_body
     async def test_tls_endpoints_cleanup(self):
         logger.info("--- Scenario: TLS endpoint provisioning (TlsClientManagement) ---")
-        ep = await self._find_endpoint_with_cluster(Clusters.TlsClientManagement)
+        ep = self._find_endpoint_with_cluster(Clusters.TlsClientManagement)
         if ep is None:
             logger.info("TlsClientManagement cluster not present on DUT — skipping")
             return
-        if not _has_cluster(self.stored_global_wildcard, ep, Clusters.TlsCertificateManagement):
+        wildcard = self._optional_stored_global_wildcard()
+        if wildcard is None or not _has_cluster(wildcard, ep, Clusters.TlsCertificateManagement):
             logger.info("TlsCertificateManagement cluster not present on endpoint %d — skipping", ep)
             return
 
