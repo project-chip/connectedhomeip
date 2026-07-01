@@ -37,10 +37,10 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+from itertools import count
 from typing import Any
 
 from mobly import asserts
-from itertools import count
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
