@@ -194,7 +194,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
-    subtype.pakeMode = kSE05x_SPAKE2PLUS_P256_SHA256_HKDF_HMAC;
+    subtype.pakeMode = kSE05x_SPAKE2PLUS_P256_SHA256_HKDF_HMAC_v02;
 
 #if ENABLE_REENTRANCY
     VerifyOrReturnError(spake_objects_created < LIMIT_CRYPTO_OBJECTS, CHIP_ERROR_INTERNAL);
