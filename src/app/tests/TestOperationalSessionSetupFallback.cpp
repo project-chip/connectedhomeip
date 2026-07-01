@@ -27,10 +27,14 @@
 #include <app/CASESessionManager.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/tests/AppTestContext.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/Pool.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 
@@ -40,9 +44,48 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
+namespace chip {
+namespace Testing {
+
+class OperationalSessionSetupTestAccess
+{
+public:
+    explicit OperationalSessionSetupTestAccess(OperationalSessionSetup * sessionSetup) : mSessionSetup(sessionSetup) {}
+
+    void SetCASEClient(CASEClient * client) { mSessionSetup->mCASEClient = client; }
+    CASEClient * GetCASEClient() const { return mSessionSetup->mCASEClient; }
+    void SetStateConnecting() { mSessionSetup->mState = OperationalSessionSetup::State::Connecting; }
+    void CleanupCASEClient() { mSessionSetup->CleanupCASEClient(); }
+
+private:
+    OperationalSessionSetup * mSessionSetup = nullptr;
+};
+
+} // namespace Testing
+} // namespace chip
+
 namespace {
 
-constexpr uint16_t kTestPort = 5540;
+constexpr uint16_t kTestPort       = 5540;
+constexpr NodeId kTestNodeId       = 0x123456789abcdefULL;
+constexpr FabricIndex kFabricIndex = 1;
+
+class MockCASEClientPool : public CASEClientPoolDelegate
+{
+public:
+    CASEClient * Allocate() override { return mClientPool.CreateObject(); }
+
+    void Release(CASEClient * client) override
+    {
+        mReleaseCount++;
+        mClientPool.ReleaseObject(client);
+    }
+
+    int mReleaseCount = 0;
+
+private:
+    ObjectPool<CASEClient, 1> mClientPool;
+};
 
 class MockOperationalSessionReleaseDelegate : public OperationalSessionReleaseDelegate
 {
@@ -101,6 +144,7 @@ public:
         AppContext::SetUp();
         mReleaseDelegate.Reset();
         mSessionDelegate.Reset();
+        mCASEClientPool.mReleaseCount = 0;
     }
 
     void TearDown() override { AppContext::TearDown(); }
@@ -108,6 +152,26 @@ public:
 protected:
     MockOperationalSessionReleaseDelegate mReleaseDelegate;
     MockSessionEstablishmentDelegate mSessionDelegate;
+    MockCASEClientPool mCASEClientPool;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
+
+    CASEClientInitParams CreateCASEClientInitParams()
+    {
+        CASEClientInitParams params;
+        params.sessionManager    = &GetSecureSessionManager();
+        params.exchangeMgr       = &GetExchangeManager();
+        params.fabricTable       = &GetFabricTable();
+        params.groupDataProvider = &mGroupDataProvider;
+        return params;
+    }
+
+    void DrainSystemLayer()
+    {
+        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+                      [](intptr_t) -> void { RETURN_SAFELY_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, 0),
+                  CHIP_NO_ERROR);
+        chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    }
 
     AddressResolve::ResolveResult CreateTestResolveResult()
     {
@@ -122,10 +186,45 @@ protected:
     }
 };
 
-#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+TEST_F(TestOperationalSessionSetupFallback, ImmediateCASEClientCleanupReleasesInline)
+{
+    OperationalSessionSetup sessionSetup(CreateCASEClientInitParams(), &mCASEClientPool, ScopedNodeId(kTestNodeId, kFabricIndex),
+                                         &mReleaseDelegate);
+    chip::Testing::OperationalSessionSetupTestAccess access(&sessionSetup);
+    CASEClient * caseClient = mCASEClientPool.Allocate();
+    ASSERT_NE(caseClient, nullptr);
 
-constexpr NodeId kTestNodeId       = 0x123456789abcdefULL;
-constexpr FabricIndex kFabricIndex = 1;
+    access.SetCASEClient(caseClient);
+    access.CleanupCASEClient();
+
+    EXPECT_EQ(access.GetCASEClient(), nullptr);
+    EXPECT_EQ(mCASEClientPool.mReleaseCount, 1);
+}
+
+TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupDoesNotUseSessionSetupAfterReturn)
+{
+    CASEClient * caseClient = mCASEClientPool.Allocate();
+    ASSERT_NE(caseClient, nullptr);
+
+    auto * sessionSetup = chip::Platform::New<OperationalSessionSetup>(CreateCASEClientInitParams(), &mCASEClientPool,
+                                                                       ScopedNodeId(kTestNodeId, kFabricIndex), &mReleaseDelegate);
+    ASSERT_NE(sessionSetup, nullptr);
+
+    chip::Testing::OperationalSessionSetupTestAccess access(sessionSetup);
+    access.SetCASEClient(caseClient);
+    access.SetStateConnecting();
+    access.CleanupCASEClient();
+
+    EXPECT_EQ(access.GetCASEClient(), nullptr);
+    EXPECT_EQ(mCASEClientPool.mReleaseCount, 0);
+
+    chip::Platform::Delete(sessionSetup);
+    DrainSystemLayer();
+
+    EXPECT_EQ(mCASEClientPool.mReleaseCount, 1);
+}
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 TEST_F(TestOperationalSessionSetupFallback, TestSetFallbackResolveResult)
 {
