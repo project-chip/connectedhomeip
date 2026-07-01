@@ -323,7 +323,7 @@ CHIP_ERROR AppTask::Init()
     MT793X_LOG("APP: Done WiFi Init");
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    (void) sWiFiNetworkCommissioningInstance.Init();
+    LogErrorOnFailure(sWiFiNetworkCommissioningInstance.Init());
 #endif
 
     // Initialize device attestation config before server init so Operational
