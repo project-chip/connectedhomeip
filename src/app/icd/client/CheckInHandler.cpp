@@ -42,8 +42,7 @@ using namespace chip::Protocols::SecureChannel;
 namespace chip {
 namespace app {
 
-inline constexpr uint64_t kCheckInCounterMax = (1ULL << 32);
-inline constexpr uint32_t kKeyRefreshLimit   = (1U << 31);
+inline constexpr uint32_t kKeyRefreshLimit = (1U << 31);
 
 CheckInHandler::CheckInHandler() {}
 
@@ -97,25 +96,14 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
 
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     ICDClientInfo clientInfo;
-    CounterType counter = 0;
     // If the check-in message processing fails, return CHIP_NO_ERROR and exit.
-    CHIP_ERROR err = mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter);
+    CHIP_ERROR err = mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(ICD, "ProcessCheckInPayload failed: %" CHIP_ERROR_FORMAT, err.Format());
         return CHIP_NO_ERROR;
     }
-    CounterType receivedCheckInCounterOffset = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-
-    // Detect duplicate check-in messages and return CHIP_NO_ERROR on receiving a duplicate message
-    if (receivedCheckInCounterOffset <= clientInfo.offset)
-    {
-        ChipLogError(ICD, "A duplicate check-in message was received and discarded");
-        return CHIP_NO_ERROR;
-    }
-
-    clientInfo.offset = receivedCheckInCounterOffset;
-    bool refreshKey   = (receivedCheckInCounterOffset > kKeyRefreshLimit);
+    bool refreshKey = (clientInfo.offset > kKeyRefreshLimit);
 
     if (refreshKey)
     {

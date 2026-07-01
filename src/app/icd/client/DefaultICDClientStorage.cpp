@@ -39,6 +39,7 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 
 namespace chip {
 namespace app {
+
 CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
@@ -518,19 +519,22 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
-                                                          Protocols::SecureChannel::CounterType & counter)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
 {
     uint8_t appDataBuffer[kAppDataLength];
     MutableByteSpan appData(appDataBuffer);
     auto * iterator = IterateICDClientInfo();
     VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+    Protocols::SecureChannel::CounterType offset = 0;
+
     while (iterator->Next(clientInfo))
     {
         CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
-            clientInfo.aes_key_handle, clientInfo.hmac_key_handle, payload, counter, appData);
+            clientInfo.aes_key_handle, clientInfo.hmac_key_handle, clientInfo.start_icd_counter, clientInfo.offset, payload, offset,
+            appData);
         if (CHIP_NO_ERROR == err)
         {
+            clientInfo.offset = offset;
             iterator->Release();
             return CHIP_NO_ERROR;
         }
