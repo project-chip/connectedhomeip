@@ -718,12 +718,12 @@ int16_t ThermostatCluster::GetMaxCoolSetpointLimit()
     return mMaxCoolSetpointLimit;
 }
 
-Protocols::InteractionModel::Status ThermostatCluster::SetMinSetpointDeadbanc(int8_t value)
+Protocols::InteractionModel::Status ThermostatCluster::SetMinSetpointDeadband(int8_t value)
 {
     return HandleMinSetpointDeadband(value);
 }
 
-int8_t ThermostatCluster::GetMinSetpointDeadbanc()
+int8_t ThermostatCluster::GetMinSetpointDeadband()
 {
     return mMinSetpointDeadBand;
 }

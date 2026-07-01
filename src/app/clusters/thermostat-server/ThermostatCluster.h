@@ -176,8 +176,8 @@ public:
     int16_t GetMaxCoolSetpointLimit();
 
     // MinSetpointDeadbanc
-    Protocols::InteractionModel::Status SetMinSetpointDeadbanc(int8_t value);
-    int8_t GetMinSetpointDeadbanc();
+    Protocols::InteractionModel::Status SetMinSetpointDeadband(int8_t value);
+    int8_t GetMinSetpointDeadband();
 
     // RemoteSensing
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> value);

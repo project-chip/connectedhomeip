@@ -260,7 +260,905 @@ Status Set(EndpointId endpoint, DataModel::Nullable<int16_t> value)
     return Status::Success;
 }
 
-} // namespace FanMode
+} // namespace LocalTemperature
+
+namespace OutdoorTemperature {
+
+Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetOutdoorTemperature();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, DataModel::Nullable<int16_t> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetOutdoorTemperature(value);
+    return Status::Success;
+}
+
+} // namespace OutdoorTemperature
+
+namespace Occupancy {
+
+Status Get(EndpointId endpoint, BitMask<OccupancyBitmap> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetOccupancy();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, BitMask<OccupancyBitmap> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetOccupancy(value);
+    return Status::Success;
+}
+
+} // namespace Occupancy
+
+namespace LocalTemperatureCalibration {
+
+Status Get(EndpointId endpoint, int8_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetLocalTemperatureCalibration();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int8_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetLocalTemperatureCalibration(value);
+    return Status::Success;
+}
+
+} // namespace LocalTemperatureCalibration
+
+namespace OccupiedCoolingSetpoint {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetOccupiedCoolingSetpoint();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetOccupiedCoolingSetpoint(value);
+}
+
+} // namespace OccupiedCoolingSetpoint
+
+namespace OccupiedHeatingSetpoint {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetOccupiedHeatingSetpoint();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetOccupiedHeatingSetpoint(value);
+}
+
+} // namespace OccupiedHeatingSetpoint
+
+namespace UnoccupiedCoolingSetpoint {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetUnoccupiedCoolingSetpoint();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetUnoccupiedCoolingSetpoint(value);
+}
+
+} // namespace UnoccupiedCoolingSetpoint
+
+namespace UnoccupiedHeatingSetpoint {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetUnoccupiedHeatingSetpoint();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetUnoccupiedHeatingSetpoint(value);
+}
+
+} // namespace UnoccupiedHeatingSetpoint
+
+namespace MinHeatSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetMinHeatSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetMinHeatSetpointLimit(value);
+}
+
+} // namespace MinHeatSetpointLimit
+
+namespace MaxHeatSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetMaxHeatSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetMaxHeatSetpointLimit(value);
+}
+
+} // namespace MaxHeatSetpointLimit
+
+namespace MinCoolSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetMinCoolSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetMinCoolSetpointLimit(value);
+}
+
+} // namespace MinCoolSetpointLimit
+
+namespace MaxCoolSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetMaxCoolSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetMaxCoolSetpointLimit(value);
+}
+
+} // namespace MaxCoolSetpointLimit
+
+namespace MinSetpointDeadBand {
+
+Status Get(EndpointId endpoint, int8_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetMinSetpointDeadband();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int8_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetMinSetpointDeadband(value);
+}
+
+} // namespace MinSetpointDeadBand
+
+namespace RemoteSensing {
+
+Status Get(EndpointId endpoint, BitMask<RemoteSensingBitmap> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetRemoteSensing();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, BitMask<RemoteSensingBitmap> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetRemoteSensing(value);
+}
+
+} // namespace RemoteSensing
+
+namespace ControlSequenceOfOperation {
+
+Status Get(EndpointId endpoint, ControlSequenceOfOperationEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetControlSequenceOfOperation();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, ControlSequenceOfOperationEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetControlSequenceOfOperation(value);
+}
+
+} // namespace ControlSequenceOfOperation
+
+namespace SystemMode {
+
+Status Get(EndpointId endpoint, SystemModeEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSystemMode();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, SystemModeEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetSystemMode(value);
+}
+
+} // namespace SystemMode
+
+namespace ThermostatRunningMode {
+
+Status Get(EndpointId endpoint, ThermostatRunningModeEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetThermostatRunningMode();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, ThermostatRunningModeEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetThermostatRunningMode(value);
+    return Status::Success;
+}
+
+} // namespace ThermostatRunningMode
+
+namespace TemperatureSetpointHold {
+
+Status Get(EndpointId endpoint, TemperatureSetpointHoldEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetTemperatureSetpointHold();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, TemperatureSetpointHoldEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetTemperatureSetpointHold(value);
+    return Status::Success;
+}
+
+} // namespace TemperatureSetpointHold
+
+namespace TemperatureSetpointHoldDuration {
+
+Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetTemperatureSetpointHoldDuration();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, DataModel::Nullable<uint16_t> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetTemperatureSetpointHoldDuration(value);
+    return Status::Success;
+}
+
+} // namespace TemperatureSetpointHoldDuration
+
+namespace ThermostatRunningState {
+
+Status Get(EndpointId endpoint, BitMask<RelayStateBitmap> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetThermostatRunningState();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, BitMask<RelayStateBitmap> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetThermostatRunningState(value);
+    return Status::Success;
+}
+
+} // namespace ThermostatRunningState
+
+namespace SetpointChangeSource {
+
+Status Get(EndpointId endpoint, SetpointChangeSourceEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSetpointChangeSource();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, SetpointChangeSourceEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetSetpointChangeSource(value);
+    return Status::Success;
+}
+
+} // namespace SetpointChangeSource
+
+namespace SetpointChangeAmount {
+
+Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSetpointChangeAmount();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, DataModel::Nullable<int16_t> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetSetpointChangeAmount(value);
+    return Status::Success;
+}
+
+} // namespace SetpointChangeAmount
+
+namespace SetpointChangeSourceTimestamp {
+
+Status Get(EndpointId endpoint, uint32_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSetpointChangeSourceTimestamp();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, uint32_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetSetpointChangeSourceTimestamp(value);
+    return Status::Success;
+}
+
+} // namespace SetpointChangeSourceTimestamp
+
+namespace EmergencyHeatDelta {
+
+Status Get(EndpointId endpoint, uint8_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetEmergencyHeatDelta();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, uint8_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetEmergencyHeatDelta(value);
+    return Status::Success;
+}
+
+} // namespace EmergencyHeatDelta
+
+namespace ACType {
+
+Status Get(EndpointId endpoint, ACTypeEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACType();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, ACTypeEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACType(value);
+    return Status::Success;
+}
+
+} // namespace ACType
+
+namespace ACCapacity {
+
+Status Get(EndpointId endpoint, uint16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACCapacity();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, uint16_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACCapacity(value);
+    return Status::Success;
+}
+
+} // namespace ACCapacity
+
+namespace ACRefrigerantType {
+
+Status Get(EndpointId endpoint, ACRefrigerantTypeEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACRefrigerantType();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, ACRefrigerantTypeEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACRefrigerantType(value);
+    return Status::Success;
+}
+
+} // namespace ACRefrigerantType
+
+namespace ACCompressorType {
+
+Status Get(EndpointId endpoint, ACCompressorTypeEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACCompressorType();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, ACCompressorTypeEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACCompressorType(value);
+    return Status::Success;
+}
+
+} // namespace ACCompressorType
+
+namespace ACErrorCode {
+
+Status Get(EndpointId endpoint, BitMask<ACErrorCodeBitmap> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACErrorCode();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, BitMask<ACErrorCodeBitmap> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACErrorCode(value);
+    return Status::Success;
+}
+
+} // namespace ACErrorCode
+
+namespace ACLouverPosition {
+
+Status Get(EndpointId endpoint, ACLouverPositionEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACLouverPosition();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, ACLouverPositionEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACLouverPosition(value);
+    return Status::Success;
+}
+
+} // namespace ACLouverPosition
+
+namespace ACCoilTemperature {
+
+Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACCoilTemperature();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, DataModel::Nullable<int16_t> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACCoilTemperature(value);
+    return Status::Success;
+}
+
+} // namespace ACCoilTemperature
+
+namespace ACCapacityformat {
+
+Status Get(EndpointId endpoint, ACCapacityFormatEnum & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetACCapacityFormat();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, ACCapacityFormatEnum value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetACCapacityFormat(value);
+    return Status::Success;
+}
+
+} // namespace ACCapacityformat
+
+namespace NumberOfSchedules {
+
+Status Get(EndpointId endpoint, uint8_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetNumberOfSchedules();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, uint8_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetNumberOfSchedules(value);
+    return Status::Success;
+}
+
+} // namespace NumberOfSchedules
+
+namespace NumberOfScheduleTransitions {
+
+Status Get(EndpointId endpoint, uint8_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetNumberOfScheduleTransitions();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, uint8_t value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetNumberOfScheduleTransitions(value);
+    return Status::Success;
+}
+
+} // namespace NumberOfScheduleTransitions
+
+namespace NumberOfScheduleTransitionPerDay {
+
+Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetNumberOfScheduleTransitionPerDay();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, DataModel::Nullable<uint8_t> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetNumberOfScheduleTransitionPerDay(value);
+    return Status::Success;
+}
+
+} // namespace NumberOfScheduleTransitionPerDay
+
+namespace SetpointHoldExpiryTimestamp {
+
+Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSetpointHoldExpiryTimestamp();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, DataModel::Nullable<uint32_t> value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    cluster->SetSetpointHoldExpiryTimestamp(value);
+    return Status::Success;
+}
+
+} // namespace SetpointHoldExpiryTimestamp
 } // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters
