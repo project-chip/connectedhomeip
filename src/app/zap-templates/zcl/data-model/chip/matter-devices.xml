@@ -1673,7 +1673,16 @@ limitations under the License.
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
-            <!-- TODO: Add Electrical Alarm (Provisional, Optional per spec, with OverCurrent feature mandatory) once https://github.com/project-chip/connectedhomeip/pull/72223 lands -->
+            <include cluster="Electrical Alarm" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="OVERCUR" name="OverCurrent">
+                        <otherwiseConform>
+                            <provisionalConform></provisionalConform>
+                            <mandatoryConform></mandatoryConform>
+                        </otherwiseConform>
+                    </feature>
+                </features>
+            </include>
             <include cluster="Electrical Distribution" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Electrical Protection Alarm" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
