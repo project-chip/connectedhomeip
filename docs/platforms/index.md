@@ -17,6 +17,7 @@ openthread/index
 silabs/index
 stm32/index
 ti/index
+tizen/index
 ```
 
 -   [Android](./android/)
@@ -31,3 +32,4 @@ ti/index
 -   [Silabs](./silabs/)
 -   [STM32](./stm32/)
 -   [TI](./ti/)
+-   [Tizen](./tizen/)
