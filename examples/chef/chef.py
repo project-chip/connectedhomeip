@@ -883,8 +883,7 @@ def main() -> int:
                 (f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
-                 f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\"", '
-                 f'"CONFIG_CHEF_SAMPLE_NAME=\\"{options.sample_device_type_name}\\""]'),
+                 f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
                 'chip_app_data_model_target = "//:chef-data-model"',
                 'shell_use_all_clusters_data_model = false',
             ])
