@@ -22419,6 +22419,32 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(newElement_0_responsesInsideOptional,
                                                                                                newElement_0_responses);
                 }
+                jobject newElement_0_languageCode;
+                if (!entry_0.languageCode.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_languageCode);
+                }
+                else
+                {
+                    jobject newElement_0_languageCodeInsideOptional;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.languageCode.Value(),
+                                                                                         newElement_0_languageCodeInsideOptional));
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_languageCodeInsideOptional, newElement_0_languageCode);
+                }
+                jobject newElement_0_messageURI;
+                if (!entry_0.messageURI.HasValue())
+                {
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_messageURI);
+                }
+                else
+                {
+                    jobject newElement_0_messageURIInsideOptional;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.messageURI.Value(),
+                                                                                         newElement_0_messageURIInsideOptional));
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_messageURIInsideOptional, newElement_0_messageURI);
+                }
 
                 {
                     jclass messageStructStructClass_1;
@@ -22434,7 +22460,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, messageStructStructClass_1, "<init>",
                         "([BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/util/"
-                        "Optional;)V",
+                        "Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
                         &messageStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || messageStructStructCtor_1 == nullptr)
                     {
@@ -22444,7 +22470,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 = env->NewObject(messageStructStructClass_1, messageStructStructCtor_1, newElement_0_messageID,
                                                   newElement_0_priority, newElement_0_messageControl, newElement_0_startTime,
-                                                  newElement_0_duration, newElement_0_messageText, newElement_0_responses);
+                                                  newElement_0_duration, newElement_0_messageText, newElement_0_responses,
+                                                  newElement_0_languageCode, newElement_0_messageURI);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -22470,6 +22497,48 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.data()));
                 newElement_0 = newElement_0ByteArray;
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::SupportedLanguageCodes::Id: {
+            using TypeInfo = Attributes::SupportedLanguageCodes::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0, newElement_0));
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::SupportedMimeTypes::Id: {
+            using TypeInfo = Attributes::SupportedMimeTypes::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0, newElement_0));
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

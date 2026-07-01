@@ -5802,6 +5802,10 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy) NSString * _Nonnull messageText MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 @property (nonatomic, copy) NSArray * _Nullable responses MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+@property (nonatomic, copy) NSString * _Nullable languageCode MTR_PROVISIONALLY_AVAILABLE;
+
+@property (nonatomic, copy) NSString * _Nullable messageURI MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

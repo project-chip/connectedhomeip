@@ -332,6 +332,7 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/GroupcastClusterGroupcastTestingEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MediaPlaybackClusterStateChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessageCompleteEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessageNotPresentedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessagePresentedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessageQueuedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/OccupancySensingClusterOccupancyChangedEvent.kt",

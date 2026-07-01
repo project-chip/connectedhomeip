@@ -7843,6 +7843,8 @@ public static class MessagesClusterMessageStruct {
   public @Nullable Long duration;
   public String messageText;
   public Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses;
+  public Optional<String> languageCode;
+  public Optional<String> messageURI;
   private static final long MESSAGE_ID_ID = 0L;
   private static final long PRIORITY_ID = 1L;
   private static final long MESSAGE_CONTROL_ID = 2L;
@@ -7850,6 +7852,8 @@ public static class MessagesClusterMessageStruct {
   private static final long DURATION_ID = 4L;
   private static final long MESSAGE_TEXT_ID = 5L;
   private static final long RESPONSES_ID = 6L;
+  private static final long LANGUAGE_CODE_ID = 7L;
+  private static final long MESSAGE_URI_ID = 8L;
 
   public MessagesClusterMessageStruct(
     byte[] messageID,
@@ -7858,7 +7862,9 @@ public static class MessagesClusterMessageStruct {
     @Nullable Long startTime,
     @Nullable Long duration,
     String messageText,
-    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses
+    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses,
+    Optional<String> languageCode,
+    Optional<String> messageURI
   ) {
     this.messageID = messageID;
     this.priority = priority;
@@ -7867,6 +7873,8 @@ public static class MessagesClusterMessageStruct {
     this.duration = duration;
     this.messageText = messageText;
     this.responses = responses;
+    this.languageCode = languageCode;
+    this.messageURI = messageURI;
   }
 
   public StructType encodeTlv() {
@@ -7878,6 +7886,8 @@ public static class MessagesClusterMessageStruct {
     values.add(new StructElement(DURATION_ID, duration != null ? new UIntType(duration) : new NullType()));
     values.add(new StructElement(MESSAGE_TEXT_ID, new StringType(messageText)));
     values.add(new StructElement(RESPONSES_ID, responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(LANGUAGE_CODE_ID, languageCode.<BaseTLVType>map((nonOptionallanguageCode) -> new StringType(nonOptionallanguageCode)).orElse(new EmptyType())));
+    values.add(new StructElement(MESSAGE_URI_ID, messageURI.<BaseTLVType>map((nonOptionalmessageURI) -> new StringType(nonOptionalmessageURI)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7893,6 +7903,8 @@ public static class MessagesClusterMessageStruct {
     @Nullable Long duration = null;
     String messageText = null;
     Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses = Optional.empty();
+    Optional<String> languageCode = Optional.empty();
+    Optional<String> messageURI = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MESSAGE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -7929,6 +7941,16 @@ public static class MessagesClusterMessageStruct {
           ArrayType castingValue = element.value(ArrayType.class);
           responses = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.MessagesClusterMessageResponseOptionStruct.decodeTlv(elementcastingValue)));
         }
+      } else if (element.contextTagNum() == LANGUAGE_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          languageCode = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == MESSAGE_URI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          messageURI = Optional.of(castingValue.value(String.class));
+        }
       }
     }
     return new MessagesClusterMessageStruct(
@@ -7938,7 +7960,9 @@ public static class MessagesClusterMessageStruct {
       startTime,
       duration,
       messageText,
-      responses
+      responses,
+      languageCode,
+      messageURI
     );
   }
 
@@ -7966,6 +7990,12 @@ public static class MessagesClusterMessageStruct {
     output.append("\n");
     output.append("\tresponses: ");
     output.append(responses);
+    output.append("\n");
+    output.append("\tlanguageCode: ");
+    output.append(languageCode);
+    output.append("\n");
+    output.append("\tmessageURI: ");
+    output.append(messageURI);
     output.append("\n");
     output.append("}\n");
     return output.toString();
