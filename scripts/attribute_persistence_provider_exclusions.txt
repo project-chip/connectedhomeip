@@ -49,8 +49,8 @@ src/app/clusters/boolean-state-configuration-server/MigrateBooleanStateConfigura
 src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h
 src/app/clusters/camera-av-stream-management-server/tests/TestCameraAVStreamManagementCluster.cpp
 src/app/clusters/mode-base-server/CodegenIntegration.cpp
-src/app/clusters/mode-base-server/ModeBaseCluster.cpp
-src/app/clusters/mode-base-server/ModeBaseCluster.h
+src/app/clusters/mode-base-server/MigrateModeBaseServerStorage.cpp
+src/app/clusters/mode-base-server/MigrateModeBaseServerStorage.h
 src/app/clusters/resource-monitoring-server/tests/TestResourceMonitoringCluster.cpp
 src/app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.cpp
 src/app/clusters/thread-network-directory-server/tests/TestThreadNetworkDirectoryCluster.cpp
