@@ -39,7 +39,9 @@ import click
 import coloredlogs
 from colorama import Fore, Style
 
+from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
@@ -183,6 +185,17 @@ class IpPacketCaptureManager:
             self.dump_filename.unlink(missing_ok=True)
 
 
+def run_timeout(run: Metadata) -> float:
+    if run.timeout is not None:
+        return run.timeout
+    if run.script_args is not None:
+        p = matter_test_args_parser()
+        (args, _) = p.parse_known_args(shlex.split(run.script_args))
+        if args.timeout is not None:
+            return args.timeout + TestingDefaults.TEST_RUNNER_SLACK_S
+    return TestingDefaults.DEFAULT_TIMEOUT_S
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -266,13 +279,13 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run.quiet, run.run)
+                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              quiet: bool, run_name: str):
+              script_timeout: float, quiet: bool, run_name: str):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -350,7 +363,11 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_script_process.p.stdin.close()
 
     try:
-        test_script_exit_code = test_script_process.wait()
+        try:
+            test_script_exit_code = test_script_process.wait(script_timeout)
+        except TimeoutError as e:
+            log.exception("%r", e)
+            test_script_exit_code = -1  # Trigger error codepath
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
