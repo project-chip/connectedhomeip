@@ -33,9 +33,7 @@ class AmbientContextSensingCluster : public DefaultServerCluster, public TimerCo
 public:
     struct Config
     {
-        Config(EndpointId endpointId, AmbientContextSensing::AmbientContextSensingDelegate & acsDelegate,
-               TimerDelegate & timerDelegate) :
-            mEndpointId(endpointId),
+        Config(AmbientContextSensing::AmbientContextSensingDelegate & acsDelegate, TimerDelegate & timerDelegate) :
             mDelegate(acsDelegate), mHoldTimeDelegate(timerDelegate)
         {}
 
@@ -59,7 +57,6 @@ public:
             return *this;
         }
 
-        EndpointId mEndpointId;
         BitMask<AmbientContextSensing::Feature> mFeatureMap = 0;
         uint32_t mOptionalAttributeBits                     = 0;
         AmbientContextSensing::ObjectCountConfigType mObjectCountConfig            = {
@@ -81,7 +78,7 @@ public:
 
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<AmbientContextSensing::Attributes::ObjectCount::Id>;
 
-    AmbientContextSensingCluster(const Config & config);
+    AmbientContextSensingCluster(EndpointId endpointId, const Config & config);
     ~AmbientContextSensingCluster() = default;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
