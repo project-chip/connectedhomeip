@@ -87,12 +87,18 @@ class TC_HSTAT_2_2(MatterBaseTest):
                 TestStep(next(step), "TH sends command with UserSetpoint set toe MinSetpointValue - 1.",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
 
-                TestStep(next(step), "TH sends command with mode set to Humidifier", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with mode set to Dehumidifier", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with mode set to FanOnly", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with mode set to Auto", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with MistType set to Warm", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with MistType set to Cold", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with mode set to Humidifier",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with mode set to Dehumidifier",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with mode set to FanOnly",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with mode set to Auto",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with MistType set to Warm",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command with MistType set to Cold",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 ]
 
     async def read_hstat_attribute_expect_success(self, endpoint, attribute):
@@ -179,7 +185,8 @@ class TC_HSTAT_2_2(MatterBaseTest):
         self.step(next(step))  # Read UserSetpoint, confirm it is MinSetpoint + Step
         if supports_sensor:
             dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
-            asserts.assert_equal(dut_UserSetpoint, dut_MinSetpoint+dut_Step, "UserSetpoint attribute not equal to MinSetpoint + StepValue")
+            asserts.assert_equal(dut_UserSetpoint, dut_MinSetpoint+dut_Step,
+                                 "UserSetpoint attribute not equal to MinSetpoint + StepValue")
 
         self.step(next(step))  # Set UserSetpoint to MinSetpoint + 1
         if supports_sensor and dut_Step > 1:
@@ -248,6 +255,7 @@ class TC_HSTAT_2_2(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.INVALID_IN_STATE, "Unexpected error returned")
                 pass
+
 
 if __name__ == "__main__":
     default_matter_test_main()
