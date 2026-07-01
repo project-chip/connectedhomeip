@@ -44,8 +44,7 @@ struct AbortContext
 };
 
 /**
- * @brief Handles one component's binary within a multi-image OTA bundle.
- *
+ * @brief Handles a single sub-image in a multi-image OTA bundle.
  */
 class SubImageProcessor
 {
@@ -53,58 +52,63 @@ public:
     virtual ~SubImageProcessor() = default;
 
     /**
-     * @brief Prepare to receive this component's binary. Called once, before IsReadyForOTA().
+     * @brief Initializes the processor for a sub-image.
      *
-     * @param entry  Image header for this sub-image. Valid only for
-     *               the duration of the call.
-     * @retval CHIP_NO_ERROR if initialization was successful; other error code otherwise.
+     * Called once before IsReadyForOTA().
+     *
+     * @param entry Header for the sub-image. Valid only for the duration of
+     *              the call.
+     * @retval CHIP_NO_ERROR on success; otherwise an error.
      */
     virtual CHIP_ERROR Init(const SubImageHeader & entry) = 0;
 
     /**
-     * @brief Whether Init() has run (the processor is mid-transfer).
-     * @return true if initialised; false otherwise.
+     * @brief Returns whether the processor has been initialized.
      */
     virtual bool IsInitialized() = 0;
 
     /**
-     * @brief Report readiness for this OTA cycle. .
+     * @brief Reports whether the processor is ready for this OTA update.
      *
-     * @param[out] state  reporting state of the device for this OTA cycle.
-     * @retval CHIP_NO_ERROR on success, other error code otherwise.
+     * @param[out] state Receives the processor's OTA state.
+     * @retval CHIP_NO_ERROR on success; otherwise an error.
      */
     virtual CHIP_ERROR IsReadyForOTA(DeviceState & state) = 0;
 
     /**
-     * @brief Consume one ordered chunk of this sub-image's binary.
+     * @brief Writes the next chunk of the sub-image.
      *
-     * The data is ready to be written to the target component. If the OTA
-     * package is encrypted, the payload has already been decrypted.
-     *
-     * @param block  Payload bytes for this sub-image; valid only for the duration of the call.
-     * @retval CHIP_NO_ERROR on success, other error code otherwise.
+     * @param block Payload bytes for the sub-image. Valid only for the
+     *              duration of the call.
+     * @retval CHIP_NO_ERROR on success; otherwise an error.
      */
     virtual CHIP_ERROR Write(ByteSpan & block) = 0;
 
     /**
-     * @brief Close this sub-image after the final chunk. Called once by the dispatcher when
-     *        all of this sub-image's bytes have been delivered and its integrity has been verified.
+     * @brief Finalizes the sub-image after the last chunk has been written.
      *
-     * @retval CHIP_NO_ERROR on success, other error code otherwise.
+     * Called once after all bytes have been received and verified.
+     *
+     * @retval CHIP_NO_ERROR on success; otherwise an error.
      */
     virtual CHIP_ERROR Finish() { return CHIP_NO_ERROR; }
 
     /**
-     * @brief Tear down an aborted session. Called on every Initialized processor.
+     * @brief Aborts an in-progress OTA session.
      *
-     * @param context  reason = kError (with context.error) or kCancelled.
+     * Called for every initialized processor.
+     *
+     * @param context Indicates whether the session was cancelled or aborted
+     *                due to an error.
      */
     virtual void Abort(AbortContext & context) = 0;
 
     /**
-     * @brief Commit this sub-image during the apply phase. Called once per Initialized processor.
+     * @brief Applies the sub-image during the apply phase.
      *
-     * @retval CHIP_NO_ERROR on success, other error code otherwise.
+     * Called once for every initialized processor.
+     *
+     * @retval CHIP_NO_ERROR on success; otherwise an error.
      */
     virtual CHIP_ERROR Apply() { return CHIP_NO_ERROR; }
 };

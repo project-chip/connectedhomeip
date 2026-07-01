@@ -42,10 +42,10 @@ constexpr uint8_t kMaxNumImages = 255;
 
 struct SubImageHeader
 {
-    uint32_t imageId;                            // identifies which sub-processor handles this binary
-    uint32_t version;                            // expected installed version of this binary
-    uint32_t offset;                             // byte offset of binary data from payload start
-    uint32_t length;                             // exact byte count of the binary
+    uint32_t imageId; // identifies which sub-processor handles this binary
+    uint32_t version; // expected installed version of this binary
+    uint32_t offset;  // byte offset of binary data from payload start
+    uint32_t length;  // exact byte count of the binary
     // SHA-256 of this binary as sent over the wire. For an encrypted or delta image, that is the
     // encrypted/patch bytes — not the final decrypted or rebuilt image.
     uint8_t sha256[Crypto::kSHA256_Hash_Length];
@@ -86,30 +86,19 @@ public:
     bool IsHeaderParsed() const { return mHeaderParsed; }
 
     /**
-     * @brief Decode the MultiOTAImageHeader.
+     * @brief Decodes a MultiOTAImageHeader from the OTA payload.
      *
-     * The MultiOTAImageHeader consists of a fixed preamble (magic, numImages, reserved) followed by
-     * a variable-length list of numImages SubImageHeader entries. The method takes subsequent chunks
-     * of the OTA payload (the bytes that follow the outer Matter OTA header) and decodes the header
-     * once enough data has been provided. If more data is needed, CHIP_ERROR_BUFFER_TOO_SMALL is
-     * returned and the caller is expected to call the method again with the next chunk. Other error
-     * codes indicate that the header is invalid.
+     * Call this method with successive payload chunks until the header is fully
+     * decoded. If more data is required, it returns CHIP_ERROR_BUFFER_TOO_SMALL
+     * and the caller is expected to call the method again with the next chunk.
+     * Other error codes indicate that the header is invalid.
      *
-     * @param buffer Byte span containing a subsequent payload chunk. When the method returns
-     *               CHIP_NO_ERROR, the span is updated to reference the remaining bytes of the
-     *               chunk that follow the header (i.e. the first sub-image's binary data).
-     * @param header On success, receives the parsed header. header.subImages points into the
-     *               parser's internal buffer and must not be referenced after Clear() is called.
-     *
-     * @retval CHIP_NO_ERROR                        Header has been decoded successfully.
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL          More payload bytes are needed to decode the
-     *                                              header. Call the method again with the next chunk.
-     * @retval CHIP_ERROR_INVALID_FILE_IDENTIFIER   Payload does not begin with the header
-     *                                              identifier ("MIOT").
-     * @retval CHIP_ERROR_INVALID_ARGUMENT          Header is structurally invalid (numImages == 0,
-     *                                              reserved bytes nonzero, or an entry has
-     *                                              imageId == 0 or length == 0).
-     * @retval Error code                           Encoded header is otherwise invalid.
+     * @param buffer Payload chunk.
+     * @param header Receives the decoded header.
+     * @return CHIP_NO_ERROR if the header is decoded successfully, CHIP_ERROR_BUFFER_TOO_SMALL if more data is required,
+     *         CHIP_ERROR_INVALID_FILE_IDENTIFIER if the header identifier is invalid,
+     *         CHIP_ERROR_INVALID_ARGUMENT if the header is structurally invalid,
+     *         or other error code if the header is otherwise invalid.
      */
     CHIP_ERROR AccumulateAndDecode(ByteSpan & buffer, MultiOTAImageHeader & header);
 

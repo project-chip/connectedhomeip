@@ -61,27 +61,40 @@ public:
     CHIP_ERROR ConfirmCurrentImage() override;
 
     /**
-     * @brief Register a sub-processor under its image-ID tag. The caller owns the entry node.
+     * @brief Registers a sub-processor for an image-ID tag.
      *
-     * @param entry The entry node to register.
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the processor is null or tag is 0,
-     *         or CHIP_ERROR_DUPLICATE_KEY_ID if the tag is already registered.
+     * @param entry Entry node to register. Ownership remains with the caller.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the
+     *         processor is null or the tag is 0, or
+     *         CHIP_ERROR_DUPLICATE_KEY_ID if the tag is already registered.
      */
     CHIP_ERROR RegisterProcessor(ImageProcessorEntry & entry);
 
     /**
-     * @brief Gives the application the final decision on whether to apply a downloaded update.
+     * @brief Decides whether to apply a downloaded OTA update.
      *
-     * Invoked once after a successful download, on the Matter thread, before the apply phase.
-     * The application can inspect the per-sub-image results and decide whether the staged
-     * update should be applied. Returning true proceeds with the update; returning false
-     * discards the staged update and keeps the currently running firmware. The next
-     * QueryImage request may offer the bundle again.
+     * Called after a successful download, before the apply phase. The application
+     * can inspect the per-sub-image results and decide whether to proceed.
      *
-     * This callback must not block and should make its decision using only the provided
-     * in-memory results. The default implementation always returns true.
+     * Runs on the Matter thread and must not block. The default implementation
+     * always returns true.
+     *
+     * @return true to apply the update; false to discard it.
      */
     virtual bool ShouldApplyUpdate(Span<const SubImageResult> results) { return true; }
+
+    /**
+     * @brief Verifies a newly booted OTA image before it is committed.
+     *
+     * Called on the first boot after an OTA update. The default implementation
+     * confirms the running software version matches the target version. Override
+     * this method to perform custom validation instead.
+     *
+     * Runs on the Matter thread early during boot and must not block.
+     *
+     * @return CHIP_NO_ERROR to accept the new image; otherwise an error to reject it.
+     */
+    virtual CHIP_ERROR ConfirmOTASuccess();
 
 private:
     OTADownloader * mDownloader = nullptr;

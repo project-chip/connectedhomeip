@@ -61,6 +61,11 @@ bool MultiImageOTAProcessorImpl::IsFirstImageRun()
 
 CHIP_ERROR MultiImageOTAProcessorImpl::ConfirmCurrentImage()
 {
+    return ConfirmOTASuccess();
+}
+
+CHIP_ERROR MultiImageOTAProcessorImpl::ConfirmOTASuccess()
+{
     OTARequestorInterface * requestor = GetRequestorInstance();
     if (requestor == nullptr)
     {
