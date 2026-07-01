@@ -37,6 +37,7 @@ source_set("clusters") {
     "concentration-measurement-server",
     "descriptor",
     "device-energy-management-server",
+    "dynamic-lighting-server",
     "fan-control-server",
     "flow-measurement-server",
     "general-commissioning-server",
