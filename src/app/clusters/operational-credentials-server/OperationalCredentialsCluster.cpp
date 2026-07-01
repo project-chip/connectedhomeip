@@ -272,11 +272,11 @@ CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & 
     });
 }
 
-std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              TLV::TLVReader & input_arguments, FabricTable & fabricTable,
-                                                              FailSafeContext & failSafeContext,
-                                                              Credentials::DeviceAttestationCredentialsProvider & dacProvider,
-                                                              const ByteSpan (&vendorReserved)[3])
+std::optional<DataModel::ActionReturnStatus>
+HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, TLV::TLVReader & input_arguments,
+                 FabricTable & fabricTable, FailSafeContext & failSafeContext,
+                 Credentials::DeviceAttestationCredentialsProvider & dacProvider,
+                 const ByteSpan (&vendorReserved)[OperationalCredentialsCluster::kMaxCSRVendorReservedFields])
 {
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     Commands::CSRRequest::DecodableType commandData;

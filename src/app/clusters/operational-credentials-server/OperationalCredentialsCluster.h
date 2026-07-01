@@ -59,7 +59,7 @@ public:
     };
 
     OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
-        DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context){};
+        DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context) {};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -101,7 +101,7 @@ public:
 
 private:
     const OperationalCredentialsCluster::Context mOpCredsContext;
-    ByteSpan mCsrVendorReserved[kMaxCSRVendorReservedFields];
+    ByteSpan mCsrVendorReserved[kMaxCSRVendorReservedFields] = {};
 };
 
 } // namespace Clusters
