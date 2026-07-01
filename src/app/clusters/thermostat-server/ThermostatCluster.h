@@ -96,8 +96,6 @@ public:
         chip::FabricTable & fabricTable;
     };
 
-    /// Scalar attribute default values read from the Ember/ZAP configuration by the codegen
-    /// integration layer. Members are typed via the generated TypeInfo so they always track the spec.
     struct StartupConfiguration
     {
         int16_t absMinHeatSetpointLimit   = 700; // 7C (44.5 F) is the default
@@ -109,17 +107,7 @@ public:
         DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay;
     };
 
-    struct Config
-    {
-        Config(FabricTable & fabricTable, uint32_t featureMap, BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes) 
-        : fabricTable(fabricTable), features(featureMap), optionalAttributes(optionalAttributes) {};
-
-        FabricTable & fabricTable;
-        BitFlags<Thermostat::Feature> features;
-        BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes;
-    };
-
-    ThermostatCluster(EndpointId endpointId, const StartupConfiguration & config, const Config & gConfig);
+    ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config, const Context & context, BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes);
 
     void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
     Thermostat::Delegate * GetDelegate() const { return mDelegate; }
@@ -389,7 +377,7 @@ private:
     void GenerateScalarChangeEvent(AttributeId attributeId);
     void LoadPersistentAttributes();
 
-    FabricTable & mFabricTable;
+    Context mContext;
     Thermostat::Delegate * mDelegate = nullptr;
     const BitFlags<Thermostat::Feature> mFeatures;
     const BitFlags<Thermostat::OptionalAttributesBits> mOptionalAttributes;
@@ -449,8 +437,8 @@ private:
     // buffers below own the bytes so the spans remain valid for the lifetime of the cluster.
     uint8_t mActivePresetHandleBuffer[kPresetHandleSize]{};
     uint8_t mActiveScheduleHandleBuffer[kPresetHandleSize]{};
-    Attributes::ActivePresetHandle::TypeInfo::Type mActivePresetHandle{};
-    Attributes::ActiveScheduleHandle::TypeInfo::Type mActiveScheduleHandle{};
+    DataModel::Nullable<chip::ByteSpan> mActivePresetHandle{};
+    DataModel::Nullable<chip::ByteSpan> mActiveScheduleHandle{};
     DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp{};
 };
 

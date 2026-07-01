@@ -110,6 +110,11 @@ ThermostatCluster::StartupConfiguration DefaultConfig()
     return ThermostatCluster::StartupConfiguration{};
 }
 
+BitFlags<Thermostat::OptionalAttributesBits> AllAttributes()
+{
+    BitFlags<Thermostat::OptionalAttributesBits> allAttributes;
+    return allAttributes.SetRaw(0xFFFFFFFF);
+}
 class TestThermostatCluster : public ::testing::Test
 {
 public:
@@ -127,8 +132,8 @@ struct ClusterFixture
     ThermostatCluster cluster;
     ClusterTester tester{ cluster };
 
-    ClusterFixture(uint32_t featureMap, const ThermostatCluster::StartupConfiguration & config = DefaultConfig()) :
-        cluster(kEndpointId, featureMap, config, ThermostatCluster::Context{ fabricTable })
+    ClusterFixture(uint32_t featureMap, const ThermostatCluster::StartupConfiguration & config = DefaultConfig(), const BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes = AllAttributes()) :
+        cluster(kEndpointId, featureMap, config, ThermostatCluster::Context{ fabricTable }, optionalAttributes)
     {
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     }

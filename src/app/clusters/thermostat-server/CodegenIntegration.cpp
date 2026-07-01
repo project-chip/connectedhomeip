@@ -100,7 +100,18 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ThermostatCluster::StartupConfiguration config;
+        ThermostatCluster::StartupConfiguration config{};
+
+        // Optional Attributes
+        BitFlags<OptionalAttributesBits> optionalAttributes;
+        for (const auto & mapping : kOptionalAttributeMap)
+        {
+            if (emberAfContainsAttribute(endpointId, Thermostat::Id, mapping.attributeId))
+            {
+                optionalAttributes.Set(mapping.bit);
+            }
+        }
+
 
         // Seed the setpoint family and mode attributes from the Ember/ZAP defaults.
         SeedFromDefault(AbsMinHeatSetpointLimit::GetDefault, endpointId, config.absMinHeatSetpointLimit);
@@ -126,19 +137,9 @@ public:
             config.numberOfScheduleTransitionPerDay = numberOfScheduleTransitionPerDay;
         }
 
-        // Optional Attributes
-        BitFlags<OptionalAttributesBits> optionalAttributes;
-        for (const auto & mapping : kOptionalAttributeMap)
-        {
-            if (emberAfContainsAttribute(endpointId, Thermostat::Id, mapping.attributeId))
-            {
-                optionalAttributes.Set(mapping.bit);
-            }
-        }
+        ThermostatCluster::Context clusterContext{ Server::GetInstance().GetFabricTable() };
 
-        ThermostatCluster::Config gConfig(Server::GetInstance().GetFabricTable(), featureMap, optionalAttributes);
-
-        gServers[clusterInstanceIndex].Create(endpointId, config, gConfig);
+        gServers[clusterInstanceIndex].Create(endpointId, featureMap, config, clusterContext, optionalAttributes);
         gServers[clusterInstanceIndex].Cluster().SetDelegate(gDelegateTable[clusterInstanceIndex]);
         return gServers[clusterInstanceIndex].Registration();
     }

@@ -89,9 +89,10 @@ int16_t ThermostatCluster::EnforceCoolingSetpointLimits(int16_t coolingSetpoint)
 }
 
 
-ThermostatCluster::ThermostatCluster(EndpointId endpointId, const StartupConfiguration & config, const Config & gConfig) :
+ThermostatCluster::ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config,
+                                     const Context & context, BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mFabricTable(gConfig.fabricTable), mFeatures(gConfig.features), mOptionalAttributes(gConfig.optionalAttributes)
+    mContext(context), mFeatures(featureMap), mOptionalAttributes(optionalAttributes)
 {
     mAbsMinHeatSetpointLimit    = config.absMinHeatSetpointLimit;
     mAbsMaxHeatSetpointLimit    = config.absMaxHeatSetpointLimit;
@@ -107,7 +108,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     // Register as a fabric delegate so open atomic writes can be rolled back when their fabric is removed.
-    CHIP_ERROR err = mFabricTable.AddFabricDelegate(this);
+    CHIP_ERROR err = mContext.fabricTable.AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Thermostat: failed to register fabric delegate: %" CHIP_ERROR_FORMAT, err.Format());
@@ -213,7 +214,7 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     {
         ResetAtomicWrite(GetEndpointId());
     }
-    mFabricTable.RemoveFabricDelegate(this);
+    mContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(type);
 }
 
@@ -588,484 +589,6 @@ void ThermostatCluster::GenerateScalarChangeEvent(AttributeId attributeId)
     default:
         break;
     }
-}
-
-void ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> value)
-{
-    if (SetAttributeValue(mLocalTemperature, value, LocalTemperature::Id) && mFeatures.Has(Feature::kEvents))
-    {
-        GenerateLocalTemperatureChangeEvent(GetEndpointId(), mLocalTemperature);
-    }
-}
-
-DataModel::Nullable<int16_t> ThermostatCluster::GetLocalTemperature()
-{
-    return mLocalTemperature;
-}
-
-void ThermostatCluster::SetOutdoorTemperature(DataModel::Nullable<int16_t> value)
-{
-    SetAttributeValue(mOutdoorTemperature, value, OutdoorTemperature::Id);
-}
-
-DataModel::Nullable<int16_t> ThermostatCluster::GetOutdoorTemperature()
-{
-    return mOutdoorTemperature;
-}
-
-void ThermostatCluster::SetOccupancy(BitMask<OccupancyBitmap> value)
-{
-    if (SetAttributeValue(mOccupancy, value, Occupancy::Id) && mFeatures.Has(Feature::kEvents))
-    {
-        GenerateOccupancyChangeEvent(GetEndpointId(), NullOptional, mOccupancy);
-    }
-}
-
-BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> ThermostatCluster::GetOccupancy()
-{
-    return mOccupancy;
-}
-
-void ThermostatCluster::SetLocalTemperatureCalibration(int8_t value)
-{
-    VerifyOrReturn(value != mLocalTemperatureCalibration);
-    NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id, DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id }, { reinterpret_cast<const uint8_t *>(&mLocalTemperatureCalibration), sizeof(mLocalTemperatureCalibration) }));
-}
-
-int8_t ThermostatCluster::GetLocalTemperatureCalibration()
-{
-    return mLocalTemperatureCalibration;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetOccupiedCoolingSetpoint(int16_t value)
-{
-    return HandleOccupancyCoolingSetpoint(value, OccupiedCoolingSetpoint::Id);
-}
-
-int16_t ThermostatCluster::GetOccupiedCoolingSetpoint()
-{
-    return mOccupiedCoolingSetpoint;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetOccupiedHeatingSetpoint(int16_t value)
-{
-    return HandleOccupancyHeatingSetpoint(value, OccupiedHeatingSetpoint::Id);
-}
-
-int16_t ThermostatCluster::GetOccupiedHeatingSetpoint()
-{
-    return mOccupiedHeatingSetpoint;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetUnoccupiedCoolingSetpoint(int16_t value)
-{
-    return HandleOccupancyCoolingSetpoint(value, UnoccupiedCoolingSetpoint::Id);
-}
-
-int16_t ThermostatCluster::GetUnoccupiedCoolingSetpoint()
-{
-    return mUnoccupiedCoolingSetpoint;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetUnoccupiedHeatingSetpoint(int16_t value)
-{
-    return HandleOccupancyHeatingSetpoint(value, UnoccupiedHeatingSetpoint::Id);
-}
-
-int16_t ThermostatCluster::GetUnoccupiedHeatingSetpoint()
-{
-    return mUnoccupiedHeatingSetpoint;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetMinHeatSetpointLimit(int16_t value)
-{
-    return HandleMinHeatSetpointLimit(value);
-}
-
-int16_t ThermostatCluster::GetMinHeatSetpointLimit()
-{
-    return mMinHeatSetpointLimit;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetMaxHeatSetpointLimit(int16_t value)
-{
-    return HandleMaxHeatSetpointLimit(value);
-}
-
-int16_t ThermostatCluster::GetMaxHeatSetpointLimit()
-{
-    return mMaxHeatSetpointLimit;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetMinCoolSetpointLimit(int16_t value)
-{
-    return HandleMinCoolSetpointLimit(value);
-}
-
-int16_t ThermostatCluster::GetMinCoolSetpointLimit()
-{
-    return mMinCoolSetpointLimit;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetMaxCoolSetpointLimit(int16_t value)
-{
-    return HandleMaxCoolSetpointLimit(value);
-}
-
-int16_t ThermostatCluster::GetMaxCoolSetpointLimit()
-{
-    return mMaxCoolSetpointLimit;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetMinSetpointDeadband(int8_t value)
-{
-    return HandleMinSetpointDeadband(value);
-}
-
-int8_t ThermostatCluster::GetMinSetpointDeadband()
-{
-    return mMinSetpointDeadBand;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetRemoteSensing(BitMask<RemoteSensingBitmap> value)
-{
-    return HandleRemoteSensing(value);
-}
-
-BitMask<RemoteSensingBitmap> ThermostatCluster::GetRemoteSensing()
-{
-    return mRemoteSensing;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum value)
-{
-    return HandleControlSequenceOfOperation(value);
-}
-
-ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation()
-{
-    return mControlSequenceOfOperation;
-}
-
-Protocols::InteractionModel::Status ThermostatCluster::SetSystemMode(SystemModeEnum value)
-{
-    return HandleSystemMode(value);
-}
-
-SystemModeEnum ThermostatCluster::GetSystemMode()
-{
-    return mSystemMode;
-}
-
-void ThermostatCluster::SetThermostatRunningState(BitMask<RelayStateBitmap> value)
-{
-    if (SetAttributeValue(mThermostatRunningState, value, ThermostatRunningState::Id) && mFeatures.Has(Feature::kEvents))
-    {
-        GenerateRunningStateChangeEvent(GetEndpointId(), NullOptional, mThermostatRunningState);
-    }
-}
-
-BitMask<RelayStateBitmap> ThermostatCluster::GetThermostatRunningState()
-{
-    return mThermostatRunningState;
-}
-
-void ThermostatCluster::SetThermostatRunningMode(ThermostatRunningModeEnum value)
-{
-    if (SetAttributeValue(mThermostatRunningMode, value, ThermostatRunningMode::Id) && mFeatures.Has(Feature::kEvents))
-    {
-        GenerateRunningModeChangeEvent(GetEndpointId(), NullOptional, mThermostatRunningMode);
-    }
-}
-
-ThermostatRunningModeEnum ThermostatCluster::GetThermostatRunningMode()
-{
-    return mThermostatRunningMode;
-}
-
-void ThermostatCluster::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum value)
-{
-    SetAttributeValue(mTemperatureSetpointHold, value, TemperatureSetpointHold::Id);
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
-        { reinterpret_cast<const uint8_t *>(&mTemperatureSetpointHold), sizeof(mTemperatureSetpointHold) }));
-}
-
-TemperatureSetpointHoldEnum ThermostatCluster::GetTemperatureSetpointHold()
-{
-    return mTemperatureSetpointHold;
-}
-
-void ThermostatCluster::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value)
-{
-    SetAttributeValue(mTemperatureSetpointHoldDuration, value, TemperatureSetpointHoldDuration::Id);
-
-    NumericAttributeTraits<uint16_t>::StorageType storageValue;
-    DataModel::NullableToStorage(value, storageValue);
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
-        { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
-}
-
-DataModel::Nullable<uint16_t> ThermostatCluster::GetTemperatureSetpointHoldDuration()
-{
-    return mTemperatureSetpointHoldDuration;
-}
-
-void ThermostatCluster::SetSetpointChangeSource(SetpointChangeSourceEnum value)
-{
-    SetAttributeValue(mSetpointChangeSource, value, SetpointChangeSource::Id);
-}
-
-SetpointChangeSourceEnum ThermostatCluster::GetSetpointChangeSource()
-{
-    return mSetpointChangeSource;
-}
-
-void ThermostatCluster::SetSetpointChangeAmount(DataModel::Nullable<int16_t> value)
-{
-    SetAttributeValue(mSetpointChangeAmount, value, SetpointChangeAmount::Id);
-}
-
-DataModel::Nullable<int16_t> ThermostatCluster::GetSetpointChangeAmount()
-{
-    return mSetpointChangeAmount;
-}
-
-void ThermostatCluster::SetSetpointChangeSourceTimestamp(uint32_t value)
-{
-    SetAttributeValue(mSetpointChangeSourceTimestamp, value, SetpointChangeSourceTimestamp::Id);
-}
-
-uint32_t ThermostatCluster::GetSetpointChangeSourceTimestamp()
-{
-    return mSetpointChangeSourceTimestamp;
-}
-
-void ThermostatCluster::SetEmergencyHeatDelta(uint8_t value)
-{
-    VerifyOrReturn(SetAttributeValue(mEmergencyHeatDelta, value, EmergencyHeatDelta::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, EmergencyHeatDelta::Id },
-        { reinterpret_cast<const uint8_t *>(&mEmergencyHeatDelta), sizeof(mEmergencyHeatDelta) }));
-}
-
-uint8_t ThermostatCluster::GetEmergencyHeatDelta()
-{
-    return mEmergencyHeatDelta;
-}
-
-void ThermostatCluster::SetACType(ACTypeEnum value)
-{
-    VerifyOrReturn(SetAttributeValue(mACType, value, ACType::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACType::Id },
-        { reinterpret_cast<const uint8_t *>(&mACType), sizeof(mACType) }));
-
-}
-
-ACTypeEnum ThermostatCluster::GetACType()
-{
-    return mACType;
-}
-
-void ThermostatCluster::SetACCapacity(uint16_t value)
-{
-    VerifyOrReturn(SetAttributeValue(mACCapacity, value, ACCapacity::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACCapacity::Id },
-        { reinterpret_cast<const uint8_t *>(&mACCapacity), sizeof(mACCapacity) }));
-
-}
-
-uint16_t ThermostatCluster::GetACCapacity()
-{
-    return mACCapacity;
-}
-
-void ThermostatCluster::SetACRefrigerantType(ACRefrigerantTypeEnum value)
-{
-    VerifyOrReturn(SetAttributeValue(mACRefrigerantType, value, ACRefrigerantType::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id },
-        { reinterpret_cast<const uint8_t *>(&mACRefrigerantType), sizeof(mACRefrigerantType) }));
-
-}
-
-ACRefrigerantTypeEnum ThermostatCluster::GetACRefrigerantType()
-{
-    return mACRefrigerantType;
-}
-
-void ThermostatCluster::SetACCompressorType(ACCompressorTypeEnum value)
-{
-    VerifyOrReturn(SetAttributeValue(mACCompressorType, value, ACCompressorType::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id },
-        { reinterpret_cast<const uint8_t *>(&mACCompressorType), sizeof(mACCompressorType) }));
-
-}
-
-ACCompressorTypeEnum ThermostatCluster::GetACCompressorType()
-{
-    return mACCompressorType;
-}
-
-void ThermostatCluster::SetACErrorCode(BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> value)
-{
-    VerifyOrReturn(SetAttributeValue(mACErrorCode, value, ACErrorCode::Id));
-}
-
-BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> ThermostatCluster::GetACErrorCode()
-{
-    return mACErrorCode;
-}
-
-void ThermostatCluster::SetACLouverPosition(ACLouverPositionEnum value)
-{
-    VerifyOrReturn(SetAttributeValue(mACLouverPosition, value, ACLouverPosition::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
-        { reinterpret_cast<const uint8_t *>(&mACLouverPosition), sizeof(mACLouverPosition) }));
-
-}
-
-ACLouverPositionEnum ThermostatCluster::GetACLouverPosition()
-{
-    return mACLouverPosition;
-}
-
-void ThermostatCluster::SetACCoilTemperature(DataModel::Nullable<int16_t> value)
-{
-    SetAttributeValue(mACCoilTemperature, value, ACCoilTemperature::Id);
-}
-
-DataModel::Nullable<int16_t> ThermostatCluster::GetACCoilTemperature()
-{
-    return mACCoilTemperature;
-}
-
-void ThermostatCluster::SetACCapacityFormat(ACCapacityFormatEnum value)
-{
-    VerifyOrReturn(SetAttributeValue(mACCapacityFormat, value, ACCapacityformat::Id));
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
-        { reinterpret_cast<const uint8_t *>(&mACCapacityFormat), sizeof(mACCapacityFormat) }));
-
-}
-
-ACCapacityFormatEnum ThermostatCluster::GetACCapacityFormat()
-{
-    return mACCapacityFormat;
-}
-
-void ThermostatCluster::SetNumberOfSchedules(uint8_t value)
-{
-    SetAttributeValue(mNumberOfSchedules, value, NumberOfSchedules::Id);
-}
-
-uint8_t ThermostatCluster::GetNumberOfSchedules()
-{
-    return mNumberOfSchedules;
-}
-
-void ThermostatCluster::SetNumberOfScheduleTransitions(uint8_t value)
-{
-    SetAttributeValue(mNumberOfScheduleTransitions, value, NumberOfScheduleTransitions::Id);
-}
-
-uint8_t ThermostatCluster::GetNumberOfScheduleTransitions()
-{
-    return mNumberOfScheduleTransitions;
-}
-
-void ThermostatCluster::SetNumberOfScheduleTransitionPerDay(DataModel::Nullable<uint8_t> value)
-{
-    SetAttributeValue(mNumberOfScheduleTransitionPerDay, value, NumberOfScheduleTransitionPerDay::Id);
-}
-
-DataModel::Nullable<uint8_t> ThermostatCluster::GetNumberOfScheduleTransitionPerDay()
-{
-    return mNumberOfScheduleTransitionPerDay;
-}
-
-void ThermostatCluster::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> value)
-{
-    SetAttributeValue(mSetpointHoldExpiryTimestamp, value, SetpointHoldExpiryTimestamp::Id);
-
-    NumericAttributeTraits<uint32_t>::StorageType storageValue;
-    DataModel::NullableToStorage(value, storageValue);
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
-        { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
-}
-
-DataModel::Nullable<uint32_t> ThermostatCluster::GetSetpointHoldExpiryTimestamp()
-{
-    return mSetpointHoldExpiryTimestamp;
-}
-
-void ThermostatCluster::SetActivePresetHandle(DataModel::Nullable<ByteSpan> value)
-{
-    VerifyOrReturn(DefaultServerCluster::mContext != nullptr);
-
-    if (value.IsNull())
-    {
-        if (mActivePresetHandle.IsNull())
-        {
-            return; // no-op
-        }
-        mActivePresetHandle.SetNull();
-    }
-    else
-    {
-        VerifyOrReturn(value.Value().size() <= kPresetHandleSize,
-                       ChipLogError(Zcl, "SetActivePresetHandle: handle too large (%u bytes)", (unsigned) value.Value().size()));
-        if (!mActivePresetHandle.IsNull() && mActivePresetHandle.Value().data_equal(value.Value()))
-        {
-            return; // no-op: same bytes
-        }
-        memcpy(mActivePresetHandleBuffer, value.Value().data(), value.Value().size());
-        mActivePresetHandle.SetNonNull(ByteSpan(mActivePresetHandleBuffer, value.Value().size()));
-    }
-
-    NotifyAttributeChanged(ActivePresetHandle::Id);
-
-    const ByteSpan toStore = mActivePresetHandle.IsNull() ? ByteSpan{} : mActivePresetHandle.Value();
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ActivePresetHandle::Id }, toStore));
-}
-
-void ThermostatCluster::SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> value)
-{
-    VerifyOrReturn(DefaultServerCluster::mContext != nullptr);
-
-    if (value.IsNull())
-    {
-        if (mActiveScheduleHandle.IsNull())
-        {
-            return; // no-op
-        }
-        mActiveScheduleHandle.SetNull();
-    }
-    else
-    {
-        VerifyOrReturn(value.Value().size() <= kPresetHandleSize,
-                       ChipLogError(Zcl, "SetActiveScheduleHandle: handle too large (%u bytes)", (unsigned) value.Value().size()));
-        if (!mActiveScheduleHandle.IsNull() && mActiveScheduleHandle.Value().data_equal(value.Value()))
-        {
-            return; // no-op: same bytes
-        }
-        memcpy(mActiveScheduleHandleBuffer, value.Value().data(), value.Value().size());
-        mActiveScheduleHandle.SetNonNull(ByteSpan(mActiveScheduleHandleBuffer, value.Value().size()));
-    }
-
-    NotifyAttributeChanged(ActiveScheduleHandle::Id);
-
-    const ByteSpan toStore = mActiveScheduleHandle.IsNull() ? ByteSpan{} : mActiveScheduleHandle.Value();
-    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ActiveScheduleHandle::Id }, toStore));
 }
 
 bool ThermostatCluster::SetAndPersistSetpoint(int16_t & member, int16_t value, AttributeId attributeId)
@@ -1752,6 +1275,485 @@ CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path
     }
     return CHIP_NO_ERROR;
 }
+
+void ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> value)
+{
+    if (SetAttributeValue(mLocalTemperature, value, LocalTemperature::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateLocalTemperatureChangeEvent(GetEndpointId(), mLocalTemperature);
+    }
+}
+
+DataModel::Nullable<int16_t> ThermostatCluster::GetLocalTemperature()
+{
+    return mLocalTemperature;
+}
+
+void ThermostatCluster::SetOutdoorTemperature(DataModel::Nullable<int16_t> value)
+{
+    SetAttributeValue(mOutdoorTemperature, value, OutdoorTemperature::Id);
+}
+
+DataModel::Nullable<int16_t> ThermostatCluster::GetOutdoorTemperature()
+{
+    return mOutdoorTemperature;
+}
+
+void ThermostatCluster::SetOccupancy(BitMask<OccupancyBitmap> value)
+{
+    if (SetAttributeValue(mOccupancy, value, Occupancy::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateOccupancyChangeEvent(GetEndpointId(), NullOptional, mOccupancy);
+    }
+}
+
+BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> ThermostatCluster::GetOccupancy()
+{
+    return mOccupancy;
+}
+
+void ThermostatCluster::SetLocalTemperatureCalibration(int8_t value)
+{
+    VerifyOrReturn(value != mLocalTemperatureCalibration);
+    NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id, DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id }, { reinterpret_cast<const uint8_t *>(&mLocalTemperatureCalibration), sizeof(mLocalTemperatureCalibration) }));
+}
+
+int8_t ThermostatCluster::GetLocalTemperatureCalibration()
+{
+    return mLocalTemperatureCalibration;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetOccupiedCoolingSetpoint(int16_t value)
+{
+    return HandleOccupancyCoolingSetpoint(value, OccupiedCoolingSetpoint::Id);
+}
+
+int16_t ThermostatCluster::GetOccupiedCoolingSetpoint()
+{
+    return mOccupiedCoolingSetpoint;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetOccupiedHeatingSetpoint(int16_t value)
+{
+    return HandleOccupancyHeatingSetpoint(value, OccupiedHeatingSetpoint::Id);
+}
+
+int16_t ThermostatCluster::GetOccupiedHeatingSetpoint()
+{
+    return mOccupiedHeatingSetpoint;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetUnoccupiedCoolingSetpoint(int16_t value)
+{
+    return HandleOccupancyCoolingSetpoint(value, UnoccupiedCoolingSetpoint::Id);
+}
+
+int16_t ThermostatCluster::GetUnoccupiedCoolingSetpoint()
+{
+    return mUnoccupiedCoolingSetpoint;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetUnoccupiedHeatingSetpoint(int16_t value)
+{
+    return HandleOccupancyHeatingSetpoint(value, UnoccupiedHeatingSetpoint::Id);
+}
+
+int16_t ThermostatCluster::GetUnoccupiedHeatingSetpoint()
+{
+    return mUnoccupiedHeatingSetpoint;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetMinHeatSetpointLimit(int16_t value)
+{
+    return HandleMinHeatSetpointLimit(value);
+}
+
+int16_t ThermostatCluster::GetMinHeatSetpointLimit()
+{
+    return mMinHeatSetpointLimit;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetMaxHeatSetpointLimit(int16_t value)
+{
+    return HandleMaxHeatSetpointLimit(value);
+}
+
+int16_t ThermostatCluster::GetMaxHeatSetpointLimit()
+{
+    return mMaxHeatSetpointLimit;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetMinCoolSetpointLimit(int16_t value)
+{
+    return HandleMinCoolSetpointLimit(value);
+}
+
+int16_t ThermostatCluster::GetMinCoolSetpointLimit()
+{
+    return mMinCoolSetpointLimit;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetMaxCoolSetpointLimit(int16_t value)
+{
+    return HandleMaxCoolSetpointLimit(value);
+}
+
+int16_t ThermostatCluster::GetMaxCoolSetpointLimit()
+{
+    return mMaxCoolSetpointLimit;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetMinSetpointDeadband(int8_t value)
+{
+    return HandleMinSetpointDeadband(value);
+}
+
+int8_t ThermostatCluster::GetMinSetpointDeadband()
+{
+    return mMinSetpointDeadBand;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetRemoteSensing(BitMask<RemoteSensingBitmap> value)
+{
+    return HandleRemoteSensing(value);
+}
+
+BitMask<RemoteSensingBitmap> ThermostatCluster::GetRemoteSensing()
+{
+    return mRemoteSensing;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum value)
+{
+    return HandleControlSequenceOfOperation(value);
+}
+
+ControlSequenceOfOperationEnum ThermostatCluster::GetControlSequenceOfOperation()
+{
+    return mControlSequenceOfOperation;
+}
+
+Protocols::InteractionModel::Status ThermostatCluster::SetSystemMode(SystemModeEnum value)
+{
+    return HandleSystemMode(value);
+}
+
+SystemModeEnum ThermostatCluster::GetSystemMode()
+{
+    return mSystemMode;
+}
+
+void ThermostatCluster::SetThermostatRunningState(BitMask<RelayStateBitmap> value)
+{
+    if (SetAttributeValue(mThermostatRunningState, value, ThermostatRunningState::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateRunningStateChangeEvent(GetEndpointId(), NullOptional, mThermostatRunningState);
+    }
+}
+
+BitMask<RelayStateBitmap> ThermostatCluster::GetThermostatRunningState()
+{
+    return mThermostatRunningState;
+}
+
+void ThermostatCluster::SetThermostatRunningMode(ThermostatRunningModeEnum value)
+{
+    if (SetAttributeValue(mThermostatRunningMode, value, ThermostatRunningMode::Id) && mFeatures.Has(Feature::kEvents))
+    {
+        GenerateRunningModeChangeEvent(GetEndpointId(), NullOptional, mThermostatRunningMode);
+    }
+}
+
+ThermostatRunningModeEnum ThermostatCluster::GetThermostatRunningMode()
+{
+    return mThermostatRunningMode;
+}
+
+void ThermostatCluster::SetTemperatureSetpointHold(TemperatureSetpointHoldEnum value)
+{
+    SetAttributeValue(mTemperatureSetpointHold, value, TemperatureSetpointHold::Id);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
+        { reinterpret_cast<const uint8_t *>(&mTemperatureSetpointHold), sizeof(mTemperatureSetpointHold) }));
+}
+
+TemperatureSetpointHoldEnum ThermostatCluster::GetTemperatureSetpointHold()
+{
+    return mTemperatureSetpointHold;
+}
+
+void ThermostatCluster::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value)
+{
+    SetAttributeValue(mTemperatureSetpointHoldDuration, value, TemperatureSetpointHoldDuration::Id);
+
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    DataModel::NullableToStorage(value, storageValue);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
+        { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
+}
+
+DataModel::Nullable<uint16_t> ThermostatCluster::GetTemperatureSetpointHoldDuration()
+{
+    return mTemperatureSetpointHoldDuration;
+}
+
+void ThermostatCluster::SetSetpointChangeSource(SetpointChangeSourceEnum value)
+{
+    SetAttributeValue(mSetpointChangeSource, value, SetpointChangeSource::Id);
+}
+
+SetpointChangeSourceEnum ThermostatCluster::GetSetpointChangeSource()
+{
+    return mSetpointChangeSource;
+}
+
+void ThermostatCluster::SetSetpointChangeAmount(DataModel::Nullable<int16_t> value)
+{
+    SetAttributeValue(mSetpointChangeAmount, value, SetpointChangeAmount::Id);
+}
+
+DataModel::Nullable<int16_t> ThermostatCluster::GetSetpointChangeAmount()
+{
+    return mSetpointChangeAmount;
+}
+
+void ThermostatCluster::SetSetpointChangeSourceTimestamp(uint32_t value)
+{
+    SetAttributeValue(mSetpointChangeSourceTimestamp, value, SetpointChangeSourceTimestamp::Id);
+}
+
+uint32_t ThermostatCluster::GetSetpointChangeSourceTimestamp()
+{
+    return mSetpointChangeSourceTimestamp;
+}
+
+void ThermostatCluster::SetEmergencyHeatDelta(uint8_t value)
+{
+    VerifyOrReturn(SetAttributeValue(mEmergencyHeatDelta, value, EmergencyHeatDelta::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, EmergencyHeatDelta::Id },
+        { reinterpret_cast<const uint8_t *>(&mEmergencyHeatDelta), sizeof(mEmergencyHeatDelta) }));
+}
+
+uint8_t ThermostatCluster::GetEmergencyHeatDelta()
+{
+    return mEmergencyHeatDelta;
+}
+
+void ThermostatCluster::SetACType(ACTypeEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACType, value, ACType::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACType::Id },
+        { reinterpret_cast<const uint8_t *>(&mACType), sizeof(mACType) }));
+
+}
+
+ACTypeEnum ThermostatCluster::GetACType()
+{
+    return mACType;
+}
+
+void ThermostatCluster::SetACCapacity(uint16_t value)
+{
+    VerifyOrReturn(SetAttributeValue(mACCapacity, value, ACCapacity::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACCapacity::Id },
+        { reinterpret_cast<const uint8_t *>(&mACCapacity), sizeof(mACCapacity) }));
+
+}
+
+uint16_t ThermostatCluster::GetACCapacity()
+{
+    return mACCapacity;
+}
+
+void ThermostatCluster::SetACRefrigerantType(ACRefrigerantTypeEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACRefrigerantType, value, ACRefrigerantType::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id },
+        { reinterpret_cast<const uint8_t *>(&mACRefrigerantType), sizeof(mACRefrigerantType) }));
+
+}
+
+ACRefrigerantTypeEnum ThermostatCluster::GetACRefrigerantType()
+{
+    return mACRefrigerantType;
+}
+
+void ThermostatCluster::SetACCompressorType(ACCompressorTypeEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACCompressorType, value, ACCompressorType::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id },
+        { reinterpret_cast<const uint8_t *>(&mACCompressorType), sizeof(mACCompressorType) }));
+
+}
+
+ACCompressorTypeEnum ThermostatCluster::GetACCompressorType()
+{
+    return mACCompressorType;
+}
+
+void ThermostatCluster::SetACErrorCode(BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> value)
+{
+    VerifyOrReturn(SetAttributeValue(mACErrorCode, value, ACErrorCode::Id));
+}
+
+BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> ThermostatCluster::GetACErrorCode()
+{
+    return mACErrorCode;
+}
+
+void ThermostatCluster::SetACLouverPosition(ACLouverPositionEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACLouverPosition, value, ACLouverPosition::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
+        { reinterpret_cast<const uint8_t *>(&mACLouverPosition), sizeof(mACLouverPosition) }));
+
+}
+
+ACLouverPositionEnum ThermostatCluster::GetACLouverPosition()
+{
+    return mACLouverPosition;
+}
+
+void ThermostatCluster::SetACCoilTemperature(DataModel::Nullable<int16_t> value)
+{
+    SetAttributeValue(mACCoilTemperature, value, ACCoilTemperature::Id);
+}
+
+DataModel::Nullable<int16_t> ThermostatCluster::GetACCoilTemperature()
+{
+    return mACCoilTemperature;
+}
+
+void ThermostatCluster::SetACCapacityFormat(ACCapacityFormatEnum value)
+{
+    VerifyOrReturn(SetAttributeValue(mACCapacityFormat, value, ACCapacityformat::Id));
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
+        { reinterpret_cast<const uint8_t *>(&mACCapacityFormat), sizeof(mACCapacityFormat) }));
+
+}
+
+ACCapacityFormatEnum ThermostatCluster::GetACCapacityFormat()
+{
+    return mACCapacityFormat;
+}
+
+void ThermostatCluster::SetNumberOfSchedules(uint8_t value)
+{
+    SetAttributeValue(mNumberOfSchedules, value, NumberOfSchedules::Id);
+}
+
+uint8_t ThermostatCluster::GetNumberOfSchedules()
+{
+    return mNumberOfSchedules;
+}
+
+void ThermostatCluster::SetNumberOfScheduleTransitions(uint8_t value)
+{
+    SetAttributeValue(mNumberOfScheduleTransitions, value, NumberOfScheduleTransitions::Id);
+}
+
+uint8_t ThermostatCluster::GetNumberOfScheduleTransitions()
+{
+    return mNumberOfScheduleTransitions;
+}
+
+void ThermostatCluster::SetNumberOfScheduleTransitionPerDay(DataModel::Nullable<uint8_t> value)
+{
+    SetAttributeValue(mNumberOfScheduleTransitionPerDay, value, NumberOfScheduleTransitionPerDay::Id);
+}
+
+DataModel::Nullable<uint8_t> ThermostatCluster::GetNumberOfScheduleTransitionPerDay()
+{
+    return mNumberOfScheduleTransitionPerDay;
+}
+
+void ThermostatCluster::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> value)
+{
+    SetAttributeValue(mSetpointHoldExpiryTimestamp, value, SetpointHoldExpiryTimestamp::Id);
+
+    NumericAttributeTraits<uint32_t>::StorageType storageValue;
+    DataModel::NullableToStorage(value, storageValue);
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, SetpointHoldExpiryTimestamp::Id },
+        { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
+}
+
+DataModel::Nullable<uint32_t> ThermostatCluster::GetSetpointHoldExpiryTimestamp()
+{
+    return mSetpointHoldExpiryTimestamp;
+}
+
+void ThermostatCluster::SetActivePresetHandle(DataModel::Nullable<ByteSpan> value)
+{
+    VerifyOrReturn(DefaultServerCluster::mContext != nullptr);
+
+    if (value.IsNull())
+    {
+        if (mActivePresetHandle.IsNull())
+        {
+            return; // no-op
+        }
+        mActivePresetHandle.SetNull();
+    }
+    else
+    {
+        VerifyOrReturn(value.Value().size() <= kPresetHandleSize,
+                       ChipLogError(Zcl, "SetActivePresetHandle: handle too large (%u bytes)", (unsigned) value.Value().size()));
+        if (!mActivePresetHandle.IsNull() && mActivePresetHandle.Value().data_equal(value.Value()))
+        {
+            return; // no-op: same bytes
+        }
+        memcpy(mActivePresetHandleBuffer, value.Value().data(), value.Value().size());
+        mActivePresetHandle.SetNonNull(ByteSpan(mActivePresetHandleBuffer, value.Value().size()));
+    }
+
+    NotifyAttributeChanged(ActivePresetHandle::Id);
+
+    const ByteSpan toStore = mActivePresetHandle.IsNull() ? ByteSpan{} : mActivePresetHandle.Value();
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ActivePresetHandle::Id }, toStore));
+}
+
+void ThermostatCluster::SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> value)
+{
+    VerifyOrReturn(DefaultServerCluster::mContext != nullptr);
+
+    if (value.IsNull())
+    {
+        if (mActiveScheduleHandle.IsNull())
+        {
+            return; // no-op
+        }
+        mActiveScheduleHandle.SetNull();
+    }
+    else
+    {
+        VerifyOrReturn(value.Value().size() <= kPresetHandleSize,
+                       ChipLogError(Zcl, "SetActiveScheduleHandle: handle too large (%u bytes)", (unsigned) value.Value().size()));
+        if (!mActiveScheduleHandle.IsNull() && mActiveScheduleHandle.Value().data_equal(value.Value()))
+        {
+            return; // no-op: same bytes
+        }
+        memcpy(mActiveScheduleHandleBuffer, value.Value().data(), value.Value().size());
+        mActiveScheduleHandle.SetNonNull(ByteSpan(mActiveScheduleHandleBuffer, value.Value().size()));
+    }
+
+    NotifyAttributeChanged(ActiveScheduleHandle::Id);
+
+    const ByteSpan toStore = mActiveScheduleHandle.IsNull() ? ByteSpan{} : mActiveScheduleHandle.Value();
+    LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
+        { mPath.mEndpointId, Thermostat::Id, ActiveScheduleHandle::Id }, toStore));
+}
+
 
 } // namespace Thermostat
 } // namespace Clusters
