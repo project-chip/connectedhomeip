@@ -263,6 +263,46 @@ public:
         return pw::OkStatus();
     }
 
+    ::pw::Status GetWriteAttributePaths(const pw_protobuf_Empty & request, chip_rpc_WritableAttributePathsResponse & response)
+    {
+        PigweedDebugInfoInterceptor * interceptor = PigweedDebugAccessInterceptorRegistry::Instance().GetInfoInterceptor();
+        if (interceptor == nullptr)
+        {
+            ChipLogProgress(Support, "No custom Pigweed OOB Info Interceptor registered.");
+            return ::pw::Status::Unimplemented();
+        }
+
+        auto pathsResult = interceptor->GetSupportedWritePaths();
+
+        if (std::holds_alternative<::pw::Status>(pathsResult))
+        {
+            return std::get<::pw::Status>(pathsResult);
+        }
+
+        auto & pathsBuffer = std::get<chip::ReadOnlyBuffer<chip::app::ConcreteDataAttributePath>>(pathsResult);
+
+        // Nanopb repeated fields are compiled as fixed-size arrays. So cap the count to the limit.
+        size_t maxPaths  = sizeof(response.paths) / sizeof(response.paths[0]);
+        size_t copyCount = std::min(static_cast<size_t>(pathsBuffer.size()), maxPaths);
+
+        for (size_t i = 0; i < copyCount; ++i)
+        {
+            response.paths[i].endpoint     = pathsBuffer[i].mEndpointId;
+            response.paths[i].cluster_id   = pathsBuffer[i].mClusterId;
+            response.paths[i].attribute_id = pathsBuffer[i].mAttributeId;
+        }
+
+        response.paths_count = static_cast<pb_size_t>(copyCount);
+
+        if (pathsBuffer.size() > maxPaths)
+        {
+            ChipLogProgress(Support, "OOB supported paths list truncated to %d elements (original size %d)", (int) maxPaths,
+                            (int) pathsBuffer.size());
+        }
+
+        return ::pw::OkStatus();
+    }
+
     ::pw::Status Read(const chip_rpc_AttributeMetadata & request, chip_rpc_AttributeData & response)
     {
         app::ConcreteAttributePath path(request.endpoint, request.cluster, request.attribute_id);

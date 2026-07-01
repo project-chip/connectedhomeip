@@ -188,3 +188,85 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_ArrayValue)
     EXPECT_EQ(request.value.Next(), CHIP_END_OF_TLV);
     EXPECT_EQ(request.value.ExitContainer(outerType), CHIP_NO_ERROR);
 }
+
+TEST_F(TestOOBDataSerializer, BuildSupportedPathsResponse_MultiplePaths)
+{
+    std::vector<ConcreteDataAttributePath> paths = { ConcreteDataAttributePath(1, 2, 3), ConcreteDataAttributePath(10, 20, 30),
+                                                     ConcreteDataAttributePath(100, 200, 300) };
+
+    auto buildResult = OOBDataSerializer::SerializePathsList(Span<const ConcreteDataAttributePath>(paths.data(), paths.size()));
+    EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+
+    auto & responseBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
+    EXPECT_GT(responseBuffer.size(), 0U);
+
+    // Parse it back to verify correctness
+    TLV::TLVReader reader;
+    reader.Init(responseBuffer.data(), responseBuffer.size());
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.GetType(), TLV::kTLVType_Array);
+
+    TLV::TLVType arrayType;
+    EXPECT_EQ(reader.EnterContainer(arrayType), CHIP_NO_ERROR);
+
+    for (size_t i = 0; i < paths.size(); ++i)
+    {
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetType(), TLV::kTLVType_Structure);
+
+        TLV::TLVType structType;
+        EXPECT_EQ(reader.EnterContainer(structType), CHIP_NO_ERROR);
+
+        // Tag 1: EndpointId
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetTag(), TLV::ContextTag(OOBDataSerializer::kTagEndpointId));
+        uint16_t endpointId = 0;
+        EXPECT_EQ(reader.Get(endpointId), CHIP_NO_ERROR);
+        EXPECT_EQ(endpointId, paths[i].mEndpointId);
+
+        // Tag 2: ClusterId
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetTag(), TLV::ContextTag(OOBDataSerializer::kTagClusterId));
+        uint32_t clusterId = 0;
+        EXPECT_EQ(reader.Get(clusterId), CHIP_NO_ERROR);
+        EXPECT_EQ(clusterId, paths[i].mClusterId);
+
+        // Tag 3: AttributeId
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetTag(), TLV::ContextTag(OOBDataSerializer::kTagAttributeId));
+        uint32_t attributeId = 0;
+        EXPECT_EQ(reader.Get(attributeId), CHIP_NO_ERROR);
+        EXPECT_EQ(attributeId, paths[i].mAttributeId);
+
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(structType), CHIP_NO_ERROR);
+    }
+
+    EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+    EXPECT_EQ(reader.ExitContainer(arrayType), CHIP_NO_ERROR);
+}
+
+TEST_F(TestOOBDataSerializer, SerializeAndDeserialize_PathsList)
+{
+    std::vector<ConcreteDataAttributePath> paths = { ConcreteDataAttributePath(1, 2, 3), ConcreteDataAttributePath(10, 20, 30),
+                                                     ConcreteDataAttributePath(100, 200, 300) };
+
+    auto buildResult = OOBDataSerializer::SerializePathsList(Span<const ConcreteDataAttributePath>(paths.data(), paths.size()));
+    EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+
+    auto & responseBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
+    EXPECT_GT(responseBuffer.size(), 0U);
+
+    auto deserializeResult = OOBDataSerializer::DeSerializePathsList(ByteSpan(responseBuffer.data(), responseBuffer.size()));
+    EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(deserializeResult));
+
+    auto & deserializedPaths = std::get<ReadOnlyBuffer<ConcreteDataAttributePath>>(deserializeResult);
+    EXPECT_EQ(deserializedPaths.size(), paths.size());
+
+    for (size_t i = 0; i < paths.size(); ++i)
+    {
+        EXPECT_EQ(deserializedPaths[i].mEndpointId, paths[i].mEndpointId);
+        EXPECT_EQ(deserializedPaths[i].mClusterId, paths[i].mClusterId);
+        EXPECT_EQ(deserializedPaths[i].mAttributeId, paths[i].mAttributeId);
+    }
+}

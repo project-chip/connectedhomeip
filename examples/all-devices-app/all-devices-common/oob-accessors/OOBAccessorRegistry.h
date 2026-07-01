@@ -35,6 +35,8 @@ public:
 
     void Register(OOBAccessor & accessor) { mAccessors.PushBack(&accessor); }
 
+    IntrusiveList<OOBAccessor, IntrusiveMode::AutoUnlink> & GetAccessors() { return mAccessors; }
+
     /**
      * @brief Routes a simulation or out-of-band control action to the registered accessors.
      *
@@ -50,17 +52,17 @@ public:
      *
      * @return CHIP_ERROR_NOT_FOUND if no accessor handles this action; otherwise, the result of the action.
      */
-    CHIP_ERROR HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
+    OOBAccessor::ActionResponse HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
     {
         for (auto & accessor : mAccessors)
         {
             auto result = accessor.HandleAction(actionName, tlvBuffer);
             if (result.has_value())
             {
-                return *result;
+                return std::move(*result);
             }
         }
-        return CHIP_ERROR_NOT_FOUND;
+        return { CHIP_ERROR_NOT_FOUND, ReadOnlyBuffer<uint8_t>() };
     }
 
 private:
