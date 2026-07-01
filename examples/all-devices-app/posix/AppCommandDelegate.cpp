@@ -153,6 +153,11 @@ public:
             ChipLogError(AppServer, "AmbientContextType array is empty");
             return;
         }
+        if (actArray.size() > AmbientContextSensing::kMaxACTypeSupported)
+        {
+            ChipLogError(AppServer, "AmbientContextType array too large: %u", static_cast<unsigned>(actArray.size()));
+            return;
+        }
         Span<Globals::Structs::SemanticTagStruct::Type> semanticTags;
         std::unique_ptr<Globals::Structs::SemanticTagStruct::Type[]> tagBuf =
             std::make_unique<Globals::Structs::SemanticTagStruct::Type[]>(actArray.size());
@@ -287,6 +292,11 @@ public:
             ChipLogError(AppServer, "PredictedActivity array is empty");
             return;
         }
+        if (predictArray.size() > AmbientContextSensing::kMaxPredictedActivity)
+        {
+            ChipLogError(AppServer, "PredictedActivity array too large: %u", static_cast<unsigned>(predictArray.size()));
+            return;
+        }
         std::unique_ptr<AmbientContextSensing::Structs::PredictedActivityStruct::Type[]> predictArrayBuf =
             std::make_unique<AmbientContextSensing::Structs::PredictedActivityStruct::Type[]>(predictArray.size());
         std::vector<std::vector<Globals::Structs::SemanticTagStruct::Type>> allSemanticTags;
@@ -320,7 +330,13 @@ public:
             }
             if (item.isMember("CrowdCnt"))
             {
-                predictAct.crowdCount.SetValue(static_cast<uint8_t>(item["CrowdCnt"].asUInt()));
+                const auto crowdCntValue = item["CrowdCnt"].asUInt();
+                if ((crowdCntValue == 0) || (crowdCntValue > AmbientContextSensing::kMaxCrowdCount))
+                {
+                    ChipLogError(AppServer, "PredictedActivity[%u], invalid CrowdCnt value: %u", static_cast<uint16_t>(i), static_cast<unsigned>(crowdCntValue));
+                    return;
+                }
+                predictAct.crowdCount.SetValue(static_cast<uint8_t>(crowdCntValue));
             }
             // Validate AmbientContextType exists and is an array
             if (!item.isMember("AmbientContextType") || !item["AmbientContextType"].isArray())

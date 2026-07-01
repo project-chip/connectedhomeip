@@ -230,6 +230,7 @@ CHIP_ERROR AmbientContextSensingCluster::AddDetection(const AmbientContextSensin
     {
         // The new detection event
         item                = mACSDelegate.AllocDetection();
+        VerifyOrReturnError(item != nullptr, CHIP_ERROR_NO_MEMORY);
         const auto & tags   = sensedEvent.ambientContextSensed;
         const auto tagCount = tags.size();
         for (size_t t = 0; t < tagCount; t++)
@@ -813,7 +814,7 @@ CHIP_ERROR AmbientContextSensingCluster::CheckPredictedActivity(const Span<Predi
             if (item.crowdCount.HasValue())
             {
                 uint8_t value = item.crowdCount.Value();
-                VerifyOrReturnError(((1 <= value) && (value <= 254)), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(((kMinCrowdCount <= value) && (value <= kMaxCrowdCount)), CHIP_ERROR_INVALID_ARGUMENT);
             }
         }
     }

@@ -65,7 +65,6 @@ CHIP_ERROR LoggingAmbientContextSensorDevice::SetPredictedActivity(const Span<Pr
 
         if (!src.ambientContextType.HasValue())
         {
-            dst.mInfo.ambientContextType.ClearValue();
             continue;
         }
 

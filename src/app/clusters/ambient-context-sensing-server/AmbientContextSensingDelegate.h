@@ -40,6 +40,8 @@ constexpr uint8_t kMaxSimultaneousDetectionLimit = 10;
 constexpr uint16_t kMinObjectCount               = 1;
 constexpr uint8_t kMaxPredictedACType            = 100;
 constexpr uint8_t kMaxPredictedActivity          = 20;
+constexpr uint8_t kMinCrowdCount                 = 1;
+constexpr uint8_t kMaxCrowdCount                 = 254;
 
 struct AmbientContextSensed : public IntrusiveListNodeBase<>
 {
