@@ -104,9 +104,9 @@ public:
     // ProxyConnectResponse carrying the session ID.
     Protocols::InteractionModel::Status
     ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
-                        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, uint16_t discriminator,
-                        chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
-                        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
+                        chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap> transport,
+                        uint16_t discriminator, chip::VendorId vendorid, uint16_t productid, uint16_t timeout,
+                        chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> wiFiBand,
                         chip::app::CommandHandler * commandObj,
                         const DataModel::InvokeRequest & request) override;
 
@@ -120,11 +120,14 @@ public:
     Protocols::InteractionModel::Status
     ProxyDisconnectRequest(uint16_t sessionId, chip::FabricIndex fabricIndex) override;
 
-    // Attribute accessors
-    uint8_t GetScanMaxTime() override;
-    void    SetScanMaxTime(uint8_t seconds) override;
+    // Attribute accessors for delegate-owned state (device capabilities and the
+    // scan-result cache). The writable ScanMaxTime / CacheTimeout attributes are
+    // stored and change-reported by the cluster, not the delegate; read the live
+    // value through GetServer()->GetScanMaxTime() / GetCacheTimeout() if needed.
+    uint8_t GetMaxSessions() override;
+    uint8_t GetActiveSessionCount() override;
 
-    // ... implement other required attribute getters/setters
+    // ... implement other required attribute getters
 };
 ```
 
@@ -145,9 +148,11 @@ chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature> gFeatures(
     chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
 );
 
+// The endpoint id is passed to the cluster constructor (it is only known at
+// registration time); the Config carries the fixed feature set and delegate.
 chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster> gCPCluster(
-    chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::Config(
-        CommissioningProxyEndpoint, gFeatures, gMyCPDelegate)
+    CommissioningProxyEndpoint,
+    chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::Config(gFeatures, gMyCPDelegate)
 );
 ```
 

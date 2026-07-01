@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023-2026 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,9 +67,9 @@ CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                         AttributeValueDecoder & decoder)
 {
-    // These attributes are stored by the delegate but reporting is the cluster's
-    // responsibility. Snapshot the value across the delegate write and only emit a
-    // change report when the stored value actually changes, to avoid redundant reports.
+    // These writable attributes are stored by the cluster so that change-reporting is
+    // always the cluster's responsibility. Only emit a change report when the stored
+    // value actually changes, to avoid redundant reports.
     switch (request.path.mAttributeId)
     {
     case ScanMaxTime::Id: {
@@ -78,8 +78,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
         // Spec: ScanMaxTime has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(time >= 1, Status::ConstraintError);
         // No change → no write, no report.
-        VerifyOrReturnValue(time != mDelegate.GetScanMaxTime(), Status::Success);
-        mDelegate.SetScanMaxTime(time);
+        VerifyOrReturnValue(time != mScanMaxTime, Status::Success);
+        mScanMaxTime = time;
         break;
     }
     case CacheTimeout::Id: {
@@ -88,8 +88,8 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
         // Spec: CacheTimeout has constraint "min 1"; reject 0 with ConstraintError.
         VerifyOrReturnError(cacheTimeout >= 1, Status::ConstraintError);
         // No change → no write, no report.
-        VerifyOrReturnValue(cacheTimeout != mDelegate.GetCacheTimeout(), Status::Success);
-        mDelegate.SetCacheTimeout(cacheTimeout);
+        VerifyOrReturnValue(cacheTimeout != mCacheTimeout, Status::Success);
+        mCacheTimeout = cacheTimeout;
         break;
     }
     default:
@@ -121,7 +121,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
         return encoder.Encode(mDelegate.GetMaxSessions());
 
     case ScanMaxTime::Id:
-        return encoder.Encode(mDelegate.GetScanMaxTime());
+        return encoder.Encode(mScanMaxTime);
 
     case MaxCachedResults::Id:
         return encoder.Encode(mDelegate.GetMaxCachedResults());
@@ -130,7 +130,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
         return encoder.Encode(mDelegate.GetNumCachedResults());
 
     case CacheTimeout::Id:
-        return encoder.Encode(mDelegate.GetCacheTimeout());
+        return encoder.Encode(mCacheTimeout);
 
     case CachedResults::Id:
         return mDelegate.EncodeCachedResults(encoder);
@@ -165,28 +165,19 @@ std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCo
 {
     using namespace Commands;
 
+    // Each handler returns its own std::optional result: std::nullopt when the
+    // delegate has taken ownership of the response (sync or async AddResponse) so
+    // the framework must not add a duplicate status, or a concrete status otherwise.
     switch (request.path.mCommandId)
     {
-    case ProxyConnectRequest::Id: {
-        auto result = HandleProxyConnectRequest(request, input_arguments, handler);
-        // The delegate always sends the response (sync or async via Handle).
-        // Return nullopt so the framework does not add a duplicate status.
-        if (result.IsSuccess())
-            return std::nullopt;
-        return result;
-    }
+    case ProxyConnectRequest::Id:
+        return HandleProxyConnectRequest(request, input_arguments, handler);
 
     case ProxyDisconnectRequest::Id:
         return HandleProxyDisconnectRequest(request, input_arguments, handler);
 
-    case ProxyScanRequest::Id: {
-        auto result = HandleProxyScanRequest(request, input_arguments, handler);
-        // Delegate sends ProxyScanResponse asynchronously; return nullopt on
-        // success so the framework does not add a duplicate status.
-        if (result.IsSuccess())
-            return std::nullopt;
-        return result;
-    }
+    case ProxyScanRequest::Id:
+        return HandleProxyScanRequest(request, input_arguments, handler);
 
     case ProxyBackGroundScanStartRequest::Id:
         return HandleProxyBackGroundScanStartRequest(request, input_arguments, handler);
@@ -194,23 +185,17 @@ std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCo
     case ProxyBackGroundScanStopRequest::Id:
         return HandleProxyBackGroundScanStopRequest(request, input_arguments, handler);
 
-    case ProxyMessageRequest::Id: {
-        auto result = HandleProxyMessageRequest(request, input_arguments, handler);
-        // Delegate sends ProxyMessageResponse asynchronously; return nullopt on
-        // success so the framework does not add a duplicate status.
-        if (result.IsSuccess())
-            return std::nullopt;
-        return result;
-    }
+    case ProxyMessageRequest::Id:
+        return HandleProxyMessageRequest(request, input_arguments, handler);
 
     default:
         return Status::UnsupportedCommand;
     }
 }
 
-DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectRequest(const DataModel::InvokeRequest & request,
-                                                                                   TLV::TLVReader & input_arguments,
-                                                                                   CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+CommissioningProxyCluster::HandleProxyConnectRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                     CommandHandler * handler)
 {
     Commands::ProxyConnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
@@ -278,14 +263,15 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
         mDelegate.ProxyConnectRequest(commandData.address, commandData.transport, commandData.discriminator, commandData.vendorID,
                                       commandData.productID, commandData.timeout, wiFiBand, handler, request);
 
-    ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
-
-    return Status::Success;
+    // On error, surface the status; on success the delegate owns the (sync or async)
+    // ProxyConnectResponse, so return nullopt to avoid a duplicate framework status.
+    VerifyOrReturnValue(delegateStatus == Status::Success, DataModel::ActionReturnStatus(delegateStatus));
+    return std::nullopt;
 }
 
-DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request,
-                                                                                      TLV::TLVReader & input_arguments,
-                                                                                      CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                        CommandHandler * handler)
 {
     Commands::ProxyDisconnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
@@ -317,9 +303,9 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest & request,
-                                                                                TLV::TLVReader & input_arguments,
-                                                                                CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                  CommandHandler * handler)
 {
     Commands::ProxyScanRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
@@ -361,14 +347,14 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(
         wiFiBands = commandData.wiFiBands.Value();
     }
 
-    ReturnErrorOnFailure(
-        DataModel::ActionReturnStatus(mDelegate.ProxyScanRequest(commandData.transport, wiFiBands, handler, request))
-            .GetUnderlyingError());
-
-    return Status::Success;
+    // Delegate sends ProxyScanResponse asynchronously; on success return nullopt so
+    // the framework does not add a duplicate status.
+    auto delegateStatus = mDelegate.ProxyScanRequest(commandData.transport, wiFiBands, handler, request);
+    VerifyOrReturnValue(delegateStatus == Status::Success, DataModel::ActionReturnStatus(delegateStatus));
+    return std::nullopt;
 }
 
-DataModel::ActionReturnStatus
+std::optional<DataModel::ActionReturnStatus>
 CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel::InvokeRequest & request,
                                                                  TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
@@ -422,7 +408,7 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus
+std::optional<DataModel::ActionReturnStatus>
 CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
                                                                 TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
@@ -467,9 +453,9 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel:
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageRequest(const DataModel::InvokeRequest & request,
-                                                                                   TLV::TLVReader & input_arguments,
-                                                                                   CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+CommissioningProxyCluster::HandleProxyMessageRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                     CommandHandler * handler)
 {
     Commands::ProxyMessageRequest::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments, request.GetAccessingFabricIndex()));
@@ -483,8 +469,10 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageReque
     auto delegateStatus =
         mDelegate.ProxyMessageRequest(commandData.sessionID, message, commandData.responseTimeout, handler, request);
 
-    ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
-    return Status::Success;
+    // Delegate sends ProxyMessageResponse asynchronously; on success return nullopt so
+    // the framework does not add a duplicate status.
+    VerifyOrReturnValue(delegateStatus == Status::Success, DataModel::ActionReturnStatus(delegateStatus));
+    return std::nullopt;
 }
 
 CHIP_ERROR CommissioningProxyCluster::Attributes(const ConcreteClusterPath & path,
@@ -517,13 +505,13 @@ CHIP_ERROR CommissioningProxyCluster::AcceptedCommands(const ConcreteClusterPath
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioningProxyCluster::SetCPState(CommissioningProxyCluster::State_t state)
+CHIP_ERROR CommissioningProxyCluster::SetCPState(CommissioningProxyCluster::State state)
 {
     mMainCommissioningProxyState = state;
     return CHIP_NO_ERROR;
 }
 
-CommissioningProxyCluster::State_t CommissioningProxyCluster::GetCPState()
+CommissioningProxyCluster::State CommissioningProxyCluster::GetCPState()
 {
     return mMainCommissioningProxyState;
 }
