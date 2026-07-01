@@ -436,7 +436,9 @@ void TimeSynchronizationCluster::OnDeviceConnectionFailureFn()
 void TimeSynchronizationCluster::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                                  const StatusIB & aStatus)
 {
-    if (aPath.mClusterId != Id || aStatus.IsFailure())
+    // Defense-in-depth: ReadClient::ProcessAttributeReportIBs already rejects spec-violating
+    // AttributeStatusIB(Success), but keep the local nullptr check in case that invariant is ever loosened.
+    if (aPath.mClusterId != Id || aStatus.IsFailure() || apData == nullptr)
     {
         return;
     }
