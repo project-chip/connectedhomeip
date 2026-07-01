@@ -3066,6 +3066,250 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
+    Map<String, InteractionInfo> writeAudioControlInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeAudioControlMaxUserVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlmaxUserVolumeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlMaxUserVolumeCommandParams.put(
+        "value",
+        audioControlmaxUserVolumeCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlMaxUserVolumeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeMaxUserVolumeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlMaxUserVolumeCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeMaxUserVolumeAttribute", writeAudioControlMaxUserVolumeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlDefaultStepSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControldefaultStepSizeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlDefaultStepSizeCommandParams.put(
+        "value",
+        audioControldefaultStepSizeCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlDefaultStepSizeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeDefaultStepSizeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlDefaultStepSizeCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeDefaultStepSizeAttribute", writeAudioControlDefaultStepSizeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlSetVolumeUnmutePolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlsetVolumeUnmutePolicyCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlSetVolumeUnmutePolicyCommandParams.put(
+        "value",
+        audioControlsetVolumeUnmutePolicyCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlSetVolumeUnmutePolicyAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeSetVolumeUnmutePolicyAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlSetVolumeUnmutePolicyCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeSetVolumeUnmutePolicyAttribute", writeAudioControlSetVolumeUnmutePolicyAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlIncreaseVolumeUnmutePolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlincreaseVolumeUnmutePolicyCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlIncreaseVolumeUnmutePolicyCommandParams.put(
+        "value",
+        audioControlincreaseVolumeUnmutePolicyCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlIncreaseVolumeUnmutePolicyAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeIncreaseVolumeUnmutePolicyAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlIncreaseVolumeUnmutePolicyCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeIncreaseVolumeUnmutePolicyAttribute", writeAudioControlIncreaseVolumeUnmutePolicyAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlIncreaseVolumeUnmuteVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlincreaseVolumeUnmuteVolumeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlIncreaseVolumeUnmuteVolumeCommandParams.put(
+        "value",
+        audioControlincreaseVolumeUnmuteVolumeCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlIncreaseVolumeUnmuteVolumeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeIncreaseVolumeUnmuteVolumeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlIncreaseVolumeUnmuteVolumeCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeIncreaseVolumeUnmuteVolumeAttribute", writeAudioControlIncreaseVolumeUnmuteVolumeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlDecreaseVolumeUnmutePolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControldecreaseVolumeUnmutePolicyCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlDecreaseVolumeUnmutePolicyCommandParams.put(
+        "value",
+        audioControldecreaseVolumeUnmutePolicyCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlDecreaseVolumeUnmutePolicyAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeDecreaseVolumeUnmutePolicyAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlDecreaseVolumeUnmutePolicyCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeDecreaseVolumeUnmutePolicyAttribute", writeAudioControlDecreaseVolumeUnmutePolicyAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlStartUpMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlstartUpMutedCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeAudioControlStartUpMutedCommandParams.put(
+        "value",
+        audioControlstartUpMutedCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlStartUpMutedAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeStartUpMutedAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlStartUpMutedCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeStartUpMutedAttribute", writeAudioControlStartUpMutedAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlStartUpVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlstartUpVolumeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlStartUpVolumeCommandParams.put(
+        "value",
+        audioControlstartUpVolumeCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlStartUpVolumeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeStartUpVolumeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlStartUpVolumeCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeStartUpVolumeAttribute", writeAudioControlStartUpVolumeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlBassCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlbassCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlBassCommandParams.put(
+        "value",
+        audioControlbassCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlBassAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeBassAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlBassCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeBassAttribute", writeAudioControlBassAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlMidCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControlmidCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlMidCommandParams.put(
+        "value",
+        audioControlmidCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlMidAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeMidAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlMidCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeMidAttribute", writeAudioControlMidAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeAudioControlTrebleCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo audioControltrebleCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeAudioControlTrebleCommandParams.put(
+        "value",
+        audioControltrebleCommandParameterInfo
+    );
+    InteractionInfo writeAudioControlTrebleAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster).writeTrebleAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeAudioControlTrebleCommandParams
+    );
+    writeAudioControlInteractionInfo.put("writeTrebleAttribute", writeAudioControlTrebleAttributeInteractionInfo);
+    writeAttributeMap.put("audioControl", writeAudioControlInteractionInfo);
     Map<String, InteractionInfo> writeZoneManagementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeZoneManagementSensitivityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo zoneManagementsensitivityCommandParameterInfo =

@@ -63,6 +63,10 @@
 #include <clusters/ApplicationLauncher/Commands.h>
 #include <clusters/ApplicationLauncher/Events.h>
 #include <clusters/ApplicationLauncher/Structs.h>
+#include <clusters/AudioControl/Attributes.h>
+#include <clusters/AudioControl/Commands.h>
+#include <clusters/AudioControl/Events.h>
+#include <clusters/AudioControl/Structs.h>
 #include <clusters/AudioOutput/Attributes.h>
 #include <clusters/AudioOutput/Commands.h>
 #include <clusters/AudioOutput/Events.h>

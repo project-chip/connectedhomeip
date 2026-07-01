@@ -19107,6 +19107,274 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readAudioControlInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAudioControlSoftMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlSoftMutedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readSoftMutedAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readAudioControlSoftMutedCommandParams
+        );
+        result.put("readSoftMutedAttribute", readAudioControlSoftMutedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlPhysicallyMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlPhysicallyMutedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readPhysicallyMutedAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readAudioControlPhysicallyMutedCommandParams
+        );
+        result.put("readPhysicallyMutedAttribute", readAudioControlPhysicallyMutedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlVolumeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readVolumeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlVolumeCommandParams
+        );
+        result.put("readVolumeAttribute", readAudioControlVolumeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlMinDeviceVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlMinDeviceVolumeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readMinDeviceVolumeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlMinDeviceVolumeCommandParams
+        );
+        result.put("readMinDeviceVolumeAttribute", readAudioControlMinDeviceVolumeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlMaxDeviceVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlMaxDeviceVolumeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readMaxDeviceVolumeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlMaxDeviceVolumeCommandParams
+        );
+        result.put("readMaxDeviceVolumeAttribute", readAudioControlMaxDeviceVolumeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlMaxDeviceVolumeDBCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlMaxDeviceVolumeDBAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readMaxDeviceVolumeDBAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlMaxDeviceVolumeDBCommandParams
+        );
+        result.put("readMaxDeviceVolumeDBAttribute", readAudioControlMaxDeviceVolumeDBAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlMaxUserVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlMaxUserVolumeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readMaxUserVolumeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlMaxUserVolumeCommandParams
+        );
+        result.put("readMaxUserVolumeAttribute", readAudioControlMaxUserVolumeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlDefaultStepSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlDefaultStepSizeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readDefaultStepSizeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlDefaultStepSizeCommandParams
+        );
+        result.put("readDefaultStepSizeAttribute", readAudioControlDefaultStepSizeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlSetVolumeUnmutePolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlSetVolumeUnmutePolicyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readSetVolumeUnmutePolicyAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlSetVolumeUnmutePolicyCommandParams
+        );
+        result.put("readSetVolumeUnmutePolicyAttribute", readAudioControlSetVolumeUnmutePolicyAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlIncreaseVolumeUnmutePolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlIncreaseVolumeUnmutePolicyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readIncreaseVolumeUnmutePolicyAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlIncreaseVolumeUnmutePolicyCommandParams
+        );
+        result.put("readIncreaseVolumeUnmutePolicyAttribute", readAudioControlIncreaseVolumeUnmutePolicyAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlIncreaseVolumeUnmuteVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlIncreaseVolumeUnmuteVolumeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readIncreaseVolumeUnmuteVolumeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlIncreaseVolumeUnmuteVolumeCommandParams
+        );
+        result.put("readIncreaseVolumeUnmuteVolumeAttribute", readAudioControlIncreaseVolumeUnmuteVolumeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlDecreaseVolumeUnmutePolicyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlDecreaseVolumeUnmutePolicyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readDecreaseVolumeUnmutePolicyAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlDecreaseVolumeUnmutePolicyCommandParams
+        );
+        result.put("readDecreaseVolumeUnmutePolicyAttribute", readAudioControlDecreaseVolumeUnmutePolicyAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlStartUpMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlStartUpMutedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readStartUpMutedAttribute(
+              (ChipClusters.AudioControlCluster.StartUpMutedAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAudioControlClusterStartUpMutedAttributeCallback(),
+          readAudioControlStartUpMutedCommandParams
+        );
+        result.put("readStartUpMutedAttribute", readAudioControlStartUpMutedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlStartUpVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlStartUpVolumeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readStartUpVolumeAttribute(
+              (ChipClusters.AudioControlCluster.StartUpVolumeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAudioControlClusterStartUpVolumeAttributeCallback(),
+          readAudioControlStartUpVolumeCommandParams
+        );
+        result.put("readStartUpVolumeAttribute", readAudioControlStartUpVolumeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlBassCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlBassAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readBassAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlBassCommandParams
+        );
+        result.put("readBassAttribute", readAudioControlBassAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlMidCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlMidAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readMidAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlMidCommandParams
+        );
+        result.put("readMidAttribute", readAudioControlMidAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlTrebleCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlTrebleAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readTrebleAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlTrebleCommandParams
+        );
+        result.put("readTrebleAttribute", readAudioControlTrebleAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlMinCorrectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlMinCorrectionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readMinCorrectionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlMinCorrectionCommandParams
+        );
+        result.put("readMinCorrectionAttribute", readAudioControlMinCorrectionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlMaxCorrectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlMaxCorrectionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readMaxCorrectionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlMaxCorrectionCommandParams
+        );
+        result.put("readMaxCorrectionAttribute", readAudioControlMaxCorrectionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.AudioControlCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAudioControlClusterGeneratedCommandListAttributeCallback(),
+          readAudioControlGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readAudioControlGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.AudioControlCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAudioControlClusterAcceptedCommandListAttributeCallback(),
+          readAudioControlAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readAudioControlAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.AudioControlCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedAudioControlClusterAttributeListAttributeCallback(),
+          readAudioControlAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readAudioControlAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readAudioControlFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readAudioControlFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAudioControlClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAudioControlClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AudioControlCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAudioControlClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readAudioControlClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readZoneManagementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readZoneManagementMaxUserDefinedZonesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readZoneManagementMaxUserDefinedZonesAttributeInteractionInfo = new InteractionInfo(
@@ -22662,6 +22930,7 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
+            put("audioControl", readAudioControlInteractionInfo());
             put("zoneManagement", readZoneManagementInteractionInfo());
             put("cameraAvStreamManagement", readCameraAvStreamManagementInteractionInfo());
             put("cameraAvSettingsUserLevelManagement", readCameraAvSettingsUserLevelManagementInteractionInfo());
