@@ -553,7 +553,7 @@ void OperationalSessionSetup::CleanupCASEClient()
     }
 
     CASEClientPoolDelegate * clientPool = mClientPool;
-    mCASEClient                       = nullptr;
+    mCASEClient                         = nullptr;
 
     VerifyOrReturn(clientPool != nullptr, ChipLogError(Discovery, "Cannot release CASEClient without a client pool"));
 
@@ -572,8 +572,9 @@ void OperationalSessionSetup::CleanupCASEClient()
     CHIP_ERROR err = systemLayer->ScheduleLambda(releaseClient);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to schedule deferred CASEClient release: %" CHIP_ERROR_FORMAT
-                                "; leaking client to avoid re-entrant destruction",
+        ChipLogError(Discovery,
+                     "Failed to schedule deferred CASEClient release: %" CHIP_ERROR_FORMAT
+                     "; leaking client to avoid re-entrant destruction",
                      err.Format());
     }
 }

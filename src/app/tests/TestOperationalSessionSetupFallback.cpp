@@ -66,8 +66,8 @@ private:
 
 namespace {
 
-constexpr uint16_t kTestPort = 5540;
-constexpr NodeId kTestNodeId = 0x123456789abcdefULL;
+constexpr uint16_t kTestPort       = 5540;
+constexpr NodeId kTestNodeId       = 0x123456789abcdefULL;
 constexpr FabricIndex kFabricIndex = 1;
 
 class MockCASEClientPool : public CASEClientPoolDelegate
@@ -158,10 +158,10 @@ protected:
     CASEClientInitParams CreateCASEClientInitParams()
     {
         CASEClientInitParams params;
-        params.sessionManager     = &GetSecureSessionManager();
-        params.exchangeMgr        = &GetExchangeManager();
-        params.fabricTable        = &GetFabricTable();
-        params.groupDataProvider  = &mGroupDataProvider;
+        params.sessionManager    = &GetSecureSessionManager();
+        params.exchangeMgr       = &GetExchangeManager();
+        params.fabricTable       = &GetFabricTable();
+        params.groupDataProvider = &mGroupDataProvider;
         return params;
     }
 
@@ -206,8 +206,8 @@ TEST_F(TestOperationalSessionSetupFallback, DeferredCASEClientCleanupDoesNotUseS
     CASEClient * caseClient = mCASEClientPool.Allocate();
     ASSERT_NE(caseClient, nullptr);
 
-    auto * sessionSetup = chip::Platform::New<OperationalSessionSetup>(
-        CreateCASEClientInitParams(), &mCASEClientPool, ScopedNodeId(kTestNodeId, kFabricIndex), &mReleaseDelegate);
+    auto * sessionSetup = chip::Platform::New<OperationalSessionSetup>(CreateCASEClientInitParams(), &mCASEClientPool,
+                                                                       ScopedNodeId(kTestNodeId, kFabricIndex), &mReleaseDelegate);
     ASSERT_NE(sessionSetup, nullptr);
 
     chip::Testing::OperationalSessionSetupTestAccess access(sessionSetup);
