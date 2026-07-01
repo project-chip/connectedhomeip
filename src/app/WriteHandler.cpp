@@ -143,8 +143,8 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
 
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
-    // Do not send response on Group Write
-    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
+    // Do not send response on Group Write or Write request with SuppressResponse flag set.
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext() && !mStateFlags.Has(StateBits::kSuppressResponse))
     {
         CHIP_ERROR err = SendWriteResponse(std::move(messageWriter));
         if (err != CHIP_NO_ERROR)
@@ -171,6 +171,12 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
         Close();
+        // Return Success if SuppressResponse is set to avoid sending StatusResponse when error is catched in
+        // InteractionModelEngine.
+        if (mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            return Status::Success;
+        }
     }
 
     return status;
@@ -211,7 +217,10 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
     }
     else
     {
-        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (!mStateFlags.Has(StateBits::kSuppressResponse))
+        {
+            err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        }
         Close();
     }
     return err;

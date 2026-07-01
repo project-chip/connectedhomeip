@@ -1736,6 +1736,11 @@ class ChipDeviceControllerBase:
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
             commandRefsOverride=commandRefsOverride).raise_on_error()
+
+        if suppressResponse:
+            if not future.done():
+                future.set_result(None)
+
         return await future
 
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeId: int, endpoint: int,
@@ -1867,6 +1872,11 @@ class ChipDeviceControllerBase:
                 ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
             res.raise_on_error()
+
+            if suppressResponse:
+                if not future.done():
+                    future.set_result(None)
+
             return await future
 
         return await self._run_with_session_retry(nodeId, _send_impl)
