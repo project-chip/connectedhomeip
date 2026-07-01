@@ -139,6 +139,7 @@ chip_configure_data_model(${COMPONENT_LIB}
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
