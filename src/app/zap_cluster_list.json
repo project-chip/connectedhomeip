@@ -178,6 +178,8 @@
         ],
         "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
+        "AMBIENT_CONTEXT_SENSING_CLUSTER": [],
+        "AMBIENT_SENSING_UNION_CLUSTER": ["ambient-sensing-union-server"],
         "AMBIENT_CONTEXT_SENSING_CLUSTER": ["ambient-context-sensing-server"],
         "AMBIENT_SENSING_UNION_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
