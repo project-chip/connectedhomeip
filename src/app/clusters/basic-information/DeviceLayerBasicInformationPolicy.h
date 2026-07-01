@@ -16,7 +16,9 @@
  */
 #pragma once
 
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/basic-information/BasicInformationOptionalAttributes.h>
+#include <app/persistence/AttributePersistence.h>
 #include <cstddef>
 #include <cstdint>
 #include <lib/support/Span.h>
@@ -26,16 +28,20 @@
 
 namespace chip::app::Clusters {
 
-class DeviceLayerBasicInformationPolicy
+constexpr size_t kMaxDeviceLocationTLVSize = 160;
+
+using LocationDescriptorStructType = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type;
+
+class DeviceLayerBasicInformationPolicyBase
 {
 public:
     // Base class for the cluster to inherit from, to satisfy PlatformManagerDelegate requirements
     using LifetimeDelegate = DeviceLayer::PlatformManagerDelegate;
 
-    DeviceLayerBasicInformationPolicy(BasicInformationOptionalAttributesSet optionalAttributes,
-                                      DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
-                                      DeviceLayer::ConfigurationManager & configurationManager,
-                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
+    DeviceLayerBasicInformationPolicyBase(BasicInformationOptionalAttributesSet optionalAttributes,
+                                          DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
+                                          DeviceLayer::ConfigurationManager & configurationManager,
+                                          DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
         mOptionalAttributes(optionalAttributes),
         mDeviceInstanceInfoProvider(deviceInstanceInfoProvider), mConfigurationManager(configurationManager),
         mPlatformManager(platformManager), mSubscriptionsPerFabric(subscriptionsPerFabric)
@@ -185,11 +191,279 @@ private:
         return status;
     }
 
+protected:
     BasicInformationOptionalAttributesSet mOptionalAttributes;
+
+private:
     DeviceLayer::DeviceInstanceInfoProvider & mDeviceInstanceInfoProvider;
     DeviceLayer::ConfigurationManager & mConfigurationManager;
     DeviceLayer::PlatformManager & mPlatformManager;
     uint16_t mSubscriptionsPerFabric;
+};
+
+// By default, don't instantiate the code related to the DeviceLocation
+// optional attribute.
+template <bool HasDeviceLocation>
+class DeviceLayerBasicInformationPolicy final : public DeviceLayerBasicInformationPolicyBase
+{
+public:
+    using DeviceLayerBasicInformationPolicyBase::DeviceLayerBasicInformationPolicyBase;
+
+    static constexpr bool kHasDeviceLocation = false;
+};
+
+template <>
+class DeviceLayerBasicInformationPolicy<true> final : public DeviceLayerBasicInformationPolicyBase
+{
+public:
+    using DeviceLayerBasicInformationPolicyBase::DeviceLayerBasicInformationPolicyBase;
+
+    DeviceLayerBasicInformationPolicy(BasicInformationOptionalAttributesSet optionalAttributes,
+                                      DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
+                                      DeviceLayer::ConfigurationManager & configurationManager,
+                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
+        DeviceLayerBasicInformationPolicyBase(optionalAttributes, deviceInstanceInfoProvider, configurationManager, platformManager,
+                                              subscriptionsPerFabric)
+    {
+        if (mOptionalAttributes.IsSet(BasicInformation::Attributes::DeviceLocation::Id))
+        {
+            mDeviceLocation.emplace(DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable));
+        }
+    }
+
+    static constexpr bool kHasDeviceLocation = true;
+
+    // The code for supporting the DeviceLocation attribute was borrowed + adapted
+    // from the BridgedDeviceBasicInformation cluster. Try to keep the two in sync,
+    // if any changes are required.
+    //
+    struct OwnedDeviceLocation
+    {
+        std::string locationName;
+        std::optional<int16_t> floorNumber;
+        std::optional<Globals::AreaTypeTag> areaType;
+
+        OwnedDeviceLocation() = default;
+        OwnedDeviceLocation(const LocationDescriptorStructType & other) { *this = other; }
+
+        LocationDescriptorStructType ToView() const
+        {
+            return {
+                .locationName = { locationName.data(), locationName.size() },
+                .floorNumber  = floorNumber.has_value() ? DataModel::MakeNullable(*floorNumber) : DataModel::Nullable<int16_t>(),
+                .areaType = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
+            };
+        }
+
+        // Safe for empty LocationName (CharSpan.data() may be nullptr)
+        OwnedDeviceLocation & operator=(const LocationDescriptorStructType & value)
+        {
+            // Special handling since empty char-span will return nullptr for data() and
+            // std::string does not like that
+            if (value.locationName.empty())
+            {
+                locationName.clear();
+            }
+            else
+            {
+                locationName = std::string{ value.locationName.data(), value.locationName.size() };
+            }
+
+            if (value.floorNumber.IsNull())
+            {
+                floorNumber.reset();
+            }
+            else
+            {
+                floorNumber = value.floorNumber.Value();
+            }
+
+            if (value.areaType.IsNull())
+            {
+                areaType.reset();
+            }
+            else
+            {
+                areaType = value.areaType.Value();
+            }
+
+            return *this;
+        }
+    };
+
+    /// Attempt to update the current DeviceLocation with the given value and store it to persistent storage.
+    ///
+    /// @param location The new device location to set.
+    /// @param persistence The persistence handler.
+    /// @return Status code indicating the result of the operation.
+
+    CHIP_ERROR WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> & value,
+                                   AttributePersistence & persistence)
+    {
+        return SetDeviceLocationInternal(value, persistence, PersistenceMode::kPersist).GetUnderlyingError();
+    }
+
+    void LoadDeviceLocation(AttributePersistence & persistence)
+    {
+        const ConcreteAttributePath path{ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::DeviceLocation::Id };
+
+        uint8_t buffer[kMaxDeviceLocationTLVSize];
+        MutableByteSpan tlvBuffer(buffer);
+
+        DataModel::Nullable<LocationDescriptorStructType> decoded;
+
+        if (mDeviceLocation.has_value())
+        {
+            CHIP_ERROR err = persistence.LoadTLV(path, decoded, tlvBuffer);
+
+            if (err == CHIP_NO_ERROR)
+            {
+                // Best effort: SetDeviceLocationInternal is called with kDoNotPersist, so it will not fail due to persistence
+                // errors. Other failures (like constraint errors) are not expected here as the value comes from storage.
+                LogErrorOnFailure(
+                    SetDeviceLocationInternal(decoded, persistence, PersistenceMode::kDoNotPersist).GetUnderlyingError());
+            }
+            else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            {
+                // Nothing in storage, keep the initial value (from mDeviceLocation).
+                // This is a best-effort attempt to keep persisted data in sync with startup value
+                // and what is read through `ReadAttribute`.
+                //
+                // Failure to store here should not cause the cluster to stop initializing.
+                LogErrorOnFailure(PersistDeviceLocation(persistence));
+            }
+        }
+
+        return;
+    }
+
+    std::optional<DataModel::Nullable<LocationDescriptorStructType>> GetDeviceLocation() const
+    {
+        if (!mDeviceLocation.has_value())
+        {
+            return std::nullopt;
+        }
+        else if (mDeviceLocation->IsNull())
+        {
+            return DataModel::Nullable<LocationDescriptorStructType>(DataModel::NullNullable);
+        }
+        else
+        {
+            return DataModel::MakeNullable(mDeviceLocation->Value().ToView());
+        }
+    }
+
+private:
+    enum class PersistenceMode
+    {
+        kPersist,
+        kDoNotPersist,
+    };
+
+    bool IsLocationEqual(const LocationDescriptorStructType & a, const LocationDescriptorStructType & b)
+    {
+        return a.locationName.data_equal(b.locationName) && (a.floorNumber == b.floorNumber) && (a.areaType == b.areaType);
+    }
+
+    /// Updates the DeviceLocation attribute value with optional persistence.
+    ///
+    /// This internal helper validates the new value, persists it to NVM if requested,
+    /// and then updates the in-memory state.
+    ///
+    /// @param location The new device location to set.
+    /// @param persistence The persistence handler.
+    /// @param mode Whether to persist the new value to NVM.
+    /// @return Status code indicating the result of the operation.
+    DataModel::ActionReturnStatus SetDeviceLocationInternal(const DataModel::Nullable<LocationDescriptorStructType> & location,
+                                                            AttributePersistence & persistence, PersistenceMode mode)
+    {
+        using chip::Protocols::InteractionModel::Status;
+
+        // The cluster must support this attribute
+        VerifyOrReturnError(mDeviceLocation.has_value(), Status::UnsupportedAttribute);
+
+        if (!location.IsNull())
+        {
+            // Validation: At least one field must be non-null/empty
+            VerifyOrReturnError(!location.Value().locationName.empty() || !location.Value().floorNumber.IsNull() ||
+                                    !location.Value().areaType.IsNull(),
+                                Status::ConstraintError);
+
+            // constraint on location name
+            VerifyOrReturnError(location.Value().locationName.size() <= 128, Status::ConstraintError);
+        }
+
+        // Check for equality
+        if (mDeviceLocation->IsNull())
+        {
+            if (location.IsNull())
+            {
+                return Status::Success; // No change
+            }
+        }
+        else
+        {
+            if (!location.IsNull())
+            {
+                if (IsLocationEqual(mDeviceLocation->Value().ToView(), location.Value()))
+                {
+                    return Status::Success; // No change
+                }
+            }
+        }
+
+        auto oldValue = mDeviceLocation;
+
+        if (location.IsNull())
+        {
+            mDeviceLocation->SetNull();
+        }
+        else
+        {
+            mDeviceLocation->SetNonNull(location.Value());
+        }
+
+        if (mode == PersistenceMode::kPersist)
+        {
+            if (auto err = PersistDeviceLocation(persistence); err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Failed to persist DeviceLocation: %" CHIP_ERROR_FORMAT, err.Format());
+                // Revert the change
+                mDeviceLocation = oldValue;
+                return Status::Failure;
+            }
+        }
+
+        return Status::Success;
+    }
+
+    /// Store the current DeviceLocation to persistent storage
+    CHIP_ERROR PersistDeviceLocation(AttributePersistence & persistence)
+    {
+        if (!mOptionalAttributes.IsSet(BasicInformation::Attributes::DeviceLocation::Id))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        VerifyOrReturnError(mDeviceLocation.has_value(), CHIP_ERROR_INCORRECT_STATE);
+
+        std::optional<DataModel::Nullable<LocationDescriptorStructType>> loc;
+
+        if (mDeviceLocation->IsNull())
+        {
+            loc = DataModel::Nullable<LocationDescriptorStructType>(DataModel::NullNullable);
+        }
+        else
+        {
+            loc = DataModel::MakeNullable(mDeviceLocation->Value().ToView());
+        }
+
+        const ConcreteAttributePath path{ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::DeviceLocation::Id };
+
+        return persistence.StoreTLV<kMaxDeviceLocationTLVSize>(path, *loc);
+    }
+
+    std::optional<DataModel::Nullable<OwnedDeviceLocation>> mDeviceLocation;
 };
 
 } // namespace chip::app::Clusters
