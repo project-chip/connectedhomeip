@@ -101,6 +101,8 @@ class TC_HSTAT_2_1(MatterBaseTest):
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
                          "Verify that the DUT response contains Off."),
+                TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
+                         "Verify that the DUT response contains Off."),
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Humidifier"
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
@@ -323,6 +325,11 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(next(step))  # Read Mode, should be Off
         dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
         asserts.assert_equal(dut_Mode, modeOff, "Mode attribute is not Off")
+
+        self.step(next(step))  # Read SystemState, should be Off
+        if supports_humidifier:
+            dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
+            asserts.assert_equal(dut_SystemState, stateOff, "SystemState attribute is not Humidifying")
 
         self.step(next(step))  # Write Mode to Humidifier
         if supports_humidifier:
