@@ -58,7 +58,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
         ]
 
     def desc_TC_HSTAT_2_1(self) -> str:
-        return "[TC-HSTAT-2.1] Primary functionality with DUT as Server
+        return "[TC-HSTAT-2.1] Primary functionality with DUT as Server"
 
     def steps_TC_FAN_2_1(self):
         step = count(1)
@@ -163,7 +163,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
                 TestStep(next(step), "TH writes to the DUT the Optimal attribute with a value of !OptState.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "Store the value as OptState",
-                             "Verify that the DUT response contains !OptState.")
+                             "Verify that the DUT response contains !OptState."),
                 TestStep(next(step), "TH writes to the DUT the Optimal attribute with a value of False.",
                              "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue + 1.",
@@ -331,7 +331,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(next(step)) # Read SystemState, should be Humidifying
         if supports_humidifier:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.assert_equal(dut_SystemState, stateHumidifying), "SystemState attribute is not Humidifying")
+            asserts.assert_equal(dut_SystemState, stateHumidifying, "SystemState attribute is not Humidifying")
 
         self.step(next(step)) # Write Mode to Dehumidifier
         if supports_dehumidifier:
@@ -345,7 +345,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(next(step)) # Read SystemState, should be Dehumidifying
         if supports_humidifier:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.assert_equal(dut_SystemState, stateDehumidifying), "SystemState attribute is not Dehumidifying")
+            asserts.assert_equal(dut_SystemState, stateDehumidifying, "SystemState attribute is not Dehumidifying")
 
         self.step(next(step)) # Write Mode to Auto
         if supports_auto:
@@ -373,7 +373,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(next(step)) # Read SystemState, should be Fan
         if supports_fan:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.assert_equal(dut_SystemState, stateFan), "SystemState attribute is not Fan")
+            asserts.assert_equal(dut_SystemState, stateFan, "SystemState attribute is not Fan")
 
         self.step(next(step)) # Write Mode to Humidifier or Dehumidifier
         if supports_humidifier:
@@ -466,7 +466,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(next(step)) # Write SleeOptimalp to False
         if supports_optimal:
             await self.write_single_attribute(attribute_value=attributes.Optimal(False), endpoint_id=endpoint)
-            
+
         self.step(next(step)) # Write bad step value to UserSetpoint
         if supports_sensor and dut_Step != 1:
             retval = await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MinSetpoint + 1), endpoint_id=endpoint, expect_success = False)
