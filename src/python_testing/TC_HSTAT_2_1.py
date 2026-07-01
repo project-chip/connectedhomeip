@@ -307,17 +307,17 @@ class TC_HSTAT_2_1(MatterBaseTest):
         self.step(next(step))  # Check Continuous attribute
         if supports_continuous:
             dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Continuous)
-            asserts.assert_true(isintance(dut_Continuous, bool), "Continuous attribute must be a Boolean")
+            asserts.assert_true(isinstance(dut_Continuous, bool), "Continuous attribute must be a Boolean")
 
         self.step(next(step))  # Check Sleep attribute
         if attributes.Sleep.attribute_id in supported_attributes:
             dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Sleep)
-            asserts.assert_true(isintance(dut_Sleep, bool), "Sleep attribute must be a Boolean")
+            asserts.assert_true(isinstance(dut_Sleep, bool), "Sleep attribute must be a Boolean")
 
         self.step(next(step))  # Check Optimal attribute
         if supports_optimal:
             dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Optimal)
-            asserts.assert_true(isintance(dut_Optimal, bool), "Optimal attribute must be a Boolean")
+            asserts.assert_true(isinstance(dut_Optimal, bool), "Optimal attribute must be a Boolean")
 
         self.step(next(step))  # Write Mode to Off
         await self.write_single_attribute(attribute_value=attributes.Mode(modeOff), endpoint_id=endpoint)
