@@ -73,7 +73,10 @@ PersistentStorageOpKeystorese05x::ExtractKeyIdFromSerializedKeypair(const Crypto
     // Verify magic number
     if (memcmp(privKeyRef, se05x_magic_no, sizeof(se05x_magic_no)) != 0)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        /** Check only for Magic Number. Return Success when key not present in SE05x.  */
+        ChipLogDetail(Crypto, "Not a ref key, Key not present in SE05x.");
+        outKeyId = 0;
+        return CHIP_NO_ERROR;
     }
 
     // Extract KeyID (big-endian, 4 bytes)
@@ -118,36 +121,6 @@ static CHIP_ERROR generate_node_oper_key()
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = se_sss_key_store_generate_key(&gex_sss_chip_ctx.ks, &keyObject, 256, 0);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PersistentStorageOpKeystorese05x::ExtractKeyIdFromSerializedKeypair(const Crypto::P256SerializedKeypair & serializedKeypair,
-                                                                    uint32_t & outKeyId) const
-{
-
-    const uint8_t * privKeyRef = serializedKeypair.ConstBytes() + kP256_PublicKey_Length;
-
-    if (serializedKeypair.Length() < kP256_PublicKey_Length + KEYPAIR_KEYID_OFFSET + 4)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    // Verify magic number
-    if (memcmp(privKeyRef, se05x_magic_no, sizeof(se05x_magic_no)) != 0)
-    {
-        /** Check only for Magic Number. Return Success when key not present in SE05x.  */
-        ChipLogDetail(Crypto, "Not a ref key, Key not present in SE05x.");
-        outKeyId = 0;
-        return CHIP_NO_ERROR;
-    }
-
-    // Extract KeyID (big-endian, 4 bytes)
-    outKeyId = (privKeyRef[KEYPAIR_KEYID_OFFSET] << 24) | (privKeyRef[KEYPAIR_KEYID_OFFSET + 1] << 16) |
-        (privKeyRef[KEYPAIR_KEYID_OFFSET + 2] << 8) | (privKeyRef[KEYPAIR_KEYID_OFFSET + 3]);
-    status = sss_key_store_generate_key(&gex_sss_chip_ctx.ks, &keyObject, 256, 0);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -260,67 +233,6 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
         ExitNow(err = kvsErr);
     }
 
-    err = ExtractKeyIdFromSerializedKeypair(newKeyRef, pendingKeyId);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Crypto, "Fabric %u: Failed to extract key ID from pending keypair: %" CHIP_ERROR_FORMAT, fabricIndex,
-                     err.Format());
-        ExitNow();
-    }
-
-    // Verify the new key exists in SE05x
-    if (pendingKeyId != 0)
-    {
-        bool pendingKeyExists = false;
-        err                   = se05x_check_object_exists(pendingKeyId, &pendingKeyExists);
-        if (err != CHIP_NO_ERROR || !pendingKeyExists)
-        {
-            ChipLogError(Crypto, "Fabric %u: New key does not exist at slot 0x%" PRIx32, fabricIndex, pendingKeyId);
-            ExitNow(err = CHIP_ERROR_INVALID_FABRIC_INDEX);
-        }
-    }
-
-    ChipLogProgress(Crypto, "Fabric %u: Committing new key at (0x%" PRIx32 ")", fabricIndex, pendingKeyId);
-
-    writer.Init(tlvBuf.Bytes(), tlvBuf.Capacity());
-
-    err = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType);
-    SuccessOrExit(err);
-
-    // Write version tag
-    err = writer.Put(kOpKeyVersionTag, kOpKeyVersion);
-    SuccessOrExit(err);
-
-    // Write the serialized keypair (SE05x key reference)
-    err = writer.Put(kOpKeyDataTag, ByteSpan(newKeyRef.Bytes(), newKeyRef.Length()));
-    SuccessOrExit(err);
-
-    err = writer.EndContainer(outerType);
-    SuccessOrExit(err);
-
-    opKeyLength = writer.GetLengthWritten();
-
-    if (!CanCastTo<uint16_t>(opKeyLength))
-    {
-        ChipLogError(Crypto, "Fabric %u: TLV data too large", fabricIndex);
-        ExitNow(err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    }
-
-    // Store the new key reference in persistent storage
-    err = mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), tlvBuf.ConstBytes(),
-                                    static_cast<uint16_t>(opKeyLength));
-    SuccessOrExit(err);
-
-    ChipLogProgress(Crypto, "Fabric %u: Successfully stored new key reference in KVS", fabricIndex);
-
-    // Delete the OLD key from the other slot
-    oldKeyId = (pendingKeyId == slotAKeyId) ? slotBKeyId : slotAKeyId;
-
-    ChipLogProgress(Crypto, "Fabric %u: Deleting old key (0x%" PRIx32 ")", fabricIndex, oldKeyId);
-    se05x_delete_key(oldKeyId);
-
-    // Reset pending key state
-    ResetPendingKey();
     if (!hasExistingKey)
     {
         // First time commissioning - use Slot A
@@ -389,6 +301,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     err = CHIP_NO_ERROR;
 
 exit:
+
     if (se05x_close_session() != CHIP_NO_ERROR)
     {
         ChipLogError(Crypto, "SE05x: Error closing session during cleanup");
