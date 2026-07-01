@@ -24,6 +24,8 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/all-devices-app/posix/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
+chip_inet_config_enable_tcp_endpoint = true
+
 chip_config_enable_groupcast = true
 
 matter_enable_tracing_support = true
