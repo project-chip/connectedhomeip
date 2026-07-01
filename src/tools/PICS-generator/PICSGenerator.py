@@ -21,6 +21,7 @@ import pathlib
 import re
 import sys
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -28,7 +29,9 @@ from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_l
 from rich.console import Console
 
 import matter.clusters as Clusters
+from matter.clusters.Attribute import AsyncReadTransaction
 from matter.testing.decorators import async_test_body
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import uint
 
@@ -36,6 +39,7 @@ from matter.tlv import uint
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceException  # noqa: E402
 from matter.testing.matter_testing import MatterBaseTest  # noqa: E402
+from matter.testing.pics import BasePicsFacts, derive_base_pics_facts_from_device_wildcard  # noqa: E402
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, XmlEvent, build_xml_clusters  # noqa: E402
 
 console = None
@@ -44,9 +48,40 @@ xml_clusters = None
 # Matches the trailing ".E<hex>" event-id suffix in a PICS itemNumber like "ACL.S.E01".
 _EVENT_ID_RE = re.compile(r'\.E([0-9A-Fa-f]+)$')
 
+# Filename of the MCORE/base template in the CSA PICS XML bundle.
+_BASE_PICS_TEMPLATE_FILENAME = "Base.xml"
+
+# Network Commissioning cluster ID. Used to detect the cluster on any endpoint
+# without depending on it living on EP0.
+_NETWORK_COMMISSIONING_CLUSTER_ID = 0x0031
+
+# Network Commissioning feature bits (see NetworkCommissioningCluster.xml).
+_NETCOMM_FEATURE_BIT_WIFI = 0
+_NETCOMM_FEATURE_BIT_THREAD = 1
+_NETCOMM_FEATURE_BIT_ETHERNET = 2
+
+# Aggregator device type ID (see data_model/.../device_types/Aggregator.xml).
+# Endpoints with this device type identify the device as a Bridge.
+_AGGREGATOR_DEVICE_TYPE_ID = 0x000E
+
+
+# Local-only fact extension. Inherits everything BasePicsFacts derives from
+# the wildcard (commissionee, server, bridge, OTA, multi-endpoint groups,
+# Wi-Fi bands, mandatory events). Adds the MCORE.COM.WIFI/THR/ETH/WIRELESS
+# transport bits that the shared helper deliberately does not derive while
+# GRL stress-test feedback is outstanding (Cecille, May 2026). Once the
+# test-plans cleanup PRs land, this extension can be deleted and the
+# generator can use BasePicsFacts directly.
+@dataclass
+class _BasePicsFacts(BasePicsFacts):
+    supports_wifi: bool = False
+    supports_thread: bool = False
+    supports_ethernet: bool = False
+
 
 def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
-    """Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
+    """
+    Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
 
     Returns None if item_number is missing or doesn't end in '.E<hex>'.
     """
@@ -56,6 +91,95 @@ def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
     if match is None:
         return None
     return int(match.group(1), 16)
+
+
+def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
+    """
+    Auto-mark the base/MCORE PICS we can derive from the DUT.
+
+    Only flips items with a deterministic protocol readback. Everything else
+    is left at the template default (false) so the reviewer knows to look at it.
+    """
+    template_path = Path(xmlTemplatePathStr) / _BASE_PICS_TEMPLATE_FILENAME
+    if not template_path.exists():
+        console.print(f"[red]Base PICS template ({_BASE_PICS_TEMPLATE_FILENAME}) not found in {xmlTemplatePathStr}; skipping ❌")
+        return
+
+    # itemNumber -> True if we want to flip support to "true". Items not in
+    # this map keep the template value (false).
+    auto_marked: dict[str, bool] = {}
+    if facts.is_commissionee:
+        auto_marked["MCORE.ROLE.COMMISSIONEE"] = True
+
+    # MCORE.COM.WIFI_2P4GHZ / MCORE.COM.WIFI_5GHZ are about Public Action
+    # Frame support on the corresponding band, not radio band capability,
+    # and there's no protocol-observable signal for that. Leave both at the
+    # template default (false) and let the reviewer flip them if needed.
+    if facts.supports_wifi:
+        auto_marked["MCORE.COM.WIFI"] = True
+
+    if facts.supports_thread:
+        auto_marked["MCORE.COM.THR"] = True
+
+    if facts.supports_ethernet:
+        auto_marked["MCORE.COM.ETH"] = True
+
+    # MCORE.COM.WIRELESS conformance requires at least one of WIFI / THR to
+    # be set; mirror what we marked above so we don't leave the file
+    # internally inconsistent.
+    if facts.supports_wifi or facts.supports_thread:
+        auto_marked["MCORE.COM.WIRELESS"] = True
+
+    if facts.is_server:
+        auto_marked["MCORE.IDM.S"] = True
+
+    if facts.is_bridge:
+        auto_marked["MCORE.BRIDGE"] = True
+
+    if facts.is_ota_requestor:
+        auto_marked["MCORE.OTA.Requestor"] = True
+
+    if facts.is_ota_provider:
+        auto_marked["MCORE.OTA.Provider"] = True
+
+    if facts.has_groups_on_multiple_endpoints:
+        auto_marked["MCORE.G.MULTIENDPOINT"] = True
+
+    parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
+    tree = ET.parse(template_path, parser)
+    root = tree.getroot()
+
+    marked_count = 0
+    for picsItem in root.iter('picsItem'):
+        itemNumberElement = picsItem.find('itemNumber')
+        if itemNumberElement is None or itemNumberElement.text is None:
+            continue
+        item_id = itemNumberElement.text.strip()
+        if auto_marked.get(item_id):
+            supportElement = picsItem.find('support')
+            if supportElement is not None:
+                supportElement.text = "true"
+                console.print(f"Auto-marked {item_id} in Base.xml ✅")
+                marked_count += 1
+
+    if marked_count == 0:
+        console.print("[yellow]Base.xml: no MCORE items auto-marked (Network Commissioning not detected?)")
+
+    # Preserve the template's leading xml declaration + autogenerated comment
+    # block by streaming raw lines until we hit the root <generalPICS>, then
+    # writing the parsed tree. Matches the style used by GenerateDevicePicsXmlFiles.
+    output_file_path = Path(outputPathStr) / _BASE_PICS_TEMPLATE_FILENAME
+    with (open(template_path, encoding='utf-8') as inputFile,
+          open(output_file_path, "wb") as outputFile):
+        header = ""
+        line = inputFile.readline()
+        while line and 'generalPICS' not in line:
+            header += line
+            line = inputFile.readline()
+        outputFile.write(header.encode())
+        tree.write(outputFile, encoding='utf-8', xml_declaration=False)
+
+    console.print(f"[blue]Wrote Base.xml: {output_file_path}")
 
 
 def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, attributePicsList,
@@ -70,12 +194,16 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     picsFileName = map_cluster_name_to_pics_xml(clusterName, xmlFileList)
 
-    # Determine if file has already been handled and use this file
-    for outputFolderFileName in os.listdir(outputPathStr):
-        if picsFileName in outputFolderFileName:
+    # If we've already written an output for this cluster's template
+    # (e.g. OTA Software Update Provider and Requestor both resolve to
+    # the same template, or a cluster appears as both server and client
+    # on this endpoint), reuse the existing file as input so the new
+    # markings get merged in instead of writing a fresh copy.
+    if picsFileName:
+        existing_output = Path(outputPathStr) / picsFileName
+        if existing_output.is_file():
             xmlPath = outputPathStr
-            fileName = outputFolderFileName
-            break
+            fileName = picsFileName
 
     # If no file is found in output folder, determine if there is a match for the cluster name in input folder
     if fileName == "":
@@ -98,7 +226,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         return
 
     # Usage PICS
-    # console.print(clusterPicsCode)
     usageNode = root.find('usage')
     for picsItem in usageNode:
         itemNumberElement = picsItem.find('itemNumber')
@@ -108,7 +235,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         if itemNumberElement.text == f"{clusterPicsCode}":
             console.print("Found usage PICS value in XML template ✅")
             supportElement = picsItem.find('support')
-            # console.print(f"Support: {supportElement.text}")
             supportElement.text = "true"
 
             # Since usage PICS (server or client) is not a list, we can break out when a match is found,
@@ -212,22 +338,21 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
             else:
                 console.print(f"  → not mandatory for this device (decision={decision.decision.name})")
 
-    # Grabbing the header from the XML templates
-    with (open(f"{xmlPath}{fileName}") as inputFile,
-          open(f"{outputPathStr}/{fileName}", "ab") as outputFile):
-
-        xmlHeader = ""
+    # Read the template/existing header before opening the output for
+    # write. "wb" truncates on open, so doing it under a single `with`
+    # would wipe the file we're reading from when xmlPath ==
+    # outputPathStr (server+client merge case, where the second pass
+    # reuses the file the first pass wrote).
+    xmlHeader = ""
+    with open(f"{xmlPath}{fileName}") as inputFile:
         inputLine = inputFile.readline().lstrip()
-
         while 'clusterPICS' not in inputLine:
             xmlHeader += inputLine
             inputLine = inputFile.readline().lstrip()
 
-        # Write the PICS XML header
+    with open(f"{outputPathStr}/{fileName}", "wb") as outputFile:
         outputFile.write(xmlHeader.encode())
-
-        # Write the PICS XML data
-        tree.write(outputFile)
+        tree.write(outputFile, encoding='utf-8', xml_declaration=False)
 
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
@@ -244,6 +369,21 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
     partsList.insert(0, 0)
     # console.print(partsList)
 
+    # Track the transport bits the shared helper deliberately does not
+    # derive yet. Everything else on _BasePicsFacts comes from
+    # derive_base_pics_facts_from_device_wildcard at the bottom of this
+    # function.
+    transport_supports_wifi = False
+    transport_supports_thread = False
+    transport_supports_ethernet = False
+
+    # Accumulator that mirrors the shape of AsyncReadTransaction.ReadResponse
+    # so the shared helper can derive the in-scope facts from a single pass
+    # at the end. We populate the slices the helper actually reads:
+    #   - attributes[ep][Clusters.Descriptor][...DeviceTypeList]  (parsed objects)
+    #   - tlvAttributes[ep][cluster_id][global_attr_id]           (raw values)
+    wildcard = AsyncReadTransaction.ReadResponse(attributes={}, events=[], tlvAttributes={})
+
     for endpoint in partsList:
         # Test step 2 - Map each available endpoint
         console.print(f"Mapping endpoint: {endpoint}")
@@ -256,8 +396,15 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
         # Read device list (Not required)
         deviceListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.DeviceTypeList)])
+        device_type_list = deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
 
-        for deviceTypeData in deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+        # Mirror device types into the wildcard accumulator so the shared
+        # helper can see Aggregator (-> MCORE.BRIDGE) and Root Node
+        # (-> MCORE.ROLE.COMMISSIONEE).
+        wildcard.attributes.setdefault(endpoint, {}).setdefault(
+            Clusters.Descriptor, {})[Clusters.Descriptor.Attributes.DeviceTypeList] = device_type_list
+
+        for deviceTypeData in device_type_list:
             console.print(f"Device Type: {deviceTypeData.deviceType}")
 
         # Read server list
@@ -306,6 +453,18 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
             console.print("Collected feature PICS:")
             console.print(featurePicsList)
+
+            # Transport bits the shared helper does not derive yet. Keep
+            # MCORE.COM.WIFI / THR / ETH driven from the featuremap here
+            # until Cecille's test-plans cleanup PRs land and these PICS
+            # items are removed from Base.xml.
+            if server == _NETWORK_COMMISSIONING_CLUSTER_ID:
+                if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_WIFI):
+                    transport_supports_wifi = True
+                if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_THREAD):
+                    transport_supports_thread = True
+                if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_ETHERNET):
+                    transport_supports_ethernet = True
 
             # Read attribute list
             attributeListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.AttributeList)])
@@ -356,6 +515,17 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             clusterRevisionResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.ClusterRevision)])
             clusterRevision = clusterRevisionResponse[endpoint][clusterClass][clusterClass.Attributes.ClusterRevision]
 
+            # Mirror the per-cluster global attributes into the wildcard
+            # accumulator so the shared helper sees the same inputs that
+            # the inline assessment_data below uses.
+            wildcard.tlvAttributes.setdefault(endpoint, {})[server] = {
+                GlobalAttributeIds.FEATURE_MAP_ID: featureMapValue,
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: list(attributeList),
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: list(acceptedCommandList),
+                GlobalAttributeIds.GENERATED_COMMAND_LIST_ID: list(generatedCommandList),
+                GlobalAttributeIds.CLUSTER_REVISION_ID: clusterRevision,
+            }
+
             # Inputs the conformance evaluator needs to decide which events
             # are mandatory on this DUT.
             assessment_data = ConformanceAssessmentData(
@@ -389,6 +559,30 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             console.print(f"{clusterName} - {clusterPICS}")
 
             GenerateDevicePicsXmlFiles(clusterName, clusterPICS, [], [], [], [], endpointOutputPathStr)
+
+    # Derive the in-scope Base/MCORE facts from the wildcard we accumulated
+    # during the parts-list walk. Keeping this in a single shared helper
+    # means TC_IDM_10_4 and the generator can never disagree on these bits.
+    shared_facts, derivation_problems = derive_base_pics_facts_from_device_wildcard(wildcard, xml_clusters)
+    for problem in derivation_problems:
+        console.print(f"[yellow]{problem.problem}")
+
+    base_pics_facts = _BasePicsFacts(
+        is_commissionee=shared_facts.is_commissionee,
+        is_server=shared_facts.is_server,
+        is_bridge=shared_facts.is_bridge,
+        is_ota_requestor=shared_facts.is_ota_requestor,
+        is_ota_provider=shared_facts.is_ota_provider,
+        has_groups_on_multiple_endpoints=shared_facts.has_groups_on_multiple_endpoints,
+        mandatory_events_by_cluster=shared_facts.mandatory_events_by_cluster,
+        supports_wifi=transport_supports_wifi,
+        supports_thread=transport_supports_thread,
+        supports_ethernet=transport_supports_ethernet,
+    )
+
+    # Base/MCORE PICS are per-device, not per-endpoint, so this runs once after
+    # the parts list walk completes and writes Base.xml at the device root.
+    GenerateBasePicsXmlFile(base_pics_facts, outputPathStr)
 
 
 def cleanDirectory(pathToClean):

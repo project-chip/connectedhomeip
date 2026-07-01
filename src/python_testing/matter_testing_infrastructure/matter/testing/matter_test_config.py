@@ -67,7 +67,9 @@ class MatterTestConfig:
     wifi_passphrase: Optional[str] = None
     thread_operational_dataset: Optional[bytes] = None
 
-    pics: dict[str, bool] = field(default_factory=dict)
+    # Endpoint-keyed PICS tree: {endpoint: {pics_code: supported}}. Device-wide
+    # codes (e.g. MCORE.*) live under endpoint 0.
+    pics: dict[int, dict[str, bool]] = field(default_factory=dict)
 
     # Node ID for basic DUT
     dut_node_ids: list[int] = field(default_factory=list)
