@@ -36,7 +36,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
@@ -215,7 +214,7 @@ class TC_CLCTRL_7_2(MatterBaseTest):
         log.info("LatchControlModes: %s", latch_control_modes)
 
         self.step("2d")
-        overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+        overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
         current_latch: bool = None
         if overall_current_state is NullValue:
             current_latch = NullValue
