@@ -27,8 +27,8 @@
 namespace chip {
 namespace {
 
-constexpr NodeId kTestNodeId       = 0x123456789abcdefULL;
-constexpr FabricIndex kFabricIndex = 1;
+constexpr NodeId kTestNodeId              = 0x123456789abcdefULL;
+constexpr FabricIndex kFabricIndex        = 1;
 constexpr uint16_t kMaxGroupsPerFabric    = 5;
 constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
