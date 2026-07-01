@@ -162,4 +162,23 @@ TEST_F(TestSetUpCodePairer, SyncPASEFailure_ClearsCurrentPASEParameters)
     EXPECT_FALSE(Access().HasCurrentPASEParameters());
 }
 
+#if CONFIG_NETWORK_LAYER_BLE
+TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
+{
+    Access().SetWaitingForPASE(true);
+
+    auto * connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(0x1234);
+    Access().CallOnDiscoveredDeviceOverBle(connObj, std::make_optional<uint16_t>(3840));
+
+    ASSERT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+
+    const auto & params = Access().FrontDiscoveredParameters();
+    EXPECT_EQ(params.GetPeerAddress().GetTransportType(), Transport::Type::kBle);
+    EXPECT_FALSE(params.HasConnectionObject());
+    EXPECT_FALSE(params.HasDiscoveredObject());
+    ASSERT_TRUE(params.mLongDiscriminator.has_value());
+    EXPECT_EQ(params.mLongDiscriminator.value(), 3840);
+}
+#endif
+
 } // namespace
