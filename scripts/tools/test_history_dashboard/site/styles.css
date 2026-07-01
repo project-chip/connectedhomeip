@@ -1,0 +1,261 @@
+:root {
+    --bg: #0b1020;
+    --panel: #141b2d;
+    --panel-2: #0f1525;
+    --text: #e8edf7;
+    --muted: #9aabc7;
+    --border: #27304a;
+    --accent: #7aa2ff;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --gray: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+code {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.page-header h1 {
+    margin: 0 0 6px 0;
+    font-size: 28px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.header-actions button,
+.filters select,
+.filters input,
+.toggle-group button {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.header-actions button:hover,
+.toggle-group button:hover {
+    cursor: pointer;
+    border-color: var(--accent);
+}
+
+.cards {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 24px;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.card-title {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin: 0 24px 24px;
+    overflow: hidden;
+}
+
+.panel-header {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.filters {
+    padding: 16px 18px 18px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    text-align: left;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+    background: var(--panel-2);
+}
+
+th,
+td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.status-passed {
+    background: rgba(34, 197, 94, 0.16);
+    color: #86efac;
+}
+
+.status-failed {
+    background: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+}
+
+.status-broken {
+    background: rgba(234, 179, 8, 0.16);
+    color: #fde68a;
+}
+
+.status-skipped {
+    background: rgba(148, 163, 184, 0.16);
+    color: #cbd5e1;
+}
+
+.status-unknown {
+    background: rgba(122, 162, 255, 0.16);
+    color: #bfdbfe;
+}
+
+.test-name {
+    font-weight: 600;
+}
+
+.test-sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+    word-break: break-all;
+}
+
+.two-col {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+}
+
+.chart-wrap {
+    padding: 16px;
+    min-height: 340px;
+}
+
+.detail-stats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    padding: 16px;
+}
+
+.detail-stat {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.detail-stat-label {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.detail-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.toggle-group {
+    display: flex;
+    gap: 8px;
+}
+
+.toggle-group button.active {
+    border-color: var(--accent);
+    outline: 1px solid var(--accent);
+}
+
+a {
+    color: #a5c4ff;
+}
+
+@media (max-width: 1100px) {
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
