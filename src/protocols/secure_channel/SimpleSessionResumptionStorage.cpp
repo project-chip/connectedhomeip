@@ -43,7 +43,7 @@ StorageKeyName SimpleSessionResumptionStorage::GetStorageKey(const ScopedNodeId 
 StorageKeyName SimpleSessionResumptionStorage::GetStorageKey(ConstResumptionIdView resumptionId)
 {
     char resumptionIdBase64[BASE64_ENCODED_LEN(resumptionId.size()) + 1];
-    auto len                = Base64Encode(resumptionId.data(), resumptionId.size(), resumptionIdBase64);
+    auto len                = Base64URLEncode(resumptionId.data(), resumptionId.size(), resumptionIdBase64);
     resumptionIdBase64[len] = '\0';
     return DefaultStorageKeyAllocator::SessionResumption(resumptionIdBase64);
 }
