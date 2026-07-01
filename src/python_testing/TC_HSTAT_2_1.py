@@ -67,25 +67,25 @@ class TC_HSTAT_2_1(MatterBaseTest):
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
                          "Verify that the DUT response contains a value between 0 and 4 inclusive."),
                 TestStep(next(step), "TH reads from the DUT the FeatureMap attribute.",
-                         "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap." +
-                         "Confirm that one or both of HSTAT.S.F00(HUM) or HSTAT.S.F01(DEHUM) are set." +
-                         "Confirm that one or both of HSTAT.S.F02(CONT) or HSTAT.S.F03(SENSOR) are set." +
-                         "If HSTAT.S.F04(AUTO) is set, confirm that HSTAT.S.F00(HUM), HSTAT.S.F01(DEHUM), and HSTAT.S.F03(SENSOR) are all set." +
-                         "If HSTAT.S.F07(OPT) is set, confirm that HSTAT.S.F03(SENSOR) is set." +
+                         "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap. " + \
+                         "Confirm that one or both of HSTAT.S.F00(HUM) or HSTAT.S.F01(DEHUM) are set. " + \
+                         "Confirm that one or both of HSTAT.S.F02(CONT) or HSTAT.S.F03(SENSOR) are set. " + \
+                         "If HSTAT.S.F04(AUTO) is set, confirm that HSTAT.S.F00(HUM), HSTAT.S.F01(DEHUM), and HSTAT.S.F03(SENSOR) are all set. " + \
+                         "If HSTAT.S.F07(OPT) is set, confirm that HSTAT.S.F03(SENSOR) is set. " + \
                          "If HSTAT.S.F00(HUM) is set, confirm that one or both of HSTAT.S.F08(WARM) and HSTAT.S.F09(COLD) are set."),
                 TestStep(next(step), "TH reads from the DUT the MinSetpoint attribute.",
-                         "Verify that the DUT response contains a value between 0 and 99 inclusive. " +
+                         "Verify that the DUT response contains a value between 0 and 99 inclusive. " + \
                          "Store the value as MinSetpointValue"),
                 TestStep(next(step), "TH reads from the DUT the MaxSetpoint attribute.",
-                         "Verify that the DUT response contains a value between MinSetpointValue and 100. " +
+                         "Verify that the DUT response contains a value between MinSetpointValue and 100. " + \
                          "Store the value as MaxSetpointValue."),
                 TestStep(next(step), "TH reads from the DUT the Step attribute.",
-                         "Store the value as StepValue. " +
-                         "StepValue is between 1 and (MaxSetpointValue - MinSetpointValue) inclusive. " +
+                         "Store the value as StepValue. " + \
+                         "StepValue is between 1 and (MaxSetpointValue - MinSetpointValue) inclusive. " + \
                          "StepValue is such that (MaxSetpointValue - MinSetpointValue) % value == 0."),
                 TestStep(next(step), "Store the value as StepValue.",
-                         "Store the value as SetpointValue. " +
-                         "SetpointValue is between MinSetpointValue and MaxSetpointValue inclusive. " +
+                         "Store the value as SetpointValue. " + \
+                         "SetpointValue is between MinSetpointValue and MaxSetpointValue inclusive. " + \
                          "SetpointValue is such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
                 TestStep(next(step), "Store the value as SetpointValue.",
                          "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive."),
