@@ -38,7 +38,6 @@
 
 import logging
 from itertools import count
-from typing import Any
 
 from mobly import asserts
 
@@ -65,127 +64,127 @@ class TC_HSTAT_2_1(MatterBaseTest):
         return [TestStep(next(step), "Commissioning already done.", is_commissioning=True),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
                          "Verify that the DUT response contains a value between 0 and 4 inclusive."),
-                TestStep(next(step),"TH reads from the DUT the SystemState attribute.",
+                TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
                          "Verify that the DUT response contains a value between 0 and 4 inclusive."),
                 TestStep(next(step), "TH reads from the DUT the FeatureMap attribute.",
-                            "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap." +
-                            "Confirm that one or both of HSTAT.S.F00(HUM) or HSTAT.S.F01(DEHUM) are set." +
-                            "Confirm that one or both of HSTAT.S.F02(CONT) or HSTAT.S.F03(SENSOR) are set." +
-                            "If HSTAT.S.F04(AUTO) is set, confirm that HSTAT.S.F00(HUM), HSTAT.S.F01(DEHUM), and HSTAT.S.F03(SENSOR) are all set." +
-                            "If HSTAT.S.F07(OPT) is set, confirm that HSTAT.S.F03(SENSOR) is set." +
-                            "If HSTAT.S.F00(HUM) is set, confirm that one or both of HSTAT.S.F08(WARM) and HSTAT.S.F09(COLD) are set."),
+                         "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap." +
+                         "Confirm that one or both of HSTAT.S.F00(HUM) or HSTAT.S.F01(DEHUM) are set." +
+                         "Confirm that one or both of HSTAT.S.F02(CONT) or HSTAT.S.F03(SENSOR) are set." +
+                         "If HSTAT.S.F04(AUTO) is set, confirm that HSTAT.S.F00(HUM), HSTAT.S.F01(DEHUM), and HSTAT.S.F03(SENSOR) are all set." +
+                         "If HSTAT.S.F07(OPT) is set, confirm that HSTAT.S.F03(SENSOR) is set." +
+                         "If HSTAT.S.F00(HUM) is set, confirm that one or both of HSTAT.S.F08(WARM) and HSTAT.S.F09(COLD) are set."),
                 TestStep(next(step), "TH reads from the DUT the MinSetpoint attribute.",
-                            "Verify that the DUT response contains a value between 0 and 99 inclusive. " +
-                            "Store the value as MinSetpointValue"),
+                         "Verify that the DUT response contains a value between 0 and 99 inclusive. " +
+                         "Store the value as MinSetpointValue"),
                 TestStep(next(step), "TH reads from the DUT the MaxSetpoint attribute.",
-                            "Verify that the DUT response contains a value between MinSetpointValue and 100. " +
-                            "Store the value as MaxSetpointValue."),
+                         "Verify that the DUT response contains a value between MinSetpointValue and 100. " +
+                         "Store the value as MaxSetpointValue."),
                 TestStep(next(step), "TH reads from the DUT the Step attribute.",
-                            "Store the value as StepValue. " +
-                            "StepValue is between 1 and (MaxSetpointValue - MinSetpointValue) inclusive. " +
-                            "StepValue is such that (MaxSetpointValue - MinSetpointValue) % value == 0."),
+                         "Store the value as StepValue. " +
+                         "StepValue is between 1 and (MaxSetpointValue - MinSetpointValue) inclusive. " +
+                         "StepValue is such that (MaxSetpointValue - MinSetpointValue) % value == 0."),
                 TestStep(next(step), "Store the value as StepValue.",
-                            "Store the value as SetpointValue. " +
-                            "SetpointValue is between MinSetpointValue and MaxSetpointValue inclusive. " +
-                            "SetpointValue is such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
+                         "Store the value as SetpointValue. " +
+                         "SetpointValue is between MinSetpointValue and MaxSetpointValue inclusive. " +
+                         "SetpointValue is such that (SetpointValue - MinSetpointValue) % StepValue == 0."),
                 TestStep(next(step), "Store the value as SetpointValue.",
-                            "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive."),
+                         "Verify that the DUT response contains a value between MinSetpointValue and MaxSetpointValue inclusive."),
                 TestStep(next(step), "TH reads from the DUT the MistType attribute.",
-                            "Verify that the DUT response contains a value or 0 or 1"),
+                         "Verify that the DUT response contains a value or 0 or 1"),
                 TestStep(next(step), "TH reads from the DUT the Continuous attribute.",
-                             "Verify that the DUT response contains a value or True or False."),
+                         "Verify that the DUT response contains a value or True or False."),
                 TestStep(next(step), "Verify that the DUT response contains a value or True or False",
-                             "Verify that the DUT response contains a value or True or False."),
+                         "Verify that the DUT response contains a value or True or False."),
                 TestStep(next(step), "TH reads from the DUT the Optimal attribute.",
-                             "Verify that the DUT response contains a value or True or False"),
+                         "Verify that the DUT response contains a value or True or False"),
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Off",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Humidifier"
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
-                             "Verify that the DUT response contains Humidifier."),
+                         "Verify that the DUT response contains Humidifier."),
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
-                             "Verify that the DUT response contains Humidifying."),
+                         "Verify that the DUT response contains Humidifying."),
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Dehumidifier",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
-                             "Verify that the DUT response contains Dehumidifier."),
+                         "Verify that the DUT response contains Dehumidifier."),
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
-                             "Verify that the DUT response contains Dehumidifying."),
+                         "Verify that the DUT response contains Dehumidifying."),
 
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Auto",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
-                             "Verify that the DUT response is Auto."),
+                         "Verify that the DUT response is Auto."),
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
-                             "Verify that the DUT response contains Idle, Humidifying, or Dehumidifying."),
+                         "Verify that the DUT response contains Idle, Humidifying, or Dehumidifying."),
 
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of FanOnly",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Mode attribute.",
-                             "Verify that the DUT response is FanOnly."),
+                         "Verify that the DUT response is FanOnly."),
                 TestStep(next(step), "TH reads from the DUT the SystemState attribute.",
-                             "Verify that the DUT response contains Fan."),
+                         "Verify that the DUT response contains Fan."),
 
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Humidifier or Dehumidifier",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
 
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue."
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
-                             "Verify that the DUT response contains MinSetpointValue."),
+                         "Verify that the DUT response contains MinSetpointValue."),
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MaxSetpointValue."
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
-                             "Verify that the DUT response contains MaxSetpointValue."),
+                         "Verify that the DUT response contains MaxSetpointValue."),
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue + StepValue.",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
-                             "Verify that the DUT response contains MinSetpointValue + StepValue."),
+                         "Verify that the DUT response contains MinSetpointValue + StepValue."),
                 TestStep(next(step), "TH reads from the DUT the Continuous attribute."
-                             "Store the value as ContState"),
+                         "Store the value as ContState"),
                 TestStep(next(step), "TH writes to the DUT the Continuous attribute with a value of !ContState.",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Continuous attribute.",
-                             "Verify that the DUT response contains !ContState."),
+                         "Verify that the DUT response contains !ContState."),
                 TestStep(next(step), "TH writes to the DUT the Continuous attribute with a value of False.",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Sleep attribute.",
-                             "Store the value as SleepState"),
+                         "Store the value as SleepState"),
                 TestStep(next(step), "TH writes to the DUT the Sleep attribute with a value of !SleepState.",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Sleep attribute.",
-                             "Verify that the DUT response contains !SleepState."),
+                         "Verify that the DUT response contains !SleepState."),
                 TestStep(next(step), "TH writes to the DUT the Sleep attribute with a value of False.",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the Optimal attribute.",
-                             "Store the value as OptState"),
+                         "Store the value as OptState"),
                 TestStep(next(step), "TH writes to the DUT the Optimal attribute with a value of !OptState.",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "Store the value as OptState",
-                             "Verify that the DUT response contains !OptState."),
+                         "Verify that the DUT response contains !OptState."),
                 TestStep(next(step), "TH writes to the DUT the Optimal attribute with a value of False.",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue + 1.",
-                             "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MinSetpointValue - 1.",
-                             "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 TestStep(next(step), "TH writes to the DUT the UserSetpoint attribute with value MaxSetpointValue + 1.",
-                             "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 TestStep(next(step), "TH writes to the DUT the Mode attribute with a value of Humidifier",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH writes to the DUT the MistType attribute with a value of MistWarm",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the MistType attribute.",
-                             "Verify that the DUT response contains MistWarm."),
+                         "Verify that the DUT response contains MistWarm."),
                 TestStep(next(step), "TH writes to the DUT the MistType attribute with a value of MistCold",
-                             "Verify DUT responds w/ status SUCCESS(0x00)"),
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the MistType attribute.",
-                             "Verify that the DUT response contains a value of MistCold."),
+                         "Verify that the DUT response contains a value of MistCold."),
                 TestStep(next(step), "TH writes to the DUT the MistType attribute with a value of MistWarm.",
-                             "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 TestStep(next(step), "TH writes to the DUT the MistType attribute with a value of MistCold.",
-                             "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 ]
 
     async def read_hstat_attribute_expect_success(self, endpoint, attribute):
@@ -242,17 +241,17 @@ class TC_HSTAT_2_1(MatterBaseTest):
         stateFan = cluster.Enums.SystemStateEnum.kFan
         stateIdle = cluster.Enums.SystemStateEnum.kIdle
 
-        self.step(next(step)) # Check Mode attribute
+        self.step(next(step))  # Check Mode attribute
         dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
         asserts.assert_greater_equal(dut_Mode, 0, "Mode attribute is out of range")
         asserts.assert_less_equal(dut_Mode, 4, "Mode attribute is out of range")
 
-        self.step(next(step)) # Check SystemState attribute
+        self.step(next(step))  # Check SystemState attribute
         dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
         asserts.assert_greater_equal(dut_SystemState, 0, "SystemState attribute is out of range")
         asserts.assert_less_equal(dut_SystemState, 4, "SystemState attribute is out of range")
 
-        self.step(next(step)) # Verify feature map
+        self.step(next(step))  # Verify feature map
         asserts.assert_true(supports_humidifier or supports_dehumidifier, "Must support Humidifier and/or Dehumidifier")
         asserts.assert_true(supports_continuous or supports_sensor, "Must support Continuous and/or Sensor")
         if supports_auto:
@@ -262,257 +261,265 @@ class TC_HSTAT_2_1(MatterBaseTest):
             asserts_assert_true(supports_sensor, "Must support Sensor if Optimal is supported")
         asserts.assert_true(supports_warm or supports_cold, "Must support Warm and/or Cold")
 
-        self.step(next(step)) # Check MinSetpoint attribute
+        self.step(next(step))  # Check MinSetpoint attribute
         if supports_sensor:
             dut_MinSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinSetpoint)
             asserts.assert_greater_equal(dut_MinSetpoint, 0, "MinSetpoint attribute is out of range")
             asserts.assert_less_equal(dut_MinSetpoint, 99, "MinSetpoint attribute is out of range")
 
-        self.step(next(step)) # Check MaxSetpoint attribute
+        self.step(next(step))  # Check MaxSetpoint attribute
         if supports_sensor:
             dut_MaxSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxSetpoint)
             asserts.assert_greater_equal(dut_MaxSetpoint, dut_MinSetpoint, "MaxSetpoint attribute is out of range")
             asserts.assert_less_equal(dut_MaxSetpoint, 100, "MaxSetpoint attribute is out of range")
 
-        self.step(next(step)) # Check Step attribute
+        self.step(next(step))  # Check Step attribute
         if supports_sensor:
             dut_Step = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Step)
             asserts.assert_greater_equal(dut_Step, 1, "Step attribute cannot be zero")
             asserts.assert_less_equal(dut_Step, dut_MaxSetpoint - dut_MinSetpoint, "Step attribute is greater than MaxSetpoint")
-            asserts.assert_equal(dut_Step % (dut_MaxSetpoint - dut_MinSetpoint), 0, "Step attribute is not divisible by (MaxSetpoint - MinSetpoint)")
+            asserts.assert_equal(dut_Step % (dut_MaxSetpoint - dut_MinSetpoint), 0,
+                                 "Step attribute is not divisible by (MaxSetpoint - MinSetpoint)")
 
-        self.step(next(step)) # Check UserSetpoint attribute
+        self.step(next(step))  # Check UserSetpoint attribute
         if supports_sensor:
             dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
             asserts.assert_greater_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute is greater than MaxSetpoint")
-            asserts.assert_equal(dut_UserSetpoint % (dut_MaxSetpoint - dut_MinSetpoint), 0, "UserSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
+            asserts.assert_equal(dut_UserSetpoint % (dut_MaxSetpoint - dut_MinSetpoint), 0,
+                                 "UserSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
 
-        self.step(next(step)) # Check TargetSetpoint attribute
+        self.step(next(step))  # Check TargetSetpoint attribute
         if supports_optimal or (supports_sensor and attributes.TargetSetpoint.attribute_id in supported_attributes):
             dut_TargetSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetSetpoint)
             asserts.assert_greater_equal(dut_TargetSetpoint, dut_MinSetpoint, "TargetSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_TargetSetpoint, dut_MaxSetpoint, "TargetSetpoint attribute is greater than MaxSetpoint")
-            asserts.assert_equal(dut_TargetSetpoint % (dut_MaxSetpoint - dut_MinSetpoint), 0, "TargetSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
+            asserts.assert_equal(dut_TargetSetpoint % (dut_MaxSetpoint - dut_MinSetpoint), 0,
+                                 "TargetSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
 
-        self.step(next(step)) # Check MistType attribute
+        self.step(next(step))  # Check MistType attribute
         if supports_humidifier:
             dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MistType)
             asserts.assert_greater_equal(dut_MistType, 0, "MistType attribute must be 0 or 1")
             asserts.assert_less_equal(dut_MistType, 1, "MistType attribute must be 0 or 1")
 
-        self.step(next(step)) # Check Continuous attribute
+        self.step(next(step))  # Check Continuous attribute
         if supports_continuous:
             dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Continuous)
             asserts.assert_true(dut_Continuous or not dut_Continuous, "Continuous attribute must be True or False")
 
-        self.step(next(step)) # Check Sleep attribute
+        self.step(next(step))  # Check Sleep attribute
         if attributes.Sleep.attribute_id in supported_attributes:
             dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Sleep)
             asserts.assert_true(dut_Sleep or not dut_Sleep, "Sleep attribute must be True or False")
 
-        self.step(next(step)) # Check Optimal attribute
+        self.step(next(step))  # Check Optimal attribute
         if supports_optimal:
             dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Optimal)
             asserts.assert_true(dut_Optimal or not dut_Optimal, "Optimal attribute must be True or False")
 
-        self.step(next(step)) # Write Mode to Off
+        self.step(next(step))  # Write Mode to Off
         await self.write_single_attribute(attribute_value=attributes.Mode(modeOff), endpoint_id=endpoint)
 
-        self.step(next(step)) # Write Mode to Humidifier
+        self.step(next(step))  # Write Mode to Humidifier
         if supports_humidifier:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeHumidifier), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Mode, should be Humidifier
+        self.step(next(step))  # Read Mode, should be Humidifier
         if supports_humidifier:
             dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
             asserts.assert_equal(dut_Mode, modeHumidifier, "Mode attribute is not Humidifier")
 
-        self.step(next(step)) # Read SystemState, should be Humidifying
+        self.step(next(step))  # Read SystemState, should be Humidifying
         if supports_humidifier:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
             asserts.assert_equal(dut_SystemState, stateHumidifying, "SystemState attribute is not Humidifying")
 
-        self.step(next(step)) # Write Mode to Dehumidifier
+        self.step(next(step))  # Write Mode to Dehumidifier
         if supports_dehumidifier:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeDehumidifier), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Mode, should be Dehmidifier
+        self.step(next(step))  # Read Mode, should be Dehmidifier
         if supports_dehumidifier:
             dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
             asserts.assert_equal(dut_Mode, modeDehumidifier, "Mode attribute is not Dehumidifier")
 
-        self.step(next(step)) # Read SystemState, should be Dehumidifying
+        self.step(next(step))  # Read SystemState, should be Dehumidifying
         if supports_humidifier:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
             asserts.assert_equal(dut_SystemState, stateDehumidifying, "SystemState attribute is not Dehumidifying")
 
-        self.step(next(step)) # Write Mode to Auto
+        self.step(next(step))  # Write Mode to Auto
         if supports_auto:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeAuto), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Mode, should be Auto
+        self.step(next(step))  # Read Mode, should be Auto
         if supports_auto:
             dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
             asserts.assert_equal(dut_Mode, modeAuto, "Mode attribute is not Auto")
 
-        self.step(next(step)) # Read SystemState, should be Idle, Humidifying, or Dehumidifying
+        self.step(next(step))  # Read SystemState, should be Idle, Humidifying, or Dehumidifying
         if supports_auto:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
-            asserts.assert_true(dut_SystemState in [stateIdle, stateHumidifying, stateDehumidifying], "SystemState attribute is not Idle, Humidifying, or Dehumifying")
+            asserts.assert_true(dut_SystemState in [stateIdle, stateHumidifying, stateDehumidifying],
+                                "SystemState attribute is not Idle, Humidifying, or Dehumifying")
 
-        self.step(next(step)) # Write Mode to FanOnly
+        self.step(next(step))  # Write Mode to FanOnly
         if supports_fan:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeFanOnly), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Mode, should be FanOnly
+        self.step(next(step))  # Read Mode, should be FanOnly
         if supports_fan:
             dut_Mode = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Mode)
             asserts.assert_equal(dut_Mode, modeFanOnly, "Mode attribute is not FanOnly")
 
-        self.step(next(step)) # Read SystemState, should be Fan
+        self.step(next(step))  # Read SystemState, should be Fan
         if supports_fan:
             dut_SystemState = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.SystemState)
             asserts.assert_equal(dut_SystemState, stateFan, "SystemState attribute is not Fan")
 
-        self.step(next(step)) # Write Mode to Humidifier or Dehumidifier
+        self.step(next(step))  # Write Mode to Humidifier or Dehumidifier
         if supports_humidifier:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeHumidifier), endpoint_id=endpoint)
         else:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeDehumidifier), endpoint_id=endpoint)
 
-        self.step(next(step)) # Write MinSetpoint to UserSetpoint
+        self.step(next(step))  # Write MinSetpoint to UserSetpoint
         if supports_sensor:
             await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MinSetpoint), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read UserSetpoint, confirm it is MinSetpoint
+        self.step(next(step))  # Read UserSetpoint, confirm it is MinSetpoint
         if supports_sensor:
             dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
             asserts.assert_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute not equal to MinSetpoint attribute")
 
-        self.step(next(step)) # Write MaxSetpoint to UserSetpoint
+        self.step(next(step))  # Write MaxSetpoint to UserSetpoint
         if supports_sensor:
             await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MaxSetpoint), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read UserSetpoint, confirm it is MaxSetpoint
+        self.step(next(step))  # Read UserSetpoint, confirm it is MaxSetpoint
         if supports_sensor:
             dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
             asserts.assert_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute not equal to MaxSetpoint attribute")
 
         testUserValue = dut_MinSetpoint + dut_Step
 
-        self.step(next(step)) # Write test value to UserSetpoint
+        self.step(next(step))  # Write test value to UserSetpoint
         if supports_sensor:
             await self.write_single_attribute(attribute_value=attributes.UserSetpoint(testUserValue), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read UserSetpoint, confirm it is test value
+        self.step(next(step))  # Read UserSetpoint, confirm it is test value
         if supports_sensor:
             dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
             asserts.assert_equal(dut_UserSetpoint, testUserValue, "UserSetpoint attribute not as expected")
 
-        self.step(next(step)) # Read Continuous attribute
+        self.step(next(step))  # Read Continuous attribute
         if supports_continuous:
             dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Continuous)
 
         testContinuousValue = not dut_Continuous
 
-        self.step(next(step)) # Write opposite value to Continuous
+        self.step(next(step))  # Write opposite value to Continuous
         if supports_continuous:
             await self.write_single_attribute(attribute_value=attributes.Continuous(testContinuousValue), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Continuous attribute and check value
+        self.step(next(step))  # Read Continuous attribute and check value
         if supports_continuous:
             dut_Continuous = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Continuous)
             asserts.assert_equal(dut_Continuous, testContinuousValue, "Continuous attribute not as expected")
 
-        self.step(next(step)) # Write Continuous to False
+        self.step(next(step))  # Write Continuous to False
         if supports_continuous:
             await self.write_single_attribute(attribute_value=attributes.Continuous(False), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Sleep attribute
+        self.step(next(step))  # Read Sleep attribute
         if attributes.Sleep.attribute_id in supported_attributes:
             dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Sleep)
 
         testSleepValue = not dut_Sleep
 
-        self.step(next(step)) # Write opposite value to Sleep
+        self.step(next(step))  # Write opposite value to Sleep
         if attributes.Sleep.attribute_id in supported_attributes:
             await self.write_single_attribute(attribute_value=attributes.Sleep(testSleepValue), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Sleep attribute and check value
+        self.step(next(step))  # Read Sleep attribute and check value
         if attributes.Sleep.attribute_id in supported_attributes:
             dut_Sleep = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Sleep)
             asserts.assert_equal(dut_Sleep, testSleepValue, "Sleep attribute not as expected")
 
-        self.step(next(step)) # Write Sleep to False
+        self.step(next(step))  # Write Sleep to False
         if attributes.Sleep.attribute_id in supported_attributes:
             await self.write_single_attribute(attribute_value=attributes.Sleep(False), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Optimal attribute
+        self.step(next(step))  # Read Optimal attribute
         if supports_optimal:
             dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Optimal)
 
         testOptimalValue = not dut_Optimal
 
-        self.step(next(step)) # Write opposite value to Optimal
+        self.step(next(step))  # Write opposite value to Optimal
         if supports_optimal:
             await self.write_single_attribute(attribute_value=attributes.Optimal(testOptimalValue), endpoint_id=endpoint)
 
-        self.step(next(step)) # Read Optimal attribute and check value
+        self.step(next(step))  # Read Optimal attribute and check value
         if supports_optimal:
             dut_Optimal = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Optimal)
             asserts.assert_equal(dut_Optimal, testOptimalValue, "Optimal attribute not as expected")
 
-        self.step(next(step)) # Write SleeOptimalp to False
+        self.step(next(step))  # Write SleeOptimalp to False
         if supports_optimal:
             await self.write_single_attribute(attribute_value=attributes.Optimal(False), endpoint_id=endpoint)
 
-        self.step(next(step)) # Write bad step value to UserSetpoint
+        self.step(next(step))  # Write bad step value to UserSetpoint
         if supports_sensor and dut_Step != 1:
-            retval = await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MinSetpoint + 1), endpoint_id=endpoint, expect_success = False)
-            asserts.assert_equal(retval, Status.CONSTRAINT_ERROR, "Write of bad step to UserSetpoint DID NOT cause a CONSTRAINT_ERROR as expected")
+            retval = await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MinSetpoint + 1), endpoint_id=endpoint, expect_success=False)
+            asserts.assert_equal(retval, Status.CONSTRAINT_ERROR,
+                                 "Write of bad step to UserSetpoint DID NOT cause a CONSTRAINT_ERROR as expected")
 
-        self.step(next(step)) # Write low error value to UserSetpoint
+        self.step(next(step))  # Write low error value to UserSetpoint
         if supports_sensor:
-            retval = await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MinSetpoint - 1), endpoint_id=endpoint, expect_success = False)
-            asserts.assert_equal(retval, Status.CONSTRAINT_ERROR, "Write too low value to UserSetpoint DID NOT cause a CONSTRAINT_ERROR as expected")
+            retval = await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MinSetpoint - 1), endpoint_id=endpoint, expect_success=False)
+            asserts.assert_equal(retval, Status.CONSTRAINT_ERROR,
+                                 "Write too low value to UserSetpoint DID NOT cause a CONSTRAINT_ERROR as expected")
 
-        self.step(next(step)) # Write high error value to UserSetpoint
+        self.step(next(step))  # Write high error value to UserSetpoint
         if supports_sensor:
-            retval = await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MaxSetpoint + 1), endpoint_id=endpoint, expect_success = False)
-            asserts.assert_equal(retval, Status.CONSTRAINT_ERROR, "Write too high value to UserSetpoint DID NOT cause a CONSTRAINT_ERROR as expected")
+            retval = await self.write_single_attribute(attribute_value=attributes.UserSetpoint(dut_MaxSetpoint + 1), endpoint_id=endpoint, expect_success=False)
+            asserts.assert_equal(retval, Status.CONSTRAINT_ERROR,
+                                 "Write too high value to UserSetpoint DID NOT cause a CONSTRAINT_ERROR as expected")
 
-        self.step(next(step)) # Write Mode to Humidifier
+        self.step(next(step))  # Write Mode to Humidifier
         if supports_humidifier:
             await self.write_single_attribute(attribute_value=attributes.Mode(modeHumidifier), endpoint_id=endpoint)
 
-        self.step(next(step)) # Write Warm to MistType
+        self.step(next(step))  # Write Warm to MistType
         if supports_humidifier and supports_warm:
             await self.write_single_attribute(attribute_value=attributes.MistType(mistBitmap.kWarmMist), endpoint_id=endpoint)
 
-        self.step(next(step)) # Check that MistType attribute is Warm
+        self.step(next(step))  # Check that MistType attribute is Warm
         if supports_humidifier and supports_warm:
             dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MistType)
             asserts.assert_true(bool(dut_MistType & mistBitmap.kWarmMist), "MistType not Warm")
 
-        self.step(next(step)) # Write Cold to MistType
+        self.step(next(step))  # Write Cold to MistType
         if supports_humidifier and supports_cold:
             await self.write_single_attribute(attribute_value=attributes.MistType(mistBitmap.kColdMist), endpoint_id=endpoint)
 
-        self.step(next(step)) # Check that MistType attribute is Cold
+        self.step(next(step))  # Check that MistType attribute is Cold
         if supports_humidifier and supports_cold:
             dut_MistType = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MistType)
             asserts.assert_true(bool(dut_MistType & mistBitmap.kColdMist), "MistType not Cold")
 
-        self.step(next(step)) # Write Warm to MistType when it is not supported
+        self.step(next(step))  # Write Warm to MistType when it is not supported
         if supports_humidifier and not supports_warm:
-            retval = await self.write_single_attribute(attribute_value=attributes.MistType(mistBitmap.kWarmMist), endpoint_id=endpoint, expect_success = False)
+            retval = await self.write_single_attribute(attribute_value=attributes.MistType(mistBitmap.kWarmMist), endpoint_id=endpoint, expect_success=False)
             asserts.assert_equal(retval, Status.CONSTRAINT_ERROR, "Should not have been able to set the mist type to Warm")
 
-        self.step(next(step)) # Write Cold to MistType when it is not supported
+        self.step(next(step))  # Write Cold to MistType when it is not supported
         if supports_humidifier and not supports_cold:
-            retval = await self.write_single_attribute(attribute_value=attributes.MistType(mistBitmap.kColdMist), endpoint_id=endpoint, expect_success = False)
+            retval = await self.write_single_attribute(attribute_value=attributes.MistType(mistBitmap.kColdMist), endpoint_id=endpoint, expect_success=False)
             asserts.assert_equal(retval, Status.CONSTRAINT_ERROR, "Should not have been able to set the mist type to Cold")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
