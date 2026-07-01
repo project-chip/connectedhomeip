@@ -25,6 +25,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 #include <platform/mt793x/NetworkCommissioningWiFiDriver.h>
+#include <platform/mt793x/route_hook/mtk_route_hook.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
@@ -128,7 +129,7 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         }
         else if (FILOGIC_WIFI_PORT_AP == event_data->u.wifi_init.port)
         {
-            ConfigureWiFiAP();
+            TEMPORARY_RETURN_IGNORED ConfigureWiFiAP();
             ChangeWiFiAPState(kWiFiAPState_Activating);
         }
         else
@@ -187,6 +188,7 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         DriveStationState();
 
         UpdateInternetConnectivityState(hadIPv4Conn, TRUE, event_data->u.ipv6_str.addr);
+        mtk_route_hook_init();
     }
     else if (event->Platform.FilogicEvent.event == FILOGIC_STA_CONNECTED_TO_AP)
     {
