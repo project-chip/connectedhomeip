@@ -24,8 +24,64 @@
 
 #include <platform/ConfigurationManager.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <platform/ConnectivityManager.h>
+#include <wifipaf/WiFiPAFLayer.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+namespace {
+
+// Watchdog: if the PAFTP peer never sends a packet to drive the tx-idle
+// check after we queue the ConnectNetworkResponse, post the event anyway
+// after this many seconds so commissioning is not stuck waiting on mDNS.
+constexpr System::Clock::Timeout kPostOpEventWatchdog = System::Clock::Seconds32(5);
+
+// One-shot guard so the tx-idle callback and the watchdog timer don't both
+// post the event.  Reset at the start of every PostConnectedToOperationalNetworkEvent.
+bool sPostOpEventFired = false;
+
+void PostOperationalNetworkEnabled()
+{
+    if (sPostOpEventFired)
+    {
+        return;
+    }
+    sPostOpEventFired = true;
+    ChipDeviceEvent ev{ .Type = DeviceEventType::kOperationalNetworkEnabled, .OperationalNetwork = { .network = 0 } };
+    CHIP_ERROR err = PlatformMgr().PostEvent(&ev);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "kOperationalNetworkEnabled post: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void CancelPafPublisher(uint32_t id, WiFiPAF::WiFiPafRole role)
+{
+    CHIP_ERROR err = ConnectivityMgr().WiFiPAFShutdown(id, role);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "WiFiPAFShutdown(id=%u): %" CHIP_ERROR_FORMAT, id, err.Format());
+    }
+}
+
+void OnPostOpEventWatchdog(System::Layer *, void *)
+{
+    ChipLogProgress(DeviceLayer, "PAFTP tx-idle watchdog: posting kOperationalNetworkEnabled");
+    PostOperationalNetworkEnabled();
+}
+
+void OnPafTxIdle(void * /*ctx*/)
+{
+    DeviceLayer::SystemLayer().CancelTimer(OnPostOpEventWatchdog, nullptr);
+    PostOperationalNetworkEnabled();
+}
+
+} // namespace
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 DeviceControlServer DeviceControlServer::sInstance;
 
@@ -66,6 +122,23 @@ exit:
 
 CHIP_ERROR DeviceControlServer::PostConnectedToOperationalNetworkEvent(ByteSpan networkID)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Under WiFiPAF the device must deliver ConnectNetworkResponse via NAN
+    // (PAF) before the mDNS burst that kOperationalNetworkEnabled triggers,
+    // otherwise the Avahi burst occupies the shared radio and prevents the
+    // closing PAFTP Follow-up from reaching the peer.  Hook the explicit
+    // PAFTP tx-idle signal (send queue empty + all fragment acks received)
+    // and tear down the publish to close the session per spec §4.20.3.10
+    // [4.780], then post kOperationalNetworkEnabled.  A 5 s watchdog timer
+    // guards against the peer never driving the tx-idle check.
+    auto & paf = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    if (paf.GetWiFiPAFState() == WiFiPAF::State::kConnected)
+    {
+        sPostOpEventFired = false;
+        paf.ScheduleCancelPublishersOnTxIdle(CancelPafPublisher, OnPafTxIdle, nullptr);
+        return DeviceLayer::SystemLayer().StartTimer(kPostOpEventWatchdog, OnPostOpEventWatchdog, nullptr);
+    }
+#endif
     ChipDeviceEvent event{ .Type = DeviceEventType::kOperationalNetworkEnabled,
                            // TODO(cecille): This should be some way to specify thread or wifi.
                            .OperationalNetwork = { .network = 0 } };

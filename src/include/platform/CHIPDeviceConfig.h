@@ -338,6 +338,26 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+ *
+ * When set to 1, ConnectNetwork received over a WiFi-PAF transport responds
+ * with Status::kSuccess *before* starting WiFi association.  Default 0
+ * preserves the upstream concurrent-connection behaviour: the response is
+ * sent from OnResult() after the wireless driver reports the actual result.
+ *
+ * Set to 1 on devices where the radio is shared between NAN and WiFi-AP and
+ * post-association NAN Follow-up TX is unreliable (the radio is camped on
+ * the AP channel and PAF frames either don't transmit or transmit on the
+ * wrong channel).
+ *
+ * Only takes effect when both CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF and
+ * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION are 1.
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+#define CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 0
+#endif // CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+
+/**
  * The device shall check every WIFI_START_CHECK_TIME_USEC whether Wi-Fi management
  * has been fully initialized. If after WIFI_START_CHECK_ATTEMPTS Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device
@@ -1697,6 +1717,23 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 0
 #endif // CHIP_DEVICE_ENABLE_PORT_PARAMS
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY enables Commissioning Proxy
+ * support.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
+// NOTE: the WiFi-PAF and BLE proxy transports have no dedicated CP-side enable
+// flags.  The Commissioning Proxy cluster source itself is only compiled when
+// CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY is on (the build system pulls
+// it in via app_config_dependent_sources.gni only for those apps), so each
+// transport is gated purely on its own existing compile flag:
+//   WiFi-PAF: CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+//   BLE:      CONFIG_NETWORK_LAYER_BLE (the BLE-wide GN arg
+//             chip_config_network_layer_ble)
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY

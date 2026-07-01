@@ -621,6 +621,21 @@ CHIP_ERROR WiFiPAFEndPoint::DriveSending()
         return CHIP_NO_ERROR;
     }
 
+    // Gate ALL sends (including standalone ACKs) on resource availability.
+    //
+    // Formerly standalone ACKs bypassed this gate to keep the peer's ack-recv
+    // timer alive during WiFi scan/association.  However, _WiFiPAFSend is a
+    // synchronous nantransmit_sync D-Bus call: wpa_supplicant accepts the
+    // request immediately but may defer OTA transmission.  When the radio
+    // becomes available after association, wpa_supplicant delivers frames
+    // submitted during the scan (e.g. a standalone ACK) AFTER frames submitted
+    // post-scan (e.g. ConnectNetworkResponse), causing out-of-order PAFTP
+    // delivery and a multi-second reorder-queue stall at the proxy.
+    //
+    // By deferring ACKs via the WaitResource timer (1 s ticks), we ensure they
+    // are submitted to wpa_supplicant only after the channel is restored, and
+    // strictly before data frames.  PAFTP_ACK_TIMEOUT (15 s) provides
+    // sufficient margin for a typical WiFi scan + association (~5-10 s).
     if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() && (!mAckToSend.IsNull() || !mSendQueue.IsNull()))
     {
         // Resource is currently unavailable, send packets later

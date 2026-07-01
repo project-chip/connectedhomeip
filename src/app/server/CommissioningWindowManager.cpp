@@ -218,7 +218,11 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         mAppDelegate->OnCommissioningSessionStarted();
     }
 
-    TEMPORARY_RETURN_IGNORED StopAdvertisement(/* aShuttingDown = */ false);
+    // Stop accepting new PASE attempts, but keep the WiFi-PAF publisher alive:
+    // the PAFTP session that just completed PASE is the data path for the rest
+    // of commissioning (until ConnectNetwork succeeds, when the publisher is
+    // cancelled at PAFTP tx-idle).
+    TEMPORARY_RETURN_IGNORED StopAdvertisement(/* aShuttingDown = */ false, /* aKeepPAFPublish = */ true);
 
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
@@ -547,7 +551,7 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
+CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, bool aKeepPAFPublish)
 {
     TEMPORARY_RETURN_IGNORED RestoreDiscriminator();
 
@@ -575,11 +579,25 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    // Cancel PAF advertisement if PAF is selected and publishId is valid
-    if ((mIsWiFiPAF) && (aShuttingDown) && (mPublishId != 0) && (mPublishId != WiFiPAF::kUndefinedWiFiPafSessionId))
+    // Cancel PAF advertisement whenever the commissioning window closes (not only
+    // on shutdown).  The commissioning-window publisher (mPublishId) is separate
+    // from the device's startup publisher; cancelling it here avoids leaving a
+    // stale publisher slot occupied after RevokeCommissioning or after the
+    // commissioning attempt is torn down, which would otherwise exhaust the PAF
+    // endpoint table when a subsequent ProxyConnectRequest tries to add a
+    // subscriber session.
+    //
+    // Skip when aKeepPAFPublish is set (OnSessionEstablished): the PAFTP session
+    // is the data path for the remainder of commissioning (ArmFailSafe / OpCreds
+    // / ConnectNetwork) and cancelling publish here tears the session down
+    // mid-flow.  The publisher is cancelled later at PAFTP tx-idle following
+    // ConnectNetwork (DeviceControlServer::PostConnectedToOperationalNetworkEvent),
+    // or here on failsafe-expiry / RevokeCommissioning / shutdown.
+    if (!aKeepPAFPublish && (mIsWiFiPAF) && (mPublishId != 0) && (mPublishId != WiFiPAF::kUndefinedWiFiPafSessionId))
     {
         ChipLogProgress(WiFiPAF, "Canceling Wi-Fi PAF publish");
         TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(false, mPublishId);
+        mPublishId = WiFiPAF::kUndefinedWiFiPafSessionId;
     }
 #endif
 

@@ -68,6 +68,16 @@
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#include "commissioning-proxy-delegate-impl.h"
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <cstring>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <platform/Linux/ConnectivityManagerImpl.h>
+#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
 #include <string>
 
 using namespace chip;
@@ -183,6 +193,35 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
 LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
+
+BitMask<Clusters::CommissioningProxy::Feature> gCPFeatures(Clusters::CommissioningProxy::Feature::kBackgroundScan
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                                                           ,
+                                                           Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+);
+
+RegisteredServerCluster<Clusters::CommissioningProxy::CommissioningProxyCluster> gCPCluster(
+    Clusters::CommissioningProxy::CommissioningProxyCluster::Config(CommissioningProxyEndpoint, gCPFeatures, gMyCPDelegate));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+void OnCommissioningProxyDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        // CommissioningWindowManager cancels the NAN publish automatically.
+        // Disconnect the nanreceive signal handler so that a subsequent
+        // _WiFiPAFSubscribe (triggered by ProxyConnectRequest) registers
+        // exactly one handler and packets are not delivered twice.
+        ChipLogProgress(AppServer, "CommissioningProxy: commissioning complete, disconnecting nanreceive handler");
+        DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -219,6 +258,65 @@ void ApplicationInit()
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster2.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) == CHIP_NO_ERROR);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // Register the Commissioning Proxy code-driven cluster on its dedicated endpoint.
+    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == CHIP_NO_ERROR);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Derive the supported WiFi bands from the configured freq_list and report them via the WiFiBand attribute.
+    {
+        BitMask<Clusters::CommissioningProxy::WiFiBandBitmap> bands;
+        const char * extCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
+        if (extCmds != nullptr)
+        {
+            const char * p = std::strstr(extCmds, "freq_list=");
+            if (p != nullptr)
+            {
+                p += std::strlen("freq_list=");
+                while (*p != '\0' && *p != ' ')
+                {
+                    uint32_t freq = static_cast<uint32_t>(std::strtoul(p, nullptr, 10));
+                    if ((freq >= 2412 && freq <= 2484))
+                    {
+                        bands.Set(Clusters::CommissioningProxy::WiFiBandBitmap::k2g4);
+                    }
+                    else if ((freq >= 5035 && freq <= 5980))
+                    {
+                        bands.Set(Clusters::CommissioningProxy::WiFiBandBitmap::k5g);
+                    }
+                    // Advance past this number and any comma
+                    while (*p != '\0' && *p != ',' && *p != ' ')
+                    {
+                        ++p;
+                    }
+                    if (*p == ',')
+                    {
+                        ++p;
+                    }
+                }
+            }
+        }
+        // Spec WiFiBand attribute has Fallback: 2G4 — if no valid frequency was parsed,
+        // default to 2.4 GHz rather than leaving the bitmap empty.
+        if (!bands.HasAny())
+            bands.Set(Clusters::CommissioningProxy::WiFiBandBitmap::k2g4);
+        gMyCPDelegate.SetSupportedWiFiBands(bands);
+    }
+
+    // If the proxy is already on a fabric (previously commissioned via PAF and
+    // restarted), disconnect the nanreceive handler immediately; otherwise defer
+    // to commissioning-complete.  CommissioningWindowManager handles the publish cancel.
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
+    {
+        DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
+    }
+    else
+    {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnCommissioningProxyDeviceEvent, 0);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     gGroupcastCluster.Create(

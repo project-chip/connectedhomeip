@@ -57,6 +57,9 @@ constexpr uint16_t kOptionBLE           = 0xffd9;
 constexpr uint16_t kOptionGroupcast     = 0xffda;
 constexpr uint16_t kOptionAppPipe       = 0xffdb;
 constexpr uint16_t kOptionTraceTo       = 0xffdc;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+constexpr uint16_t kOptionWiFiPAF = 0xffdd;
+#endif
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -172,6 +175,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.traceTo.push_back(value);
         ChipLogProgress(AppServer, "Added trace destination: %s", value);
         return true;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case kOptionWiFiPAF:
+        mConfig.wifipafExtCmds = value ? value : "";
+        return true;
+#endif
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -199,6 +207,9 @@ OptionSet * AppOptions::GetOptions()
         { "groupcast", kNoArgument, kOptionGroupcast },
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
         { "trace-to", kArgumentRequired, kOptionTraceTo },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        { "wifipaf", kArgumentRequired, kOptionWiFiPAF },
+#endif
         {}, // need empty terminator
     };
 
