@@ -26,9 +26,7 @@ template <size_t kSize>
 class ChunkSplitter
 {
 public:
-    ChunkSplitter(CharSpan s) : span(s)
-    {
-    }
+    ChunkSplitter(CharSpan s) : span(s) {}
 
     /// Returns the next character span
     ///
@@ -41,10 +39,11 @@ public:
         {
             out = CharSpan();
             return false; // nothing left
-        } else
+        }
+        else
         {
             size_t nextSize = std::min(kSize, span.size() - offset);
-            out = span.SubSpan(offset, nextSize);
+            out             = span.SubSpan(offset, nextSize);
             offset += nextSize;
             return true;
         }
@@ -52,7 +51,7 @@ public:
 
 protected:
     const CharSpan span; // the full span to split
-    size_t offset = 0; // the start of the next chunk to return
+    size_t offset = 0;   // the start of the next chunk to return
 };
 
 } // namespace chip

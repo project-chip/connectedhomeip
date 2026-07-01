@@ -21,9 +21,9 @@
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/ChunkSplitter.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
-#include <lib/support/ChunkSplitter.h>
 #include <log_json/log_json_build_config.h>
 #include <tracing/metric_event.h>
 #include <transport/TracingStructs.h>
@@ -521,8 +521,7 @@ void JsonBackend::OutputValue(::Json::Value & value)
             chip::CharSpan chunk;
             while (chunkSplitter.Next(chunk))
             {
-                ChipLogProgress(Automation, "%s",
-                                            StringBuilder<kMaxLogLineLength + 1>(chunk).c_str());
+                ChipLogProgress(Automation, "%s", StringBuilder<kMaxLogLineLength + 1>(chunk).c_str());
             }
         }
     }

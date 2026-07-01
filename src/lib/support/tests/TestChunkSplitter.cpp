@@ -85,7 +85,6 @@ TEST(TestChunkSplitter, TestSplitter)
     }
 
     // some edge cases
-
 }
 
 } // namespace
