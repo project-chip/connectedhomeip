@@ -146,6 +146,10 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // Keep track of dns-sd resolution objects for shutdown-time cleanup.
     os_unfair_lock _deviceConnectivityMonitorLock;
     NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+
+#ifdef DEBUG
+    BOOL _unitTestSuppressGetSessionConnectivityMonitorFire;
+#endif
 }
 
 // TODO: Figure out whether the work queue storage lives here or in the superclass
@@ -1501,6 +1505,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 }
 
 #ifdef DEBUG
+- (void)setUnitTestSuppressGetSessionConnectivityMonitorFire:(BOOL)suppress
+{
+    _unitTestSuppressGetSessionConnectivityMonitorFire = suppress;
+}
+
+- (BOOL)unitTestSuppressGetSessionConnectivityMonitorFire
+{
+    return _unitTestSuppressGetSessionConnectivityMonitorFire;
+}
+
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);
@@ -1751,6 +1765,19 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
     if ([self definitelyUsesThreadForDevice:nodeID]) {
+        // If we already have a live operational CASE session to this node, reuse it directly.
+        // Reusing an existing session generates no new session-establishment Thread traffic.
+        __block BOOL haveExistingCASESession = NO;
+        dispatch_sync(_chipWorkQueue, ^{
+            VerifyOrReturn([self checkIsRunning]);
+            auto scopedNodeID = self->_cppCommissioner->GetPeerScopedId(nodeID);
+            haveExistingCASESession = self->_cppCommissioner->SessionMgr()->FindSecureSessionForNode(scopedNodeID).HasValue();
+        });
+        if (haveExistingCASESession) {
+            [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
+            return;
+        }
+
         __block MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
             MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -1765,14 +1792,28 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         // handler block retains the monitor object itself, forming a retain cycle. The cycle is
         // broken when stopMonitoring is called.
         MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
-        BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
-            // Ensure the work item is queued only once, since this handler could be called multiple times in a row
-            if (workItem) {
-                [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
-                workItem = nil;
-                [deviceConnectivityMonitor stopMonitoring];
-            }
-        } queue:_chipWorkQueue];
+        // suppressMonitor is a DEBUG-only unit-test hook: when set, simulate a connectivity monitor
+        // that starts but whose nw path never becomes satisfied/viable, so the handler never fires
+        // and the work item is never enqueued. This has been observed in the field with idle Thread
+        // sleepy end devices, for example. It is always NO in release builds.
+        BOOL suppressMonitor = NO;
+#ifdef DEBUG
+        suppressMonitor = _unitTestSuppressGetSessionConnectivityMonitorFire;
+#endif
+
+        BOOL monitorStarted;
+        if (suppressMonitor) {
+            monitorStarted = YES;
+        } else {
+            monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
+                // Ensure the work item is queued only once, since this handler could be called multiple times in a row
+                if (workItem) {
+                    [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+                    workItem = nil;
+                    [deviceConnectivityMonitor stopMonitoring];
+                }
+            } queue:_chipWorkQueue];
+        }
 
         if (monitorStarted) {
             // Add the monitor object to the weak set, so that the above retain cycle can be broken
