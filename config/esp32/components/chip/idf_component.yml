@@ -31,3 +31,11 @@ dependencies:
         version: "~2.7.0"
         rules:
             - if: "target in [esp32p4]"
+
+    # REE-side wrapper for the ESP-TEE secure storage service, used to derive and
+    # sign the DAC key inside the TEE (CONFIG_USE_ESP32_TEE_DAC_KEY_PBKDF2).
+    tee_sec_storage:
+        path: ${IDF_PATH}/components/esp_tee/subproject/components/tee_sec_storage
+        rules:
+            - if: "idf_version >=5.5"
+            - if: "target in [esp32c6, esp32h2, esp32c5]"
