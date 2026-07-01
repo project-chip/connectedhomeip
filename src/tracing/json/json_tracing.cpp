@@ -23,6 +23,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
+#include <lib/support/ChunkSplitter.h>
 #include <log_json/log_json_build_config.h>
 #include <tracing/metric_event.h>
 #include <transport/TracingStructs.h>
@@ -513,25 +514,15 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::StringSplitter splitter(data_string.c_str(), '\n');
 
         chip::CharSpan line;
-        constexpr size_t kMaxLogLineLength = 256;
         while (splitter.Next(line))
         {
-            // if the line is longer than 256 characters and would be truncated,
-            // instead loop over 256-char long slices and log each separately
-            if (line.size() > kMaxLogLineLength)
+            constexpr size_t kMaxLogLineLength = 256;
+            chip::ChunkSplitter<kMaxLogLineLength> chunkSplitter(line); // we try to log smaller chunks, to not allocate huge arrays
+            chip::CharSpan chunk;
+            while (chunkSplitter.Next(chunk))
             {
-                size_t offset = 0;
-                while (offset < line.size())
-                {
-                    size_t slice_size = std::min(kMaxLogLineLength, static_cast<size_t>(line.size() - offset));
-                    ChipLogProgress(Automation, "%s",
-                                    StringBuilder<kMaxLogLineLength + 1>(line.SubSpan(offset, slice_size)).c_str());
-                    offset += slice_size;
-                }
-            }
-            else
-            {
-                ChipLogProgress(Automation, "%s", StringBuilder<kMaxLogLineLength + 1>(line).c_str());
+                ChipLogProgress(Automation, "%s",
+                                            StringBuilder<kMaxLogLineLength + 1>(chunk).c_str());
             }
         }
     }
