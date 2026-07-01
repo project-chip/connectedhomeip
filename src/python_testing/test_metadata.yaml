@@ -57,6 +57,12 @@ not_automated:
       reason: Shared code for TC_EEM and TC_EPM, not a standalone test
     - name: TC_EGCTestBase.py
       reason: Shared code for TC_EGC, not a standalone test
+    - name: TC_ELDIST_2_2.py
+      reason:
+          Electrical Distribution Cluster (ELDIST, 0x00A2) server is not yet
+          integrated into any example app; this script will be enabled when the
+          upcoming electrical-protection-app provides an ELDIST server on a
+          non-root endpoint
     - name: TC_OpstateCommon.py
       reason: Shared code for TC_OPSTATE, not a standalone test
     - name: TC_pics_checker.py
