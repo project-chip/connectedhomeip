@@ -29,9 +29,28 @@ Git:
     <define>ACCOUNT_LOGIN_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
     <!-- Revision   -->
     <description>This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client.</description>
+    <features>
+      <feature bit="0" code="OA" name="OAuth" summary="Support for account login via OAuth 2.0 Device Authorization Grant">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform/>
+        </otherwiseConform>
+      </feature>
+    </features>
+    <!-- LoggedIn attribute added manually: Alchemy v1.6.18 drops the attribute because it
+         cannot parse the "s" scene marker in "0x0000 s" in the spec table ID cell. -->
+    <attribute code="0x0000" side="server" name="LoggedIn" define="LOGGED_IN" type="boolean" optional="true">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="OA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+
     <command source="client" code="0x00" name="GetSetupPIN" isFabricScoped="true" response="GetSetupPINResponse" mustUseTimedInvoke="true" optional="false">
       <description>The purpose of this command is to determine if the active user account of the given Content App matches the active user account of a given Commissionee, and when it does, return a Setup PIN which can be used for password-authenticated session establishment (PASE) with the Commissionee.</description>
       <access op="invoke" role="administer"/>
@@ -54,6 +73,32 @@ Git:
     <command source="server" code="0x01" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true" isFabricScoped="true">
       <description>This message is sent in response to the GetSetupPIN command, and contains the Setup PIN, or null when the account identified in the request does not match the active account of the running Content App.</description>
       <arg id="0" name="SetupPIN" type="char_string"/>
+    </command>
+
+    <command code="0x04" source="client" name="GetDeviceAuthURI" isFabricScoped="true" optional="true" response="GetDeviceAuthURIResponse" mustUseTimedInvoke="true">
+      <description>This command initiates OAuth 2.0 Device Authorization Grant flow in a Content App.</description>
+      <access op="invoke" privilege="administer"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="OA"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </command>
+
+    <command code="0x05" source="server" name="GetDeviceAuthURIResponse" isFabricScoped="true" optional="true" disableDefaultResponse="true">
+      <description>This response contains the OAuth 2.0 Device Authorization Grant parameters needed to complete the user account login.</description>
+      <arg id="0" name="UserCode" type="char_string" length="16"/>
+      <arg id="1" name="VerificationURI" type="long_char_string" length="256"/>
+      <arg id="2" name="VerificationURIComplete" type="long_char_string" optional="true" length="512"/>
+      <arg id="3" name="ExpiresIn" type="int16u"/>
+      <arg id="4" name="Interval" type="int8u"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="OA"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </command>
 
     <event side="server" code="0x00" priority="critical" name="LoggedOut" optional="true" isFabricSensitive="true">

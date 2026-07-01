@@ -8817,6 +8817,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster AccountLogin attributes
+        case MTRAttributeIDTypeClusterAccountLoginAttributeLoggedInID:
+            result = @"LoggedIn";
+            break;
+
         case MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -13004,6 +13008,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Logout";
             break;
 
+        case MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIID:
+            result = @"GetDeviceAuthURI";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -15412,6 +15420,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINResponseID:
             result = @"GetSetupPINResponse";
+            break;
+
+        case MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIResponseID:
+            result = @"GetDeviceAuthURIResponse";
             break;
 
         default:
