@@ -38,7 +38,7 @@ public:
     using ChipP256KeypairPtr = chip::Crypto::P256Keypair *;
 
     MTROperationalCredentialsDelegate(MTRDeviceController_Concrete * deviceController);
-    ~MTROperationalCredentialsDelegate() {}
+    ~MTROperationalCredentialsDelegate();
 
     CHIP_ERROR Init(ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert);
 
@@ -148,6 +148,24 @@ private:
     id<MTROperationalCertificateIssuer> _Nullable mOperationalCertificateIssuer;
     dispatch_queue_t _Nullable mOperationalCertificateIssuerQueue;
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * _Nullable mOnNOCCompletionCallback = nullptr;
+
+    // Cached at watchdog-arm time so the destructor can fence on the same
+    // queue without re-fetching it (which could return nil during late-stage
+    // platform shutdown, silently skipping the fence and allowing UAF).
+    dispatch_queue_t _Nullable mWatchdogQueue = nil;
+
+    // Watchdog timer for the external operational-certificate issuer path.
+    // The issuer is a 3rd-party object delivered via SDK API; if it (or the
+    // hosting companion process) crashes or hangs mid-issuance the commissioner
+    // would otherwise wait the full MRP-inflated CommandSender exchange timeout
+    // (~67s) before failing. The watchdog bounds that wait to ~20s by surfacing
+    // CHIP_ERROR_TIMEOUT through the same completion path. Cancelled (and
+    // released) by ExternalNOCChainGenerated when the real completion arrives
+    // first, and by the destructor (with a fence on the Matter queue) on
+    // controller teardown to avoid a use-after-free / libdispatch trap when
+    // shutdown races a hung issuer. The source's target queue is the Matter
+    // work queue so the handler is serialized with delegate destruction.
+    dispatch_source_t _Nullable mExternalNOCChainWatchdog = nil;
 };
 
 NS_ASSUME_NONNULL_END
