@@ -229,7 +229,7 @@ CHIP_ERROR AmbientContextSensingCluster::AddDetection(const AmbientContextSensin
     if (!fromExisting)
     {
         // The new detection event
-        item                = mACSDelegate.AllocDetection();
+        item = mACSDelegate.AllocDetection();
         VerifyOrReturnError(item != nullptr, CHIP_ERROR_NO_MEMORY);
         const auto & tags   = sensedEvent.ambientContextSensed;
         const auto tagCount = tags.size();

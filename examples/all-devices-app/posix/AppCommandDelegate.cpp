@@ -333,7 +333,8 @@ public:
                 const auto crowdCntValue = item["CrowdCnt"].asUInt();
                 if ((crowdCntValue == 0) || (crowdCntValue > AmbientContextSensing::kMaxCrowdCount))
                 {
-                    ChipLogError(AppServer, "PredictedActivity[%u], invalid CrowdCnt value: %u", static_cast<uint16_t>(i), static_cast<unsigned>(crowdCntValue));
+                    ChipLogError(AppServer, "PredictedActivity[%u], invalid CrowdCnt value: %u", static_cast<uint16_t>(i),
+                                 static_cast<unsigned>(crowdCntValue));
                     return;
                 }
                 predictAct.crowdCount.SetValue(static_cast<uint8_t>(crowdCntValue));
