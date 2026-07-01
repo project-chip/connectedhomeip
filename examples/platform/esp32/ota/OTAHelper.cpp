@@ -23,8 +23,8 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
-#include <platform/ESP32/multi-ota/AppImageProcessor.h>
-#include <platform/ESP32/multi-ota/MultiImageOTAProcessorImpl.h>
+#include <platform/ESP32/multi_ota/AppImageProcessor.h>
+#include <platform/ESP32/multi_ota/MultiImageOTAProcessorImpl.h>
 #else
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 #endif // CONFIG_ENABLE_MULTI_IMAGE_OTA

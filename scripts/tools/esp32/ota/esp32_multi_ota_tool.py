@@ -219,22 +219,16 @@ def generate_image(args: object):
 
 
 # ── Multi-image OTA (ESP32) ──────────────────────────────────────────────────
-#
-# Wire format defined in src/platform/ESP32/multi-ota/DESIGN.md §3. The OTA
-# payload (the bytes after the standard Matter OTA header below) begins with a
-# MultiImageHeader followed by an array of SubImageHeader entries, then every
-# component binary concatenated in delivery order. All fields are little-endian.
-
 MULTI_IMAGE_HEADER_MAGIC = 0x4D494F54  # "MIOT"
 
-# MultiImageHeader: magic(4) + numImages(1) + reserved(3) = 8 bytes (§3.2)
+# MultiImageHeader: magic(4) + numImages(1) + reserved(3) = 8 bytes
 MULTI_IMAGE_HEADER_FORMAT = '<IB3s'
-# SubImageHeader: imageId(4) + version(4) + offset(4) + length(4) + sha256(32) = 48 bytes (§3.3)
+# SubImageHeader: imageId(4) + version(4) + offset(4) + length(4) + sha256(32) = 48 bytes
 SUB_IMAGE_HEADER_FORMAT = '<IIII32s'
-MULTI_IMAGE_HEADER_SIZE = struct.calcsize(MULTI_IMAGE_HEADER_FORMAT)  # 8
-SUB_IMAGE_HEADER_SIZE = struct.calcsize(SUB_IMAGE_HEADER_FORMAT)      # 48
+MULTI_IMAGE_HEADER_SIZE = struct.calcsize(MULTI_IMAGE_HEADER_FORMAT)
+SUB_IMAGE_HEADER_SIZE = struct.calcsize(SUB_IMAGE_HEADER_FORMAT)
 
-# Platform-defined application firmware image ID (§3.4). It lives in the
+# Platform-defined application firmware image ID. It lives in the
 # platform-reserved range 0x00000001..0x000000FF and is a fixed ABI constant:
 # it must match the value the device firmware registers its built-in
 # application sub-processor under, and it is intentionally not configurable.
@@ -257,9 +251,9 @@ def parse_manifest(manifest_path: str) -> list:
     Read a CSV manifest describing the bundle's component binaries.
 
     Columns: id, version, path. Rows are kept in file order; that order is the
-    delivery order in which sub-processors receive bytes (§3.5, §10.5). The
+    delivery order in which sub-processors receive bytes. The
     application image may appear anywhere in the manifest — the tool always
-    moves it to the last position (§3.5). Paths are resolved relative to the
+    moves it to the last position. Paths are resolved relative to the
     manifest file's directory when not absolute.
     """
     manifest_dir = os.path.dirname(os.path.abspath(manifest_path))
@@ -292,7 +286,7 @@ def parse_manifest(manifest_path: str) -> list:
 
 def validate_multi_images(images: list):
     """
-    Enforce the bundle rules of DESIGN.md §3.5 at packaging time.
+    Enforce the bundle rules at packaging time.
     """
     if not images:
         error('Manifest is empty; a bundle must contain at least the application image')
@@ -326,12 +320,12 @@ def validate_multi_images(images: list):
 
 def order_images_app_last(images: list) -> list:
     """
-    Return the images with the application image moved to the end (§3.5).
+    Return the images with the application image moved to the end.
 
     The application image is always the last entry in the bundle, regardless of
     where it appears in the manifest. Co-processor entries keep their manifest
     order — that order is the write-dependency order in which sub-processors
-    receive bytes (§3.5 rule 3, §10.5).
+    receive bytes.
     """
     coproc = [img for img in images if img['id'] != APP_IMAGE_ID]
     app = [img for img in images if img['id'] == APP_IMAGE_ID]
@@ -340,7 +334,7 @@ def order_images_app_last(images: list) -> list:
 
 def build_multi_image_header(images: list) -> bytes:
     """
-    Build the MultiImageHeader + SubImageHeader[] blob (§3.2, §3.3).
+    Build the MultiImageHeader + SubImageHeader[] blob.
 
     Each image's resolved offset, length and digest are stored back into the
     corresponding dict for later reporting.
@@ -375,14 +369,10 @@ def generate_multi_image(args: object):
     images = parse_manifest(args.input_csv)
     validate_multi_images(images)
 
-    # The application image is always written last (§3.5); reorder internally so
-    # the manifest order of co-processor entries is the only thing that matters.
     images = order_images_app_last(images)
 
     header_blob = build_multi_image_header(images)
 
-    # The outer payload digest covers the header blob followed by every binary,
-    # in delivery order — computed in a single streaming pass.
     digest = hashlib.new(args.digest_algorithm)
     if digest.digest_size < (256 // 8):
         warn('Using digest length below 256 bits is not recommended')
@@ -510,7 +500,6 @@ def show_header(args: object):
 
         print(f'  [{tag}] {tag_name}: {value}')
 
-    # If the payload is a multi-image bundle, decode and show its header too.
     show_multi_image_header(args.image_file, full_header_size(args))
 
 

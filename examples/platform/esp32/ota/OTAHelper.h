@@ -21,7 +21,7 @@
 
 #ifdef CONFIG_ENABLE_MULTI_IMAGE_OTA
 #include <lib/core/CHIPError.h>
-#include <src/platform/ESP32/multi-ota/MultiImageOTAProcessorImpl.h>
+#include <src/platform/ESP32/multi_ota/MultiImageOTAProcessorImpl.h>
 #endif
 
 class OTAHelpers
