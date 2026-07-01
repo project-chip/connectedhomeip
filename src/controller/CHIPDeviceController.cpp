@@ -1570,7 +1570,7 @@ void DeviceCommissioner::OnICDManagementStayActiveResponse(
 
 exit:
     CommissioningDelegate::CommissioningReport report;
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+    commissioner->CommissioningStageComplete(err, report);
 }
 
 bool DeviceCommissioner::ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
