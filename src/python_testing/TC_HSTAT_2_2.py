@@ -39,10 +39,13 @@
 import logging
 from itertools import count
 
+from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.interaction_model import InteractionModelError, Status
 
 log = logging.getLogger(__name__)
 
@@ -64,7 +67,6 @@ class TC_HSTAT_2_2(MatterBaseTest):
                 TestStep(next(step), "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to false",
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the MinSetpoint attribute.", "Store the value as MinSetpointValue"),
-                TestStep(next(step), "TH reads from the DUT the MaxSetpoint attribute.", "Store the value as MaxSetpointValue."),
                 TestStep(next(step), "TH reads from the DUT the Step attribute.", "Store the value as StepValue. "),
 
                 TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue",
@@ -113,30 +115,30 @@ class TC_HSTAT_2_2(MatterBaseTest):
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
         mistBitmap = cluster.Bitmaps.Mist
-        supported_attributes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        # supported_attributes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         feature_map = await self.read_setting(attributes.FeatureMap)
         supports_humidifier = bool(feature_map & features.kHumidifier)
         supports_dehumidifier = bool(feature_map & features.kDehumidifier)
-        supports_continuous = bool(feature_map & features.kContinuous)
+        # supports_continuous = bool(feature_map & features.kContinuous)
         supports_sensor = bool(feature_map & features.kSensor)
         supports_auto = bool(feature_map & features.kAuto)
         supports_fan = bool(feature_map & features.kFan)
-        supports_optimal = bool(feature_map & features.kOptimal)
+        # supports_optimal = bool(feature_map & features.kOptimal)
         supports_warm = bool(feature_map & features.kWarmMist)
         supports_cold = bool(feature_map & features.kColdMist)
 
         # some convenience definions
-        modeOff = cluster.Enums.ModeEnum.kOff
+        # modeOff = cluster.Enums.ModeEnum.kOff
         modeHumidifier = cluster.Enums.ModeEnum.kHumidifier
         modeDehumidifier = cluster.Enums.ModeEnum.kDeumidifier
         modeAuto = cluster.Enums.ModeEnum.kAuto
         modeFanOnly = cluster.Enums.ModeEnum.kFanOnly
-        stateOff = cluster.Enums.SystemStateEnum.kOff
-        stateHumidifying = cluster.Enums.SystemStateEnum.kHumidifying
-        stateDehumidifying = cluster.Enums.SystemStateEnum.kDehumidifying
-        stateFan = cluster.Enums.SystemStateEnum.kFan
-        stateIdle = cluster.Enums.SystemStateEnum.kIdle
+        # stateOff = cluster.Enums.SystemStateEnum.kOff
+        # stateHumidifying = cluster.Enums.SystemStateEnum.kHumidifying
+        # stateDehumidifying = cluster.Enums.SystemStateEnum.kDehumidifying
+        # stateFan = cluster.Enums.SystemStateEnum.kFan
+        # stateIdle = cluster.Enums.SystemStateEnum.kIdle
 
         self.step(next(step))  # Write Mode to Humidifier or Dehumidifier
         if supports_humidifier:
@@ -150,10 +152,6 @@ class TC_HSTAT_2_2(MatterBaseTest):
         self.step(next(step))  # Read MinSetpoint attribute
         if supports_sensor:
             dut_MinSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinSetpoint)
-
-        self.step(next(step))  # Read MaxSetpoint attribute
-        if supports_sensor:
-            dut_MaxSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxSetpoint)
 
         self.step(next(step))  # Read Step attribute
         if supports_sensor:
