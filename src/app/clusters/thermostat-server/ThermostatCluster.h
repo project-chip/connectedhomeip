@@ -50,15 +50,41 @@ enum class AtomicWriteState
     Open,
 };
 
+enum class OptionalAttributesBits : uint32_t
+{
+    kOutdoorTemperature                     = 0x1,
+    kAbsMinHeatSetpointLimit                = 0x2,
+    kAbsMaxHeatSetpointLimit                = 0x4,
+    kAbsMinCoolSetpointLimit                = 0x8,
+    kAbsMaxCoolSetpointLimit                = 0x10,
+    kLocalTemperatureCalibration            = 0x20,
+    kMinHeatSetpointLimit                   = 0x40,
+    kMaxHeatSetpointLimit                   = 0x80,
+    kMinCoolSetpointLimit                   = 0x100,
+    kMaxCoolSetpointLimit                   = 0x200,
+    kRemoteSensing                          = 0x400,
+    kThermostatRunningMode                  = 0x800,
+    kTemperatureSetpointHold                = 0x1000,
+    kTemperatureSetpointHoldDuration        = 0x2000,
+    kThermostatRunningState                 = 0x4000,
+    kSetpointChangeSource                   = 0x8000,
+    kSetpointChangeAmount                   = 0x10000,
+    kSetpointChangeSourceTimestamp          = 0x20000,
+    kEmergencyHeatDelta                     = 0x40000,
+    kACType                                 = 0x80000,
+    kACCapacity                             = 0x100000,
+    kACRefrigerantType                      = 0x200000,
+    kACCompressorType                       = 0x400000,
+    kACErrorCode                            = 0x800000,
+    kACLouverPosition                       = 0x1000000,
+    kACCoilTemperature                      = 0x2000000,
+    kACCapacityFormat                       = 0x4000000,
+    kSetpointHoldExpiryTimestamp            = 0x8000000,
+};
+
 /**
  * @brief Code-driven Thermostat cluster server.
  *
- * One instance is created per endpoint by the codegen integration layer (see CodegenIntegration.cpp).
- * It owns the scalar (formerly Ember RAM-backed) attributes directly, handles the SetpointRaiseLower
- * command, and (since PR 3b-1) owns the atomic-write state machine and registers itself as a
- * FabricTable::Delegate so open atomic writes are rolled back when their fabric is removed. The complex
- * list/preset/schedule/suggestion attributes and the preset/suggestion commands are still forwarded to the
- * retained ThermostatAttrAccess helper.
  */
 class ThermostatCluster : public DefaultServerCluster, public chip::FabricTable::Delegate
 {
@@ -83,7 +109,17 @@ public:
         DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay;
     };
 
-    ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config, const Context & context);
+    struct Config
+    {
+        Config(FabricTable & fabricTable, uint32_t featureMap, BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes) 
+        : fabricTable(fabricTable), features(featureMap), optionalAttributes(optionalAttributes) {};
+
+        FabricTable & fabricTable;
+        BitFlags<Thermostat::Feature> features;
+        BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes;
+    };
+
+    ThermostatCluster(EndpointId endpointId, const StartupConfiguration & config, const Config & gConfig);
 
     void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
     Thermostat::Delegate * GetDelegate() const { return mDelegate; }
@@ -353,9 +389,10 @@ private:
     void GenerateScalarChangeEvent(AttributeId attributeId);
     void LoadPersistentAttributes();
 
-    Context mContext;
+    FabricTable & mFabricTable;
     Thermostat::Delegate * mDelegate = nullptr;
     const BitFlags<Thermostat::Feature> mFeatures;
+    const BitFlags<Thermostat::OptionalAttributesBits> mOptionalAttributes;
 
     struct AtomicWriteSession
     {

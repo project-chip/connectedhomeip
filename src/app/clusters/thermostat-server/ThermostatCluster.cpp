@@ -53,15 +53,6 @@ using namespace Protocols::InteractionModel;
 // as required in emberAfThermostatClusterServerPostAttributeChangedCallback
 // limit change validation assures that there is at least 1 setpoint that will be valid
 
-#define FEATURE_MAP_HEAT 0x01
-#define FEATURE_MAP_COOL 0x02
-#define FEATURE_MAP_OCC 0x04
-#define FEATURE_MAP_SCH 0x08
-#define FEATURE_MAP_SB 0x10
-#define FEATURE_MAP_AUTO 0x20
-
-#define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -98,10 +89,9 @@ int16_t ThermostatCluster::EnforceCoolingSetpointLimits(int16_t coolingSetpoint)
 }
 
 
-ThermostatCluster::ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config,
-                                     const Context & context) :
+ThermostatCluster::ThermostatCluster(EndpointId endpointId, const StartupConfiguration & config, const Config & gConfig) :
     DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mContext(context), mFeatures(featureMap)
+    mFabricTable(gConfig.fabricTable), mFeatures(gConfig.features), mOptionalAttributes(gConfig.optionalAttributes)
 {
     mAbsMinHeatSetpointLimit    = config.absMinHeatSetpointLimit;
     mAbsMaxHeatSetpointLimit    = config.absMaxHeatSetpointLimit;
@@ -117,7 +107,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     // Register as a fabric delegate so open atomic writes can be rolled back when their fabric is removed.
-    CHIP_ERROR err = mContext.fabricTable.AddFabricDelegate(this);
+    CHIP_ERROR err = mFabricTable.AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Thermostat: failed to register fabric delegate: %" CHIP_ERROR_FORMAT, err.Format());
@@ -223,7 +213,7 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     {
         ResetAtomicWrite(GetEndpointId());
     }
-    mContext.fabricTable.RemoveFabricDelegate(this);
+    mFabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(type);
 }
 
@@ -1627,54 +1617,51 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
     const bool heat = mFeatures.Has(Feature::kHeating);
     const bool cool = mFeatures.Has(Feature::kCooling);
     const bool occ  = mFeatures.Has(Feature::kOccupancy);
-    const bool sch  = mFeatures.Has(Feature::kScheduleConfiguration);
     const bool autoM = mFeatures.Has(Feature::kAutoMode);
     const bool ltne = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
     const bool msch = mFeatures.Has(Feature::kMatterScheduleConfiguration);
     const bool pres = mFeatures.Has(Feature::kPresets);
     const bool sugg = mFeatures.Has(Feature::kThermostatSuggestions);
+    const bool tevt = mFeatures.Has(Feature::kEvents);
 
     using Entry = AttributeListBuilder::OptionalAttributeEntry;
     // NOTE(3a): deprecated attributes (PI*Demand, HVACSystemTypeConfiguration, ThermostatProgrammingOperationMode,
     // *Setback*) are intentionally not advertised. Plain-optional non-feature attributes are advertised
     // unconditionally for now; matching them exactly to each application's ZAP configuration is a follow-up.
     const Entry optionalAttributes[] = {
-        { true, OutdoorTemperature::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kOutdoorTemperature), OutdoorTemperature::kMetadataEntry },
         { occ, Occupancy::kMetadataEntry },
-        { heat, AbsMinHeatSetpointLimit::kMetadataEntry },
-        { heat, AbsMaxHeatSetpointLimit::kMetadataEntry },
-        { cool, AbsMinCoolSetpointLimit::kMetadataEntry },
-        { cool, AbsMaxCoolSetpointLimit::kMetadataEntry },
-        { !ltne, LocalTemperatureCalibration::kMetadataEntry },
+        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMinHeatSetpointLimit), AbsMinHeatSetpointLimit::kMetadataEntry },
+        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMaxHeatSetpointLimit), AbsMaxHeatSetpointLimit::kMetadataEntry },
+        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMinCoolSetpointLimit), AbsMinCoolSetpointLimit::kMetadataEntry },
+        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMaxCoolSetpointLimit), AbsMaxCoolSetpointLimit::kMetadataEntry },
+        { !ltne && mOptionalAttributes.Has(OptionalAttributesBits::kLocalTemperatureCalibration), LocalTemperatureCalibration::kMetadataEntry },
         { cool, OccupiedCoolingSetpoint::kMetadataEntry },
         { heat, OccupiedHeatingSetpoint::kMetadataEntry },
         { cool && occ, UnoccupiedCoolingSetpoint::kMetadataEntry },
         { heat && occ, UnoccupiedHeatingSetpoint::kMetadataEntry },
-        { heat, MinHeatSetpointLimit::kMetadataEntry },
-        { heat, MaxHeatSetpointLimit::kMetadataEntry },
-        { cool, MinCoolSetpointLimit::kMetadataEntry },
-        { cool, MaxCoolSetpointLimit::kMetadataEntry },
+        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kMinHeatSetpointLimit), MinHeatSetpointLimit::kMetadataEntry },
+        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kMaxHeatSetpointLimit), MaxHeatSetpointLimit::kMetadataEntry },
+        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kMinCoolSetpointLimit), MinCoolSetpointLimit::kMetadataEntry },
+        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kMaxCoolSetpointLimit), MaxCoolSetpointLimit::kMetadataEntry },
         { autoM, MinSetpointDeadBand::kMetadataEntry },
-        { true, RemoteSensing::kMetadataEntry },
-        { autoM, ThermostatRunningMode::kMetadataEntry },
-        { sch, StartOfWeek::kMetadataEntry },
-        { sch, NumberOfWeeklyTransitions::kMetadataEntry },
-        { sch, NumberOfDailyTransitions::kMetadataEntry },
-        { true, TemperatureSetpointHold::kMetadataEntry },
-        { true, TemperatureSetpointHoldDuration::kMetadataEntry },
-        { true, ThermostatRunningState::kMetadataEntry },
-        { true, SetpointChangeSource::kMetadataEntry },
-        { true, SetpointChangeAmount::kMetadataEntry },
-        { true, SetpointChangeSourceTimestamp::kMetadataEntry },
-        { true, EmergencyHeatDelta::kMetadataEntry },
-        { true, ACType::kMetadataEntry },
-        { true, ACCapacity::kMetadataEntry },
-        { true, ACRefrigerantType::kMetadataEntry },
-        { true, ACCompressorType::kMetadataEntry },
-        { true, ACErrorCode::kMetadataEntry },
-        { true, ACLouverPosition::kMetadataEntry },
-        { true, ACCoilTemperature::kMetadataEntry },
-        { true, ACCapacityformat::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kRemoteSensing), RemoteSensing::kMetadataEntry },
+        { (autoM && tevt) || (autoM && mOptionalAttributes.Has(OptionalAttributesBits::kThermostatRunningMode)), ThermostatRunningMode::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kTemperatureSetpointHold), TemperatureSetpointHold::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kTemperatureSetpointHoldDuration), TemperatureSetpointHoldDuration::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kThermostatRunningState), ThermostatRunningState::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointChangeSource), SetpointChangeSource::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointChangeAmount), SetpointChangeAmount::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointChangeSourceTimestamp), SetpointChangeSourceTimestamp::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kEmergencyHeatDelta), EmergencyHeatDelta::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACType), ACType::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACCapacity), ACCapacity::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACRefrigerantType), ACRefrigerantType::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACCompressorType), ACCompressorType::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACErrorCode), ACErrorCode::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACLouverPosition), ACLouverPosition::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACCoilTemperature), ACCoilTemperature::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kACCapacityFormat), ACCapacityformat::kMetadataEntry },
         { pres, PresetTypes::kMetadataEntry },
         { msch, ScheduleTypes::kMetadataEntry },
         { pres, NumberOfPresets::kMetadataEntry },
@@ -1685,7 +1672,7 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
         { msch, ActiveScheduleHandle::kMetadataEntry },
         { pres, Presets::kMetadataEntry },
         { msch, Schedules::kMetadataEntry },
-        { true, SetpointHoldExpiryTimestamp::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointHoldExpiryTimestamp), SetpointHoldExpiryTimestamp::kMetadataEntry },
         { sugg, MaxThermostatSuggestions::kMetadataEntry },
         { sugg, ThermostatSuggestions::kMetadataEntry },
         { sugg, CurrentThermostatSuggestion::kMetadataEntry },

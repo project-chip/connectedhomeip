@@ -47,6 +47,43 @@ LazyRegisteredServerCluster<ThermostatCluster> gServers[kThermostatMaxClusterCou
 // retained here and also pushed onto the live cluster instance when available.
 Thermostat::Delegate * gDelegateTable[kThermostatMaxClusterCount] = { nullptr };
 
+struct OptionalAttributeMapping
+{
+    AttributeId attributeId;
+    OptionalAttributesBits bit;
+};
+
+constexpr OptionalAttributeMapping kOptionalAttributeMap[] = {
+    { OutdoorTemperature::Id,              OptionalAttributesBits::kOutdoorTemperature },
+    { AbsMinHeatSetpointLimit::Id,         OptionalAttributesBits::kAbsMinHeatSetpointLimit },
+    { AbsMaxHeatSetpointLimit::Id,         OptionalAttributesBits::kAbsMaxHeatSetpointLimit },
+    { AbsMinCoolSetpointLimit::Id,         OptionalAttributesBits::kAbsMinCoolSetpointLimit },
+    { AbsMaxCoolSetpointLimit::Id,         OptionalAttributesBits::kAbsMaxCoolSetpointLimit },
+    { LocalTemperatureCalibration::Id,     OptionalAttributesBits::kLocalTemperatureCalibration },
+    { MinHeatSetpointLimit::Id,            OptionalAttributesBits::kMinHeatSetpointLimit },
+    { MaxHeatSetpointLimit::Id,            OptionalAttributesBits::kMaxHeatSetpointLimit },
+    { MinCoolSetpointLimit::Id,            OptionalAttributesBits::kMinCoolSetpointLimit },
+    { MaxCoolSetpointLimit::Id,            OptionalAttributesBits::kMaxCoolSetpointLimit },
+    { RemoteSensing::Id,                   OptionalAttributesBits::kRemoteSensing },
+    { ThermostatRunningMode::Id,           OptionalAttributesBits::kThermostatRunningMode },
+    { TemperatureSetpointHold::Id,         OptionalAttributesBits::kTemperatureSetpointHold },
+    { TemperatureSetpointHoldDuration::Id, OptionalAttributesBits::kTemperatureSetpointHoldDuration },
+    { ThermostatRunningState::Id,          OptionalAttributesBits::kThermostatRunningState },
+    { SetpointChangeSource::Id,            OptionalAttributesBits::kSetpointChangeSource },
+    { SetpointChangeAmount::Id,            OptionalAttributesBits::kSetpointChangeAmount },
+    { SetpointChangeSourceTimestamp::Id,   OptionalAttributesBits::kSetpointChangeSourceTimestamp },
+    { EmergencyHeatDelta::Id,              OptionalAttributesBits::kEmergencyHeatDelta },
+    { ACType::Id,                          OptionalAttributesBits::kACType },
+    { ACCapacity::Id,                      OptionalAttributesBits::kACCapacity },
+    { ACRefrigerantType::Id,               OptionalAttributesBits::kACRefrigerantType },
+    { ACCompressorType::Id,                OptionalAttributesBits::kACCompressorType },
+    { ACErrorCode::Id,                     OptionalAttributesBits::kACErrorCode },
+    { ACLouverPosition::Id,                OptionalAttributesBits::kACLouverPosition },
+    { ACCoilTemperature::Id,               OptionalAttributesBits::kACCoilTemperature },
+    { ACCapacityformat::Id,                OptionalAttributesBits::kACCapacityFormat },
+    { SetpointHoldExpiryTimestamp::Id,     OptionalAttributesBits::kSetpointHoldExpiryTimestamp },
+};
+
 /// Reads the Ember/ZAP configured default for a single int16_t attribute.
 void SeedFromDefault(Status (*getDefault)(EndpointId, int16_t *), EndpointId endpointId, int16_t & target)
 {
@@ -89,8 +126,19 @@ public:
             config.numberOfScheduleTransitionPerDay = numberOfScheduleTransitionPerDay;
         }
 
-        ThermostatCluster::Context clusterContext{ Server::GetInstance().GetFabricTable() };
-        gServers[clusterInstanceIndex].Create(endpointId, featureMap, config, clusterContext);
+        // Optional Attributes
+        BitFlags<OptionalAttributesBits> optionalAttributes;
+        for (const auto & mapping : kOptionalAttributeMap)
+        {
+            if (emberAfContainsAttribute(endpointId, Thermostat::Id, mapping.attributeId))
+            {
+                optionalAttributes.Set(mapping.bit);
+            }
+        }
+
+        ThermostatCluster::Config gConfig(Server::GetInstance().GetFabricTable(), featureMap, optionalAttributes);
+
+        gServers[clusterInstanceIndex].Create(endpointId, config, gConfig);
         gServers[clusterInstanceIndex].Cluster().SetDelegate(gDelegateTable[clusterInstanceIndex]);
         return gServers[clusterInstanceIndex].Registration();
     }
