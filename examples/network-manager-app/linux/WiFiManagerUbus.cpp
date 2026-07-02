@@ -35,18 +35,32 @@ static constexpr int kInvokeTimeout = 2000;
 
 void WiFiManagerUbus::InvokeUciGetWifiIfaces()
 {
+    int status;
     BlobMsgBuf buf;
-    buf.Add("config", "wireless");
-    buf.Add("type", "wifi-iface");
+    buf.Add("config", "matter");
+    buf.Add("type", "struct");
     if (buf.HasError())
     {
         ChipLogError(AppServer, "WiFiManagerUbus: failed to build uci get request");
         return;
     }
-    int status = mUbusManager.Invoke(
+    status = mUbusManager.Invoke(
         mUci, "get", buf.head,
         [](ubus_request * req, int /*type*/, blob_attr * msg) {
-            static_cast<WiFiManagerUbus *>(req->priv)->OnUciGetResponse(msg);
+            static_cast<WiFiManagerUbus *>(req->priv)->OnPreferencesUpdate(msg);
+        },
+        this, kInvokeTimeout);
+    if (status != UBUS_STATUS_OK)
+    {
+        ChipLogError(AppServer, "WiFiManagerUbus: uci get failed: %s", ubus_strerror(status));
+    }
+    buf.Clear();
+    buf.Add("config", "wireless");
+    buf.Add("type", "wifi-iface");
+    status = mUbusManager.Invoke(
+        mUci, "get", buf.head,
+        [](ubus_request * req, int /*type*/, blob_attr * msg) {
+            static_cast<WiFiManagerUbus *>(req->priv)->OnWirelessNetworksUpdate(msg);
         },
         this, kInvokeTimeout);
     if (status != UBUS_STATUS_OK)
@@ -57,13 +71,11 @@ void WiFiManagerUbus::InvokeUciGetWifiIfaces()
 
 void WiFiManagerUbus::Init()
 {
-    mUci.SetResolvedCallback([](UbusWatch & /*watch*/, void * appState) {
-        static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces();
-    });
+    mUci.SetResolvedCallback(
+        [](UbusWatch & /*watch*/, void * appState) { static_cast<WiFiManagerUbus *>(appState)->InvokeUciGetWifiIfaces(); });
 
-    mService.SetResolvedCallback([](UbusWatch & /*watch*/, void * /*appState*/) {
-        ChipLogDetail(AppServer, "WiFiManagerUbus: service object resolved");
-    });
+    mService.SetResolvedCallback(
+        [](UbusWatch & /*watch*/, void * /*appState*/) { ChipLogDetail(AppServer, "WiFiManagerUbus: service object resolved"); });
 
     mService.SetNotificationCallback(
         [](UbusWatch & /*watch*/, void * appState, ubus_request_data * /*req*/, const char * notification, blob_attr * msg) {
@@ -101,60 +113,132 @@ void WiFiManagerUbus::Init()
 
     mUbusManager.Register(mUci);
     mUbusManager.Register(mService);
+    ChipLogProgress(AppServer, "WiFiManagerUbus: init done");
 }
 
-void WiFiManagerUbus::OnUciGetResponse(blob_attr * msg)
+void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
+{
+    // {"values":{"values":{".anonymous":false,".type":"struct",".name":"values",".index":1,"wifi_iface":"default_radio0"}}}
+
+    blob_attr * values = nullptr;
+    blob_attr * cur    = nullptr;
+    blob_attr * i      = nullptr;
+    int rem            = 0;
+    int r              = 0;
+
+    const char * json = blobmsg_format_json(msg, true);
+    ChipLogProgress(AppServer, "preferences = %s", json);
+
+    blobmsg_for_each_attr(cur, msg, rem)
+    {
+        if (blobmsg_type(cur) != BLOBMSG_TYPE_TABLE || strcmp(blobmsg_name(cur), "values") != 0)
+        {
+            ChipLogError(AppServer, "Invalid data received (%s)", blobmsg_name(cur));
+            return;
+        }
+        values = cur;
+        break;
+    }
+    blobmsg_for_each_attr(cur, values, rem)
+    {
+        ChipLogProgress(AppServer, "Found section: %s", blobmsg_name(cur));
+        blobmsg_for_each_attr(i, cur, r)
+        {
+            if (blobmsg_type(i) == BLOBMSG_TYPE_STRING)
+            {
+                ChipLogProgress(AppServer, "  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
+                if (strcmp(blobmsg_name(i), "wifi_iface") == 0)
+                {
+                    free(desired_radio);
+                    desired_radio = strdup(blobmsg_get_string(i));
+                    ChipLogProgress(AppServer, "Preferences: desired radio: %s", desired_radio);
+                }
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
+            }
+        }
+    }
+}
+
+void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
 {
     // Response: { "values": { "<section>": { ".type": "wifi-device"|"wifi-iface", "ssid": "...", "key": "...", ... } } }
     blob_attr * values = nullptr;
-    blob_attr * cur;
-    int rem;
+    blob_attr * cur    = nullptr;
+    blob_attr * i      = nullptr;
+    blob_attr * radio  = nullptr;
+    int rem            = 0;
+    int r              = 0;
+
+    const char * json = blobmsg_format_json(msg, true);
+    ChipLogProgress(AppServer, "radios = %s", json);
+
+    if (desired_radio)
+    {
+        ChipLogProgress(AppServer, "Looking for radio '%s'", desired_radio);
+    }
+
     blobmsg_for_each_attr(cur, msg, rem)
     {
-        if (blobmsg_type(cur) == BLOBMSG_TYPE_TABLE && strcmp(blobmsg_name(cur), "values") == 0)
+        if (blobmsg_type(cur) != BLOBMSG_TYPE_TABLE || strcmp(blobmsg_name(cur), "values") != 0)
         {
-            values = cur;
+            ChipLogError(AppServer, "Invalid data received (%s)", blobmsg_name(cur));
+            return;
+        }
+        values = cur;
+        break;
+    }
+
+    blobmsg_for_each_attr(cur, values, rem)
+    {
+        bool station_mode = false;
+        ChipLogProgress(AppServer, "Found radio: %s", blobmsg_name(cur));
+        blobmsg_for_each_attr(i, cur, r)
+        {
+            if (blobmsg_type(i) == BLOBMSG_TYPE_STRING)
+            {
+                ChipLogDetail(AppServer, "  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
+                if (strcmp(blobmsg_name(i), "mode") == 0 && strcmp(blobmsg_get_string(i), "ap") != 0)
+                {
+                    ChipLogProgress(AppServer, "Found non-AP radio, SKIPPING");
+                    station_mode = true;
+                }
+            }
+            else
+            {
+                ChipLogDetail(AppServer, "  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
+            }
+        }
+        if (!station_mode && (desired_radio == nullptr || strcmp(desired_radio, blobmsg_name(cur)) == 0))
+        {
+            radio = cur;
             break;
         }
     }
-    VerifyOrReturn(values != nullptr);
+    VerifyOrReturn(radio != nullptr, ChipLogError(AppServer, "No valid radio found!"));
+    char * ssid = nullptr;
+    char * key  = nullptr;
 
-#ifdef CHIP_WIFI_MANAGER_UBUS_DEBUGGING
-    ChipLogProgress(AppServer, "uci wireless values fields:");
-    blobmsg_for_each_attr(cur, static_cast<blob_attr *>(blobmsg_data(values)), rem)
+    blobmsg_for_each_attr(cur, radio, rem)
     {
-        if (blobmsg_type(cur) == BLOBMSG_TYPE_STRING)
+        if (blobmsg_type(cur) == BLOBMSG_TYPE_STRING && strcmp(blobmsg_name(cur), "ssid") == 0)
         {
-            ChipLogProgress(AppServer, "  [string] %s = %s", blobmsg_name(cur), blobmsg_get_string(cur));
+            ssid = blobmsg_get_string(cur);
         }
-        else
+        if (blobmsg_type(cur) == BLOBMSG_TYPE_STRING && strcmp(blobmsg_name(cur), "key") == 0)
         {
-            ChipLogProgress(AppServer, "  [type=%d] %s", blobmsg_type(cur), blobmsg_name(cur));
+            key = blobmsg_get_string(cur);
         }
     }
-#endif
+    VerifyOrReturn(ssid != nullptr, ChipLogError(AppServer, "Radio %s does not have a set SSID!", blobmsg_name(radio)));
+    VerifyOrReturn(key != nullptr, ChipLogError(AppServer, "Radio %s does not have a set key!", blobmsg_name(radio)));
 
-    // "values" is a TABLE; its data pointer points directly to the first section blob_attr
-    blob_attr * section = static_cast<blob_attr *>(blobmsg_data(values));
-    VerifyOrReturn(section != nullptr);
+    ChipLogProgress(AppServer, "Chosen radio '%s' has SSID '%s' and key '%s'", blobmsg_name(radio), ssid, key);
 
-    BlobMsgField<const char *, CHIP_CTST("mode")> mode;
-    BlobMsgRequiredField<const char *, CHIP_CTST("ssid")> ssid;
-    BlobMsgRequiredField<const char *, CHIP_CTST("key")> key;
-    if (!BlobMsgParse(section, mode, ssid, key))
-    {
-        ChipLogError(AppServer, "No ap-mode wifi-iface with ssid+key found in uci wireless config");
-        return;
-    }
-    if (mode.has_value() && strcmp(mode.value(), "ap") != 0)
-    {
-        ChipLogError(AppServer, "wifi-iface mode is not ap");
-        return;
-    }
-
-    CHIP_ERROR err = mServer.SetNetworkCredentials(
-        ByteSpan(reinterpret_cast<const uint8_t *>(ssid.value()), strlen(ssid.value())),
-        ByteSpan(reinterpret_cast<const uint8_t *>(key.value()), strlen(key.value())));
+    CHIP_ERROR err = mServer.SetNetworkCredentials(ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid)),
+                                                   ByteSpan(reinterpret_cast<const uint8_t *>(key), strlen(key)));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "SetNetworkCredentials failed: %" CHIP_ERROR_FORMAT, err.Format());
