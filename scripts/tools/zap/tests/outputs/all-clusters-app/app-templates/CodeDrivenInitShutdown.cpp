@@ -106,11 +106,44 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
+    case app::Clusters::OvenCavityOperationalState::Id:
+        MatterOvenCavityOperationalStateClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::OvenMode::Id:
+        MatterOvenModeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::LaundryWasherMode::Id:
+        MatterLaundryWasherModeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
+        MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::RvcRunMode::Id:
+        MatterRvcRunModeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::RvcCleanMode::Id:
+        MatterRvcCleanModeClusterInitCallback(endpoint);
+        break;
     case app::Clusters::TemperatureControl::Id:
         MatterTemperatureControlClusterInitCallback(endpoint);
         break;
+    case app::Clusters::DishwasherMode::Id:
+        MatterDishwasherModeClusterInitCallback(endpoint);
+        break;
     case app::Clusters::AirQuality::Id:
         MatterAirQualityClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::SmokeCoAlarm::Id:
+        MatterSmokeCoAlarmClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::MicrowaveOvenMode::Id:
+        MatterMicrowaveOvenModeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::OperationalState::Id:
+        MatterOperationalStateClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::RvcOperationalState::Id:
+        MatterRvcOperationalStateClusterInitCallback(endpoint);
         break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterInitCallback(endpoint);
@@ -139,8 +172,11 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterInitCallback(endpoint);
         break;
-    case app::Clusters::Thermostat::Id:
-        MatterThermostatClusterInitCallback(endpoint);
+    case app::Clusters::EnergyEvseMode::Id:
+        MatterEnergyEvseModeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::DeviceEnergyManagementMode::Id:
+        MatterDeviceEnergyManagementModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::FanControl::Id:
         MatterFanControlClusterInitCallback(endpoint);
@@ -257,11 +293,44 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::OvenCavityOperationalState::Id:
+        MatterOvenCavityOperationalStateClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::OvenMode::Id:
+        MatterOvenModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::LaundryWasherMode::Id:
+        MatterLaundryWasherModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
+        MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::RvcRunMode::Id:
+        MatterRvcRunModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::RvcCleanMode::Id:
+        MatterRvcCleanModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::TemperatureControl::Id:
         MatterTemperatureControlClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::DishwasherMode::Id:
+        MatterDishwasherModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::AirQuality::Id:
         MatterAirQualityClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::SmokeCoAlarm::Id:
+        MatterSmokeCoAlarmClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::MicrowaveOvenMode::Id:
+        MatterMicrowaveOvenModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::OperationalState::Id:
+        MatterOperationalStateClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::RvcOperationalState::Id:
+        MatterRvcOperationalStateClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterShutdownCallback(endpoint, shutdownType);
@@ -290,8 +359,11 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterShutdownCallback(endpoint, shutdownType);
         break;
-    case app::Clusters::Thermostat::Id:
-        MatterThermostatClusterShutdownCallback(endpoint, shutdownType);
+    case app::Clusters::EnergyEvseMode::Id:
+        MatterEnergyEvseModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::DeviceEnergyManagementMode::Id:
+        MatterDeviceEnergyManagementModeClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::FanControl::Id:
         MatterFanControlClusterShutdownCallback(endpoint, shutdownType);

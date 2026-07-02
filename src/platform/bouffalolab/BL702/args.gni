@@ -36,8 +36,7 @@ chip_build_tests = false
 openthread_external_mbedtls = mbedtls_target
 
 openthread_core_config_platform_check_file =
-    "bl702-openthread-core-config-check.h"
-openthread_project_include_dirs =
-    [ "${chip_root}/src/platform/bouffalolab/BL702" ]
+    "openthread-core-platform-config-check.h"
+openthread_project_include_dirs = []
 openthread_external_platform =
     "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk"
