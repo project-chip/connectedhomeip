@@ -106,7 +106,7 @@ exit:
         se_sss_mac_context_free(&ctx_mac);
     }
 
-    if (keyObject.keyStore != nullptr  && keyObject.keyStore->session != NULL)
+    if (keyObject.keyStore->session != NULL)
     {
         se_sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }
