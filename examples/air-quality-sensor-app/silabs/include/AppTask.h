@@ -76,8 +76,8 @@ public:
     void UpdateAirQualitySensorUI();
 
     /**
-    * @brief Update the Air Quality cluster attribute
-    */
+     * @brief Update the Air Quality cluster attribute
+     */
     static void WriteAirQualityToAttribute(intptr_t context);
 
     /**
