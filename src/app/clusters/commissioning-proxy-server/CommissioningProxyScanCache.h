@@ -46,9 +46,9 @@ namespace CommissioningProxy {
 class ScanCacheObserver
 {
 public:
-    virtual ~ScanCacheObserver() = default;
-    virtual void MarkCachedResultsDirty()   = 0;
-    virtual uint16_t GetCacheTimeout() const  = 0;
+    virtual ~ScanCacheObserver()                = default;
+    virtual void MarkCachedResultsDirty()       = 0;
+    virtual uint16_t GetCacheTimeout() const    = 0;
     virtual uint8_t GetMaxCachedResults() const = 0;
 };
 
