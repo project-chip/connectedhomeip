@@ -42,20 +42,22 @@ silabs:
     - "config/silabs/**"
     - "config/efr32/**"
 
+esp32:
+  maintainers:
+    - shubhamdp
+    - wqx6
+    - jadhavrohit924
+  paths:
+    - "src/platform/ESP32/**"
+    - "src/test_driver/esp32/**"
+    - "src/tracing/esp32_diagnostics/**"
+    - "examples/platform/esp32/**"
+    - "examples/**/esp32/**"
+    - "config/esp32/**"
+    - "docs/platforms/esp32/**"
+
 # --- Proposals / Opt-In Templates ---
 
-# esp32:
-#   maintainers:
-#     - shubhamdp
-#     - wqx6
-#     - shripad621git
-#     - jadhavrohit924
-#   paths:
-#     - "src/platform/ESP32/**"
-#     - "examples/platform/esp32/**"
-#     - "examples/**/esp32/**"
-#     - "config/esp32/**"
-# 
 # telink:
 #   maintainers:
 #     - s07641069
