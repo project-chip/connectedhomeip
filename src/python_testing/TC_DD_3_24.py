@@ -94,14 +94,16 @@ class TC_DD_3_24(MatterBaseTest):
 
         # Step 2: the NFC tag data is parsed and checked if the device supports NFC commissioning and commission begins
         self.step(2)
-        asserts.assert_true(SetupPayload().ParseQrCode(nfc_tag_data).supports_nfc_commissioning, "Device does not Support NFC Commissioning")
+        asserts.assert_true(SetupPayload().ParseQrCode(nfc_tag_data).supports_nfc_commissioning,
+                            "Device does not Support NFC Commissioning")
         payload = self.get_setup_payload_info()[0]
         discriminator = payload.filter_value
         asserts.assert_is_not_none(discriminator, "Discriminator must not be None")
         setupCode = payload.setup_code
         asserts.assert_is_not_none(setupCode, "Setup Code must not be None")
 
-        asserts.assert_is_not_none(self.matter_test_config.in_test_commissioning_method, "in_test_commissioning_method must not be None")
+        asserts.assert_is_not_none(self.matter_test_config.in_test_commissioning_method,
+                                   "in_test_commissioning_method must not be None")
         assert self.matter_test_config.in_test_commissioning_method is not None
         commissioning_method: str = self.matter_test_config.in_test_commissioning_method
         asserts.assert_true(
@@ -125,7 +127,8 @@ class TC_DD_3_24(MatterBaseTest):
                 asserts.assert_is_not_none(self.matter_test_config.wifi_passphrase, "wifi_passphrase must not be None")
                 await self.default_controller.CommissionNfcWiFi(discriminator, setupCode, dut_node_id, self.get_wifi_ssid(), self.get_credentials())
             case "thread":
-                asserts.assert_is_not_none(self.matter_test_config.thread_operational_dataset, "thread_operational_dataset must not be None")
+                asserts.assert_is_not_none(self.matter_test_config.thread_operational_dataset,
+                                           "thread_operational_dataset must not be None")
                 assert self.matter_test_config.thread_operational_dataset is not None
                 await self.default_controller.CommissionNfcThread(discriminator, setupCode, dut_node_id, self.matter_test_config.thread_operational_dataset)
             case "ethernet":
