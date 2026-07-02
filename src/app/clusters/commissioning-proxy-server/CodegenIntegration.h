@@ -32,12 +32,15 @@ namespace CommissioningProxy {
 class Instance
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature);
+    Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config);
 
     CHIP_ERROR Init();
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
+
+    /// Register a platform transport driver on the wrapped cluster (call before Init).
+    void RegisterTransport(CommissioningProxyTransport & transport) { mCluster.Cluster().RegisterTransport(transport); }
 
 private:
     RegisteredServerCluster<CommissioningProxyCluster> mCluster;

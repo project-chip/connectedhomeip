@@ -18,6 +18,7 @@
 
 #include <app/util/generic-callbacks.h>
 #include <clusters/CommissioningProxy/Metadata.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -26,9 +27,7 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-    mCluster(aEndpointId, CommissioningProxyCluster::Config(aFeature, aDelegate))
-{}
+Instance::Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config) : mCluster(aEndpointId, config) {}
 
 CHIP_ERROR Instance::Init()
 {

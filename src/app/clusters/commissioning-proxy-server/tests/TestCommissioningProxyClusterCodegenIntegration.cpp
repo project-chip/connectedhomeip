@@ -37,7 +37,6 @@
 // =============================================================================
 
 #include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
-#include <app/clusters/commissioning-proxy-server/tests/CommissioningProxyMockDelegate.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <pw_unit_test/framework.h>
@@ -69,10 +68,9 @@ TEST_F(TestCommissioningProxyClusterCodegenIntegration, TestInstanceLifecycle)
 {
     // Test 1: Create Instance with all features
     {
-        CommissioningProxyMockDelegate mockDelegate;
         BitMask<Feature> allFeatures(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
 
-        Instance instance(kTestEndpointId, mockDelegate, allFeatures);
+        Instance instance(kTestEndpointId, CommissioningProxyCluster::Config(allFeatures));
 
         // Test initialization (registration)
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
@@ -97,9 +95,8 @@ TEST_F(TestCommissioningProxyClusterCodegenIntegration, TestInstanceLifecycle)
 
     // Test Instance with no features enabled
     {
-        CommissioningProxyMockDelegate mockDelegate;
         BitMask<Feature> noFeatures;
-        Instance instance(kTestEndpointId, mockDelegate, noFeatures);
+        Instance instance(kTestEndpointId, CommissioningProxyCluster::Config(noFeatures));
 
         // Test initialization
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);

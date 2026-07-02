@@ -27,5 +27,4 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CommissioningProxyCluster.cpp"
     "${CLUSTER_DIR}/CommissioningProxyCluster.h"
-    "${CLUSTER_DIR}/CommissioningProxyDelegate.h"
 )
