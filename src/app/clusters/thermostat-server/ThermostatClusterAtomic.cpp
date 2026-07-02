@@ -17,7 +17,6 @@
 
 #include "ThermostatCluster.h"
 
-#include <app/GlobalAttributes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -123,15 +122,57 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
     return attributeIdsIter.GetStatus() == CHIP_NO_ERROR;
 }
 
+void SendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, Status status,
+                        const Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses,
+                        Optional<uint16_t> timeout = NullOptional)
+{
+    Commands::AtomicResponse::Type response;
+    response.statusCode = to_underlying(status);
+    response.attributeStatus =
+        DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.Get(), attributeStatuses.AllocatedSize());
+    response.timeout = timeout;
+    commandObj->AddResponse(commandPath, response);
+}
+
+} // anonymous namespace
+
+bool ThermostatCluster::IsKnownAttribute(AttributeId attributeId)
+{
+    // Global attributes are always present on every cluster (FeatureMap, ClusterRevision,
+    // GeneratedCommandList, AcceptedCommandList, AttributeList).
+    for (const auto & entry : DefaultServerCluster::GlobalAttributes())
+    {
+        if (entry.attributeId == attributeId)
+        {
+            return true;
+        }
+    }
+
+    // Cluster-specific attributes, gated by the active feature map and optional-attribute set. The
+    // cluster's own Attributes() listing is the code-driven source of truth (replaces ember metadata).
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
+    if (Attributes(ConcreteClusterPath(GetEndpointId(), Thermostat::Id), builder) != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+    for (const auto & entry : builder.TakeBuffer())
+    {
+        if (entry.attributeId == attributeId)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
-/// @param endpoint The associated endpoint for the AtomicRequest invocation
 /// @param attributeRequests The list of requested attributes
 /// @param attributeStatuses The status of each requested attribute, plus additional attributes if needed
 /// @return Status::Success if the request is valid, an error status if it is not
-Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::DecodableList<chip::AttributeId> attributeRequests,
-                              Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
+Status ThermostatCluster::BuildAttributeStatuses(
+    const DataModel::DecodableList<AttributeId> & attributeRequests,
+    Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
 {
-
     bool requestedPresets = false, requestedSchedules = false;
     size_t attributeStatusCount = 0;
     if (!CountAttributeRequests(attributeRequests, attributeStatusCount, requestedPresets, requestedSchedules))
@@ -176,39 +217,14 @@ Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
     for (size_t i = 0; i < index; ++i)
     {
         auto & attributeStatus = attributeStatuses[i];
-        const EmberAfAttributeMetadata * metadata =
-            emberAfLocateAttributeMetadata(endpoint, Thermostat::Id, attributeStatus.attributeID);
-
-        if (metadata != nullptr)
+        if (!IsKnownAttribute(attributeStatus.attributeID))
         {
-            // This is definitely an attribute we know about.
-            continue;
+            // This is not a valid attribute on the Thermostat cluster on this endpoint
+            return Status::InvalidCommand;
         }
-
-        if (IsSupportedGlobalAttributeNotInMetadata(attributeStatus.attributeID))
-        {
-            continue;
-        }
-
-        // This is not a valid attribute on the Thermostat cluster on the supplied endpoint
-        return Status::InvalidCommand;
     }
     return Status::Success;
 }
-
-void SendAtomicResponse(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, Status status,
-                        const Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses,
-                        Optional<uint16_t> timeout = NullOptional)
-{
-    Commands::AtomicResponse::Type response;
-    response.statusCode = to_underlying(status);
-    response.attributeStatus =
-        DataModel::List<const AtomicAttributeStatusStruct::Type>(attributeStatuses.Get(), attributeStatuses.AllocatedSize());
-    response.timeout = timeout;
-    commandObj->AddResponse(commandPath, response);
-}
-
-} // anonymous namespace
 
 bool ThermostatCluster::InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId)
 {
@@ -346,7 +362,7 @@ void ThermostatCluster::BeginAtomicWrite(CommandHandler * commandObj, const Conc
     }
 
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
+    auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
@@ -449,7 +465,7 @@ void ThermostatCluster::CommitAtomicWrite(CommandHandler * commandObj, const Con
     }
 
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
+    auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);
@@ -534,7 +550,7 @@ void ThermostatCluster::RollbackAtomicWrite(CommandHandler * commandObj, const C
     }
 
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
-    auto status = BuildAttributeStatuses(endpoint, commandData.attributeRequests, attributeStatuses);
+    auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
     {
         commandObj->AddStatus(commandPath, status);

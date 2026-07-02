@@ -367,6 +367,14 @@ private:
     // @brief Validates and appends a preset to the delegate's pending-preset list during an atomic write.
     CHIP_ERROR AppendPendingPreset(const Structs::PresetStruct::Type & preset);
 
+    // @brief Returns true if attributeId is a valid attribute on this cluster
+    bool IsKnownAttribute(AttributeId attributeId);
+
+    // @brief Builds the AtomicAttributeStatusStruct list for an AtomicRequest
+    Protocols::InteractionModel::Status BuildAttributeStatuses(
+        const DataModel::DecodableList<AttributeId> & attributeRequests,
+        Platform::ScopedMemoryBufferWithSize<Globals::Structs::AtomicAttributeStatusStruct::Type> & attributeStatuses);
+
     // Delegate-backed attribute encode/decode (presets / schedules / suggestions). Scalar attributes are
     // handled directly by ReadAttribute / WriteAttribute.
     CHIP_ERROR ReadDelegateAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
