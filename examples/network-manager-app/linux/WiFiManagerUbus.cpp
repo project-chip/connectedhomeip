@@ -33,40 +33,54 @@ namespace chip {
 
 static constexpr int kInvokeTimeout = 2000;
 
-void WiFiManagerUbus::InvokeUciGetWifiIfaces()
+bool WiFiManagerUbus::GetUciBlob(const char * config, const char * type, blob_attr ** blob)
 {
-    int status;
     BlobMsgBuf buf;
-    buf.Add("config", "matter");
-    buf.Add("type", "struct");
+    buf.Add("config", config);
+    buf.Add("type", type);
     if (buf.HasError())
     {
         ChipLogError(AppServer, "WiFiManagerUbus: failed to build uci get request");
-        return;
+        return false;
     }
-    status = mUbusManager.Invoke(
+    int status = mUbusManager.Invoke(
         mUci, "get", buf.head,
         [](ubus_request * req, int /*type*/, blob_attr * msg) {
-            static_cast<WiFiManagerUbus *>(req->priv)->OnPreferencesUpdate(msg);
+            blob_attr ** blob_ptr = static_cast<blob_attr **>(req->priv);
+            *blob_ptr             = blob_memdup(msg);
         },
-        this, kInvokeTimeout);
+        blob, kInvokeTimeout);
     if (status != UBUS_STATUS_OK)
     {
         ChipLogError(AppServer, "WiFiManagerUbus: uci get failed: %s", ubus_strerror(status));
+        return false;
     }
-    buf.Clear();
-    buf.Add("config", "wireless");
-    buf.Add("type", "wifi-iface");
-    status = mUbusManager.Invoke(
-        mUci, "get", buf.head,
-        [](ubus_request * req, int /*type*/, blob_attr * msg) {
-            static_cast<WiFiManagerUbus *>(req->priv)->OnWirelessNetworksUpdate(msg);
-        },
-        this, kInvokeTimeout);
-    if (status != UBUS_STATUS_OK)
+    return true;
+}
+
+void WiFiManagerUbus::InvokeUciGetWifiIfaces(void)
+{
+    blob_attr * matter_config   = nullptr;
+    blob_attr * wireless_config = nullptr;
+
+    if (!GetUciBlob("matter", "struct", &matter_config))
     {
-        ChipLogError(AppServer, "WiFiManagerUbus: uci get failed: %s", ubus_strerror(status));
+        ChipLogError(AppServer, "Unable to fetch matter config, not setting default interface");
     }
+    else
+    {
+        OnPreferencesUpdate(matter_config);
+    }
+    if (!GetUciBlob("wireless", "wifi-iface", &wireless_config))
+    {
+        ChipLogError(AppServer, "Unable to fetch wireless config, can't configure matter!");
+    }
+    else
+    {
+        OnWirelessNetworksUpdate(wireless_config);
+    }
+    free(matter_config);
+    free(wireless_config);
 }
 
 void WiFiManagerUbus::Init()
