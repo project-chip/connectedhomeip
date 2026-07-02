@@ -15,10 +15,25 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 source_set("thermostat-server") {
-  sources = []
+  sources = [
+    "PresetStructWithOwnedMembers.cpp",
+    "PresetStructWithOwnedMembers.h",
+    "ThermostatCluster.cpp",
+    "ThermostatCluster.h",
+    "ThermostatClusterAtomic.cpp",
+    "ThermostatClusterEvents.cpp",
+    "ThermostatClusterEvents.h",
+    "ThermostatClusterPresets.cpp",
+    "ThermostatClusterPresets.h",
+    "ThermostatClusterSuggestions.cpp",
+    "ThermostatDelegate.h",
+    "ThermostatSuggestionStructWithOwnedMembers.cpp",
+    "ThermostatSuggestionStructWithOwnedMembers.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/support:span",

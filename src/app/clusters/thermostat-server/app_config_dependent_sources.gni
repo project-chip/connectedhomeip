@@ -14,17 +14,4 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
-  "PresetStructWithOwnedMembers.cpp",
-  "PresetStructWithOwnedMembers.h",
-  "ThermostatCluster.cpp",
-  "ThermostatCluster.h",
-  "ThermostatClusterAtomic.cpp",
-  "ThermostatClusterEvents.cpp",
-  "ThermostatClusterEvents.h",
-  "ThermostatClusterPresets.cpp",
-  "ThermostatClusterPresets.h",
-  "ThermostatClusterSuggestions.cpp",
-  "ThermostatDelegate.h",
-  "ThermostatSuggestionStructWithOwnedMembers.cpp",
-  "ThermostatSuggestionStructWithOwnedMembers.h",
 ]
