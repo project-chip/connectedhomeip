@@ -59,6 +59,10 @@
 #include <ControllerShellCommands.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#ifndef CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
+#define CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT 1
+#endif
+
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
 #include <lib/shell/Engine.h> // nogncheck
@@ -155,8 +159,6 @@
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
 #include <third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h>
-
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -1050,11 +1052,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
     ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().commissionerFabricId) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");
+#endif // CHIP_LINUX_APP_START_COMMISSIONER_AT_BOOT
 #if defined(ENABLE_CHIP_SHELL)
     Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
@@ -1104,11 +1108,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     Server::GetInstance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // Commissioner shutdown call shuts down entire stack, including the platform manager.
     ShutdownCommissioner();
-#else
-    DeviceLayer::PlatformMgr().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    DeviceLayer::PlatformMgr().Shutdown();
 
 #if ENABLE_TRACING
     tracing_setup.StopTracing();

@@ -14,7 +14,7 @@
 
 import enum
 from dataclasses import dataclass, field
-from typing import Optional, Union
+from typing import Optional
 
 from lark.tree import Meta
 
@@ -62,6 +62,7 @@ class CommandQuality(enum.Flag):
     NONE = 0
     TIMED_INVOKE = enum.auto()
     FABRIC_SCOPED = enum.auto()
+    OPTIONAL = enum.auto()
 
 
 class AttributeQuality(enum.Flag):
@@ -87,6 +88,7 @@ class EventPriority(enum.Enum):
 class EventQuality(enum.Flag):
     NONE = 0
     FABRIC_SENSITIVE = enum.auto()
+    OPTIONAL = enum.auto()
 
 
 class StructTag(enum.Enum):
@@ -152,7 +154,7 @@ class Attribute:
     qualities: AttributeQuality = AttributeQuality.NONE
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
-    default: Optional[Union[str, int]] = None
+    default: Optional[str | int] = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
@@ -170,6 +172,14 @@ class Attribute:
     @property
     def requires_timed_write(self) -> bool:
         return AttributeQuality.TIMED_WRITE in self.qualities
+
+    @property
+    def is_optional(self) -> bool:
+        return self.definition.is_optional
+
+    @property
+    def is_nullable(self) -> bool:
+        return self.definition.is_nullable
 
 
 @dataclass
@@ -205,6 +215,10 @@ class Event:
     @property
     def is_fabric_sensitive(self) -> bool:
         return EventQuality.FABRIC_SENSITIVE in self.qualities
+
+    @property
+    def is_optional(self) -> bool:
+        return EventQuality.OPTIONAL in self.qualities
 
 
 @dataclass
@@ -266,6 +280,10 @@ class Command:
     def is_timed_invoke(self) -> bool:
         return CommandQuality.TIMED_INVOKE in self.qualities
 
+    @property
+    def is_optional(self) -> bool:
+        return CommandQuality.OPTIONAL in self.qualities
+
 
 @dataclass
 class Cluster:
@@ -289,7 +307,7 @@ class Cluster:
 class AttributeInstantiation:
     name: str
     storage: AttributeStorage
-    default: Optional[Union[str, int, bool]] = None
+    default: Optional[str | int | bool] = None
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)

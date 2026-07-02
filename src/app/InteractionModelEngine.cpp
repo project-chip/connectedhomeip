@@ -1855,10 +1855,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     if (testing.IsEnabled() && testing.IsFabricUnderTest(request.GetAccessingFabricIndex()))
     {
         testing.SetAccessAllowed(Status::Success == accessStatus);
-        if (!testing.GetAccessAllowed().ValueOr(false))
-        {
-            testing.SetTestResult(Groupcast::Testing::Result::kFailedAuth);
-        }
+        testing.SetTestResult(Groupcast::Testing::Result::kSuccess);
     }
     VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
 

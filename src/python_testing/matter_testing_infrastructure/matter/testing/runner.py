@@ -25,7 +25,6 @@ import os
 import pathlib
 import re
 import sys
-import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
@@ -249,7 +248,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
 @dataclass
 class TestStep:
-    test_plan_number: typing.Union[int, str]
+    test_plan_number: int | str
     description: str
     expectation: str = ""
     is_commissioning: bool = False
@@ -790,6 +789,10 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
     config.debug = args.debug
+    if getattr(args, 'enable_spec_errata_ci_only_disallowed_for_certification', False):
+        config.spec_errata_path = "data_model/errata_future.yaml"
+    else:
+        config.spec_errata_path = None
 
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
@@ -807,6 +810,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
+    config.no_wildcard_subscription = args.no_wildcard_subscription
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -947,6 +951,8 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
                              help='A list of tests in the test class to execute.')
     basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
                              help="Fail the test if any test cases are skipped")
+    basic_group.add_argument('--enable-spec-errata-ci-only-disallowed-for-certification', action='store_true', default=False,
+                             help="Enable declarative data model errata overlays to bridge Spec IDM testing with in-progress Matter SDK PRs")
     basic_group.add_argument('--trace-to', nargs="*", default=[],
                              help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
@@ -981,6 +987,11 @@ def parse_matter_test_args(argv: Optional[list[str]] = None):
 
     basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
                              help="Send test event triggers with endpoint 0 for older devices")
+    basic_group.add_argument("--no-wildcard-subscription", action="store_true", default=False,
+                             dest="no_wildcard_subscription",
+                             help="Skip the background wildcard attribute subscription that is normally started "
+                                  "before each test.  Prefer setting disable_wildcard_subscription = True on the "
+                                  "test class (MatterBaseTest) for certification; this flag overrides for ad-hoc runs.")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 

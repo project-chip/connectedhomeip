@@ -47,6 +47,9 @@ log = logging.getLogger(__name__)
 
 
 class TC_ACL_2_4(MatterBaseTest):
+    # ACL entry counts in the test plan assume no framework secondary-controller ACL row.
+    disable_wildcard_subscription = True
+
     def desc_TC_ACL_2_4(self) -> str:
         return "[TC-ACL-2.4] ACL Attribute"
 

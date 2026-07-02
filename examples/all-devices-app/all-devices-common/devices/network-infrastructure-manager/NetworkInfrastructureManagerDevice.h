@@ -48,7 +48,7 @@ public:
     ~NetworkInfrastructureManagerDevice() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // ThreadBorderRouterManagementDelegate
@@ -64,6 +64,18 @@ public:
     CHIP_ERROR CommitActiveDataset() override;
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
+
+    // Public getters for programmatic control
+    Clusters::ThreadBorderRouterManagementCluster & ThreadBorderRouterManagementCluster()
+    {
+        return mThreadBorderRouterManagementCluster.Cluster();
+    }
+    Clusters::WiFiNetworkManagementCluster & WiFiNetworkManagementCluster() { return mWiFiNetworkManagementCluster.Cluster(); }
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
+    Clusters::ThreadNetworkDiagnosticsCluster & ThreadNetworkDiagnosticsCluster()
+    {
+        return mThreadNetworkDiagnosticsCluster.Cluster();
+    }
 
 protected:
     SimpleBreadCrumbTracker mBreadCrumbTracker;
