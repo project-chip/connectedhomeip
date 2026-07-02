@@ -661,7 +661,7 @@ TEST_F(TestClosureDimensionCluster, TestInvokeGroupedSetTargetSuccess)
     EXPECT_TRUE(mClusterTester.Invoke(request).IsSuccess());
     EXPECT_EQ(mockDelegate.setTargetCalls, 1);
     DataModel::Nullable<GenericDimensionStateStruct> ts = mCluster.GetTargetState();
-    EXPECT_FALSE(ts.IsNull());
+    ASSERT_FALSE(ts.IsNull());
     EXPECT_EQ(ts.Value().position.Value().Value(), static_cast<Percent100ths>(5200));
 }
 

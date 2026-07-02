@@ -193,19 +193,11 @@ std::optional<DataModel::ActionReturnStatus> ClosureDimensionCluster::InvokeComm
         return HandleStepCommand(commandData.direction, commandData.numberOfSteps, commandData.speed);
     }
     case Commands::GroupedSetTarget::Id: {
-        if (mFeatureMap.Has(Feature::kAccess))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::GroupedSetTarget::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleSetTargetCommand(commandData.position, commandData.latch, commandData.speed);
     }
     case Commands::GroupedStep::Id: {
-        if (mFeatureMap.Has(Feature::kAccess))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::GroupedStep::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleStepCommand(commandData.direction, commandData.numberOfSteps, commandData.speed);

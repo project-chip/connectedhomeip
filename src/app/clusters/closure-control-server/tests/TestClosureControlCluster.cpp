@@ -682,7 +682,7 @@ TEST_F(TestClosureControlCluster, TestInvokeGroupedMoveToAllFeatures)
     EXPECT_EQ(mockDelegate.moveToCommandCalls, 1);
 
     DataModel::Nullable<GenericOverallTargetState> targetState = cluster.GetOverallTargetState();
-    EXPECT_FALSE(targetState.IsNull());
+    ASSERT_FALSE(targetState.IsNull());
     EXPECT_EQ(targetState.Value().position.Value().Value(), TargetPositionEnum::kMoveToFullyOpen);
     EXPECT_EQ(targetState.Value().latch.Value().Value(), false);
     EXPECT_EQ(targetState.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);

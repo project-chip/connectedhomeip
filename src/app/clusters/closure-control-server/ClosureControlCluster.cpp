@@ -169,10 +169,6 @@ std::optional<DataModel::ActionReturnStatus> ClosureControlCluster::InvokeComman
     case Commands::Calibrate::Id:
         return HandleCalibrate();
     case Commands::GroupedMoveTo::Id: {
-        if (mFeatureMap.Has(Feature::kAccess))
-        {
-            return Status::UnsupportedCommand;
-        }
         Commands::GroupedMoveTo::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
