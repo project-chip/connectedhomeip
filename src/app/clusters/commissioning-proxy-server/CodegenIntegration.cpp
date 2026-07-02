@@ -18,6 +18,7 @@
 
 #include <app/util/generic-callbacks.h>
 #include <clusters/CommissioningProxy/Metadata.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 

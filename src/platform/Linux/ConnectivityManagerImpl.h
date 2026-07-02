@@ -46,6 +46,7 @@
 #include <wifipaf/WiFiPAFEndPoint.h>
 #include <wifipaf/WiFiPAFLayer.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#include <cstring>
 #include <set>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

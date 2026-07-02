@@ -936,6 +936,21 @@ bool IsConnectPending()
 
 void Shutdown()
 {
+    // If a ProxyConnectRequest was in flight, cancel its timeout and fail the
+    // exchange.  Do not call FailPendingConnect() here — that would invoke
+    // ResumeBleBgScanIfNeeded(), which would restart the HW scan immediately
+    // before the cleanup below stops and clears it.
+    if (sBlePendingConnect != nullptr)
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnBleConnect_Timeout, nullptr);
+        auto * ctx                      = sBlePendingConnect;
+        sBlePendingConnect              = nullptr;
+        chip::app::CommandHandler * cmd = ctx->handle.Get();
+        if (cmd != nullptr)
+            cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
+        delete ctx;
+    }
+
     // Cancel every outstanding per-fabric lifetime timer and free its context.
     for (auto & [key, rec] : sBleBgFabrics)
     {
