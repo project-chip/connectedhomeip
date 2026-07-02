@@ -263,9 +263,10 @@ TEST_F(TestCommissioningProxyCluster, TestMandatoryAttributes)
 
     ClusterTester tester(cluster);
 
+    // ScanMaxTime has no spec fallback; the cluster uses 10 s as a practical default.
     uint8_t scanMaxTime = 0;
     ASSERT_EQ(tester.ReadAttribute(CPAttributes::ScanMaxTime::Id, scanMaxTime), CHIP_NO_ERROR);
-    EXPECT_EQ(scanMaxTime, 120);
+    EXPECT_EQ(scanMaxTime, 10);
 
     uint8_t maxSessions = 0;
     ASSERT_EQ(tester.ReadAttribute(CPAttributes::MaxSessions::Id, maxSessions), CHIP_NO_ERROR);
@@ -318,9 +319,9 @@ TEST_F(TestCommissioningProxyCluster, TestTransportAttribute_ReflectsRegisteredT
     }
 }
 
-// MaxSessions attribute must reflect the delegate's GetMaxSessions() value,
+// MaxSessions attribute must reflect the configured GetMaxSessions() value,
 // not a hardcoded constant.
-TEST_F(TestCommissioningProxyCluster, TestMaxSessionsAttributeReadsFromDelegate)
+TEST_F(TestCommissioningProxyCluster, TestMaxSessionsAttributeReadsFromConfig)
 {
     TestServerClusterContext context;
     BitMask<Feature> noFeatures;
@@ -465,8 +466,8 @@ TEST_F(TestCommissioningProxyCluster, TestScanMaxTimeAttribute_ChangeReporting)
     ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Writing the current value (default 120) is a no-op: success, no change report.
-    EXPECT_TRUE(tester.WriteAttribute(CPAttributes::ScanMaxTime::Id, static_cast<uint8_t>(120)).IsSuccess());
+    // Writing the current value (default 10) is a no-op: success, no change report.
+    EXPECT_TRUE(tester.WriteAttribute(CPAttributes::ScanMaxTime::Id, static_cast<uint8_t>(10)).IsSuccess());
     EXPECT_FALSE(tester.IsAttributeDirty(CPAttributes::ScanMaxTime::Id));
 
     // Writing a new value reports the change.
@@ -560,8 +561,8 @@ TEST_F(TestCommissioningProxyCluster, TestNumCachedResultsAttribute_DefaultZero)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Spec § Attributes: MaxCachedResults (BGS-only) min 1.  Reads from delegate.
-TEST_F(TestCommissioningProxyCluster, TestMaxCachedResultsAttribute_ReadsFromDelegate)
+// Spec § Attributes: MaxCachedResults (BGS-only) min 1.  Reads from config.
+TEST_F(TestCommissioningProxyCluster, TestMaxCachedResultsAttribute_ReadsFromConfig)
 {
     TestServerClusterContext context;
     BitMask<Feature> bgs(Feature::kBackgroundScan);
@@ -578,8 +579,8 @@ TEST_F(TestCommissioningProxyCluster, TestMaxCachedResultsAttribute_ReadsFromDel
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Spec § Attributes: WiFiBand (WI-only) reflects delegate's supported bands.
-TEST_F(TestCommissioningProxyCluster, TestWiFiBandAttribute_ReadsFromDelegate)
+// Spec § Attributes: WiFiBand (WI-only) reflects the configured supported bands.
+TEST_F(TestCommissioningProxyCluster, TestWiFiBandAttribute_ReadsFromConfig)
 {
     TestServerClusterContext context;
     chip::BitMask<WiFiBandBitmap> bands;
@@ -894,8 +895,8 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_StateUnchangedOnFa
 
 // Per the ProxyConnectRequest Effect on Receipt: if the number of active sessions
 // has reached the value of the MaxSessions attribute, a RESOURCE_EXHAUSTED status
-// SHALL be returned.  Enforced generically by the cluster from the delegate's
-// GetActiveSessionCount() vs GetMaxSessions(), so every delegate inherits the
+// SHALL be returned.  Enforced generically by the cluster from
+// GetActiveSessionCount() vs the configured MaxSessions, so every transport inherits the
 // behaviour without having to remember the check itself.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedAtMaxSessions)
 {
@@ -917,7 +918,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_ResourceExhaustedA
 }
 
 // Below MaxSessions: the cluster-level pre-check does not reject; the
-// request is forwarded to the delegate and (for the mock) succeeds.
+// request is forwarded to the transport driver and (for the mock) succeeds.
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSucceeds)
 {
     TestServerClusterContext context;
@@ -935,7 +936,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
 
 // Per the ProxyConnectRequest Effect on Receipt: if Timeout expires, the connection
 // attempt is terminated and a TIMEOUT status SHALL be returned.
-TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_DelegateTimeout_Propagated)
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_TransportTimeout_Propagated)
 {
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}));
@@ -1046,7 +1047,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionSta
 
 // When the transport fails to disconnect, the command SHALL fail and the cluster
 // state SHALL remain Connected (session not cleaned up).
-TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateFailurePreservesState)
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_TransportFailurePreservesState)
 {
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}));
@@ -1109,7 +1110,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_A
 
     ClusterTester tester(cluster);
 
-    // CancelPendingConnect inherits InvalidInState from Delegate base (no pending connect).
+    // CancelPendingConnect inherits InvalidInState from the transport driver (no pending connect).
     Commands::ProxyDisconnectRequest::Type cmd;
     cmd.sessionID.SetNull();
     auto result = tester.Invoke(cmd);
@@ -1151,9 +1152,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_CancelPending_W
 
 // Per the ProxyDisconnectRequest Effect on Receipt: if no transport connection
 // with the specified SessionId exists (or the connection's fabric does not match
-// the sending fabric), the command SHALL be rejected with NOT_FOUND.  Delegate
+// the sending fabric), the command SHALL be rejected with NOT_FOUND.  The cluster
 // returns NotFound; cluster must propagate.
-TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_DelegateNotFound_Propagated)
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_UnknownSession_NotFound)
 {
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}));
@@ -1507,7 +1508,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_SessionIdEchoed)
 // Per the ProxyMessageRequest Effect on Receipt: if no transport connection with
 // the specified SessionID exists (or the fabric does not match), the command SHALL
 // be rejected with NOT_FOUND. The cluster's session table enforces this.
-TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateNotFound_Propagated)
+TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_UnknownSession_NotFound)
 {
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}));
@@ -1532,7 +1533,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateNotFound_P
 // Per the ProxyMessageRequest Effect on Receipt: if another ProxyMessageRequest
 // referencing the same SessionId is still outstanding, the command SHALL be
 // rejected with BUSY. The cluster's session manager enforces this.
-TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DelegateBusy_Propagated)
+TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_DuplicateRequest_Busy)
 {
     TestServerClusterContext context;
     CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}));
@@ -1797,9 +1798,9 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ReservedTransportBits)
 // kBle is not gated by any Feature bit in the spec; whenever the proxy
 // advertises kBle in the Transport attribute, ProxyBackGroundScanStopRequest
 // with kBle passes the cluster-level transport validation and is forwarded to
-// the delegate.  The mock delegate returns Success, mirroring the WiFiPAF
+// the transport driver.  The mock returns Success, mirroring the WiFiPAF
 // positive case below.  (NotFound for an unrecognised fabric is a
-// delegate-level concern and is covered by the platform delegate's own tests.)
+// transport-level concern and is covered by the platform transport's own tests.)
 TEST_F(TestCommissioningProxyCluster, TestBgScanStop_BleValid)
 {
     TestServerClusterContext context;
@@ -1912,9 +1913,9 @@ TEST_F(TestCommissioningProxyCluster, TestBgScanStop_ValidWiFiPAF_5gBand)
 // Per the ProxyBackGroundScanStopRequest Effect on Receipt: if the NodeId and
 // FabricId of the client do not match those used in a previous
 // ProxyBackGroundScanStartRequest, the proxy SHALL take no action and the command
-// SHALL be rejected with NOT_FOUND.  This is delegate-side state; the cluster
-// must propagate the delegate's NotFound status.
-TEST_F(TestCommissioningProxyCluster, TestBgScanStop_DelegateNotFound_Propagated)
+// SHALL be rejected with NOT_FOUND.  This is transport-side state; the cluster
+// must propagate the transport's NotFound status.
+TEST_F(TestCommissioningProxyCluster, TestBgScanStop_TransportNotFound_Propagated)
 {
     TestServerClusterContext context;
     BitMask<Feature> features(Feature::kBackgroundScan);

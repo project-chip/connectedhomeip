@@ -470,8 +470,17 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
                                                   const chip::app::DataModel::InvokeRequest & request, uint16_t discriminator,
                                                   uint16_t timeout)
 {
-    // Per spec §10.5.7.1: if background scanning is active, pause it so that
-    // the NAN subscribe slot can be reused for the PAF connect subscribe.
+    // Only one PAF connect can be in flight at a time. Reject a second one up front,
+    // before pausing the background scan or touching the PAF session pool, so a
+    // refused connect leaves no side effects behind.
+    if (sPafPendingConnect != nullptr)
+    {
+        ChipLogError(AppServer, "ProxyConnectRequest: a PAF connect is already in progress");
+        return chip::Protocols::InteractionModel::Status::Busy;
+    }
+
+    // If background scanning is active, pause it so the NAN subscribe slot can be
+    // reused for the PAF connect subscribe; it resumes on OnAllSessionsClosed().
     if (!sBgScanFabrics.empty() && !sBgScanPaused)
     {
         ChipLogProgress(AppServer, "ProxyConnectRequest: pausing background scan");
@@ -505,12 +514,6 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         ChipLogError(AppServer, "ProxyConnectRequest: AddPafSession failed: %" CHIP_ERROR_FORMAT, addErr.Format());
         return (addErr == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED) ? chip::Protocols::InteractionModel::Status::ResourceExhausted
                                                               : chip::Protocols::InteractionModel::Status::Failure;
-    }
-
-    if (sPafPendingConnect != nullptr)
-    {
-        ChipLogError(AppServer, "ProxyConnectRequest: a PAF connect is already in progress");
-        return chip::Protocols::InteractionModel::Status::Busy;
     }
 
     // Per spec a Timeout of 0 indicates no timeout: the connect runs until it

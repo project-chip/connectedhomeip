@@ -630,6 +630,19 @@ CHIP_ERROR CommissioningProxyCluster::AcceptedCommands(const ConcreteClusterPath
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CommissioningProxyCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                        ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    // The three response commands the server can generate. All are mandatory and
+    // independent of the feature flags (the BackgroundScan commands respond with a
+    // plain status, not a generated command).
+    return builder.AppendElements({
+        Commands::ProxyConnectResponse::Id,
+        Commands::ProxyScanResponse::Id,
+        Commands::ProxyMessageResponse::Id,
+    });
+}
+
 CHIP_ERROR CommissioningProxyCluster::SetCPState(CommissioningProxyCluster::State state)
 {
     mMainCommissioningProxyState = state;
