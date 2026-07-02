@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="access.xsd" />
+  <xs:include schemaLocation="bitmap.xsd" />
+  <xs:include schemaLocation="conformance.xsd" />
+  <xs:include schemaLocation="constraint.xsd" />
+  <xs:include schemaLocation="enum.xsd" />
+  <xs:include schemaLocation="field.xsd" />
+  <xs:include schemaLocation="number.xsd" />
+  <xs:include schemaLocation="quality.xsd" />
+  <xs:include schemaLocation="revision.xsd" />
+  <xs:include schemaLocation="struct.xsd" />
+
+</xs:schema>
