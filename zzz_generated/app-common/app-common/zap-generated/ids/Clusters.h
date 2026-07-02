@@ -30,6 +30,7 @@
 #include <clusters/AmbientSensingUnion/ClusterId.h>
 #include <clusters/ApplicationBasic/ClusterId.h>
 #include <clusters/ApplicationLauncher/ClusterId.h>
+#include <clusters/AudioControl/ClusterId.h>
 #include <clusters/AudioOutput/ClusterId.h>
 #include <clusters/AvAnalysis/ClusterId.h>
 #include <clusters/BallastConfiguration/ClusterId.h>

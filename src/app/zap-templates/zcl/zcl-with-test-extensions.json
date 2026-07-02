@@ -16,6 +16,7 @@
         "ambient-sensing-union-cluster.xml",
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
+        "audio-control-cluster.xml",
         "audio-output-cluster.xml",
         "av-analysis-cluster.xml",
         "ballast-configuration-cluster.xml",
