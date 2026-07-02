@@ -122,6 +122,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/clusters/water-heater-management/chef-water-heater-management.cpp
+    ${CHEF}/common/clusters/water-heater-mode/chef-water-heater-mode.cpp
     ${CHEF}/common/clusters/window-covering/chef-window-covering.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/nrfconnect/AppTask.cpp
