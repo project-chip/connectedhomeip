@@ -63,6 +63,10 @@ _available_devices = [
     "CHIME",
   ],
   [
+    "commissioning-proxy",
+    "COMMISSIONING_PROXY",
+  ],
+  [
     "contact-sensor",
     "CONTACT_SENSOR",
   ],
