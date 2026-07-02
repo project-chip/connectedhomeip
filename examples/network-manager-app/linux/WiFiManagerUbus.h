@@ -29,12 +29,15 @@ public:
         mUbusManager(ubusManager), mServer(server), desired_radio(nullptr)
     {}
 
+    virtual ~WiFiManagerUbus(void) { free(desired_radio); }
+
     void Init();
 
 private:
-    void InvokeUciGetWifiIfaces();
+    void InvokeUciGetWifiIfaces(void);
     void OnWirelessNetworksUpdate(blob_attr * msg);
     void OnPreferencesUpdate(blob_attr * msg);
+    bool GetUciBlob(const char * config, const char * type, blob_attr ** blob);
 
     ubus::UbusManager & mUbusManager;
     app::Clusters::WiFiNetworkManagementServer & mServer;
