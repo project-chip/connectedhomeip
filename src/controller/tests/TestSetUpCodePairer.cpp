@@ -26,6 +26,7 @@
 #include <transport/raw/PeerAddress.h>
 
 #include <memory>
+#include <optional>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -168,7 +169,7 @@ TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
     Access().SetWaitingForPASE(true);
 
     auto * connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(0x1234);
-    Access().CallOnDiscoveredDeviceOverBle(connObj, std::make_optional<uint16_t>(3840));
+    Access().CallOnDiscoveredDeviceOverBle(connObj, std::optional<uint16_t>{ 3840 });
 
     ASSERT_EQ(Access().GetDiscoveredParametersCount(), 1u);
 
@@ -177,7 +178,7 @@ TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
     EXPECT_FALSE(params.HasConnectionObject());
     EXPECT_FALSE(params.HasDiscoveredObject());
     ASSERT_TRUE(params.mLongDiscriminator.has_value());
-    EXPECT_EQ(params.mLongDiscriminator.value(), 3840);
+    EXPECT_EQ(params.mLongDiscriminator, std::optional<uint16_t>{ 3840 });
 }
 #endif
 
