@@ -120,7 +120,14 @@ uint32_t NFCDataRetrievalInfo::GetRemainingFailSafeTimerForSE05x()
     // Reset the flag after successful read
     mSe05xReadFailSafe = 0;
 
-    return fail_safe_time;
+    // TODO: Remove hardcoded value
+    // Currently returning 120 seconds as a workaround for applet limitation
+    constexpr uint32_t kDefaultFailSafeTimeSeconds = 120;
+
+    ChipLogDetail(Crypto, "SE05x: Fail-safe time read from SE: %" PRIu16 " seconds, returning: %" PRIu32 " seconds (hardcoded)",
+                  fail_safe_time, kDefaultFailSafeTimeSeconds);
+
+    return kDefaultFailSafeTimeSeconds;
 }
 
 #if defined(CONFIG_SE05X_HOST_GPIO)
