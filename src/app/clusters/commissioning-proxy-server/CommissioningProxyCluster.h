@@ -36,7 +36,7 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-class CommissioningProxyCluster : public DefaultServerCluster
+class CommissioningProxyCluster : public DefaultServerCluster, public ScanCacheObserver
 {
 private:
     using OptionalAttributesSet =
@@ -152,11 +152,11 @@ public:
      * (via its host back-pointer) rather than caching its own copy.
      */
     uint8_t GetScanMaxTime() const { return mScanMaxTime; }
-    uint16_t GetCacheTimeout() const { return mCacheTimeout; }
+    uint16_t GetCacheTimeout() const override { return mCacheTimeout; }
 
     // Static device capabilities (from Config).
     uint8_t GetMaxSessions() const { return mMaxSessions; }
-    uint8_t GetMaxCachedResults() const { return mMaxCachedResults; }
+    uint8_t GetMaxCachedResults() const override { return mMaxCachedResults; }
     BitMask<CommissioningProxy::WiFiBandBitmap> GetSupportedWiFiBands() const { return mSupportedWiFiBands; }
 
     /// Update the supported Wi-Fi bands (e.g. once the radio's capabilities are
@@ -198,7 +198,7 @@ public:
      *
      * Called by the scan cache whenever the background-scan result set changes.
      */
-    void MarkCachedResultsDirty()
+    void MarkCachedResultsDirty() override
     {
         NotifyAttributeChanged(CommissioningProxy::Attributes::CachedResults::Id);
         NotifyAttributeChanged(CommissioningProxy::Attributes::NumCachedResults::Id);
