@@ -42,7 +42,6 @@ declare_args() {
   # Enable Thread sanitizer
   is_tsan = false
 
-
   # ASAN builds use -fsanitize-address-field-padding=1 to detect overflows
   # within (not just past) classes. The flag is ABI-breaking, so libc++/
   # libc++abi/libunwind have to be rebuilt with it; the Pigweed-shipped
