@@ -86,6 +86,13 @@ public:
     // ProxyMessageResponse back through the session manager. Set false to leave the
     // request pending (e.g. to exercise the BUSY path on a second request).
     void SetAutoRespond(bool a) { mAutoRespond = a; }
+    // When true (default), a successful Scan synchronously contributes results to the
+    // aggregator. Set false to leave the foreground scan in-flight (e.g. to exercise
+    // the concurrent-scan BUSY path on a second ProxyScanRequest).
+    void SetAutoContribute(bool a) { mAutoContribute = a; }
+    // When true, a successful SendMessage synchronously delivers a TIMEOUT failure for
+    // the pending ProxyMessageRequest (models the commissionee never replying).
+    void SetSendMessageTimeout(bool t) { mSendMessageTimeout = t; }
 
     uint16_t LastSessionId() const { return mLastSessionId; }
     uint8_t OnAllSessionsClosedCount() const { return mOnAllSessionsClosedCount; }
@@ -103,6 +110,8 @@ private:
     Protocols::InteractionModel::Status mBgScanStopStatus  = Protocols::InteractionModel::Status::Success;
     CHIP_ERROR mSendMessageError                           = CHIP_NO_ERROR;
     bool mAutoRespond                                      = true;
+    bool mAutoContribute                                   = true;
+    bool mSendMessageTimeout                               = false;
     bool mConnectPending                                   = false;
     uint16_t mLastSessionId                                = 0;
     uint8_t mOnAllSessionsClosedCount                      = 0;

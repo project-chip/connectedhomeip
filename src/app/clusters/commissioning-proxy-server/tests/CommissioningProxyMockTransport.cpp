@@ -56,6 +56,14 @@ CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, Syst
     if (mSendMessageError != CHIP_NO_ERROR)
         return mSendMessageError;
 
+    // Simulate the commissionee never replying: the response timeout fires and the
+    // pending ProxyMessageRequest resolves with TIMEOUT.
+    if (mSendMessageTimeout)
+    {
+        mHost->Sessions().DispatchMessageFailure(sessionId, Status::Timeout);
+        return CHIP_NO_ERROR;
+    }
+
     // Simulate an immediate commissionee reply (null message) so a pending
     // ProxyMessageRequest completes synchronously.
     if (mAutoRespond)
@@ -89,7 +97,10 @@ Status CommissioningProxyMockTransport::Scan(uint8_t scanMaxTime)
     results[1].transport.Set(mType);
 
     // The aggregator deep-copies, so the local backing storage need not outlive this.
-    mHost->ScanAggregator().Contribute(Span<const ScanResult>(results.data(), results.size()));
+    // When mAutoContribute is false the scan is left in-flight (no Contribute), so a
+    // second ProxyScanRequest sees the aggregator busy.
+    if (mAutoContribute)
+        mHost->ScanAggregator().Contribute(Span<const ScanResult>(results.data(), results.size()));
     return Status::Success;
 }
 
