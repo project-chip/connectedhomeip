@@ -26,19 +26,21 @@ class WiFiManagerUbus
 {
 public:
     WiFiManagerUbus(ubus::UbusManager & ubusManager, app::Clusters::WiFiNetworkManagementServer & server) :
-        mUbusManager(ubusManager), mServer(server)
+        mUbusManager(ubusManager), mServer(server), desired_radio(nullptr)
     {}
 
     void Init();
 
 private:
     void InvokeUciGetWifiIfaces();
-    void OnUciGetResponse(blob_attr * msg);
+    void OnWirelessNetworksUpdate(blob_attr * msg);
+    void OnPreferencesUpdate(blob_attr * msg);
 
     ubus::UbusManager & mUbusManager;
     app::Clusters::WiFiNetworkManagementServer & mServer;
     ubus::UbusWatch mUci{ "uci", this };
     ubus::UbusWatch mService{ "service", this };
+    char * desired_radio;
 };
 
 } // namespace chip
