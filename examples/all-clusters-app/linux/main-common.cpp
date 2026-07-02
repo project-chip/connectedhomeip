@@ -275,6 +275,7 @@ using namespace chip::app::Clusters::LaundryWasherControls;
 void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
     LaundryWasherControlsServer::SetDelegate(endpoint, LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+    LogErrorOnFailure(LaundryWasherControlsServer::SetSpinSpeedCurrent(endpoint, 0));
 }
 
 using namespace chip::app::Clusters::LaundryDryerControls;
