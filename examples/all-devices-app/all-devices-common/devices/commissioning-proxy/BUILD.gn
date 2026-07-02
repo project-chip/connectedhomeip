@@ -17,29 +17,21 @@ import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("commissioning-proxy") {
-  # Transport-agnostic sources: always built when CP is enabled.
-  # CommissioningProxyCluster.cpp is normally compiled via chip_data_model() from
-  # app_config_dependent_sources.gni, but all-devices-app has no chip_data_model()
-  # rule so we compile it directly here.  CodegenIntegration.cpp is intentionally
-  # excluded — it wires the Ember/codegen path which this app does not use.
+  # Transport-agnostic session/scan/message bookkeeping now lives in the
+  # commissioning-proxy-server cluster and its subsystems (pulled in via deps
+  # below), so the example only supplies the device wiring and the per-transport
+  # drivers.  CommissioningProxyCluster.cpp is normally compiled via
+  # chip_data_model() from app_config_dependent_sources.gni, but all-devices-app
+  # has no chip_data_model() rule so we compile it directly here.
+  # CodegenIntegration.cpp is intentionally excluded — it wires the Ember/codegen
+  # path which this app does not use.
   sources = [
     "${chip_root}/src/app/clusters/commissioning-proxy-server/CommissioningProxyCluster.cpp",
     "${chip_root}/src/app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h",
-    "${chip_root}/src/app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h",
-    "CommissioningProxyBgScanCache.cpp",
-    "CommissioningProxyBgScanCache.h",
-    "CommissioningProxyCommandDelegate.cpp",
     "CommissioningProxyDevice.cpp",
     "CommissioningProxyDevice.h",
-    "CommissioningProxyDispatcher.h",
-    "commissioning-proxy-delegate-impl.cpp",
-    "commissioning-proxy-delegate-impl.h",
   ]
 
-  # Per-transport implementations compiled only when the transport stack is
-  # enabled.  Only the BLE transport ships in this PR; the WiFi-PAF transport
-  # (CommissioningProxyPafTransport.*) and the Linux WiFi-PAF platform support
-  # it depends on land in a follow-up PR.
   if (chip_config_network_layer_ble) {
     sources += [
       "CommissioningProxyBleTransport.cpp",

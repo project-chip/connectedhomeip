@@ -18,19 +18,18 @@
 #include <PosixChimeDevice.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #include <devices/commissioning-proxy/CommissioningProxyDevice.h>
-#endif
 
 namespace chip {
 namespace app {
 
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-    DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
-                                                 []() { return std::make_unique<CommissioningProxyDevice>(); });
-#endif
+    if constexpr (ALL_DEVICES_ENABLE_COMMISSIONING_PROXY)
+    {
+        DeviceFactory::GetInstance().RegisterCreator("commissioning-proxy",
+                                                     []() { return std::make_unique<CommissioningProxyDevice>(); });
+    }
 
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {

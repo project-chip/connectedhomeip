@@ -149,6 +149,7 @@ foreach(_key
         air-quality-sensor
         bridged-node
         chime
+        commissioning-proxy
         contact-sensor
         cooktop
         device-energy-management
