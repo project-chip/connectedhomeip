@@ -91,14 +91,7 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 #endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
     // Use thread-safe strerror_r when available
-#if defined(__GLIBC__) && defined(_GNU_SOURCE)
-    // GNU version returns char*
-    const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
-    if (s != nullptr)
-    {
-        return s; // errBuf or suitable glibc buffer
-    }
-#elif defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L)
+#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L)
     // POSIX version returns int (0 on success)
     if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
     {
