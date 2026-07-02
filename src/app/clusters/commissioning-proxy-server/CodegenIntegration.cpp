@@ -19,6 +19,7 @@
 #include <app/util/generic-callbacks.h>
 #include <clusters/CommissioningProxy/Metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -26,9 +27,7 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-    mCluster(CommissioningProxyCluster::Config(aEndpointId, aFeature, aDelegate))
-{}
+Instance::Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config) : mCluster(aEndpointId, config) {}
 
 CHIP_ERROR Instance::Init()
 {
