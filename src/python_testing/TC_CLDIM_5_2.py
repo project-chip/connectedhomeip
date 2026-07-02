@@ -130,6 +130,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
     async def test_TC_CLDIM_5_2(self):
         endpoint = self.get_endpoint()
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        IANA_ADDR_POLICY = 0
         self.kGroupKeysetId = 0x01a1
         self.kGroupId = 0x0001
         self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
@@ -144,7 +145,7 @@ class TC_CLDIM_5_2(MatterBaseTest):
                 epoch_start_time0=2220000,
             )
             dev_controller.SetGroupKey(self.kGroupId, self.kGroupKeysetId)
-            dev_controller.SetGroupInfo(self.kGroupId, "Closure Dimension Group")
+            dev_controller.SetGroupInfo(self.kGroupId, "Closure Dimension Group", IANA_ADDR_POLICY)
         log.info("Groupcast on root node enabled: %s", self.groupcast_enabled)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)

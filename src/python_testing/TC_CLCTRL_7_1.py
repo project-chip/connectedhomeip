@@ -231,6 +231,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
         dev_controller = self.default_controller
         attributes = Clusters.ClosureControl.Attributes
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        IANA_ADDR_POLICY = 0
         self.kGroupKeysetId = 0x01a1
         self.kGroupId = 0x0001
         self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
@@ -244,7 +245,7 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 epoch_start_time0=2220000,
             )
             dev_controller.SetGroupKey(self.kGroupId, self.kGroupKeysetId)
-            dev_controller.SetGroupInfo(self.kGroupId, "Closure Control Group")
+            dev_controller.SetGroupInfo(self.kGroupId, "Closure Control Group", IANA_ADDR_POLICY)
         log.info("Groupcast on root node enabled: %s", self.groupcast_enabled)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
