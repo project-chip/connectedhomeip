@@ -44620,6 +44620,21 @@ class AmbientSensingUnion(Cluster):
 
     class Structs:
         @dataclass
+        class ContributorStatusChangeStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contributorIndex", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="previousContributorStatus", Tag=1, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="currentContributorStatus", Tag=2, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                    ])
+
+            contributorIndex: 'uint' = 0
+            previousContributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+            currentContributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+
+        @dataclass
         class UnionContributorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -44627,14 +44642,14 @@ class AmbientSensingUnion(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="contributorNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="contributorEndpointID", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="contributorHealth", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="contributorName", Tag=2, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contributorStatus", Tag=3, Type=AmbientSensingUnion.Enums.UnionContributorStatusEnum),
                     ])
 
             contributorNodeID: 'typing.Union[Nullable, uint]' = NullValue
             contributorEndpointID: 'typing.Union[Nullable, uint]' = NullValue
-            contributorName: 'typing.Optional[str]' = None
-            contributorHealth: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
+            contributorName: 'typing.Union[Nullable, str]' = NullValue
+            contributorStatus: 'AmbientSensingUnion.Enums.UnionContributorStatusEnum' = 0
 
     class Attributes:
         @dataclass
@@ -44818,10 +44833,10 @@ class AmbientSensingUnion(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="statusChangedContributor", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.UnionContributorStruct]),
+                        ClusterObjectFieldDescriptor(Label="contributorStatusChange", Tag=0, Type=typing.List[AmbientSensingUnion.Structs.ContributorStatusChangeStruct]),
                     ])
 
-            statusChangedContributor: typing.List[AmbientSensingUnion.Structs.UnionContributorStruct] = field(default_factory=lambda: [])
+            contributorStatusChange: typing.List[AmbientSensingUnion.Structs.ContributorStatusChangeStruct] = field(default_factory=lambda: [])
 
 
 @dataclass
