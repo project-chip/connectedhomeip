@@ -87,7 +87,8 @@ PersistentStorageOpKeystorese05x::ExtractKeyIdFromSerializedKeypair(const Crypto
  * @brief Reset binary data in SE05x
  *
  * This function checks if an object with the given keyid already exists in the secure element.
- * If it exists it deletes the old object before writing.
+ * If it exists and the size differs from the new data, it deletes the old object before writing.
+ * This prevents errors when trying to overwrite objects with different sizes.
  *
  * @param[in] keyid - Key id of the object
  * @param[in] buf - Buffer containing binary data
@@ -96,9 +97,22 @@ PersistentStorageOpKeystorese05x::ExtractKeyIdFromSerializedKeypair(const Crypto
  */
 static CHIP_ERROR se05x_reset_binary_data(uint32_t keyid, const uint8_t * buf, size_t buflen)
 {
-    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+    uint16_t seObjectSize = 0;
+    CHIP_ERROR err = se05x_read_object_size(keyid, &seObjectSize);
 
-    se05x_delete_key(keyid);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (seObjectSize != buflen)
+        {
+            ChipLogProgress(Crypto, "SE05x: Size mismatch for keyid 0x%" PRIx32 " (SE: %" PRIu16 " bytes, new: %" PRIu16 " bytes) - deleting old object",
+                keyid, seObjectSize, static_cast<uint16_t>(buflen));
+            se05x_delete_key(keyid);
+        }
+    }
+    else
+    {
+        ChipLogDetail(Crypto, "SE05x: No existing object found for keyid 0x%" PRIx32, keyid);
+    }
 
     err = se05x_set_binary_data(keyid, buf, buflen);
     return err;
@@ -569,15 +583,177 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::SignWithOpKeypair(FabricIndex fabri
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);                                                                            \
     }
 
+#define SE05X_SET_EC_KEY(keyid, buf)                                \
+    {                                                               \
+        const uint8_t buffer[] = {buf};                             \
+        err = se05x_set_ec_key(keyid, buffer, sizeof(buffer));      \
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);             \
+    }
+
 static CHIP_ERROR se05xResetNFCCommData()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    /* Delete NFC commissioned data for the Operational Credential cluster,
-    Root CA, and Wi-fi / thread credentials */
+
+    /* Delete NFC commissioned data also, like Operational Credential cluster,
+    Root CA, ICA, IPK, Access control cluster, Wi-fi / thread credentials,  */
     SE05X_SET_BIN_DATA_TEMPLATE(SE051H_OP_CRED_CLUSTER_ID, OCC);
     SE05X_SET_BIN_DATA_TEMPLATE(SE051H_ROOT_CER_ID, ROOT_CERTIFICATE);
+    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_IPK_ID, IPK);
+    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_ACL_ID, ACL);
     SE05X_SET_BIN_DATA_TEMPLATE(SE051H_WIFI_CRED_ID_APP_8_4, WIFI_CRED_DATA);
     SE05X_SET_BIN_DATA_TEMPLATE(SE051H_WIFI_CRED_ID_APP_8_8, WIFI_CRED_DATA);
+    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_VR_ID, VENDOR_RESERVED);
+    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_NOC_ID, NOC);
+    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_PAI_ID, PAI_CERTIFICATE);
+    SE05X_SET_BIN_DATA_TEMPLATE(SE051H_DAC_ID, DAC_CERTIFICATE);
+    SE05X_SET_EC_KEY(SE051H_DA_KEY_PAIR_ID, DA_KEY_PAIR_DATA);
+
+    {
+        uint8_t attest_tbs[] = {STRUCTURE_START,   CERTIFICATE_DECLARATION,
+                      ATTESTATION_NONCE, SE_TIMESTAMP,
+                      STRUCTURE_END,     ATTESTATION_CHALLENGE};
+
+        err = se05x_reset_binary_data(SE051H_ATTEST_TBS, attest_tbs, sizeof(attest_tbs));
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    }
+
+    {
+        uint8_t acl_data[] = {
+            DATA_VERSION_ACC,
+            CLUSTER_REVISION_ACC,
+            FEATUREMAP_ACC,
+            ATTRIBUTE_LIST_ACC,
+            ACCEPTED_COMMAND_LIST_ACC,
+            GENERATED_COMMAND_LIST_ACC,
+            ACLS,
+            EXTENSION,
+            EXTENSION_FILLER,
+            SUBJECTS_PER_ACCESS_CONTROL_ENTRY,
+            TARGETS_PER_ACCESS_CONTROL_ENTRY,
+            ACCESS_CONTROL_ENTRIES_PER_FABRIC,
+            COMMISSIONING_ARL,
+            COMMISSIONING_ARL_FILLER,
+            ARL,
+            ARL_FILLER,
+        };
+
+        err = se05x_reset_binary_data(SE051H_ACC_ID, acl_data, sizeof(acl_data));
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    }
+
+    {
+        uint8_t ncc_buf[] = {
+            DATA_VERSION_NCC,
+            CLUSTER_REVISION_NCC,
+            FEATUREMAP_NCC,
+            ATTRIBUTE_LIST_NCC,
+            ACCEPTED_COMMAND_LIST_NCC,
+            GENERATED_COMMAND_LIST_NCC,
+            MAX_NETWORKS,
+            NETWORKS,
+            NETWORKS_FILLER,
+            SCAN_MAX_TIME_SECONDS,
+            CONNECT_MAX_TIME_SECONDS,
+            INTERFACE_ENABLED,
+            LAST_NETWORKING_STATUS,
+            LAST_NETWORK_ID,
+            LAST_NETWORK_ID_FILLER,
+            LAST_CONNECT_ERROR_VALUE_NCC,
+            LAST_CONNECT_ERROR_VALUE_FILLER_NCC,
+            SUPPORTED_WIFI_BANDS_NCC,
+            SUPPORTED_THREAD_FEATURES_NCC,
+            THREAD_VERSION_NCC,
+        };
+
+        uint8_t buffer[512] = {0};
+        size_t buf_len = sizeof(buffer);
+
+        // read NCC to check what was the last network interface type set for NFC comm
+        smStatus_t smstatus = SM_NOT_OK;
+        SE05x_Result_t exists = kSE05x_Result_NA;
+
+        smstatus = Se05x_API_CheckObjectExists(
+        &((sss_se05x_session_t *)&gex_sss_chip_ctx.session)->s_ctx, SE051H_NCC_ID,
+        &exists);
+        if (smstatus == SM_OK) {
+            if (exists == kSE05x_Result_SUCCESS) {
+                err = se05x_get_certificate(SE051H_NCC_ID, buffer, &buf_len);
+                VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+                VerifyOrReturnError(buf_len > NETWORK_INTERFACE_BTYE_OFFSET, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+                ncc_buf[NETWORK_INTERFACE_BTYE_OFFSET] = buffer[NETWORK_INTERFACE_BTYE_OFFSET];
+            }
+        }
+        else {
+            ChipLogError(Crypto, "Se05x_API_CheckObjectExists Failed");
+        }
+
+        err = se05x_reset_binary_data(SE051H_NCC_ID, ncc_buf, sizeof(ncc_buf));
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    }
+
+    {
+        uint8_t Genaral_comm_cluster_data[] = {
+            DATA_VERSION_GCC,
+            CLUSTER_REVISION_GCC,
+            FEATUREMAP_GCC,
+            ATTRIBUTE_LIST_GCC,
+            ACCEPTED_COMMAND_LIST_GCC,
+            GENERATED_COMMAND_LIST_GCC,
+            BREADCRUMB,
+            BASIC_COMMISSIONING_INFO,
+            REGULATORY_CONFIG,
+            LOCATION_CAPABILITY,
+            SUPPORTS_CONCURRENT_CONNECTION,
+            TC_ACCEPTED_VERSION,
+            TC_MIN_REQUIRED_VERSION,
+            TC_ACKNOWLEDGEMENTS,
+            TC_ACKNOWLEDGEMENTS_REQUIRED,
+            TC_UPDATE_DEADLINE,
+            IS_COMM_WITHOUT_POWER,
+        };
+        err =
+            se05x_reset_binary_data(SE051H_GENERAL_COMM_CLUSTER_ID, Genaral_comm_cluster_data, sizeof(Genaral_comm_cluster_data));
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    }
+
+    {
+        uint8_t Basic_info_cluster_data[] = {
+            DATA_VERSION_BIC,
+            CLUSTER_REVISION_BIC,
+            FEATUREMAP_BIC,
+            ATTRIBUTE_LIST_BIC,
+            ACCEPTED_COMMAND_LIST_BIC,
+            GENERATED_COMMAND_LIST_BIC,
+            DATA_MODEL_REVISION,
+            VENDOR_NAME,
+            VENDOR_NAME_FILLER,
+            VENDOR_ID,
+            PRODUCT_NAME,
+            PRODUCT_NAME_FILLER,
+            PRODUCT_ID,
+            NODE_LABEL,
+            NODE_LABEL_FILLER,
+            LOCATION,
+            HARDWARE_VERSION,
+            HARDWARE_VERSIONING,
+            HARDWARE_VERSIONING_FILLER,
+            SOFTWARE_VERSION,
+            SOFTWARE_VERSIONING,
+            SOFTWARE_VERSIONING_FILLER,
+            UNIQUE_ID,
+            UNIQUE_ID_FILLER,
+            CAPABILITY_MINIMA,
+            SPECIFICATION_VERSION,
+            MAX_PATH_PER_INVOKE,
+            CONFIGURATION_VERSION};
+
+        err = se05x_reset_binary_data(SE051H_BASIC_INFO_CLUSTER_ID, Basic_info_cluster_data, sizeof(Basic_info_cluster_data));
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    }
+
     return CHIP_NO_ERROR;
 }
 
