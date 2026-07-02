@@ -32,6 +32,7 @@
 #include "ral.h"
 #endif
 
+#if (CFG_LPM_LEVEL != 0)
 /* External functions --------------------------------------------------------*/
 extern uint32_t llhwc_cmn_is_dp_slp_enabled(void);
 
@@ -121,3 +122,4 @@ void APP_SYS_SetWakeupOffset(uint32_t wakeup_offset_us)
 {
     wakeup_offset = wakeup_offset_us;
 }
+#endif

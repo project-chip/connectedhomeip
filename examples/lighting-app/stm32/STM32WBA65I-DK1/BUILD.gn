@@ -132,11 +132,11 @@ stm32_executable("lighting_app") {
   if (chip_enable_ota_requestor) {
     defines += [ "STM32_OTA_ENABLED" ]
     sources += [
-      "${examples_plat_dir}/OTAConfig.cpp",
+      #"${examples_plat_dir}/OTAConfig.cpp",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_device.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_flash.c",
       "${stm32_board_src}/STM32WBA65I-DK1/Src/stm_ota_spi_flash.c",
-      "src/STM32WBA6/ota.cpp",
+      "src/ota.cpp",
     ]
   }
 

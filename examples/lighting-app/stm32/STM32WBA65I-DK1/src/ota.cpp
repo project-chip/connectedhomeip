@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+
 /*****************************************************************************
  *                    Includes Definitions
  *****************************************************************************/
@@ -25,14 +26,15 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 
 #include <platform/stm32/stm32wba/OTAImageProcessorImpl.h>
 
-#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <platform/stm32/stm32wba/FactoryDataProvider.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;
@@ -81,18 +83,22 @@ bool OtaHeaderValidation(Ota_ImageHeader_t imageHeader)
 
 void InitializeOTARequestor(void)
 {
+	CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "Initialising OTA Requestor");
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&gRequestorCore);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    err = gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                        chip::GetOTARequestorAttributes(), chip::GetDefaultOTARequestorEventGenerator());
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
     gUserConsentProvider.SetUserConsentState(gUserConsentState);
     // Test to trigger ota. this function can be trigger by a Push Button
     TriggerOTAQuery();
+
+
 }
 
 void TriggerOTAQuery(void)
@@ -115,3 +121,4 @@ void TriggerOTAQuery(void)
     }
 }
 #endif /* (OTA_SUPPORT == 1) */
+
