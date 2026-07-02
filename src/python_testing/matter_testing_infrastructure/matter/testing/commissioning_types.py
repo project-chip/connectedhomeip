@@ -41,8 +41,9 @@ class CustomCommissioningParameters:
     pair it with ``randomDiscriminator`` for ``CommissionOnNetwork`` discovery.
 
     For **standalone PASE** (e.g. composition tests with ``first_setup_code`` only),
-    use ``setup_code`` and/or ``discriminator`` + ``passcode``; leave the ECM fields
-    unset. Use :meth:`resolve_setup_code` for the string passed to
+    use ``setup_code`` and/or ``discriminator`` + ``passcode``; leave the ECM
+    (Enhanced Commissioning Method) fields unset — ``commissioningParameters`` and
+    ``randomDiscriminator``. Use :meth:`resolve_setup_code` for the string passed to
     ``FindOrEstablishPASESession``.
 
     Attributes:
@@ -54,7 +55,7 @@ class CustomCommissioningParameters:
             otherwise None.
         setup_code (Optional[str]): QR or manual pairing code string for PASE-only flows.
         discriminator (Optional[int]): With ``passcode``, used to build a manual code when
-            ``setup_code`` is not set and ECM fields are not used.
+            ``setup_code`` is not set and the ECM fields above are not used.
         passcode (Optional[int]): With ``discriminator``, for manual code synthesis.
     """
 

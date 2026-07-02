@@ -194,7 +194,6 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
 
         LOGGER.info("Checking DNS-SD for commissioned device")
 
-        # Retries are handled internally by _is_device_operational_via_dnssd
         is_operational = await _is_device_operational_via_dnssd(
             self.default_controller,
             self.th_server_local_nodeid

@@ -40,7 +40,7 @@ from python_path import PythonPath
 
 # Add the python_testing directory to path so mdns_discovery module can be found
 with PythonPath('..', relative_to=__file__):
-    import mdns_discovery.mdns_discovery  # noqa: F401
+    pass  # mdns_discovery is mocked per-test where needed; avoid importing zeroconf here
 
 # Test constants
 TEST_NODE_ID = 1234
@@ -48,6 +48,7 @@ TEST_COMPRESSED_FABRIC_ID = 0x1234567890ABCDEF
 TEST_ENDPOINT = 0
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
+OPERATIONAL_SERVICE_TYPE = "_matter._tcp.local."
 
 
 @dataclass
@@ -77,6 +78,11 @@ def build_expected_instance_name(compressed_fabric_id: int, node_id: int) -> str
     return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
 
+def build_expected_instance_qname(compressed_fabric_id: int, node_id: int) -> str:
+    """Build the full operational service instance qname for targeted SRV resolve."""
+    return f"{build_expected_instance_name(compressed_fabric_id, node_id)}.{OPERATIONAL_SERVICE_TYPE}"
+
+
 @contextlib.contextmanager
 def mock_mdns_module():
     """Context manager to inject a mock mdns_discovery module into sys.modules.
@@ -84,30 +90,43 @@ def mock_mdns_module():
     This is necessary because the real mdns_discovery depends on zeroconf,
     which may not be installed in unit test environments. By injecting a mock
     module, the `from mdns_discovery.mdns_discovery import MdnsDiscovery`
-    inside _is_device_operational_via_dnssd resolves correctly.
+    and `from mdns_discovery.enums.mdns_service_type import MdnsServiceType`
+    imports inside _is_device_operational_via_dnssd resolve correctly.
     """
+    from enum import Enum
+
+    class MockMdnsServiceType(Enum):
+        OPERATIONAL = OPERATIONAL_SERVICE_TYPE
+
     mock_mdns_mod = MagicMock()
     mock_parent = MagicMock()
     mock_parent.mdns_discovery = mock_mdns_mod
 
-    saved_parent = sys.modules.get('mdns_discovery')
-    saved_child = sys.modules.get('mdns_discovery.mdns_discovery')
+    mock_enums_mod = MagicMock()
+    mock_enums_mod.MdnsServiceType = MockMdnsServiceType
+    mock_enums_parent = MagicMock()
+    mock_enums_parent.mdns_service_type = mock_enums_mod
+
+    saved = {
+        'mdns_discovery': sys.modules.get('mdns_discovery'),
+        'mdns_discovery.mdns_discovery': sys.modules.get('mdns_discovery.mdns_discovery'),
+        'mdns_discovery.enums': sys.modules.get('mdns_discovery.enums'),
+        'mdns_discovery.enums.mdns_service_type': sys.modules.get('mdns_discovery.enums.mdns_service_type'),
+    }
 
     sys.modules['mdns_discovery'] = mock_parent
     sys.modules['mdns_discovery.mdns_discovery'] = mock_mdns_mod
+    sys.modules['mdns_discovery.enums'] = mock_enums_parent
+    sys.modules['mdns_discovery.enums.mdns_service_type'] = mock_enums_mod
 
     try:
         yield mock_mdns_mod
     finally:
-        # Restore original modules
-        if saved_parent is not None:
-            sys.modules['mdns_discovery'] = saved_parent
-        else:
-            sys.modules.pop('mdns_discovery', None)
-        if saved_child is not None:
-            sys.modules['mdns_discovery.mdns_discovery'] = saved_child
-        else:
-            sys.modules.pop('mdns_discovery.mdns_discovery', None)
+        for key, value in saved.items():
+            if value is not None:
+                sys.modules[key] = value
+            else:
+                sys.modules.pop(key, None)
 
 
 # =============================================================================
@@ -131,27 +150,33 @@ async def test_dnssd_device_found_on_this_fabric():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name=expected_instance_name)
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=MockMdnsServiceInfo(
+            instance_name=expected_instance_name
+        ))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
         if not result:
             return "Expected True when device is operational on this fabric"
+        expected_qname = build_expected_instance_qname(TEST_COMPRESSED_FABRIC_ID, TEST_NODE_ID)
+        mock_mdns.get_srv_record.assert_awaited_once_with(
+            service_name=expected_qname,
+            service_type=OPERATIONAL_SERVICE_TYPE,
+            query_timeout_sec=3.0,
+            log_output=False,
+        )
     return None
 
 
 async def test_dnssd_device_on_different_fabric():
     """
-    Test: Device advertising on different fabric (Scenario 3).
+    Test: Targeted SRV resolve for our fabric+node returns no record (Scenario 3).
 
     Scenario: Device is commissioned to another fabric but not ours.
-    Expected: Returns False - device not operational on OUR fabric.
+    Expected: Returns False - our instance name is not advertised.
 
-    Value: Verifies we don't falsely detect devices on other fabrics as ours.
-    The fabric ID in the instance name must match our compressed fabric ID.
+    Value: Verifies that when our fabric+node instance is not advertised, the helper returns False.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
@@ -159,10 +184,7 @@ async def test_dnssd_device_on_different_fabric():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        # Device advertising on different fabric (different compressed fabric ID)
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name="AAAAAAAAAAAAAAAA-00000000000004D2")  # Different fabric, same node
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=None)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -174,10 +196,10 @@ async def test_dnssd_device_on_different_fabric():
 
 async def test_dnssd_no_services_found():
     """
-    Test: No operational services found via DNS-SD.
+    Test: Targeted operational SRV resolve returns no record.
 
-    Scenario: Factory fresh device or device not advertising.
-    Expected: Returns False - no operational advertisements found.
+    Scenario: Factory fresh device or device not advertising on this fabric+node.
+    Expected: Returns False - no SRV record for our instance qname.
 
     Value: Verifies correct behavior when DNS-SD finds nothing,
     which triggers the parallel PASE/CASE fallback.
@@ -188,13 +210,13 @@ async def test_dnssd_no_services_found():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[])
+        mock_mdns.get_srv_record = AsyncMock(return_value=None)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
         if result:
-            return "Expected False when no operational services found"
+            return "Expected False when no operational SRV record is found"
     return None
 
 
@@ -214,7 +236,7 @@ async def test_dnssd_exception_handling():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(side_effect=Exception("DNS-SD network error"))
+        mock_mdns.get_srv_record = AsyncMock(side_effect=Exception("DNS-SD network error"))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         try:
@@ -271,14 +293,14 @@ async def test_dnssd_import_error_propagates():
     return None
 
 
-async def test_dnssd_multiple_services_finds_correct_one():
+async def test_dnssd_targeted_resolve_finds_instance():
     """
-    Test: Multiple services found, one matches our fabric+node.
+    Test: Targeted SRV resolve returns a record for our fabric+node instance.
 
-    Scenario: Network has multiple Matter devices, we find ours.
-    Expected: Returns True when our specific device is in the list.
+    Scenario: Our operational instance is advertised on the network.
+    Expected: Returns True when get_srv_record finds the instance.
 
-    Value: Verifies correct filtering when multiple devices advertise.
+    Value: Verifies the helper queries the specific operational instance qname via get_srv_record.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
@@ -287,40 +309,34 @@ async def test_dnssd_multiple_services_finds_correct_one():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name="OTHERFABRICID00000-0000000000005678"),
-            MockMdnsServiceInfo(instance_name=expected_instance_name),  # Our device
-            MockMdnsServiceInfo(instance_name="ANOTHERFABRIC0000-0000000000009999"),
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=MockMdnsServiceInfo(
+            instance_name=expected_instance_name
+        ))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
         if not result:
-            return "Expected True when this fabric's service is in the list"
+            return "Expected True when targeted SRV resolve finds our instance"
     return None
 
 
 async def test_dnssd_same_fabric_different_node():
     """
-    Test: Service for same fabric but different node ID.
+    Test: Targeted SRV resolve for our node returns no record.
 
-    Scenario: Another device on our fabric, but not the one we're looking for.
-    Expected: Returns False - wrong node ID.
+    Scenario: Another device on our fabric advertises, but not the node we query.
+    Expected: Returns False when our instance qname has no SRV record.
 
-    Value: Verifies both fabric AND node ID must match.
+    Value: Verifies both fabric AND node ID are part of the targeted instance name.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
     mock_controller = MockDeviceController()
-    # Same fabric, different node
-    different_node_instance = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, 9999)
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name=different_node_instance)
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=None)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -851,10 +867,10 @@ def main():
         # Category A: DNS-SD Discovery Tests
         ("A1. DNS-SD: device found on THIS fabric", test_dnssd_device_found_on_this_fabric),
         ("A2. DNS-SD: device on DIFFERENT fabric", test_dnssd_device_on_different_fabric),
-        ("A3. DNS-SD: no services found", test_dnssd_no_services_found),
+        ("A3. DNS-SD: no operational SRV record", test_dnssd_no_services_found),
         ("A4. DNS-SD: exception handling", test_dnssd_exception_handling),
         ("A5. DNS-SD: import error propagates", test_dnssd_import_error_propagates),
-        ("A6. DNS-SD: multiple services finds correct one", test_dnssd_multiple_services_finds_correct_one),
+        ("A6. DNS-SD: targeted resolve finds instance", test_dnssd_targeted_resolve_finds_instance),
         ("A7. DNS-SD: same fabric different node", test_dnssd_same_fabric_different_node),
 
         # Category B: Parallel Session Establishment Tests

@@ -418,8 +418,6 @@ async def _is_device_operational_via_dnssd(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
     discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC,
-    max_retries: int = 3,
-    retry_delay_sec: float = 2.0
 ) -> bool:
     """
     Check if a device is advertising as operational on this fabric via DNS-SD.
@@ -428,44 +426,35 @@ async def _is_device_operational_via_dnssd(
     commissioned. Devices advertise operational services on _matter._tcp.local.
     with instance name format: {compressed_fabric_id}-{node_id}
 
-    Retries internally to handle flaky mDNS propagation.
-
     Args:
         dev_ctrl: The chip device controller instance (used to get compressed fabric ID)
         node_id: Node ID of the device to check
-        discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
-        max_retries: Number of discovery attempts before giving up (default 3)
-        retry_delay_sec: Delay between retry attempts in seconds (default 2.0)
+        discovery_timeout_sec: Timeout for the DNS-SD SRV query (default 3 seconds)
 
     Returns:
         True if device is advertising as operational on this fabric, False otherwise
     """
+    from mdns_discovery.enums.mdns_service_type import MdnsServiceType
     from mdns_discovery.mdns_discovery import MdnsDiscovery
 
     try:
-        # Build expected instance name for this fabric+node
         compressed_fabric_id = dev_ctrl.GetCompressedFabricId()
-        expected_instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
-        LOGGER.info("Checking DNS-SD for operational service: %s", expected_instance_name)
+        LOGGER.info("Checking DNS-SD for operational service: %s", instance_name)
 
         mdns = MdnsDiscovery()
-        for attempt in range(max_retries):
-            # Discover operational services
-            services = await mdns.get_operational_services(
-                discovery_timeout_sec=discovery_timeout_sec,
-                log_output=False
-            )
+        record = await mdns.get_srv_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            query_timeout_sec=discovery_timeout_sec,
+            log_output=False,
+        )
 
-            # Check if our expected instance is in the discovered services
-            for service in services:
-                if service.instance_name == expected_instance_name:
-                    LOGGER.info("Device %s found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
-                    return True
-
-            if attempt < max_retries - 1:
-                LOGGER.info("DNS-SD attempt %s/%s did not find device, retrying...", attempt + 1, max_retries)
-                await asyncio.sleep(retry_delay_sec)
+        if record is not None:
+            LOGGER.info("Device %s found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
+            return True
 
         LOGGER.info("Device %s not found operational on fabric %016X via DNS-SD", node_id, compressed_fabric_id)
         return False
@@ -659,8 +648,8 @@ async def is_commissioned(
 
     Uses a passive detection strategy:
 
-    1. DNS-SD operational check (_matter._tcp): if the device advertises as operational
-       for this fabric and node, returns True immediately.
+    1. DNS-SD operational check: targeted SRV resolve of
+       ``{compressedFabricId}-{nodeId}._matter._tcp.local``; if found, returns True immediately.
     2. DNS-SD commissionable check (_matterc._udp): if the device advertises a pairing
        window, returns False immediately (fast-fail — device is not operational).
     3. If neither mDNS check is conclusive, returns False (device is off, broken,
@@ -669,7 +658,8 @@ async def is_commissioned(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
+        discovery_timeout_sec: Timeout for DNS-SD lookups in seconds (operational SRV query
+            and commissionable browse; default 3 seconds)
 
     Returns:
         True only when the device advertises as operational on this fabric (Step 1).
@@ -715,11 +705,12 @@ async def get_commissioned_fabric_count(
     """
     Get the number of commissioned fabrics on a device.
 
-    Uses DNS-SD to check if the device is operational on this fabric (fast path for CASE).
-    Then reads the TrustedRootCertificates attribute from endpoint 0 and returns the count.
+    Optionally resolves the operational DNS-SD instance for this fabric and node (fast path
+    for CASE), then reads the TrustedRootCertificates attribute from endpoint 0 and returns the count.
     OperationalCredentials is node-scoped per the Matter spec and always resides on endpoint 0.
 
-    Performs an operational DNS-SD check, then reads ``TrustedRootCertificates``. If the node is
+    When the operational probe is not skipped, performs a targeted SRV resolve, then reads
+    ``TrustedRootCertificates``. If the node is
     not operational on this fabric via DNS-SD, the caller must already have a usable session
     (for example by calling :func:`establish_pase_or_case_session`); otherwise the attribute read
     may block or fail.
@@ -727,7 +718,8 @@ async def get_commissioned_fabric_count(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        discovery_timeout_sec: Timeout for each DNS-SD discovery attempt (default 3 seconds)
+        discovery_timeout_sec: Timeout for the operational DNS-SD SRV query when the probe
+            runs (default 3 seconds)
         skip_operational_dnssd_check: When True, skip the operational DNS-SD probe and read
             ``TrustedRootCertificates`` immediately. Use when the caller already ran
             :func:`is_device_operational_on_fabric_dnssd` or established PASE/CASE.
