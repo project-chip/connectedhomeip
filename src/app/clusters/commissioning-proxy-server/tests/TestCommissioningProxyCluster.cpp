@@ -1521,7 +1521,6 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_NullMessage_Poll)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-
 // Per the ProxyMessageRequest Effect on Receipt: if no transport connection with
 // the specified SessionID exists (or the fabric does not match), the command SHALL
 // be rejected with NOT_FOUND. The cluster's session table enforces this.
@@ -2153,7 +2152,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_ConcurrentBusy)
     // stays busy for the second request.
     mockBle.SetAutoContribute(false);
     Commands::ProxyScanRequest::Type command;
-    command.transport = CapabilitiesBitmap::kBle;
+    command.transport           = CapabilitiesBitmap::kBle;
     [[maybe_unused]] auto first = tester.Invoke(command); // stays pending
 
     auto second = tester.Invoke(command);
