@@ -72,8 +72,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/impl/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light-switch/OnOffLightSwitchDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingOperationalStateDelegate.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingRvcOperationalStateDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/oven/OvenDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/oven/impl/LoggingOvenDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/power-source/BatteryPowerSourceDevice.cpp"
@@ -104,13 +102,15 @@ set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/DimmableLoadDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/impl/LoggingDimmableLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/FanLoadDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/impl/LoggingFanLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/OnOffLoadDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/impl/LoggingOnOffLoadDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingOperationalStateDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingRvcOperationalStateDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     # keep-sorted: end
 )
 

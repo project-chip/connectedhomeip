@@ -23,11 +23,11 @@ namespace chip::app::Clusters::OperationalState {
 
 CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    static constexpr uint8_t kSupportedStates[] = {
-        to_underlying(OperationalStateEnum::kStopped),
-        to_underlying(OperationalStateEnum::kRunning),
-        to_underlying(OperationalStateEnum::kPaused),
-        to_underlying(OperationalStateEnum::kError),
+    static constexpr GenericOperationalState kSupportedStates[] = {
+        { .operationalStateID = to_underlying(OperationalStateEnum::kStopped), .operationalStateLabel = CharSpan("Stopped", 7) },
+        { .operationalStateID = to_underlying(OperationalStateEnum::kRunning), .operationalStateLabel = CharSpan("Running", 7) },
+        { .operationalStateID = to_underlying(OperationalStateEnum::kPaused), .operationalStateLabel = CharSpan("Paused", 6) },
+        { .operationalStateID = to_underlying(OperationalStateEnum::kError), .operationalStateLabel = CharSpan("Error", 5) },
     };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedStates))
@@ -35,7 +35,7 @@ CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t in
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    operationalState.operationalStateID = kSupportedStates[index];
+    operationalState = kSupportedStates[index];
     return CHIP_NO_ERROR;
 }
 
