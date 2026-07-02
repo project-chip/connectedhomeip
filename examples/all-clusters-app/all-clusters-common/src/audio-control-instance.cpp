@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <audio-control-instance.h>
 #include <app/clusters/audio-control-server/CodegenIntegration.h>
+#include <audio-control-instance.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
