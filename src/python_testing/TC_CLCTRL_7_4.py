@@ -169,6 +169,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
 
         endpoint: int = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else countdown_time_max
+        IANA_ADDR_POLICY = 0
         self.kGroupKeysetId = 0x01a1
         self.kGroupId = 0x0001
         self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
@@ -183,7 +184,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                 epoch_start_time0=2220000,
             )
             dev_controller.SetGroupKey(self.kGroupId, self.kGroupKeysetId)
-            dev_controller.SetGroupInfo(self.kGroupId, "Closure Control Group")
+            dev_controller.SetGroupInfo(self.kGroupId, "Closure Control Group", IANA_ADDR_POLICY)
         log.info("Groupcast on root node enabled: %s", self.groupcast_enabled)
 
         self.step(1)
