@@ -22,14 +22,15 @@ from os import path
 from time import sleep
 from typing import Optional
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 
 # Type aliases for AccessControl cluster types
 AccessControlCluster = Clusters.AccessControl
@@ -390,3 +391,108 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
         log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)
+
+    async def track_download_progress(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id:  int, max_progress: int = 99):
+        """Track the progress of the download using AttributeSubscription.
+        Verify that we have download progress. Fails if there is no progress during the timeout.
+        If no progress is seen, the test will fail as no report received in the timeout.
+
+        Args:
+            controller (ChipDeviceCtrl.ChipDeviceController): Controller
+            requestor_node_id (int): Node id
+            max_progress (int, optional): Max progress to track. Defaults to 99.
+
+        """
+        # Verify how to track the progress of the ota image download after the device reach
+        # the Downloading State
+
+        # Max timeout seconds
+        max_timeout = 180
+        progress_step = 10
+
+        download_progress_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress
+        )
+        log.info("About to Start to Track Ota Image Download")
+
+        # Read the current progress
+        current_progress = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress)
+
+        # At start it can be NullValue but first test need to check for progress
+        if current_progress is NullValue:
+            current_progress = 0
+
+        progress_seen = False
+        current_max_progress = int(current_progress) + progress_step
+
+        # Verify every second the progress
+        await download_progress_attr_handler.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=0,
+                                                   fabric_filtered=False, min_interval_sec=0, max_interval_sec=1)
+
+        def check_ota_download_progress(report):
+            """Check for the UpdateStateProgress and confirms it downloaded the image when the
+                status reach to NullValue
+            Args:
+                report : Report value
+            """
+            value = report.value
+            nonlocal progress_seen, current_progress, current_max_progress
+            if value is not NullValue and isinstance(value, int) and 0 <= value <= current_max_progress:
+                # Just check if we see some progress to confirm is downloading
+
+                if not progress_seen:
+                    progress_seen = True
+            # Exit when the progress is on the expected value and progress was seen
+            current_progress = value
+            return bool(value == current_max_progress and progress_seen) or value >= current_max_progress
+
+        download_progress_attr_matcher_obj = AttributeMatcher.from_callable(
+            description="Monitoring ota download ", matcher=check_ota_download_progress)
+
+        while int(current_progress) < max_progress:
+            log.info(
+                "Current OTA Image download progress is %d%% , waiting for reports to reach %d%%", current_progress, current_max_progress)
+
+            # Handle subscribe issues
+            if current_progress > current_max_progress:
+                current_max_progress = current_progress + progress_step
+
+            retry = False
+            try:
+                download_progress_attr_handler.await_all_expected_report_matches(
+                    [download_progress_attr_matcher_obj], timeout_sec=max_timeout)
+            except signals.TestFailure:
+                # Cancel this to avoid having reports in the command line
+                download_progress_attr_handler.cancel()
+                retry = True
+
+            if retry:
+                user_response = self.wait_for_user_input(
+                    f"Download progress not reached the total of {current_max_progress}% the timeframe of: {max_timeout} seconds, would you like retry and  wait {max_timeout} seconds for next report?",
+                    prompt_msg_placeholder="Enter 'y' or 'n'")
+                if user_response.lower() in ["y", "yes"]:
+                    # This will retry one more time if needed to avoid cancel the test by a timeout
+                    # Read the current progress
+                    update_state_progress = await self.read_single_attribute_check_success(Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, controller)
+                    # Start the handler for the second time
+                    await download_progress_attr_handler.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=0,
+                                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=1)
+                    # Update nonlocalvalues
+                    current_progress = update_state_progress
+                    continue
+                asserts.fail("Test terminated by user.")
+
+            # Did not fail and the Download Track Continues
+            current_max_progress += progress_step
+            if current_max_progress > max_progress:
+                current_max_progress = max_progress
+            progress_seen = False
+            log.info("Current OTA Image download progress is %d%% ", current_progress)
+            download_progress_attr_handler.reset()
+
+        # After completing the Download cancel the AttributeReportHandler for Download
+        download_progress_attr_handler.cancel()
