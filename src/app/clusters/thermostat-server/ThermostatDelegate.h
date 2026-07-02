@@ -19,8 +19,10 @@
 
 #include "PresetStructWithOwnedMembers.h"
 #include "ThermostatSuggestionStructWithOwnedMembers.h"
-#include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <clusters/Thermostat/Attributes.h>
+#include <clusters/Thermostat/Events.h>
+#include <clusters/Thermostat/Structs.h>
 
 namespace chip {
 namespace app {

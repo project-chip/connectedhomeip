@@ -15,7 +15,10 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/Thermostat/Attributes.h>
+#include <clusters/Thermostat/Commands.h>
+#include <clusters/Thermostat/Events.h>
+#include <clusters/Thermostat/Structs.h>
 
 #include <app/EventLogging.h>
 

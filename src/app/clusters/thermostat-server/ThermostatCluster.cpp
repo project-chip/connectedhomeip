@@ -19,19 +19,15 @@
 #include "PresetStructWithOwnedMembers.h"
 #include "ThermostatClusterEvents.h"
 
-#include <app/util/attribute-storage.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
+#include <clusters/Thermostat/Attributes.h>
+#include <clusters/Thermostat/Events.h>
+#include <clusters/Thermostat/Structs.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server/Server.h>
-#include <app/util/endpoint-config-api.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 

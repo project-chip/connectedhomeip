@@ -26,9 +26,7 @@
 
 #include "ThermostatDelegate.h"
 
-#include <app-common/zap-generated/callback.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
+#include <clusters/Thermostat/Commands.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server-cluster/DefaultServerCluster.h>
