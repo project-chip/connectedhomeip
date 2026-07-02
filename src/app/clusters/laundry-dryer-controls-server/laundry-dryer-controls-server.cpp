@@ -47,6 +47,17 @@ static constexpr size_t kLaundryDryerControlsDelegateTableSize =
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 //
+
+Status Delegate::CanSetSelectedDrynessLevel(DrynessLevelEnum newSelectedDrynessLevel)
+{
+    return Status::Success;
+}
+
+Status Delegate::GetSelectedDrynessLevel(DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
+{
+    return Status::Failure;
+}
+
 namespace {
 Delegate * gDelegateTable[kLaundryDryerControlsDelegateTableSize] = { nullptr };
 }
@@ -98,6 +109,14 @@ Status LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId endpointId
 Status LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId,
                                                            DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
 {
+    Delegate * delegate = GetDelegate(endpointId);
+    if (delegate != nullptr)
+    {
+        Status res = delegate->GetSelectedDrynessLevel(selectedDrynessLevel);
+        if (res == Status::Success)
+            return res;
+    }
+
     return SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 }
 
@@ -113,6 +132,15 @@ CHIP_ERROR LaundryDryerControlsServer::Read(const ConcreteReadAttributePath & aP
     }
     switch (aPath.mAttributeId)
     {
+    case Attributes::SelectedDrynessLevel::Id: {
+        DataModel::Nullable<DrynessLevelEnum> selectedDrynessLevel;
+        Status status = GetSelectedDrynessLevel(aPath.mEndpointId, selectedDrynessLevel);
+        if (status != Status::Success)
+        {
+            return CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
+        }
+        return aEncoder.Encode(selectedDrynessLevel);
+    }
     case Attributes::SupportedDrynessLevels::Id:
         return ReadSupportedDrynessLevels(aPath, aEncoder);
     default:
@@ -167,6 +195,11 @@ Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const 
     switch (attributePath.mAttributeId)
     {
     case Attributes::SelectedDrynessLevel::Id: {
+        Status canSet = delegate->CanSetSelectedDrynessLevel(static_cast<DrynessLevelEnum>(*value));
+        if (canSet != Status::Success)
+        {
+            return canSet;
+        }
         uint8_t drynessLevelIdx = 0;
         if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
         {
