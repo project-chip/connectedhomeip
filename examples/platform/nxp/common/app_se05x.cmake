@@ -30,9 +30,7 @@ if(CONFIG_APP_FREERTOS_OS)
     )
 
     target_sources(app PRIVATE
-        ${CHIP_ROOT}/src/platform/nxp/crypto/se05x/mcu_kvs/NFCDataRetrievalInfo.cpp
-        ${CHIP_ROOT}/src/platform/nxp/crypto/se05x/kvs_utilities/CHIPCryptoPALHsm_se05x_readClusters.cpp
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x/source/AppSe05xCustom.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x/source/AppSe05x.cpp
     )
 else()
     list(FIND ZEPHYR_EXTRA_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo/matter" se_index)
