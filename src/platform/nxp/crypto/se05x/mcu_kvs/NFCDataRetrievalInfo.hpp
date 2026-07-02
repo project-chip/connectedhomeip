@@ -98,7 +98,7 @@ private:
     char op_data_set[256]  = { 0 };
     size_t op_data_set_len = sizeof(op_data_set);
 
-#if defined(CONFIG_SE05X_HOST_GPIO) || defined(CONFIG_SE05X_HOST_GPIO_FRDM_IMX93)
+#if defined(CONFIG_SE05X_HOST_GPIO)
     /**
      * @brief Check if device is commissioned and initialize GPIO notification if needed
      *
