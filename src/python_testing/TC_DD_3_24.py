@@ -94,13 +94,18 @@ class TC_DD_3_24(MatterBaseTest):
 
         # Step 2: the NFC tag data is parsed and checked if the device supports NFC commissioning and commission begins
         self.step(2)
-        payload = SetupPayload().ParseQrCode(nfc_tag_data)
-        asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
+        asserts.assert_true(SetupPayload().ParseQrCode(nfc_tag_data).supports_nfc_commissioning, "Device does not Support NFC Commissioning")
+        payload = self.get_setup_payload_info()[0]
+        discriminator = payload.filter_value
+        asserts.assert_is_not_none(discriminator, "Discriminator must not be None")
+        setupCode = payload.setup_code
+        asserts.assert_is_not_none(setupCode, "Setup Code must not be None")
 
-        commissioning_method = self.matter_test_config.in_test_commissioning_method
-        asserts.assert_is_not_none(commissioning_method, "in_test_commissioning_method must not be None")
+        asserts.assert_is_not_none(self.matter_test_config.in_test_commissioning_method, "in_test_commissioning_method must not be None")
+        assert self.matter_test_config.in_test_commissioning_method is not None
+        commissioning_method: str = self.matter_test_config.in_test_commissioning_method
         asserts.assert_true(
-            str(commissioning_method).startswith("nfc-"),
+            commissioning_method.startswith("nfc-"),
             f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
         )
 
@@ -110,8 +115,22 @@ class TC_DD_3_24(MatterBaseTest):
                  getattr(self, "default_controller", None),
                  hex(id(self.default_controller)) if hasattr(self, "default_controller") else "N/A")
 
-        commissioning_success = await self.commission_devices()
-        asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
+        asserts.assert_count_equal(self.matter_test_config.dut_node_ids, 1, "Expected exactly one DUT node ID for this test")
+        dut_node_id: int = self.matter_test_config.dut_node_ids[0]
+
+        commissionee_node_id: int = 0
+        match commissioning_method[4:]:
+            case "wifi":
+                asserts.assert_is_not_none(self.matter_test_config.wifi_ssid, "wifi_ssid must not be None")
+                asserts.assert_is_not_none(self.matter_test_config.wifi_passphrase, "wifi_passphrase must not be None")
+                await self.default_controller.CommissionNfcWiFi(discriminator, setupCode, dut_node_id, self.get_wifi_ssid(), self.get_credentials())
+            case "thread":
+                asserts.assert_is_not_none(self.matter_test_config.thread_operational_dataset, "thread_operational_dataset must not be None")
+                assert self.matter_test_config.thread_operational_dataset is not None
+                await self.default_controller.CommissionNfcThread(discriminator, setupCode, dut_node_id, self.matter_test_config.thread_operational_dataset)
+            case "ethernet":
+                await self.default_controller.CommissionNfcEthernet(discriminator, setupCode, dut_node_id)
+        asserts.assert_not_equal(commissionee_node_id, 0, "Device Commissioning using nfc transport has failed")
         asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen!")
 
         self.step(3)
@@ -123,6 +142,11 @@ class TC_DD_3_24(MatterBaseTest):
         asserts.assert_not_equal(
             self.commissionee_node_id, 0,
             "commissionee_node_id was not set before calling ContinueCommissioningAfterConnectNetworkRequest"
+        )
+
+        asserts.assert_equal(
+            self.commissionee_node_id, commissionee_node_id,
+            "commissionee_node_id does not match the node ID returned by the commissioning method"
         )
 
         log.info("commissionee_node_id : 0x%X", self.commissionee_node_id)
