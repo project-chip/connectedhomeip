@@ -99,6 +99,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/channel/ChannelManager.cpp
     ${CHEF}/common/clusters/chime/chef-chime-delegate.cpp
     ${CHEF}/common/clusters/content-launch/chef-content-launch-delegate.cpp
+    ${CHEF}/common/clusters/device-energy-management-mode/chef-device-energy-management-mode.cpp
     ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp
