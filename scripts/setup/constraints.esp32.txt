@@ -1,3 +1,4 @@
-cryptography>=2.1.4
+# needed to parse the fancy Python versions, eg: "Python 3.11.3+chromium.29"
+cryptography==45.0.4
 pyelftools>=0.22
 pyserial>=3.3
