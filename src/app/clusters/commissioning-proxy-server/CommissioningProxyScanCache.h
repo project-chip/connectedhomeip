@@ -36,7 +36,21 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-class CommissioningProxyCluster;
+/**
+ * @brief Callbacks from CommissioningProxyScanCache to its owning cluster.
+ *
+ * Defined here (not in CommissioningProxyCluster.h) so CommissioningProxyScanCache.cpp
+ * can call back without including the full cluster header, which lives in a
+ * separate GN target compiled in the consumer's context.
+ */
+class ScanCacheObserver
+{
+public:
+    virtual ~ScanCacheObserver() = default;
+    virtual void MarkCachedResultsDirty()   = 0;
+    virtual uint16_t GetCacheTimeout() const  = 0;
+    virtual uint8_t GetMaxCachedResults() const = 0;
+};
 
 /**
  * @brief Transport-agnostic background-scan result cache.
@@ -58,7 +72,7 @@ class CommissioningProxyScanCache
 public:
     using ScanResultEntry = Structs::ScanResultStruct::Type;
 
-    explicit CommissioningProxyScanCache(CommissioningProxyCluster & cluster) : mCluster(cluster) {}
+    explicit CommissioningProxyScanCache(ScanCacheObserver & cluster) : mCluster(cluster) {}
     ~CommissioningProxyScanCache() = default;
 
     /**
@@ -112,7 +126,7 @@ private:
     void OnSweep();
     void ArmSweepIfNeeded();
 
-    CommissioningProxyCluster & mCluster;
+    ScanCacheObserver & mCluster;
     std::map<Key, Entry> mEntries;
     bool mSweepArmed = false;
 };

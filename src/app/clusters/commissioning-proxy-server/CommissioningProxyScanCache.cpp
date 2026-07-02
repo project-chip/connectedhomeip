@@ -17,7 +17,6 @@
  */
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyScanCache.h>
 
-#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
