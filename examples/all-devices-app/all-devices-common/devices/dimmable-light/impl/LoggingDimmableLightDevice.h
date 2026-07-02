@@ -17,50 +17,16 @@
 
 #pragma once
 
-#include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/level-control/LevelControlDelegate.h>
-#include <app/clusters/on-off-server/OnOffDelegate.h>
-#include <app/clusters/on-off-server/OnOffEffectDelegate.h>
-#include <devices/dimmable-light/DimmableLightDevice.h>
+#include <devices/capabilities/dimmable-load/impl/LoggingDimmableLoadDevice.h>
 
 namespace chip {
 namespace app {
 
-/**
- * @brief An implementation of a Dimmable Light Device.
- *
- * This class serves as a simple example of a dimmable light. It implements the OnOffDelegate,
- * LevelControlDelegate, and OnOffEffectDelegate interfaces and logs messages when actions occur.
- */
-class LoggingDimmableLightDevice : public DimmableLightDevice,
-                                   public Clusters::OnOffDelegate,
-                                   public Clusters::LevelControlDelegate,
-                                   public Clusters::OnOffEffectDelegate,
-                                   public Clusters::IdentifyDelegate
+class LoggingDimmableLightDevice : public LoggingDimmableLoadDevice
 {
 public:
-    LoggingDimmableLightDevice(const Context & context);
+    LoggingDimmableLightDevice(const Context & context, const Config & config = {});
     ~LoggingDimmableLightDevice() override = default;
-
-    // OnOffDelegate
-    void OnOffStartup(bool on) override;
-    void OnOnOffChanged(bool on) override;
-
-    // LevelControlDelegate
-    void OnLevelChanged(uint8_t level) override;
-    void OnOptionsChanged(BitMask<Clusters::LevelControl::OptionsBitmap> options) override;
-    void OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel) override;
-    void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate) override;
-
-    // OnOffEffectDelegate
-    DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum e) override;
-    DataModel::ActionReturnStatus TriggerDyingLight(Clusters::OnOff::DyingLightEffectVariantEnum e) override;
-
-    // IdentifyDelegate
-    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
-    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
-    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
-    bool IsTriggerEffectEnabled() const override;
 };
 
 } // namespace app

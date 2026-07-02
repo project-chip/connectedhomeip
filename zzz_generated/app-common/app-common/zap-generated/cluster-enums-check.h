@@ -32,6 +32,7 @@
 #include <clusters/AmbientSensingUnion/EnumsCheck.h>
 #include <clusters/ApplicationBasic/EnumsCheck.h>
 #include <clusters/ApplicationLauncher/EnumsCheck.h>
+#include <clusters/AudioControl/EnumsCheck.h>
 #include <clusters/AudioOutput/EnumsCheck.h>
 #include <clusters/AvAnalysis/EnumsCheck.h>
 #include <clusters/BallastConfiguration/EnumsCheck.h>
@@ -50,6 +51,7 @@
 #include <clusters/ClosureDimension/EnumsCheck.h>
 #include <clusters/ColorControl/EnumsCheck.h>
 #include <clusters/CommissionerControl/EnumsCheck.h>
+#include <clusters/CommissioningProxy/EnumsCheck.h>
 #include <clusters/CommodityMetering/EnumsCheck.h>
 #include <clusters/CommodityPrice/EnumsCheck.h>
 #include <clusters/CommodityTariff/EnumsCheck.h>

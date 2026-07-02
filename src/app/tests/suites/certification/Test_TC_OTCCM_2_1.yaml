@@ -14,6 +14,16 @@
 
 name: 3.3 [TC-OTCCM-2.1] Change to Mode functionality with DUT as Server
 
+CI:
+    - name: "Test against all-devices/oven"
+      app: all-devices
+      args:
+          - --device
+          - oven
+      test_args:
+          - --endpoint
+          - "2"
+
 PICS:
     - OTCCM.S
 

@@ -30,6 +30,8 @@
 #include <clusters/ApplicationBasic/MetadataProvider.h>
 #include <clusters/ApplicationLauncher/Ids.h>
 #include <clusters/ApplicationLauncher/MetadataProvider.h>
+#include <clusters/AudioControl/Ids.h>
+#include <clusters/AudioControl/MetadataProvider.h>
 #include <clusters/AudioOutput/Ids.h>
 #include <clusters/AudioOutput/MetadataProvider.h>
 #include <clusters/AvAnalysis/Ids.h>
@@ -66,6 +68,8 @@
 #include <clusters/ColorControl/MetadataProvider.h>
 #include <clusters/CommissionerControl/Ids.h>
 #include <clusters/CommissionerControl/MetadataProvider.h>
+#include <clusters/CommissioningProxy/Ids.h>
+#include <clusters/CommissioningProxy/MetadataProvider.h>
 #include <clusters/CommodityMetering/Ids.h>
 #include <clusters/CommodityMetering/MetadataProvider.h>
 #include <clusters/CommodityPrice/Ids.h>
@@ -383,6 +387,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
         if (id == ApplicationLauncher::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ApplicationLauncher::Id>::EntryFor(command);
     }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioControl::Id) || ...))
+    {
+        if (id == AudioControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioControl::Id>::EntryFor(command);
+    }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioOutput::Id) || ...))
     {
         if (id == AudioOutput::Id)
@@ -475,6 +484,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == CommissionerControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissionerControl::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommissioningProxy::Id) || ...))
+    {
+        if (id == CommissioningProxy::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, CommissioningProxy::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == CommodityMetering::Id) || ...))
     {

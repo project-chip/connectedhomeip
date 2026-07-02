@@ -19,10 +19,9 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/proximity-ranging-server/ProximityRangingCluster.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <devices/proximity-ranger/DefaultProximityRangingDriver.h>
-#include <devices/proximity-ranger/RangingAdapter.h>
-#include <lib/support/BitMask.h>
 #include <lib/support/TimerDelegate.h>
+
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -30,33 +29,56 @@ namespace app {
 class ProximityRangerDevice : public SingleEndpointDevice
 {
 public:
-    ProximityRangerDevice(TimerDelegate & timerDelegate, Span<Clusters::ProximityRanging::RangingAdapter * const> adapters);
+    /**
+     * Generic Proximity Ranger device. The caller injects the set of
+     * RangingAdapter instances the cluster should expose; the device does not
+     * own the adapters but takes a copy of the pointer list so callers do not
+     * need to keep their own backing array alive.
+     *
+     * Each adapter pointer MUST be non-null and the underlying adapter MUST
+     * outlive this device. Construction VerifyOrDies if any pointer is null.
+     *
+     * The cluster's feature map is derived from the technologies of the
+     * supplied adapters, so the caller does not pass a feature mask in.
+     */
+    ProximityRangerDevice(TimerDelegate & timerDelegate, std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters);
     ~ProximityRangerDevice() override = default;
+
+    // Non-copyable / non-movable: copying or moving this device would invalidate the
+    // adapter pointers that subclasses (e.g. LoggingProximityRangerDevice) take to their
+    // own member adapters and pass into the base.
+    ProximityRangerDevice(const ProximityRangerDevice &)             = delete;
+    ProximityRangerDevice & operator=(const ProximityRangerDevice &) = delete;
+    ProximityRangerDevice(ProximityRangerDevice &&)                  = delete;
+    ProximityRangerDevice & operator=(ProximityRangerDevice &&)      = delete;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // Public getters for programmatic control
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::ProximityRanging::ProximityRangingCluster & ProximityRangingCluster() { return mProximityRangingCluster.Cluster(); }
+
 private:
-    Clusters::ProximityRanging::DefaultProximityRangingDriver mRangingDriver;
+    /// Derive the cluster's feature map from the supplied adapters.
+    ///
+    /// Cannot be cached as a member computed in the constructor: a derived
+    /// class (e.g. LoggingProximityRangerDevice) typically owns the adapter
+    /// objects as its own members, and base-class member init runs before
+    /// those subclass members are constructed. Calling adapter->GetTechnology()
+    /// at that point is a virtual call on a not-yet-constructed object —
+    /// undefined behavior. Register() runs after construction completes, so
+    /// it's safe to derive there.
+    BitMask<Clusters::ProximityRanging::Feature> DeriveFeatures() const;
+
     TimerDelegate & mTimerDelegate;
-    Span<Clusters::ProximityRanging::RangingAdapter * const> mAdapters; // Backing array must outlive this device
+    const std::vector<Clusters::ProximityRanging::RangingAdapter *> mAdapters;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ProximityRanging::ProximityRangingCluster> mProximityRangingCluster;
 
     bool mRegistered = false;
-
-    // Ref-counts ProximityRangerDevice instances that have completed Register so the
-    // shared adapters remain registered with the singleton RangingTechnologyController
-    // as long as at least one device is registered. Adapters are unregistered only
-    // when the last ProximityRangerDevice is unregistered.
-    //
-    // ASSUMES every ProximityRangerDevice instance is constructed with the same adapter
-    // set. A heterogeneous configuration (e.g. one device with BLE+UWB, another with
-    // BLE only) could leak adapters from the larger span if the last device of that
-    // flavor unregisters while a smaller-span device is still active.
-    static size_t sActiveCount;
 };
 
 } // namespace app

@@ -14,7 +14,7 @@
 
 import enum
 from dataclasses import dataclass, field
-from typing import Optional, Union
+from typing import Optional
 
 from lark.tree import Meta
 
@@ -154,7 +154,7 @@ class Attribute:
     qualities: AttributeQuality = AttributeQuality.NONE
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
-    default: Optional[Union[str, int]] = None
+    default: Optional[str | int] = None
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
@@ -307,7 +307,7 @@ class Cluster:
 class AttributeInstantiation:
     name: str
     storage: AttributeStorage
-    default: Optional[Union[str, int, bool]] = None
+    default: Optional[str | int | bool] = None
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)

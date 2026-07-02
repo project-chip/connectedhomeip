@@ -75,7 +75,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -152,7 +152,7 @@ class TC_ACE_1_6(MatterBaseTest):
             TestStep(32, "TH sends GroupcastTesting command with TestOperation DisableTesting"),
 
             # --- 4. Shared Cleanup (Steps 33 - 36) ---
-            TestStep(33, "TH resets GroupKeyMap attribute list on GroupKeyManagement cluster with empty list"),
+            TestStep(33, "TH verifies it has not received any GroupKeyMap attribute change notifications (if ClusterRevision is >= 4) and then resets GroupKeyMap attribute list on GroupKeyManagement cluster with empty list"),
             TestStep(34, "TH resets key set 0x01a3 by sending KeySetRemove command"),
             TestStep(35, "TH resets key set 0x01a1 by sending KeySetRemove command"),
             TestStep(36, "TH writes wildcard ACL attribute in Access Control cluster to restore full admin access"),
@@ -310,6 +310,58 @@ class TC_ACE_1_6(MatterBaseTest):
             self.default_controller.SetGroupInfo(groupID2, "Group 2", INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL)
             self.default_controller.SetGroupInfo(groupID3, "Group 3", INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL)
 
+        # Read the GroupKeyManagement cluster's ClusterRevision attribute before opening the subscription.
+        group_key_management_revision = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=Clusters.GroupKeyManagement,
+            attribute=Clusters.GroupKeyManagement.Attributes.ClusterRevision
+        )
+
+        # Establish a unified subscription (1 wildcard attribute path, 1 wildcard event path) to satisfy the GroupKeyMap reporting check and all event checks.
+        group_key_map_sub = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.GroupKeyManagement,
+            expected_attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap
+        )
+
+        groupcast_event_handler = EventSubscriptionHandler(
+            expected_cluster=Clusters.Groupcast,
+            expected_event_id=Clusters.Groupcast.Events.GroupcastTesting.event_id
+        )
+
+        access_control_event_handler = EventSubscriptionHandler(
+            expected_cluster=Clusters.AccessControl,
+            expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id
+        )
+
+        # The EventMultiplexer is used to direct events to the correct handler
+        # because we are using a single unified subscription.
+        class EventMultiplexer:
+            def __init__(self, handlers):
+                self.handlers = handlers
+
+            def __call__(self, event_result, transaction):
+                for handler in self.handlers:
+                    handler(event_result, transaction)
+
+        event_multiplexer = EventMultiplexer([groupcast_event_handler, access_control_event_handler])
+
+        unified_sub = await self.default_controller.Read(
+            nodeId=self.dut_node_id,
+            attributes=[(0, Clusters.GroupKeyManagement)],
+            events=[0],
+            reportInterval=(0, 30),
+            keepSubscriptions=True,
+            autoResubscribe=False
+        )
+
+        unified_sub.SetAttributeUpdateCallback(group_key_map_sub)
+        unified_sub.SetEventUpdateCallback(event_multiplexer)
+
+        # Flush initial reports to start with clean state
+        group_key_map_sub.reset()
+        groupcast_event_handler.reset()
+        access_control_event_handler.reset()
+
         # --- Path Branching ---
         if not gc_on_root:
             # --- Legacy Groups Path (Steps 2 to 14) ---
@@ -449,9 +501,9 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 17: Subscribe to Groupcast cluster's GroupcastTesting event
             self.step(17)
-            event_sub = EventSubscriptionHandler(expected_cluster=Clusters.Groupcast,
-                                                 expected_event_id=Clusters.Groupcast.Events.GroupcastTesting.event_id)
-            await event_sub.start(self.default_controller, self.dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
+            # Keeping the step number for test plan alignment. The actual subscription
+            # was opened up front; we just reset the queue here to clear any early events.
+            groupcast_event_handler.reset()
 
             # Step 18: Enable GroupcastTesting
             self.step(18)
@@ -467,7 +519,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20a: Verify GroupcastTesting event (AccessAllowed: true)
             self.step("20a")
-            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -497,7 +549,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20d: Check for event (kNoAvailableKey)
             self.step("20d")
-            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect destination IP address in event")
@@ -529,7 +581,7 @@ class TC_ACE_1_6(MatterBaseTest):
             # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases
             # (i.e. when testing over multiple networks). This safely filters through potential duplicate events from the
             # previous steps.
-            event_data = event_sub.wait_for_event_report_with_duplication(
+            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
                 current_event_filter_func=current_event_filter,
                 previous_event_filter_func=previous_event_filter,
@@ -549,7 +601,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 22: Verify event (AccessAllowed: false)
             self.step(22)
-            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -568,7 +620,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 25: Verify event (AccessAllowed: true)
             self.step(25)
-            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID2, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -592,7 +644,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 28: Verify event (AccessAllowed: false)
             self.step(28)
-            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_false(event_data.accessAllowed, "AccessAllowed should be false")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -610,7 +662,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 31a: Verify event (AccessAllowed: true)
             self.step("31a")
-            event_data = event_sub.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
+            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
             asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
@@ -619,9 +671,9 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 31b: Subscribe to AuxiliaryAccessUpdated events
             self.step("31b")
-            ac_event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl,
-                                                    expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
-            await ac_event_sub.start(self.default_controller, self.dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
+            # Keeping the step number for test plan alignment. The actual subscription
+            # was opened up front; we just reset the queue here to clear any early events.
+            access_control_event_handler.reset()
 
             # Step 31c: Read CurrentFabricIndex
             self.step("31c")
@@ -633,7 +685,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 31e: Verify AuxiliaryAccessUpdated event
             self.step("31e")
-            event_data = ac_event_sub.wait_for_event_report(Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=30)
+            event_data = access_control_event_handler.wait_for_event_report(
+                Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=30)
             asserts.assert_equal(event_data.fabricIndex, fabric_index, "Incorrect fabric index in event")
             asserts.assert_equal(event_data.adminNodeID, th1_nodeid, "Incorrect adminNodeID in event")
 
@@ -645,8 +698,16 @@ class TC_ACE_1_6(MatterBaseTest):
 
         # --- Shared Cleanup (Steps 33 to 36) ---
 
-        # Step 33: Reset GroupKeyMap attribute list
+        # Step 33: Reset GroupKeyMap attribute list and verify no GroupKeyMap received notifications
         self.step(33)
+
+        # If ClusterRevision is >= 4, verify that there have been NO attribute change notifications for GroupKeyMap across the entire test run.
+        if group_key_management_revision >= 4:
+            group_key_map_reports = group_key_map_sub.attribute_report_counts.get(
+                Clusters.GroupKeyManagement.Attributes.GroupKeyMap, 0)
+            asserts.assert_equal(group_key_map_reports, 0,
+                                 f"Expected 0 GroupKeyMap change notifications, but received {group_key_map_reports}")
+
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
 
         # Step 34: Reset key set 0x01a3
@@ -666,6 +727,9 @@ class TC_ACE_1_6(MatterBaseTest):
             subjects=[th1_nodeid],
             targets=NullValue)
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin_full]))])
+
+        # Shut down the unified subscription
+        unified_sub.Shutdown()
 
 
 if __name__ == "__main__":
