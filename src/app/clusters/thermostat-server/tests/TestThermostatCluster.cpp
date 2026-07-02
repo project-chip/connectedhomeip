@@ -34,6 +34,8 @@
 #include <lib/support/CodeUtils.h>
 #include <pw_unit_test/framework.h>
 
+#include <functional>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -44,52 +46,6 @@ using Protocols::InteractionModel::Status;
 
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
-
-// The cluster sources call the free Thermostat::GetDelegate(endpoint) (normally defined in
-// CodegenIntegration.cpp, which is excluded from this test target to avoid the app-specific
-// StaticApplicationConfig dependency). The scalar / SetpointRaiseLower paths exercised here never use a
-// delegate, so a null-returning stub is sufficient to satisfy linking.
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
-Delegate * GetDelegate(EndpointId)
-{
-    return nullptr;
-}
-} // namespace Thermostat
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-// --- Temporary link shims for the Ember-coupled retained-helper Read path ---
-// The retained ThermostatAttrAccess::Read still references the Ember Attributes::FeatureMap/RemoteSensing
-// GetDefault accessors (in branches the code-driven ReadAttribute never actually reaches), whose real
-// implementations require a full Ember app image. They are not exercised by the tests below, so dummy
-// implementations are sufficient to link. PR 3b-3 removes the retained helper, after which these shims can
-// be deleted.
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
-namespace Attributes {
-namespace FeatureMap {
-Protocols::InteractionModel::Status GetDefault(EndpointId, uint32_t *)
-{
-    return Protocols::InteractionModel::Status::Failure;
-}
-} // namespace FeatureMap
-namespace RemoteSensing {
-Protocols::InteractionModel::Status GetDefault(EndpointId, BitMask<RemoteSensingBitmap> *)
-{
-    return Protocols::InteractionModel::Status::Failure;
-}
-} // namespace RemoteSensing
-} // namespace Attributes
-} // namespace Thermostat
-} // namespace Clusters
-} // namespace app
-} // namespace chip
 
 namespace {
 
@@ -104,11 +60,6 @@ constexpr uint32_t kFeatPres = static_cast<uint32_t>(Feature::kPresets);
 
 constexpr uint32_t kHeatCool     = kFeatHeat | kFeatCool;
 constexpr uint32_t kHeatCoolAuto = kFeatHeat | kFeatCool | kFeatAuto;
-
-ThermostatCluster::StartupConfiguration DefaultConfig()
-{
-    return ThermostatCluster::StartupConfiguration{};
-}
 
 BitFlags<Thermostat::OptionalAttributesBits> AllAttributes()
 {
@@ -125,20 +76,39 @@ public:
 // Small holder so each test can spin up an independent cluster with a chosen feature map / config.
 struct ClusterFixture
 {
-    // Declared before `cluster` so it is constructed first (the cluster's Context holds a reference to it)
+    // Optional hook to tweak the Config (e.g. override a setpoint limit) before the cluster is built.
+    using ConfigCustomizer = std::function<void(ThermostatCluster::Config &)>;
+
+    // Declared before `cluster` so it is constructed first (the cluster's Config holds a reference to it)
     // and destroyed last. AddFabricDelegate/RemoveFabricDelegate are simple list operations that do not
     // require FabricTable::Init(), so a default-constructed table is sufficient for these tests.
     chip::FabricTable fabricTable;
     ThermostatCluster cluster;
     ClusterTester tester{ cluster };
 
-    ClusterFixture(uint32_t featureMap, const ThermostatCluster::StartupConfiguration & config = DefaultConfig(), const BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes = AllAttributes()) :
-        cluster(kEndpointId, featureMap, config, ThermostatCluster::Context{ fabricTable }, optionalAttributes)
+    ClusterFixture(uint32_t featureMap,
+                   const BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes = AllAttributes(),
+                   const ConfigCustomizer & customize = {}) :
+        cluster(MakeConfig(fabricTable, featureMap, optionalAttributes, customize))
     {
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
     ~ClusterFixture() { cluster.Shutdown(app::ClusterShutdownType::kClusterShutdown); }
+
+private:
+    static ThermostatCluster::Config MakeConfig(chip::FabricTable & fabricTable, uint32_t featureMap,
+                                                const BitFlags<Thermostat::OptionalAttributesBits> & optionalAttributes,
+                                                const ConfigCustomizer & customize)
+    {
+        ThermostatCluster::Config config(kEndpointId, fabricTable);
+        config.WithFeatures(BitFlags<Thermostat::Feature>(featureMap)).WithOptionalAttributes(optionalAttributes);
+        if (customize)
+        {
+            customize(config);
+        }
+        return config;
+    }
 };
 
 TEST_F(TestThermostatCluster, ReadsClusterRevisionAndFeatureMap)
@@ -297,10 +267,8 @@ TEST_F(TestThermostatCluster, AutoModeShiftsPairedSetpointToMaintainDeadband)
 TEST_F(TestThermostatCluster, AutoModeRejectsSetpointWhenDeadbandInfeasible)
 {
     // Constrain the cooling ceiling so the deadband cannot be preserved.
-    ThermostatCluster::StartupConfiguration config = DefaultConfig();
-    config.absMaxCoolSetpointLimit                 = 2500;
-
-    ClusterFixture fixture(kHeatCoolAuto, config);
+    ClusterFixture fixture(kHeatCoolAuto, AllAttributes(),
+                           [](ThermostatCluster::Config & config) { config.mAbsMaxCoolSetpointLimit = 2500; });
 
     fixture.cluster.SetMaxCoolSetpointLimit(2500);
     fixture.cluster.SetOccupiedCoolingSetpoint(2400);

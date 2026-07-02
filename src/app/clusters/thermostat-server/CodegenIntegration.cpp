@@ -100,8 +100,6 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ThermostatCluster::StartupConfiguration config{};
-
         // Optional Attributes
         BitFlags<OptionalAttributesBits> optionalAttributes;
         for (const auto & mapping : kOptionalAttributeMap)
@@ -112,34 +110,34 @@ public:
             }
         }
 
+        ThermostatCluster::Config config(endpointId, Server::GetInstance().GetFabricTable());
+        config.WithFeatures(BitFlags<Thermostat::Feature>(featureMap)).WithOptionalAttributes(optionalAttributes);
 
         // Seed the setpoint family and mode attributes from the Ember/ZAP defaults.
-        SeedFromDefault(AbsMinHeatSetpointLimit::GetDefault, endpointId, config.absMinHeatSetpointLimit);
-        SeedFromDefault(AbsMaxHeatSetpointLimit::GetDefault, endpointId, config.absMaxHeatSetpointLimit);
-        SeedFromDefault(AbsMinCoolSetpointLimit::GetDefault, endpointId, config.absMinCoolSetpointLimit);
-        SeedFromDefault(AbsMaxCoolSetpointLimit::GetDefault, endpointId, config.absMaxCoolSetpointLimit);
+        SeedFromDefault(AbsMinHeatSetpointLimit::GetDefault, endpointId, config.mAbsMinHeatSetpointLimit);
+        SeedFromDefault(AbsMaxHeatSetpointLimit::GetDefault, endpointId, config.mAbsMaxHeatSetpointLimit);
+        SeedFromDefault(AbsMinCoolSetpointLimit::GetDefault, endpointId, config.mAbsMinCoolSetpointLimit);
+        SeedFromDefault(AbsMaxCoolSetpointLimit::GetDefault, endpointId, config.mAbsMaxCoolSetpointLimit);
 
-        uint8_t numberOfSchedules = config.numberOfSchedules;
+        uint8_t numberOfSchedules = config.mNumberOfSchedules;
         if (NumberOfSchedules::GetDefault(endpointId, &numberOfSchedules) == Status::Success)
         {
-            config.numberOfSchedules = numberOfSchedules;
+            config.mNumberOfSchedules = numberOfSchedules;
         }
 
-        uint8_t numberOfScheduleTransitions = config.numberOfScheduleTransitions;
+        uint8_t numberOfScheduleTransitions = config.mNumberOfScheduleTransitions;
         if (NumberOfScheduleTransitions::GetDefault(endpointId, &numberOfScheduleTransitions) == Status::Success)
         {
-            config.numberOfScheduleTransitions = numberOfScheduleTransitions;
+            config.mNumberOfScheduleTransitions = numberOfScheduleTransitions;
         }
 
-        DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay = config.numberOfScheduleTransitionPerDay;
+        DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay = config.mNumberOfScheduleTransitionPerDay;
         if (NumberOfScheduleTransitionPerDay::GetDefault(endpointId, numberOfScheduleTransitionPerDay) == Status::Success)
         {
-            config.numberOfScheduleTransitionPerDay = numberOfScheduleTransitionPerDay;
+            config.mNumberOfScheduleTransitionPerDay = numberOfScheduleTransitionPerDay;
         }
 
-        ThermostatCluster::Context clusterContext{ Server::GetInstance().GetFabricTable() };
-
-        gServers[clusterInstanceIndex].Create(endpointId, featureMap, config, clusterContext, optionalAttributes);
+        gServers[clusterInstanceIndex].Create(config);
         gServers[clusterInstanceIndex].Cluster().SetDelegate(gDelegateTable[clusterInstanceIndex]);
         return gServers[clusterInstanceIndex].Registration();
     }

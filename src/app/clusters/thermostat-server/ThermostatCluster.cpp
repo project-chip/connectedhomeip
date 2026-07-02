@@ -89,18 +89,17 @@ int16_t ThermostatCluster::EnforceCoolingSetpointLimits(int16_t coolingSetpoint)
 }
 
 
-ThermostatCluster::ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config,
-                                     const Context & context, BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes) :
-    DefaultServerCluster({ endpointId, Thermostat::Id }),
-    mContext(context), mFeatures(featureMap), mOptionalAttributes(optionalAttributes)
+ThermostatCluster::ThermostatCluster(const Config & config) :
+    DefaultServerCluster({ config.mEndpointId, Thermostat::Id }),
+    mFabricTable(config.mFabricTable), mFeatures(config.mFeatureMap), mOptionalAttributes(config.mOptionalAttributes)
 {
-    mAbsMinHeatSetpointLimit    = config.absMinHeatSetpointLimit;
-    mAbsMaxHeatSetpointLimit    = config.absMaxHeatSetpointLimit;
-    mAbsMinCoolSetpointLimit    = config.absMinCoolSetpointLimit;
-    mAbsMaxCoolSetpointLimit    = config.absMaxCoolSetpointLimit;
-    mNumberOfSchedules           = config.numberOfSchedules;
-    mNumberOfScheduleTransitions = config.numberOfScheduleTransitions;
-    mNumberOfScheduleTransitionPerDay = config.numberOfScheduleTransitionPerDay;
+    mAbsMinHeatSetpointLimit          = config.mAbsMinHeatSetpointLimit;
+    mAbsMaxHeatSetpointLimit          = config.mAbsMaxHeatSetpointLimit;
+    mAbsMinCoolSetpointLimit          = config.mAbsMinCoolSetpointLimit;
+    mAbsMaxCoolSetpointLimit          = config.mAbsMaxCoolSetpointLimit;
+    mNumberOfSchedules                = config.mNumberOfSchedules;
+    mNumberOfScheduleTransitions      = config.mNumberOfScheduleTransitions;
+    mNumberOfScheduleTransitionPerDay = config.mNumberOfScheduleTransitionPerDay;
 }
 
 CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
@@ -108,7 +107,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     // Register as a fabric delegate so open atomic writes can be rolled back when their fabric is removed.
-    CHIP_ERROR err = mContext.fabricTable.AddFabricDelegate(this);
+    CHIP_ERROR err = mFabricTable.AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Thermostat: failed to register fabric delegate: %" CHIP_ERROR_FORMAT, err.Format());
@@ -163,7 +162,7 @@ void ThermostatCluster::LoadPersistentAttributes()
     uint8_t tempRemoteSensing;
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, RemoteSensing::Id },
                                           tempRemoteSensing, defaultRemoteSensing);
-    mRemoteSensing.Set(static_cast<RemoteSensingBitmap>(tempRemoteSensing));
+    mRemoteSensing.SetRaw(tempRemoteSensing);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id },
                                           mControlSequenceOfOperation, defaultControlSequenceOfOperation);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SystemMode::Id },
@@ -214,7 +213,7 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     {
         ResetAtomicWrite(GetEndpointId());
     }
-    mContext.fabricTable.RemoveFabricDelegate(this);
+    mFabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(type);
 }
 

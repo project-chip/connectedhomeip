@@ -98,24 +98,54 @@ public:
     static constexpr uint8_t kMinSetpointDeadbancDefault = 20; // 2C is the default
     static constexpr uint8_t kEmergencyHeatDeltaDefault = 255; // 25.5C is the default
 
-    /// External dependencies injected at construction.
-    struct Context
+    /// Aggregates every construction-time parameter for the cluster.
+    struct Config
     {
-        chip::FabricTable & fabricTable;
+        Config(EndpointId endpointId, chip::FabricTable & fabricTable) :
+            mEndpointId(endpointId), mFabricTable(fabricTable)
+        {}
+
+        Config & WithFeatures(BitFlags<Thermostat::Feature> features)
+        {
+            mFeatureMap = features;
+            return *this;
+        }
+        Config & WithOptionalAttributes(BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes)
+        {
+            mOptionalAttributes = optionalAttributes;
+            return *this;
+        }
+        Config & WithSetpointLimits(int16_t absMinHeat, int16_t absMaxHeat, int16_t absMinCool, int16_t absMaxCool)
+        {
+            mAbsMinHeatSetpointLimit = absMinHeat;
+            mAbsMaxHeatSetpointLimit = absMaxHeat;
+            mAbsMinCoolSetpointLimit = absMinCool;
+            mAbsMaxCoolSetpointLimit = absMaxCool;
+            return *this;
+        }
+        Config & WithSchedules(uint8_t numberOfSchedules, uint8_t numberOfScheduleTransitions,
+                               DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay)
+        {
+            mNumberOfSchedules                = numberOfSchedules;
+            mNumberOfScheduleTransitions      = numberOfScheduleTransitions;
+            mNumberOfScheduleTransitionPerDay = numberOfScheduleTransitionPerDay;
+            return *this;
+        }
+
+        EndpointId mEndpointId;
+        chip::FabricTable & mFabricTable;
+        BitFlags<Thermostat::Feature> mFeatureMap;
+        BitFlags<Thermostat::OptionalAttributesBits> mOptionalAttributes;
+        int16_t mAbsMinHeatSetpointLimit = kAbsMinHeatSetpointLimitDefault;
+        int16_t mAbsMaxHeatSetpointLimit = kAbsMaxHeatSetpointLimitDefault;
+        int16_t mAbsMinCoolSetpointLimit = kAbsMinCoolSetpointLimitDefault;
+        int16_t mAbsMaxCoolSetpointLimit = kAbsMaxCoolSetpointLimitDefault;
+        uint8_t mNumberOfSchedules              = 0;
+        uint8_t mNumberOfScheduleTransitions    = 0;
+        DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionPerDay;
     };
 
-    struct StartupConfiguration
-    {
-        int16_t absMinHeatSetpointLimit   = kAbsMinHeatSetpointLimitDefault; 
-        int16_t absMaxHeatSetpointLimit   = kAbsMaxHeatSetpointLimitDefault;
-        int16_t absMinCoolSetpointLimit   = kAbsMinCoolSetpointLimitDefault; 
-        int16_t absMaxCoolSetpointLimit   = kAbsMaxCoolSetpointLimitDefault;
-        uint8_t numberOfSchedules;
-        uint8_t numberOfScheduleTransitions;
-        DataModel::Nullable<uint8_t> numberOfScheduleTransitionPerDay;
-    };
-
-    ThermostatCluster(EndpointId endpointId, uint32_t featureMap, const StartupConfiguration & config, const Context & context, BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes);
+    explicit ThermostatCluster(const Config & config);
 
     void SetDelegate(Thermostat::Delegate * delegate) { mDelegate = delegate; }
     Thermostat::Delegate * GetDelegate() const { return mDelegate; }
@@ -384,7 +414,7 @@ private:
     void GenerateScalarChangeEvent(AttributeId attributeId);
     void LoadPersistentAttributes();
 
-    Context mContext;
+    chip::FabricTable & mFabricTable;
     Thermostat::Delegate * mDelegate = nullptr;
     const BitFlags<Thermostat::Feature> mFeatures;
     const BitFlags<Thermostat::OptionalAttributesBits> mOptionalAttributes;
