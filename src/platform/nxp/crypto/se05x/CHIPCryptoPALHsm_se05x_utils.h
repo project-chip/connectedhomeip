@@ -117,11 +117,11 @@ void se05x_delete_key(uint32_t keyid);
  * @param[in] key - Buffer with AES / EC key key.
  * @param[in] keylen - Key length.
  * @param[in] keyPart - Type of key.
- * @param[in] cipherType - kSE_SSS_CipherType_EC_NIST_P for ecc and kSE_SSS_CipherType_HMAC for AES key.
+ * @param[in] cipherType - kSSS_CipherType_EC_NIST_P for ecc and kSSS_CipherType_HMAC for AES key.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart,
-                                   se_sss_cipher_type_t cipherType);
+                                   sss_cipher_type_t cipherType);
 /**
  * @brief Get certificate in se05x.
  * The certificate is stored with transient option. The contents are lost on session close.

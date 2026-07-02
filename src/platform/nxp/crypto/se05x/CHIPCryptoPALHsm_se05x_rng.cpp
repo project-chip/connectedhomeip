@@ -38,7 +38,7 @@ namespace Crypto {
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
     sss_status_t status;
-    se_sss_rng_context_t ctx_rng = { 0 };
+    sss_rng_context_t ctx_rng = { 0 };
 
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -47,13 +47,13 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    status = se_sss_rng_context_init(&ctx_rng, &gex_sss_chip_ctx.session /* Session */);
+    status = sss_rng_context_init(&ctx_rng, &gex_sss_chip_ctx.session /* Session */);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = se_sss_rng_get_random(&ctx_rng, out_buffer, out_length);
+    status = sss_rng_get_random(&ctx_rng, out_buffer, out_length);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    se_sss_rng_context_free(&ctx_rng);
+    sss_rng_context_free(&ctx_rng);
 
     return CHIP_NO_ERROR;
 }
