@@ -17,77 +17,50 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyTransport.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <clusters/CommissioningProxy/Enums.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-class CommissioningProxyCluster;
+// Wi-Fi PAF transport driver for the Linux commissioning-proxy example. Only
+// compiled when CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF is on (the .cpp is gated at GN
+// level by chip_device_config_enable_wifipaf). Implements
+// CommissioningProxyTransport; the cluster owns all transport-agnostic
+// session/scan/message bookkeeping and this driver reports results back through
+// its host cluster's subsystem accessors.
+//
+// A single instance exists per device; the underlying WiFiPAFLayer callbacks are
+// C-style singletons, so the driver's state is process-wide.
+class CommissioningProxyPafTransport : public CommissioningProxyTransport
+{
+public:
+    CapabilitiesBitmap GetTransportType() const override { return CapabilitiesBitmap::kWiFiPAF; }
+    void SetHost(CommissioningProxyCluster * host) override;
 
-// WiFi-PAF transport for the Linux commissioning-proxy example.  Only compiled
-// when CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF is on (the .cpp is gated at GN level by
-// chip_device_config_enable_wifipaf).  Each function mirrors a method on the
-// commissioning-proxy delegate; the dispatcher (CommissioningProxyCommandDelegate.cpp)
-// calls these after applying transport-agnostic checks.
-namespace Paf {
+    Protocols::InteractionModel::Status Connect(app::CommandHandler * commandObj, const DataModel::InvokeRequest & request,
+                                                uint16_t discriminator, uint16_t timeout) override;
+    Protocols::InteractionModel::Status CancelPendingConnect(FabricIndex fabricIndex) override;
+    Protocols::InteractionModel::Status Disconnect(uint16_t sessionId) override;
+    CHIP_ERROR SendMessage(uint16_t sessionId, System::PacketBufferHandle && buf) override;
+    Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime) override;
+    Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands, FabricIndex fabricIndex,
+                                                    NodeId nodeId) override;
+    Protocols::InteractionModel::Status BgScanStop(BitMask<CapabilitiesBitmap> transport, BitMask<WiFiBandBitmap> wiFiBands,
+                                                   FabricIndex fabricIndex, NodeId nodeId) override;
+    void OnAllSessionsClosed() override;
+    bool IsConnectPending() const override;
+    void Shutdown() override;
+};
 
-// ProxyConnectRequest path for WiFi-PAF.
-chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::DataModel::InvokeRequest & request, uint16_t discriminator,
-                                                  uint16_t timeout, CommissioningProxyCluster * cluster);
-
-// Cancel an in-flight PAF connect started by Paf::Connect.  Sends Failure on
-// the original IM exchange.  Returns InvalidInState if nothing is pending.
-chip::Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex fabricIndex);
-
-// Disconnect a PAF proxy session and tear down the PAF endpoint.
-chip::Protocols::InteractionModel::Status Disconnect(uint16_t sessionId);
-
-// Forward a Matter packet over PAF.  Returns CHIP_NO_ERROR on success; the
-// commissionee reply arrives asynchronously via the receive callback and is
-// routed back through the dispatcher.
-CHIP_ERROR SendMessage(uint16_t sessionId, chip::System::PacketBufferHandle && buf);
-
-// Foreground ProxyScanRequest path for WiFi-PAF.  Starts an async NAN scan and,
-// when it completes, reports its results to the dispatcher's aggregator via
-// ProxyDispatcher::ContributeScanResults (the dispatcher owns the command
-// handle and sends the combined ProxyScanResponse).  Returns Success once the
-// scan is under way, or an error status if it could not be started.
-chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime);
-
-// ProxyBackgroundScanStartRequest path for WiFi-PAF.
-chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transport, uint16_t timeout, WiFiBandBitmap wiFiBands,
-                                                      chip::FabricIndex fabricIndex, chip::NodeId nodeId,
-                                                      CommissioningProxyCluster * cluster);
-
-// ProxyBackgroundScanStopRequest path for WiFi-PAF.
-chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands,
-                                                     chip::FabricIndex fabricIndex, chip::NodeId nodeId);
-
-// Notify the PAF transport that the *generic* sProxySessions emptied so it
-// can resume any bg-scan it paused for the connect.
-void OnAllSessionsClosed();
-
-// True while a PAF connect is in flight (sent ProxyConnectRequest, waiting on
-// success / error / timeout).  Used by the dispatcher's GetActiveSessionCount
-// to combine pending connects across transports against MaxSessions.
-bool IsConnectPending();
-
-// Cancel all outstanding PAF state (pending connect + per-fabric background-scan
-// lifetime timers) and stop the hardware scan.  Must be called before the cluster
-// is destroyed so no timer or cached cluster pointer outlives it.
-void Shutdown();
-
-} // namespace Paf
 } // namespace CommissioningProxy
 } // namespace Clusters
 } // namespace app

@@ -17,9 +17,6 @@
  */
 #include "CommissioningProxyPafTransport.h"
 
-#include "CommissioningProxyBgScanCache.h"
-#include "CommissioningProxyDispatcher.h"
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
@@ -40,6 +37,11 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 namespace Paf {
+
+// Defined below; called during the receive-delegate/timeout teardown paths, which
+// appear before the definition.
+void OnAllSessionsClosed();
+
 namespace {
 
 using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type;
@@ -66,6 +68,11 @@ struct PafConnectCtx
 // later callback for the same subscribe can detect it has already been handled
 // and avoid use-after-free.
 static PafConnectCtx * sPafPendingConnect = nullptr;
+
+// Host cluster (set via the transport's SetHost). All transport-agnostic
+// bookkeeping (sessions, message routing, scan cache/aggregation) is reached
+// through its subsystem accessors.
+static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sHost = nullptr;
 
 // True while a ProxyScanRequest is in progress; used to return Busy for concurrent requests.
 static bool sScanInProgress = false;
@@ -126,7 +133,8 @@ static void OnBgScanDiscovery(void * /*ctx*/, const chip::DeviceLayer::NanPeerIn
 {
     // Runs on the Matter event loop (wpa_supplicant NAN callbacks are dispatched
     // there), so the shared cache may be touched directly.
-    BgScanCache::Report(NanPeerToScanResult(peer), sBgScanCluster);
+    if (sBgScanCluster != nullptr)
+        sBgScanCluster->ScanCache().Report(NanPeerToScanResult(peer));
 }
 
 static void OnBgScanLifetimeExpiry(chip::System::Layer * /*layer*/, void * appState)
@@ -148,7 +156,8 @@ static void OnBgScanLifetimeExpiry(chip::System::Layer * /*layer*/, void * appSt
     {
         chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
         sBgScanPaused = false;
-        BgScanCache::ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF, sBgScanCluster);
+        if (sBgScanCluster != nullptr)
+            sBgScanCluster->ScanCache().ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
         sBgScanCluster = nullptr;
     }
 }
@@ -180,7 +189,8 @@ public:
         {
             if (sess.peer_id == RxInfo.peer_id)
             {
-                ProxyDispatcher::DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
+                if (sHost != nullptr)
+                    sHost->Sessions().DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
                 return CHIP_NO_ERROR;
             }
         }
@@ -225,7 +235,8 @@ public:
             ChipLogError(AppServer, "WiFiPAFCloseSession: PAF session for proxy session %u closed by peer — cleaning up", sid);
             // Resolve any in-flight ProxyMessageRequest so the commissioner gets a
             // timely error instead of waiting out its 30 s timeout.
-            ProxyDispatcher::DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
+            if (sHost != nullptr)
+                sHost->Sessions().DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
             sPafSessions.erase(sid);
             chip::WiFiPAF::WiFiPAFLayer & layer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
             (void) layer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccSessionId, pafSession);
@@ -237,7 +248,8 @@ public:
             {
                 (void) chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pafSession.id);
             }
-            ProxyDispatcher::RemoveSession(sid);
+            if (sHost != nullptr)
+                sHost->Sessions().RemoveSession(sid);
             // This path does not run through the dispatcher's OnAllSessionsClosed(),
             // so resume a bg-scan paused for the connect once the last session is
             // gone and no connect is mid-flight.
@@ -371,9 +383,9 @@ static void OnPafConnectSuccess(void * /*context*/)
         return;
     }
 
-    uint16_t sessionId      = ProxyDispatcher::AllocSessionId();
+    uint16_t sessionId      = ctx->cluster->Sessions().AllocSessionId();
     sPafSessions[sessionId] = *pPafInfo;
-    ProxyDispatcher::RegisterSession(sessionId, CapabilitiesBitmap::kWiFiPAF, ctx->fabricIndex);
+    ctx->cluster->Sessions().RegisterSession(sessionId, CapabilitiesBitmap::kWiFiPAF, ctx->fabricIndex);
 
     ChipLogProgress(AppServer, "ProxyConnectRequest: WiFiPAF connected, proxy session %u (disc %u peer_id %u)", sessionId,
                     ctx->discriminator, pPafInfo->peer_id);
@@ -436,21 +448,27 @@ static void OnPafScanDone(void * /*context*/, const std::vector<chip::DeviceLaye
         out.push_back(r);
     }
 
-    // Hand the results to the dispatcher's aggregator; it owns the command
+    // Hand the results to the cluster's scan aggregator; it owns the command
     // handle and emits the combined ProxyScanResponse once every transport's
     // sub-scan has reported.
-    ProxyDispatcher::ContributeScanResults(chip::Span<const ScanResultT>(out.data(), out.size()));
+    if (sHost != nullptr)
+        sHost->ScanAggregator().Contribute(chip::Span<const ScanResultT>(out.data(), out.size()));
 }
 
 } // namespace
 
 // ==================================================================
-// Public entry points (called by the dispatcher)
+// Internal entry points (invoked by the CommissioningProxyPafTransport methods).
 // ==================================================================
+
+void SetHost(CommissioningProxyCluster * host)
+{
+    sHost = host;
+}
 
 chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * commandObj,
                                                   const chip::app::DataModel::InvokeRequest & request, uint16_t discriminator,
-                                                  uint16_t timeout, CommissioningProxyCluster * cluster)
+                                                  uint16_t timeout)
 {
     // Per spec §10.5.7.1: if background scanning is active, pause it so that
     // the NAN subscribe slot can be reused for the PAF connect subscribe.
@@ -504,7 +522,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     ctx->path          = request.path;
     ctx->discriminator = discriminator;
     ctx->subscribeId   = 0;
-    ctx->cluster       = cluster;
+    ctx->cluster       = sHost;
     ctx->fabricIndex   = request.subjectDescriptor.fabricIndex;
     sPafPendingConnect = ctx;
     commandObj->FlushAcksRightAwayOnSlowCommand();
@@ -663,10 +681,13 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transport, uint16_t timeout, WiFiBandBitmap wiFiBands,
-                                                      chip::FabricIndex fabricIndex, chip::NodeId nodeId,
-                                                      CommissioningProxyCluster * cluster)
+chip::Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, chip::BitMask<WiFiBandBitmap> wiFiBandsMask,
+                                                      chip::FabricIndex fabricIndex, chip::NodeId nodeId)
 {
+    // This driver services the kWiFiPAF transport; the requested bands are recorded
+    // per-fabric so a later stop can match on them.
+    const CapabilitiesBitmap transport = CapabilitiesBitmap::kWiFiPAF;
+    const WiFiBandBitmap wiFiBands     = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
     FabricKey fabricKey{ fabricIndex, nodeId };
     bool wasEmpty      = sBgScanFabrics.empty();
     bool alreadyExists = (sBgScanFabrics.count(fabricKey) > 0);
@@ -685,7 +706,7 @@ chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transpo
 
     sBgScanFabrics[fabricKey] = FabricScanRecord{ transport, wiFiBands, nullptr };
     if (sBgScanCluster == nullptr)
-        sBgScanCluster = cluster;
+        sBgScanCluster = sHost;
 
     if (sPafPendingConnect != nullptr)
     {
@@ -739,8 +760,9 @@ chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap transpo
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands,
-                                                     chip::FabricIndex fabricIndex, chip::NodeId nodeId)
+chip::Protocols::InteractionModel::Status BgScanStop(chip::BitMask<CapabilitiesBitmap> transport,
+                                                     chip::BitMask<WiFiBandBitmap> wiFiBands, chip::FabricIndex fabricIndex,
+                                                     chip::NodeId nodeId)
 {
     FabricKey fabricKey{ fabricIndex, nodeId };
     auto it = sBgScanFabrics.find(fabricKey);
@@ -751,8 +773,8 @@ chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transpor
         return chip::Protocols::InteractionModel::Status::NotFound;
     }
 
-    uint8_t reqTransportBits = static_cast<uint8_t>(transport);
-    uint16_t reqBandBits     = static_cast<uint16_t>(wiFiBands);
+    uint8_t reqTransportBits = transport.Raw();
+    uint16_t reqBandBits     = wiFiBands.Raw();
     uint8_t fabTransportBits = static_cast<uint8_t>(it->second.transport);
     uint16_t fabBandBits     = static_cast<uint16_t>(it->second.wiFiBands);
 
@@ -818,7 +840,8 @@ chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transpor
         if (sBgScanFabrics.empty())
         {
             chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
-            BgScanCache::ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF, sBgScanCluster);
+            if (sBgScanCluster != nullptr)
+                sBgScanCluster->ScanCache().ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
             sBgScanCluster = nullptr;
             ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: last fabric stopped, hardware scan stopped");
         }
@@ -903,6 +926,71 @@ void Shutdown()
 }
 
 } // namespace Paf
+
+// ==================================================================
+// CommissioningProxyTransport implementation (thin adapter over the Paf:: singleton).
+// ==================================================================
+
+void CommissioningProxyPafTransport::SetHost(CommissioningProxyCluster * host)
+{
+    Paf::SetHost(host);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::Connect(app::CommandHandler * commandObj,
+                                                                            const DataModel::InvokeRequest & request,
+                                                                            uint16_t discriminator, uint16_t timeout)
+{
+    return Paf::Connect(commandObj, request, discriminator, timeout);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::CancelPendingConnect(FabricIndex fabricIndex)
+{
+    return Paf::CancelPendingConnect(fabricIndex);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::Disconnect(uint16_t sessionId)
+{
+    return Paf::Disconnect(sessionId);
+}
+
+CHIP_ERROR CommissioningProxyPafTransport::SendMessage(uint16_t sessionId, System::PacketBufferHandle && buf)
+{
+    return Paf::SendMessage(sessionId, std::move(buf));
+}
+
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::Scan(uint8_t scanMaxTime)
+{
+    return Paf::Scan(scanMaxTime);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands,
+                                                                                FabricIndex fabricIndex, NodeId nodeId)
+{
+    return Paf::BgScanStart(timeout, wiFiBands, fabricIndex, nodeId);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyPafTransport::BgScanStop(BitMask<CapabilitiesBitmap> transport,
+                                                                               BitMask<WiFiBandBitmap> wiFiBands,
+                                                                               FabricIndex fabricIndex, NodeId nodeId)
+{
+    return Paf::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+}
+
+void CommissioningProxyPafTransport::OnAllSessionsClosed()
+{
+    Paf::OnAllSessionsClosed();
+}
+
+bool CommissioningProxyPafTransport::IsConnectPending() const
+{
+    return Paf::IsConnectPending();
+}
+
+void CommissioningProxyPafTransport::Shutdown()
+{
+    Paf::Shutdown();
+}
+
 } // namespace CommissioningProxy
 } // namespace Clusters
 } // namespace app

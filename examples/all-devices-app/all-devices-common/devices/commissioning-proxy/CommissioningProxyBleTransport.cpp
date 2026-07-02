@@ -17,9 +17,6 @@
  */
 #include "CommissioningProxyBleTransport.h"
 
-#include "CommissioningProxyBgScanCache.h"
-#include "CommissioningProxyDispatcher.h"
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
@@ -63,6 +60,11 @@ struct BleConnectCtx
 
 // Single in-flight proxy connect (MaxSessions=1 shared across transports).
 static BleConnectCtx * sBlePendingConnect = nullptr;
+
+// Host cluster (set via the transport's SetHost). All transport-agnostic
+// bookkeeping (sessions, message routing, scan cache/aggregation) is reached
+// through its subsystem accessors.
+static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sHost = nullptr;
 
 // ------------------------------------------------------------------
 // Foreground scan state (ProxyScanRequest path)
@@ -149,7 +151,8 @@ static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sBle
 static void OnBleBgDiscovery(void * /*context*/, const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId,
                              uint16_t productId)
 {
-    BgScanCache::Report(MakeBleScanResult(bdAddr, discriminator, vendorId, productId), sBleBgCluster);
+    if (sBleBgCluster != nullptr)
+        sBleBgCluster->ScanCache().Report(MakeBleScanResult(bdAddr, discriminator, vendorId, productId));
 }
 
 static void OnBleBgLifetimeExpiry(chip::System::Layer * /*layer*/, void * appState)
@@ -172,7 +175,8 @@ static void OnBleBgLifetimeExpiry(chip::System::Layer * /*layer*/, void * appSta
         if (!sBleBgPaused)
             (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
         sBleBgPaused = false;
-        BgScanCache::ClearTransport(CapabilitiesBitmap::kBle, sBleBgCluster);
+        if (sBleBgCluster != nullptr)
+            sBleBgCluster->ScanCache().ClearTransport(CapabilitiesBitmap::kBle);
         sBleBgCluster = nullptr;
     }
 }
@@ -333,9 +337,9 @@ public:
                 return;
             }
 
-            uint16_t sessionId       = ProxyDispatcher::AllocSessionId();
+            uint16_t sessionId       = ctx->cluster->Sessions().AllocSessionId();
             sBleEndpoints[sessionId] = endpoint;
-            ProxyDispatcher::RegisterSession(sessionId, CapabilitiesBitmap::kBle, ctx->fabricIndex);
+            ctx->cluster->Sessions().RegisterSession(sessionId, CapabilitiesBitmap::kBle, ctx->fabricIndex);
 
             ChipLogProgress(AppServer, "ProxyConnectRequest: BLE connected, proxy session %u (disc %u)", sessionId,
                             ctx->discriminator);
@@ -367,7 +371,8 @@ public:
         {
             // DispatchMessageResponse copies the payload into the IM ProxyMessageResponse
             // synchronously, so msg can be released when this scope returns.
-            ProxyDispatcher::DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
+            if (sHost != nullptr)
+                sHost->Sessions().DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
             return;
         }
         if (mOriginalTransport != nullptr)
@@ -380,10 +385,13 @@ public:
         if (FindSessionId(endpoint, sid))
         {
             ChipLogProgress(AppServer, "BleProxyDelegate: session %u closed: %" CHIP_ERROR_FORMAT, sid, err.Format());
-            // Fail any in-flight ProxyMessageRequest for this session.
-            ProxyDispatcher::DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
+            // Fail any in-flight ProxyMessageRequest for this session and drop it.
+            if (sHost != nullptr)
+            {
+                sHost->Sessions().DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
+                sHost->Sessions().RemoveSession(sid);
+            }
             sBleEndpoints.erase(sid);
-            ProxyDispatcher::RemoveSession(sid);
             // Peer (commissionee) closed the session. Unlike ProxyDisconnectRequest,
             // this path does not run through the dispatcher's OnAllSessionsClosed(),
             // so resume a background scan paused for the connect once the last
@@ -559,10 +567,11 @@ static void OnBleScanTimer(chip::System::Layer * /*layer*/, void * /*appState*/)
         out.push_back(MakeBleScanResult(d.mac, d.discriminator, d.vid, d.pid));
     }
 
-    // Hand the results to the dispatcher's aggregator; it owns the command
+    // Hand the results to the cluster's scan aggregator; it owns the command
     // handle and emits the combined ProxyScanResponse once every transport's
     // sub-scan has reported.
-    ProxyDispatcher::ContributeScanResults(chip::Span<const ScanResultT>(out.data(), out.size()));
+    if (sHost != nullptr)
+        sHost->ScanAggregator().Contribute(chip::Span<const ScanResultT>(out.data(), out.size()));
     sBleScanResults.clear();
 
     // The foreground scan has released the BLE scanner; resume a background scan
@@ -573,12 +582,17 @@ static void OnBleScanTimer(chip::System::Layer * /*layer*/, void * /*appState*/)
 } // namespace
 
 // ==================================================================
-// Public entry points (called by the dispatcher)
+// Internal entry points (invoked by the CommissioningProxyBleTransport methods).
 // ==================================================================
+
+void SetHost(CommissioningProxyCluster * host)
+{
+    sHost = host;
+}
 
 chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * commandObj,
                                                   const chip::app::DataModel::InvokeRequest & request, uint16_t discriminator,
-                                                  uint16_t timeout, CommissioningProxyCluster * cluster)
+                                                  uint16_t timeout)
 {
     if (sBlePendingConnect != nullptr)
     {
@@ -628,7 +642,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     ctx->handle        = chip::app::CommandHandler::Handle(commandObj);
     ctx->path          = request.path;
     ctx->discriminator = discriminator;
-    ctx->cluster       = cluster;
+    ctx->cluster       = sHost;
     ctx->fabricIndex   = request.subjectDescriptor.fabricIndex;
     sBlePendingConnect = ctx;
     commandObj->FlushAcksRightAwayOnSlowCommand();
@@ -783,12 +797,10 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap /*transport*/, uint16_t timeout,
-                                                      WiFiBandBitmap /*wiFiBands*/, chip::FabricIndex fabricIndex,
-                                                      chip::NodeId nodeId, CommissioningProxyCluster * cluster)
+chip::Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, chip::BitMask<WiFiBandBitmap> /*wiFiBands*/,
+                                                      chip::FabricIndex fabricIndex, chip::NodeId nodeId)
 {
-    // The dispatcher passes only kBle here; BLE has no Wi-Fi bands, so the
-    // WiFiBands field is meaningless and ignored.
+    // BLE has no Wi-Fi bands, so the WiFiBands field is meaningless and ignored.
     BgFabricKey fabricKey{ fabricIndex, nodeId };
     bool wasEmpty      = sBleBgFabrics.empty();
     bool alreadyExists = (sBleBgFabrics.count(fabricKey) > 0);
@@ -807,7 +819,7 @@ chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap /*trans
 
     sBleBgFabrics[fabricKey] = BleBgFabricRecord{ nullptr };
     if (sBleBgCluster == nullptr)
-        sBleBgCluster = cluster;
+        sBleBgCluster = sHost;
 
     if (wasEmpty || sBleBgPaused)
     {
@@ -859,8 +871,9 @@ chip::Protocols::InteractionModel::Status BgScanStart(CapabilitiesBitmap /*trans
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transport, WiFiBandBitmap /*wiFiBands*/,
-                                                     chip::FabricIndex fabricIndex, chip::NodeId nodeId)
+chip::Protocols::InteractionModel::Status BgScanStop(chip::BitMask<CapabilitiesBitmap> transport,
+                                                     chip::BitMask<WiFiBandBitmap> /*wiFiBands*/, chip::FabricIndex fabricIndex,
+                                                     chip::NodeId nodeId)
 {
     BgFabricKey fabricKey{ fabricIndex, nodeId };
     auto it = sBleBgFabrics.find(fabricKey);
@@ -870,11 +883,11 @@ chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transpor
         return chip::Protocols::InteractionModel::Status::NotFound;
     }
 
-    // BLE has no bands; only the kBle transport bit is meaningful.  A request
-    // that does not name kBle does not stop BLE scanning (spec: valid but not
-    // originally requested transports/bands return SUCCESS).
-    uint8_t stopBle = static_cast<uint8_t>(transport) & static_cast<uint8_t>(CapabilitiesBitmap::kBle);
-    if (stopBle == 0)
+    // BLE has no bands; only the kBle transport bit is meaningful.  A request that
+    // does not name kBle (e.g. a band-only stop the cluster fans to every driver)
+    // does not stop BLE scanning (spec: valid but not-requested transports/bands
+    // return SUCCESS).
+    if (!transport.Has(CapabilitiesBitmap::kBle))
     {
         ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: request does not target BLE, returning SUCCESS");
         return chip::Protocols::InteractionModel::Status::Success;
@@ -897,7 +910,8 @@ chip::Protocols::InteractionModel::Status BgScanStop(CapabilitiesBitmap transpor
         if (!sBleBgPaused)
             (void) chip::DeviceLayer::Internal::BLEMgrImpl().StopProxyScan();
         sBleBgPaused = false;
-        BgScanCache::ClearTransport(CapabilitiesBitmap::kBle, sBleBgCluster);
+        if (sBleBgCluster != nullptr)
+            sBleBgCluster->ScanCache().ClearTransport(CapabilitiesBitmap::kBle);
         sBleBgCluster = nullptr;
         ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: last BLE fabric stopped, hardware scan stopped");
     }
@@ -943,6 +957,71 @@ void Shutdown()
 }
 
 } // namespace Ble
+
+// ==================================================================
+// CommissioningProxyTransport implementation (thin adapter over the Ble:: singleton).
+// ==================================================================
+
+void CommissioningProxyBleTransport::SetHost(CommissioningProxyCluster * host)
+{
+    Ble::SetHost(host);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::Connect(app::CommandHandler * commandObj,
+                                                                            const DataModel::InvokeRequest & request,
+                                                                            uint16_t discriminator, uint16_t timeout)
+{
+    return Ble::Connect(commandObj, request, discriminator, timeout);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::CancelPendingConnect(FabricIndex fabricIndex)
+{
+    return Ble::CancelPendingConnect(fabricIndex);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::Disconnect(uint16_t sessionId)
+{
+    return Ble::Disconnect(sessionId);
+}
+
+CHIP_ERROR CommissioningProxyBleTransport::SendMessage(uint16_t sessionId, System::PacketBufferHandle && buf)
+{
+    return Ble::SendMessage(sessionId, std::move(buf));
+}
+
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::Scan(uint8_t scanMaxTime)
+{
+    return Ble::Scan(scanMaxTime);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::BgScanStart(uint16_t timeout, BitMask<WiFiBandBitmap> wiFiBands,
+                                                                                FabricIndex fabricIndex, NodeId nodeId)
+{
+    return Ble::BgScanStart(timeout, wiFiBands, fabricIndex, nodeId);
+}
+
+Protocols::InteractionModel::Status CommissioningProxyBleTransport::BgScanStop(BitMask<CapabilitiesBitmap> transport,
+                                                                               BitMask<WiFiBandBitmap> wiFiBands,
+                                                                               FabricIndex fabricIndex, NodeId nodeId)
+{
+    return Ble::BgScanStop(transport, wiFiBands, fabricIndex, nodeId);
+}
+
+void CommissioningProxyBleTransport::OnAllSessionsClosed()
+{
+    Ble::OnAllSessionsClosed();
+}
+
+bool CommissioningProxyBleTransport::IsConnectPending() const
+{
+    return Ble::IsConnectPending();
+}
+
+void CommissioningProxyBleTransport::Shutdown()
+{
+    Ble::Shutdown();
+}
+
 } // namespace CommissioningProxy
 } // namespace Clusters
 } // namespace app

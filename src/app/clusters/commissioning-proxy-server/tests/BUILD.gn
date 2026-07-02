@@ -35,9 +35,8 @@ chip_test_suite("tests") {
   sources = [
     "../CommissioningProxyCluster.cpp",
     "../CommissioningProxyCluster.h",
-    "../CommissioningProxyDelegate.h",
-    "CommissioningProxyMockDelegate.cpp",
-    "CommissioningProxyMockDelegate.h",
+    "CommissioningProxyMockTransport.cpp",
+    "CommissioningProxyMockTransport.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -77,8 +76,8 @@ chip_test_suite("tests-codegen-integration") {
     sources += [ "../" + file ]
   }
   sources += [
-    "CommissioningProxyMockDelegate.cpp",
-    "CommissioningProxyMockDelegate.h",
+    "CommissioningProxyMockTransport.cpp",
+    "CommissioningProxyMockTransport.h",
   ]
 
   cflags = [ "-Wconversion" ]

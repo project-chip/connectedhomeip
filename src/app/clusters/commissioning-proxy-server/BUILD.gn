@@ -25,7 +25,18 @@ source_set("commissioning-proxy-server") {
   # set as expected when the consumer's CHIPProjectAppConfig.h / BLE buildconfig is
   # in scope.  If the .cpp were compiled in this source_set's own target the
   # platform defaults would always win.
-  sources = []
+  #
+  # The transport-agnostic subsystems below have NO build-flag dependency, so they
+  # are compiled here in the cluster's own target.
+  sources = [
+    "CommissioningProxyScanAggregator.cpp",
+    "CommissioningProxyScanAggregator.h",
+    "CommissioningProxyScanCache.cpp",
+    "CommissioningProxyScanCache.h",
+    "CommissioningProxySessionManager.cpp",
+    "CommissioningProxySessionManager.h",
+    "CommissioningProxyTransport.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/data-model-provider",
@@ -33,6 +44,8 @@ source_set("commissioning-proxy-server") {
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/app/server-cluster:registry",
     "${chip_root}/src/data-model-providers/codegen:headers",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/platform",
     "${chip_root}/zzz_generated/app-common/clusters/CommissioningProxy",
   ]
 }

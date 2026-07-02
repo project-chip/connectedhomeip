@@ -26,9 +26,7 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-    mCluster(aEndpointId, CommissioningProxyCluster::Config(aFeature, aDelegate))
-{}
+Instance::Instance(EndpointId aEndpointId, const CommissioningProxyCluster::Config & config) : mCluster(aEndpointId, config) {}
 
 CHIP_ERROR Instance::Init()
 {

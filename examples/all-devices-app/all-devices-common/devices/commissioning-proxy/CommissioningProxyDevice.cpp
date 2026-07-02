@@ -18,19 +18,13 @@
 
 #include "CommissioningProxyDevice.h"
 
-#include "CommissioningProxyBgScanCache.h"
 #include <app/server/Server.h>
-#if CONFIG_NETWORK_LAYER_BLE
-#include "CommissioningProxyBleTransport.h"
-#endif
-
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include "CommissioningProxyPafTransport.h"
 #include <app_options/AppOptions.h>
 #include <cstring>
 #include <platform/Linux/ConnectivityManagerImpl.h>
@@ -57,13 +51,11 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
 #endif
     );
 
-    mCluster.Create(Clusters::CommissioningProxy::CommissioningProxyCluster::Config(endpoint, features, mDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mCluster.Registration()));
-    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
-
+    // Supported Wi-Fi bands are a device capability supplied to the cluster at
+    // construction. Only meaningful with the Wi-Fi PAF transport.
+    BitMask<WiFiBandBitmap> bands;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     {
-        BitMask<WiFiBandBitmap> bands;
         const AppOptions::AppConfig * cfg = AppOptions::TryGetConfig();
         const char * extCmds              = (cfg && !cfg->wifipafExtCmds.empty()) ? cfg->wifipafExtCmds.c_str() : nullptr;
         if (extCmds != nullptr)
@@ -90,9 +82,24 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
         // default to 2.4 GHz rather than leaving the bitmap empty.
         if (!bands.HasAny())
             bands.Set(WiFiBandBitmap::k2g4);
-        mDelegate.SetSupportedWiFiBands(bands);
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
+    // MaxSessions = 1 (one device at a time across transports); MaxCachedResults = 10.
+    mCluster.Create(endpoint,
+                    Clusters::CommissioningProxy::CommissioningProxyCluster::Config(features, /*maxSessions=*/1,
+                                                                                    /*maxCachedResults=*/10, bands));
+#if CONFIG_NETWORK_LAYER_BLE
+    mCluster.Cluster().RegisterTransport(mBleTransport);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    mCluster.Cluster().RegisterTransport(mPafTransport);
+#endif
+
+    ReturnErrorOnFailure(provider.AddCluster(mCluster.Registration()));
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (Server::GetInstance().GetFabricTable().FabricCount() > 0)
     {
         DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
@@ -112,15 +119,9 @@ void CommissioningProxyDevice::Unregister(CodeDrivenDataModelProvider & provider
 
     if (mCluster.IsConstructed())
     {
-        // Drop every cached reference to the cluster before it is destroyed so a
-        // self-re-arming background-scan sweep/timer can never dereference it.
-        Clusters::CommissioningProxy::BgScanCache::Unregister(&mCluster.Cluster());
-#if CONFIG_NETWORK_LAYER_BLE
-        Clusters::CommissioningProxy::Ble::Shutdown();
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        Clusters::CommissioningProxy::Paf::Shutdown();
-#endif
+        // The cluster destructor shuts down its subsystems (scan cache, session
+        // manager, aggregator) and every registered transport, cancelling their
+        // timers so nothing outlives the cluster.
         LogErrorOnFailure(provider.RemoveCluster(&mCluster.Cluster()));
         mCluster.Destroy();
     }
