@@ -117,84 +117,6 @@ CHIP_ERROR linux_connect_to_thread_network()
 }
 
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-namespace {
-constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
-constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
-} // namespace
-
-/**
- * @brief Connect to WiFi network using credentials stored in KVS
- *
- * This function retrieves WiFi network credentials (SSID and password) from the
- * Key-Value Storage and attempts to connect to the WiFi network asynchronously.
- *
- * @return CHIP_NO_ERROR on success, or appropriate error code on failure
- *
- */
-CHIP_ERROR linux_connect_to_wifi_network()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
-    size_t ssidLen = 0;
-    uint8_t credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
-    size_t credentialsLen = 0;
-
-    auto & kvs = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-
-    // Retrieve WiFi SSID from KVS
-    err = kvs.Get(kWiFiSSIDKeyName, ssid, sizeof(ssid), &ssidLen);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        ChipLogDetail(NotSpecified, "No WiFi SSID found in KVS");
-        return CHIP_NO_ERROR;
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to retrieve WiFi SSID: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    if (ssidLen > sizeof(ssid))
-    {
-        ChipLogError(NotSpecified, "Invalid SSID length: %zu", ssidLen);
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    if (ssidLen != 0)
-    {
-        // Retrieve WiFi credentials from KVS
-        err = kvs.Get(kWiFiCredentialsKeyName, credentials, sizeof(credentials), &credentialsLen);
-        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-        {
-            ChipLogDetail(NotSpecified, "No WiFi credentials found in KVS");
-            return CHIP_NO_ERROR;
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to retrieve WiFi credentials: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
-        if (credentialsLen > sizeof(credentials))
-        {
-            ChipLogError(NotSpecified, "Invalid credentials length: %zu", credentialsLen);
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        }
-
-        // Connect to WiFi network asynchronously
-        err = DeviceLayer::ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(ssid, ssidLen),
-                                                                          ByteSpan(credentials, credentialsLen), NULL);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        ChipLogProgress(NotSpecified, "WiFi connection initiated successfully");
-    }
-    return CHIP_NO_ERROR;
-}
-#endif // #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #endif // #ifdef __linux__
 
 CHIP_ERROR Init()
@@ -229,10 +151,6 @@ CHIP_ERROR PostInit()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     TEMPORARY_RETURN_IGNORED linux_connect_to_thread_network();
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    TEMPORARY_RETURN_IGNORED linux_connect_to_wifi_network();
-#endif // #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #endif // #ifdef __linux__
 
     return err;
