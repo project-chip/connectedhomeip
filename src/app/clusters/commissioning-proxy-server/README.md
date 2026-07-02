@@ -15,23 +15,24 @@ cluster server (`CommissioningProxyCluster.{h,cpp}`) using the code-driven
 `DefaultServerCluster` pattern.
 
 The cluster owns **all transport-agnostic behavior**: command validation,
-feature-based attribute/command gating, transport/WiFiBand constraint checks, the
-writable-attribute storage and change-reporting, and — via three subsystems it
-composes — proxy-session bookkeeping, `ProxyMessage` routing, the background-scan
-result cache, and multi-transport `ProxyScanRequest` aggregation:
+feature-based attribute/command gating, transport/WiFiBand constraint checks,
+the writable-attribute storage and change-reporting, and — via three subsystems
+it composes — proxy-session bookkeeping, `ProxyMessage` routing, the
+background-scan result cache, and multi-transport `ProxyScanRequest`
+aggregation:
 
-| Subsystem                          | Responsibility                                                        |
-| ---------------------------------- | --------------------------------------------------------------------- |
+| Subsystem                          | Responsibility                                                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `CommissioningProxySessionManager` | Session-id allocation, id→{transport,fabric} table, per-fabric isolation, `ProxyMessage` routing + response-timeout timer |
-| `CommissioningProxyScanCache`      | `CachedResults` / `NumCachedResults` (one entry per device, per-entry TTL, `MaxCachedResults` cap) |
-| `CommissioningProxyScanAggregator` | Combines a multi-transport `ProxyScanRequest` into one `ProxyScanResponse` |
+| `CommissioningProxyScanCache`      | `CachedResults` / `NumCachedResults` (one entry per device, per-entry TTL, `MaxCachedResults` cap)                        |
+| `CommissioningProxyScanAggregator` | Combines a multi-transport `ProxyScanRequest` into one `ProxyScanResponse`                                                |
 
 The application supplies **only the platform-specific transport work** by
-implementing the `CommissioningProxyTransport` driver interface (one per physical
-transport, e.g. BLE or Wi-Fi PAF) and registering it with the cluster. There is
-no do-everything application delegate: static device capabilities are passed to
-the constructor via `Config`, writable-attribute state is owned by the cluster,
-and the driver is scoped to transport actions only. See
+implementing the `CommissioningProxyTransport` driver interface (one per
+physical transport, e.g. BLE or Wi-Fi PAF) and registering it with the cluster.
+There is no do-everything application delegate: static device capabilities are
+passed to the constructor via `Config`, writable-attribute state is owned by the
+cluster, and the driver is scoped to transport actions only. See
 [Architecture](#architecture-why-a-driver-not-a-delegate) below.
 
 ### How it works
@@ -96,23 +97,25 @@ is pushed through setters rather than fetched from a delegate. This cluster
 follows that split precisely, so instead of one do-everything delegate there are
 three homes for what such a delegate would otherwise hold:
 
-| Concern                                                              | Lives in                                           | Why                                                                                  |
-| -------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Transport actions (Connect / Scan / SendMessage / Disconnect / …)    | `CommissioningProxyTransport` driver               | The only genuinely platform-specific surface (BlueZ GATT, wpa_supplicant NAN).       |
-| Writable attributes (`ScanMaxTime`, `CacheTimeout`) + cache view     | The cluster (members + setters) and its subsystems | The cluster owns change-reporting, so a driver can never forget `NotifyAttributeChanged`. |
-| Static capabilities (`MaxSessions`, `MaxCachedResults`, bands)       | `Config` (constructor argument)                    | Fixed device facts, not actions.                                                     |
+| Concern                                                           | Lives in                                           | Why                                                                                       |
+| ----------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Transport actions (Connect / Scan / SendMessage / Disconnect / …) | `CommissioningProxyTransport` driver               | The only genuinely platform-specific surface (BlueZ GATT, wpa_supplicant NAN).            |
+| Writable attributes (`ScanMaxTime`, `CacheTimeout`) + cache view  | The cluster (members + setters) and its subsystems | The cluster owns change-reporting, so a driver can never forget `NotifyAttributeChanged`. |
+| Static capabilities (`MaxSessions`, `MaxCachedResults`, bands)    | `Config` (constructor argument)                    | Fixed device facts, not actions.                                                          |
 
 **How multiple platforms plug in.** A platform provides one
-`CommissioningProxyTransport` implementation per physical transport and registers
-it with `RegisterTransport()`. The cluster dispatches each command to the driver
-whose `GetTransportType()` matches the request's transport bit, and drivers report
-async results back through the cluster's shared subsystems (`Sessions()`,
-`ScanCache()`, `ScanAggregator()`). A new platform therefore writes only its
-GATT/NAN driver and inherits all session/scan/message bookkeeping unchanged.
+`CommissioningProxyTransport` implementation per physical transport and
+registers it with `RegisterTransport()`. The cluster dispatches each command to
+the driver whose `GetTransportType()` matches the request's transport bit, and
+drivers report async results back through the cluster's shared subsystems
+(`Sessions()`, `ScanCache()`, `ScanAggregator()`). A new platform therefore
+writes only its GATT/NAN driver and inherits all session/scan/message
+bookkeeping unchanged.
 
-`RegisterTransport()` is used (rather than a single constructor-injected delegate)
-because there can be several drivers — one per transport — and they are typically
-constructed after the cluster, whose endpoint is only known at registration time.
+`RegisterTransport()` is used (rather than a single constructor-injected
+delegate) because there can be several drivers — one per transport — and they
+are typically constructed after the cluster, whose endpoint is only known at
+registration time.
 
 ## Usage
 
@@ -210,8 +213,8 @@ under
 
 For applications that register clusters through the `CodegenDataModelProvider`,
 `CodegenIntegration.{h,cpp}` provide an `Instance` wrapper that constructs a
-`RegisteredServerCluster<CommissioningProxyCluster>` and adds/removes it from the
-provider registry on `Init()`/`Shutdown()`. Transports are registered on it
+`RegisteredServerCluster<CommissioningProxyCluster>` and adds/removes it from
+the provider registry on `Init()`/`Shutdown()`. Transports are registered on it
 before `Init()`:
 
 ```cpp
@@ -235,23 +238,23 @@ only after the cluster has validated the request; the driver does the
 transport-specific work and reports results back through the host cluster's
 subsystems.
 
-| Method                    | Description                                                             |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `GetTransportType()`      | The single transport bit this driver services (`kBle` / `kWiFiPAF`)     |
-| `SetHost()`               | Bind the host cluster (set to null at cluster teardown)                 |
-| `Connect()`               | Open a transport session; allocate + register it via `Sessions()`       |
-| `SendMessage()`           | Forward a packet; reply routed back via `Sessions()`                    |
-| `Scan()`                  | Foreground scan; results reported to `ScanAggregator()`                 |
-| `BgScanStart()`           | Start a background scan; results reported to `ScanCache()` (BGS)        |
-| `BgScanStop()`            | Stop a background scan (BGS)                                            |
-| `CancelPendingConnect()`  | Cancel an in-flight connect (null-SessionID disconnect)                 |
-| `Disconnect()`            | Tear down an active proxy session                                       |
-| `OnAllSessionsClosed()`   | Notified when the last session across all transports closes             |
-| `IsConnectPending()`      | Whether a connect is in flight (counted against `MaxSessions`)          |
-| `Shutdown()`              | Cancel driver timers/state before cluster destruction                   |
+| Method                   | Description                                                         |
+| ------------------------ | ------------------------------------------------------------------- |
+| `GetTransportType()`     | The single transport bit this driver services (`kBle` / `kWiFiPAF`) |
+| `SetHost()`              | Bind the host cluster (set to null at cluster teardown)             |
+| `Connect()`              | Open a transport session; allocate + register it via `Sessions()`   |
+| `SendMessage()`          | Forward a packet; reply routed back via `Sessions()`                |
+| `Scan()`                 | Foreground scan; results reported to `ScanAggregator()`             |
+| `BgScanStart()`          | Start a background scan; results reported to `ScanCache()` (BGS)    |
+| `BgScanStop()`           | Stop a background scan (BGS)                                        |
+| `CancelPendingConnect()` | Cancel an in-flight connect (null-SessionID disconnect)             |
+| `Disconnect()`           | Tear down an active proxy session                                   |
+| `OnAllSessionsClosed()`  | Notified when the last session across all transports closes         |
+| `IsConnectPending()`     | Whether a connect is in flight (counted against `MaxSessions`)      |
+| `Shutdown()`             | Cancel driver timers/state before cluster destruction               |
 
-Note there is **no** `ProxyScanRequest`/`ProxyMessageRequest`/etc. delegate hook:
-those commands' spec logic, session tracking, message routing, and scan
+Note there is **no** `ProxyScanRequest`/`ProxyMessageRequest`/etc. delegate
+hook: those commands' spec logic, session tracking, message routing, and scan
 aggregation live in the cluster and its subsystems; the driver only exposes the
 transport primitives above.
 
@@ -306,9 +309,10 @@ matches the connection against the active session map, and calls
 
 ## Wi-Fi PAF Transport Integration
 
-When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the driver
-(`CommissioningProxyPafTransport`) interacts with `chip::WiFiPAF::WiFiPAFLayer`
-to open, send over, receive from, and close PAF (NAN) sessions:
+When the build enables Wi-Fi PAF (`CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`) the
+driver (`CommissioningProxyPafTransport`) interacts with
+`chip::WiFiPAF::WiFiPAFLayer` to open, send over, receive from, and close PAF
+(NAN) sessions:
 
 -   `Connect()` — calls `WiFiPAFLayer::WiFiPAFSubscribe()` to open a PAF session
     identified by the commissionee discriminator and peer address.
@@ -318,8 +322,8 @@ to open, send over, receive from, and close PAF (NAN) sessions:
     session.
 
 Incoming PAF messages are routed back to the cluster via a
-`WiFiPAFLayerDelegate` subclass that intercepts `WiFiPAFMessageReceived`, matches
-the peer against the active session map, and calls
+`WiFiPAFLayerDelegate` subclass that intercepts `WiFiPAFMessageReceived`,
+matches the peer against the active session map, and calls
 `host->Sessions().DispatchMessageResponse()`.
 
 ## Cluster State
