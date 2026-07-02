@@ -210,8 +210,19 @@ class TC_CLCTRL_7_1(MatterBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        if self.groupcast_enabled:
-            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+        if getattr(self, 'groupcast_enabled', False):
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership,
+            )
+            if membership:
+                try:
+                    await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+                except InteractionModelError as e:
+                    if e.status != Status.NotFound:
+                        raise
+                    log.info("LeaveGroup(groupID=0) returned NotFound during teardown; no groups to clean up")
         super().teardown_test()
 
     @async_test_body

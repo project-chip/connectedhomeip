@@ -111,8 +111,19 @@ class TC_CLDIM_5_2(MatterBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        if self.groupcast_enabled:
-            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+        if getattr(self, 'groupcast_enabled', False):
+            membership = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Groupcast,
+                attribute=Clusters.Groupcast.Attributes.Membership,
+            )
+            if membership:
+                try:
+                    await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+                except InteractionModelError as e:
+                    if e.status != Status.NotFound:
+                        raise
+                    log.info("LeaveGroup(groupID=0) returned NotFound during teardown; no groups to clean up")
         super().teardown_test()
 
     @async_test_body
@@ -123,6 +134,17 @@ class TC_CLDIM_5_2(MatterBaseTest):
         self.kGroupId = 0x0001
         self.kGroupKey = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
         self.groupcast_enabled = await is_groupcast_on_root_node(self)
+        if self.groupcast_enabled:
+            dev_controller = self.default_controller
+            dev_controller.SetGroupKeySet(
+                keyset_id=self.kGroupKeysetId,
+                policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+                num_keys=1,
+                epoch_key0=self.kGroupKey,
+                epoch_start_time0=2220000,
+            )
+            dev_controller.SetGroupKey(self.kGroupId, self.kGroupKeysetId)
+            dev_controller.SetGroupInfo(self.kGroupId, "Closure Dimension Group")
         log.info("Groupcast on root node enabled: %s", self.groupcast_enabled)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
