@@ -332,6 +332,48 @@ TEST_F(TestSystemTimer, CheckCancellation)
     EXPECT_EQ(strcmp(testState.record, "AC"), 0);
 }
 
+// Regression: StartTimer must honor a delay whose millisecond value exceeds
+// UINT32_MAX rather than truncating it at the API boundary. 4'294'968 s * 1000 ==
+// 4'294'968'000 ms, which wraps a 32-bit Milliseconds32 to 704 ms. A Seconds32
+// argument converts implicitly to whichever delay type StartTimer takes, so this
+// test is RED before the Milliseconds64 widening (the timer fires within 60 s) and
+// GREEN after. A due "tick" timer keeps the (select-based) event loop from blocking
+// on the far-future deadline.
+TEST_F(TestSystemTimer, LargeDelayIsNotTruncated)
+{
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
+    Layer & systemLayer = mLayer;
+
+    struct TestState
+    {
+        static void Fired(Layer *, void * state) { *static_cast<bool *>(state) = true; }
+        static void Tick(Layer *, void * state) { *static_cast<bool *>(state) = true; }
+    };
+    bool fired = false;
+    bool tick  = false;
+
+    Clock::Internal::RAIIMockClock mockClock;
+
+    EXPECT_SUCCESS(systemLayer.StartTimer(Clock::Seconds32(4'294'968), TestState::Fired, &fired));
+
+    // 60 s is far past the wrapped 704 ms deadline but nowhere near the real ~49.7 days.
+    // The kZero tick timer is due now, so ServiceEvents does not block on the long timer.
+    mockClock.AdvanceMonotonic(Clock::Seconds32(60));
+    EXPECT_SUCCESS(systemLayer.StartTimer(Clock::kZero, TestState::Tick, &tick));
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    EXPECT_TRUE(tick);
+    EXPECT_FALSE(fired); // pre-fix: the wrapped 704 ms timer has already fired here
+
+    // Advancing past the real deadline fires it, confirming the full delay was honored.
+    mockClock.AdvanceMonotonic(Clock::Seconds32(4'294'968));
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    EXPECT_TRUE(fired);
+
+    systemLayer.CancelTimer(TestState::Fired, &fired);
+}
+
 namespace {
 
 namespace CancelTimerTest {
