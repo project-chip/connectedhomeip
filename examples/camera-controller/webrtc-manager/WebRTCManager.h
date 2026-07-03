@@ -55,7 +55,13 @@ public:
 
     CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session, const std::vector<ICECandidateStruct> & candidates);
 
-    CHIP_ERROR Connect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
+    CHIP_ERROR InitWebRTCProviderClient(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
+
+    CHIP_ERROR Connect();
+
+    CHIP_ERROR SendProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionId, std::string sdp, StreamUsageEnum streamUsage,
+                chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
     CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
                             chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
@@ -67,6 +73,8 @@ public:
     CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
 
     CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
+
+    void SetClientICECandidates(const std::string& clientSdp);
 
     /**
      * @brief Close the WebRTC connection and clean up resources
@@ -87,6 +95,10 @@ private:
     void OnConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection, rtc::PeerConnection::State state);
     void OnGatheringStateChanged(const std::shared_ptr<rtc::PeerConnection> & connection,
                                  rtc::PeerConnection::GatheringState state);
+
+    std::vector<ICECandidateInfo> ParseClientICECandidates(const std::string& clientSdp);
+    std::string MergeICECandidatesIntoSDP(const std::string& originalSdp,
+                                                     const std::vector<ICECandidateStruct>& candidates);
 
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster>
         mWebRTCRegisteredServerCluster;
@@ -117,7 +129,7 @@ private:
     PendingSdpContext mPendingSdpContext;
 
     // Local vector to store the ICE Candidate info coming from the WebRTC stack
-    std::vector<ICECandidateInfo> mLocalCandidates;
+    std::vector<ICECandidateInfo> mICECandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
     std::shared_ptr<rtc::Track> mAudioTrack;
@@ -132,4 +144,7 @@ private:
     // UDP socket for RTP forwarding
     int mRTPSocket      = -1;
     int mAudioRTPSocket = -1;
+
+    std::string mClientSDP;
+    bool mClientMode = false;
 };

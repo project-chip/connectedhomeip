@@ -32,6 +32,21 @@ typedef void (*IceCandidateCallback)(const char * candidate, const char * mid, v
 typedef void (*GatheringCompleteCallback)();
 typedef void (*OnStateChangeCallback)(const char * state);
 
+using PyObject                        = void *;
+using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                  chip::CommandId commandId, size_t index,
+                                                 std::underlying_type_t<chip::Protocols::InteractionModel::Status> status,
+                                                  chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
+using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
+                                              std::underlying_type_t<chip::Protocols::InteractionModel::Status> status,
+                                              chip::ClusterStatus clusterStatus, PyChipError chiperror);
+using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
+
+OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
+OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
+OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
+
+
 /**
  * @brief Creates a new WebRTC client instance.
  *

@@ -37,6 +37,17 @@ CHIP_ERROR LiveViewStartCommand::RunCommand()
     // Use provided stream usage or default to 3 (LiveView)
     uint8_t streamUsage = mStreamUsage.HasValue() ? mStreamUsage.Value() : 3;
 
+    if (mClientSdp.HasValue())
+    {
+        std::string base64Sdp(mClientSdp.Value());
+
+        std::vector<uint8_t> decodedSdpBuf(base64Sdp.length());
+        uint16_t decodedSdpLen = chip::Base64Decode(base64Sdp.c_str(), static_cast<uint16_t>(base64Sdp.length()), decodedSdpBuf.data());
+        std::string clientSdp(reinterpret_cast<char*>(decodedSdpBuf.data()), decodedSdpLen);
+
+        camera::DeviceManager::Instance().SetClientSdp(clientSdp);
+    }
+
     return camera::DeviceManager::Instance().AllocateVideoStream(mPeerNodeId, streamUsage, camera::WebRTCOfferType::kProvideOffer,
                                                                  mMinResWidth, mMinResHeight, mMinFrameRate, mMinBitRate);
 }

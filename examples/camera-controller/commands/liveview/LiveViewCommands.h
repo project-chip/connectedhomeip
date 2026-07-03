@@ -31,6 +31,7 @@ public:
         AddArgument("min-res-height", 0, UINT16_MAX, &mMinResHeight);
         AddArgument("min-framerate", 0, UINT16_MAX, &mMinFrameRate);
         AddArgument("min-bitrate", 0, UINT32_MAX, &mMinBitRate);
+        AddArgument("client-sdp", &mClientSdp);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -45,6 +46,8 @@ private:
     chip::Optional<uint16_t> mMinResHeight;
     chip::Optional<uint16_t> mMinFrameRate;
     chip::Optional<uint32_t> mMinBitRate;
+
+    chip::Optional<char *> mClientSdp;
 };
 
 class LiveViewStopCommand : public CHIPCommand

@@ -17,6 +17,7 @@
  */
 
 #include "WebRTCProviderCommands.h"
+#include <lib/support/CodeUtils.h>
 #include <commands/common/RemoteDataModelLogger.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <device-manager/DeviceManager.h>
@@ -32,7 +33,8 @@ namespace webrtc {
 CHIP_ERROR ConnectCommand::RunCommand()
 {
     ChipLogProgress(Camera, "Run ConnectCommand");
-    return WebRTCManager::Instance().Connect(CurrentCommissioner(), mPeerNodeId, mPeerEndpointId);
+    ReturnLogErrorOnFailure(WebRTCManager::Instance().InitWebRTCProviderClient(CurrentCommissioner(), mPeerNodeId, mPeerEndpointId));
+    return WebRTCManager::Instance().Connect();
 }
 
 CHIP_ERROR ProvideOfferCommand::RunCommand()

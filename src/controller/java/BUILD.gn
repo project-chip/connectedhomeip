@@ -142,6 +142,10 @@ shared_library("jni") {
     "AndroidLogDownloadFromNode.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
+    "AndroidWebRTCTransportProviderClient.cpp",
+    "AndroidWebRTCTransportProviderClient.h",
+    "AndroidWebRTCTransportRequestorManager.cpp",
+    "AndroidWebRTCTransportRequestorManager.h",
     "AttestationTrustStoreBridge.cpp",
     "AttestationTrustStoreBridge.h",
     "BdxDiagnosticLogsReceiver.cpp",
@@ -184,6 +188,7 @@ shared_library("jni") {
     deps += [
       "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/controller:nodatamodel",
+      "${chip_root}/src/controller/webrtc",
     ]
 
     # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
@@ -662,6 +667,7 @@ android_library("java") {
     "src/chip/devicecontroller/ICDCheckInDelegateWrapper.java",
     "src/chip/devicecontroller/ICDDeviceInfo.java",
     "src/chip/devicecontroller/ICDRegistrationInfo.java",
+    "src/chip/devicecontroller/IceCandidate.java",
     "src/chip/devicecontroller/KeypairDelegate.java",
     "src/chip/devicecontroller/NetworkCredentials.java",
     "src/chip/devicecontroller/NetworkLocation.java",
@@ -672,6 +678,9 @@ android_library("java") {
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "src/chip/devicecontroller/ThreadScanResult.java",
     "src/chip/devicecontroller/UnpairDeviceCallback.java",
+    "src/chip/devicecontroller/WebRTCTransportSolicitOfferCallback.java",
+    "src/chip/devicecontroller/WebRTCTransportProvideOfferCallback.java",
+    "src/chip/devicecontroller/WebRTCTransportRequestorDelegate.java",
     "src/chip/devicecontroller/WiFiScanResult.java",
   ]
 

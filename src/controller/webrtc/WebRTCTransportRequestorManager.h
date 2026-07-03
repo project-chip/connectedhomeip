@@ -37,11 +37,10 @@ struct OwnedIceCandidate
     IceCandidate view{};
 };
 
-// The Python callbacks to call when certain events happen in WebRTCTransportRequestor.
-using OnOfferCallback         = int (*)(uint16_t, const char *);
-using OnAnswerCallback        = int (*)(uint16_t, const char *);
-using OnICECandidatesCallback = int (*)(uint16_t, const IceCandidate *, int);
-using OnEndCallback           = int (*)(uint16_t, uint8_t);
+using OnOfferCallback         = CHIP_ERROR (*)(uint16_t, const char *);
+using OnAnswerCallback        = CHIP_ERROR (*)(uint16_t, const char *);
+using OnICECandidatesCallback = CHIP_ERROR (*)(uint16_t, const IceCandidate *, int);
+using OnEndCallback           = CHIP_ERROR (*)(uint16_t, uint8_t);
 
 constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
 
@@ -58,7 +57,11 @@ public:
         return instance;
     }
 
-    // methods to be called by python
+    chip::EndpointId GetEndpointId() const
+    {
+        return kWebRTCRequesterDynamicEndpointId;
+    }
+
     void Init();
 
     void Shutdown();
@@ -85,4 +88,10 @@ private:
 
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster>
         mWebRTCRegisteredServerCluster;
+
+    // Callback member variables
+    OnOfferCallback mOnOfferCallback                 = nullptr;
+    OnAnswerCallback mOnAnswerCallback               = nullptr;
+    OnICECandidatesCallback mOnICECandidatesCallback = nullptr;
+    OnEndCallback mOnEndCallback                     = nullptr;
 };

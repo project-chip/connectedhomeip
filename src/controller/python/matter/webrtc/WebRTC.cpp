@@ -193,6 +193,33 @@ void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uin
     }
 }
 
+void OnCommandResponseCallback(void * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                 chip::CommandId commandId, size_t index,
+                                                 chip::Protocols::InteractionModel::Status status,
+                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length)
+{
+    if (gOnCommandSenderResponseCallback != nullptr)
+    {
+        gOnCommandSenderResponseCallback(appContext, endpointId, clusterId, commandId, index, to_underlying(status), clusterStatus, payload, length);
+    }
+}
+void OnCommandErrorCallback(void * appContext,
+                            chip::Protocols::InteractionModel::Status status,
+                            chip::ClusterStatus clusterStatus, CHIP_ERROR error)
+{
+    if (gOnCommandSenderErrorCallback != nullptr)
+    {
+        gOnCommandSenderErrorCallback(appContext, to_underlying(status), clusterStatus, ToPyChipError(error));
+    }
+}
+void OnCommandDoneCallback(void * appContext)
+{
+    if (gOnCommandSenderDoneCallback != nullptr)
+    {
+        gOnCommandSenderDoneCallback(appContext);
+    }
+}
+
 void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle handle,
                                                          OnCommandSenderResponseCallback onCommandSenderResponseCallback,
                                                          OnCommandSenderErrorCallback onCommandSenderErrorCallback,
@@ -202,7 +229,7 @@ void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle hand
     auto it = g_provider_clients.find(handle);
     if (it != g_provider_clients.end())
     {
-        it->second->InitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback, onCommandSenderDoneCallback);
+        it->second->InitCallbacks(OnCommandResponseCallback, OnCommandErrorCallback, OnCommandDoneCallback);
     }
 }
 
@@ -213,7 +240,7 @@ PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void 
     auto it = g_provider_clients.find(handle);
     if (it != g_provider_clients.end())
     {
-        return it->second->SendCommand(appContext, endpointId, clusterId, commandId, payload, length);
+        return ToPyChipError(it->second->SendCommand(appContext, endpointId, clusterId, commandId, payload, length));
     }
     return ToPyChipError(CHIP_ERROR_INTERNAL);
 }

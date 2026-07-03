@@ -27,6 +27,8 @@
 #include "AndroidDeviceControllerWrapper.h"
 #include "AndroidInteractionClient.h"
 #include "AndroidLogDownloadFromNode.h"
+#include "AndroidWebRTCTransportProviderClient.h"
+#include "AndroidWebRTCTransportRequestorManager.h"
 #include <controller/java/ControllerConfig.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -616,6 +618,26 @@ exit:
         ChipLogError(Controller, "Failed to set ICD Check-In Deleagate. : %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
+}
+
+JNI_METHOD(void, startWebRTCTransportRequestor)(JNIEnv * env, jobject self, jlong handle, jobject webrtcDelegate)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(Controller, "startWebRTCTransportRequestor() called directly from JNI");
+    AndroidWebRTCTransportRequestorManager::Instance().Init(env, webrtcDelegate);
+#endif
+}
+
+JNI_METHOD(void, finishWebRTCTransportRequestor)(JNIEnv * env, jobject self, jlong handle)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(Controller, "finishWebRTCTransportRequestor() called directly from JNI");
+    AndroidWebRTCTransportRequestorManager::Instance().Shutdown(env);
+#endif
 }
 
 JNI_METHOD(void, commissionDevice)
@@ -1527,7 +1549,8 @@ JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(commissioneeDevice);
 }
 
-JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
+JNI_METHOD(void, getConnectedDevicePointer)
+(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jboolean allowLargePayload, jlong callbackHandle)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -1535,8 +1558,9 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
     VerifyOrExit(connectedDeviceCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    err = wrapper->Controller()->GetConnectedDevice(static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess,
-                                                    &connectedDeviceCallback->mOnFailure);
+    err = wrapper->Controller()->GetConnectedDevice(
+        static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure,
+        allowLargePayload == JNI_TRUE ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload);
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -2379,6 +2403,70 @@ JNI_METHOD(void, stopDnssd)(JNIEnv * env, jobject self, jlong handle)
     VerifyOrReturn(wrapper != nullptr,
                    ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in stopDnssd fails!"));
     wrapper->StopDnssd();
+}
+
+JNI_METHOD(void, webRTCTransportSolicitOffer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "webRTCTransportSolicitOffer() called with device ID and callback object");
+
+    err = AndroidWebRTCTransportProviderClient::SolicitOffer(
+        wrapper->Controller(), 
+        static_cast<chip::NodeId>(deviceId), 
+        static_cast<chip::EndpointId>(endpointId), 
+        callback
+    );
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to solicit offer.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
+JNI_METHOD(void, webRTCTransportProvideOffer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject jVideoStreamId, jobject jAudioStreamId, jstring offerSdp, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "webRTCTransportProvideOffer() called with device ID and callback object");
+
+    chip::JniUtfString jniOfferSdp(env, offerSdp);
+    chip::CharSpan offerSpan(jniOfferSdp.c_str(), jniOfferSdp.size());
+
+    Optional<DataModel::Nullable<uint16_t>> optionalVideoStreamId;
+    if (jVideoStreamId != nullptr)
+    {
+        jint videoStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jVideoStreamId);
+        optionalVideoStreamId.SetValue(DataModel::Nullable<uint16_t>(static_cast<uint16_t>(videoStreamId)));
+    }
+
+    Optional<DataModel::Nullable<uint16_t>> optionalAudioStreamId;
+    if (jAudioStreamId != nullptr)
+    {
+        jint audioStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jAudioStreamId);
+        optionalAudioStreamId.SetValue(DataModel::Nullable<uint16_t>(static_cast<uint16_t>(audioStreamId)));
+    }
+
+    err = AndroidWebRTCTransportProviderClient::ProvideOffer(
+        wrapper->Controller(), 
+        static_cast<chip::NodeId>(deviceId), 
+        static_cast<chip::EndpointId>(endpointId),
+        optionalVideoStreamId,
+        optionalAudioStreamId,
+        offerSpan, 
+        callback
+    );
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to provide offer.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
 }
 
 void * IOThreadMain(void * arg)

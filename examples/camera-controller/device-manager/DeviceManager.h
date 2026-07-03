@@ -90,6 +90,8 @@ public:
      */
     void OnWebRTCSessionEstablished(uint16_t streamId);
 
+    void SetClientSdp(const std::string& sdp) { mClientSdp.SetValue(sdp); }
+
 private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
     chip::NodeId mNodeId                                 = chip::kUndefinedNodeId;
@@ -97,6 +99,8 @@ private:
     WebRTCOfferType mOfferType                           = WebRTCOfferType::kProvideOffer;
     std::map<uint16_t, pid_t> mVideoStreamProcesses; // Stream ID -> Process ID mapping
     uint16_t mPendingVideoStreamId = 0;              // Track the stream ID we're setting up
+
+    chip::Optional<std::string> mClientSdp;
 
     AVStreamManagement mAVStreamManagment;
 

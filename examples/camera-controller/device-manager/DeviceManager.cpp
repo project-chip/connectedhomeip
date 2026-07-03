@@ -189,8 +189,26 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
 {
     ChipLogProgress(Camera, "DeviceManager: Initiating WebRTC session for node=0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
+    CHIP_ERROR err = WebRTCManager::Instance().InitWebRTCProviderClient(*mCommissioner, mNodeId, kCameraEndpointId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to init WebRTC manager. Error: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+
+    auto videoStreamIdNullable = app::DataModel::MakeNullable(videoStreamId);
+    auto videoStreamIdOptional = MakeOptional(videoStreamIdNullable);
+    auto streamUsage           = static_cast<StreamUsageEnum>(mStreamUsage);
+
+    if (mClientSdp.HasValue())
+    {
+        WebRTCManager::Instance().SetClientICECandidates(mClientSdp.Value());
+        ReturnAndLogOnFailure(WebRTCManager::Instance().SendProvideOffer(app::DataModel::NullNullable, mClientSdp.Value(), streamUsage, videoStreamIdOptional, NullOptional), Camera, "Fail to Send ProviderOffer");
+        return;
+    }
+
     // Connect to the WebRTC transport provider on the device
-    CHIP_ERROR err = WebRTCManager::Instance().Connect(*mCommissioner, mNodeId, kCameraEndpointId);
+    err = WebRTCManager::Instance().Connect();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "Failed to connect WebRTC manager. Error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -199,10 +217,6 @@ void DeviceManager::InitiateWebRTCSession(uint16_t videoStreamId)
 
     // Add a 1-second delay after successful connection to allow local SDP gets populated
     std::this_thread::sleep_for(std::chrono::seconds(1));
-
-    auto videoStreamIdNullable = app::DataModel::MakeNullable(videoStreamId);
-    auto videoStreamIdOptional = MakeOptional(videoStreamIdNullable);
-    auto streamUsage           = static_cast<StreamUsageEnum>(mStreamUsage);
 
     // Choose between ProvideOffer and SolicitOffer based on the configured offer type
     if (mOfferType == WebRTCOfferType::kProvideOffer)
