@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
@@ -266,6 +267,23 @@ class TC_CLDIM_5_2(MatterBaseTest):
                 endpoints=[endpoint],
                 keySetID=self.kGroupKeysetId,
                 key=self.kGroupKey), endpoint=0)
+
+            acl = [
+                # ACL entry granting CASE admin access to the controller.
+                Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                    subjects=[self.default_controller.nodeId],
+                    targets=NullValue),
+                # Grant a additional Group Operate access to the closure cluster.
+                Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
+                    subjects=[self.kGroupId],
+                    targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                        endpoint=endpoint, cluster=Clusters.ClosureDimension.id)]),
+            ]
+            await dev_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         else:
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
             self.mark_current_step_skipped()
