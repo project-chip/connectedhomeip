@@ -244,7 +244,7 @@ private:
         /// Periodic cadence in milliseconds; std::nullopt means single-shot
         /// (instant) ranging. Captured from request.trigger.rangingInstanceInterval
         /// and never visible to the adapter.
-        std::optional<System::Clock::Milliseconds32> interval;
+        std::optional<System::Clock::Milliseconds64> interval;
 
         /// True once a measurement has passed the driver's reporting filter
         /// and been forwarded to the cluster. The driver remaps an

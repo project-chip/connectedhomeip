@@ -64,9 +64,9 @@ StartSessionParams BuildStartParams(const Commands::StartRangingRequest::Decodab
     return params;
 }
 
-System::Clock::Milliseconds32 SecondsToMilliseconds32(uint32_t seconds)
+System::Clock::Milliseconds64 SecondsToMilliseconds64(uint32_t seconds)
 {
-    return std::chrono::duration_cast<System::Clock::Milliseconds32>(System::Clock::Seconds32(seconds));
+    return std::chrono::duration_cast<System::Clock::Milliseconds64>(System::Clock::Seconds32(seconds));
 }
 
 /// Returns true for the responder side of a ranging pair. Real radios in
@@ -204,7 +204,7 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
     }
     if (request.trigger.rangingInstanceInterval.HasValue())
     {
-        session->interval = SecondsToMilliseconds32(request.trigger.rangingInstanceInterval.Value());
+        session->interval = SecondsToMilliseconds64(request.trigger.rangingInstanceInterval.Value());
     }
     session->isPassiveResponder = RequestIsPassiveResponder(request);
 
@@ -219,7 +219,7 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
     // Phase 2: arm EndTime cutoff. trigger.endTime > trigger.startTime is
     // enforced by the cluster's preflight (see ProximityRangingCluster::
     // ValidateStartRangingRequest), so endTime is always strictly positive.
-    LogErrorOnFailure(mTimerDelegate.StartTimer(&session->endTimer, SecondsToMilliseconds32(request.trigger.endTime)));
+    LogErrorOnFailure(mTimerDelegate.StartTimer(&session->endTimer, SecondsToMilliseconds64(request.trigger.endTime)));
 
     // Phase 3: kick off the first measurement. With startTime == 0 we issue
     // it synchronously on the calling thread; otherwise we arm NextTrigger
@@ -230,7 +230,7 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
     }
     else
     {
-        LogErrorOnFailure(mTimerDelegate.StartTimer(&session->nextTrigger, SecondsToMilliseconds32(request.trigger.startTime)));
+        LogErrorOnFailure(mTimerDelegate.StartTimer(&session->nextTrigger, SecondsToMilliseconds64(request.trigger.startTime)));
     }
 
     return result;

@@ -555,6 +555,36 @@ TEST_F(TestProximityRangingDriver, EndTimeFiresWhileSessionActive)
     driver.Shutdown();
 }
 
+// 13b. Regression: a large endTime (in seconds) must not wrap when converted to
+//      the timer's millisecond representation. 4'294'968 s * 1000 == 4'294'968'000,
+//      which overflows a 32-bit Milliseconds32 to 704 ms; a 64-bit conversion keeps
+//      the intended ~49.7-day delay. RED before the seconds->Milliseconds64 fix
+//      (the end timer fires almost immediately and tears the session down), GREEN after.
+TEST_F(TestProximityRangingDriver, EndTimeSecondsDoesNotWrapToNearImmediate)
+{
+    TimerDelegateMock timer;
+    MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
+    RangingAdapter * adapters[] = { &ble };
+    ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
+    RecordingClusterCallback cb;
+    ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
+
+    auto request              = MakeBleRequest();
+    request.trigger.startTime = 0;
+    request.trigger.endTime   = 4'294'968; // s; * 1000 wraps Milliseconds32 to 704 ms
+    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    EXPECT_EQ(ble.mStartCalls, 1);
+
+    // Advance far past the wrapped (704 ms) deadline but nowhere near the real
+    // ~49.7-day one. With a 32-bit conversion the end timer has already fired here
+    // (wrong); with the 64-bit conversion the session is still active.
+    timer.AdvanceClock(System::Clock::Milliseconds32(60'000));
+    EXPECT_EQ(ble.mStopCalls, 0);
+    EXPECT_EQ(driver.GetNumActiveSessionIds(), 1u);
+
+    driver.Shutdown();
+}
+
 // 14. Adapter rejects in PrepareSession → no session record committed,
 //     SessionIDList is not made dirty, no timers armed.
 TEST_F(TestProximityRangingDriver, PrepareSessionRejectedByAdapter)
