@@ -19,39 +19,25 @@ security_mbedtls_source
 security_se_manager
 
 # efr32_sdk.gni
-app
 bgapi_protocol
-bluetooth_apploader
 bluetooth_common
 bluetooth_le_controller
 bluetooth_le_host
 bluetooth_le_middleware
-bluetooth_mesh
-board_drivers
 boards
 bootloader
-bootloader_interface
 cmsis
-cmsis_common
 common_15_4
-devices
 freertos
-glib
-lwip
+mbedtls
 openthread
 openthread_stack
-platform
-platform_common
 platform_core
 rail_library
-security_mbedtls
-security_mbedtls_source
-security_se_manager
 segger
-util
 
 # efr32_sdk.gni libraries (.a)
-openthread/build/gcc/cortex-m33/cmake/sl-openthread-library/Release/libsl_openthread.a
+openthread/libs/build/gcc/cortex-m33/sl-openthread-library/Release/libsl_openthread.a
 # openthread/libs (all .a from connectedhomeip_silabs)
 openthread/libs/libsl_ot_stack_ftd_coap_efr32mg21_gcc.a
 openthread/libs/libsl_ot_stack_ftd_coap_efr32mg24_gcc.a
@@ -136,31 +122,25 @@ rail_library/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a
 
 # all (combined unique, alphabetical)
 bgapi_protocol
-bluetooth_apploader
 bluetooth_common
 bluetooth_le_controller
 bluetooth_le_host
 bluetooth_le_middleware
-bluetooth_mesh
 board_drivers
 boards
 bootloader
-bootloader_interface
 cmsis
 cmsis_common
 common_15_4
-devices
 freertos
 glib
-lwip
+mbedtls
 openthread
 openthread_stack
-platform
 platform_common
 platform_core
 rail_library
-segger
 security_mbedtls
 security_mbedtls_source
 security_se_manager
-util
+segger
