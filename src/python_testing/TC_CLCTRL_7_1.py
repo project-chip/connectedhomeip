@@ -330,6 +330,23 @@ class TC_CLCTRL_7_1(MatterBaseTest):
                 endpoints=[endpoint],
                 keySetID=self.kGroupKeysetId,
                 key=self.kGroupKey), endpoint=0)
+
+            acl = [
+                # ACL entry granting CASE admin access to the controller.
+                Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                    subjects=[self.default_controller.nodeId],
+                    targets=NullValue),
+                # Grant a additional Group Operate access to the closure cluster.
+                Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
+                    subjects=[self.kGroupId],
+                    targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                        endpoint=endpoint, cluster=Clusters.ClosureControl.id)]),
+            ]
+            await dev_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         else:
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
             self.mark_current_step_skipped()
