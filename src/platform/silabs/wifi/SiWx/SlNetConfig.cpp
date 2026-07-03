@@ -71,9 +71,6 @@ void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuratio
     configuration->boot_config.coex_mode = SL_SI91X_WLAN_BLE_MODE;
     configuration->boot_config.ext_custom_feature_bit_map |= SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE;
     configuration->boot_config.bt_feature_bit_map = RSI_BT_FEATURE_BITMAP;
-#if (RSI_BT_GATT_ON_CLASSIC)
-    configuration->boot_config.bt_feature_bit_map |= SL_SI91X_BT_ATT_OVER_CLASSIC_ACL;
-#endif // RSI_BT_GATT_ON_CLASSIC
     configuration->boot_config.ble_feature_bit_map =
         ((SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS) | SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS) |
           SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV) | SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC)) |
@@ -84,23 +81,7 @@ void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuratio
 #endif // RSI_BLE_GATT_ASYNC_ENABLE
         );
     configuration->boot_config.ble_ext_feature_bit_map =
-        (SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS) | SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES))
-#if RSI_BLE_INDICATE_CONFIRMATION_FROM_HOST
-        | SL_SI91X_BLE_INDICATE_CONFIRMATION_FROM_HOST
-#endif // RSI_BLE_INDICATE_CONFIRMATION_FROM_HOST
-#if RSI_BLE_MTU_EXCHANGE_FROM_HOST
-        | SL_SI91X_BLE_MTU_EXCHANGE_FROM_HOST
-#endif // RSI_BLE_MTU_EXCHANGE_FROM_HOST
-#if RSI_BLE_SET_SCAN_RESP_DATA_FROM_HOST
-        | SL_SI91X_BLE_SET_SCAN_RESP_DATA_FROM_HOST
-#endif // RSI_BLE_SET_SCAN_RESP_DATA_FROM_HOST
-#if RSI_BLE_DISABLE_CODED_PHY_FROM_HOST
-        | SL_SI91X_BLE_DISABLE_CODED_PHY_FROM_HOST
-#endif // RSI_BLE_DISABLE_CODED_PHY_FROM_HOST
-#if BLE_SIMPLE_GATT
-        | SL_SI91X_BLE_GATT_INIT
-#endif // BLE_SIMPLE_GATT
-        ;
+        (SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS) | SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES));
 
 #endif // SLI_SI91X_ENABLE_BLE
 }
