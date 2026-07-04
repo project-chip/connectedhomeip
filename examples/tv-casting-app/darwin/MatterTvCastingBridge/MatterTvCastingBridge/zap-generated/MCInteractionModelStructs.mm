@@ -527,3 +527,115 @@
     return descriptionString;
 }
 @end
+
+@implementation MCContentLauncherClusterContentAppInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _contentAppVendorID = @(0);
+        _contentAppProductID = @(0);
+        _data = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCContentLauncherClusterContentAppInfo alloc] init];
+    other.contentAppVendorID = self.contentAppVendorID;
+    other.contentAppProductID = self.contentAppProductID;
+    other.data = self.data;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentAppVendorID:%@; contentAppProductID:%@; data:%@; >", NSStringFromClass([self class]), _contentAppVendorID, _contentAppProductID, _data];
+    return descriptionString;
+}
+@end
+
+@implementation MCContentLauncherClusterLaunchUrlInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _url = @"";
+        _data = nil;
+        _contentType = nil;
+        _contentHeaders = nil;
+        _offsetMillisecs = nil;
+        _queueType = nil;
+        _nextUrl = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCContentLauncherClusterLaunchUrlInfo alloc] init];
+    other.url = self.url;
+    other.data = self.data;
+    other.contentType = self.contentType;
+    other.contentHeaders = self.contentHeaders;
+    other.offsetMillisecs = self.offsetMillisecs;
+    other.queueType = self.queueType;
+    other.nextUrl = self.nextUrl;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: url:%@; >", NSStringFromClass([self class]), _url];
+    return descriptionString;
+}
+@end
+
+@implementation MCContentLauncherClusterReplicationInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _launchUrlInfo = nil;
+        _contentAppInfo = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCContentLauncherClusterReplicationInfo alloc] init];
+    other.launchUrlInfo = self.launchUrlInfo;
+    other.contentAppInfo = self.contentAppInfo;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: launchUrlInfo:%@; contentAppInfo:%@; >", NSStringFromClass([self class]), _launchUrlInfo, _contentAppInfo];
+    return descriptionString;
+}
+@end
+
+@implementation MCContentLauncherClusterContentPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _presetID = @(0);
+        _presetName = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCContentLauncherClusterContentPresetStruct alloc] init];
+    other.presetID = self.presetID;
+    other.presetName = self.presetName;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetID:%@; presetName:%@; >", NSStringFromClass([self class]), _presetID, _presetName];
+    return descriptionString;
+}
+@end
