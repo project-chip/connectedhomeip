@@ -132,6 +132,18 @@ tests:
                                 Size: { Width: 0, Height: 0, Metric: 0 },
                             },
                     }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "en",
+                                Characteristics: null,
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks: null,
+                    }
       response:
           values:
               - name: "Data"
