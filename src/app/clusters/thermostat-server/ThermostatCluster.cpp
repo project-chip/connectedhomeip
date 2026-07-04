@@ -203,8 +203,7 @@ void ThermostatCluster::LoadPersistentAttributes()
 
 void ThermostatCluster::Shutdown(ClusterShutdownType type)
 {
-    // Roll back an open atomic write (which also cancels its pending timeout timer). The timer is only ever
-    // scheduled while a write is open, so when none is open there is nothing to cancel.
+    // Roll back an open atomic write (which also cancels its pending timeout timer)
     if (mAtomicWriteSession.state == AtomicWriteState::Open)
     {
         ResetAtomicWrite(GetEndpointId());
@@ -213,8 +212,7 @@ void ThermostatCluster::Shutdown(ClusterShutdownType type)
     DefaultServerCluster::Shutdown(type);
 }
 
-// Encodes the delegate-backed list / preset / schedule / suggestion attributes. The scalar attributes
-// (including LocalTemperature, RemoteSensing and ClusterRevision) are handled directly by ReadAttribute.
+// Encodes the delegate-backed list / preset / schedule / suggestion attributes.
 CHIP_ERROR ThermostatCluster::ReadDelegateAttribute(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
@@ -363,8 +361,7 @@ CHIP_ERROR ThermostatCluster::ReadDelegateAttribute(const ConcreteReadAttributeP
     return CHIP_NO_ERROR;
 }
 
-// Handles writes to the delegate-backed atomic-write attributes (Presets / Schedules). All other writable
-// attributes are handled directly by WriteAttribute.
+// Handles writes to the delegate-backed atomic-write attributes (Presets / Schedules).
 CHIP_ERROR ThermostatCluster::WriteDelegateAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     EndpointId endpoint      = aPath.mEndpointId;
@@ -532,7 +529,6 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         return encoder.Encode(mActiveScheduleHandle);
     case SetpointHoldExpiryTimestamp::Id:
         return encoder.Encode(mSetpointHoldExpiryTimestamp);
-    // Delegate-backed list / preset / schedule / suggestion attributes are still served by the retained delegate.
     case PresetTypes::Id:
     case ScheduleTypes::Id:
     case NumberOfPresets::Id:
@@ -764,13 +760,11 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
     const AttributeId attributeId = request.path.mAttributeId;
     AttributePersistence persistence{ DefaultServerCluster::mContext->attributeStorage };
 
-    // Preset / Schedule writes (and their atomic-write semantics) are still owned by the retained delegate.
     if (attributeId == Presets::Id || attributeId == Schedules::Id)
     {
         return WriteDelegateAttribute(request.path, decoder);
     }
 
-    // No non-atomic attribute may be written while this client has an atomic write open.
     if (InAtomicWrite(GetEndpointId(), decoder.GetSubjectDescriptor()))
     {
         return Status::InvalidInState;
@@ -875,7 +869,7 @@ void ThermostatCluster::HandleSetpointPostWrite(AttributeId attributeId)
 {
     const int16_t deadband = DeadBandTemp();
 
-    // Maintain the deadband by shifting the paired setpoint (replaces EnsureDeadband). WriteAttribute has
+    // Maintain the deadband by shifting the paired setpoint. WriteAttribute has
     // already validated that this shift stays within the limits, so it cannot exceed them here.
     if (mFeatures.Has(Feature::kAutoMode))
     {
@@ -996,8 +990,6 @@ std::optional<DataModel::ActionReturnStatus> ThermostatCluster::InvokeCommand(co
         return std::nullopt;
     }
     default:
-        // SetWeeklySchedule / GetWeeklySchedule / ClearWeeklySchedule / SetActiveScheduleRequest were never
-        // implemented in the legacy server (their Ember callbacks returned false -> UnsupportedCommand).
         return Status::UnsupportedCommand;
     }
 }
