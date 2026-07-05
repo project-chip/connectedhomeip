@@ -3,8 +3,8 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/TLV.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/core/TLV.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
