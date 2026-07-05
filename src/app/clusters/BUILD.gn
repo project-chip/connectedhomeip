@@ -62,6 +62,7 @@ source_set("clusters") {
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
     "scenes-server",
+    "service-area-server",
     "smoke-co-alarm-server",
     "software-diagnostics-server",
     "soil-measurement-server",
