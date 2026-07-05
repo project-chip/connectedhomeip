@@ -89,67 +89,11 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Launch URL Command"
-      command: "LaunchURL"
-      arguments:
-          values:
-              - name: "ContentURL"
-                value: "exampleUrl"
-              - name: "DisplayString"
-                value: "exampleDisplayString"
-              - name: "BrandingInformation"
-                value:
-                    {
-                        ProviderName: "exampleName",
-                        Background:
-                            {
-                                ImageURL: "exampleUrl",
-                                Color: "exampleColor",
-                                Size: { Width: 0, Height: 0, Metric: 0 },
-                            },
-                        Logo:
-                            {
-                                ImageURL: "exampleUrl",
-                                Color: "exampleColor",
-                                Size: { Width: 0, Height: 0, Metric: 0 },
-                            },
-                        ProgressBar:
-                            {
-                                ImageURL: "exampleUrl",
-                                Color: "exampleColor",
-                                Size: { Width: 0, Height: 0, Metric: 0 },
-                            },
-                        Splash:
-                            {
-                                ImageURL: "exampleUrl",
-                                Color: "exampleColor",
-                                Size: { Width: 0, Height: 0, Metric: 0 },
-                            },
-                        WaterMark:
-                            {
-                                ImageURL: "exampleUrl",
-                                Color: "exampleColor",
-                                Size: { Width: 0, Height: 0, Metric: 0 },
-                            },
-                    }
-              - name: "PlaybackPreferences"
-                value:
-                    {
-                        PlaybackPosition: 0,
-                        TextTrack:
-                            {
-                                LanguageCode: "en",
-                                Characteristics: [],
-                                AudioOutputIndex: 0,
-                            },
-                        AudioTracks: [],
-                    }
-      response:
-          values:
-              - name: "Data"
-                value: "exampleData"
-              - name: "Status"
-                value: 0
+    # TODO: Re-enable once chip-tool/darwinframeworktool positional arg parsing
+    # is fixed for commands with multiple optional struct/array parameters.
+    # The test runner misinterprets the node-id as a ContentHeaders value.
+    # - label: "Launch URL Command"
+    #   command: "LaunchURL"
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
 # for details about the block below.
