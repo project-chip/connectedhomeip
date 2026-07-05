@@ -139,10 +139,10 @@ tests:
                         TextTrack:
                             {
                                 LanguageCode: "en",
-                                Characteristics: null,
+                                Characteristics: [],
                                 AudioOutputIndex: 0,
                             },
-                        AudioTracks: null,
+                        AudioTracks: [],
                     }
       response:
           values:
