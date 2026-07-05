@@ -11027,6 +11027,98 @@ cluster ContentAppObserver = 1296 {
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
+/** This cluster provides an interface for managing and sharing media files on devices such as Streaming Speakers, Smart TVs, or other media playback devices. */
+provisional cluster MediaFileManagement = 1297 {
+  revision 1;
+
+  enum FileStatusEnum : enum8 {
+    kSuccess = 0;
+    kInsufficientStorage = 1;
+    kInvalidFileID = 2;
+    kAuthenticationFailed = 3;
+    kFileNotAvailable = 4;
+    kInvalidRequest = 5;
+    kUnsupportedMimeType = 6;
+  }
+
+  bitmap Feature : bitmap32 {
+    kMediaSharing = 0x1;
+  }
+
+  struct FileDescriptionStruct {
+    int64u fileID = 0;
+    char_string<128> name = 1;
+    int64u size = 2;
+    long_char_string<256> mimeType = 3;
+    long_char_string<256> imageUri = 4;
+  }
+
+  provisional info event SharedFilesAdded = 0 {
+    int16u requestID = 0;
+    int16u responseID = 1;
+  }
+
+  provisional readonly attribute access(read: manage) int64u totalStorage = 0;
+  provisional readonly attribute access(read: manage) int64u availableStorage = 1;
+  provisional readonly attribute access(read: manage) FileDescriptionStruct availableFiles[] = 2;
+  provisional readonly attribute access(read: manage) char_string supportedMimeTypes[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddFileRequest {
+    char_string<128> name = 0;
+    int64u size = 1;
+    long_char_string<256> mimeType = 2;
+    long_char_string<256> imageUri = 3;
+  }
+
+  response struct AddFileResponse = 1 {
+    FileStatusEnum status = 0;
+    nullable int64u fileID = 1;
+  }
+
+  request struct DeleteFileRequest {
+    int64u fileID = 0;
+  }
+
+  request struct RequestSharedFilesRequest {
+    char_string<128> clientName = 0;
+    int16u requestID = 1;
+    optional nullable char_string supportedMimeTypes[] = 2;
+  }
+
+  request struct GetSharedFileRequest {
+    int16u responseID = 0;
+  }
+
+  response struct GetSharedFileResponse = 5 {
+    FileStatusEnum status = 0;
+    optional nullable FileDescriptionStruct fileDescription = 1;
+  }
+
+  request struct OfferFileRequest {
+    char_string<128> clientName = 0;
+    char_string<128> name = 1;
+    int64u size = 2;
+    long_char_string<256> mimeType = 3;
+    long_char_string<256> imageUri = 4;
+  }
+
+  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage. */
+  command access(invoke: manage) AddFile(AddFileRequest): AddFileResponse = 0;
+  /** Upon receipt, this command SHALL delete the specified media file from the device's storage. */
+  command access(invoke: manage) DeleteFile(DeleteFileRequest): DefaultSuccess = 2;
+  /** Upon receipt, this command SHALL initiate a request for the server to share files with the requesting client. */
+  command access(invoke: view) RequestSharedFiles(RequestSharedFilesRequest): DefaultSuccess = 3;
+  /** Upon receipt, this command SHALL retrieve information about a file that was previously shared with the requesting client. */
+  command access(invoke: view) GetSharedFile(GetSharedFileRequest): GetSharedFileResponse = 4;
+  /** Upon receipt, this command SHALL indicate that the requesting client wishes to share a file with the server. */
+  command access(invoke: view) OfferFile(OfferFileRequest): DefaultSuccess = 6;
+}
+
 /** This cluster provides attributes and commands to control the audio output volume and frequency corrections of a device. */
 provisional cluster AudioControl = 1298 {
   revision 1;

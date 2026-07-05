@@ -3066,6 +3066,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
     Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
+    Map<String, InteractionInfo> writeMediaFileManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("mediaFileManagement", writeMediaFileManagementInteractionInfo);
     Map<String, InteractionInfo> writeAudioControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeAudioControlMaxUserVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo audioControlmaxUserVolumeCommandParameterInfo =

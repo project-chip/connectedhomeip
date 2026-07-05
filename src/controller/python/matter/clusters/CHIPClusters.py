@@ -14054,6 +14054,112 @@ class ChipClusters:
             },
         },
     }
+    _MEDIA_FILE_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "MediaFileManagement",
+        "clusterId": 0x00000511,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "AddFile",
+                "args": {
+                    "name": "str",
+                    "size": "int",
+                    "mimeType": "str",
+                    "imageUri": "str",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "DeleteFile",
+                "args": {
+                    "fileID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "RequestSharedFiles",
+                "args": {
+                    "clientName": "str",
+                    "requestID": "int",
+                    "supportedMimeTypes": "str",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetSharedFile",
+                "args": {
+                    "responseID": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "OfferFile",
+                "args": {
+                    "clientName": "str",
+                    "name": "str",
+                    "size": "int",
+                    "mimeType": "str",
+                    "imageUri": "str",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "TotalStorage",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "AvailableStorage",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "AvailableFiles",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "SupportedMimeTypes",
+                "attributeId": 0x00000003,
+                "type": "str",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _AUDIO_CONTROL_CLUSTER_INFO = {
         "clusterName": "AudioControl",
         "clusterId": 0x00000512,
@@ -17569,6 +17675,7 @@ class ChipClusters:
         0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
         0x0000050F: _CONTENT_CONTROL_CLUSTER_INFO,
         0x00000510: _CONTENT_APP_OBSERVER_CLUSTER_INFO,
+        0x00000511: _MEDIA_FILE_MANAGEMENT_CLUSTER_INFO,
         0x00000512: _AUDIO_CONTROL_CLUSTER_INFO,
         0x00000550: _ZONE_MANAGEMENT_CLUSTER_INFO,
         0x00000551: _CAMERA_AV_STREAM_MANAGEMENT_CLUSTER_INFO,
@@ -17728,6 +17835,7 @@ class ChipClusters:
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ContentControl": _CONTENT_CONTROL_CLUSTER_INFO,
         "ContentAppObserver": _CONTENT_APP_OBSERVER_CLUSTER_INFO,
+        "MediaFileManagement": _MEDIA_FILE_MANAGEMENT_CLUSTER_INFO,
         "AudioControl": _AUDIO_CONTROL_CLUSTER_INFO,
         "ZoneManagement": _ZONE_MANAGEMENT_CLUSTER_INFO,
         "CameraAvStreamManagement": _CAMERA_AV_STREAM_MANAGEMENT_CLUSTER_INFO,
