@@ -90,174 +90,170 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-#define FORWARD_TO_CLUSTER(method) return mCluster.Cluster().method
-
 uint32_t Instance::GetNumberOfSupportedAreas()
 {
-    FORWARD_TO_CLUSTER(GetNumberOfSupportedAreas());
+    return mCluster.Cluster().GetNumberOfSupportedAreas();
 }
 
 bool Instance::GetSupportedAreaByIndex(uint32_t listIndex, AreaStructureWrapper & aSupportedArea)
 {
-    FORWARD_TO_CLUSTER(GetSupportedAreaByIndex(listIndex, aSupportedArea));
+    return mCluster.Cluster().GetSupportedAreaByIndex(listIndex, aSupportedArea);
 }
 
 bool Instance::GetSupportedAreaById(uint32_t aAreaId, uint32_t & listIndex, AreaStructureWrapper & aSupportedArea)
 {
-    FORWARD_TO_CLUSTER(GetSupportedAreaById(aAreaId, listIndex, aSupportedArea));
+    return mCluster.Cluster().GetSupportedAreaById(aAreaId, listIndex, aSupportedArea);
 }
 
 bool Instance::AddSupportedArea(AreaStructureWrapper & aNewArea)
 {
-    FORWARD_TO_CLUSTER(AddSupportedArea(aNewArea));
+    return mCluster.Cluster().AddSupportedArea(aNewArea);
 }
 
 bool Instance::ModifySupportedArea(AreaStructureWrapper & aNewArea)
 {
-    FORWARD_TO_CLUSTER(ModifySupportedArea(aNewArea));
+    return mCluster.Cluster().ModifySupportedArea(aNewArea);
 }
 
 bool Instance::ClearSupportedAreas()
 {
-    FORWARD_TO_CLUSTER(ClearSupportedAreas());
+    return mCluster.Cluster().ClearSupportedAreas();
 }
 
 bool Instance::RemoveSupportedArea(uint32_t areaId)
 {
-    FORWARD_TO_CLUSTER(RemoveSupportedArea(areaId));
+    return mCluster.Cluster().RemoveSupportedArea(areaId);
 }
 
 uint32_t Instance::GetNumberOfSupportedMaps()
 {
-    FORWARD_TO_CLUSTER(GetNumberOfSupportedMaps());
+    return mCluster.Cluster().GetNumberOfSupportedMaps();
 }
 
 bool Instance::GetSupportedMapByIndex(uint32_t listIndex, MapStructureWrapper & aSupportedMap)
 {
-    FORWARD_TO_CLUSTER(GetSupportedMapByIndex(listIndex, aSupportedMap));
+    return mCluster.Cluster().GetSupportedMapByIndex(listIndex, aSupportedMap);
 }
 
 bool Instance::GetSupportedMapById(uint32_t aMapId, uint32_t & listIndex, MapStructureWrapper & aSupportedMap)
 {
-    FORWARD_TO_CLUSTER(GetSupportedMapById(aMapId, listIndex, aSupportedMap));
+    return mCluster.Cluster().GetSupportedMapById(aMapId, listIndex, aSupportedMap);
 }
 
 bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
 {
-    FORWARD_TO_CLUSTER(AddSupportedMap(aMapId, aMapName));
+    return mCluster.Cluster().AddSupportedMap(aMapId, aMapName);
 }
 
 bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 {
-    FORWARD_TO_CLUSTER(RenameSupportedMap(aMapId, newMapName));
+    return mCluster.Cluster().RenameSupportedMap(aMapId, newMapName);
 }
 
 bool Instance::ClearSupportedMaps()
 {
-    FORWARD_TO_CLUSTER(ClearSupportedMaps());
+    return mCluster.Cluster().ClearSupportedMaps();
 }
 
 bool Instance::RemoveSupportedMap(uint32_t mapId)
 {
-    FORWARD_TO_CLUSTER(RemoveSupportedMap(mapId));
+    return mCluster.Cluster().RemoveSupportedMap(mapId);
 }
 
 uint32_t Instance::GetNumberOfSelectedAreas()
 {
-    FORWARD_TO_CLUSTER(GetNumberOfSelectedAreas());
+    return mCluster.Cluster().GetNumberOfSelectedAreas();
 }
 
 bool Instance::GetSelectedAreaByIndex(uint32_t listIndex, uint32_t & selectedArea)
 {
-    FORWARD_TO_CLUSTER(GetSelectedAreaByIndex(listIndex, selectedArea));
+    return mCluster.Cluster().GetSelectedAreaByIndex(listIndex, selectedArea);
 }
 
 bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 {
-    FORWARD_TO_CLUSTER(AddSelectedArea(aSelectedArea));
+    return mCluster.Cluster().AddSelectedArea(aSelectedArea);
 }
 
 bool Instance::ClearSelectedAreas()
 {
-    FORWARD_TO_CLUSTER(ClearSelectedAreas());
+    return mCluster.Cluster().ClearSelectedAreas();
 }
 
 bool Instance::RemoveSelectedAreas(uint32_t areaId)
 {
-    FORWARD_TO_CLUSTER(RemoveSelectedAreas(areaId));
+    return mCluster.Cluster().RemoveSelectedAreas(areaId);
 }
 
 DataModel::Nullable<uint32_t> Instance::GetCurrentArea()
 {
-    FORWARD_TO_CLUSTER(GetCurrentArea());
+    return mCluster.Cluster().GetCurrentArea();
 }
 
 bool Instance::SetCurrentArea(const DataModel::Nullable<uint32_t> & aCurrentArea)
 {
-    FORWARD_TO_CLUSTER(SetCurrentArea(aCurrentArea));
+    return mCluster.Cluster().SetCurrentArea(aCurrentArea);
 }
 
 DataModel::Nullable<uint32_t> Instance::GetEstimatedEndTime()
 {
-    FORWARD_TO_CLUSTER(GetEstimatedEndTime());
+    return mCluster.Cluster().GetEstimatedEndTime();
 }
 
 bool Instance::SetEstimatedEndTime(const DataModel::Nullable<uint32_t> & aEstimatedEndTime)
 {
-    FORWARD_TO_CLUSTER(SetEstimatedEndTime(aEstimatedEndTime));
+    return mCluster.Cluster().SetEstimatedEndTime(aEstimatedEndTime);
 }
 
 uint32_t Instance::GetNumberOfProgressElements()
 {
-    FORWARD_TO_CLUSTER(GetNumberOfProgressElements());
+    return mCluster.Cluster().GetNumberOfProgressElements();
 }
 
 bool Instance::GetProgressElementByIndex(uint32_t listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    FORWARD_TO_CLUSTER(GetProgressElementByIndex(listIndex, aProgressElement));
+    return mCluster.Cluster().GetProgressElementByIndex(listIndex, aProgressElement);
 }
 
 bool Instance::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
 {
-    FORWARD_TO_CLUSTER(GetProgressElementById(aAreaId, listIndex, aProgressElement));
+    return mCluster.Cluster().GetProgressElementById(aAreaId, listIndex, aProgressElement);
 }
 
 bool Instance::AddPendingProgressElement(uint32_t aAreaId)
 {
-    FORWARD_TO_CLUSTER(AddPendingProgressElement(aAreaId));
+    return mCluster.Cluster().AddPendingProgressElement(aAreaId);
 }
 
 bool Instance::SetProgressStatus(uint32_t aAreaId, OperationalStatusEnum opStatus)
 {
-    FORWARD_TO_CLUSTER(SetProgressStatus(aAreaId, opStatus));
+    return mCluster.Cluster().SetProgressStatus(aAreaId, opStatus);
 }
 
 bool Instance::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
 {
-    FORWARD_TO_CLUSTER(SetProgressTotalOperationalTime(aAreaId, aTotalOperationalTime));
+    return mCluster.Cluster().SetProgressTotalOperationalTime(aAreaId, aTotalOperationalTime);
 }
 
 bool Instance::SetProgressEstimatedTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aEstimatedTime)
 {
-    FORWARD_TO_CLUSTER(SetProgressEstimatedTime(aAreaId, aEstimatedTime));
+    return mCluster.Cluster().SetProgressEstimatedTime(aAreaId, aEstimatedTime);
 }
 
 bool Instance::ClearProgress()
 {
-    FORWARD_TO_CLUSTER(ClearProgress());
+    return mCluster.Cluster().ClearProgress();
 }
 
 bool Instance::RemoveProgressElement(uint32_t areaId)
 {
-    FORWARD_TO_CLUSTER(RemoveProgressElement(areaId));
+    return mCluster.Cluster().RemoveProgressElement(areaId);
 }
 
 bool Instance::HasFeature(ServiceArea::Feature feature) const
 {
     return mCluster.Cluster().HasFeature(feature);
 }
-
-#undef FORWARD_TO_CLUSTER
 
 // ZAP-generated plugin callbacks are left as stubs. Applications instantiate Instance directly
 // (not through these callbacks) and register it with the codegen data model provider via Init().
