@@ -48,7 +48,9 @@ void CommissioningProxyScanAggregator::Begin(app::CommandHandler * commandObj, c
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + kScanWatchdogMarginSecs), WatchdogCallback, this);
     if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(Zcl, "CommissioningProxy: failed to arm scan watchdog: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void CommissioningProxyScanAggregator::AddPendingContributor()
@@ -128,19 +130,25 @@ void CommissioningProxyScanAggregator::Contribute(Span<const ScanResultEntry> re
     // cluster has started every sub-scan.
     ++mReported;
     if (mExpected > 0 && mReported >= mExpected)
+    {
         EmitCombinedResponse();
+    }
 }
 
 void CommissioningProxyScanAggregator::MaybeEmitIfComplete()
 {
     if (mInProgress && mExpected > 0 && mReported >= mExpected)
+    {
         EmitCombinedResponse();
+    }
 }
 
 void CommissioningProxyScanAggregator::Abort()
 {
     if (!mInProgress)
+    {
         return;
+    }
     DeviceLayer::SystemLayer().CancelTimer(WatchdogCallback, this);
     mHandle.Release();
     mAddressStore.clear();

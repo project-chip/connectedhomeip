@@ -178,7 +178,9 @@ public:
         for (size_t i = 0; i < mTransportCount; i++)
         {
             if (mTransports[i]->IsConnectPending())
+            {
                 count++;
+            }
         }
         return count;
     }
