@@ -220,6 +220,7 @@ class XmlAttribute:
     changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
     quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
     scene: bool = False   # S quality: attribute value is stored/restored by the Scenes cluster
+    atomic_write: bool = False  # Atomic Write quality: written via atomic transaction; staged values not reported until commit
     constraints: Optional[Constraints] = None
 
     def access_string(self):
@@ -689,7 +690,8 @@ class ClusterParser:
 
     @staticmethod
     def _is_change_omitted_attribute(xml_attribute: ElementTree.Element) -> bool:
-        """Returns True if the attribute carries the Changes Omitted (C) quality.
+        """
+        Returns True if the attribute carries the Changes Omitted (C) quality.
 
         Attributes with this quality do not report value changes in subscription reports.
         They correspond to <quality changeOmitted="true"/> in the cluster XML.
@@ -699,7 +701,8 @@ class ClusterParser:
 
     @staticmethod
     def _is_quieter_reporting_attribute(xml_attribute: ElementTree.Element) -> bool:
-        """Returns True if the attribute carries the Quieter Reporting (Q) quality.
+        """
+        Returns True if the attribute carries the Quieter Reporting (Q) quality.
 
         Attributes with this quality may be reported less frequently than the normal
         minimum interval allows.  They correspond to <quality quieterReporting="true"/>
@@ -717,6 +720,17 @@ class ClusterParser:
         """
         quality = xml_attribute.find('./quality')
         return quality is not None and quality.get('scene', 'false').lower() == 'true'
+    def _is_atomic_write_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """
+        Returns True if the attribute carries the Atomic Write quality.
+
+        Attributes with this quality are modified only within an atomic write
+        transaction (AtomicRequest Begin/Commit); intermediate values are staged
+        and not reported until the transaction commits.
+        They correspond to <quality atomicWrite="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('atomicWrite', 'false').lower() == 'true'
 
     def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Optional[Constraints]:
         """
@@ -1111,6 +1125,7 @@ class ClusterParser:
                                             changes_omitted=self._is_change_omitted_attribute(element),
                                             quieter_reporting=self._is_quieter_reporting_attribute(element),
                                             scene=self._is_scene_attribute(element),
+                                            atomic_write=self._is_atomic_write_attribute(element),
                                             constraints=constraints)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:

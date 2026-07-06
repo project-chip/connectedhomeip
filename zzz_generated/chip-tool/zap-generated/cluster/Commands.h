@@ -169,6 +169,7 @@
 | AccountLogin                                                        | 0x050E |
 | ContentControl                                                      | 0x050F |
 | ContentAppObserver                                                  | 0x0510 |
+| MediaFileManagement                                                 | 0x0511 |
 | AudioControl                                                        | 0x0512 |
 | ZoneManagement                                                      | 0x0550 |
 | CameraAvStreamManagement                                            | 0x0551 |
@@ -15498,6 +15499,229 @@ public:
 
 private:
     chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster MediaFileManagement                                         | 0x0511 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddFile                                                           |   0x00 |
+| * DeleteFile                                                        |   0x02 |
+| * RequestSharedFiles                                                |   0x03 |
+| * GetSharedFile                                                     |   0x04 |
+| * OfferFile                                                         |   0x06 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TotalStorage                                                      | 0x0000 |
+| * AvailableStorage                                                  | 0x0001 |
+| * AvailableFiles                                                    | 0x0002 |
+| * SupportedMimeTypes                                                | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * SharedFilesAdded                                                  | 0x0000 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddFile
+ */
+class MediaFileManagementAddFile : public ClusterCommand
+{
+public:
+    MediaFileManagementAddFile(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("add-file", credsIssuerConfig)
+    {
+        AddArgument("Name", &mRequest.name);
+        AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
+        AddArgument("MimeType", &mRequest.mimeType);
+        AddArgument("ImageUri", &mRequest.imageUri);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type mRequest;
+};
+
+/*
+ * Command DeleteFile
+ */
+class MediaFileManagementDeleteFile : public ClusterCommand
+{
+public:
+    MediaFileManagementDeleteFile(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("delete-file", credsIssuerConfig)
+    {
+        AddArgument("FileID", 0, UINT64_MAX, &mRequest.fileID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Type mRequest;
+};
+
+/*
+ * Command RequestSharedFiles
+ */
+class MediaFileManagementRequestSharedFiles : public ClusterCommand
+{
+public:
+    MediaFileManagementRequestSharedFiles(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("request-shared-files", credsIssuerConfig), mComplex_SupportedMimeTypes(&mRequest.supportedMimeTypes)
+    {
+        AddArgument("ClientName", &mRequest.clientName);
+        AddArgument("RequestID", 0, UINT16_MAX, &mRequest.requestID);
+        AddArgument("SupportedMimeTypes", &mComplex_SupportedMimeTypes, "", Argument::kOptional);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>>>
+        mComplex_SupportedMimeTypes;
+};
+
+/*
+ * Command GetSharedFile
+ */
+class MediaFileManagementGetSharedFile : public ClusterCommand
+{
+public:
+    MediaFileManagementGetSharedFile(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-shared-file", credsIssuerConfig)
+    {
+        AddArgument("ResponseID", 0, UINT16_MAX, &mRequest.responseID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type mRequest;
+};
+
+/*
+ * Command OfferFile
+ */
+class MediaFileManagementOfferFile : public ClusterCommand
+{
+public:
+    MediaFileManagementOfferFile(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("offer-file", credsIssuerConfig)
+    {
+        AddArgument("ClientName", &mRequest.clientName);
+        AddArgument("Name", &mRequest.name);
+        AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
+        AddArgument("MimeType", &mRequest.mimeType);
+        AddArgument("ImageUri", &mRequest.imageUri);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -33206,6 +33430,77 @@ void registerClusterContentAppObserver(Commands & commands, CredentialIssuerComm
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterMediaFileManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::MediaFileManagement;
+
+    const char * clusterName = "MediaFileManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
+        make_unique<MediaFileManagementAddFile>(credsIssuerConfig),            //
+        make_unique<MediaFileManagementDeleteFile>(credsIssuerConfig),         //
+        make_unique<MediaFileManagementRequestSharedFiles>(credsIssuerConfig), //
+        make_unique<MediaFileManagementGetSharedFile>(credsIssuerConfig),      //
+        make_unique<MediaFileManagementOfferFile>(credsIssuerConfig),          //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "total-storage", Attributes::TotalStorage::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "available-storage", Attributes::AvailableStorage::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "available-files", Attributes::AvailableFiles::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<uint64_t>>(Id, "total-storage", 0, UINT64_MAX, Attributes::TotalStorage::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint64_t>>(Id, "available-storage", 0, UINT64_MAX, Attributes::AvailableStorage::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type>>>(
+            Id, "available-files", Attributes::AvailableFiles::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CharSpan>>>(
+            Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "total-storage", Attributes::TotalStorage::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "available-storage", Attributes::AvailableStorage::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "available-files", Attributes::AvailableFiles::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                          //
+        make_unique<ReadEvent>(Id, "shared-files-added", Events::SharedFilesAdded::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeEvent>(Id, "shared-files-added", Events::SharedFilesAdded::Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterAudioControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::AudioControl;
@@ -35666,6 +35961,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterAccountLogin(commands, credsIssuerConfig);
     registerClusterContentControl(commands, credsIssuerConfig);
     registerClusterContentAppObserver(commands, credsIssuerConfig);
+    registerClusterMediaFileManagement(commands, credsIssuerConfig);
     registerClusterAudioControl(commands, credsIssuerConfig);
     registerClusterZoneManagement(commands, credsIssuerConfig);
     registerClusterCameraAvStreamManagement(commands, credsIssuerConfig);
