@@ -762,7 +762,8 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeSoftMutedUnmuteOrChangeWithVolume)
 
 TEST_F(TestAudioControlCluster, IncreaseVolumeStepSizeConstraintError)
 {
-    // effectiveMax=100, minVol=1 → valid stepSize: [1, 99]
+    // StepSize is only constrained to be >= 1; an over-large StepSize is clamped against
+    // EffectiveMax rather than rejected.
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50).WithInitialDefaultStepSize(10));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -772,11 +773,11 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeStepSizeConstraintError)
     IncreaseVolume::Type cmd;
     cmd.stepSize.SetValue(0);
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
-
-    cmd.stepSize.SetValue(100); // > 99
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
-
     EXPECT_EQ(cluster.GetVolume(), 50u); // unchanged
+
+    cmd.stepSize.SetValue(100); // effectiveMax(100) - minVol(1) == 99, so this overshoots
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+    EXPECT_EQ(cluster.GetVolume(), 100u); // clamped to EffectiveMax, not rejected
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -900,7 +901,8 @@ TEST_F(TestAudioControlCluster, DecreaseVolumeSoftMutedPolicyPath)
 
 TEST_F(TestAudioControlCluster, DecreaseVolumeStepSizeConstraintError)
 {
-    // effectiveMax=100, minVol=1 → valid stepSize: [1, 99]
+    // StepSize is only constrained to be >= 1; an over-large StepSize floors at MinDeviceVolume
+    // (muting the device) rather than being rejected.
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50).WithInitialDefaultStepSize(10));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -910,11 +912,12 @@ TEST_F(TestAudioControlCluster, DecreaseVolumeStepSizeConstraintError)
     DecreaseVolume::Type cmd;
     cmd.stepSize.SetValue(0);
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
-
-    cmd.stepSize.SetValue(100); // > 99
-    EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
-
     EXPECT_EQ(cluster.GetVolume(), 50u); // unchanged
+
+    cmd.stepSize.SetValue(100); // overshoots down to below MinDeviceVolume
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+    EXPECT_EQ(cluster.GetVolume(), 1u); // floored at MinDeviceVolume
+    EXPECT_TRUE(cluster.GetSoftMuted());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2724,10 +2727,11 @@ TEST_F(TestAudioControlCluster, SetMaxUserVolumeDelegateVetoLeavesAllStateUnchan
 
 // ---------- Optional attribute absent: startup fallback behavior ----------
 
-TEST_F(TestAudioControlCluster, StartUpMutedAbsentBehavesAsFalse)
+TEST_F(TestAudioControlCluster, StartUpMutedAbsentRetainsPersistedSoftMuted)
 {
-    // When StartUpMuted is absent, the cluster always starts unmuted (false), regardless of
-    // what SoftMuted state was persisted. This mirrors the behavior of an explicit StartUpMuted=false.
+    // When StartUpMuted is absent, SoftMuted is still non-volatile per spec: the cluster retains
+    // the persisted SoftMuted state on startup, mirroring the behavior of an explicit
+    // StartUpMuted=null.
     auto cfg = BasicConfig().WithInitialSoftMuted(false);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
@@ -2739,7 +2743,7 @@ TEST_F(TestAudioControlCluster, StartUpMutedAbsentBehavesAsFalse)
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-        EXPECT_FALSE(cluster.GetSoftMuted()); // always unmuted — absent StartUpMuted forces false
+        EXPECT_TRUE(cluster.GetSoftMuted()); // retained from persistence, not forced to false
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
@@ -3091,6 +3095,29 @@ TEST_F(TestAudioControlCluster, StartupCorruptedEnumKvsFallsBackToConfigDefault)
 
 // ---------- Regression tests for command/persistence hardening fixes ----------
 
+TEST_F(TestAudioControlCluster, StartupCorruptedMaxUserVolumeKvsClampedToValidRange)
+{
+    // Simulate a corrupted/stale KVS value for MaxUserVolume that is below MinDeviceVolume.
+    // Without clamping, EffectiveMaxVolume() would return it verbatim and the later
+    // std::clamp(mVolume, mMinDeviceVolume, EffectiveMaxVolume()) call would violate std::clamp's
+    // precondition (lower <= upper).
+    const uint16_t corruptValue = 0; // BasicConfig() has MinDeviceVolume == 1
+    auto key = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, MaxUserVolume::Id);
+    ASSERT_EQ(testContext.StorageDelegate().SyncSetKeyValue(key.KeyName(), &corruptValue, sizeof(corruptValue)), CHIP_NO_ERROR);
+
+    AudioControlCluster::OptionalAttributeSet optionalSet;
+    optionalSet.Set<MaxUserVolume::Id>();
+    auto cfg = BasicConfig().WithOptionalAttributes(optionalSet).WithInitialMaxUserVolume(100).WithInitialVolume(50);
+
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.GetMaxUserVolume(), 1u); // clamped up to MinDeviceVolume, not left at 0
+    EXPECT_EQ(cluster.GetVolume(), 1u);        // Volume clamp then applies against the corrected ceiling
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestAudioControlCluster, SetVolumeInvalidUnmutePolicyReturnsConstraintError)
 {
     // SoftMuted=TRUE so the command goes through ApplyUnmutePolicy (not the fast path).
@@ -3116,11 +3143,11 @@ TEST_F(TestAudioControlCluster, SetVolumeInvalidUnmutePolicyReturnsConstraintErr
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, IncreaseVolumeDegenerateRangeReturnsConstraintError)
+TEST_F(TestAudioControlCluster, IncreaseVolumeDegenerateRangeClampsToNoOpSuccess)
 {
-    // MinDeviceVolume == MaxDeviceVolume → EffectiveMax == MinDeviceVolume, so the valid
-    // StepSize range [1, EffectiveMax - MinDeviceVolume] is empty. Even the default StepSize
-    // (omitted from the command) must be rejected rather than silently clamped to a no-op success.
+    // MinDeviceVolume == MaxDeviceVolume -> EffectiveMax == MinDeviceVolume, so there is no room to
+    // increase. StepSize is only checked for being >= 1; the resulting volume is clamped to
+    // EffectiveMax, so the command succeeds as a no-op rather than failing with ConstraintError.
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 AudioControlCluster::Config{}
                                     .WithMinDeviceVolume(50)
@@ -3132,18 +3159,17 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeDegenerateRangeReturnsConstraintEr
     ClusterTester tester(cluster);
 
     auto result = tester.Invoke(IncreaseVolume::Type{});
-    EXPECT_FALSE(result.IsSuccess());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    EXPECT_TRUE(result.IsSuccess());
     EXPECT_EQ(cluster.GetVolume(), 50u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, DecreaseVolumeDegenerateRangeReturnsConstraintError)
+TEST_F(TestAudioControlCluster, DecreaseVolumeDegenerateRangeClampsToNoOpSuccess)
 {
-    // Same degenerate range as IncreaseVolumeDegenerateRangeReturnsConstraintError, but for
-    // DecreaseVolume.
+    // Same degenerate range as IncreaseVolumeDegenerateRangeClampsToNoOpSuccess, but for
+    // DecreaseVolume: the result floors at MinDeviceVolume (== MaxDeviceVolume here), so the
+    // command succeeds, muting the device rather than failing with ConstraintError.
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
                                 AudioControlCluster::Config{}
                                     .WithMinDeviceVolume(50)
@@ -3155,19 +3181,44 @@ TEST_F(TestAudioControlCluster, DecreaseVolumeDegenerateRangeReturnsConstraintEr
     ClusterTester tester(cluster);
 
     auto result = tester.Invoke(DecreaseVolume::Type{});
-    EXPECT_FALSE(result.IsSuccess());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_EQ(cluster.GetVolume(), 50u);
+    EXPECT_TRUE(cluster.GetSoftMuted());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, IncreaseDecreaseVolumeRejectZeroStepSize)
+{
+    // StepSize is still required to be >= 1 regardless of the volume range.
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialVolume(50));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    IncreaseVolume::Type increaseCmd;
+    increaseCmd.stepSize.SetValue(0);
+    auto increaseResult = tester.Invoke(increaseCmd);
+    EXPECT_FALSE(increaseResult.IsSuccess());
+    ASSERT_TRUE(increaseResult.GetStatusCode().has_value());
+    EXPECT_EQ(increaseResult.GetStatusCode()->GetStatus(), Status::ConstraintError);
+
+    DecreaseVolume::Type decreaseCmd;
+    decreaseCmd.stepSize.SetValue(0);
+    auto decreaseResult = tester.Invoke(decreaseCmd);
+    EXPECT_FALSE(decreaseResult.IsSuccess());
+    ASSERT_TRUE(decreaseResult.GetStatusCode().has_value());
+    EXPECT_EQ(decreaseResult.GetStatusCode()->GetStatus(), Status::ConstraintError);
+
     EXPECT_EQ(cluster.GetVolume(), 50u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, SoftMutedNotPersistedWithoutStartUpMuted)
+TEST_F(TestAudioControlCluster, SoftMutedPersistedWithoutStartUpMuted)
 {
-    // StartUpMuted is NOT in the optional set → SoftMuted must never be written to KVS (it is
-    // never read back), and must NOT survive a restart: the cluster must come back up at the
-    // config default (false), not the pre-shutdown value.
+    // SoftMuted is non-volatile per spec and must survive a restart even when StartUpMuted is not
+    // in the optional set.
     auto cfg = BasicConfig().WithInitialSoftMuted(false);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
@@ -3175,14 +3226,14 @@ TEST_F(TestAudioControlCluster, SoftMutedNotPersistedWithoutStartUpMuted)
         ASSERT_EQ(cluster.SetSoftMuted(true), CHIP_NO_ERROR);
 
         auto key = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, SoftMuted::Id);
-        EXPECT_FALSE(testContext.StorageDelegate().SyncDoesKeyExist(key.KeyName()));
+        EXPECT_TRUE(testContext.StorageDelegate().SyncDoesKeyExist(key.KeyName()));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-        EXPECT_FALSE(cluster.GetSoftMuted()); // config default, NOT the pre-shutdown `true`
+        EXPECT_TRUE(cluster.GetSoftMuted()); // restored from persistence, not the config default
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }

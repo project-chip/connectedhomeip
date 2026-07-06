@@ -88,6 +88,9 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
         attributePersistence.LoadNativeEndianValue(
             ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::MaxUserVolume::Id), mMaxUserVolume,
             mMaxUserVolume);
+        // Guard against a corrupted/stale KVS value so EffectiveMaxVolume() never returns something
+        // below mMinDeviceVolume, which would violate std::clamp's precondition below.
+        mMaxUserVolume = std::clamp(mMaxUserVolume, mMinDeviceVolume, mMaxDeviceVolume);
     }
 
     // Restore last-known Volume (always; serves as fallback when StartUpVolume is null or absent).
@@ -130,14 +133,17 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
     if (mDecreaseVolumeUnmutePolicy >= UnmutePolicyEnum::kUnknownEnumValue)
         mDecreaseVolumeUnmutePolicy = defaultDecreaseVolumePolicy;
 
+    // SoftMuted is non-volatile per spec and must be restored on startup regardless of whether
+    // StartUpMuted is supported.
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id), mSoftMuted, mSoftMuted);
+
     // Apply StartUpMuted:
-    //   absent  → mSoftMuted stays at the config default (false); persisted state is not loaded.
-    //   null    → load and retain the persisted SoftMuted state.
-    //   non-null → load persisted state, then override with the StartUpMuted value.
+    //   absent   -> mSoftMuted stays at the just-restored persisted value.
+    //   null     -> retain the persisted SoftMuted state.
+    //   non-null -> override with the StartUpMuted value.
     if (mOptionalAttributeSet.IsSet(StartUpMuted::Id))
     {
-        attributePersistence.LoadNativeEndianValue(
-            ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id), mSoftMuted, mSoftMuted);
         attributePersistence.LoadNativeEndianValue(
             ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpMuted::Id), mStartUpMuted, mStartUpMuted);
         if (!mStartUpMuted.IsNull())
@@ -202,9 +208,6 @@ void AudioControlCluster::StoreVolume()
 void AudioControlCluster::StoreSoftMuted()
 {
     VerifyOrReturn(mContext != nullptr);
-    // SoftMuted is only ever loaded back in Startup() when StartUpMuted is supported (it feeds the
-    // null-retain behavior); skip the write otherwise to avoid pointless flash wear.
-    VerifyOrReturn(mOptionalAttributeSet.IsSet(Attributes::StartUpMuted::Id));
     LogErrorOnFailure(
         mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id),
                                               ByteSpan(reinterpret_cast<const uint8_t *>(&mSoftMuted), sizeof(mSoftMuted))));
@@ -658,10 +661,10 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleIncreaseVolume(chip::TL
     const uint16_t effectiveMax = EffectiveMaxVolume();
     const uint16_t stepSize     = req.stepSize.ValueOr(mDefaultStepSize);
 
-    // Constraint: 1 to (EffectiveMax - MinDeviceVolume). When EffectiveMax <= MinDeviceVolume the
-    // valid range is empty, so any StepSize is out of range.
-    const uint16_t maxStepSize = (effectiveMax > mMinDeviceVolume) ? static_cast<uint16_t>(effectiveMax - mMinDeviceVolume) : 0;
-    VerifyOrReturnError(stepSize >= 1 && stepSize <= maxStepSize, Status::ConstraintError);
+    // StepSize is clamped against the volume range below rather than rejected here, so a
+    // previously-valid DefaultStepSize doesn't start failing IncreaseVolume calls after
+    // MaxUserVolume shrinks.
+    VerifyOrReturnError(stepSize >= 1, Status::ConstraintError);
 
     const UnmutePolicyEnum policy       = req.unmutePolicy.ValueOr(mIncreaseVolumeUnmutePolicy);
     const UnmuteVolumeEnum unmuteVolume = req.unmuteVolume.ValueOr(mIncreaseVolumeUnmuteVolume);
@@ -714,13 +717,12 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleDecreaseVolume(chip::TL
     DecreaseVolume::DecodableType req;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
 
-    const uint16_t effectiveMax = EffectiveMaxVolume();
-    const uint16_t stepSize     = req.stepSize.ValueOr(mDefaultStepSize);
+    const uint16_t stepSize = req.stepSize.ValueOr(mDefaultStepSize);
 
-    // Constraint: 1 to (EffectiveMax - MinDeviceVolume). When EffectiveMax <= MinDeviceVolume the
-    // valid range is empty, so any StepSize is out of range.
-    const uint16_t maxStepSize = (effectiveMax > mMinDeviceVolume) ? static_cast<uint16_t>(effectiveMax - mMinDeviceVolume) : 0;
-    VerifyOrReturnError(stepSize >= 1 && stepSize <= maxStepSize, Status::ConstraintError);
+    // StepSize is clamped against the volume range below rather than rejected here, so a
+    // previously-valid DefaultStepSize doesn't start failing DecreaseVolume calls after
+    // MaxUserVolume shrinks.
+    VerifyOrReturnError(stepSize >= 1, Status::ConstraintError);
 
     // RequestedVolume = Volume - StepSize (with underflow protection)
     const uint32_t requestedVolume32 = static_cast<uint32_t>(mVolume) > static_cast<uint32_t>(stepSize)
