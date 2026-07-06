@@ -68,13 +68,21 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
                 {
                     uint32_t freq = static_cast<uint32_t>(std::strtoul(p, nullptr, 10));
                     if (freq >= 2412 && freq <= 2484)
+                    {
                         bands.Set(WiFiBandBitmap::k2g4);
+                    }
                     else if (freq >= 5035 && freq <= 5980)
+                    {
                         bands.Set(WiFiBandBitmap::k5g);
+                    }
                     while (*p != '\0' && *p != ',' && *p != ' ')
+                    {
                         ++p;
+                    }
                     if (*p == ',')
+                    {
                         ++p;
+                    }
                 }
             }
         }

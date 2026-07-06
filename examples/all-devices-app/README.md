@@ -92,10 +92,9 @@ The application supports the following device types (specified via the
 -   `soil-sensor`
 -   `speaker`
 -   `water-freeze-detector`
--   `water-leak-detector` <<<<<<< cp-pr3-all-devices-app
--   # `commissioning-proxy`
+-   `water-leak-detector`
 -   `water-valve`
-    > > > > > > > master
+-   `commissioning-proxy`
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -106,11 +105,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-<<<<<<< cp-pr3-all-devices-app
-  --device <chime|contact-sensor|dimmable-light|fan|fan-no-onoff|flow-sensor|humidity-sensor|light-sensor|occupancy-sensor|on-off-light|power-source|pressure-sensor|rain-sensor|soil-sensor|speaker|water-freeze-detector|water-leak-detector|commissioning-proxy>
-=======
-  --device <air-purifier|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|mounted-dimmable-load-control|mounted-on-off-control|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|rain-sensor|refrigerator|soil-sensor|speaker|water-freeze-detector|water-leak-detector|water-valve>
->>>>>>> master
+  --device <air-purifier|chime|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-sensor|light-sensor|mounted-dimmable-load-control|mounted-on-off-control|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|power-source|pressure-sensor|rain-sensor|refrigerator|soil-sensor|speaker|water-freeze-detector|water-leak-detector|water-valve|commissioning-proxy>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
