@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -956,6 +956,27 @@ static const struct ccm_128_test_vector chiptest_dac9e1195a0d_test_vector_266 = 
                                                                                   .tcId      = 37,
                                                                                   .result    = CHIP_ERROR_INTERNAL };
 
+static const uint8_t chiptest_dac9e1195a0d_key_267[]                          = { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+                                                                                  0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f };
+static const uint8_t chiptest_dac9e1195a0d_nonce_268[]                        = { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
+                                                                                  0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+static const uint8_t chiptest_dac9e1195a0d_tag_269[]                          = { 0x32, 0xd6, 0xf8, 0x24, 0x3a, 0x26, 0xd0, 0xbd,
+                                                                                  0x98, 0xd0, 0x1b, 0x0f, 0x44, 0x8e, 0x77, 0x73 };
+static const struct ccm_128_test_vector chiptest_dac9e1195a0d_test_vector_270 = { .pt        = nullptr,
+                                                                                  .pt_len    = 0,
+                                                                                  .aad       = nullptr,
+                                                                                  .aad_len   = 0,
+                                                                                  .key       = chiptest_dac9e1195a0d_key_267,
+                                                                                  .key_len   = 16,
+                                                                                  .nonce     = chiptest_dac9e1195a0d_nonce_268,
+                                                                                  .nonce_len = 13,
+                                                                                  .ct        = nullptr,
+                                                                                  .ct_len    = 0,
+                                                                                  .tag       = chiptest_dac9e1195a0d_tag_269,
+                                                                                  .tag_len   = 16,
+                                                                                  .tcId      = 38,
+                                                                                  .result    = CHIP_NO_ERROR };
+
 static const uint8_t test_vector_2ef53070ae20_key[] = {
     0x09, 0x53, 0xfa, 0x93, 0xe7, 0xca, 0xac, 0x96, 0x38, 0xf5, 0x88, 0x20, 0x22, 0x0a, 0x39, 0x8e,
 };
@@ -1636,6 +1657,7 @@ static const struct ccm_128_test_vector * ccm_128_test_vectors[] = {
     &chiptest_dac9e1195a0d_test_vector_217,        &chiptest_dac9e1195a0d_test_vector_224,
     &chiptest_dac9e1195a0d_test_vector_231,        &chiptest_dac9e1195a0d_test_vector_238,
     &chiptest_dac9e1195a0d_test_vector_245,        &chiptest_dac9e1195a0d_test_vector_252,
+    &chiptest_dac9e1195a0d_test_vector_270,
 #endif // !CHIP_CRYPTO_BORINGSSL
     &aesccm128_matter_2ef53070ae20_test_vector_0,  &aesccm128_matter_91c8d337cf46_test_vector_1,
     &aesccm128_matter_37fc295e3601_test_vector_2,  &aesccm128_matter_8bab3993e4d1_test_vector_3,

@@ -445,7 +445,7 @@ void BLEEndPoint::ReleaseBleConnection()
         if (mConnStateFlags.Has(ConnectionStateFlag::kAutoClose))
         {
             ChipLogProgress(Ble, "Auto-closing end point's BLE connection.");
-            mBle->mPlatformDelegate->CloseConnection(mConnObj);
+            TEMPORARY_RETURN_IGNORED mBle->mPlatformDelegate->CloseConnection(mConnObj);
         }
         else
         {
@@ -876,7 +876,7 @@ CHIP_ERROR BLEEndPoint::DoSendStandAloneAck()
     ChipLogDebugBleEndPoint(Ble, "entered DoSendStandAloneAck; sending stand-alone ack");
 
     // Encode and transmit stand-alone ack.
-    mBtpEngine.EncodeStandAloneAck(mAckToSend);
+    ReturnErrorOnFailure(mBtpEngine.EncodeStandAloneAck(mAckToSend));
     ReturnErrorOnFailure(SendCharacteristic(mAckToSend.Retain()));
 
     // Reset local receive window counter.
@@ -1000,8 +1000,8 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && 
     // Select fragment size for connection based on ATT MTU.
     if (mtu > 0) // If one or both device knows connection's MTU...
     {
-        resp.mFragmentSize =
-            std::min(static_cast<uint16_t>(mtu - 3), BtpEngine::sMaxFragmentSize); // Reserve 3 bytes of MTU for ATT header.
+        resp.mFragmentSize = std::clamp<uint16_t>(static_cast<uint16_t>(std::max<uint16_t>(mtu, 3) - 3U), // ensure no undeflow
+                                                  BtpEngine::sMinFragmentSize, BtpEngine::sMaxFragmentSize);
     }
     else // Else, if neither device knows MTU...
     {
@@ -1056,7 +1056,7 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle &&
     // Decode BTP capabilities response.
     ReturnErrorOnFailure(BleTransportCapabilitiesResponseMessage::Decode(data, resp));
 
-    VerifyOrReturnError(resp.mFragmentSize > 0, BLE_ERROR_INVALID_FRAGMENT_SIZE);
+    VerifyOrReturnError(resp.mFragmentSize >= BtpEngine::sMinFragmentSize, BLE_ERROR_INVALID_FRAGMENT_SIZE);
 
     ChipLogProgress(Ble, "peripheral chose BTP version %d; central expected between %d and %d", resp.mSelectedProtocolVersion,
                     CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION);
@@ -1077,9 +1077,11 @@ CHIP_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle &&
 
     // Select local and remote max receive window size based on local resources available for both incoming indications
     // AND GATT confirmations.
-    mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize = resp.mWindowSize;
+    VerifyOrReturnError(resp.mWindowSize > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize =
+        std::min(resp.mWindowSize, static_cast<uint8_t>(BLE_MAX_RECEIVE_WINDOW_SIZE));
 
-    ChipLogProgress(Ble, "local and remote recv window size = %u", resp.mWindowSize);
+    ChipLogProgress(Ble, "local and remote recv window size = %u", mReceiveWindowMaxSize);
 
     // Shrink local receive window counter by 1, since connect handshake indication requires acknowledgement.
     mLocalReceiveWindowSize = static_cast<SequenceNumber_t>(mLocalReceiveWindowSize - 1);

@@ -82,7 +82,7 @@ CHIP_ERROR ReportDataMessage::Parser::PrettyPrint() const
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                attributeReportIBs.Init(reader);
+                TEMPORARY_RETURN_IGNORED attributeReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
                 ReturnErrorOnFailure(attributeReportIBs.PrettyPrint());
@@ -94,7 +94,7 @@ CHIP_ERROR ReportDataMessage::Parser::PrettyPrint() const
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                eventReportIBs.Init(reader);
+                TEMPORARY_RETURN_IGNORED eventReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
                 ReturnErrorOnFailure(eventReportIBs.PrettyPrint());

@@ -19,7 +19,7 @@
 import datetime
 import logging
 import sys
-from typing import Dict, List, Mapping, Optional, Tuple, cast
+from typing import Mapping, Optional, cast
 
 import memdf.report
 import memdf.util.config
@@ -27,6 +27,8 @@ import memdf.util.sqlite
 import pandas as pd  # type: ignore
 from memdf import Config
 from memdf.sizedb import SizeDatabase
+
+log = logging.getLogger(__name__)
 
 QUERY_CONFIG = {
     Config.group_map('query'): {
@@ -68,16 +70,16 @@ QUERY_CONFIG = {
 }
 
 
-def argsplit(metavar: str, value: str) -> Tuple[Optional[Tuple], Dict]:
+def argsplit(metavar: str, value: str) -> tuple[Optional[tuple], dict]:
     """Given comma-separated metavar and values, match them up."""
     values = tuple(value.split(','))
     names = metavar.split(',')
     if len(names) < len(values):
-        logging.error('Too many values for %s', metavar)
+        log.error("Too many values for '%s'", metavar)
         return (None, {})
     if len(names) > len(values):
-        logging.error('Missing %s for %s', ','.join(names[len(values):]),
-                      metavar)
+        log.error("Missing '%s' for '%s'", ','.join(names[len(values):]),
+                  metavar)
         return (None, {})
     return (values, dict(zip(names, values)))
 
@@ -100,7 +102,7 @@ def postprocess_canned_sql_option(config: Config, key: str,
             args = {metavar: value}
         title = title.format(**args)
     else:
-        values = tuple()
+        values = ()
 
     if config['queries'] is None:
         config['queries'] = []
@@ -306,7 +308,7 @@ QUERY_CONFIG |= {
 }
 
 
-def get_build_sections(db: SizeDatabase, build: str) -> Optional[Tuple]:
+def get_build_sections(db: SizeDatabase, build: str) -> Optional[tuple]:
     """Split a build arg and get its thing_id and sections."""
     values, args = argsplit('PLATFORM,CONFIG,TARGET', build)
     if not values:
@@ -317,19 +319,19 @@ def get_build_sections(db: SizeDatabase, build: str) -> Optional[Tuple]:
     ptarget = args['TARGET']
     thing_id = db.select_thing_id(platform, pconfig, ptarget)
     if not thing_id:
-        logging.error('No match for %s,%s,%s', platform, pconfig, ptarget)
+        log.error("No match for '%s,%s,%s'", platform, pconfig, ptarget)
         return None
 
     sections = db.select_sections_for_thing(thing_id)
     if not sections:
-        logging.warning('No sections for %s,%s,%s', platform, pconfig, ptarget)
+        log.warning("No sections for '%s,%s,%s'", platform, pconfig, ptarget)
         return None
 
     return (platform, pconfig, ptarget, thing_id, sections)
 
 
 def make_build_sizes_query(config: Config, thing_id: str,
-                           sections: List[str]) -> Tuple[List[str], str]:
+                           sections: list[str]) -> tuple[list[str], str]:
     """Construct and SQL query for all section sizes for a given thing."""
     # SQLite doesn't have PIVOT so we need to construct a query with
     # a column for each section.
@@ -363,7 +365,7 @@ def query_build_sizes(config: Config, db: SizeDatabase,
     platform, pconfig, ptarget, thing_id, sections = t
 
     columns, query = make_build_sizes_query(config, thing_id, sections)
-    logging.debug('Query: %s', query)
+    log.debug("Query: '%s'", query)
 
     cur = db.execute(query)
     rows = cur.fetchall()
@@ -401,10 +403,10 @@ def main(argv):
         for title, key, values, info in config.get('queries', []):
             q += 1
             query = make_query(config, info)
-            logging.debug('Option: %s', key)
-            logging.debug('Title: %s', title)
-            logging.debug('Query: %s', query.strip())
-            logging.debug('With: %s', values)
+            log.debug("Option: '%s'", key)
+            log.debug("Title: '%s'", title)
+            log.debug("Query: '%s'", query.strip())
+            log.debug("With: '%s'", values)
             cur = db.execute(query, values)
             columns = [i[0] for i in cur.description]
             rows = cur.fetchall()

@@ -55,7 +55,7 @@ private:
 class ListenSocketPickerDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
-    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->mListenUdp; }
+    chip::Inet::UDPEndPointHandle Accept(ServerBase::EndpointInfo * info) override { return info->mListenUdp; }
 };
 
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
@@ -66,7 +66,7 @@ public:
 class QuerySocketPickerDelegate : public ServerBase::BroadcastSendDelegate
 {
 public:
-    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->mUnicastQueryUdp; }
+    chip::Inet::UDPEndPointHandle Accept(ServerBase::EndpointInfo * info) override { return info->mUnicastQueryUdp; }
 };
 
 #else
@@ -95,7 +95,7 @@ public:
         mAddressType(type), mChild(child)
     {}
 
-    chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override
+    chip::Inet::UDPEndPointHandle Accept(ServerBase::EndpointInfo * info) override
     {
         if ((info->mInterfaceId != mInterface) && (info->mInterfaceId != chip::Inet::InterfaceId::Null()))
         {
@@ -185,7 +185,7 @@ bool ServerBase::IsListening() const
 {
     bool listening = false;
     mEndpoints.ForEachActiveObject([&](auto * endpoint) {
-        if (endpoint->mListenUdp != nullptr)
+        if (endpoint->mListenUdp)
         {
             listening = true;
             return chip::Loop::Break;
@@ -207,9 +207,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
 
     while (it->Next(&interfaceId, &addressType))
     {
-        chip::Inet::UDPEndPoint * listenUdp;
-        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&listenUdp));
-        std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> endPointHolder(listenUdp, {});
+        chip::Inet::UDPEndPointHandle listenUdp;
+        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(listenUdp));
 
         ReturnErrorOnFailure(listenUdp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
 
@@ -220,13 +219,13 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
         if (err != CHIP_NO_ERROR)
         {
             char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
-            interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
+            TEMPORARY_RETURN_IGNORED interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %" CHIP_ERROR_FORMAT,
                          interfaceName, AddressTypeStr(addressType), err.Format());
 
-            endPointHolder.reset();
+            listenUdp.Release();
         }
 
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
@@ -234,24 +233,23 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
         //   - helps in not having conflicts on port 5353, will receive unicast replies directly
         //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
         //     not originate from 5353 and the answers will include a query section.
-        chip::Inet::UDPEndPoint * unicastQueryUdp;
-        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&unicastQueryUdp));
-        std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> endPointHolderUnicast(unicastQueryUdp, {});
+        chip::Inet::UDPEndPointHandle unicastQueryUdp;
+        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(unicastQueryUdp));
         ReturnErrorOnFailure(unicastQueryUdp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId));
         ReturnErrorOnFailure(unicastQueryUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 #endif
 
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-        if (endPointHolder || endPointHolderUnicast)
+        if (listenUdp || unicastQueryUdp)
         {
             // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
-            mEndpoints.CreateObject(interfaceId, addressType, std::move(endPointHolder), std::move(endPointHolderUnicast));
+            mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp), std::move(unicastQueryUdp));
         }
 #else
-        if (endPointHolder)
+        if (listenUdp)
         {
             // If allocation fails, the rref will not be consumed, so that the endpoint will also be freed correctly
-            mEndpoints.CreateObject(interfaceId, addressType, std::move(endPointHolder));
+            mEndpoints.CreateObject(interfaceId, addressType, std::move(listenUdp));
         }
 #endif
 
@@ -275,7 +273,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
 {
     CHIP_ERROR err = CHIP_ERROR_NOT_CONNECTED;
     mEndpoints.ForEachActiveObject([&](auto * info) {
-        if (info->mListenUdp == nullptr)
+        if (info->mListenUdp.IsNull())
         {
             return chip::Loop::Continue;
         }
@@ -344,9 +342,9 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
     CHIP_ERROR lastError = CHIP_ERROR_NO_ENDPOINT;
 
     if (chip::Loop::Break == mEndpoints.ForEachActiveObject([&](auto * info) {
-            chip::Inet::UDPEndPoint * udp = delegate->Accept(info);
+            auto udp = delegate->Accept(info);
 
-            if (udp == nullptr)
+            if (udp.IsNull())
             {
                 return chip::Loop::Continue;
             }

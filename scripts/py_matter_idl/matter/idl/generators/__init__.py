@@ -14,7 +14,7 @@
 
 import logging
 import os
-from typing import Dict, Optional
+from typing import Optional
 
 import jinja2
 
@@ -22,6 +22,8 @@ from matter.idl.matter_idl_types import Idl
 
 from .filters import RegisterCommonFilters
 from .storage import GeneratorStorage
+
+log = logging.getLogger(__name__)
 
 
 class CodeGenerator:
@@ -82,7 +84,7 @@ class CodeGenerator:
         """
         raise NotImplementedError("Method should be implemented by subclasses")
 
-    def internal_render_one_output(self, template_path: str, output_file_name: str, vars: Dict):
+    def internal_render_one_output(self, template_path: str, output_file_name: str, template_vars: dict):
         """
         Method to be called by subclasses to mark that a template is to be generated.
 
@@ -99,12 +101,12 @@ class CodeGenerator:
           output_file_name - File name that the template is to be generated to.
           vars             - variables used for template generation
         """
-        logging.info("File to be generated: %s" % output_file_name)
+        log.info("File to be generated: '%s'", output_file_name)
         if self.dry_run:
             return
 
-        logging.info(f"Template path: {template_path}, CWD: {os.getcwd()}")
-        rendered = self.jinja_env.get_template(template_path).render(vars)
+        log.info("Template path: '%s', CWD: '%s'", template_path, os.getcwd())
+        rendered = self.jinja_env.get_template(template_path).render(template_vars)
 
         # Report regardless if it has changed or not. This is because even if
         # files are unchanged, validation of what the correct output is should
@@ -112,6 +114,6 @@ class CodeGenerator:
         self.storage.report_output_file(output_file_name)
 
         if rendered == self.storage.get_existing_data(output_file_name):
-            logging.info("File content not changed")
+            log.info("File content not changed")
         else:
             self.storage.write_new_data(output_file_name, rendered)

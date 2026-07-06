@@ -14,7 +14,7 @@
 # limitations under the License.
 import os
 from dataclasses import dataclass
-from typing import Generator, List, Optional
+from typing import Generator, Optional
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage
@@ -34,7 +34,7 @@ class TableEntry:
 class Table:
     # Usable variable fully qualified name (like <Cluster>_<name>)
     full_name: str
-    entries: List[TableEntry]
+    entries: list[TableEntry]
 
 
 class ClusterTablesGenerator:
@@ -171,9 +171,7 @@ class ClusterTablesGenerator:
             )
             for e in self.cluster.events if e.fields
         ])
-        cluster_entries.extend(
-            [entry for entry in self.CommandEntries()]
-        )
+        cluster_entries.extend(self.CommandEntries())
 
         yield Table(
             full_name=self.cluster.name,
@@ -238,16 +236,14 @@ class ClusterTablesGenerator:
             )
 
 
-def CreateTables(idl: Idl) -> List[Table]:
+def CreateTables(idl: Idl) -> list[Table]:
     result = []
     for cluster in idl.clusters:
-        result.extend(
-            [table for table in ClusterTablesGenerator(cluster).GenerateTables()])
-
+        result.extend(ClusterTablesGenerator(cluster).GenerateTables())
     return result
 
 
-def IndexInTable(name: Optional[str], table: List[Table]) -> str:
+def IndexInTable(name: Optional[str], table: list[Table]) -> str:
     """Find the index of the given name in the table.
 
     The index is 1-based (to allow for a first entry containing a
@@ -297,7 +293,7 @@ class TLVMetaDataGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="TLVMetaData_cpp.jinja",
             output_file_name=f"tlv/meta/{self.table_name}.cpp",
-            vars={
+            template_vars={
                 'clusters': self.idl.clusters,
                 'table_name': self.table_name,
                 'sub_tables': tables,
@@ -307,7 +303,7 @@ class TLVMetaDataGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="TLVMetaData_h.jinja",
             output_file_name=f"tlv/meta/{self.table_name}.h",
-            vars={
+            template_vars={
                 'clusters': self.idl.clusters,
                 'table_name': self.table_name,
                 'sub_tables': tables,

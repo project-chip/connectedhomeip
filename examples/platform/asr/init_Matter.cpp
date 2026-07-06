@@ -84,10 +84,10 @@ CHIP_ERROR MatterInitializer::Init_Matter_Stack(const char * appName)
 
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
     return CHIP_NO_ERROR;
@@ -104,11 +104,11 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-    chip::Server::GetInstance().Init(initParams);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    // Initialize device attestation config
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
     SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ASR_LOG("Starting Platform Manager Event Loop");
     // // Start a task to run the CHIP Device event loop.

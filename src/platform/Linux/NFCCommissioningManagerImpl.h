@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include <nfc/NfcApplicationDelegate.h>
+#include <transport/raw/NfcApplicationDelegate.h>
 
+#include <lib/core/Global.h>
 #include <platform/internal/NFCCommissioningManager.h>
 
 #include <atomic>
@@ -34,7 +35,11 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#ifdef __APPLE__
+#include <PCSC/winscard.h>
+#else
 #include <winscard.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
@@ -152,13 +157,15 @@ private:
 
     CHIP_ERROR _Init();
     void _Shutdown();
+    Nfc::NFCReaderTransport * _GetNFCReaderTransport() const { return nullptr; }
+    void _SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport) {}
 
     // ===== Members for internal use by the following friends.
 
     friend NFCCommissioningManager & NFCCommissioningMgr();
     friend NFCCommissioningManagerImpl & NFCCommissioningMgrImpl();
 
-    static NFCCommissioningManagerImpl sInstance;
+    static Global<NFCCommissioningManagerImpl> sInstance;
 
     void EraseAllTagInstancesUsingReaderName(const char * readerName);
     std::shared_ptr<TagInstance> SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName, SCARDHANDLE cardHandle);
@@ -168,6 +175,10 @@ private:
     CHIP_ERROR ScanReader(uint16_t nfcShortId, char * readerName);
 
     Transport::NFCBase * mNFCBase = nullptr;
+
+    SCARDCONTEXT mPcscContext = 0;
+    std::shared_ptr<TagInstance> mLastTagInstanceUsed;
+    std::vector<std::shared_ptr<TagInstance>> mTagInstances;
 
     // Thread and synchronization primitives
     std::thread mNfcThread;
@@ -191,7 +202,7 @@ private:
  */
 inline NFCCommissioningManager & NFCCommissioningMgr()
 {
-    return NFCCommissioningManagerImpl::sInstance;
+    return NFCCommissioningManagerImpl::sInstance.get();
 }
 
 /**
@@ -202,7 +213,7 @@ inline NFCCommissioningManager & NFCCommissioningMgr()
  */
 inline NFCCommissioningManagerImpl & NFCCommissioningMgrImpl()
 {
-    return NFCCommissioningManagerImpl::sInstance;
+    return NFCCommissioningManagerImpl::sInstance.get();
 }
 
 } // namespace Internal

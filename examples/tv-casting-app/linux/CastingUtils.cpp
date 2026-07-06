@@ -38,7 +38,10 @@ CHIP_ERROR DiscoverCommissioners()
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
     return DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
-        [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+        [](System::Layer *, void *) {
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow);
+        },
+        nullptr);
 }
 
 CHIP_ERROR RequestCommissioning(int index)
@@ -62,12 +65,12 @@ CHIP_ERROR RequestCommissioning(int index)
  */
 void PrepareForCommissioning(const Dnssd::CommissionNodeData * selectedCommissioner)
 {
-    CastingServer::GetInstance()->Init();
+    TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->Init();
 
     CommissioningCallbacks commissioningCallbacks;
     commissioningCallbacks.commissioningComplete = HandleCommissioningCompleteCallback;
-    CastingServer::GetInstance()->OpenBasicCommissioningWindow(commissioningCallbacks, OnConnectionSuccess, OnConnectionFailure,
-                                                               OnNewOrUpdatedEndpoint);
+    TEMPORARY_RETURN_IGNORED CastingServer::GetInstance()->OpenBasicCommissioningWindow(
+        commissioningCallbacks, OnConnectionSuccess, OnConnectionFailure, OnNewOrUpdatedEndpoint);
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();

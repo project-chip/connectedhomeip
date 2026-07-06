@@ -28,6 +28,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
+#include <credentials/GroupDataProviderImpl.h>
 #if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
 #include <app/server/TermsAndConditionsManager.h>
 #endif
@@ -86,13 +87,6 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
-Identify gIdentify0 = {
-    chip::EndpointId{ 0 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-};
-
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
@@ -116,18 +110,18 @@ static void InitServer(intptr_t context)
 
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
-    NetWorkCommissioningInstInit();
 
 #if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
     const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
         app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
     PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
-    chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
+    chip::app::TermsAndConditionsManager::GetInstance().Init(&persistentStorageDelegate, termsAndConditions);
 #endif
+
+    NetWorkCommissioningInstInit();
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {

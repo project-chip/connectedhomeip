@@ -14,6 +14,13 @@
 
 name: 7.2.2. [TC-TMP-2.2] Primary functionality with server as DUT
 
+CI:
+    - name: "Test against all-devices/temperature-sensor"
+      app: all-devices
+      args:
+          - --device
+          - temperature-sensor
+
 PICS:
     - TMP.S
 
@@ -32,7 +39,6 @@ tests:
                 value: nodeId
 
     - label: "Step 2: TH reads MinMeasuredValue attribute from DUT"
-      PICS: TMP.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -42,7 +48,6 @@ tests:
               maxValue: 32766
 
     - label: "Step 3: TH reads MaxMeasuredValue attribute from DUT"
-      PICS: TMP.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
@@ -52,7 +57,6 @@ tests:
               maxValue: 32767
 
     - label: "Step 4: TH reads MeasuredValue attribute from DUT"
-      PICS: TMP.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
@@ -78,7 +82,7 @@ tests:
           DUT"
       command: "readAttribute"
       attribute: "MeasuredValue"
-      PICS: TMP.S.A0000 && TMP.M.ManuallyControlled
+      PICS: TMP.M.ManuallyControlled
       response:
           constraints:
               type: int16s

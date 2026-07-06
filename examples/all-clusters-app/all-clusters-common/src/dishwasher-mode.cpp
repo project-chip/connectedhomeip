@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,13 @@ CHIP_ERROR DishwasherModeDelegate::Init()
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
 void DishwasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
+    if (gDishwasherModeInstance->GetFailTransition())
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+        response.statusText.SetValue("Mode change not allowed due to device state"_span);
+        return;
+    }
+
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
@@ -95,16 +102,16 @@ void DishwasherMode::Shutdown()
     }
 }
 
-void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
     gDishwasherModeDelegate = new DishwasherMode::DishwasherModeDelegate;
     gDishwasherModeInstance = new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, 0);
-    gDishwasherModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gDishwasherModeInstance->Init();
 }
 
-void emberAfDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     if (gDishwasherModeInstance)

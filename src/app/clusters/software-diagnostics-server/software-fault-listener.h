@@ -37,7 +37,7 @@ public:
     virtual void
     OnSoftwareFaultDetect(const chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) = 0;
 
-    /// Returs the set global listener (if any). May return nullptr if no such listener is set.
+    /// Returns the set global listener (if any). May return nullptr if no such listener is set.
     static SoftwareFaultListener * GetGlobalListener();
 
     /// Set the global software fault listener, returns the old value

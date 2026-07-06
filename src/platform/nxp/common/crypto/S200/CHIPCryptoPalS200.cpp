@@ -40,13 +40,13 @@
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/oid.h>
+#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -723,9 +723,9 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
 
     VerifyOrReturnError(sss_sscp_key_object_init(&ecdsaPublic, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&ecdsaPublic, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P,
-                                                            keySize, SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
-                        CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_key_object_allocate_handle(&ecdsaPublic, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P, keySize,
+                                                     SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
+                 error = CHIP_ERROR_INTERNAL);
 
     // The first byte of the public key is the uncompressed marker
     VerifyOrExit(SSS_KEY_STORE_SET_KEY(&ecdsaPublic, Uint8::to_const_uchar(*this) + 1, Length() - 1, coordinateBitsLen,
@@ -739,7 +739,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     bFreeAsyncCtx = true;
     VerifyOrExit(sss_sscp_asymmetric_verify_digest(&asyc, (uint8_t *) hash, hash_length, (uint8_t *) signature.ConstBytes(),
                                                    signature.Length()) == kStatus_SSS_Success,
-                 error = CHIP_ERROR_INTERNAL);
+                 error = CHIP_ERROR_INVALID_SIGNATURE);
 exit:
 
     if (bFreeAsyncCtx)
@@ -775,9 +775,9 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     /* Remote public key */
     VerifyOrReturnError(sss_sscp_key_object_init(&pEcdhPubKey, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(&pEcdhPubKey, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P,
-                                                            keySize, SSS_KEYPROP_OPERATION_KDF) == kStatus_SSS_Success,
-                        CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_key_object_allocate_handle(&pEcdhPubKey, 0u, kSSS_KeyPart_Public, kSSS_CipherType_EC_NIST_P, keySize,
+                                                     SSS_KEYPROP_OPERATION_KDF) == kStatus_SSS_Success,
+                 error = CHIP_ERROR_INTERNAL);
 
     // The first byte of the public key is the uncompressed marker
     VerifyOrExit(SSS_KEY_STORE_SET_KEY(&pEcdhPubKey, Uint8::to_const_uchar(remote_public_key) + 1, keySize, coordinateBitsLen,
@@ -862,10 +862,10 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 
     VerifyOrReturnError(sss_sscp_key_object_init(keypair, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(sss_sscp_key_object_allocate_handle(
-                            keypair, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P, 3 * kP256_PrivateKey_Length,
-                            SSS_KEYPROP_OPERATION_KDF | SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
-                        error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sss_sscp_key_object_allocate_handle(keypair, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P,
+                                                     3 * kP256_PrivateKey_Length,
+                                                     SSS_KEYPROP_OPERATION_KDF | SSS_KEYPROP_OPERATION_ASYM) == kStatus_SSS_Success,
+                 error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(SSS_ECP_GENERATE_KEY(keypair, keyBitsLen) == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
@@ -1160,6 +1160,84 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     VerifyOrReturnError(ECP256_PointValid((ecp256Point_t *) R), CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certificate, MutableCharSpan & cdpurl)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
+                                    CertificateChainValidationResult & result)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate, const ByteSpan * candidateCertificates,
+                                          size_t candidateCertificatesCount, ByteSpan & outCertificate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractCDPExtensionCRLIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & crlIssuer)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR IsCertificateValidAtIssuance(const mbedtls_x509_crt * candidateCertificate, const mbedtls_x509_crt * issuerCertificate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, const ByteSpan & issuerCertificate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Crypto

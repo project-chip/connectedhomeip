@@ -17,20 +17,31 @@
 import glob
 import json
 import os
-import typing
 import xml.etree.ElementTree as ET
 
+import matter.clusters as Clusters
+from matter.clusters.Attribute import AsyncReadTransaction
+from matter.testing.global_attribute_ids import (AttributeIdType, GlobalAttributeIds, attribute_id_type, is_standard_cluster_id,
+                                                 is_standard_command_id)
+from matter.testing.problem_notices import ClusterPathLocation, ProblemNotice, ProblemSeverity
+from matter.testing.spec_parsing import XmlCluster
+from matter.tlv import uint
 
-def attribute_pics_str(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.A{id:04x}'
+
+def event_pics_str(pics_base: str, eid: int) -> str:
+    return f'{pics_base}.S.E{eid:02x}'
 
 
-def accepted_cmd_pics_str(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Rsp'
+def attribute_pics_str(pics_base: str, aid: int) -> str:
+    return f'{pics_base}.S.A{aid:04x}'
 
 
-def generated_cmd_pics_str(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02x}.Tx'
+def accepted_cmd_pics_str(pics_base: str, cid: int) -> str:
+    return f'{pics_base}.S.C{cid:02x}.Rsp'
+
+
+def generated_cmd_pics_str(pics_base: str, cid: int) -> str:
+    return f'{pics_base}.S.C{cid:02x}.Tx'
 
 
 def feature_pics_str(pics_base: str, bit: int) -> str:
@@ -45,7 +56,7 @@ def client_pics_str(pics_base: str) -> str:
     return f'{pics_base}.C'
 
 
-def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
+def parse_pics(lines: list[str]) -> dict[str, bool]:
     pics = {}
     for raw in lines:
         line, _, _ = raw.partition("#")
@@ -93,12 +104,59 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
     if os.path.isdir(os.path.abspath(path)):
         pics_dict = {}
         for filename in glob.glob(f'{path}/*.xml'):
-            with open(filename, 'r') as f:
+            with open(filename) as f:
                 contents = f.read()
                 pics_dict.update(parse_pics_xml(contents))
         return pics_dict
 
-    else:
-        with open(path, 'r') as f:
-            lines = f.readlines()
-            return parse_pics(lines)
+    with open(path) as f:
+        lines = f.readlines()
+        return parse_pics(lines)
+
+
+def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransaction.ReadResponse, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, list[str]], list[ProblemNotice]]:
+    ''' Returns a list of device element PICS and problems from each device wildcard.
+    '''
+    # Endpoint to list of device element PICS
+    device_pics: dict[int, list[str]] = {}
+    problems = []
+    for endpoint_id, endpoint in wildcard.tlvAttributes.items():
+        endpoint_has_server = False
+        device_pics[endpoint_id] = []
+        for cluster_id, cluster in endpoint.items():
+            if not is_standard_cluster_id(cluster_id):
+                continue
+            if cluster_id not in xml_clusters:
+                # This is covered by another test - we don't want to block every test, so just warn here
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                problems.append(ProblemNotice(test_name="General error", location=location,
+                                severity=ProblemSeverity.WARNING, problem="Unknown standard cluster on device"))
+                continue
+            cluster_pics = xml_clusters[cluster_id].pics
+            device_pics[endpoint_id].append(server_pics_str(cluster_pics))
+            endpoint_has_server = True
+            for attribute_id in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]:
+                if attribute_id_type(attribute_id) != AttributeIdType.kStandardNonGlobal:
+                    continue
+                device_pics[endpoint_id].append(attribute_pics_str(cluster_pics, attribute_id))
+            feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
+            for i in range(0, 16):
+                bit = 1 << i
+                if feature_map & bit:
+                    device_pics[endpoint_id].append(feature_pics_str(cluster_pics, i))
+            for cmd_id in cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID]:
+                if not is_standard_command_id(cmd_id):
+                    continue
+                device_pics[endpoint_id].append(accepted_cmd_pics_str(cluster_pics, cmd_id))
+            for cmd_id in cluster.get(GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, []):
+                if not is_standard_command_id(cmd_id):
+                    continue
+                device_pics[endpoint_id].append(generated_cmd_pics_str(cluster_pics, cmd_id))
+        if endpoint_has_server:
+            device_pics[endpoint_id].append('IDM.S')
+    ep0_device_type_list = wildcard.attributes.get(0, {}).get(
+        Clusters.Descriptor, {}).get(Clusters.Descriptor.Attributes.DeviceTypeList, [])
+    if any(d.deviceType == 0x16 for d in ep0_device_type_list):
+        device_pics.setdefault(0, []).append('MCORE.ROLE.COMMISSIONEE')
+
+    return device_pics, problems

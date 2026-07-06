@@ -71,10 +71,10 @@
 
 namespace chip {
 
-namespace Test {
+namespace Testing {
 // Forward declaration of BleLayerTestAccess class tests to allow it to be friends with BleLayer
 class BleLayerTestAccess;
-} // namespace Test
+} // namespace Testing
 namespace Ble {
 
 /**
@@ -221,7 +221,7 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-    friend class Test::BleLayerTestAccess;
+    friend class Testing::BleLayerTestAccess;
 
 public:
     // Public data members:

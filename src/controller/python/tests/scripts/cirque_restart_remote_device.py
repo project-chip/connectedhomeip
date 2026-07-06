@@ -19,16 +19,15 @@
 
 # This is used to restart the remote device in cirque test
 
+import contextlib
 import logging
 import os
 import sys
 import threading
 import time
 
-try:
+with contextlib.suppress(ImportError):
     import paramiko
-except ImportError:
-    pass
 
 CHIP_REPO = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), "..", "..", "..", "..", "..")
@@ -47,7 +46,7 @@ logger.addHandler(sh)
 class restartRemoteDevice(threading.Thread):
     def __init__(self, remote_ip: str, ssh_port: int, user: str, password: str, remote_server_app: str,
                  extra_args: str):
-        super(restartRemoteDevice, self).__init__()
+        super().__init__()
         self.remote_ip = remote_ip
         self.ssh_port = ssh_port
         self.user = user
@@ -61,16 +60,16 @@ class restartRemoteDevice(threading.Thread):
         try:
             client.connect(self.remote_ip, self.ssh_port, self.user, self.password)
             client.exec_command(
-                ("kill \"$(ps aux | grep -E \'out/debug/{}\' | grep -v grep | grep -v gdb | "
-                 "awk \'{{print $2}}\')\"").format(self.remote_server_app))
+                "kill \"$(ps aux | grep -E \'out/debug/{}\' | grep -v grep | grep -v gdb | awk \'{{print $2}}\')\"".format(
+                    self.remote_server_app))
             time.sleep(1)
             stdin, stdout, stderr = client.exec_command(
-                ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
-                 "awk \'{{print $2}}\'").format(self.remote_server_app))
+                "ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | awk \'{{print $2}}\'".format(
+                    self.remote_server_app))
             if not stdout.read().decode().strip():
-                logger.info(f"Succeed to kill remote process {self.remote_server_app}")
+                logger.info("Succeed to kill remote process %s", self.remote_server_app)
             else:
-                logger.error(f"Failed to kill remote process {self.remote_server_app}")
+                logger.error("Failed to kill remote process %s", self.remote_server_app)
 
             restart_remote_device_command = (
                 "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "

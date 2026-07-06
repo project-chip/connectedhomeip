@@ -19,8 +19,11 @@
 #include "SoftwareFaultReports.h"
 #include "FreeRTOSConfig.h"
 #include "silabs_utils.h"
+#ifdef MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
-#include <app/util/attribute-storage.h>
+#endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
+
+#include <cinttypes>
 #include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -80,7 +83,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     softwareFault.id = taskDetails.xTaskNumber;
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
-    SystemLayer().ScheduleLambda(
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
         [&softwareFault] { Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault); });
     // Allow some time for the Fault event to be sent as the next action after exiting this function
     // is typically an assert or reboot.
@@ -108,6 +111,19 @@ extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
 #endif
 
 #if HARD_FAULT_LOG_ENABLE
+// Identifier used by the various fault handlers to tag the fault type.
+// Note: This is read/written from exception/interrupt context.
+// Referenced from naked asm via "m"(faultId); retain under LTO.
+alignas(4) static volatile uint32_t faultId __asm__("faultId") __attribute__((used)) = 0;
+
+#define SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(tagVar)                                                                               \
+    __asm__ volatile("ldr r0, %1\n\t"                                                                                              \
+                     "str r0, %0\n\t"                                                                                              \
+                     "b.w LogFault_Handler"                                                                                        \
+                     : "=m"(faultId)                                                                                               \
+                     : "m"(tagVar)                                                                                                 \
+                     : "r0", "memory")
+
 /**
  * Log register contents to UART when a hard fault occurs.
  */
@@ -115,6 +131,7 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
 {
 #if SILABS_LOG_ENABLED
     [[maybe_unused]] uint32_t cfsr  = SCB->CFSR;
+    [[maybe_unused]] uint32_t ccr   = SCB->CCR;
     [[maybe_unused]] uint32_t hfsr  = SCB->HFSR;
     [[maybe_unused]] uint32_t mmfar = SCB->MMFAR;
     [[maybe_unused]] uint32_t bfar  = SCB->BFAR;
@@ -127,71 +144,96 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
     [[maybe_unused]] uint32_t pc    = sp[6];
     [[maybe_unused]] uint32_t psr   = sp[7];
 
-    ChipLogError(NotSpecified, "HardFault:");
-    ChipLogError(NotSpecified, "SCB->CFSR   0x%08lx", cfsr);
-    ChipLogError(NotSpecified, "SCB->HFSR   0x%08lx", hfsr);
-    ChipLogError(NotSpecified, "SCB->MMFAR  0x%08lx", mmfar);
-    ChipLogError(NotSpecified, "SCB->BFAR   0x%08lx", bfar);
-    ChipLogError(NotSpecified, "SCB->BFAR   0x%08lx", bfar);
-    ChipLogError(NotSpecified, "SP          0x%08lx", (uint32_t) sp);
-    ChipLogError(NotSpecified, "R0          0x%08lx", r0);
-    ChipLogError(NotSpecified, "R1          0x%08lx", r1);
-    ChipLogError(NotSpecified, "R2          0x%08lx", r2);
-    ChipLogError(NotSpecified, "R3          0x%08lx", r3);
-    ChipLogError(NotSpecified, "R12         0x%08lx", r12);
-    ChipLogError(NotSpecified, "LR          0x%08lx", lr);
-    ChipLogError(NotSpecified, "PC          0x%08lx", pc);
-    ChipLogError(NotSpecified, "PSR         0x%08lx", psr);
+    SILABS_UART_FLUSH();
+    ChipLogError(NotSpecified, "HardFault:  0x%08" PRIx32 "\r\n", faultId);
+    ChipLogError(NotSpecified, "SCB->CFSR   0x%08" PRIx32 "\r\n", cfsr);
+    ChipLogError(NotSpecified, "SCB->CCR    0x%08" PRIx32 "\r\n", ccr);
+    ChipLogError(NotSpecified, "SCB->HFSR   0x%08" PRIx32 "\r\n", hfsr);
+    ChipLogError(NotSpecified, "SCB->MMFAR  0x%08" PRIx32 "\r\n", mmfar);
+    ChipLogError(NotSpecified, "SCB->BFAR   0x%08" PRIx32 "\r\n", bfar);
+    ChipLogError(NotSpecified, "SP          0x%08" PRIx32 "\r\n", (uint32_t) sp);
+    SILABS_UART_FLUSH();
+    ChipLogError(NotSpecified, "R0          0x%08" PRIx32 "\r\n", r0);
+    ChipLogError(NotSpecified, "R1          0x%08" PRIx32 "\r\n", r1);
+    ChipLogError(NotSpecified, "R2          0x%08" PRIx32 "\r\n", r2);
+    ChipLogError(NotSpecified, "R3          0x%08" PRIx32 "\r\n", r3);
+    ChipLogError(NotSpecified, "R12         0x%08" PRIx32 "\r\n", r12);
+    ChipLogError(NotSpecified, "LR          0x%08" PRIx32 "\r\n", lr);
+    ChipLogError(NotSpecified, "PC          0x%08" PRIx32 "\r\n", pc);
+    ChipLogError(NotSpecified, "PSR         0x%08" PRIx32 "\r\n", psr);
     SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
 
     configASSERTNULL(NULL);
 }
 
+/*
+ * Note: All our Fault handlers are defined naked functions so they don't modify the stack or registers we are trying to capture.
+ * Because of that, C statements are not allowed in the fault handlers as it could lead to unpredictable behavior.
+ * All the fault handlers are defined using inline assembly.
+ */
+
 /**
  * Log a fault to the debugHardfault function.
  * This function is called by the fault handlers to log the fault details.
  */
 
-extern "C" __attribute__((naked)) void LogFault_Handler(void)
+extern "C" __attribute__((used, naked)) void LogFault_Handler(void)
 {
-    uint32_t * sp;
-    __asm volatile("tst lr, #4 \n"
-                   "ite eq \n"
-                   "mrseq %0, msp \n"
-                   "mrsne %0, psp \n"
-                   : "=r"(sp));
-    debugHardfault(sp);
+    /* bx + "r"(fn): LTO can place debugHardfault out of b/b.w range; address comes from the compiler. */
+    /* r0 holds SP for debugHardfault (AAPCS); %[dbg] must not use r0—use "h" (r8–r15) and clobber r0. */
+    __asm__ volatile("tst lr, #4\n\t"
+                     "ite eq\n\t"
+                     "mrseq r0, msp\n\t"
+                     "mrsne r0, psp\n\t"
+                     "bx %[dbg]\n"
+                     :
+                     : [dbg] "h"(reinterpret_cast<void (*)(uint32_t *)>(debugHardfault))
+                     : "r0", "memory", "cc");
 }
+alignas(4) static const uint32_t kFaultMagicHard __attribute__((used))  = 0x48415244; // 'HARD'
+alignas(4) static const uint32_t kFaultMagicMpu __attribute__((used))   = 0x4D505546; // 'MPUF'
+alignas(4) static const uint32_t kFaultMagicBus __attribute__((used))   = 0x42555346; // 'BUSF'
+alignas(4) static const uint32_t kFaultMagicUsage __attribute__((used)) = 0x55534654; // 'USFT'
+#if (__CORTEX_M >= 23U)
+alignas(4) static const uint32_t kFaultMagicSecure __attribute__((used)) = 0x53434654; // 'SCFT'
+#endif
+alignas(4) static const uint32_t kFaultMagicDbg __attribute__((used))  = 0x44424D4E; // 'DBMN'
+alignas(4) static const uint32_t kFaultMagicWdog __attribute__((used)) = 0x57444F47; // 'WDOG'
 
 #ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
-extern "C" __attribute__((naked)) void HardFault_Handler(void)
+extern "C" __attribute__((used, naked)) void HardFault_Handler(void)
 {
-    __asm volatile("b LogFault_Handler");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicHard);
 }
-extern "C" __attribute__((naked)) void mpu_fault_handler(void)
+extern "C" __attribute__((used, naked)) void mpu_fault_handler(void)
 {
-    __asm volatile("b LogFault_Handler");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicMpu);
 }
-extern "C" __attribute__((naked)) void BusFault_Handler(void)
+extern "C" __attribute__((used, naked)) void BusFault_Handler(void)
 {
-    __asm volatile("b LogFault_Handler");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicBus);
 }
-extern "C" __attribute__((naked)) void UsageFault_Handler(void)
+extern "C" __attribute__((used, naked)) void UsageFault_Handler(void)
 {
-    __asm volatile("b LogFault_Handler");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicUsage);
 }
 #if (__CORTEX_M >= 23U)
-extern "C" __attribute__((naked)) void SecureFault_Handler(void)
+extern "C" __attribute__((used, naked)) void SecureFault_Handler(void)
 {
-    __asm volatile("b LogFault_Handler");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicSecure);
 }
 #endif // (__CORTEX_M >= 23U)
-extern "C" __attribute__((naked)) void DebugMon_Handler(void)
+extern "C" __attribute__((used, naked)) void DebugMon_Handler(void)
 {
-    __asm volatile("b LogFault_Handler");
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicDbg);
 }
 #endif // !SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+
+extern "C" __attribute__((used, naked)) void WDOG0_IRQHandler(void)
+{
+    SILABS_ASM_STORE_FAULT_ID_AND_BRANCH(kFaultMagicWdog);
+}
 
 extern "C" void vApplicationMallocFailedHook(void)
 {
@@ -290,7 +332,7 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
 extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode)
 {
     char faultMessage[kMaxFaultStringLen] = { 0 };
-    snprintf(faultMessage, sizeof faultMessage, "RAIL Assert:%ld", errorCode);
+    snprintf(faultMessage, sizeof faultMessage, "RAIL Assert:%" PRIu32, errorCode);
 #if SILABS_LOG_ENABLED
 #ifdef RAIL_ASSERT_DEBUG_STRING
     static const char * railErrorMessages[] = RAIL_ASSERT_ERROR_MESSAGES;

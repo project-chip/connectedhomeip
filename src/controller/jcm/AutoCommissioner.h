@@ -18,14 +18,13 @@
 
 #pragma once
 
-#include "TrustVerification.h"
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/DeviceProxy.h>
 #include <app/ReadClient.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
+#include <credentials/jcm/TrustVerification.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>

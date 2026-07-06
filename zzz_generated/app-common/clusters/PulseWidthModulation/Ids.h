@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster PulseWidthModulation (cluster code: 28/0x041C)
+// Identifier constant values for cluster PulseWidthModulation (cluster code: 28/0x001C)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

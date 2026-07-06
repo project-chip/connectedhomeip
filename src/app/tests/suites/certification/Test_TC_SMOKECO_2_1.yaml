@@ -14,6 +14,13 @@
 
 name: 4.2.1. [TC-SMOKECO-2.1] Attributes with DUT as Server
 
+CI:
+    - name: "Test against all-devices/smoke-co-alarm"
+      app: all-devices
+      args:
+          - --device
+          - smoke-co-alarm
+
 PICS:
     - SMOKECO.S
 
@@ -39,7 +46,7 @@ tests:
           constraints:
               type: enum8
               minValue: 0
-              maxValue: 8
+              maxValue: 9
 
     - label: "Step 3: TH reads from the DUT the SmokeState attribute"
       PICS: SMOKECO.S.A0001
@@ -156,3 +163,11 @@ tests:
       response:
           constraints:
               type: epoch_s
+
+    - label: "Step 15: TH reads from the DUT the Unmounted attribute"
+      PICS: SMOKECO.S.A000d
+      command: "readAttribute"
+      attribute: "Unmounted"
+      response:
+          constraints:
+              type: boolean

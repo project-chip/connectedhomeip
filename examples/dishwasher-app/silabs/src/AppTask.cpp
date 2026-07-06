@@ -87,8 +87,10 @@ CHIP_ERROR AppTask::AppInit()
     // Register DEM & Electrical Sensor Test Event Trigger
     if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
     {
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sEnergyReportingTestEventTriggerHandler);
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(
+            &sEnergyReportingTestEventTriggerHandler);
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(
+            &sDeviceEnergyManagementTestEventTriggerHandler);
     }
 #endif
 
@@ -192,7 +194,7 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
     }
     else if (action == OperationalStateEnum::kStopped)
     {
-        SILABS_LOG("Stoping dishwasher");
+        SILABS_LOG("Stopping dishwasher");
     }
     else if (action == OperationalStateEnum::kPaused)
     {

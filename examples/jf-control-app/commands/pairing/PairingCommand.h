@@ -23,6 +23,7 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/jcm/DeviceCommissioner.h>
+#include <credentials/jcm/TrustVerification.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -30,11 +31,17 @@
 
 #include <optional>
 
-using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
-using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
-using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo     = chip::Controller::JCM::TrustVerificationInfo;
+using ::chip::ByteSpan;
+using ::chip::NodeId;
+using ::chip::VendorId;
+using ::chip::Credentials::CertificateKeyId;
+
+using JCMDeviceCommissioner            = chip::Controller::JCM::DeviceCommissioner;
+using JCMTrustVerificationStateMachine = chip::Credentials::JCM::TrustVerificationStateMachine;
+using JCMTrustVerificationDelegate     = chip::Credentials::JCM::TrustVerificationDelegate;
+using JCMTrustVerificationStage        = chip::Credentials::JCM::TrustVerificationStage;
+using JCMTrustVerificationError        = chip::Credentials::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo         = chip::Credentials::JCM::TrustVerificationInfo;
 
 enum class PairingMode
 {
@@ -68,7 +75,6 @@ class PairingCommand : public CHIPCommand,
                        public chip::Controller::DeviceDiscoveryDelegate,
                        public JCMTrustVerificationDelegate,
                        public chip::Credentials::DeviceAttestationDelegate
-
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -97,6 +103,7 @@ public:
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
         AddArgument("anchor", 0, 1, &mAnchor, "If set to true then a NOC with Anchor and Administrator CAT is issued");
         AddArgument("jcm", 0, 1, &mJCM, "Set it to true in order to commission a Joint Fabric Administrator");
+        AddArgument("regular", 0, 1, &mRegularDevice, "Set it to true to commission a regular device");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -260,10 +267,11 @@ public:
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     /////////// JCMTrustVerificationDelegate /////////
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
-                          JCMTrustVerificationError error);
-    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info);
+    void OnProgressUpdate(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationStage stage,
+                          JCMTrustVerificationInfo & info, JCMTrustVerificationError error) override;
+    void OnAskUserForConsent(JCMTrustVerificationStateMachine & stateMachine, JCMTrustVerificationInfo & info) override;
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                              ByteSpan & globallyTrustedRoot) override;
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -289,6 +297,7 @@ private:
     chip::Optional<bool> mSkipCommissioningComplete;
     chip::Optional<bool> mAnchor;
     chip::Optional<bool> mJCM;
+    chip::Optional<bool> mRegularDevice;
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;
@@ -333,6 +342,7 @@ private:
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     ::pw::rpc::NanopbClientReader<::RequestOptions> rpcGetStream;
+    chip::ByteSpan mRemoteAdminTrustedRoot;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;

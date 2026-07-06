@@ -33,13 +33,14 @@ namespace app {
  */
 struct ConcreteAttributePath : public ConcreteClusterPath
 {
-    ConcreteAttributePath()
+    CHIP_CPP20(constexpr) ConcreteAttributePath()
     {
         // Note: mExpanded is in the superclass, so we can't use a field
         // initializer.
         mExpanded = false;
     }
 
+    CHIP_CPP20(constexpr)
     ConcreteAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteClusterPath(aEndpointId, aClusterId), mAttributeId(aAttributeId)
     {
@@ -156,6 +157,8 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     bool operator!=(const ConcreteDataAttributePath & aOther) const { return !(*this == aOther); }
 
     bool operator<(const ConcreteDataAttributePath & aOther) const = delete;
+
+    bool operator==(const ConcreteAttributePath & aOther) const { return ConcreteAttributePath::operator==(aOther); }
 
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e

@@ -16,7 +16,7 @@
 
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Optional
 
 from mobly import asserts
@@ -25,7 +25,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class ElectricalGridConditionsTestBaseHelper:
@@ -65,7 +65,9 @@ class ElectricalGridConditionsTestBaseHelper:
         matter_asserts.assert_valid_enum(
             struct.localCarbonLevel, "LocalCarbonLevel attribute must return a ThreeLevelEnum", cluster.Enums.ThreeLevelEnum)
 
-        logger.info(f"EGC: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : GridC: {struct.gridCarbonIntensity} / GridCLevel: {struct.gridCarbonLevel} / LocalC: {struct.localCarbonIntensity} / LocalCLevel: {struct.localCarbonLevel}")
+        log.info("EGC: from: %s to %s : GridC: %s / GridCLevel: %s / LocalC: %s / LocalCLevel: %s",
+                 self.convert_epoch_s_to_time(struct.periodStart, tz=None), self.convert_epoch_s_to_time(struct.periodEnd, tz=None),
+                 struct.gridCarbonIntensity, struct.gridCarbonLevel, struct.localCarbonIntensity, struct.localCarbonLevel)
 
     async def send_test_event_trigger_current_conditions_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerCurrentConditionsUpdate)
@@ -73,11 +75,10 @@ class ElectricalGridConditionsTestBaseHelper:
     async def send_test_event_trigger_forecast_conditions_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastConditionsUpdate)
 
-    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc) -> Optional[datetime]:
+    def convert_epoch_s_to_time(self, epoch_s, tz=UTC) -> Optional[datetime]:
         if epoch_s is not NullValue:
             delta_from_epoch = timedelta(seconds=epoch_s)
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
 
             return matter_epoch + delta_from_epoch
-        else:
-            return None
+        return None

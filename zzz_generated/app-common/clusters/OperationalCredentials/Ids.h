@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OperationalCredentials (cluster code: 62/0x043E)
+// Identifier constant values for cluster OperationalCredentials (cluster code: 62/0x003E)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

@@ -22,16 +22,17 @@
 #include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-#include <controller/jcm/TrustVerification.h> // nogncheck
-#endif                                        // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/jcm/TrustVerification.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CharSpanToStdString.h>
 #include <lib/support/Span.h>
 #include <lib/support/Variant.h>
 #include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
+
+#include <string>
 
 namespace chip {
 namespace Controller {
@@ -63,19 +64,27 @@ enum CommissioningStage : uint8_t
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
     kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registration informations.
     kICDRegistration,            ///< Register for ICD management
-    kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
-    kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
-    kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
-    kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
-    kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
-    kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+
+    // NOTE: If any new steps are added between kWiFiNetworkSetup and kICDSendStayActive, double-check
+    // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
+    // failure" conditions still makes sense.
+    kWiFiNetworkSetup,             ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,           ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kFailsafeBeforeWiFiEnable,     ///< Extend the fail-safe before doing kWiFiNetworkEnable
+    kFailsafeBeforeThreadEnable,   ///< Extend the fail-safe before doing kThreadNetworkEnable
+    kWiFiNetworkEnable,            ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kEvictPreviousCaseSessions,    ///< Evict previous stale case sessions from a commissioned device with this node ID before
     kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
                                    ///< StayActive command
     kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
                                               ///< Commissioning Complete command
     kSendComplete,                            ///< Send CommissioningComplete (0x30:4) command to the device
     kICDSendStayActive,                       ///< Send Keep Alive to ICD
+    // NOTE: If any new steps are added between kWiFiNetworkSetup and kICDSendStayActive, double-check
+    // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
+    // failure" conditions still makes sense.
+
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     kScanNetworks,
@@ -88,7 +97,12 @@ enum CommissioningStage : uint8_t
     kRemoveWiFiNetworkConfig,         ///< Remove Wi-Fi network config.
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
-    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state/
+    kRequestWiFiCredentials,          ///< Wi-Fi credentials are needed; ask for those.
+    kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
+    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
+#endif
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -126,11 +140,30 @@ struct NOCChainGenerationParameters
 struct CompletionStatus
 {
     CompletionStatus() : err(CHIP_NO_ERROR), failedStage(NullOptional), attestationResult(NullOptional) {}
+
     CHIP_ERROR err;
     Optional<CommissioningStage> failedStage;
     Optional<Credentials::AttestationVerificationResult> attestationResult;
     Optional<app::Clusters::GeneralCommissioning::CommissioningErrorEnum> commissioningError;
     Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> networkCommissioningStatus;
+    /// Optional device-reported low-level error from ConnectNetworkResponse.errorValue (e.g.
+    /// driver-specific TX-power-limited / interference / association-failure code), distinct
+    /// from the spec-level NetworkCommissioningStatusEnum already captured above.
+    Optional<int32_t> connectNetworkErrorValue;
+    /// Optional NodeOperationalCertStatusEnum from the device's NOCResponse during the
+    /// AddNOC / UpdateNOC / RemoveFabric flows. Lets callers distinguish kInvalidPublicKey
+    /// from kInvalidNodeOpId from kFabricConflict from kLabelConflict, etc., without losing
+    /// fidelity to a generic CHIP_ERROR.
+    Optional<app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> operationalCertStatus;
+
+    /// Owned copy of the device-supplied GeneralCommissioning debugText from
+    /// ArmFailSafeResponse / SetRegulatoryConfigResponse / CommissioningCompleteResponse.
+    /// Empty if no debug text was provided.
+    std::string commissioningDebugText;
+
+    /// Owned copy of the device-supplied NetworkCommissioning debugText from
+    /// NetworkConfigResponse / ConnectNetworkResponse. Empty if no debug text was provided.
+    std::string networkCommissioningDebugText;
 };
 
 inline constexpr uint16_t kDefaultFailsafeTimeout = 60;
@@ -768,7 +801,7 @@ struct GeneralCommissioningInfo
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
     app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum locationCapability =
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
-    ;
+    bool isCommissioningWithoutPower = false;
 };
 
 // ICDManagementClusterInfo is populated when the controller reads information from
@@ -831,7 +864,22 @@ struct AttestationErrorInfo
 struct CommissioningErrorInfo
 {
     CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningErrorEnum result) : commissioningError(result) {}
+    CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningErrorEnum result, CharSpan text) :
+        commissioningError(result), debugText(CharSpanToStdString(text))
+    {}
     app::Clusters::GeneralCommissioning::CommissioningErrorEnum commissioningError;
+    /// Owned copy of the device-supplied `debugText` from
+    /// ArmFailSafeResponse / SetRegulatoryConfigResponse / CommissioningCompleteResponse.
+    /// Empty when the device did not provide debug text.
+    std::string debugText;
+};
+
+struct OperationalCertErrorInfo
+{
+    OperationalCertErrorInfo(app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum result) :
+        operationalCertStatus(result)
+    {}
+    app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum operationalCertStatus;
 };
 
 struct NetworkCommissioningStatusInfo
@@ -839,7 +887,23 @@ struct NetworkCommissioningStatusInfo
     NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result) :
         networkCommissioningStatus(result)
     {}
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result, CharSpan text) :
+        networkCommissioningStatus(result), debugText(CharSpanToStdString(text))
+    {}
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result, CharSpan text,
+                                   Optional<int32_t> errorValue) :
+        networkCommissioningStatus(result),
+        debugText(CharSpanToStdString(text)), connectNetworkErrorValue(errorValue)
+    {}
     app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum networkCommissioningStatus;
+    /// Owned copy of the device-supplied `debugText` from
+    /// `NetworkConfigResponse` / `ConnectNetworkResponse`. Empty when the device did not
+    /// provide debug text.
+    std::string debugText;
+    /// Optional device-specific connect failure code from ConnectNetworkResponse.errorValue.
+    /// Only populated for ConnectNetwork failures; null for NetworkConfig failures (which
+    /// don't carry an errorValue field).
+    Optional<int32_t> connectNetworkErrorValue;
 };
 
 class CommissioningDelegate
@@ -863,7 +927,7 @@ public:
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
-     * kSendNOC: None
+     * kSendNOC: OperationalCertErrorInfo if AddNOC returned a non-success NodeOperationalCertStatusEnum
      * kConfigureTrustedTimeSource: None
      * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
@@ -878,12 +942,8 @@ public:
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                  ,
-                  JCM::TrustVerificationError
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                  >
+                  AttestationErrorInfo, CommissioningErrorInfo, OperationalCertErrorInfo, NetworkCommissioningStatusInfo,
+                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

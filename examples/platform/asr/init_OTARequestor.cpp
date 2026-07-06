@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 #include "init_OTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
@@ -43,22 +44,24 @@ static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentSta
 extern "C" void asrQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling asrQueryImageCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+        [](intptr_t) { TEMPORARY_RETURN_IGNORED GetRequestorInstance()->TriggerImmediateQuery(); });
 }
 
 extern "C" void asrApplyUpdateCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling asrApplyUpdateCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
 }
 
 void OTAInitializer::InitOTARequestor(void)
 {
     SetRequestorInstance(&gRequestorCore);
-    ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                                 GetOTARequestorAttributes(), GetDefaultOTARequestorEventGenerator());
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);

@@ -16,7 +16,7 @@
 
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Optional
 
 from mobly import asserts
@@ -27,7 +27,7 @@ from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class CommodityPriceTestBaseHelper:
@@ -115,7 +115,9 @@ class CommodityPriceTestBaseHelper:
         else:
             asserts.assert_is_none(struct.description)
 
-        logger.info(f"PRICE: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : Price: {struct.price} / PriceLevel: {struct.priceLevel} / Description: {struct.description}")
+        log.info("PRICE: from: %s to %s : Price: %s / PriceLevel: %s / Description: %s",
+                 self.convert_epoch_s_to_time(struct.periodStart, tz=None), self.convert_epoch_s_to_time(struct.periodEnd, tz=None),
+                 struct.price, struct.priceLevel, struct.description)
 
         if details & cluster.Bitmaps.CommodityPriceDetailBitmap.kComponents:
             if struct.components is not None:
@@ -148,32 +150,28 @@ class CommodityPriceTestBaseHelper:
         if struct.tariffComponentID is not None:
             matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
 
-        logger.info(
-            f"  Component: price: {struct.price} source: {struct.source}, desc: {struct.description} tariffComponentID: {struct.tariffComponentID}")
+        log.info("  Component: price: %s source: %s, desc: %s tariffComponentID: %s",
+                 struct.price, struct.source, struct.description, struct.tariffComponentID)
 
     async def send_get_detailed_price_request(self, endpoint=None,
                                               details: Clusters.CommodityPrice.Bitmaps =
                                               Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                               timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
+        return await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
             details=details),
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
-
-        return result
 
     async def send_get_detailed_forecast_request(self, endpoint=None,
                                                  details: Clusters.CommodityPrice.Bitmaps =
                                                  Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                                  timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
+        return await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
             details=details),
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
-
-        return result
 
     async def send_test_event_trigger_price_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerPriceUpdate)
@@ -181,11 +179,10 @@ class CommodityPriceTestBaseHelper:
     async def send_test_event_trigger_forecast_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerForecastUpdate)
 
-    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc) -> Optional[datetime]:
+    def convert_epoch_s_to_time(self, epoch_s, tz=UTC) -> Optional[datetime]:
         if epoch_s is not NullValue:
             delta_from_epoch = timedelta(seconds=epoch_s)
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
 
             return matter_epoch + delta_from_epoch
-        else:
-            return None
+        return None

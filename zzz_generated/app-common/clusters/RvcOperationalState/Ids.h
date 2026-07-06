@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster RvcOperationalState (cluster code: 97/0x0461)
+// Identifier constant values for cluster RvcOperationalState (cluster code: 97/0x0061)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

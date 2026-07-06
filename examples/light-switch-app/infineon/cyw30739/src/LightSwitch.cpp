@@ -18,7 +18,7 @@
 
 #include <BindingHandler.h>
 #include <LightSwitch.h>
-#include <app/util/binding-table.h>
+#include <app/clusters/bindings/binding-table.h>
 #include <controller/InvokeInteraction.h>
 #include <matter_config.h>
 

@@ -42,6 +42,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 
@@ -69,7 +70,7 @@ CHIP_ERROR AppTask::AppInit()
     // Register Smoke & Co Test Event Trigger
     if (Server::GetInstance().GetTestEventTriggerDelegate() != nullptr)
     {
-        Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
     }
 
     sAlarmLED.Init(LIGHT_LED);

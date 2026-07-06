@@ -636,8 +636,24 @@ CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParam
  *                       Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ *
+ * Note: This function generally creates a certificate with a non-deterministic ECDSA signature.
+ * If a deterministic derivation is required, `DeriveChipNetworkIdentity` must be used instead.
  **/
 CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert);
+
+/**
+ * @brief Deterministically derives a Network (Client) Identity certificate in TLV-encoded form.
+ *
+ * This is a variant of `NewChipNetworkIdentity` that uses Deterministic ECDSA.
+ *
+ * @param keypair The key pair underlying the identity.
+ * @param outCompactCert Buffer to store the signed certificate in compact-pdc-identity TLV format.
+ *                       Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
+ *
+ * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if Deterministic ECDSA is not supported.
+ */
+CHIP_ERROR DeriveChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert);
 
 /**
  * @brief Generate a new X.509 DER encoded VendorID Verification Signer CA certificate

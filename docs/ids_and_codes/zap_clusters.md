@@ -50,10 +50,10 @@ Generally regenerate using one of:
 |         68 |       0x44 | ProxyValid                                              |
 |         69 |       0x45 | BooleanState                                            |
 |         70 |       0x46 | IcdManagement                                           |
-|         71 |       0x47 | Timer                                                   |
 |         72 |       0x48 | OvenCavityOperationalState                              |
 |         73 |       0x49 | OvenMode                                                |
 |         74 |       0x4A | LaundryDryerControls                                    |
+|         75 |       0x4B | TemperatureControlledCabinetTopology                    |
 |         80 |       0x50 | ModeSelect                                              |
 |         81 |       0x51 | LaundryWasherMode                                       |
 |         82 |       0x52 | RefrigeratorAndTemperatureControlledCabinetMode         |
@@ -71,8 +71,10 @@ Generally regenerate using one of:
 |         96 |       0x60 | OperationalState                                        |
 |         97 |       0x61 | RvcOperationalState                                     |
 |         98 |       0x62 | ScenesManagement                                        |
+|        101 |       0x65 | Groupcast                                               |
 |        113 |       0x71 | HepaFilterMonitoring                                    |
 |        114 |       0x72 | ActivatedCarbonFilterMonitoring                         |
+|        121 |       0x79 | WaterTankLevelMonitoring                                |
 |        128 |       0x80 | BooleanStateConfiguration                               |
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
@@ -88,6 +90,9 @@ Generally regenerate using one of:
 |        158 |       0x9E | WaterHeaterMode                                         |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        160 |       0xA0 | ElectricalGridConditions                                |
+|        161 |       0xA1 | ElectricalAlarm                                         |
+|        162 |       0xA2 | ElectricalDistribution                                  |
+|        163 |       0xA3 | ElectricalProtectionAlarm                               |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        260 |      0x104 | ClosureControl                                          |
@@ -97,8 +102,10 @@ Generally regenerate using one of:
 |        513 |      0x201 | Thermostat                                              |
 |        514 |      0x202 | FanControl                                              |
 |        516 |      0x204 | ThermostatUserInterfaceConfiguration                    |
+|        517 |      0x205 | Humidistat                                              |
 |        768 |      0x300 | ColorControl                                            |
 |        769 |      0x301 | BallastConfiguration                                    |
+|        773 |      0x305 | DynamicLighting                                         |
 |       1024 |      0x400 | IlluminanceMeasurement                                  |
 |       1026 |      0x402 | TemperatureMeasurement                                  |
 |       1027 |      0x403 | PressureMeasurement                                     |
@@ -116,9 +123,15 @@ Generally regenerate using one of:
 |       1070 |      0x42E | TotalVolatileOrganicCompoundsConcentrationMeasurement   |
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
 |       1072 |      0x430 | SoilMeasurement                                         |
+|       1073 |      0x431 | AmbientContextSensing                                   |
+|       1074 |      0x432 | AmbientSensingUnion                                     |
+|       1075 |      0x433 | ProximityRanging                                        |
+|       1076 |      0x434 | SmokeConcentrationMeasurement                           |
+|       1104 |      0x450 | NetworkIdentityManagement                               |
 |       1105 |      0x451 | WiFiNetworkManagement                                   |
 |       1106 |      0x452 | ThreadBorderRouterManagement                            |
 |       1107 |      0x453 | ThreadNetworkDirectory                                  |
+|       1109 |      0x455 | CommissioningProxy                                      |
 |       1283 |      0x503 | WakeOnLan                                               |
 |       1284 |      0x504 | Channel                                                 |
 |       1285 |      0x505 | TargetNavigator                                         |
@@ -133,6 +146,7 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
+|       1298 |      0x512 | AudioControl                                            |
 |       1360 |      0x550 | ZoneManagement                                          |
 |       1361 |      0x551 | CameraAvStreamManagement                                |
 |       1362 |      0x552 | CameraAvSettingsUserLevelManagement                     |
@@ -140,6 +154,7 @@ Generally regenerate using one of:
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
 |       1365 |      0x555 | PushAvStreamTransport                                   |
 |       1366 |      0x556 | Chime                                                   |
+|       1367 |      0x557 | AvAnalysis                                              |
 |       1792 |      0x700 | CommodityTariff                                         |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
@@ -152,3 +167,4 @@ Generally regenerate using one of:
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |
+| 4294048801 | 0xFFF1FC21 | TestHiddenManufacturerSpecific                          |

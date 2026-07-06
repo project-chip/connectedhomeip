@@ -38,6 +38,7 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -50,10 +51,10 @@ using namespace chip::Protocols;
 
 namespace {
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const chip::Testing::MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
-    using namespace chip::Test;
+    using namespace chip::Testing;
     using namespace chip::app::Clusters::Globals::Attributes;
 
     // clang-format off
@@ -74,19 +75,19 @@ const chip::Test::MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-class TestCommands : public chip::Test::AppContext
+class TestCommands : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
         AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         AppContext::TearDown();
     }
@@ -142,8 +143,8 @@ TEST_F(TestCommands, TestDataResponse)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendDataResponse);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(
+        Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -181,8 +182,8 @@ TEST_F(TestCommands, TestSuccessNoDataResponse)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendSuccessStatusCode);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -219,7 +220,8 @@ TEST_F(TestCommands, TestMultipleSuccessNoDataResponses)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleSuccessStatusCodes);
 
-    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(
+        Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -257,8 +259,8 @@ TEST_F(TestCommands, TestAsyncResponse)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kAsync);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -302,8 +304,8 @@ TEST_F(TestCommands, TestFailure)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendError);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -340,7 +342,8 @@ TEST_F(TestCommands, TestMultipleFailures)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleErrors);
 
-    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(
+        Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -379,8 +382,8 @@ TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendSuccessStatusCodeWithClusterStatus);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -418,8 +421,8 @@ TEST_F(TestCommands, TestFailureWithClusterStatus)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendErrorWithClusterStatus);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 

@@ -4,17 +4,19 @@ virtualenv
 # core build requirements
 -r requirements.build.txt
 
-# esp-idf
--c constraints.esp32.txt
--r requirements.esp32.txt
-
 -r requirements.zephyr.txt
 -r requirements.cirque.txt
 -r requirements.memory.txt
 
 # device controller wheel package
 wheel; sys_platform == 'linux'
-pgi; sys_platform == 'linux'
+
+# PGI is not compatible with 3.14 - it is not maintained and uses
+# a deprecated 'pkgutil.get_loader'. Bluez integration can use either
+# of pgi or PyGobject (via gi)
+pgi; sys_platform == 'linux' and python_version < "3.14"
+PyGObject; sys_platform == 'linux' and python_version >= "3.14"
+
 pyobjc-core; sys_platform == 'darwin'
 pyobjc-framework-cocoa; sys_platform == 'darwin'
 pyobjc-framework-corebluetooth; sys_platform == 'darwin'
@@ -39,10 +41,10 @@ appdirs
 coloredlogs
 watchdog
 build==0.8.0
-mypy==1.16.0
-mypy-protobuf==3.5.0
-protobuf==5.28.3
-types-protobuf==5.29.1.20250208
+mypy
+mypy-protobuf
+protobuf
+types-protobuf
 
 cffi==1.15.0; python_version < "3.13"
 cffi==1.17.1; python_version >= "3.13"

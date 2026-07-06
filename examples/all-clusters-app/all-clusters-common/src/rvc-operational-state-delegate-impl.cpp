@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/generic-callbacks.h>
 #include <rvc-operational-state-delegate-impl.h>
 
 using namespace chip;
@@ -25,11 +26,11 @@ using namespace chip::app::Clusters::RvcOperationalState;
 CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                    OperationalState::GenericOperationalState & operationalState)
 {
-    if (index >= mOperationalStateList.size())
+    if (index >= MATTER_ARRAY_SIZE(kRvcOpStateIds))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalState = mOperationalStateList[index];
+    operationalState.Set(kRvcOpStateIds[index]);
     return CHIP_NO_ERROR;
 }
 
@@ -106,21 +107,26 @@ void RvcOperationalState::Shutdown()
     }
 }
 
-void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(endpointId == 1u);
     VerifyOrDie(gRvcOperationalStateInstance == nullptr && gRvcOperationalStateDelegate == nullptr);
 
     gRvcOperationalStateDelegate        = new RvcOperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
-    gRvcOperationalStateInstance        = new RvcOperationalState::Instance(gRvcOperationalStateDelegate, operationalStateEndpoint);
 
-    gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    OperationalState::OperationalStateCluster::Config config;
+    config.optionalAttributes.Set<OperationalState::Attributes::CountdownTime::Id>();
+    gRvcOperationalStateInstance =
+        new RvcOperationalState::Instance(gRvcOperationalStateDelegate, operationalStateEndpoint, config);
 
-    gRvcOperationalStateInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcOperationalStateInstance->SetOperationalState(
+        to_underlying(OperationalState::OperationalStateEnum::kStopped));
+
+    TEMPORARY_RETURN_IGNORED gRvcOperationalStateInstance->Init();
 }
 
-void emberAfRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     RvcOperationalState::Shutdown();
 }

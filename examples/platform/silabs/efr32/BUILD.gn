@@ -14,7 +14,9 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${chip_root}/build/config/compiler/compiler.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -35,10 +37,8 @@ declare_args() {
 import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
-assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs9116 && chip_enable_openthread))
-assert(!(use_SiWx917 && chip_enable_openthread))
-assert(!(use_wf200 && chip_enable_openthread))
+assert(!(chip_enable_wifi && chip_enable_thread))
+assert(!(use_SiWx917 && chip_enable_thread))
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -59,7 +59,7 @@ config("chip_examples_project_config") {
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources = [ "project_include/OpenThreadConfig.h" ]
 
     public_deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
@@ -111,14 +111,24 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  if (chip_enable_multi_ota_requestor) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
+  if (sl_matter_use_code_driven_dm) {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=1" ]
+  } else {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
   }
 
-  ldflags = [
-    "-Wl,--no-warn-rwx-segment",
-    "-fno-lto",
-  ]
+  ldflags = [ "-fno-lto" ]
+  if (!is_clang) {
+    ldflags += [ "-Wl,--no-warn-rwx-segment" ]
+  } else {
+    ldflags += [
+      "-Wl,--allow-multiple-definition",  # to allow our overrides from memory
+                                          # manager
+      "-lc_nano",  # for C stdlib functions (e.g.snprintf)
+      "-lstdc++_nano",  # for C++ stdlib functions (e.g. sprintf)
+      "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
+    ]
+  }
 }
 
 source_set("efr32-common") {
@@ -135,17 +145,14 @@ source_set("efr32-common") {
     ":chip_examples_project_config",
   ]
 
-  # DIC
-  if (enable_dic) {
-    public_deps +=
-        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
+  # MATTER_AWS
+  if (enable_matter_aws) {
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws" ]
   }
 
   # AWS SDK OTA
   if (aws_sdk_ota) {
-    public_deps += [
-      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
-    ]
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws-sdk-ota" ]
   }
 
   include_dirs = [ "." ]
@@ -155,6 +162,7 @@ source_set("efr32-common") {
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/MatterConfig.cpp",
     "${silabs_common_plat_dir}/SoftwareFaultReports.cpp",
+    "${silabs_common_plat_dir}/main.cpp",
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
@@ -183,7 +191,7 @@ source_set("efr32-common") {
   }
 
   # OpenThread Settings
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
@@ -191,8 +199,8 @@ source_set("efr32-common") {
   }
 
   if (sl_enable_rgb_led) {
-    sources += [ "${silabs_common_plat_dir}/led/RGBLEDWidget.cpp" ]
-    include_dirs = [ "${silabs_common_plat_dir}/rgb_led" ]
+    sources += [ "${silabs_common_plat_dir}/rgb_led/RGBLEDWidget.cpp" ]
+    include_dirs += [ "${silabs_common_plat_dir}/rgb_led" ]
   }
 
   if (chip_build_libshell) {
@@ -200,6 +208,9 @@ source_set("efr32-common") {
 
     if (chip_enable_icd_server) {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
+    }
+    if (chip_enable_read_client) {
+      deps += [ "${silabs_common_plat_dir}/shell:im" ]
     }
   }
 
@@ -217,9 +228,11 @@ source_set("efr32-common") {
 
   if (sl_enable_si70xx_sensor) {
     sources += [
-      "${silabs_common_plat_dir}/Si70xxSensor.cpp",
       "${silabs_common_plat_dir}/Si70xxSensor.h",
+      "${silabs_common_plat_dir}/Si70xxSensorGsdk.cpp",
     ]
+    public_deps +=
+        [ "${chip_root}/src/platform/silabs/platformAbstraction:common" ]
   }
 
   if (app_data_model != "") {

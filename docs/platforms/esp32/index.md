@@ -20,3 +20,4 @@ example on ESP32 series of SoCs
 -   [BLE Settings](ble_settings.md)
 -   [Providers](providers.md)
 -   [Configuration Options](config_options.md)
+-   [ESP-Hosted Instruction](esp_hosted.md)

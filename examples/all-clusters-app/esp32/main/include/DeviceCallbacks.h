@@ -25,9 +25,19 @@
 
 #pragma once
 
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/CommonDeviceCallbacks.h>
+
+class IdentifyDelegateImpl : public chip::app::Clusters::IdentifyDelegate
+{
+public:
+    void OnIdentifyStart(chip::app::Clusters::IdentifyCluster & cluster) override;
+    void OnIdentifyStop(chip::app::Clusters::IdentifyCluster & cluster) override;
+    void OnTriggerEffect(chip::app::Clusters::IdentifyCluster & cluster) override;
+    bool IsTriggerEffectEnabled() const override;
+};
 
 class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
@@ -38,7 +48,7 @@ public:
 private:
     void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
     void OnLevelControlAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_LED_TYPE_RMT
     void OnColorControlAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 #endif
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint16_t size,
@@ -51,5 +61,5 @@ class AppDeviceCallbacksDelegate : public DeviceCallbacksDelegate
 public:
     void OnIPv4ConnectivityEstablished(void) override;
     void OnIPv4ConnectivityLost(void) override;
-    void OnDnssdInitialized(void) override { InitBindingHandlers(); }
+    void OnDnssdInitialized(void) override { TEMPORARY_RETURN_IGNORED InitBindingHandlers(); }
 };

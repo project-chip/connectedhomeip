@@ -221,24 +221,22 @@ struct CATValues
     static constexpr size_t kSerializedLength = kMaxSubjectCATAttributeCount * sizeof(CASEAuthTag);
     typedef uint8_t Serialized[kSerializedLength];
 
-    CHIP_ERROR Serialize(Serialized & outSerialized) const
+    void Serialize(Serialized & outSerialized) const
     {
         uint8_t * p = outSerialized;
         for (size_t i = 0; i < kMaxSubjectCATAttributeCount; i++)
         {
             Encoding::LittleEndian::Write32(p, values[i]);
         }
-        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Deserialize(const Serialized & inSerialized)
+    void Deserialize(const Serialized & inSerialized)
     {
         const uint8_t * p = inSerialized;
         for (size_t i = 0; i < kMaxSubjectCATAttributeCount; i++)
         {
             values[i] = Encoding::LittleEndian::Read32(p);
         }
-        return CHIP_NO_ERROR;
     }
 };
 

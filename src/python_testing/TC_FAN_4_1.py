@@ -34,19 +34,37 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --int-arg pixit_fan_start_time:1
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from typing import Optional
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
-                                           run_if_endpoint_matches)
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_FAN_4_1(MatterBaseTest):
@@ -73,6 +91,7 @@ class TC_FAN_4_1(MatterBaseTest):
             return [mode.kOff, mode.kHigh]
 
         asserts.fail(f"Unknown FanModeSequence {fan_mode_sequence}")
+        return None
 
     def _sub_step(self, start_step: int, attribute_to_set: str, value: str, verify_mode: str, verify_percent: str, verify_speed: str, spd_check: bool = False):
         spd = ""
@@ -173,7 +192,7 @@ class TC_FAN_4_1(MatterBaseTest):
 
         self.step(6)
         attr = fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh)
-        resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+        resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
         asserts.assert_equal(resp[0].Status, Status.Success, "Unexpected error writing FanMode attribute")
 
         self.step(7)
@@ -226,7 +245,7 @@ class TC_FAN_4_1(MatterBaseTest):
             """
             nonlocal step_num
             self.step(step_num)
-            resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+            resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
             asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Unexpected status returned")
             if resp[0].Status != Status.Success:
                 self.skip_step(step_num + 1)
@@ -250,8 +269,8 @@ class TC_FAN_4_1(MatterBaseTest):
                 asserts.assert_not_equal(percent_setting, 0, "Incorrect percent setting")
 
             self.step(step_num + 3)
-            logging.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
-            time.sleep(wait_s)
+            log.info("Waiting for %s seconds to give the fan a chance to respond", wait_s)
+            await asyncio.sleep(wait_s)
 
             self.step(step_num + 4)
             percent_current = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.PercentCurrent)
@@ -283,7 +302,7 @@ class TC_FAN_4_1(MatterBaseTest):
             await verify_onoff_off(attr=fan.Attributes.SpeedSetting(speed_max), expected_mode=fan.Enums.FanModeEnum.kHigh, expected_percent_setting=None, expected_speed_setting=speed_max)
             await verify_onoff_off(attr=fan.Attributes.SpeedSetting(0), expected_mode=fan.Enums.FanModeEnum.kOff, expected_percent_setting=0, expected_speed_setting=0)
         else:
-            for i in range(2*num_substeps + 1):
+            for i in range(2*num_substeps):
                 self.skip_step(step_num + i)
             step_num += 2 * num_substeps
 
@@ -312,8 +331,9 @@ class TC_FAN_4_1(MatterBaseTest):
         # Make sure that we can still adjust the Percent values now that it's back on
         self.step(step_num)
         attr = fan.Attributes.PercentSetting(50)
-        resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
-        asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Invalid response from writing PercentSetting")
+        resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+        asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState],
+                          "Invalid response from writing PercentSetting")
         step_num += 1
 
         # we want to see a change on percent setting and percent current to 1

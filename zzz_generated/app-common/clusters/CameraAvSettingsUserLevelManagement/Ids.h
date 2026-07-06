@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster CameraAvSettingsUserLevelManagement (cluster code: 1362/0x04552)
+// Identifier constant values for cluster CameraAvSettingsUserLevelManagement (cluster code: 1362/0x0552)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

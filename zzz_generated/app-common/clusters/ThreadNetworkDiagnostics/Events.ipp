@@ -60,7 +60,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ConnectionStatus.
+} // namespace ConnectionStatus
 namespace NetworkFaultChange {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -96,7 +96,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace NetworkFaultChange.
+} // namespace NetworkFaultChange
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics
 } // namespace Clusters

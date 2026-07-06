@@ -97,7 +97,7 @@ CHIP_ERROR DefaultOTARequestorStorage::LoadDefaultProviders(ProviderLocationList
         ReturnErrorOnFailure(provider.Decode(reader));
         if (!ProviderAlreadyInList(providers, provider))
         {
-            providers.Add(provider);
+            TEMPORARY_RETURN_IGNORED providers.Add(provider);
         }
     }
 

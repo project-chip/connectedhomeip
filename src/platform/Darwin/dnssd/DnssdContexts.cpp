@@ -47,9 +47,31 @@ std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
 
 void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t len)
 {
-    uint16_t recordCount   = TXTRecordGetCount(len, data);
+    service.mTextEntries   = nullptr;
+    service.mTextEntrySize = 0;
+
+    uint16_t recordCount = TXTRecordGetCount(len, data);
+    // A malicious advertiser could have something like 65k TXT records; we
+    // don't really want to go and allocate 1.5MB of memory here.  Cap at
+    // something reasonable which is still much larger than the number of TXT
+    // records we expect Matter nodes to have.
+    if (recordCount > kDnssdTxtRecordMaxEntries)
+    {
+        ChipLogError(Discovery, "Mdns: TXT record has %u entries; truncating to %u", recordCount, kDnssdTxtRecordMaxEntries);
+        recordCount = kDnssdTxtRecordMaxEntries;
+    }
+    if (recordCount == 0)
+    {
+        return;
+    }
+
+    service.mTextEntries = static_cast<TextEntry *>(chip::Platform::MemoryCalloc(recordCount, sizeof(TextEntry)));
+    if (service.mTextEntries == nullptr)
+    {
+        ChipLogError(Discovery, "Mdns: Failed to allocate %u TXT entries", recordCount);
+        return;
+    }
     service.mTextEntrySize = recordCount;
-    service.mTextEntries   = static_cast<TextEntry *>(chip::Platform::MemoryCalloc(kDnssdTxtRecordMaxEntries, sizeof(TextEntry)));
 
     for (uint16_t i = 0; i < recordCount; i++)
     {
@@ -71,14 +93,32 @@ void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t
             valueLen = chip::Dnssd::kDnssdTextMaxSize - 1;
         }
 
-        char value[chip::Dnssd::kDnssdTextMaxSize];
-        memcpy(value, valuePtr, valueLen);
-        value[valueLen] = 0;
-
         auto & textEntry    = service.mTextEntries[i];
-        textEntry.mKey      = strdup(key);
-        textEntry.mData     = reinterpret_cast<const uint8_t *>(strdup(value));
-        textEntry.mDataSize = valueLen;
+        textEntry.mKey      = chip::Platform::MemoryAllocString(key, strlen(key));
+        textEntry.mData     = nullptr;
+        textEntry.mDataSize = 0;
+        if (textEntry.mKey == nullptr)
+        {
+            ChipLogError(Discovery, "Mdns: Failed to allocate TXT key");
+            service.mTextEntrySize = i;
+            break;
+        }
+
+        if (valueLen > 0)
+        {
+            auto * buf = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(valueLen, sizeof(uint8_t)));
+            if (buf == nullptr)
+            {
+                ChipLogError(Discovery, "Mdns: Failed to allocate %u-byte TXT value", valueLen);
+                chip::Platform::MemoryFree(const_cast<char *>(textEntry.mKey));
+                textEntry.mKey         = nullptr;
+                service.mTextEntrySize = i;
+                break;
+            }
+            memcpy(buf, valuePtr, valueLen);
+            textEntry.mData     = buf;
+            textEntry.mDataSize = valueLen;
+        }
     }
 }
 
@@ -348,7 +388,7 @@ void RegisterContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
     ChipLogError(Discovery, "Mdns: Register failure (%s)", errorStr);
     callback(context, nullptr, nullptr, err);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void RegisterContext::DispatchSuccess()
@@ -382,7 +422,7 @@ void BrowseContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
         ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
     }
     callback(context, nullptr, 0, true, err);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseContext::DispatchSuccess()
@@ -459,14 +499,14 @@ void BrowseWithDelegateContext::DispatchFailure(const char * errorStr, CHIP_ERRO
 
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     delegate->OnBrowseStop(err);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseWithDelegateContext::DispatchSuccess()
 {
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     delegate->OnBrowseStop(CHIP_NO_ERROR);
-    MdnsContexts::GetInstance().Remove(this);
+    TEMPORARY_RETURN_IGNORED MdnsContexts::GetInstance().Remove(this);
 }
 
 void BrowseWithDelegateContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain,
@@ -812,8 +852,8 @@ InterfaceInfo::~InterfaceInfo()
     for (size_t i = 0; i < count; i++)
     {
         const auto & textEntry = service.mTextEntries[i];
-        free(const_cast<char *>(textEntry.mKey));
-        free(const_cast<uint8_t *>(textEntry.mData));
+        Platform::MemoryFree(const_cast<char *>(textEntry.mKey));
+        Platform::MemoryFree(const_cast<uint8_t *>(textEntry.mData));
     }
     Platform::MemoryFree(const_cast<TextEntry *>(service.mTextEntries));
 }

@@ -32,6 +32,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -40,12 +54,14 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 # import time
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_FAN_3_4(MatterBaseTest):
@@ -72,7 +88,7 @@ class TC_FAN_3_4(MatterBaseTest):
         return "[TC-FAN-3.4] Optional wind functionality with DUT as Server"
 
     def steps_TC_FAN_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read from the DUT the WindSupport attribute and store"),
             TestStep(3, "SleepWind is supported, so write 0x01 to WindSetting"),
@@ -83,19 +99,22 @@ class TC_FAN_3_4(MatterBaseTest):
             TestStep(8, "NaturalWind is not supported, so write 0x02 to WindSetting to check for constraint error"),
             TestStep(9, "Write WindSetting to 0x00"),
         ]
-        return steps
 
     def pics_TC_FAN_3_4(self) -> list[str]:
         return ["FAN.S"]
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_FAN_3_4(self):
         if not self.check_pics("FAN.S.F03"):
             self.mark_all_remaining_steps_skipped(1)
-            logger.info("Test skipped because PICS FAN.S.F03 is not set")
+            log.info("Test skipped because PICS FAN.S.F03 is not set")
             return
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 
@@ -105,7 +124,7 @@ class TC_FAN_3_4(MatterBaseTest):
         if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind:
             self.step(3)
             await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind)
-            # time.sleep(1)
+            # await asyncio.sleep(1)
 
             self.step(4)
             wind_setting = await self.read_wind_setting(endpoint=endpoint)
@@ -122,7 +141,7 @@ class TC_FAN_3_4(MatterBaseTest):
         if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind:
             self.step(6)
             await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind)
-            # time.sleep(1)
+            # await asyncio.sleep(1)
 
             self.step(7)
             wind_setting = await self.read_wind_setting(endpoint=endpoint)

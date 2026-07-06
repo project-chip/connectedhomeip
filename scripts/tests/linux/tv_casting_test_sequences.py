@@ -17,13 +17,13 @@
 from linux.tv_casting_test_sequence_utils import App, Sequence, Step
 
 """
-In this file, we define the test sequences with the relevant steps that will be used in the `scripts/tests/run_tv_casting_test.py` 
-test script for validating the casting experience between the Linux tv-casting-app and the Linux tv-app. 
+In this file, we define the test sequences with the relevant steps that will be used in the `scripts/tests/run_tv_casting_test.py`
+test script for validating the casting experience between the Linux tv-casting-app and the Linux tv-app.
 
 At the beginning of each test sequence we need to indicate the start up of the tv-app using the `START_APP` string as the `input_cmd`
-followed by the same for the tv-casting-app. On the other hand, at the end of each test sequence we need to ensure that each app will 
+followed by the same for the tv-casting-app. On the other hand, at the end of each test sequence we need to ensure that each app will
 be stopped by providing the `STOP_APP` string as the `input_cmd`. As noted in the example below of `example_test_sequence`, the first
-four steps pertain to starting the apps while the last two are for signaling stopping the apps. 
+four steps pertain to starting the apps while the last two are for signaling stopping the apps.
 
 Note: `START_APP` and `STOP_APP` are reserved for signaling the starting and stopping of apps.
 

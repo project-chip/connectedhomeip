@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster AudioOutput (cluster code: 1291/0x0450B)
+// Identifier constant values for cluster AudioOutput (cluster code: 1291/0x050B)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

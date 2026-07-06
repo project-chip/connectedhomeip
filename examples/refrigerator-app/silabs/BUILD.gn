@@ -56,16 +56,17 @@ declare_args() {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     defines = []
@@ -79,7 +80,7 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
@@ -89,18 +90,11 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/freertos_config",
     ]
 
     if (use_wf200) {
       include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
-
-    if (chip_enable_ble_rs911x) {
-      include_dirs += [
-        "${chip_root}/src/platform/silabs/efr32/rs911x",
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
     }
 
     defines = []
@@ -113,12 +107,12 @@ if (wifi_soc) {
 
     if (use_temp_sensor) {
       include_dirs += [
-        "${efr32_sdk_root}/platform/driver/i2cspm/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/config",
-        "${efr32_sdk_root}/hardware/driver/si70xx/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_select",
-        "${efr32_sdk_root}/platform/common/config",
+        "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/inc",
+        "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht",
+        "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht/config",
+        "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/inc",
+        "${efr32_sdk_root}/platform_common/platform/common/config",
+        "${efr32_sdk_root}/platform_core/platform/common/config/",
       ]
 
       defines += [ "USE_TEMP_SENSOR" ]
@@ -136,10 +130,9 @@ silabs_executable("refrigerator_app") {
 
   sources = [
     "${chip_root}/examples/refrigerator-app/refrigerator-common/src/static-supported-temperature-levels.cpp",
-    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/RefrigeratorManager.cpp",
-    "src/ZclCallbacks.cpp",
     "src/refrigerator-and-temperature-controlled-cabinet-mode.cpp",
   ]
 
@@ -149,10 +142,10 @@ silabs_executable("refrigerator_app") {
 
   if (use_temp_sensor) {
     sources += [
-      "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
-      "${efr32_sdk_root}/platform/common/src/sl_status.c",
-      "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
+      "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/src/sl_si70xx.c",
+      "${efr32_sdk_root}/platform_common/platform/common/src/sl_status.c",
+      "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/src/sl_i2cspm.c",
+      "${efr32_sdk_root}/platform_core/platform/emlib/src/em_i2c.c",
       "${examples_common_plat_dir}/TemperatureSensor.cpp",
       "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
     ]
@@ -214,7 +207,11 @@ silabs_executable("refrigerator_app") {
     ]
   }
 
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
 
   inputs = [ ldscript ]
 

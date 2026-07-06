@@ -14,9 +14,11 @@
 
 import logging
 import xml.sax.xmlreader
-from typing import List, Optional
+from typing import Optional
 
 from matter.idl.matter_idl_types import Attribute, Idl, ParseMetaData
+
+log = logging.getLogger(__name__)
 
 
 class IdlPostProcessor:
@@ -39,7 +41,7 @@ class ProcessingPath:
     and in general to report things like 'this path found but was not handled'.
     """
 
-    def __init__(self, paths: Optional[List[str]] = None):
+    def __init__(self, paths: Optional[list[str]] = None):
         if paths is None:
             paths = []
         self.paths = paths
@@ -117,8 +119,7 @@ class Context:
         # NOTE: this may get added several times as both 'client' and 'server'
         #       however matter should not differentiate between the two
         code = attribute.definition.code
-        logging.info('Adding global attribute 0x%X (%d): %s' %
-                     (code, code, attribute.definition.name))
+        log.info("Adding global attribute 0x%X (%d): '%s'", code, code, attribute.definition.name)
 
         self._global_attributes[code] = attribute
 
@@ -131,7 +132,7 @@ class Context:
             if where:
                 msg = msg + " at " + where
 
-            logging.warning(msg)
+            log.warning(msg)
             self._not_handled.add(path)
 
     def AddIdlPostProcessor(self, processor: IdlPostProcessor, has_priority: bool = False):

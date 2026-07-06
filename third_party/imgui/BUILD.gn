@@ -14,6 +14,11 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${build_root}/config/linux/pkg_config.gni")
+
+pkg_config("sdl2_pkgconfig") {
+  packages = [ "sdl2" ]
+}
 
 config("imgui_config") {
   include_dirs = [
@@ -22,18 +27,17 @@ config("imgui_config") {
   ]
   defines = [ "CHIP_IMGUI_ENABLED=1" ]
 
-  # FUTURE: these should be parsed from `sdl2-config --cflags`
+  # Use pkg-config for SDL2 on all platforms
+  # FUTURE: SDL2 libs should be from `sdl2-config --libs`
+  configs = [ ":sdl2_pkgconfig" ]
+
   if (current_os == "mac") {
-    # Default path setup by `brew install sdl2`
-    include_dirs += [ "/usr/local/include/SDL2" ]
     defines += [ "_THREAD_SAFE" ]
     ldflags = [
       "-framework",
       "OpenGL",
     ]
   } else {
-    # Linux defaults
-    include_dirs += [ "/usr/include/SDL2" ]
     defines += [ "_REENTRANT" ]
   }
 }
@@ -61,14 +65,12 @@ source_set("imgui") {
     "repo/backends/imgui_impl_sdl2.h",
   ]
 
-  # FUTURE: SDL2 libs should be from `sdl2-config --libs`
-  libs = [
-    "SDL2",
-    "dl",
-  ]
-
+  # Additional libs needed on Linux beyond what pkg-config provides
   if (current_os == "linux") {
-    libs += [ "GL" ]
+    libs = [
+      "dl",
+      "GL",
+    ]
   }
 
   public_configs = [ ":imgui_config" ]

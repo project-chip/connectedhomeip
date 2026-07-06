@@ -20,6 +20,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 // DefaultSessionResumptionStorage is a partial implementation.
 // Use SimpleSessionResumptionStorage, which extends it, to test.
@@ -29,7 +30,7 @@ TEST(TestDefaultSessionResumptionStorage, TestSave)
 {
     chip::SimpleSessionResumptionStorage sessionStorage;
     chip::TestPersistentStorageDelegate storage;
-    sessionStorage.Init(&storage);
+    EXPECT_SUCCESS(sessionStorage.Init(&storage));
     struct
     {
         chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
@@ -44,7 +45,7 @@ TEST(TestDefaultSessionResumptionStorage, TestSave)
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()), CHIP_NO_ERROR);
         *vectors[i].resumptionId.data() =
             static_cast<uint8_t>(i); // set first byte to our index to ensure uniqueness for the FindByResumptionId call
-        vectors[i].sharedSecret.SetLength(vectors[i].sharedSecret.Capacity());
+        EXPECT_SUCCESS(vectors[i].sharedSecret.SetLength(vectors[i].sharedSecret.Capacity()));
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].sharedSecret.Bytes(), vectors[i].sharedSecret.Length()), CHIP_NO_ERROR);
         vectors[i].node           = chip::ScopedNodeId(static_cast<chip::NodeId>(i + 1), static_cast<chip::FabricIndex>(i + 1));
         vectors[i].cats.values[0] = static_cast<chip::CASEAuthTag>(rand());
@@ -53,6 +54,8 @@ TEST(TestDefaultSessionResumptionStorage, TestSave)
     }
 
     // Fill storage.
+    // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     for (size_t i = 0; i < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE; ++i)
     {
         EXPECT_EQ(sessionStorage.Save(vectors[i].node, vectors[i].resumptionId, vectors[i].sharedSecret, vectors[i].cats),
@@ -107,7 +110,7 @@ TEST(TestDefaultSessionResumptionStorage, TestInPlaceSave)
 {
     chip::SimpleSessionResumptionStorage sessionStorage;
     chip::TestPersistentStorageDelegate storage;
-    sessionStorage.Init(&storage);
+    EXPECT_SUCCESS(sessionStorage.Init(&storage));
     struct
     {
         chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
@@ -119,6 +122,8 @@ TEST(TestDefaultSessionResumptionStorage, TestInPlaceSave)
     // Construct only a few unique node identities to simulate talking to a
     // couple peers.
     chip::ScopedNodeId nodes[3];
+    // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     static_assert(MATTER_ARRAY_SIZE(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE,
                   "must have fewer nodes than slots in session resumption storage");
     for (size_t i = 0; i < MATTER_ARRAY_SIZE(nodes); ++i)
@@ -135,7 +140,7 @@ TEST(TestDefaultSessionResumptionStorage, TestInPlaceSave)
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()), CHIP_NO_ERROR);
         *vectors[i].resumptionId.data() =
             static_cast<uint8_t>(i); // set first byte to our index to ensure uniqueness for the FindByResumptionId call
-        vectors[i].sharedSecret.SetLength(vectors[i].sharedSecret.Capacity());
+        EXPECT_SUCCESS(vectors[i].sharedSecret.SetLength(vectors[i].sharedSecret.Capacity()));
         EXPECT_EQ(chip::Crypto::DRBG_get_bytes(vectors[i].sharedSecret.Bytes(), vectors[i].sharedSecret.Length()), CHIP_NO_ERROR);
         vectors[i].node           = nodes[i % MATTER_ARRAY_SIZE(nodes)];
         vectors[i].cats.values[0] = static_cast<chip::CASEAuthTag>(rand());
@@ -251,7 +256,7 @@ TEST(TestDefaultSessionResumptionStorage, TestDelete)
 {
     chip::SimpleSessionResumptionStorage sessionStorage;
     chip::TestPersistentStorageDelegate storage;
-    sessionStorage.Init(&storage);
+    EXPECT_SUCCESS(sessionStorage.Init(&storage));
     chip::Crypto::P256ECDHDerivedSecret sharedSecret;
     struct
     {
@@ -260,7 +265,7 @@ TEST(TestDefaultSessionResumptionStorage, TestDelete)
     } vectors[CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE];
 
     // Create a shared secret.  We can use the same one for all entries.
-    sharedSecret.SetLength(sharedSecret.Capacity());
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
 
     // Populate test vectors.
@@ -311,7 +316,7 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteAll)
 {
     chip::SimpleSessionResumptionStorage sessionStorage;
     chip::TestPersistentStorageDelegate storage;
-    sessionStorage.Init(&storage);
+    EXPECT_SUCCESS(sessionStorage.Init(&storage));
     chip::Crypto::P256ECDHDerivedSecret sharedSecret;
     struct
     {
@@ -324,7 +329,7 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteAll)
     } vectors[CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE / 3];
 
     // Create a shared secret.  We can use the same one for all entries.
-    sharedSecret.SetLength(sharedSecret.Capacity());
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
 
     // Populate test vectors.

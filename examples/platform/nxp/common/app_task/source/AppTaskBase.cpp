@@ -31,6 +31,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <platform/CommissionableDataProvider.h>
 
@@ -39,12 +40,12 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if defined(MATTER_DM_PLUGIN_USER_LABEL) || defined(MATTER_DM_PLUGIN_FIXED_LABEL)
-#ifndef CONFIG_DEVICE_INFO_PROVIDER_IMPL
-#define CONFIG_DEVICE_INFO_PROVIDER_IMPL 1
+#ifndef CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+#define CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER 1
 #endif
 #endif
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 #include <DeviceInfoProviderImpl.h>
 #endif
 
@@ -59,11 +60,15 @@
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
+#endif
+
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
 #include "WifiConnect.h"
 #endif
 
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
 #include "OperationalKeystore.h"
 #endif
 
@@ -75,7 +80,7 @@
 #include "DiagnosticLogsDemo.h"
 #endif
 
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
 #include "LowPower.h"
 #include "PWR_Interface.h"
 #endif
@@ -84,20 +89,15 @@
 #include "OTARequestorInitiator.h"
 #endif
 
-#if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#if defined(CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE) && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
 #endif
 
-#ifdef SMOKE_CO_ALARM
-#include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
-#endif
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
 #include <app/TestEventTriggerDelegate.h>
 #endif
 
@@ -114,6 +114,22 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
+#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+#include <crypto/PSAOperationalKeystore.h>
+#endif
+
+#if CONFIG_CHIP_SE05X
+#include "AppSe05x.h"
+#endif
+
+#if CONFIG_NXP_USE_POWER_DOWN
+#include "ICDUtil.h"
+#endif // CONFIG_NXP_USE_POWER_DOWN
+
+#if CONFIG_CHIP_APP_IDENTIFY
+#include "Identify.h"
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -121,7 +137,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
@@ -138,20 +154,28 @@ app::Clusters::NetworkCommissioning::Instance
     sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
 #endif
 
+#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
-extern char baseServiceInstanceName[];
+extern const char sBaseServiceInstanceName[];
 #endif
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
 #endif
 
-#ifdef SMOKE_CO_ALARM
-static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
-                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
-                                                                                          0xcc, 0xdd, 0xee, 0xff };
+#if CONFIG_CHIP_APP_IDENTIFY
+NXP::App::IdentifyDelegate sIdentifyDelegate;
+static chip::app::DefaultTimerDelegate sTimerDelegateIdentify;
+
+app::RegisteredServerCluster<app::Clusters::IdentifyCluster>
+    gIdentifyCluster(app::Clusters::IdentifyCluster::Config(CONFIG_CHIP_APP_IDENTIFY_ENDPOINT, sTimerDelegateIdentify)
+                         .WithIdentifyType(chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
+                         .WithDelegate(&sIdentifyDelegate));
 #endif
 
 #if CONFIG_NET_L2_OPENTHREAD
@@ -179,29 +203,31 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.reportScheduler = &sReportScheduler;
 #endif
 
-#if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
-#endif
-
-#ifdef SMOKE_CO_ALARM
-    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
-    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
-    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler) == CHIP_NO_ERROR);
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-#endif
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
 
-#if CONFIG_OPERATIONAL_KEYSTORE
+#endif
+
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
+
+#elif CONFIG_CHIP_CRYPTO_PSA && CONFIG_APP_FREERTOS_OS
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+#if CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+#endif
+
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_NET_L2_OPENTHREAD
@@ -214,20 +240,16 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
-    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
-#if CONFIG_OPERATIONAL_KEYSTORE
-    chip::NXP::App::OperationalKeystore::Init(persistentStorage);
-#endif
 
-#if CONFIG_DEVICE_INFO_PROVIDER_IMPL
-    gExampleDeviceInfoProvider.SetStorageDelegate(persistentStorage);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
+    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
+    TEMPORARY_RETURN_IGNORED chip::NXP::App::OperationalKeystore::Init(persistentStorage);
 #endif
 
     GetAppTask().PostInitMatterServerInstance();
 
 #if CONFIG_DIAG_LOGS_DEMO
-    chip::NXP::App::DiagnosticLogsDemo::DisplayUsage();
+    TEMPORARY_RETURN_IGNORED chip::NXP::App::DiagnosticLogsDemo::DisplayUsage();
 #endif
 
 #if CONFIG_CHIP_OTA_PROVIDER
@@ -237,6 +259,10 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
     VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
 #endif
+
+#if CONFIG_NXP_USE_POWER_DOWN
+    VerifyOrDie(chip::Server::GetInstance().GetICDManager().RegisterObserver(&chip::NXP::App::GetAppICDObserver()));
+#endif // CONFIG_NXP_USE_POWER_DOWN
 }
 
 CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
@@ -244,10 +270,10 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     /* Init Chip memory management before the stack */
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
-#if CONFIG_LOW_POWER
-    chip::NXP::App::LowPower::Init();
+#if CONFIG_NXP_USE_LOW_POWER
+    TEMPORARY_RETURN_IGNORED chip::NXP::App::LowPower::Init();
 #endif
 
     /* Initialize Matter factory data before initializing the Matter stack */
@@ -258,6 +284,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Pre Factory Data Provider init failed");
         goto exit;
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().PreMatterStackInit();
+#endif
 
     /*
      * Initialize the CHIP stack.
@@ -301,7 +332,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Error during ThreadStackMgr().InitThreadStack()");
         return err;
     }
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::CONFIG_THREAD_DEVICE_TYPE);
     if (err != CHIP_NO_ERROR)
@@ -314,7 +345,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
      * Schedule an event to the Matter stack to initialize
      * the ZCL Data Model and start server
      */
-    PlatformMgr().ScheduleWork(InitServer, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(InitServer, 0);
 
 /* Flag generated by Zap */
 #ifdef MATTER_DM_PLUGIN_BINDING
@@ -327,19 +358,38 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     }
 #endif
 
+#if CONFIG_CHIP_SE05X
+    err = chip::NXP::App::Se05x::Init();
+    SuccessOrExit(err);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* BLEApplicationManager implemented per platform or left blank */
+    chip::NXP::App::BleAppMgr().PostMatterStackInit();
+#endif
+
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
-    sNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
 #ifdef ENABLE_CHIP_SHELL
     Shell::SetWiFiDriver(chip::NXP::App::GetAppTask().GetWifiDriverInstance());
 #endif
 #elif CONFIG_CHIP_ETHERNET
-    sNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (err == CHIP_NO_ERROR)
     {
         /* If an update is under test make it permanent */
         OTARequestorInitiator::Instance().HandleSelfTest();
+    }
+#endif
+
+#if CONFIG_CHIP_APP_IDENTIFY
+    err = chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during Register(gIdentifyCluster.Registration()");
+        goto exit;
     }
 #endif
 
@@ -367,6 +417,14 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     }
 #endif
 
+#if CONFIG_CHIP_SE05X
+    err = chip::NXP::App::Se05x::PostInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
+    }
+#endif
+
 exit:
     return err;
 }
@@ -384,7 +442,7 @@ void chip::NXP::App::AppTaskBase::StartCommissioning(intptr_t arg)
     }
     else
     {
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
 }
 
@@ -414,7 +472,7 @@ void chip::NXP::App::AppTaskBase::SwitchCommissioningState(intptr_t arg)
     }
     else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else
     {
@@ -425,23 +483,28 @@ void chip::NXP::App::AppTaskBase::SwitchCommissioningState(intptr_t arg)
 void chip::NXP::App::AppTaskBase::StartCommissioningHandler(void)
 {
     /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(StartCommissioning, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(StartCommissioning, 0);
 }
 
 void chip::NXP::App::AppTaskBase::StopCommissioningHandler(void)
 {
     /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(StopCommissioning, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(StopCommissioning, 0);
 }
 
 void chip::NXP::App::AppTaskBase::SwitchCommissioningStateHandler(void)
 {
     /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
-    PlatformMgr().ScheduleWork(SwitchCommissioningState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(SwitchCommissioningState, 0);
 }
 
 void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* Trigger factory reset for BLEApplicationManager */
+    chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();
@@ -449,14 +512,14 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 
 void chip::NXP::App::AppTaskBase::AppMatter_DisallowDeviceToSleep(void)
 {
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     PWR_DisallowDeviceToSleep();
 #endif
 }
 
 void chip::NXP::App::AppTaskBase::AppMatter_AllowDeviceToSleep(void)
 {
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     PWR_AllowDeviceToSleep();
 #endif
 }
@@ -508,10 +571,10 @@ void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
                                                                                   Server::GetInstance().GetFailSafeContext());
 
         // Initialize TBR name
-        CharSpan brName(baseServiceInstanceName, strlen(baseServiceInstanceName));
+        CharSpan brName(sBaseServiceInstanceName, strlen(sBaseServiceInstanceName));
         sThreadBRDelegate.SetThreadBorderRouterName(brName);
         // Initialize TBR cluster
-        sThreadBRMgmtInstance.Init();
+        TEMPORARY_RETURN_IGNORED sThreadBRMgmtInstance.Init();
     }
 }
 #endif

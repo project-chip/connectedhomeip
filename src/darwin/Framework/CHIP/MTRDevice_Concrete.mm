@@ -43,6 +43,7 @@
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
+#import "zap-generated/MTRCommandPayloads_Private.h"
 
 #import "lib/core/CHIPError.h"
 #import "lib/core/DataModelTypes.h"
@@ -406,6 +407,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device;
+- (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -732,11 +734,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    // Check user default to disable time sync detection
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kDisableTimeSyncLossDetectionKey]) {
+        return NO;
+    }
+
     if (_timeSynchronizationLossDetectedTime == nil) {
         return YES;
     }
 
-    __block uint64_t cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
+    __block NSTimeInterval cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
 
 #ifdef DEBUG
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
@@ -2144,7 +2151,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 cumulativeIntervals += intervalSinceLastReport;
             }
         }
-        NSTimeInterval averageTimeBetweenReports = cumulativeIntervals / (_mostRecentReportTimes.count - 1);
+        NSTimeInterval averageTimeBetweenReports = cumulativeIntervals / static_cast<double>(_mostRecentReportTimes.count - 1);
 
         if (averageTimeBetweenReports < _storageBehaviorConfiguration.timeBetweenReportsTooShortThreshold) {
             // Multiplier goes from 1 to _reportToPersistenceDelayMaxMultiplier uniformly, as
@@ -3751,26 +3758,65 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // AttributeList) to determine this set, because we might be in the middle
     // of priming right now and have not gotten those yet.  Just use the set of
     // attribute paths we actually have.
-    NSMutableSet<MTRAttributePath *> * existentPaths = [[NSMutableSet alloc] init];
+    NSMutableArray<MTRAttributePath *> * existentPaths = [[NSMutableArray alloc] init];
     {
-        std::lock_guard lock(_lock);
+        // Separate paths that ask for wildcard attributes from specific attributes
+        NSMutableArray<MTRAttributeRequestPath *> * wildcardAttributePaths = [[NSMutableArray alloc] init];
+        NSMutableArray<MTRAttributeRequestPath *> * specificAttributePaths = [[NSMutableArray alloc] init];
         for (MTRAttributeRequestPath * requestPath in attributePaths) {
-            for (MTRClusterPath * clusterPath in [self _knownClusters]) {
-                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
-                    continue;
-                }
+            if (requestPath.attribute == nil) {
+                [wildcardAttributePaths addObject:requestPath];
+            } else {
+                [specificAttributePaths addObject:requestPath];
+            }
+        }
+
+        std::lock_guard lock(_lock);
+        for (MTRClusterPath * clusterPath in [self _knownClusters]) {
+            MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
+
+            // First pass to check whether any request path includes all attributes from this cluster.
+            BOOL allAttributesRequestedForCluster = NO;
+            for (MTRAttributeRequestPath * requestPath in wildcardAttributePaths) {
                 if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
                     continue;
                 }
-                MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
-                if (requestPath.attribute == nil) {
-                    for (NSNumber * attributeID in clusterData.attributes) {
-                        [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
-                    }
-                } else if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
-                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+
+                // Looping over wildcardAttributePaths, and so requestPath.attribute is known to be nil
+                allAttributesRequestedForCluster = YES;
+                break;
+            }
+            if (allAttributesRequestedForCluster) {
+                // add all attributes - no need to check other paths
+                for (NSNumber * attributeID in clusterData.attributes) {
+                    [existentPaths addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID]];
+                }
+                continue;
+            }
+
+            // Otherwise, we build the list of unique attributes in this cluster that match requested paths.
+
+#define MTR_DEVICE_READATTRIBUTEPATHS_REASONABLE_CLUSTER_SIZE_MAX (32)
+            // Use a reasonable maximum as a starting size to avoid re-hashing of the temporary set
+            //  (vast majority of clusters in spec have fewer than 32 attributes as of 2025-10-04)
+            NSUInteger reasonableClusterSize = MTR_DEVICE_READATTRIBUTEPATHS_REASONABLE_CLUSTER_SIZE_MAX;
+            reasonableClusterSize = std::min({ reasonableClusterSize, specificAttributePaths.count, clusterData.attributes.count });
+            NSMutableSet<MTRAttributePath *> * requestedAttributesInCluster = [[NSMutableSet alloc] initWithCapacity:reasonableClusterSize];
+            for (MTRAttributeRequestPath * requestPath in specificAttributePaths) {
+                if (requestPath.cluster != nil && ![requestPath.cluster isEqual:clusterPath.cluster]) {
+                    continue;
+                }
+                if (requestPath.endpoint != nil && ![requestPath.endpoint isEqual:clusterPath.endpoint]) {
+                    continue;
+                }
+                if ([clusterData.attributes objectForKey:requestPath.attribute] != nil) {
+                    [requestedAttributesInCluster addObject:[MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:requestPath.attribute]];
                 }
             }
+            [existentPaths addObjectsFromArray:[requestedAttributesInCluster allObjects]];
         }
     }
 
@@ -4485,22 +4531,38 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
 
                 [self _attributeValue:attributeDataValue reportedForPath:attributePath];
+            }
 
-                // If we've never detected a time synchronization loss, or it's
-                // been a while since we last detected a time synchronization
-                // loss then check for a time synchronization loss now.
-                if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeTimeSynchronizationID
-                    && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID
-                    && [self shouldDetectTimeSynchronizationLoss]) {
-                    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:attributeResponseValue error:nil];
-                    if (attrReport) {
-                        NSNumber * deviceUTCTime = attrReport.value;
-                        auto * deviceDate = MatterEpochMicrosecondsAsDate(deviceUTCTime.unsignedLongLongValue);
-                        if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
-                            MTR_LOG("%@ Time synchronization loss detected", self);
-                            _timeSynchronizationLossDetected = YES;
-                            _timeSynchronizationLossDetectedTime = [NSDate now];
-                        }
+            // If we've never detected a time synchronization loss, or it's
+            // been a while since we last detected a time synchronization
+            // loss then check for a time synchronization loss now.
+            //
+            // This check must be done unconditionally (not just when the
+            // cache value changed) because CurrentTime has the C (non-
+            // reportable) quality.  After we set time on a device that
+            // lost time sync, our cached value stays null even though the
+            // device now has a valid time.  If the device power-cycles
+            // again and reports null, the value matches the cache and the
+            // check would be skipped.
+            if (isFromSubscription
+                && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeTimeSynchronizationID
+                && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID
+                && [self shouldDetectTimeSynchronizationLoss]) {
+                auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:attributeResponseValue error:nil];
+                if (attrReport) {
+                    NSNumber * deviceUTCTime = attrReport.value;
+                    auto * deviceDate = MatterEpochMicrosecondsAsDate(deviceUTCTime.unsignedLongLongValue);
+                    if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
+                        MTR_LOG("%@ Time synchronization loss detected", self);
+                        _timeSynchronizationLossDetected = YES;
+                        _timeSynchronizationLossDetectedTime = [NSDate now];
+#ifdef DEBUG
+                        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                            if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectedForDevice:)]) {
+                                [testDelegate unitTestTimeSynchronizationLossDetectedForDevice:self];
+                            }
+                        }];
+#endif
                     }
                 }
             }
@@ -4541,7 +4603,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // verify that the uptime is indeed the data type we want
                 if ([attributeDataValue[MTRTypeKey] isEqual:MTRUnsignedIntegerValueType]) {
                     NSNumber * upTimeNumber = attributeDataValue[MTRValueKey];
-                    NSTimeInterval upTime = upTimeNumber.unsignedLongLongValue; // UpTime unit is defined as seconds in the spec
+                    NSTimeInterval upTime = static_cast<NSTimeInterval>(upTimeNumber.unsignedLongLongValue); // UpTime unit is defined as seconds in the spec
                     NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
                     NSDate * oldSystemStartTime = _estimatedStartTime;
                     if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {

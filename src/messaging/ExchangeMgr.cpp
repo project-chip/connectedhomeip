@@ -75,6 +75,11 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
         handler.Reset();
     }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Start from a clean slate: a stale observer must not survive a Shutdown()/re-Init() cycle.
+    mTestOnlyReceivedObserver = nullptr;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
     sessionManager->SetMessageDelegate(this);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -98,6 +103,11 @@ void ExchangeManager::Shutdown()
         mSessionManager->SetMessageDelegate(nullptr);
         mSessionManager = nullptr;
     }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Drop the test-only observer so inbound traffic after a re-Init() cannot dispatch to a now-stale observer.
+    mTestOnlyReceivedObserver = nullptr;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     mState = State::kState_NotInitialized;
 }
@@ -135,9 +145,10 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Proto
     return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
+                                                                       Messaging::UnsolicitedMessageHandler ** outHandler)
 {
-    return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
+    return UnregisterUMH(protocolId, static_cast<int16_t>(msgType), outHandler);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, UnsolicitedMessageHandler * handler)
@@ -170,16 +181,27 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgType,
+                                          Messaging::UnsolicitedMessageHandler ** outHandler)
 {
     for (auto & umh : UMHandlerPool)
     {
         if (umh.IsInUse() && umh.Matches(protocolId, msgType))
         {
+            // Store the handler before unregistering.
+            if (outHandler != nullptr)
+            {
+                *outHandler = umh.Handler;
+            }
             umh.Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
+    }
+
+    if (outHandler != nullptr)
+    {
+        *outHandler = nullptr;
     }
 
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
@@ -257,6 +279,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (mTestOnlyReceivedObserver != nullptr)
+    {
+        mTestOnlyReceivedObserver->OnMessageReceived(packetHeader, payloadHeader, msgBuf);
+    }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
     // Skip retrieval of exchange for group message since no exchange is stored
     // for group msg (optimization)
     if (!packetHeader.IsGroupSession())
@@ -270,7 +299,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                               ChipLogValueExchange(ec), ec->GetDelegate());
 
                 // Matched ExchangeContext; send to message handler.
-                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
+                TEMPORARY_RETURN_IGNORED ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags,
+                                                           std::move(msgBuf));
                 found = true;
                 return Loop::Break;
             }
@@ -348,10 +378,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // If we found a handler, create an exchange to handle the message.
     if (matchingUMH != nullptr)
     {
-        ExchangeDelegate * delegate = nullptr;
+        ExchangeDelegate * delegate         = nullptr;
+        UnsolicitedMessageHandler * handler = matchingUMH->Handler;
 
         // Fetch delegate from the handler
-        CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
+        CHIP_ERROR err = handler->OnUnsolicitedMessageReceived(payloadHeader, session, delegate);
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
@@ -366,7 +397,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             if (delegate != nullptr)
             {
-                matchingUMH->Handler->OnExchangeCreationFailed(delegate);
+                handler->OnExchangeCreationFailed(delegate);
             }
 
             // Using same error message for all errors to reduce code size.
@@ -382,6 +413,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
                          CHIP_ERROR_INVALID_MESSAGE_TYPE.Format());
+            if (delegate != nullptr)
+            {
+                // The OnExchangeCreationFailed contract allows the handler to deallocate the delegate.
+                // Clear it from the exchange context first to prevent use-after-free in ec->Close().
+                ec->SetDelegate(nullptr);
+                handler->OnExchangeCreationFailed(delegate);
+            }
             ec->Close();
             SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
             return;
@@ -453,15 +491,31 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void ExchangeManager::OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr)
+void ExchangeManager::OnTCPConnectionClosed(const Transport::ActiveTCPConnectionState & conn, const SessionHandle & session,
+                                            CHIP_ERROR conErr)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->HasSessionHandle() && ec->GetSessionHandle() == session)
         {
-            ec->OnSessionConnectionClosed(conErr);
+            ec->OnSessionConnectionClosed(conn, conErr);
         }
         return Loop::Continue;
     });
+}
+
+bool ExchangeManager::OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
+{
+    bool foundHandler = false;
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->HasSessionHandle())
+        {
+            ec->OnConnectionAttemptComplete(conn, conErr);
+            foundHandler = true;
+        }
+        return Loop::Continue;
+    });
+
+    return foundHandler;
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

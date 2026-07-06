@@ -27,7 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -432,6 +432,9 @@ const char * CertificationTypeAsString(CertificationType certificationType)
 void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
+    // The exit handler below dereferences onCompletion unconditionally; reject null here.
+    VerifyOrReturn(onCompletion != nullptr);
+
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
     Platform::ScopedMemoryBuffer<uint8_t> paaCert;
@@ -441,8 +444,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     AttestationCertVidPid paaVidPid;
 
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
-                     !info.attestationSignatureBuffer.empty() && !info.dacDerBuffer.empty() &&
-                     !info.attestationNonceBuffer.empty() && onCompletion != nullptr,
+                     !info.attestationSignatureBuffer.empty() && !info.dacDerBuffer.empty() && !info.attestationNonceBuffer.empty(),
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
     VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,
@@ -636,12 +638,26 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificationDeclarati
             ChipLogError(NotSpecified, "Disallowing CD signed by test key");
             return AttestationVerificationResult::kCertificationDeclarationNoCertificateFound;
         }
-
         ChipLogProgress(NotSpecified, "Allowing CD signed by test key");
     }
 
     VerifyOrReturnError(CMS_Verify(cmsEnvelopeBuffer, verifyingKey, certDeclBuffer) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kCertificationDeclarationInvalidSignature);
+
+    // certDeclBuffer is populated by CMS_Verify so we need to do this check after the signature check
+    CertificationElementsWithoutPIDs cdContent;
+    VerifyOrReturnError(DecodeCertificationElements(certDeclBuffer, cdContent) == CHIP_NO_ERROR,
+                        AttestationVerificationResult::kCertificationDeclarationInvalidFormat);
+    // Ensure we didn't use a test key for official or provisional certificates (if disallowed)
+    bool testKeyAllowedForCertificationType =
+        (cdContent.certificationType == to_underlying(CertificationType::kDevelopmentAndTest)) ||
+        (cdContent.certificationType == to_underlying(CertificationType::kProvisional) && kEnableCdTestKeysForProvisionalCds);
+    ChipLogProgress(NotSpecified, "Certification type %u", cdContent.certificationType);
+    if (mCdKeysTrustStore.IsCdTestKey(kid) && !testKeyAllowedForCertificationType)
+    {
+        ChipLogError(NotSpecified, "Test key is disallowed for this certification type: %u", cdContent.certificationType);
+        return AttestationVerificationResult::kCertificationDeclarationNoCertificateFound;
+    }
 
     return AttestationVerificationResult::kSuccess;
 }

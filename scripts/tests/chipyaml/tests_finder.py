@@ -15,7 +15,6 @@
 
 import json
 import os.path
-from typing import List
 
 import click
 
@@ -41,7 +40,7 @@ class TestsFinder:
     def get_default_configuration_name() -> str:
         return _CI_CONFIGURATION_NAME
 
-    def get(self, test_name: str) -> List[str]:
+    def get(self, test_name: str) -> list[str]:
         test_names = []
 
         if self.__test_collections and test_name == _KEYWORD_ALL_TESTS:
@@ -55,10 +54,10 @@ class TestsFinder:
 
         return self.__get_paths(test_names)
 
-    def get_collections(self) -> List[str]:
+    def get_collections(self) -> list[str]:
         return self.__test_collections
 
-    def __get_collections(self, configuration_directory: str, configuration_name: str) -> List[str]:
+    def __get_collections(self, configuration_directory: str, configuration_name: str) -> list[str]:
         if os.path.isfile(configuration_name):
             configuration_filepath = configuration_name
         elif os.path.isfile(os.path.join(configuration_directory, configuration_name + _JSON_FILE_EXTENSION)):
@@ -86,11 +85,11 @@ class TestsFinder:
 
         return collections
 
-    def __get_paths(self, test_names: List[str]) -> List[str]:
+    def __get_paths(self, test_names: list[str]) -> list[str]:
         paths = []
 
         for name in test_names:
-            for root, dir, files in os.walk(self.__test_directory):
+            for root, _, files in os.walk(self.__test_directory):
                 if name in files:
                     paths.append(os.path.join(root, name))
                 elif (name + _YAML_FILE_EXTENSION) in files:
@@ -104,9 +103,8 @@ class TestsFinder:
 def test_finder_options(f):
     f = click.option("--configuration_directory", type=click.Path(exists=True), required=True, show_default=True,
                      default=_DEFAULT_DIRECTORY, help='Path to the directory containing the tests configuration.')(f)
-    f = click.option("--configuration_name", type=str, required=True, show_default=True,
-                     default=_CI_CONFIGURATION_NAME, help='Name of the collection configuration json file to use.')(f)
-    return f
+    return click.option("--configuration_name", type=str, required=True, show_default=True,
+                        default=_CI_CONFIGURATION_NAME, help='Name of the collection configuration json file to use.')(f)
 
 
 @click.command()

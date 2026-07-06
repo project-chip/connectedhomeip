@@ -49,14 +49,14 @@ using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 using namespace chip::Protocols;
 
-struct TestAbortExchangesForFabric : public chip::Test::LoopbackMessagingContext
+struct TestAbortExchangesForFabric : public chip::Testing::LoopbackMessagingContext
 {
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
     }
 
     void CommonCheckAbortAllButOneExchange(bool dropResponseMessages);
@@ -184,12 +184,12 @@ void TestAbortExchangesForFabric::CommonCheckAbortAllButOneExchange(bool dropRes
     const auto & sessionHandle2 = session2.Get();
 
     session1->AsSecureSession()->SetRemoteSessionParameters(
-        ReliableMessageProtocolConfig(chip::Test::MessagingContext::kResponsiveIdleRetransTimeout,
-                                      chip::Test::MessagingContext::kResponsiveActiveRetransTimeout));
+        ReliableMessageProtocolConfig(chip::Testing::MessagingContext::kResponsiveIdleRetransTimeout,
+                                      chip::Testing::MessagingContext::kResponsiveActiveRetransTimeout));
 
     session1Reply->AsSecureSession()->SetRemoteSessionParameters(
-        ReliableMessageProtocolConfig(chip::Test::MessagingContext::kResponsiveIdleRetransTimeout,
-                                      chip::Test::MessagingContext::kResponsiveActiveRetransTimeout));
+        ReliableMessageProtocolConfig(chip::Testing::MessagingContext::kResponsiveIdleRetransTimeout,
+                                      chip::Testing::MessagingContext::kResponsiveActiveRetransTimeout));
 
     EXPECT_TRUE(session1);
     EXPECT_TRUE(session2);
@@ -220,7 +220,7 @@ void TestAbortExchangesForFabric::CommonCheckAbortAllButOneExchange(bool dropRes
         // This version of the test allows us to validate logic that marks expired sessions as defunct
         // on encountering an MRP failure.
         //
-        loopback.mNumMessagesToDrop   = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mNumMessagesToDrop   = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
         loopback.mDroppedMessageCount = 0;
 
         //

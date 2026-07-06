@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/af-types.h>
+#include <lib/support/Span.h>
 #include <refrigerator-and-temperature-controlled-cabinet-mode.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
+using namespace chip::literals;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
@@ -36,6 +40,22 @@ CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::Init()
 void RefrigeratorAndTemperatureControlledCabinetModeDelegate::HandleChangeToMode(
     uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
+    if (gRefrigeratorAndTemperatureControlledCabinetModeDelegate == nullptr)
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+        response.statusText.SetValue("Delegate not initialized"_span);
+        return;
+    }
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
+
+    // Disallow transitions between Normal (0) and Rapid Freeze (2)
+    if ((currentMode == ModeNormal && NewMode == ModeRapidFreeze) || (currentMode == ModeRapidFreeze && NewMode == ModeNormal))
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+        response.statusText.SetValue("Direct transition between Normal and Rapid Freeze not allowed"_span);
+        return;
+    }
+
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
@@ -97,7 +117,7 @@ void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
     }
 }
 
-void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRefrigeratorAndTemperatureControlledCabinetModeDelegate == nullptr &&
@@ -107,5 +127,16 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
     gRefrigeratorAndTemperatureControlledCabinetModeInstance =
         new ModeBase::Instance(gRefrigeratorAndTemperatureControlledCabinetModeDelegate, 0x1,
                                RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(ModeBase::Feature::kOnOff));
-    gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
+}
+
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId,
+                                                                                  MatterClusterShutdownType)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    if (gRefrigeratorAndTemperatureControlledCabinetModeInstance != nullptr)
+    {
+        gRefrigeratorAndTemperatureControlledCabinetModeInstance->Shutdown();
+    }
+    RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
 }

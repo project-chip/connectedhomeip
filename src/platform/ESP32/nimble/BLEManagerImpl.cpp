@@ -64,6 +64,10 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
+#ifdef CONFIG_ESP_HOSTED_ENABLE_BT_NIMBLE
+#include <esp_hosted.h>
+#endif
+
 // Not declared in any header file, hence requires a forward declaration.
 extern "C" void ble_store_config_init(void);
 
@@ -199,15 +203,12 @@ void BLEManagerImpl::ConnectDevice(const ble_addr_t & addr, uint16_t timeout)
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
     // Initialize the Chip BleLayer.
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
+    ReturnErrorOnFailure(BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer()));
 #else
-    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
+    ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
 #endif
-    SuccessOrExit(err);
 
     mRXCharAttrHandle = 0;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -227,10 +228,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
-
-exit:
-    return err;
+    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::_Shutdown()
@@ -249,14 +247,13 @@ void BLEManagerImpl::_Shutdown()
     mFlags.ClearAll().Set(Flags::kGATTServiceStarted);
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (val)
     {
@@ -266,10 +263,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
     mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
     mFlags.Set(Flags::kAdvertisingEnabled, val);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
-
-exit:
-    return err;
+    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
@@ -295,7 +289,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(System::Layer *, void *)
         BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
     }
 #endif
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
@@ -312,8 +306,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    return CHIP_NO_ERROR;
+    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -328,9 +321,8 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     if (deviceName != NULL && deviceName[0] != 0)
     {
         if (strlen(deviceName) >= kMaxDeviceNameLength)
@@ -346,8 +338,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         mFlags.Clear(Flags::kUseCustomDeviceName);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -401,7 +392,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
 
     switch (apEvent->Type)
@@ -443,12 +433,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 
     default:
         break;
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
 
@@ -578,7 +562,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     // Force a refresh of the advertising state.
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     mFlags.Clear(Flags::kAdvertisingConfigured);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 #endif
 
     return err;
@@ -611,11 +595,14 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
         ExitNow();
     }
 
+#if ESP_IDF_VERSION <= ESP_IDF_VERSION_VAL(5, 0, 0)
     err = MapBLEError(ble_gattc_indicate_custom(conId, mTXCharCCCDAttrHandle, om));
+#else
+    err = MapBLEError(ble_gatts_indicate_custom(conId, mTXCharCCCDAttrHandle, om));
+#endif
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ble_gattc_indicate_custom() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        ExitNow();
+        ChipLogError(DeviceLayer, "ble gatt indicate custom failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 exit:
@@ -677,7 +664,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogDetail(Ble, "Received notification of closed CHIPoBLE connection (con %u)", conId);
-    CloseConnection(conId);
+    LogErrorOnFailure(CloseConnection(conId));
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
@@ -936,6 +923,26 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     SuccessOrExit(err);
 #endif
 
+#ifdef CONFIG_ESP_HOSTED_ENABLE_BT_NIMBLE
+    esp_hosted_connect_to_slave();
+
+    // init bt controller
+    err = MapBLEError(esp_hosted_bt_controller_init());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "esp_hosted_bt_controller_init() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ExitNow();
+    }
+
+    // enable bt controller
+    err = MapBLEError(esp_hosted_bt_controller_enable());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "esp_hosted_bt_controller_enable() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ExitNow();
+    }
+#endif
+
 // For ESP-IDF 5.0.1 and below, nimble_port_init() returns void
 #if ESP_IDF_VERSION <= ESP_IDF_VERSION_VAL(5, 0, 1)
     nimble_port_init();
@@ -1010,7 +1017,7 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 
         // Rescheduling it for later, 2 seconds is an arbitrary value, keeping it a bit more so that
         // we dont have to reschedule it again
-        SystemLayer().StartTimer(System::Clock::Seconds32(2), ClaimBLEMemory, nullptr);
+        LogErrorOnFailure(SystemLayer().StartTimer(System::Clock::Seconds32(2), ClaimBLEMemory, nullptr));
     }
     else
     {
@@ -1047,11 +1054,6 @@ CHIP_ERROR BLEManagerImpl::DeinitBLE()
 
     return MapBLEError(err);
 }
-
-#ifdef CONFIG_IDF_TARGET_ESP32P4
-// Stub function to avoid link error
-extern "C" void ble_transport_ll_deinit(void) {}
-#endif
 
 #ifdef CONFIG_BT_NIMBLE_EXT_ADV
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
@@ -1194,22 +1196,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             return err;
         }
 
-        ble_addr_t addr;
-
-        /* generate new non-resolvable private address */
-        err = MapBLEError(ble_hs_id_gen_rnd(1, &addr));
-        if (err != CHIP_NO_ERROR)
+        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
-            ChipLogError(DeviceLayer, "ble_hs_id_gen_rnd failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
+            ble_addr_t addr;
+            /* generate static random address */
+            err = MapBLEError(ble_hs_id_gen_rnd(0, &addr));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_hs_id_gen_rnd failed: %" CHIP_ERROR_FORMAT, err.Format());
+                return err;
+            }
 
-        /* Set generated address */
-        err = MapBLEError(ble_gap_ext_adv_set_addr(kMatterAdvInstance, &addr));
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "ble_gap_ext_adv_set_addr failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
+            /* Set generated address */
+            err = MapBLEError(ble_gap_ext_adv_set_addr(kMatterAdvInstance, &addr));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ble_gap_ext_adv_set_addr failed: %" CHIP_ERROR_FORMAT, err.Format());
+                return err;
+            }
         }
 
         struct os_mbuf * data = os_msys_get_pkthdr(mMatterAdvDataLen, 0);
@@ -1878,7 +1882,7 @@ exit:
     }
 
     // Schedule DriveBLEState() to run.
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 
     return err.AsInteger();
 }
@@ -1988,7 +1992,7 @@ int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_hand
         break;
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 
     return err;
 }
@@ -2069,7 +2073,7 @@ void BLEManagerImpl::OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::C
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kConnectTimeout), HandleConnectTimeout, nullptr);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    mDeviceScanner.StopScan();
+    LogErrorOnFailure(mDeviceScanner.StopScan());
 
     ConnectDevice(addr, kConnectTimeout);
 }
@@ -2140,7 +2144,7 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     mBLEScanConfig.mAppState      = appState;
 
     // Initiate async scan
-    PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator)));
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()

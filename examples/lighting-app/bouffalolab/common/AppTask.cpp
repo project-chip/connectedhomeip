@@ -23,7 +23,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/bouffalolab/common/BLConfig.h>
+#include <platform/bouffalolab/common/BflbConfig.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
@@ -47,7 +47,9 @@
 #include <LEDWidget.h>
 #include <plat.h>
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#include "AppTask.h"
+
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 #ifdef BOOT_PIN_RESET
 #include <bflb_gpio.h>
 #endif
@@ -58,9 +60,6 @@ extern "C" {
 #include <hosal_gpio.h>
 }
 #endif
-
-#include "AppTask.h"
-#include "mboard.h"
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -105,16 +104,14 @@ void StartAppTask(void)
 }
 
 #if CONFIG_ENABLE_CHIP_SHELL
-#if CHIP_DEVICE_LAYER_TARGET_BL616
-CHIP_ERROR AppTask::StartAppShellTask()
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+void AppTask::StartAppShellTask()
 {
     Engine::Root().Init();
 
     cmd_misc_init();
 
     Engine::Root().RunMainLoop();
-
-    return CHIP_NO_ERROR;
 }
 #else
 void AppTask::AppShellTask(void * args)
@@ -122,7 +119,7 @@ void AppTask::AppShellTask(void * args)
     Engine::Root().RunMainLoop();
 }
 
-CHIP_ERROR AppTask::StartAppShellTask()
+void AppTask::StartAppShellTask()
 {
     static TaskHandle_t shellTask;
 
@@ -131,8 +128,6 @@ CHIP_ERROR AppTask::StartAppShellTask()
     cmd_misc_init();
 
     xTaskCreate(AppTask::AppShellTask, "chip_shell", 1024 / sizeof(configSTACK_DEPTH_TYPE), NULL, APP_TASK_PRIORITY, &shellTask);
-
-    return CHIP_NO_ERROR;
 }
 #endif
 #endif
@@ -164,10 +159,12 @@ void AppTask::AppTaskMain(void * pvParameter)
     ButtonInit();
 #else
     uint32_t resetCnt = 0;
-    Internal::BLConfig::ReadConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
-    Internal::BLConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
+    Internal::BflbConfig::ReadConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
+    resetCnt++;
+    Internal::BflbConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
     GetAppTask().mButtonPressedTime = System::SystemClock().GetMonotonicMilliseconds64().count();
-    ChipLogProgress(NotSpecified, "AppTaskMain %lld, resetCnt %ld", GetAppTask().mButtonPressedTime, resetCnt);
+    ChipLogProgress(NotSpecified, "AppTaskMain %llu, resetCnt %u", (unsigned long long) GetAppTask().mButtonPressedTime,
+                    (unsigned int) resetCnt);
 #endif
 
     GetAppTask().sTimer =
@@ -191,7 +188,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     vTaskSuspend(NULL);
 
-    DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
+    TEMPORARY_RETURN_IGNORED DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
     ChipLogProgress(NotSpecified, "App Task started, with SRAM heap %lld left\r\n", currentHeapFree);
 
     while (true)
@@ -238,7 +235,7 @@ void AppTask::AppTaskMain(void * pvParameter)
                 }
                 ChipLogProgress(NotSpecified, "APP_REBOOT_RESET_COUNT_KEY resetCnt %ld", resetCnt);
                 resetCnt = 0;
-                Internal::BLConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
+                Internal::BflbConfig::WriteConfigValue(APP_REBOOT_RESET_COUNT_KEY, resetCnt);
             }
 #endif
             if (APP_EVENT_IDENTIFY_MASK & appEvent)
@@ -468,7 +465,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 }
 
 #ifdef BOOT_PIN_RESET
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 static struct bflb_device_s * app_task_gpio_var = NULL;
 static void app_task_gpio_isr(int irq, void * arg)
 {
@@ -488,7 +485,7 @@ void AppTask::ButtonInit(void)
 {
     GetAppTask().mButtonPressedTime = 0;
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     app_task_gpio_var = bflb_device_get_by_name("gpio");
 
     bflb_gpio_init(app_task_gpio_var, BOOT_PIN_RESET, GPIO_INPUT);
@@ -505,7 +502,7 @@ void AppTask::ButtonInit(void)
 
 bool AppTask::ButtonPressed(void)
 {
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     return bflb_gpio_read(app_task_gpio_var, BOOT_PIN_RESET);
 #else
     uint8_t val = 1;

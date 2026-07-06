@@ -27,7 +27,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     asr:
@@ -37,30 +37,53 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-asr:162
+            image: ghcr.io/project-chip/chip-build-asr:200
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: asr
-            - name: Build all ASR582X examples
+            - name: Build all-clusters-app (PR)
+              if: github.event_name == 'pull_request'
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target asr-asr582x-all-clusters \
-                        --target asr-asr582x-all-clusters-minimal \
-                        --target asr-asr582x-lighting-ota \
-                        --target asr-asr582x-light-switch-shell \
-                        --target asr-asr582x-lock-no_logging \
-                        --target asr-asr582x-ota-requestor \
-                        --target asr-asr582x-bridge-factory \
-                        --target asr-asr582x-temperature-measurement-rotating_id \
-                        --target asr-asr582x-thermostat-rio \
-                        --target asr-asr582x-dishwasher \
-                        --target asr-asr582x-refrigerator \
                         build \
                      "
+                  rm -rf out/
+            - name: Build all ASR582X examples (master)
+              if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+              shell: bash
+              run: |
+                  targets=(
+                      asr-asr582x-all-clusters
+                      asr-asr582x-all-clusters-minimal
+                      asr-asr582x-lighting-ota
+                      asr-asr582x-light-switch-shell
+                      asr-asr582x-lock-no_logging
+                      asr-asr582x-ota-requestor
+                      asr-asr582x-bridge-factory
+                      asr-asr582x-temperature-measurement-rotating_id
+                      asr-asr582x-thermostat-rio
+                      asr-asr582x-dishwasher
+                      asr-asr582x-refrigerator
+                  )
+                  for target in "${targets[@]}"; do
+                      echo "=== Building $target ==="
+                      ./scripts/run_in_build_env.sh \
+                         "./scripts/build/build_examples.py \
+                            --target $target \
+                            build \
+                         "
+                      rm -rf out/
+                  done
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

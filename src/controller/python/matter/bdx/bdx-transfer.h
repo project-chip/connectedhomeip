@@ -86,5 +86,8 @@ private:
     size_t mDataTransferredCount = 0;
 };
 
+// Overrides the cap for the next PrepareForTransfer() only. Reset after PrepareForTransfer.
+void SetControllerBdxMaxBlockSizeForNextTransfer(uint16_t maxBlockSize);
+
 } // namespace bdx
 } // namespace chip

@@ -16,6 +16,16 @@ name:
     178.2.2. [TC-TCTL-2.2] Optional Temperature number attributes with DUT as
     Server
 
+CI:
+    - name: "Test against all-devices/refrigerator"
+      app: all-devices
+      args:
+          - --device
+          - refrigerator
+      test_args:
+          - --endpoint
+          - "2"
+
 PICS:
     - TCTL.S
     - TCTL.S.F00
@@ -35,7 +45,6 @@ tests:
                 value: nodeId
 
     - label: "Step 2: TH reads from the DUT the MinTemperature attribute"
-      PICS: TCTL.S.A0001
       command: "readAttribute"
       attribute: "MinTemperature"
       response:
@@ -44,7 +53,6 @@ tests:
               type: temperature
 
     - label: "Step 3: TH reads from the DUT the MaxTemperature attribute"
-      PICS: TCTL.S.A0002
       command: "readAttribute"
       attribute: "MaxTemperature"
       response:
@@ -54,7 +62,6 @@ tests:
               minValue: MinTemperatureValue
 
     - label: "Step 4: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:

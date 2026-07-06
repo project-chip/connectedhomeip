@@ -59,10 +59,11 @@ private:
     static constexpr size_t kTransferPoolSize = 2;
 
     ObjectPool<BdxTransfer, kTransferPoolSize> mTransferPool;
-    System::Layer * mSystemLayer                  = nullptr;
-    Messaging::ExchangeManager * mExchangeManager = nullptr;
-    BdxTransfer::Delegate * mBdxTransferDelegate  = nullptr;
-    size_t mExpectedTransfers                     = 0;
+    System::Layer * mSystemLayer                                = nullptr;
+    Messaging::ExchangeManager * mExchangeManager               = nullptr;
+    BdxTransfer::Delegate * mBdxTransferDelegate                = nullptr;
+    size_t mExpectedTransfers                                   = 0;
+    Messaging::UnsolicitedMessageHandler * mPrevSendInitHandler = nullptr;
 };
 
 } // namespace bdx

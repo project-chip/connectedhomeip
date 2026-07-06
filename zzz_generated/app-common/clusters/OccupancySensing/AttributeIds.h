@@ -14,7 +14,7 @@ namespace OccupancySensing {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 19;
+inline constexpr uint32_t kAttributesCount = 20;
 
 namespace Occupancy {
 inline constexpr AttributeId Id = 0x00000000;
@@ -35,6 +35,10 @@ inline constexpr AttributeId Id = 0x00000003;
 namespace HoldTimeLimits {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace HoldTimeLimits
+
+namespace PredictedOccupancy {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace PredictedOccupancy
 
 namespace PIROccupiedToUnoccupiedDelay {
 inline constexpr AttributeId Id = 0x00000010;

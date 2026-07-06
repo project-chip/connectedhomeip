@@ -273,7 +273,7 @@ CHIP_ERROR CryptoContext::PrivacyEncrypt(const uint8_t * input, size_t input_len
     ByteSpan plaintext(input, input_length);
     MutableByteSpan privacytext(output, input_length);
     CryptoContext::NonceStorage privacyNonce;
-    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+    ReturnErrorOnFailure(CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac));
 
     return mKeyContext->PrivacyEncrypt(plaintext, privacyNonce, privacytext);
 }
@@ -291,7 +291,7 @@ CHIP_ERROR CryptoContext::PrivacyDecrypt(const uint8_t * input, size_t input_len
     const ByteSpan privacytext(input, input_length);
     MutableByteSpan plaintext(output, input_length);
     CryptoContext::NonceStorage privacyNonce;
-    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+    ReturnErrorOnFailure(CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac));
 
     return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
 }

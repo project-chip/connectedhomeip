@@ -47,26 +47,23 @@ import logging
 import os
 import re
 import shlex
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 import click
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARN,
-    "fatal": logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 class CompileCommand:
-    def __init__(self, dir, file, command):
+    def __init__(self, directory, file, command):
         args = shlex.split(command)
 
-        self.dir = dir
+        self.directory = directory
         self.file = file
         self.compiler = args[0]
         self.args = []
@@ -90,7 +87,7 @@ class CompileCommand:
                 if arg.startswith(p + "/"):
                     continue
                 path = arg[len(p):]  # full path
-                path = os.path.abspath(os.path.join(self.dir, path))
+                path = os.path.abspath(os.path.join(self.directory, path))
                 arg = f"{p}{path}"
                 break
 
@@ -108,23 +105,23 @@ class CompileCommand:
 
     def __str__(self):
         prefix = "\n      "  # have all args on newlines with an indent
-        return f"[{self.dir}: {self.file}] -> {prefix}{prefix.join(self.args)}"
+        return f"[{self.directory}: {self.file}] -> {prefix}{prefix.join(self.args)}"
 
 
 class ParsedCommands:
     def __init__(self, path: str):
-        logging.info("Processing json %s", path)
+        log.info("Processing JSON file '%s'", path)
 
-        with open(path, "r") as f:
+        with open(path) as f:
             self.json_data = json.load(f)
 
         # data is a list of entries. We sort them since this as a sideffect places `/src/` before
         # '/third_party/' and when multi-matching things, this makes for better best-guess matches
         self.json_data.sort(key=lambda a: a["file"])
 
-        logging.info("Done. Loaded %d entries", len(self.json_data))
+        log.info("Done. Loaded %d entries", len(self.json_data))
 
-    def all_matching(self, reg_expr: str) -> List[Any]:
+    def all_matching(self, reg_expr: str) -> list[Any]:
         r = re.compile(reg_expr)
 
         # JSON data is a list of entries:
@@ -145,11 +142,9 @@ class ParsedCommands:
             return None
 
         if len(matches) > 1:
-            logging.warning(
-                "Multiple matches found: %d matches for %s", len(matches), reg_expr
-            )
+            log.warning("Multiple matches found: %d matches for '%s'", len(matches), reg_expr)
             for m in matches:
-                logging.warning("  match: %s", m["file"])
+                log.warning("  match: '%s'", m["file"])
 
         entry = matches[0]
         return CompileCommand(entry["directory"], entry["file"], entry["command"])
@@ -184,8 +179,8 @@ def flags(compile_commands, file_expr):
     f = compile_commands.find(file_expr)
     if f is None:
         raise Exception(f"Failed to find file matching {file_expr}")
-    logging.info("Compiler settings for %s", f.file)
-    logging.debug("File data: %s", f)
+    log.info("Compiler settings for '%s'", f.file)
+    log.debug("File data: '%s'", f)
     f.print_flags()
 
 

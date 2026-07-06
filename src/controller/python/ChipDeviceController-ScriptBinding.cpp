@@ -76,7 +76,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
@@ -145,6 +145,8 @@ PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommission
 // Rendezvous
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                bool isShortDiscriminator, uint32_t setupPINCode, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
+                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
@@ -161,6 +163,13 @@ PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check);
 struct IcdRegistrationParameters;
 PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, const IcdRegistrationParameters * params);
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+PyChipError pychip_DeviceController_SetLocalMRPConfig(uint32_t idleRetransIntervalMillis, uint32_t activeRetransIntervalMillis,
+                                                      uint16_t activeThresholdMillis);
+PyChipError pychip_DeviceController_ResetLocalMRPConfig();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_DeleteAllSessionResumption(chip::Controller::DeviceCommissioner * devCtrl);
@@ -168,6 +177,9 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
 PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
                                                             uint16_t discriminator, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_EstablishPASESessionThreadMeshcop(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      const char * baHost, uint16_t port, const char * setUpCode,
+                                                                      chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::DeviceCommissioner * devCtrl, const char * setUpCode,
                                                          chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
@@ -176,6 +188,12 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
                                                         chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                         uint64_t nodeId, uint32_t setupPasscode, const uint8_t filterType,
                                                         const char * filterParam, uint32_t discoveryTimeoutMsec);
+PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::DeviceCommissioner * devCtrl,
+                                                            chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                            uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
+                                                            const char * borderAgentIPAddr, uint16_t borderAgentPort);
+PyChipError pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                char * outJson, uint32_t outJsonLen);
 
 PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
 
@@ -183,6 +201,8 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
                                                             chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                             chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
                                                             uint16_t discriminator, uint8_t optionInt);
+PyChipError pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                    chip::NodeId remoteDeviceId);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 PyChipError pychip_DeviceController_OpenJointCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
@@ -210,6 +230,10 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
 PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
     chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+
+PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(
+    chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStageStartFunct callback);
 
 PyChipError
 pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
@@ -289,7 +313,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     factoryParams.sessionKeystore          = &sSessionKeystore;
     factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance(storageAdapter);
 
-    sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
+    TEMPORARY_RETURN_IGNORED sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
     sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
@@ -313,7 +337,7 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     //
     // In situations where all the controller instances get shutdown, the entire stack is then also
     // implicitly shutdown. In the REPL, users can create such a situation by manually shutting down
-    // controllers (for example, when they call ChipReplStartup::LoadFabricAdmins multiple times). In
+    // controllers (for example, when they call ReplStartup::LoadFabricAdmins multiple times). In
     // that situation, momentarily, the stack gets de-initialized. This results in further interactions with
     // the stack being dangerous (and in fact, causes crashes).
     //
@@ -364,6 +388,12 @@ PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCo
                         ToPyChipError(CHIP_ERROR_BUFFER_TOO_SMALL));
 
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                char * outJson, uint32_t outJsonLen)
+{
+    return ToPyChipError(devCtrl->GetLastThreadMeshcopDiscoveryDiagnosticJson(outJson, outJsonLen));
 }
 
 PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
@@ -436,6 +466,22 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
                                              sCommissioningParameters));
 }
 
+PyChipError pychip_DeviceController_ConnectNFC(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
+                                               uint32_t setupPINCode, chip::NodeId nodeid)
+{
+    SetupDiscriminator setupDiscriminator;
+
+    // With NFC, only a long discriminator can be used
+    setupDiscriminator.SetLongValue(discriminator);
+
+    return ToPyChipError(devCtrl->PairDevice(nodeid,
+                                             chip::RendezvousParameters()
+                                                 .SetPeerAddress(Transport::PeerAddress::NFC(discriminator))
+                                                 .SetSetupPINCode(setupPINCode)
+                                                 .SetSetupDiscriminator(setupDiscriminator),
+                                             sCommissioningParameters));
+}
+
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid)
 {
@@ -480,6 +526,24 @@ struct UnpairDeviceCallback
     DeviceUnpairingCompleteFunct mCallback;
     chip::Controller::CurrentFabricRemover * mRemover;
 };
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+CHIP_ERROR GetSetupPasscodeFromOnboardingPayload(const char * onboardingPayload, uint32_t & setupPasscode)
+{
+    SetupPayload setupPayload;
+    bool isQRCode = strncmp(onboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+    if (isQRCode)
+    {
+        ReturnErrorOnFailure(QRCodeSetupPayloadParser(onboardingPayload).populatePayload(setupPayload));
+    }
+    else
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadParser(onboardingPayload).populatePayload(setupPayload));
+    }
+    setupPasscode = setupPayload.setUpPINCode;
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 } // anonymous namespace
 
 PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid,
@@ -543,6 +607,29 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
                                                           discoveryTimeoutMsec);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
+}
+
+PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::DeviceCommissioner * devCtrl,
+                                                            chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                            uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
+                                                            const char * borderAgentIPAddrStr, uint16_t borderAgentPort)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    const uint32_t kDefaultDiscoveryTimeoutMsec = 15 * 60 * 1000; // 15 mins
+    CHIP_ERROR err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, pairingDelegate, devCtrl,
+                                                          kDefaultDiscoveryTimeoutMsec);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    chip::Transport::PeerAddress address(Transport::Type::kThreadMeshcop);
+    chip::Inet::IPAddress borderAgentIPAddr;
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(borderAgentIPAddrStr, borderAgentIPAddr),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    address.SetIPAddress(borderAgentIPAddr).SetPort(borderAgentPort);
+
+    auto params = RendezvousParameters().SetSetupPINCode(setupPasscode).SetDiscriminator(discriminator).SetPeerAddress(address);
+    return ToPyChipError(devCtrl->PairDevice(nodeId, params, sCommissioningParameters));
+#else
+    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 }
 
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size)
@@ -690,32 +777,50 @@ PyChipError pychip_DeviceController_ResetCommissioningParameters()
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+PyChipError pychip_DeviceController_SetLocalMRPConfig(uint32_t idleRetransIntervalMillis, uint32_t activeRetransIntervalMillis,
+                                                      uint16_t activeThresholdMillis)
+{
+    chip::ReliableMessageProtocolConfig config{ chip::System::Clock::Milliseconds32(idleRetransIntervalMillis),
+                                                chip::System::Clock::Milliseconds32(activeRetransIntervalMillis),
+                                                chip::System::Clock::Milliseconds16(activeThresholdMillis) };
+    chip::ReliableMessageProtocolConfig::SetLocalMRPConfig(chip::MakeOptional(config));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_ResetLocalMRPConfig()
+{
+    chip::ReliableMessageProtocolConfig::SetLocalMRPConfig(chip::NullOptional);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     //
     // Since we permit multiple controllers per fabric and each is associated with a unique fabric index, closing a session
     // requires us to do so across all controllers on the same logical fabric.
     //
-    devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()),
-                                                                 [](auto * session) {
-                                                                     if (session->IsActiveSession())
-                                                                     {
-                                                                         session->MarkAsDefunct();
-                                                                     }
-                                                                 });
+    TEMPORARY_RETURN_IGNORED devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(
+        ScopedNodeId(nodeid, devCtrl->GetFabricIndex()), [](auto * session) {
+            if (session->IsActiveSession())
+            {
+                session->MarkAsDefunct();
+            }
+        });
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
 PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()),
-                                                                 [](auto * session) {
-                                                                     if (session->IsActiveSession())
-                                                                     {
-                                                                         session->MarkForEviction();
-                                                                     }
-                                                                 });
+    TEMPORARY_RETURN_IGNORED devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(
+        ScopedNodeId(nodeid, devCtrl->GetFabricIndex()), [](auto * session) {
+            if (session->IsActiveSession())
+            {
+                session->MarkForEviction();
+            }
+        });
 
     return ToPyChipError(CHIP_NO_ERROR);
 }
@@ -758,6 +863,38 @@ PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::De
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
 
+PyChipError pychip_DeviceController_EstablishPASESessionThreadMeshcop(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      const char * baHost, uint16_t baPort, const char * setUpCode,
+                                                                      chip::NodeId nodeId)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    const uint32_t kDefaultDiscoveryTimeoutMsec = 1000000;
+    uint32_t setupPasscode                      = 0;
+
+    CHIP_ERROR err = GetSetupPasscodeFromOnboardingPayload(setUpCode, setupPasscode);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, nullptr, devCtrl,
+                                               kDefaultDiscoveryTimeoutMsec, true);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    VerifyOrReturnError(sCommissioningParameters.GetThreadOperationalDataset().HasValue(),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Inet::IPAddress baAddr;
+    SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(baHost, baAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    meshcopParams.mBorderAgentAddress.SetTransportType(chip::Transport::Type::kThreadMeshcop).SetIPAddress(baAddr).SetPort(baPort);
+    Thread::OperationalDatasetView dataset;
+    err = dataset.Init(sCommissioningParameters.GetThreadOperationalDataset().Value());
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    err = dataset.GetPSKc(meshcopParams.mPSKcBuffer);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    return ToPyChipError(
+        devCtrl->EstablishPASEConnection(nodeId, setUpCode, DiscoveryType::kAll, NullOptional, MakeOptional(meshcopParams)));
+#else
+    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif
+}
+
 PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::DeviceCommissioner * devCtrl, const char * setUpCode,
                                                          chip::NodeId nodeid)
 {
@@ -766,7 +903,7 @@ PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::Devic
 
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
-    CommissioningParameters params;
+    CommissioningParameters params = sCommissioningParameters;
     return ToPyChipError(devCtrl->Commission(nodeid, params));
 }
 
@@ -807,6 +944,17 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
     }
 
     return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+PyChipError pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                                    chip::NodeId remoteDeviceId)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    return ToPyChipError(devCtrl->ContinueCommissioningAfterConnectNetworkRequest(remoteDeviceId));
+#else
+    return ToPyChipError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
@@ -851,6 +999,14 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallb
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
 {
     pairingDelegate->SetCommissioningStatusUpdateCallback(callback);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(
+    chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+    chip::Controller::DevicePairingDelegate_OnCommissioningStageStartFunct callback)
+{
+    pairingDelegate->SetCommissioningStageStartCallback(callback);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -932,7 +1088,7 @@ PyChipError pychip_IsSessionOverTCPConnection(chip::OperationalDeviceProxy * dev
     VerifyOrReturnError(isSessionOverTCP != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    *isSessionOverTCP = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection() != nullptr;
+    *isSessionOverTCP = !deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection().IsNull();
 #else
     *isSessionOverTCP = false;
 #endif
@@ -960,8 +1116,11 @@ PyChipError pychip_CloseTCPConnectionWithPeer(chip::OperationalDeviceProxy * dev
     VerifyOrReturnError(deviceProxy->GetSecureSession().Value()->AsSecureSession()->AllowsLargePayload(),
                         ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
-    deviceProxy->GetExchangeManager()->GetSessionManager()->TCPDisconnect(
-        deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection(), /* shouldAbort = */ false);
+    auto tcpConnection = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetTCPConnection();
+    if (!tcpConnection.IsNull())
+    {
+        tcpConnection->ForceDisconnect();
+    }
 
     return ToPyChipError(CHIP_NO_ERROR);
 #else
@@ -1026,13 +1185,14 @@ PyChipError pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl
     //
     // Stop any active pairing sessions to this node.
     //
-    devCtrl->StopPairing(nodeId);
+    TEMPORARY_RETURN_IGNORED devCtrl->StopPairing(nodeId);
 
     //
     // Since we permit multiple controllers on the same fabric each associated with a different fabric index, expiring a session
     // needs to correctly expire sessions on other controllers on matching fabrics as well.
     //
-    devCtrl->SessionMgr()->ExpireAllSessionsOnLogicalFabric(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
+    TEMPORARY_RETURN_IGNORED devCtrl->SessionMgr()->ExpireAllSessionsOnLogicalFabric(
+        ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -1057,8 +1217,7 @@ PyChipError pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFun
     {
         return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
     }
-    PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
-    return ToPyChipError(CHIP_NO_ERROR);
+    return ToPyChipError(PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext)));
 }
 
 void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback)

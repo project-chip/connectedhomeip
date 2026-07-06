@@ -53,15 +53,15 @@ constexpr chip::AttributeId kTestFieldId2 = 2;
 using namespace chip;
 using namespace chip::Access;
 
-const Test::MockNodeConfig & TestMockNodeConfig()
+const Testing::MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::Globals::Attributes;
 
     // clang-format off
-    static const Test::MockNodeConfig config({
-        Test::MockEndpointConfig(kTestEndpointId, {
-            Test::MockClusterConfig(kTestClusterId, {
+    static const Testing::MockNodeConfig config({
+        Testing::MockEndpointConfig(kTestEndpointId, {
+            Testing::MockClusterConfig(kTestClusterId, {
                 ClusterRevision::Id, FeatureMap::Id,
                 kTestFieldId1, kTestFieldId2,
             }),
@@ -74,21 +74,21 @@ const Test::MockNodeConfig & TestMockNodeConfig()
 namespace app {
 namespace reporting {
 
-class TestReportingEngine : public chip::Test::AppContext
+class TestReportingEngine : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
+        chip::Testing::AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
-        chip::Test::AppContext::TearDown();
+        chip::Testing::AppContext::TearDown();
     }
 
     template <typename... Args>
@@ -195,17 +195,25 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     AttributePathIB::Builder & attributePathBuilder1 = attributePathListBuilder.CreatePath();
     EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
-    attributePathBuilder1.Node(1).Endpoint(kTestEndpointId).Cluster(kTestClusterId).Attribute(kTestFieldId1).EndOfAttributePathIB();
+    EXPECT_SUCCESS(attributePathBuilder1.Node(1)
+                       .Endpoint(kTestEndpointId)
+                       .Cluster(kTestClusterId)
+                       .Attribute(kTestFieldId1)
+                       .EndOfAttributePathIB());
     EXPECT_EQ(attributePathBuilder1.GetError(), CHIP_NO_ERROR);
 
     AttributePathIB::Builder & attributePathBuilder2 = attributePathListBuilder.CreatePath();
     EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
-    attributePathBuilder2.Node(1).Endpoint(kTestEndpointId).Cluster(kTestClusterId).Attribute(kTestFieldId2).EndOfAttributePathIB();
+    EXPECT_SUCCESS(attributePathBuilder2.Node(1)
+                       .Endpoint(kTestEndpointId)
+                       .Cluster(kTestClusterId)
+                       .Attribute(kTestFieldId2)
+                       .EndOfAttributePathIB());
     EXPECT_EQ(attributePathBuilder2.GetError(), CHIP_NO_ERROR);
-    attributePathListBuilder.EndOfAttributePathIBs();
+    EXPECT_SUCCESS(attributePathListBuilder.EndOfAttributePathIBs());
 
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
-    readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
+    EXPECT_SUCCESS(readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage());
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,

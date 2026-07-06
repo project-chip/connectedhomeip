@@ -1,12 +1,21 @@
 # Python requirements for scripts in this location
 alive_progress
+bluezoo>=1.0.2; sys_platform == "linux"
 click
 colorama
 coloredlogs
 diskcache
-mypy==1.16.0
+sdbus; sys_platform == "linux"
 types-PyYAML
 tabulate
+
+# Matter Python module runtime dependencies (matter.clusters / matter.core)
+aenum
+construct
+dacite
+deprecation
+ecdsa
+rich
 
 -e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
 -e ${PW_PROJECT_ROOT}/scripts/py_matter_yamltests

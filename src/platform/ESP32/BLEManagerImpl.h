@@ -27,7 +27,7 @@
 #include <sdkconfig.h>
 #include <string>
 
-#if CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_ENABLED
 #include <vector>
 #endif
 

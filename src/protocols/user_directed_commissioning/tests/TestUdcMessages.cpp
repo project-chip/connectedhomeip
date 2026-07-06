@@ -9,6 +9,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
@@ -47,7 +48,7 @@ public:
 
     void OnCommissionerPasscodeReady(UDCClientState state) {}
 
-    void FindCommissionableNode(char * instanceName)
+    void FindCommissionableNode(const char * instanceName)
     {
         mFindCommissionableNodeCalled = true;
         mInstanceName                 = instanceName;
@@ -55,7 +56,7 @@ public:
 
     // virtual ~UserConfirmationProvider() = default;
     UDCClientState mState;
-    char * mInstanceName;
+    const char * mInstanceName = nullptr;
 
     bool mOnUserDirectedCommissioningRequestCalled = false;
     bool mFindCommissionableNodeCalled             = false;
@@ -229,16 +230,16 @@ TEST_F(TestUdcMessages, TestUserDirectedCommissioningClientMessage)
     UserDirectedCommissioningClient udcClient;
 
     // obtain the UDC message
-    CHIP_ERROR err = udcClient.EncodeUDCMessage(payloadBuf);
+    EXPECT_SUCCESS(udcClient.EncodeUDCMessage(payloadBuf));
 
     // check the packet header fields
     PacketHeader packetHeader;
-    packetHeader.DecodeAndConsume(payloadBuf);
+    EXPECT_SUCCESS(packetHeader.DecodeAndConsume(payloadBuf));
     EXPECT_FALSE(packetHeader.IsEncrypted());
 
     // check the payload header fields
     PayloadHeader payloadHeader;
-    payloadHeader.DecodeAndConsume(payloadBuf);
+    EXPECT_SUCCESS(payloadHeader.DecodeAndConsume(payloadBuf));
     EXPECT_EQ(payloadHeader.GetMessageType(), to_underlying(MsgType::IdentificationDeclaration));
     EXPECT_EQ(payloadHeader.GetProtocolID(), Protocols::UserDirectedCommissioning::Id);
     EXPECT_FALSE(payloadHeader.NeedsAck());
@@ -247,13 +248,10 @@ TEST_F(TestUdcMessages, TestUserDirectedCommissioningClientMessage)
     // check the payload
     char instanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
     size_t instanceNameLength = std::min<size_t>(payloadBuf->DataLength(), Dnssd::Commission::kInstanceNameMaxLength);
-    payloadBuf->Read(Uint8::from_char(instanceName), instanceNameLength);
+    EXPECT_SUCCESS(payloadBuf->Read(Uint8::from_char(instanceName), instanceNameLength));
     instanceName[instanceNameLength] = '\0';
     ChipLogProgress(Inet, "UDC instance=%s", instanceName);
     EXPECT_STREQ(instanceName, nameBuffer);
-
-    // verify no errors
-    EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
 TEST_F(TestUdcMessages, TestUDCClients)
@@ -290,7 +288,7 @@ TEST_F(TestUdcMessages, TestUDCClients)
     EXPECT_EQ(nullptr, mUdcClients.FindUDCClientState(instanceName4));
 
     // test re-activation
-    EXPECT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
+    ASSERT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
     System::Clock::Timestamp expirationTime = state->GetExpirationTime();
     state->SetExpirationTime(expirationTime - System::Clock::Milliseconds64(1));
     EXPECT_EQ((expirationTime - System::Clock::Milliseconds64(1)), state->GetExpirationTime());
@@ -390,6 +388,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     const char * deviceName   = "device1";
     uint16_t pairingHint      = 33;
     const char * pairingInst  = "Read 6 digit code from screen";
+    uint8_t passcodeLength    = 6;
 
     TargetAppInfo appInfo;
 
@@ -426,6 +425,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     id.SetCdUponPasscodeDialog(true);
     id.SetCommissionerPasscode(true);
     id.SetCommissionerPasscodeReady(true);
+    id.SetPasscodeLength(passcodeLength);
 
     EXPECT_TRUE(id.HasDiscoveryInfo());
     EXPECT_STREQ(id.GetInstanceName(), instanceName);
@@ -446,6 +446,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     EXPECT_EQ(id.GetCdUponPasscodeDialog(), true);
     EXPECT_EQ(id.GetCommissionerPasscode(), true);
     EXPECT_EQ(id.GetCommissionerPasscodeReady(), true);
+    EXPECT_EQ(id.GetPasscodeLength(), passcodeLength);
 
     // TODO: add an ip
 
@@ -453,7 +454,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     id.WritePayload(idBuffer, sizeof(idBuffer));
 
     // next, parse this object
-    idOut.ReadPayload(idBuffer, sizeof(idBuffer));
+    EXPECT_SUCCESS(idOut.ReadPayload(idBuffer, sizeof(idBuffer)));
 
     EXPECT_TRUE(idOut.HasDiscoveryInfo());
     EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
@@ -475,9 +476,77 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     EXPECT_EQ(id.GetCdUponPasscodeDialog(), idOut.GetCdUponPasscodeDialog());
     EXPECT_EQ(id.GetCommissionerPasscode(), idOut.GetCommissionerPasscode());
     EXPECT_EQ(id.GetCommissionerPasscodeReady(), idOut.GetCommissionerPasscodeReady());
+    EXPECT_EQ(id.GetPasscodeLength(), idOut.GetPasscodeLength());
 
     // TODO: remove following "force-fail" debug line
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName = "servertest1";
+
+    uint8_t idBuffer[500] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), Dnssd::Commission::kInstanceNameMaxLength + 1, instanceName);
+
+    size_t offset = Dnssd::Commission::kInstanceNameMaxLength + 1;
+    TLV::TLVWriter writer;
+    writer.Init(idBuffer + offset, sizeof(idBuffer) - offset);
+
+    TLV::TLVType outerContainerType = TLV::kTLVType_Structure;
+    EXPECT_SUCCESS(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+
+    uint8_t oversizedId[60] = {};
+    memset(oversizedId, 0xAB, sizeof(oversizedId));
+    EXPECT_SUCCESS(writer.PutBytes(TLV::ContextTag(7), oversizedId, sizeof(oversizedId)));
+
+    EXPECT_SUCCESS(writer.EndContainer(outerContainerType));
+    EXPECT_SUCCESS(writer.Finalize());
+
+    size_t totalLen = offset + writer.GetLengthWritten();
+
+    EXPECT_NE(idOut.ReadPayload(idBuffer, totalLen), CHIP_NO_ERROR);
+    EXPECT_EQ(idOut.GetRotatingIdLength(), 0u);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTruncatedPayload)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[5] = { 't', 'e', 's', 't', '\0' };
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName                                       = "servertest1";
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), sizeof(idBuffer), instanceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+    EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(idBuffer, 'A', sizeof(idBuffer));
+
+    const char * deviceName = "test-device";
+    idOut.SetDeviceName(deviceName);
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    char expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(expectedInstanceName, 'A', Dnssd::Commission::kInstanceNameMaxLength);
+    expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength] = '\0';
+    EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
 }
 
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
@@ -493,6 +562,7 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     id.SetPasscodeDialogDisplayed(true);
     id.SetCommissionerPasscode(true);
     id.SetQRCodeDisplayed(true);
+    id.SetPasscodeLength(8);
 
     EXPECT_EQ(errorCode, id.GetErrorCode());
     EXPECT_EQ(id.GetNeedsPasscode(), true);
@@ -500,12 +570,13 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     EXPECT_EQ(id.GetPasscodeDialogDisplayed(), true);
     EXPECT_EQ(id.GetCommissionerPasscode(), true);
     EXPECT_EQ(id.GetQRCodeDisplayed(), true);
+    EXPECT_EQ(id.GetPasscodeLength(), 8);
 
     uint8_t idBuffer[500];
     id.WritePayload(idBuffer, sizeof(idBuffer));
 
     // next, parse this object
-    idOut.ReadPayload(idBuffer, sizeof(idBuffer));
+    EXPECT_SUCCESS(idOut.ReadPayload(idBuffer, sizeof(idBuffer)));
 
     EXPECT_EQ(errorCode, idOut.GetErrorCode());
     EXPECT_EQ(id.GetNeedsPasscode(), idOut.GetNeedsPasscode());
@@ -513,4 +584,5 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     EXPECT_EQ(id.GetPasscodeDialogDisplayed(), idOut.GetPasscodeDialogDisplayed());
     EXPECT_EQ(id.GetCommissionerPasscode(), idOut.GetCommissionerPasscode());
     EXPECT_EQ(id.GetQRCodeDisplayed(), idOut.GetQRCodeDisplayed());
+    EXPECT_EQ(id.GetPasscodeLength(), idOut.GetPasscodeLength());
 }

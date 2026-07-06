@@ -2,4 +2,9 @@ mobly
 pyasn1
 pyasn1_modules
 zeroconf
+ifaddr
 langcodes
+requests
+pycountry
+validators
+nest-asyncio

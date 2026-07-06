@@ -54,6 +54,8 @@ public:
 
     void SetFabricIdForNextNOCRequest(chip::FabricId fabricId) override { mNextFabricId = fabricId; }
 
+    CHIP_ERROR ObtainCsrNonce(chip::MutableByteSpan & csrNonce) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 

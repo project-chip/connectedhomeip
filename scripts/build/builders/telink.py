@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,13 +17,26 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from runner.runner import Runner
+
+from .builder import Builder, BuilderOutput, OutDirLock, lock_output_dir
+
+log = logging.getLogger(__name__)
+
+
+class TelinkLogLevel(Enum):
+    DEFAULT = auto()  # default everything
+    ALL = auto()  # enable all logging
+    PROGRESS = auto()  # progress and above
+    ERROR = auto()  # error and above
+    NONE = auto()  # no chip_logging at all
 
 
 class TelinkApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     BRIDGE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
@@ -41,76 +54,78 @@ class TelinkApp(Enum):
     def ExampleName(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app'
-        elif self == TelinkApp.ALL_CLUSTERS:
+        if self == TelinkApp.ALL_CLUSTERS:
             return 'all-clusters-app'
-        elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
+        if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        elif self == TelinkApp.BRIDGE:
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
+        if self == TelinkApp.BRIDGE:
             return 'bridge-app'
-        elif self == TelinkApp.CONTACT_SENSOR:
+        if self == TelinkApp.CONTACT_SENSOR:
             return 'contact-sensor-app'
-        elif self == TelinkApp.LIGHT:
+        if self == TelinkApp.LIGHT:
             return 'lighting-app'
-        elif self == TelinkApp.SWITCH:
+        if self == TelinkApp.SWITCH:
             return 'light-switch-app'
-        elif self == TelinkApp.LOCK:
+        if self == TelinkApp.LOCK:
             return 'lock-app'
-        elif self == TelinkApp.OTA_REQUESTOR:
+        if self == TelinkApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
-        elif self == TelinkApp.PUMP:
+        if self == TelinkApp.PUMP:
             return 'pump-app'
-        elif self == TelinkApp.PUMP_CONTROLLER:
+        if self == TelinkApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
-        elif self == TelinkApp.SHELL:
+        if self == TelinkApp.SHELL:
             return 'shell'
-        elif self == TelinkApp.SMOKE_CO_ALARM:
+        if self == TelinkApp.SMOKE_CO_ALARM:
             return 'smoke-co-alarm-app'
-        elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
+        if self == TelinkApp.TEMPERATURE_MEASUREMENT:
             return 'temperature-measurement-app'
-        elif self == TelinkApp.THERMOSTAT:
+        if self == TelinkApp.THERMOSTAT:
             return 'thermostat'
-        elif self == TelinkApp.WINDOW_COVERING:
+        if self == TelinkApp.WINDOW_COVERING:
             return 'window-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
             return 'chip-telink-air-quality-sensor-example'
-        elif self == TelinkApp.ALL_CLUSTERS:
+        if self == TelinkApp.ALL_CLUSTERS:
             return 'chip-telink-all-clusters-example'
-        elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
+        if self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
-        elif self == TelinkApp.BRIDGE:
+        if self == TelinkApp.ALL_DEVICES:
+            return 'all-devices-app'
+        if self == TelinkApp.BRIDGE:
             return 'chip-telink-bridge-example'
-        elif self == TelinkApp.CONTACT_SENSOR:
+        if self == TelinkApp.CONTACT_SENSOR:
             return 'chip-telink-contact-sensor-example'
-        elif self == TelinkApp.LIGHT:
+        if self == TelinkApp.LIGHT:
             return 'chip-telink-lighting-example'
-        elif self == TelinkApp.SWITCH:
+        if self == TelinkApp.SWITCH:
             return 'chip-telink-light-switch-example'
-        elif self == TelinkApp.LOCK:
+        if self == TelinkApp.LOCK:
             return 'chip-telink-lock-example'
-        elif self == TelinkApp.OTA_REQUESTOR:
+        if self == TelinkApp.OTA_REQUESTOR:
             return 'chip-telink-ota-requestor-example'
-        elif self == TelinkApp.PUMP:
+        if self == TelinkApp.PUMP:
             return 'chip-telink-pump-example'
-        elif self == TelinkApp.PUMP_CONTROLLER:
+        if self == TelinkApp.PUMP_CONTROLLER:
             return 'chip-telink-pump-controller-example'
-        elif self == TelinkApp.RESOURCE_MONITORING:
+        if self == TelinkApp.RESOURCE_MONITORING:
             return 'chip-telink-resource-monitoring-example'
-        elif self == TelinkApp.SHELL:
+        if self == TelinkApp.SHELL:
             return 'chip-telink-shell-example'
-        elif self == TelinkApp.SMOKE_CO_ALARM:
+        if self == TelinkApp.SMOKE_CO_ALARM:
             return 'chip-telink-smoke-co-alarm-example'
-        elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
+        if self == TelinkApp.TEMPERATURE_MEASUREMENT:
             return 'chip-telink-temperature-measurement-example'
-        elif self == TelinkApp.THERMOSTAT:
+        if self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
-        elif self == TelinkApp.WINDOW_COVERING:
+        if self == TelinkApp.WINDOW_COVERING:
             return 'chip-telink-window-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
 
 class TelinkBoard(Enum):
@@ -129,39 +144,39 @@ class TelinkBoard(Enum):
     def GnArgName(self):
         if self == TelinkBoard.TLRS9118BDK40D:
             return 'tlsr9118bdk40d'
-        elif self == TelinkBoard.TLSR9518ADK80D:
+        if self == TelinkBoard.TLSR9518ADK80D:
             return 'tlsr9518adk80d'
-        elif self == TelinkBoard.TLSR9528A:
+        if self == TelinkBoard.TLSR9528A:
             return 'tlsr9528a'
-        elif self == TelinkBoard.TLSR9528A_RETENTION:
+        if self == TelinkBoard.TLSR9528A_RETENTION:
             return 'tlsr9528a_retention'
-        elif self == TelinkBoard.TL3218X:
+        if self == TelinkBoard.TL3218X:
             return 'tl3218x'
-        elif self == TelinkBoard.TL3218X_ML3M:
+        if self == TelinkBoard.TL3218X_ML3M:
             return 'tl3218x_ml3m'
-        elif self == TelinkBoard.TL3218X_RETENTION:
+        if self == TelinkBoard.TL3218X_RETENTION:
             return 'tl3218x_retention'
-        elif self == TelinkBoard.TL7218X:
+        if self == TelinkBoard.TL7218X:
             return 'tl7218x'
-        elif self == TelinkBoard.TL7218X_ML7G:
+        if self == TelinkBoard.TL7218X_ML7G:
             return 'tl7218x_ml7g'
-        elif self == TelinkBoard.TL7218X_ML7M:
+        if self == TelinkBoard.TL7218X_ML7M:
             return 'tl7218x_ml7m'
-        elif self == TelinkBoard.TL7218X_RETENTION:
+        if self == TelinkBoard.TL7218X_RETENTION:
             return 'tl7218x_retention'
-        else:
-            raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: %r' % self)
 
 
 class TelinkBuilder(Builder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard,
                  enable_ota: bool = False,
-                 enable_dfu: bool = False,
+                 enable_dfu_smp: bool = False,
                  enable_shell: bool = False,
                  enable_rpcs: bool = False,
                  enable_factory_data: bool = False,
@@ -172,12 +187,15 @@ class TelinkBuilder(Builder):
                  thread_analyzer_config: bool = False,
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
+                 chip_enable_nfc_onboarding_payload: bool = False,
+                 log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
+                 all_devices_enabled_devices=None,
                  ):
-        super(TelinkBuilder, self).__init__(root, runner)
+        super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_ota = enable_ota
-        self.enable_dfu = enable_dfu
+        self.enable_dfu_smp = enable_dfu_smp
         self.enable_shell = enable_shell
         self.enable_rpcs = enable_rpcs
         self.enable_factory_data = enable_factory_data
@@ -188,6 +206,9 @@ class TelinkBuilder(Builder):
         self.thread_analyzer_config = thread_analyzer_config
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
+        self.chip_enable_nfc_onboarding_payload = chip_enable_nfc_onboarding_payload
+        self.log_level = log_level
+        self.all_devices_enabled_devices = all_devices_enabled_devices or []
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -203,16 +224,16 @@ class TelinkBuilder(Builder):
 
         return cmd
 
+    @lock_output_dir
     def generate(self):
-        if os.path.exists(self.output_dir):
-            return
+        os.makedirs(self.output_dir, exist_ok=True)
 
         flags = []
         if self.enable_ota:
             flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=y")
 
-        if self.enable_dfu:
-            flags.append("-DCONFIG_BOOTLOADER_MCUBOOT=y")
+        if self.enable_dfu_smp:
+            flags.append("-DCONFIG_CHIP_DFU_OVER_BT_SMP=y -DCONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y")
 
         if self.enable_shell:
             flags.append("-DCONFIG_CHIP_LIB_SHELL=y")
@@ -235,6 +256,9 @@ class TelinkBuilder(Builder):
         if self.compress_lzma_config:
             flags.append("-DCONFIG_COMPRESS_LZMA=y")
 
+        if self.chip_enable_nfc_onboarding_payload:
+            flags.append("-DCONFIG_CHIP_NFC_ONBOARDING_PAYLOAD=y")
+
         if self.thread_analyzer_config:
             flags.append("-DCONFIG_THREAD_ANALYZER=y")
 
@@ -246,6 +270,22 @@ class TelinkBuilder(Builder):
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        if self.all_devices_enabled_devices:
+            flags.append(f"-DALL_DEVICES_ENABLED_DEVICES={shlex.quote(';'.join(self.all_devices_enabled_devices))}")
+
+        if self.log_level == TelinkLogLevel.DEFAULT:
+            pass
+        elif self.log_level == TelinkLogLevel.ALL:
+            flags.append("-DTLNK_LOG_LEVEL=all")
+        elif self.log_level == TelinkLogLevel.PROGRESS:
+            flags.append("-DTLNK_LOG_LEVEL=progress")
+        elif self.log_level == TelinkLogLevel.ERROR:
+            flags.append("-DTLNK_LOG_LEVEL=error")
+        elif self.log_level == TelinkLogLevel.NONE:
+            flags.append("-DTLNK_LOG_LEVEL=none")
+        else:
+            raise Exception("Unknown log level: %r" % self.log_level)
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
@@ -261,8 +301,9 @@ class TelinkBuilder(Builder):
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 
+    @lock_output_dir
     def _build(self):
-        logging.info('Compiling Telink at %s', self.output_dir)
+        log.info('Compiling Telink at %s', self.output_dir)
 
         cmd = self.get_cmd_prefixes() + ("ninja -C %s" % self.output_dir)
 
@@ -271,11 +312,19 @@ class TelinkBuilder(Builder):
 
         self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
+    def _AllDevicesOutputName(self):
+        """Return the binary base name produced by the all-devices-app build."""
+        if self.all_devices_enabled_devices:
+            return 'example-device-app'
+        return 'all-devices-app'
+
+    @lock_output_dir
     def build_outputs(self):
+        app_name = self._AllDevicesOutputName() if self.app == TelinkApp.ALL_DEVICES else self.app.AppNamePrefix()
         yield BuilderOutput(
             os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
-            '%s.elf' % self.app.AppNamePrefix())
+            f'{app_name}.elf')
         if self.options.enable_link_map_file:
             yield BuilderOutput(
                 os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
-                '%s.map' % self.app.AppNamePrefix())
+                f'{app_name}.map')
