@@ -35,7 +35,9 @@ Status CommissioningProxyMockTransport::Connect(app::CommandHandler * commandObj
     // A forced non-success result models a transport that could not connect: no
     // session is registered and no response is sent (the cluster surfaces the status).
     if (mConnectStatus != Status::Success)
+    {
         return mConnectStatus;
+    }
 
     uint16_t sessionId = mHost->Sessions().AllocSessionId();
     mHost->Sessions().RegisterSession(sessionId, mType, request.subjectDescriptor.fabricIndex);
@@ -54,7 +56,9 @@ Status CommissioningProxyMockTransport::Connect(app::CommandHandler * commandObj
 CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, System::PacketBufferHandle && buf)
 {
     if (mSendMessageError != CHIP_NO_ERROR)
+    {
         return mSendMessageError;
+    }
 
     // Simulate the commissionee never replying: the response timeout fires and the
     // pending ProxyMessageRequest resolves with TIMEOUT.
@@ -67,7 +71,9 @@ CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, Syst
     // Simulate an immediate commissionee reply (null message) so a pending
     // ProxyMessageRequest completes synchronously.
     if (mAutoRespond)
+    {
         mHost->Sessions().DispatchMessageResponse(sessionId, nullptr, 0);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -75,7 +81,9 @@ CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, Syst
 Status CommissioningProxyMockTransport::Scan(uint8_t scanMaxTime)
 {
     if (mScanStatus != Status::Success)
+    {
         return mScanStatus;
+    }
 
     static const uint8_t kAddr1[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01 };
     static const uint8_t kAddr2[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02 };
@@ -100,7 +108,9 @@ Status CommissioningProxyMockTransport::Scan(uint8_t scanMaxTime)
     // When mAutoContribute is false the scan is left in-flight (no Contribute), so a
     // second ProxyScanRequest sees the aggregator busy.
     if (mAutoContribute)
+    {
         mHost->ScanAggregator().Contribute(Span<const ScanResult>(results.data(), results.size()));
+    }
     return Status::Success;
 }
 

@@ -50,7 +50,9 @@ public:
         // Model a real driver: InvalidInState if no connect is pending; Success if
         // the pending connect is owned by this fabric; NotFound otherwise.
         if (mPendingConnectFabric == kUndefinedFabricIndex)
+        {
             return Protocols::InteractionModel::Status::InvalidInState;
+        }
         return (fabricIndex == mPendingConnectFabric) ? Protocols::InteractionModel::Status::Success
                                                       : Protocols::InteractionModel::Status::NotFound;
     }
@@ -71,7 +73,7 @@ public:
     bool IsConnectPending() const override { return mConnectPending; }
     void Shutdown() override {}
 
-    // --- Test knobs ---------------------------------------------------------
+    // --- Test Control  ---------------------------------------------------------
     void SetConnectStatus(Protocols::InteractionModel::Status s) { mConnectStatus = s; }
     void SetConnectPending(bool p) { mConnectPending = p; }
     // Simulate a pending ProxyConnectRequest owned by @p f (kUndefinedFabricIndex =

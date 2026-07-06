@@ -1,6 +1,6 @@
 # Commissioning Proxy Cluster
 
-The Commissioning Proxy cluster (cluster ID 0x0455, Matter spec §10.5) provides
+The Commissioning Proxy cluster (cluster ID 0x0455, Matter spec) provides
 a proxy service that allows a Commissioner to use commissioning transports not
 supported locally, or to extend its commissioning range. Commissioners can use
 the proxy to discover and establish a connection to commissionable devices that
@@ -52,9 +52,8 @@ device advertises on uses the proxy as a tunnel. The flow is:
    by `SessionID`; the proxy forwards it over the transport and returns the
    device's reply in the `ProxyMessageResponse`. The proxy is a dumb relay — the
    PASE session is end-to-end between the Commissioner and the device.
-4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` (or a null
-   `SessionID` to cancel an in-flight connect); the proxy tears the transport
-   connection down.
+4. **Disconnect** — the Commissioner sends `ProxyDisconnectRequest` to cancel
+   an in-flight connect); the proxy tears the transport connection down.
 
 The cluster server itself is **transport-agnostic**: it validates the requested
 transport against the set it advertises, then dispatches the work to the
@@ -182,7 +181,7 @@ chip::BitMask<Feature> gFeatures(Feature::kBackgroundScan, Feature::kWiFiNetwork
 
 // Config: featureFlags, MaxSessions, MaxCachedResults, supported Wi-Fi bands.
 chip::app::RegisteredServerCluster<CommissioningProxyCluster> gCPCluster(
-    CommissioningProxyEndpoint, CommissioningProxyCluster::Config(gFeatures, /*maxSessions=*/1, /*maxCachedResults=*/10));
+    CommissioningProxyEndpoint, CommissioningProxyCluster::Config(gFeatures, /*aMaxSessions=*/1, /*aMaxCachedResults=*/10));
 
 void SetUpProxy()
 {

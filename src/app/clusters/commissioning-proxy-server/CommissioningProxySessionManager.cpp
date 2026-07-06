@@ -46,7 +46,9 @@ uint16_t CommissioningProxySessionManager::AllocSessionId()
     do
     {
         if (mNextSessionId == 0)
+        {
             mNextSessionId = 1;
+        }
         id = mNextSessionId++;
     } while (mSessions.count(id) > 0);
     return id;
@@ -67,7 +69,9 @@ std::optional<CommissioningProxySessionManager::SessionInfo> CommissioningProxyS
 {
     auto it = mSessions.find(sessionId);
     if (it == mSessions.end())
+    {
         return std::nullopt;
+    }
     return it->second;
 }
 
@@ -78,13 +82,17 @@ void CommissioningProxySessionManager::ResponseTimeoutCallback(System::Layer * /
 
     auto it = self->mPending.find(pm->sessionId);
     if (it == self->mPending.end() || it->second != pm)
+    {
         return; // Already resolved (reply arrived or session closed).
+    }
 
     self->mPending.erase(it);
     ChipLogProgress(Zcl, "CommissioningProxy: ProxyMessageRequest responseTimeout expired for session %u", pm->sessionId);
     // Per spec, an expired ProxyMessageRequest ResponseTimeout SHALL return TIMEOUT.
     if (app::CommandHandler * cmd = pm->handle.Get())
+    {
         cmd->AddStatus(pm->path, Status::Timeout);
+    }
     delete pm;
 }
 
@@ -112,12 +120,16 @@ Status CommissioningProxySessionManager::BeginMessage(uint16_t sessionId, app::C
     mPending[sessionId] = pm;
 
     if (auto * exchange = commandObj->GetExchangeContext())
+    {
         exchange->SetResponseTimeout(System::Clock::Seconds16(responseTimeoutSeconds));
+    }
 
     CHIP_ERROR err =
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(responseTimeoutSeconds), ResponseTimeoutCallback, pm);
     if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(Zcl, "CommissioningProxy: failed to start ProxyMessage response timer: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     return Status::Success;
 }
@@ -126,7 +138,9 @@ void CommissioningProxySessionManager::AbortPending(uint16_t sessionId)
 {
     auto it = mPending.find(sessionId);
     if (it == mPending.end())
+    {
         return;
+    }
     PendingMessage * pm = it->second;
     DeviceLayer::SystemLayer().CancelTimer(ResponseTimeoutCallback, pm);
     mPending.erase(it);
@@ -160,14 +174,18 @@ void CommissioningProxySessionManager::DispatchMessageFailure(uint16_t sessionId
 {
     auto it = mPending.find(sessionId);
     if (it == mPending.end())
+    {
         return;
+    }
 
     PendingMessage * pm = it->second;
     mPending.erase(it);
     DeviceLayer::SystemLayer().CancelTimer(ResponseTimeoutCallback, pm);
 
     if (app::CommandHandler * cmd = pm->handle.Get())
+    {
         cmd->AddStatus(pm->path, status);
+    }
     delete pm;
 }
 

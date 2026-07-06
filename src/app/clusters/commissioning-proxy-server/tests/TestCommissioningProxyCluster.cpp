@@ -1053,13 +1053,17 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionSta
 
     // First disconnect: one session remains, so state SHALL stay Connected.
     if (r1.response.has_value())
+    {
         cmd.sessionID.SetNonNull(r1.response->sessionID);
+    }
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
     // Second disconnect: no sessions remain, so state SHALL revert to Disconnected.
     if (r2.response.has_value())
+    {
         cmd.sessionID.SetNonNull(r2.response->sessionID);
+    }
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
 
@@ -1087,7 +1091,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_TransportFailur
 
     Commands::ProxyDisconnectRequest::Type cmd;
     if (connectResult.response.has_value())
+    {
         cmd.sessionID.SetNonNull(connectResult.response->sessionID);
+    }
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
 
     // State SHALL remain Connected since the transport rejected the disconnect.
@@ -1298,7 +1304,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_BleAndWiFiPAFTogether
         size_t listCount = 0;
         auto iter        = result.response->proxyScanResult.begin();
         while (iter.Next())
+        {
             ++listCount;
+        }
         EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
         EXPECT_EQ(listCount, 4u);
     }
@@ -2245,7 +2253,9 @@ TEST_F(TestCommissioningProxyCluster, TestCachedResults_ReportDedupAndClear)
         size_t count = 0;
         auto it      = list.Value().begin();
         while (it.Next())
+        {
             ++count;
+        }
         EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
         EXPECT_EQ(count, 2u);
     }
@@ -2489,7 +2499,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_PartialStart_ReturnsS
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
     if (result.response.has_value())
+    {
         EXPECT_EQ(result.response->numberOfResults, 2u);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

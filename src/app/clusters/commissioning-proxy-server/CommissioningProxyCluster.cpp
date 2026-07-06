@@ -143,7 +143,9 @@ chip::BitMask<CapabilitiesBitmap> CommissioningProxyCluster::GetSupportedTranspo
     // A transport is supported iff a driver is registered for it.
     chip::BitMask<CapabilitiesBitmap> supported;
     for (size_t i = 0; i < mTransportCount; i++)
+    {
         supported.Set(mTransports[i]->GetTransportType());
+    }
     return supported;
 }
 
@@ -152,7 +154,9 @@ CommissioningProxyTransport * CommissioningProxyCluster::FindTransport(Capabilit
     for (size_t i = 0; i < mTransportCount; i++)
     {
         if (mTransports[i]->GetTransportType() == bit)
+        {
             return mTransports[i];
+        }
     }
     return nullptr;
 }
@@ -300,7 +304,9 @@ CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeR
     if (GetActiveSessionCount() == 0)
     {
         for (size_t i = 0; i < mTransportCount; i++)
+        {
             mTransports[i]->OnAllSessionsClosed();
+        }
 
         CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
         if (stateErr != CHIP_NO_ERROR)
@@ -355,7 +361,9 @@ CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest
     // A ProxyScanRequest MAY select multiple transports: scan each requested,
     // registered transport in parallel and aggregate into one ProxyScanResponse.
     if (mScanAggregator.InProgress())
+    {
         return Status::Busy;
+    }
 
     const uint8_t scanMaxTime = mScanMaxTime;
     mScanAggregator.Begin(handler, request.path, scanMaxTime);
@@ -367,12 +375,18 @@ CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest
     {
         CommissioningProxyTransport * transport = mTransports[i];
         if (!commandData.transport.Has(transport->GetTransportType()))
+        {
             continue;
+        }
         auto s = transport->Scan(scanMaxTime);
         if (s == Status::Success)
+        {
             mScanAggregator.AddPendingContributor();
+        }
         else if (firstError == Status::Success)
+        {
             firstError = s;
+        }
     }
 
     if (mScanAggregator.PendingContributors() == 0)
@@ -386,7 +400,9 @@ CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest
     // The aggregator owns the exchange now; keep it alive for the full scan window.
     handler->FlushAcksRightAwayOnSlowCommand();
     if (auto * exchange = handler->GetExchangeContext())
+    {
         exchange->SetResponseTimeout(System::Clock::Seconds16(static_cast<uint16_t>(scanMaxTime) + 5));
+    }
 
     // If every started sub-scan already reported synchronously, emit now.
     mScanAggregator.MaybeEmitIfComplete();
@@ -447,10 +463,14 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStartRequest(const DataModel
     {
         CommissioningProxyTransport * transport = mTransports[i];
         if (!commandData.transport.Has(transport->GetTransportType()))
+        {
             continue;
+        }
         auto s = transport->BgScanStart(commandData.timeout, wiFiBands, fabricIndex, nodeId);
         if (s != Status::Success && result == Status::Success)
+        {
             result = s;
+        }
     }
 
     return result;
@@ -508,7 +528,9 @@ CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel:
         {
             matched = true;
             if (s != Status::Success)
+            {
                 err = s;
+            }
         }
     }
 
@@ -552,7 +574,9 @@ CommissioningProxyCluster::HandleProxyMessageRequest(const DataModel::InvokeRequ
     {
         CHIP_ERROR sendErr = transport->SendMessage(sessionId, std::move(buf));
         if (sendErr != CHIP_NO_ERROR)
+        {
             ChipLogDetail(Zcl, "ProxyMessageRequest(ResponseTimeout=0): SendMessage failed: %" CHIP_ERROR_FORMAT, sendErr.Format());
+        }
         Commands::ProxyMessageResponse::Type immediate;
         immediate.sessionID = sessionId;
         immediate.message.SetNull();
@@ -591,12 +615,18 @@ Protocols::InteractionModel::Status CommissioningProxyCluster::CancelPendingConn
     {
         auto s = mTransports[i]->CancelPendingConnect(fabricIndex);
         if (s == Status::Success)
+        {
             cancelledOwn = true;
+        }
         else if (s == Status::NotFound)
+        {
             sawForeignPending = true;
+        }
     }
     if (cancelledOwn)
+    {
         return Status::Success;
+    }
     return sawForeignPending ? Status::NotFound : Status::InvalidInState;
 }
 
