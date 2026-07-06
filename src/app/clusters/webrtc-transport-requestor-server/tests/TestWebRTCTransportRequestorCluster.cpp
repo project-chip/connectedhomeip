@@ -17,11 +17,13 @@
 
 #include <app/CommandHandler.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/WebRTCTransportRequestor/Attributes.h>
 #include <clusters/WebRTCTransportRequestor/Commands.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
@@ -38,6 +40,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportRequestor;
+using chip::Test::ClusterTester;
+using chip::Test::TestServerClusterContext;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
@@ -277,6 +281,44 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestReadUnsupportedAttribute)
     // Test reading unsupported attribute
     auto status = server.ReadAttribute(request, encoder);
     EXPECT_EQ(status, chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
+}
+
+// HandleOffer converts the wire ICEServers list into OfferArgs::iceServers
+// (an Optional<std::vector>). Exercises an Offer carrying a non-empty
+// ICEServers list and verifies it is handled successfully.
+TEST_F(TestWebRTCTransportRequestorCluster, TestHandleOfferWithICEServers)
+{
+    TestServerClusterContext context;
+    MockWebRTCTransportRequestorDelegate mockDelegate;
+    WebRTCTransportRequestorCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Seed a session matching the command's accessing context so FindSession()
+    // succeeds and HandleOffer reaches the ICEServers conversion. The test
+    // command handler reports an undefined node id (its subject descriptor is
+    // not CASE-authenticated) and kTestFabricIndex as the accessing fabric.
+    static constexpr uint16_t kSessionId = 42;
+    WebRTCSessionStruct session;
+    session.id          = kSessionId;
+    session.peerNodeID  = kUndefinedNodeId;
+    session.fabricIndex = app::Testing::kTestFabricIndex;
+    session.streamUsage = StreamUsageEnum::kLiveView;
+    ASSERT_EQ(server.UpsertSession(session), WebRTCTransportRequestorCluster::UpsertResultEnum::kInserted);
+
+    ClusterTester tester(server);
+
+    // A single ICEServers entry exercises the conversion loop; its fields are
+    // not inspected by the cluster.
+    Globals::Structs::ICEServerStruct::Type iceServer;
+    Commands::Offer::Type request;
+    request.webRTCSessionID = kSessionId;
+    request.sdp             = chip::CharSpan::fromCharString("v=0");
+    request.ICEServers.SetValue(DataModel::List<const Globals::Structs::ICEServerStruct::Type>(&iceServer, 1));
+
+    auto result = tester.Invoke<Commands::Offer::Type::ResponseType>(Commands::Offer::Id, request);
+    EXPECT_TRUE(result.IsSuccess());
+
+    server.Shutdown();
 }
 
 } // namespace
