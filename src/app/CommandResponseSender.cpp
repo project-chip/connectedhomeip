@@ -144,10 +144,7 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     if (mChunks.IsNull())
     {
         VerifyOrReturnError(mReportResponseDropped, CHIP_ERROR_INCORRECT_STATE);
-        if (!mCommandHandler.IsResponseSuppressed())
-        {
-            SendStatusResponse(Status::ResourceExhausted);
-        }
+        SendStatusResponse(Status::ResourceExhausted);
         mReportResponseDropped = false;
         return CHIP_NO_ERROR;
     }
@@ -221,10 +218,7 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     if (status != Status::Success)
     {
         VerifyOrDie(mState == State::ReadyForInvokeResponses);
-        if (!mCommandHandler.IsResponseSuppressed())
-        {
-            SendStatusResponse(status);
-        }
+        SendStatusResponse(status);
         // The API contract of OnInvokeCommandRequest requires the CommandResponder instance to outlive
         // the CommandHandler. Therefore, we cannot safely call Close() here, even though we have
         // finished sending data. Closing must be deferred until the CommandHandler::OnDone callback.
