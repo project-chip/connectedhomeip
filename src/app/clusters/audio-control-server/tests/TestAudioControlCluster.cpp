@@ -3133,8 +3133,9 @@ TEST_F(TestAudioControlCluster, SetVolumeInvalidUnmutePolicyReturnsConstraintErr
     cmd.unmutePolicy.SetValue(static_cast<UnmutePolicyEnum>(99));
     auto result = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
-    ASSERT_TRUE(result.GetStatusCode().has_value());
-    EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    auto statusCode = result.GetStatusCode();
+    ASSERT_TRUE(statusCode.has_value());
+    EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
 
     // State unchanged.
     EXPECT_EQ(cluster.GetVolume(), 50u);
@@ -3200,15 +3201,17 @@ TEST_F(TestAudioControlCluster, IncreaseDecreaseVolumeRejectZeroStepSize)
     increaseCmd.stepSize.SetValue(0);
     auto increaseResult = tester.Invoke(increaseCmd);
     EXPECT_FALSE(increaseResult.IsSuccess());
-    ASSERT_TRUE(increaseResult.GetStatusCode().has_value());
-    EXPECT_EQ(increaseResult.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    auto increaseStatusCode = increaseResult.GetStatusCode();
+    ASSERT_TRUE(increaseStatusCode.has_value());
+    EXPECT_EQ(increaseStatusCode->GetStatus(), Status::ConstraintError);
 
     DecreaseVolume::Type decreaseCmd;
     decreaseCmd.stepSize.SetValue(0);
     auto decreaseResult = tester.Invoke(decreaseCmd);
     EXPECT_FALSE(decreaseResult.IsSuccess());
-    ASSERT_TRUE(decreaseResult.GetStatusCode().has_value());
-    EXPECT_EQ(decreaseResult.GetStatusCode()->GetStatus(), Status::ConstraintError);
+    auto decreaseStatusCode = decreaseResult.GetStatusCode();
+    ASSERT_TRUE(decreaseStatusCode.has_value());
+    EXPECT_EQ(decreaseStatusCode->GetStatus(), Status::ConstraintError);
 
     EXPECT_EQ(cluster.GetVolume(), 50u);
 
