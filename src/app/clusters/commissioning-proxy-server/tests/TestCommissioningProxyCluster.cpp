@@ -1052,12 +1052,14 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionSta
     Commands::ProxyDisconnectRequest::Type cmd;
 
     // First disconnect: one session remains, so state SHALL stay Connected.
-    cmd.sessionID.SetNonNull(r1.response.value().sessionID);
+    if (r1.response.has_value())
+        cmd.sessionID.SetNonNull(r1.response->sessionID);
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
     // Second disconnect: no sessions remain, so state SHALL revert to Disconnected.
-    cmd.sessionID.SetNonNull(r2.response.value().sessionID);
+    if (r2.response.has_value())
+        cmd.sessionID.SetNonNull(r2.response->sessionID);
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
 
@@ -1084,7 +1086,8 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_TransportFailur
     mockBle.SetDisconnectStatus(Protocols::InteractionModel::Status::Failure);
 
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionID.SetNonNull(connectResult.response.value().sessionID);
+    if (connectResult.response.has_value())
+        cmd.sessionID.SetNonNull(connectResult.response->sessionID);
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
 
     // State SHALL remain Connected since the transport rejected the disconnect.
@@ -1289,13 +1292,16 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_BleAndWiFiPAFTogether
     auto result = tester.Invoke(command);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().numberOfResults, 4u);
-    size_t listCount = 0;
-    auto iter        = result.response.value().proxyScanResult.begin();
-    while (iter.Next())
-        ++listCount;
-    EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
-    EXPECT_EQ(listCount, 4u);
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response->numberOfResults, 4u);
+        size_t listCount = 0;
+        auto iter        = result.response->proxyScanResult.begin();
+        while (iter.Next())
+            ++listCount;
+        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(listCount, 4u);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2336,9 +2342,12 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHa
     ASSERT_TRUE(second.IsSuccess());
     ASSERT_TRUE(second.response.has_value());
 
-    EXPECT_NE(first.response.value().sessionID, 0u);
-    EXPECT_NE(second.response.value().sessionID, 0u);
-    EXPECT_NE(first.response.value().sessionID, second.response.value().sessionID);
+    if (first.response.has_value() && second.response.has_value())
+    {
+        EXPECT_NE(first.response->sessionID, 0u);
+        EXPECT_NE(second.response->sessionID, 0u);
+        EXPECT_NE(first.response->sessionID, second.response->sessionID);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2395,8 +2404,11 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimeoutZer
     auto result = tester.Invoke(cmd);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().sessionID, sid);
-    EXPECT_TRUE(result.response.value().message.IsNull());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response->sessionID, sid);
+        EXPECT_TRUE(result.response->message.IsNull());
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2476,7 +2488,8 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_PartialStart_ReturnsS
     auto result = tester.Invoke(command);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().numberOfResults, 2u);
+    if (result.response.has_value())
+        EXPECT_EQ(result.response->numberOfResults, 2u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
