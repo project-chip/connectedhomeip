@@ -721,6 +721,7 @@ class ClusterParser:
         quality = xml_attribute.find('./quality')
         return quality is not None and quality.get('scene', 'false').lower() == 'true'
 
+    @staticmethod
     def _is_atomic_write_attribute(xml_attribute: ElementTree.Element) -> bool:
         """
         Returns True if the attribute carries the Atomic Write quality.
