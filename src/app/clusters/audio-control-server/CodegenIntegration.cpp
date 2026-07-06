@@ -32,10 +32,8 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr size_t kAudioControlFixedClusterCount =
-    AudioControl::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kAudioControlMaxClusterCount =
-    kAudioControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kAudioControlFixedClusterCount = AudioControl::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kAudioControlMaxClusterCount   = kAudioControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<AudioControlCluster> gServers[kAudioControlMaxClusterCount];
 

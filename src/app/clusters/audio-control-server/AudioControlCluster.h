@@ -35,15 +35,11 @@ public:
     /// Bitset of optional attributes that can be individually enabled.
     /// Feature-gated attributes (MinCorrection, MaxCorrection) are controlled by the feature map,
     /// not this set.
-    using OptionalAttributeSet = app::OptionalAttributeSet<
-        AudioControl::Attributes::PhysicallyMuted::Id,
-        AudioControl::Attributes::MaxDeviceVolumeDB::Id,
-        AudioControl::Attributes::MaxUserVolume::Id,
-        AudioControl::Attributes::StartUpMuted::Id,
-        AudioControl::Attributes::StartUpVolume::Id,
-        AudioControl::Attributes::Bass::Id,
-        AudioControl::Attributes::Mid::Id,
-        AudioControl::Attributes::Treble::Id>;
+    using OptionalAttributeSet =
+        app::OptionalAttributeSet<AudioControl::Attributes::PhysicallyMuted::Id, AudioControl::Attributes::MaxDeviceVolumeDB::Id,
+                                  AudioControl::Attributes::MaxUserVolume::Id, AudioControl::Attributes::StartUpMuted::Id,
+                                  AudioControl::Attributes::StartUpVolume::Id, AudioControl::Attributes::Bass::Id,
+                                  AudioControl::Attributes::Mid::Id, AudioControl::Attributes::Treble::Id>;
 
     class Config
     {
@@ -188,8 +184,7 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
-                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,

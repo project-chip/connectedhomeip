@@ -37,8 +37,8 @@ using chip::Protocols::InteractionModel::Status;
 AudioControlCluster::AudioControlCluster(EndpointId endpointId, AudioControlDelegate & delegate, const Config & config) :
     DefaultServerCluster({ endpointId, AudioControl::Id }), mDelegate(delegate), mFeatures(config.mFeatures),
     mOptionalAttributeSet(config.mOptionalAttributeSet), mMinDeviceVolume(config.mMinDeviceVolume),
-    mMaxDeviceVolume(config.mMaxDeviceVolume), mMaxDeviceVolumeDB(config.mMaxDeviceVolumeDB),
-    mMinCorrection(config.mMinCorrection), mMaxCorrection(config.mMaxCorrection)
+    mMaxDeviceVolume(config.mMaxDeviceVolume), mMaxDeviceVolumeDB(config.mMaxDeviceVolumeDB), mMinCorrection(config.mMinCorrection),
+    mMaxCorrection(config.mMaxCorrection)
 {
     VerifyOrDie(mMinDeviceVolume >= 1);
     VerifyOrDie(mMaxDeviceVolume >= mMinDeviceVolume);
@@ -91,21 +91,21 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
     }
 
     // Restore last-known Volume (always; serves as fallback when StartUpVolume is null or absent).
-    attributePersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Volume::Id), mVolume, mVolume);
+    attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Volume::Id),
+                                               mVolume, mVolume);
 
     // Restore behavioral configuration.
     // For enum attributes, capture the config default before loading so that a stale/corrupted
     // KVS entry that decodes to kUnknownEnumValue falls back to the config default rather than
     // leaving the enum in an invalid state that would break command handling.
     attributePersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::DefaultStepSize::Id),
-        mDefaultStepSize, mDefaultStepSize);
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::DefaultStepSize::Id), mDefaultStepSize,
+        mDefaultStepSize);
 
     const auto defaultSetVolumePolicy = mSetVolumeUnmutePolicy;
     attributePersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SetVolumeUnmutePolicy::Id),
-        mSetVolumeUnmutePolicy, defaultSetVolumePolicy);
+        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SetVolumeUnmutePolicy::Id), mSetVolumeUnmutePolicy,
+        defaultSetVolumePolicy);
     if (mSetVolumeUnmutePolicy >= UnmutePolicyEnum::kUnknownEnumValue)
         mSetVolumeUnmutePolicy = defaultSetVolumePolicy;
 
@@ -137,11 +137,9 @@ CHIP_ERROR AudioControlCluster::Startup(ServerClusterContext & context)
     if (mOptionalAttributeSet.IsSet(StartUpMuted::Id))
     {
         attributePersistence.LoadNativeEndianValue(
-            ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id), mSoftMuted,
-            mSoftMuted);
+            ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id), mSoftMuted, mSoftMuted);
         attributePersistence.LoadNativeEndianValue(
-            ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpMuted::Id), mStartUpMuted,
-            mStartUpMuted);
+            ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::StartUpMuted::Id), mStartUpMuted, mStartUpMuted);
         if (!mStartUpMuted.IsNull())
         {
             mSoftMuted = mStartUpMuted.Value();
@@ -196,9 +194,9 @@ uint16_t AudioControlCluster::EffectiveMaxVolume() const
 void AudioControlCluster::StoreVolume()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Volume::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mVolume), sizeof(mVolume))));
+    LogErrorOnFailure(
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Volume::Id),
+                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mVolume), sizeof(mVolume))));
 }
 
 void AudioControlCluster::StoreSoftMuted()
@@ -207,9 +205,9 @@ void AudioControlCluster::StoreSoftMuted()
     // SoftMuted is only ever loaded back in Startup() when StartUpMuted is supported (it feeds the
     // null-retain behavior); skip the write otherwise to avoid pointless flash wear.
     VerifyOrReturn(mOptionalAttributeSet.IsSet(Attributes::StartUpMuted::Id));
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mSoftMuted), sizeof(mSoftMuted))));
+    LogErrorOnFailure(
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::SoftMuted::Id),
+                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mSoftMuted), sizeof(mSoftMuted))));
 }
 
 void AudioControlCluster::StoreStartUpMuted()
@@ -283,25 +281,25 @@ void AudioControlCluster::StoreMaxUserVolume()
 void AudioControlCluster::StoreBass()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Bass::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mBass), sizeof(mBass))));
+    LogErrorOnFailure(
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Bass::Id),
+                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mBass), sizeof(mBass))));
 }
 
 void AudioControlCluster::StoreMid()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Mid::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mMid), sizeof(mMid))));
+    LogErrorOnFailure(
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Mid::Id),
+                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mMid), sizeof(mMid))));
 }
 
 void AudioControlCluster::StoreTreble()
 {
     VerifyOrReturn(mContext != nullptr);
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Treble::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&mTreble), sizeof(mTreble))));
+    LogErrorOnFailure(
+        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, AudioControl::Id, Attributes::Treble::Id),
+                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mTreble), sizeof(mTreble))));
 }
 
 DataModel::ActionReturnStatus AudioControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -484,7 +482,7 @@ DataModel::ActionReturnStatus AudioControlCluster::WriteAttribute(const DataMode
 }
 
 CHIP_ERROR AudioControlCluster::Attributes(const ConcreteClusterPath & path,
-                                            ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 
@@ -505,11 +503,11 @@ CHIP_ERROR AudioControlCluster::Attributes(const ConcreteClusterPath & path,
 }
 
 CHIP_ERROR AudioControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
-        Mute::kMetadataEntry,         Unmute::kMetadataEntry,         ToggleMuted::kMetadataEntry,
-        SetVolume::kMetadataEntry,    IncreaseVolume::kMetadataEntry, DecreaseVolume::kMetadataEntry,
+        Mute::kMetadataEntry,      Unmute::kMetadataEntry,         ToggleMuted::kMetadataEntry,
+        SetVolume::kMetadataEntry, IncreaseVolume::kMetadataEntry, DecreaseVolume::kMetadataEntry,
     };
     return builder.ReferenceExisting(Span(kCommands));
 }
@@ -519,8 +517,8 @@ CHIP_ERROR AudioControlCluster::AcceptedCommands(const ConcreteClusterPath & pat
 // Only called when at least one of SoftMuted or PhysicallyMuted is TRUE.
 Status AudioControlCluster::ApplyUnmutePolicy(UnmutePolicyEnum policy, uint16_t requestedVolume)
 {
-    uint16_t newVolume    = mVolume;
-    bool newSoftMuted     = mSoftMuted;
+    uint16_t newVolume = mVolume;
+    bool newSoftMuted  = mSoftMuted;
 
     switch (policy)
     {
@@ -565,19 +563,26 @@ Status AudioControlCluster::ApplyUnmutePolicy(UnmutePolicyEnum policy, uint16_t 
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-AudioControlCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                   CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> AudioControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                chip::TLV::TLVReader & input_arguments,
+                                                                                CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
-    case Mute::Id:           return HandleMute();
-    case Unmute::Id:         return HandleUnmute();
-    case ToggleMuted::Id:    return HandleToggleMuted();
-    case SetVolume::Id:      return HandleSetVolume(input_arguments);
-    case IncreaseVolume::Id: return HandleIncreaseVolume(input_arguments);
-    case DecreaseVolume::Id: return HandleDecreaseVolume(input_arguments);
-    default:                 return Status::UnsupportedCommand;
+    case Mute::Id:
+        return HandleMute();
+    case Unmute::Id:
+        return HandleUnmute();
+    case ToggleMuted::Id:
+        return HandleToggleMuted();
+    case SetVolume::Id:
+        return HandleSetVolume(input_arguments);
+    case IncreaseVolume::Id:
+        return HandleIncreaseVolume(input_arguments);
+    case DecreaseVolume::Id:
+        return HandleDecreaseVolume(input_arguments);
+    default:
+        return Status::UnsupportedCommand;
     }
 }
 
@@ -658,7 +663,7 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleIncreaseVolume(chip::TL
     const uint16_t maxStepSize = (effectiveMax > mMinDeviceVolume) ? static_cast<uint16_t>(effectiveMax - mMinDeviceVolume) : 0;
     VerifyOrReturnError(stepSize >= 1 && stepSize <= maxStepSize, Status::ConstraintError);
 
-    const UnmutePolicyEnum policy      = req.unmutePolicy.ValueOr(mIncreaseVolumeUnmutePolicy);
+    const UnmutePolicyEnum policy       = req.unmutePolicy.ValueOr(mIncreaseVolumeUnmutePolicy);
     const UnmuteVolumeEnum unmuteVolume = req.unmuteVolume.ValueOr(mIncreaseVolumeUnmuteVolume);
 
     uint16_t requestedVolume;
@@ -676,8 +681,8 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleIncreaseVolume(chip::TL
             requestedVolume = mVolume;
             break;
         case UnmuteVolumeEnum::kVolumePlusStepSize:
-            requestedVolume = static_cast<uint16_t>(std::min<uint32_t>(
-                static_cast<uint32_t>(mVolume) + static_cast<uint32_t>(stepSize), effectiveMax));
+            requestedVolume = static_cast<uint16_t>(
+                std::min<uint32_t>(static_cast<uint32_t>(mVolume) + static_cast<uint32_t>(stepSize), effectiveMax));
             break;
         default:
             return Status::ConstraintError;
@@ -718,8 +723,7 @@ DataModel::ActionReturnStatus AudioControlCluster::HandleDecreaseVolume(chip::TL
     VerifyOrReturnError(stepSize >= 1 && stepSize <= maxStepSize, Status::ConstraintError);
 
     // RequestedVolume = Volume - StepSize (with underflow protection)
-    const uint32_t requestedVolume32 =
-        static_cast<uint32_t>(mVolume) > static_cast<uint32_t>(stepSize)
+    const uint32_t requestedVolume32 = static_cast<uint32_t>(mVolume) > static_cast<uint32_t>(stepSize)
         ? static_cast<uint32_t>(mVolume) - static_cast<uint32_t>(stepSize)
         : 0;
 
@@ -800,8 +804,7 @@ CHIP_ERROR AudioControlCluster::SetMaxUserVolume(uint16_t maxUserVolume)
         StoreVolume();
     }
 
-    if (mOptionalAttributeSet.IsSet(StartUpVolume::Id) && !mStartUpVolume.IsNull() &&
-        mStartUpVolume.Value() > maxUserVolume)
+    if (mOptionalAttributeSet.IsSet(StartUpVolume::Id) && !mStartUpVolume.IsNull() && mStartUpVolume.Value() > maxUserVolume)
     {
         SetAttributeValue(mStartUpVolume, DataModel::MakeNullable<uint16_t>(maxUserVolume), StartUpVolume::Id);
         StoreStartUpVolume();

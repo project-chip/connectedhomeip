@@ -65,15 +65,15 @@ public:
 
     void Reset()
     {
-        nextStatus            = Status::Success;
-        startupCalls  = 0;
-        startupState  = {};
-        volumeAndMuteCalls    = 0;
-        lastNewVolume         = 0;
-        lastNewSoftMuted      = false;
-        bassChangedCalls      = 0;
-        midChangedCalls       = 0;
-        trebleChangedCalls    = 0;
+        nextStatus         = Status::Success;
+        startupCalls       = 0;
+        startupState       = {};
+        volumeAndMuteCalls = 0;
+        lastNewVolume      = 0;
+        lastNewSoftMuted   = false;
+        bassChangedCalls   = 0;
+        midChangedCalls    = 0;
+        trebleChangedCalls = 0;
         lastBass = lastMid = lastTreble = 0;
     }
 
@@ -249,8 +249,7 @@ TEST_F(TestAudioControlCluster, AttributeListWithBEQFeature)
 
 TEST_F(TestAudioControlCluster, AttributeListDBFeatureHidesMaxDeviceVolumeDB)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithFeatures(BitFlags<Feature>(Feature::kDecibel)));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithFeatures(BitFlags<Feature>(Feature::kDecibel)));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -305,8 +304,7 @@ TEST_F(TestAudioControlCluster, DBFeatureProhibitsMaxDeviceVolumeDBConfig)
     // When DB feature is enabled, MaxDeviceVolumeDB must not be in the optional attribute set
     // (constructor VerifyOrDie); it is hidden from the attribute list either way.
     // BasicConfig() never sets MaxDeviceVolumeDB::Id, so this is the valid configuration.
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithFeatures(BitFlags<Feature>(Feature::kDecibel)));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithFeatures(BitFlags<Feature>(Feature::kDecibel)));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // MaxDeviceVolumeDB is absent from the attribute list when DB feature is active.
@@ -326,8 +324,7 @@ TEST_F(TestAudioControlCluster, DBFeatureProhibitsMaxDeviceVolumeDBConfig)
 
 TEST_F(TestAudioControlCluster, ReadMandatoryAttributes)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -439,8 +436,7 @@ TEST_F(TestAudioControlCluster, MuteUnmuteToggle)
 
 TEST_F(TestAudioControlCluster, SetVolumeNotMuted)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -528,10 +524,8 @@ TEST_F(TestAudioControlCluster, UnmutePolicyUnmuteOrChangeVolume)
 {
     // SoftMuted=TRUE, PhysicallyMuted=FALSE, policy=UnmuteOrChangeVolume
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig()
-                                    .WithInitialSoftMuted(true)
-                                    .WithInitialVolume(50)
-                                    .WithSetVolumeUnmutePolicy(UnmutePolicyEnum::kUnmuteOrChangeVolume));
+                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50).WithSetVolumeUnmutePolicy(
+                                    UnmutePolicyEnum::kUnmuteOrChangeVolume));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -549,10 +543,8 @@ TEST_F(TestAudioControlCluster, UnmutePolicyDoNotUnmuteAndDoNotChangeVolume)
 {
     // SoftMuted=TRUE, policy=DoNotUnmuteAndDoNotChangeVolume → INVALID_IN_STATE
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig()
-                                    .WithInitialSoftMuted(true)
-                                    .WithInitialVolume(50)
-                                    .WithSetVolumeUnmutePolicy(UnmutePolicyEnum::kDoNotUnmuteAndDoNotChangeVolume));
+                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50).WithSetVolumeUnmutePolicy(
+                                    UnmutePolicyEnum::kDoNotUnmuteAndDoNotChangeVolume));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -571,10 +563,8 @@ TEST_F(TestAudioControlCluster, UnmutePolicyDoNotUnmuteAndChangeVolume)
 {
     // SoftMuted=TRUE, policy=DoNotUnmuteAndChangeVolume → volume changes, stays muted
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig()
-                                    .WithInitialSoftMuted(true)
-                                    .WithInitialVolume(50)
-                                    .WithSetVolumeUnmutePolicy(UnmutePolicyEnum::kDoNotUnmuteAndChangeVolume));
+                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50).WithSetVolumeUnmutePolicy(
+                                    UnmutePolicyEnum::kDoNotUnmuteAndChangeVolume));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -764,7 +754,7 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeSoftMutedUnmuteOrChangeWithVolume)
     ClusterTester tester(cluster);
 
     EXPECT_TRUE(tester.Invoke(IncreaseVolume::Type{}).IsSuccess());
-    EXPECT_EQ(cluster.GetVolume(), 40u); // volume stays the same
+    EXPECT_EQ(cluster.GetVolume(), 40u);  // volume stays the same
     EXPECT_FALSE(cluster.GetSoftMuted()); // unmuted
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -845,7 +835,7 @@ TEST_F(TestAudioControlCluster, IncreaseVolumeBothMutedIgnoresUnmuteVolumeEnum)
     ClusterTester tester(cluster);
 
     EXPECT_TRUE(tester.Invoke(IncreaseVolume::Type{}).IsSuccess());
-    EXPECT_EQ(cluster.GetVolume(), 50u); // 40 + 10, NOT kMinDeviceVolume (1)
+    EXPECT_EQ(cluster.GetVolume(), 50u);  // 40 + 10, NOT kMinDeviceVolume (1)
     EXPECT_FALSE(cluster.GetSoftMuted()); // kUnmuteOrChangeVolume clears SoftMuted
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1211,7 +1201,7 @@ TEST_F(TestAudioControlCluster, WriteNoOpBassDoesNotCallDelegate)
 
     mMockDelegate.Reset();
     EXPECT_TRUE(tester.WriteAttribute(Bass::Id, val).IsNoOpSuccess()); // same value: no-op
-    EXPECT_EQ(mMockDelegate.bassChangedCalls, 0); // delegate must not be called on no-op
+    EXPECT_EQ(mMockDelegate.bassChangedCalls, 0);                      // delegate must not be called on no-op
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1350,8 +1340,7 @@ TEST_F(TestAudioControlCluster, SetSoftMutedAPI)
 
 TEST_F(TestAudioControlCluster, DelegateMuteCallbackParameters)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(42));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(42));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1367,8 +1356,7 @@ TEST_F(TestAudioControlCluster, DelegateMuteCallbackParameters)
 
 TEST_F(TestAudioControlCluster, DelegateUnmuteCallbackParameters)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(42));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(42));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1384,8 +1372,7 @@ TEST_F(TestAudioControlCluster, DelegateUnmuteCallbackParameters)
 
 TEST_F(TestAudioControlCluster, DelegateSetVolumeCallbackParameters)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1428,8 +1415,7 @@ TEST_F(TestAudioControlCluster, DelegateBassChangedCallback)
 
 TEST_F(TestAudioControlCluster, DelegateMuteVetoLeavesStateUnchanged)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1444,8 +1430,7 @@ TEST_F(TestAudioControlCluster, DelegateMuteVetoLeavesStateUnchanged)
 
 TEST_F(TestAudioControlCluster, DelegateUnmuteVetoLeavesStateUnchanged)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1460,8 +1445,7 @@ TEST_F(TestAudioControlCluster, DelegateUnmuteVetoLeavesStateUnchanged)
 
 TEST_F(TestAudioControlCluster, DelegateToggleMutedVetoLeavesStateUnchanged)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1476,8 +1460,7 @@ TEST_F(TestAudioControlCluster, DelegateToggleMutedVetoLeavesStateUnchanged)
 
 TEST_F(TestAudioControlCluster, DelegateSetVolumeVetoLeavesStateUnchanged)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1495,8 +1478,7 @@ TEST_F(TestAudioControlCluster, DelegateSetVolumeVetoLeavesStateUnchanged)
 
 TEST_F(TestAudioControlCluster, DelegateSetVolumeMuteZeroVetoLeavesStateUnchanged)
 {
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(false).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -1552,8 +1534,8 @@ TEST_F(TestAudioControlCluster, DelegateIncreaseVolumePolicyPathVetoLeavesStateU
     mMockDelegate.nextStatus = Status::Busy;
     EXPECT_FALSE(tester.Invoke(IncreaseVolume::Type{}).IsSuccess());
 
-    EXPECT_EQ(cluster.GetVolume(), 50u);   // unchanged
-    EXPECT_TRUE(cluster.GetSoftMuted());   // still muted
+    EXPECT_EQ(cluster.GetVolume(), 50u); // unchanged
+    EXPECT_TRUE(cluster.GetSoftMuted()); // still muted
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1573,7 +1555,7 @@ TEST_F(TestAudioControlCluster, DelegateBassVetoLeavesStateUnchanged)
     ClusterTester tester(cluster);
 
     mMockDelegate.nextStatus = Status::Busy;
-    int16_t val = 3;
+    int16_t val              = 3;
     EXPECT_NE(tester.WriteAttribute(Bass::Id, val), CHIP_NO_ERROR);
 
     // Bass must remain 0
@@ -1599,7 +1581,7 @@ TEST_F(TestAudioControlCluster, DelegateMidVetoLeavesStateUnchanged)
     ClusterTester tester(cluster);
 
     mMockDelegate.nextStatus = Status::Busy;
-    int16_t val = 3;
+    int16_t val              = 3;
     EXPECT_NE(tester.WriteAttribute(Mid::Id, val), CHIP_NO_ERROR);
 
     // Mid must remain 0
@@ -1625,7 +1607,7 @@ TEST_F(TestAudioControlCluster, DelegateTrebleVetoLeavesStateUnchanged)
     ClusterTester tester(cluster);
 
     mMockDelegate.nextStatus = Status::Busy;
-    int16_t val = 3;
+    int16_t val              = 3;
     EXPECT_NE(tester.WriteAttribute(Treble::Id, val), CHIP_NO_ERROR);
 
     // Treble must remain 0
@@ -1712,10 +1694,7 @@ TEST_F(TestAudioControlCluster, PersistenceStartUpVolumeClipOnSetMaxUserVolume)
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<MaxUserVolume::Id>().Set<StartUpVolume::Id>();
 
-    auto cfg = BasicConfig()
-                   .WithOptionalAttributes(optionalSet)
-                   .WithInitialMaxUserVolume(100)
-                   .WithInitialVolume(50);
+    auto cfg = BasicConfig().WithOptionalAttributes(optionalSet).WithInitialMaxUserVolume(100).WithInitialVolume(50);
     {
         AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -2150,11 +2129,9 @@ TEST_F(TestAudioControlCluster, SetMaxUserVolumeClipsStartUpVolumeInMemory)
     // must reflect the clipped in-memory value, not the original write.
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<MaxUserVolume::Id>().Set<StartUpVolume::Id>();
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig()
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithInitialMaxUserVolume(100)
-                                    .WithInitialVolume(50));
+    AudioControlCluster cluster(
+        kRootEndpointId, mMockDelegate,
+        BasicConfig().WithOptionalAttributes(optionalSet).WithInitialMaxUserVolume(100).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -2199,11 +2176,9 @@ TEST_F(TestAudioControlCluster, SetVolumeRespectEffectiveMaxAfterSetMaxUserVolum
     // in the same session — no restart needed.
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<MaxUserVolume::Id>();
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig()
-                                    .WithOptionalAttributes(optionalSet)
-                                    .WithInitialMaxUserVolume(100)
-                                    .WithInitialVolume(50));
+    AudioControlCluster cluster(
+        kRootEndpointId, mMockDelegate,
+        BasicConfig().WithOptionalAttributes(optionalSet).WithInitialMaxUserVolume(100).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ASSERT_EQ(cluster.SetMaxUserVolume(70), CHIP_NO_ERROR);
@@ -2240,8 +2215,7 @@ TEST_F(TestAudioControlCluster, MaxUserVolumeIgnoredWhenAttributeAbsent)
     // MaxUserVolume not in optional set: whether or not WithInitialMaxUserVolume was called,
     // EffectiveMaxVolume() must fall back to MaxDeviceVolume — the OptionalAttributeSet, not a
     // zero-vs-nonzero config value, is the source of truth for whether MaxUserVolume applies.
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialVolume(50).WithInitialMaxUserVolume(70));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialVolume(50).WithInitialMaxUserVolume(70));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetMaxUserVolume(), 100u); // == MaxDeviceVolume from BasicConfig(), not 70
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -2312,8 +2286,7 @@ TEST_F(TestAudioControlCluster, SetPhysicallyMutedBasic)
 {
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<PhysicallyMuted::Id>();
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithOptionalAttributes(optionalSet));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -2353,8 +2326,7 @@ TEST_F(TestAudioControlCluster, SetPhysicallyMutedDoesNotCallDelegate)
 {
     AudioControlCluster::OptionalAttributeSet optionalSet;
     optionalSet.Set<PhysicallyMuted::Id>();
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithOptionalAttributes(optionalSet));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithOptionalAttributes(optionalSet));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     mMockDelegate.Reset();
@@ -2799,8 +2771,7 @@ TEST_F(TestAudioControlCluster, StartUpVolumeAbsentBehavesAsNull)
 TEST_F(TestAudioControlCluster, OnStartupCalledWithConfigDefaultsOnFirstBoot)
 {
     // Empty KVS: OnStartup must receive the config defaults unchanged.
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialVolume(50).WithInitialSoftMuted(false));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialVolume(50).WithInitialSoftMuted(false));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(mMockDelegate.startupCalls, 1);
@@ -2985,8 +2956,7 @@ TEST_F(TestAudioControlCluster, OnStartupBEQZeroWhenFeatureDisabled)
     // since BasicConfig() never calls WithInitialBass/Mid/Treble. See the StartupState comment:
     // the delegate is constructed alongside the same Config, so it already knows BEQ is disabled
     // and should ignore these fields regardless of what raw value they carry.
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialVolume(50).WithInitialSoftMuted(false));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialVolume(50).WithInitialSoftMuted(false));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(mMockDelegate.startupState.bass, 0);
@@ -3113,8 +3083,8 @@ TEST_F(TestAudioControlCluster, StartupCorruptedEnumKvsFallsBackToConfigDefault)
     SetVolume::Type cmd;
     cmd.newVolume = 75;
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
-    EXPECT_EQ(cluster.GetVolume(), 50u);    // unchanged
-    EXPECT_TRUE(cluster.GetSoftMuted());    // still muted
+    EXPECT_EQ(cluster.GetVolume(), 50u); // unchanged
+    EXPECT_TRUE(cluster.GetSoftMuted()); // still muted
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -3126,8 +3096,7 @@ TEST_F(TestAudioControlCluster, SetVolumeInvalidUnmutePolicyReturnsConstraintErr
     // SoftMuted=TRUE so the command goes through ApplyUnmutePolicy (not the fast path).
     // An UnmutePolicy value outside the defined enumerators is a malformed command field,
     // not a state conflict, so it must be rejected with ConstraintError (not InvalidInState).
-    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
-                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50));
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);

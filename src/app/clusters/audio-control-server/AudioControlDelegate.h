@@ -71,13 +71,19 @@ public:
      * Called when the Bass EQ attribute changes via a Matter write (BEQ feature only).
      * Default implementation is a no-op that returns Success.
      */
-    virtual Protocols::InteractionModel::Status HandleBassChanged(int16_t bass) { return Protocols::InteractionModel::Status::Success; }
+    virtual Protocols::InteractionModel::Status HandleBassChanged(int16_t bass)
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
 
     /**
      * Called when the Mid EQ attribute changes via a Matter write (BEQ feature only).
      * Default implementation is a no-op that returns Success.
      */
-    virtual Protocols::InteractionModel::Status HandleMidChanged(int16_t mid) { return Protocols::InteractionModel::Status::Success; }
+    virtual Protocols::InteractionModel::Status HandleMidChanged(int16_t mid)
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
 
     /**
      * Called when the Treble EQ attribute changes via a Matter write (BEQ feature only).
