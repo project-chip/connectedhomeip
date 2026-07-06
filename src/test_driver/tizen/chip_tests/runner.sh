@@ -34,13 +34,16 @@ export GCOV_PREFIX_STRIP=5
 # Create dump directory (may not exist if emu hasn't created it yet)
 mkdir -p /mnt/chip/dump
 
-# Save original core_pattern and set to raw core dumps (no crash-manager)
-ORIGINAL_CORE_PATTERN=$(cat /proc/sys/kernel/core_pattern 2>/dev/null || echo "")
-echo "/mnt/chip/dump/core.%e.%p.%t" >/proc/sys/kernel/core_pattern
-echo "Core pattern set to: /mnt/chip/dump/core.%e.%p.%t (raw dumps, no crash-manager)"
+# Restore the core_pattern configuration file on exit
+if [ -f /proc/sys/kernel/core_pattern ]; then
+    ORIGINAL_CORE_PATTERN=$(cat /proc/sys/kernel/core_pattern 2>/dev/null)
+    trap 'echo "$ORIGINAL_CORE_PATTERN" > /proc/sys/kernel/core_pattern 2>/dev/null' EXIT
+else
+    trap 'rm -f /proc/sys/kernel/core_pattern 2>/dev/null' EXIT
+fi
 
-# Restore original core_pattern on exit
-trap 'echo "$ORIGINAL_CORE_PATTERN" > /proc/sys/kernel/core_pattern 2>/dev/null' EXIT
+# Try to apply the custom pattern needed for the test execution
+echo "/mnt/chip/dump/core.%e.%p.%t" > /proc/sys/kernel/core_pattern 2>/dev/null
 
 FAILED=()
 STATUS=0
