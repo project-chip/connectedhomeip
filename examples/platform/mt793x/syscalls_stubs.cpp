@@ -117,6 +117,21 @@ int __attribute__((weak)) _write(int file, const char * ptr, int len)
     return len;
 }
 
+/*
+ * newlib-nano omits these reent/stdio symbols, but the prebuilt
+ * matter_sdk.a (built against the full newlib) references them from
+ * FreeRTOS tasks.c (prvInitialiseNewTask) and mt7933 hal_nvic.c
+ * (isrC_main).  Provide weak zero-initialized stubs so the link
+ * succeeds under --specs=nano.specs.  lighting-app does not
+ * exercise per-task stdio, so the stubs are never actually read;
+ * if a stronger definition ever appears (e.g. from a future SDK
+ * rebuild against nano libc) it will override these.
+ */
+__attribute__((weak)) struct _reent * _global_impure_ptr = 0;
+__attribute__((weak)) FILE __sf_fake_stdin  = { 0 };
+__attribute__((weak)) FILE __sf_fake_stdout = { 0 };
+__attribute__((weak)) FILE __sf_fake_stderr = { 0 };
+
 void __attribute__((weak)) exit(int status)
 {
     /*
