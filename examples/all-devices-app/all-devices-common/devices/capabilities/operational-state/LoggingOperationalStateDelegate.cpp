@@ -24,10 +24,10 @@ namespace chip::app::Clusters::OperationalState {
 CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     static const GenericOperationalState kSupportedStates[] = {
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped), MakeOptional(CharSpan("Stopped", 7))),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning), MakeOptional(CharSpan("Running", 7))),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused), MakeOptional(CharSpan("Paused", 6))),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kError), MakeOptional(CharSpan("Error", 5))),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped), MakeOptional("Stopped"_span)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning), MakeOptional("Running"_span)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused), MakeOptional("Paused"_span)),
+        GenericOperationalState(to_underlying(OperationalStateEnum::kError), MakeOptional("Error"_span)),
     };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedStates))
@@ -41,15 +41,14 @@ CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalStateAtIndex(size_t in
 
 CHIP_ERROR LoggingOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
-    // Provide a basic set of phases to satisfy the reviewer's comment about phase lists.
-    static const char * kSupportedPhases[] = { "Starting", "Operating", "Finishing" };
+    static constexpr CharSpan kSupportedPhases[] = { "Starting"_span, "Operating"_span, "Finishing"_span };
 
     if (index >= MATTER_ARRAY_SIZE(kSupportedPhases))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(kSupportedPhases[index]), operationalPhase);
+    return CopyCharSpanToMutableCharSpan(kSupportedPhases[index], operationalPhase);
 }
 
 void LoggingOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
