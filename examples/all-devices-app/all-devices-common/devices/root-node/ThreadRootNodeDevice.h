@@ -40,7 +40,7 @@ public:
     ~ThreadRootNodeDevice() override = default;
 
     CHIP_ERROR Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 

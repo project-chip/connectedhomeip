@@ -287,6 +287,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType & value);
 
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::DecodableType & value);
+
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType & value);
 
@@ -452,6 +456,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Channel::Structs::ProgramCastStruct::DecodableType & value);
@@ -948,6 +955,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DeviceEnergyManagement::Events::Resumed::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DeviceEnergyManagement::Events::PowerRangeAdjustStart::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DeviceEnergyManagement::Events::PowerRangeAdjustEnd::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyEvse::Events::EVConnected::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyEvse::Events::EVNotDetected::DecodableType & value);
@@ -1262,6 +1273,12 @@ LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ThreadNetworkDirectory::Commands::OperationalDatasetResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

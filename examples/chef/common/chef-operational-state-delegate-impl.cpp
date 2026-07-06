@@ -305,7 +305,7 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
     return ret;
 }
 
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, OperationalState::Id,
                                                             MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
@@ -326,6 +326,20 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
         to_underlying(OperationalState::OperationalStateEnum::kStopped)));
 
     ChipLogProgress(Zcl, "Registered global delegate and instance for operational state on endpoint %d.", endpointId);
+}
+
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, OperationalState::Id,
+                                                            MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOperationalStateTableSize)
+    {
+        return;
+    }
+
+    gOperationalStateInstanceTable[epIndex]->Shutdown();
+    gOperationalStateInstanceTable[epIndex].reset();
+    gOperationalStateDelegateTable[epIndex].reset();
 }
 
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER

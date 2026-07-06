@@ -33,7 +33,7 @@ dynamic steps should define an explicit steps_* method instead.
 import ast
 import inspect
 import textwrap
-from typing import Optional, Union
+from typing import Optional
 
 from matter.testing.runner import TestStep
 
@@ -96,8 +96,8 @@ def _merge_duplicate_steps(steps: list[TestStep]) -> list[TestStep]:
 
     When a step appears in multiple branches, the entry with a description is preferred.
     """
-    seen: dict[Union[int, str], TestStep] = {}
-    order: list[Union[int, str]] = []
+    seen: dict[int | str, TestStep] = {}
+    order: list[int | str] = []
     for s in steps:
         key = s.test_plan_number
         if key not in seen:

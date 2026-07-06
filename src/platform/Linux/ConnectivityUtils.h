@@ -49,6 +49,7 @@ CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
 CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
 CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
+CHIP_ERROR GetEthCarrierDetect(const char * ifname, bool & carrierDetect);
 
 } // namespace ConnectivityUtils
 

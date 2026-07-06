@@ -464,6 +464,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DeviceEnergyMan
 static void Finalize(chip::app::Clusters::DeviceEnergyManagement::Structs::ConstraintsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::DeviceEnergyManagement::Structs::SlotAdjustmentStruct::Type & request,
                         Json::Value & value);
 
@@ -737,6 +743,11 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
                         Json::Value & value);

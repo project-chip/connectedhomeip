@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v7
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v6.0.2
+            - uses: actions/checkout@v7
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -125,12 +125,14 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-sensing-union-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/audio-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/closure-dimension-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/commissioning-proxy-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-metering-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-price-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
@@ -144,6 +146,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ota-provider-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ota-requestor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proximity-ranging-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
@@ -162,7 +166,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-settings-user-level-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-stream-management-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
@@ -241,6 +244,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/temperature-controlled-cabinet-topology-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
@@ -376,6 +380,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -396,6 +401,7 @@ jobs:
                      --runner chip_tool_python \
                      --target TestOperationalState \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -414,6 +420,7 @@ jobs:
                      --runner chip_tool_python \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -444,6 +451,7 @@ jobs:
                      --include-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
@@ -468,6 +476,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -491,6 +500,7 @@ jobs:
                      --target TestOperationalState \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -498,68 +508,6 @@ jobs:
                      --commissioning-method wifipaf-wifi \
                   "
 
-            - name: Run Tests using matter-repl (skip slow)
-              if: github.event_name == 'pull_request'
-              run: |
-                  ./scripts/run_in_python_env.sh out/venv \
-                  "./scripts/tests/run_test_suite.py \
-                     --find-path $PWD/objdir-clone \
-                     --find-path $PWD/scripts \
-                     --runner matter_repl_python \
-                     --exclude-tags MANUAL \
-                     --exclude-tags FLAKY \
-                     --exclude-tags IN_DEVELOPMENT \
-                     --exclude-tags EXTRA_SLOW \
-                     --exclude-tags SLOW \
-                     --exclude-tags PURPOSEFUL_FAILURE \
-                     --test-order random \
-                     run \
-                     --iterations 1 \
-                     --test-timeout-seconds 120 \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
-                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
-                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
-                     --summary-file test-summaries/matter-repl.json \
-                  "
-            - name: Run Tests using matter-repl (including slow)
-              if: github.event_name == 'push'
-              run: |
-                  ./scripts/run_in_python_env.sh out/venv \
-                  "./scripts/tests/run_test_suite.py \
-                     --find-path $PWD/objdir-clone \
-                     --find-path $PWD/scripts \
-                     --runner matter_repl_python \
-                     --test-order random \
-                     run \
-                     --iterations 1 \
-                     --test-timeout-seconds 120 \
-                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
-                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
-                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
-                     --summary-file test-summaries/matter-repl.json \
-                  "
             - name: Print test run summaries
               if: always()
               run: |
@@ -605,7 +553,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v5
+              uses: actions/cache/save@v6
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -646,7 +594,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v7
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |
@@ -723,6 +671,7 @@ jobs:
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -755,6 +704,7 @@ jobs:
                      --include-tags PURPOSEFUL_FAILURE \
                      --test-order random \
                      run \
+                     --value-wait-extra-duration-ms 5000 \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
@@ -815,7 +765,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v5
+              uses: actions/cache/save@v6
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -843,7 +793,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -863,7 +813,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v7
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -1074,7 +1024,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v5
+              uses: actions/cache/save@v6
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -1089,7 +1039,8 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        timeout-minutes: 45
+        # Updating the timeout for REPL Tests - Linux (RUN)(TC_[D-O]) takes over 60 minutes consistently in CI
+        timeout-minutes: 70
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -1120,7 +1071,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:194
+            image: ghcr.io/project-chip/chip-build:200
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1139,7 +1090,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v7
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -1158,9 +1109,14 @@ jobs:
               with:
                 name: repl-build-data
 
-            - name: Unpack artifacts
-              run: |
-                tar xfJ repl-build-data.tar.xz
+            # OverlayFS (Docker container storage) layer copy-up occasionally causes
+            # "Directory renamed before its status could be extracted" during rapid unpack.
+            - uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
+              name: Unpack artifacts
+              with:
+                  command: tar xfJ repl-build-data.tar.xz
+                  attempt_limit: 3
+                  attempt_delay: 2000
 
             - name: Generate an argument environment file
               run: |
@@ -1236,6 +1192,12 @@ jobs:
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/tests/scripts/mobile-device-test.py'
                   scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app"
+                  scripts/run_in_python_env.sh out/venv "scripts/tests/run_python_test.py \
+                      --factory-reset \
+                      --app objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app \
+                      --app-args '--discriminator 1234 --KVS kvs1' \
+                      --script-args '--commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 1' \
+                      --script src/python_testing/test_testing/test_manufacturer_specific_cluster.py"
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
@@ -1325,7 +1287,7 @@ jobs:
 
       steps:
           - name: Checkout
-            uses: actions/checkout@v6.0.2
+            uses: actions/checkout@v7
 
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
@@ -1343,7 +1305,7 @@ jobs:
                 annotate_only: true
 
           - name: Checkout gh-pages for Allure history
-            uses: actions/checkout@v6.0.2
+            uses: actions/checkout@v7
             with:
                 ref: gh-pages
                 path: gh-pages
@@ -1406,7 +1368,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.2
+              uses: actions/checkout@v7
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |

@@ -3807,7 +3807,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   public @Nullable Long epochStartTime1;
   public @Nullable byte[] epochKey2;
   public @Nullable Long epochStartTime2;
-  public Integer groupKeyMulticastPolicy;
   private static final long GROUP_KEY_SET_ID_ID = 0L;
   private static final long GROUP_KEY_SECURITY_POLICY_ID = 1L;
   private static final long EPOCH_KEY0_ID = 2L;
@@ -3816,7 +3815,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   private static final long EPOCH_START_TIME1_ID = 5L;
   private static final long EPOCH_KEY2_ID = 6L;
   private static final long EPOCH_START_TIME2_ID = 7L;
-  private static final long GROUP_KEY_MULTICAST_POLICY_ID = 8L;
 
   public GroupKeyManagementClusterGroupKeySetStruct(
     Integer groupKeySetID,
@@ -3826,8 +3824,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable byte[] epochKey1,
     @Nullable Long epochStartTime1,
     @Nullable byte[] epochKey2,
-    @Nullable Long epochStartTime2,
-    Integer groupKeyMulticastPolicy
+    @Nullable Long epochStartTime2
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -3837,7 +3834,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     this.epochStartTime1 = epochStartTime1;
     this.epochKey2 = epochKey2;
     this.epochStartTime2 = epochStartTime2;
-    this.groupKeyMulticastPolicy = groupKeyMulticastPolicy;
   }
 
   public StructType encodeTlv() {
@@ -3850,7 +3846,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     values.add(new StructElement(EPOCH_START_TIME1_ID, epochStartTime1 != null ? new UIntType(epochStartTime1) : new NullType()));
     values.add(new StructElement(EPOCH_KEY2_ID, epochKey2 != null ? new ByteArrayType(epochKey2) : new NullType()));
     values.add(new StructElement(EPOCH_START_TIME2_ID, epochStartTime2 != null ? new UIntType(epochStartTime2) : new NullType()));
-    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, new UIntType(groupKeyMulticastPolicy)));
 
     return new StructType(values);
   }
@@ -3867,7 +3862,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable Long epochStartTime1 = null;
     @Nullable byte[] epochKey2 = null;
     @Nullable Long epochStartTime2 = null;
-    Integer groupKeyMulticastPolicy = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3909,11 +3903,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
           UIntType castingValue = element.value(UIntType.class);
           epochStartTime2 = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == GROUP_KEY_MULTICAST_POLICY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          groupKeyMulticastPolicy = castingValue.value(Integer.class);
-        }
       }
     }
     return new GroupKeyManagementClusterGroupKeySetStruct(
@@ -3924,8 +3913,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
       epochKey1,
       epochStartTime1,
       epochKey2,
-      epochStartTime2,
-      groupKeyMulticastPolicy
+      epochStartTime2
     );
   }
 
@@ -3956,9 +3944,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     output.append("\n");
     output.append("\tepochStartTime2: ");
     output.append(epochStartTime2);
-    output.append("\n");
-    output.append("\tgroupKeyMulticastPolicy: ");
-    output.append(groupKeyMulticastPolicy);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -8797,6 +8782,97 @@ public static class DeviceEnergyManagementClusterConstraintsStruct {
     output.append("\n");
     output.append("\tloadControl: ");
     output.append(loadControl);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DeviceEnergyManagementClusterPowerRangeAdjustStruct {
+  public @Nullable Long minPower;
+  public @Nullable Long maxPower;
+  public Integer cause;
+  public Long endTime;
+  private static final long MIN_POWER_ID = 0L;
+  private static final long MAX_POWER_ID = 1L;
+  private static final long CAUSE_ID = 2L;
+  private static final long END_TIME_ID = 3L;
+
+  public DeviceEnergyManagementClusterPowerRangeAdjustStruct(
+    @Nullable Long minPower,
+    @Nullable Long maxPower,
+    Integer cause,
+    Long endTime
+  ) {
+    this.minPower = minPower;
+    this.maxPower = maxPower;
+    this.cause = cause;
+    this.endTime = endTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_POWER_ID, minPower != null ? new IntType(minPower) : new NullType()));
+    values.add(new StructElement(MAX_POWER_ID, maxPower != null ? new IntType(maxPower) : new NullType()));
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
+    values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerRangeAdjustStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Long minPower = null;
+    @Nullable Long maxPower = null;
+    Integer cause = null;
+    Long endTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          minPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_POWER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxPower = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == END_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTime = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new DeviceEnergyManagementClusterPowerRangeAdjustStruct(
+      minPower,
+      maxPower,
+      cause,
+      endTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerRangeAdjustStruct {\n");
+    output.append("\tminPower: ");
+    output.append(minPower);
+    output.append("\n");
+    output.append("\tmaxPower: ");
+    output.append(maxPower);
+    output.append("\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
+    output.append("\tendTime: ");
+    output.append(endTime);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -14114,18 +14190,22 @@ public static class NetworkIdentityManagementClusterActiveNetworkIdentityStruct 
 public static class NetworkIdentityManagementClusterClientStruct {
   public Integer clientIndex;
   public byte[] clientIdentifier;
+  public Integer clientIdentityType;
   public @Nullable Integer networkIdentityIndex;
   private static final long CLIENT_INDEX_ID = 0L;
   private static final long CLIENT_IDENTIFIER_ID = 1L;
-  private static final long NETWORK_IDENTITY_INDEX_ID = 2L;
+  private static final long CLIENT_IDENTITY_TYPE_ID = 2L;
+  private static final long NETWORK_IDENTITY_INDEX_ID = 3L;
 
   public NetworkIdentityManagementClusterClientStruct(
     Integer clientIndex,
     byte[] clientIdentifier,
+    Integer clientIdentityType,
     @Nullable Integer networkIdentityIndex
   ) {
     this.clientIndex = clientIndex;
     this.clientIdentifier = clientIdentifier;
+    this.clientIdentityType = clientIdentityType;
     this.networkIdentityIndex = networkIdentityIndex;
   }
 
@@ -14133,6 +14213,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CLIENT_INDEX_ID, new UIntType(clientIndex)));
     values.add(new StructElement(CLIENT_IDENTIFIER_ID, new ByteArrayType(clientIdentifier)));
+    values.add(new StructElement(CLIENT_IDENTITY_TYPE_ID, new UIntType(clientIdentityType)));
     values.add(new StructElement(NETWORK_IDENTITY_INDEX_ID, networkIdentityIndex != null ? new UIntType(networkIdentityIndex) : new NullType()));
 
     return new StructType(values);
@@ -14144,6 +14225,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     }
     Integer clientIndex = null;
     byte[] clientIdentifier = null;
+    Integer clientIdentityType = null;
     @Nullable Integer networkIdentityIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CLIENT_INDEX_ID) {
@@ -14156,6 +14238,11 @@ public static class NetworkIdentityManagementClusterClientStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           clientIdentifier = castingValue.value(byte[].class);
         }
+      } else if (element.contextTagNum() == CLIENT_IDENTITY_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clientIdentityType = castingValue.value(Integer.class);
+        }
       } else if (element.contextTagNum() == NETWORK_IDENTITY_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -14166,6 +14253,7 @@ public static class NetworkIdentityManagementClusterClientStruct {
     return new NetworkIdentityManagementClusterClientStruct(
       clientIndex,
       clientIdentifier,
+      clientIdentityType,
       networkIdentityIndex
     );
   }
@@ -14179,6 +14267,9 @@ public static class NetworkIdentityManagementClusterClientStruct {
     output.append("\n");
     output.append("\tclientIdentifier: ");
     output.append(Arrays.toString(clientIdentifier));
+    output.append("\n");
+    output.append("\tclientIdentityType: ");
+    output.append(clientIdentityType);
     output.append("\n");
     output.append("\tnetworkIdentityIndex: ");
     output.append(networkIdentityIndex);
@@ -14273,6 +14364,142 @@ public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
     output.append("\n");
     output.append("\tactiveTimestamp: ");
     output.append(activeTimestamp);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CommissioningProxyClusterScanResultStruct {
+  public @Nullable byte[] address;
+  public Integer transport;
+  public Integer discriminator;
+  public Integer vendorID;
+  public Integer productID;
+  public @Nullable byte[] extendedData;
+  public Optional<Integer> wiFiBand;
+  private static final long ADDRESS_ID = 0L;
+  private static final long TRANSPORT_ID = 1L;
+  private static final long DISCRIMINATOR_ID = 2L;
+  private static final long VENDOR_ID_ID = 3L;
+  private static final long PRODUCT_ID_ID = 4L;
+  private static final long EXTENDED_DATA_ID = 5L;
+  private static final long WI_FI_BAND_ID = 6L;
+
+  public CommissioningProxyClusterScanResultStruct(
+    @Nullable byte[] address,
+    Integer transport,
+    Integer discriminator,
+    Integer vendorID,
+    Integer productID,
+    @Nullable byte[] extendedData,
+    Optional<Integer> wiFiBand
+  ) {
+    this.address = address;
+    this.transport = transport;
+    this.discriminator = discriminator;
+    this.vendorID = vendorID;
+    this.productID = productID;
+    this.extendedData = extendedData;
+    this.wiFiBand = wiFiBand;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ADDRESS_ID, address != null ? new ByteArrayType(address) : new NullType()));
+    values.add(new StructElement(TRANSPORT_ID, new UIntType(transport)));
+    values.add(new StructElement(DISCRIMINATOR_ID, new UIntType(discriminator)));
+    values.add(new StructElement(VENDOR_ID_ID, new UIntType(vendorID)));
+    values.add(new StructElement(PRODUCT_ID_ID, new UIntType(productID)));
+    values.add(new StructElement(EXTENDED_DATA_ID, extendedData != null ? new ByteArrayType(extendedData) : new NullType()));
+    values.add(new StructElement(WI_FI_BAND_ID, wiFiBand.<BaseTLVType>map((nonOptionalwiFiBand) -> new UIntType(nonOptionalwiFiBand)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static CommissioningProxyClusterScanResultStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable byte[] address = null;
+    Integer transport = null;
+    Integer discriminator = null;
+    Integer vendorID = null;
+    Integer productID = null;
+    @Nullable byte[] extendedData = null;
+    Optional<Integer> wiFiBand = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ADDRESS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          address = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == TRANSPORT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          transport = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DISCRIMINATOR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          discriminator = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VENDOR_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          vendorID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PRODUCT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          productID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == EXTENDED_DATA_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          extendedData = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == WI_FI_BAND_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          wiFiBand = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new CommissioningProxyClusterScanResultStruct(
+      address,
+      transport,
+      discriminator,
+      vendorID,
+      productID,
+      extendedData,
+      wiFiBand
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommissioningProxyClusterScanResultStruct {\n");
+    output.append("\taddress: ");
+    output.append(Arrays.toString(address));
+    output.append("\n");
+    output.append("\ttransport: ");
+    output.append(transport);
+    output.append("\n");
+    output.append("\tdiscriminator: ");
+    output.append(discriminator);
+    output.append("\n");
+    output.append("\tvendorID: ");
+    output.append(vendorID);
+    output.append("\n");
+    output.append("\tproductID: ");
+    output.append(productID);
+    output.append("\n");
+    output.append("\textendedData: ");
+    output.append(Arrays.toString(extendedData));
+    output.append("\n");
+    output.append("\twiFiBand: ");
+    output.append(wiFiBand);
     output.append("\n");
     output.append("}\n");
     return output.toString();

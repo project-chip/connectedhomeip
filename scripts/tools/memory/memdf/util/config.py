@@ -19,7 +19,7 @@ import argparse
 import ast
 import logging
 import re
-from typing import Any, Mapping, MutableMapping, Optional, Pattern, Sequence, Union
+from typing import Any, Mapping, MutableMapping, Optional, Pattern, Sequence
 
 import humanfriendly  # type: ignore
 import memdf.util.nd as nd
@@ -51,7 +51,7 @@ import memdf.util.pretty
 #               the value contains a key 'group', whose value is the group
 #               to be used for configuration keys with the given prefix.
 #
-ConfigDescription = Mapping[Union[str, tuple[int, str]], Mapping[str, Any]]
+ConfigDescription = Mapping[str | tuple[int, str], Mapping[str, Any]]
 
 
 class Config:
