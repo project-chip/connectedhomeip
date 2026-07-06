@@ -2408,6 +2408,50 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRMediaFileManagementClusterAddFileParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMediaFileManagementClusterAddFileResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRMediaFileManagementClusterDeleteFileParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMediaFileManagementClusterRequestSharedFilesParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMediaFileManagementClusterGetSharedFileParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMediaFileManagementClusterGetSharedFileResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRMediaFileManagementClusterOfferFileParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRAudioControlClusterMuteParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
