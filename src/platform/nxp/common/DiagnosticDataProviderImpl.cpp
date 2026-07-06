@@ -57,12 +57,6 @@ extern "C" {
 namespace chip {
 namespace DeviceLayer {
 
-DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
-{
-    static DiagnosticDataProviderImpl sInstance;
-    return sInstance;
-}
-
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     size_t freeHeapSize;
@@ -570,10 +564,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 }
 #endif
 
+#ifndef CONFIG_CHIP_DIAGNOSTIC_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
-    return DiagnosticDataProviderImpl::GetDefaultInstance();
+    static DiagnosticDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif /* CONFIG_CHIP_DIAGNOSTIC_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL */
 
 } // namespace DeviceLayer
 } // namespace chip
