@@ -30,6 +30,7 @@
 #include <clusters/AmbientSensingUnion/CommandIds.h>
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationLauncher/CommandIds.h>
+#include <clusters/AudioControl/CommandIds.h>
 #include <clusters/AudioOutput/CommandIds.h>
 #include <clusters/AvAnalysis/CommandIds.h>
 #include <clusters/BallastConfiguration/CommandIds.h>
@@ -48,6 +49,7 @@
 #include <clusters/ClosureDimension/CommandIds.h>
 #include <clusters/ColorControl/CommandIds.h>
 #include <clusters/CommissionerControl/CommandIds.h>
+#include <clusters/CommissioningProxy/CommandIds.h>
 #include <clusters/CommodityMetering/CommandIds.h>
 #include <clusters/CommodityPrice/CommandIds.h>
 #include <clusters/CommodityTariff/CommandIds.h>

@@ -30,6 +30,7 @@
 #include <clusters/AmbientSensingUnion/EventIds.h>
 #include <clusters/ApplicationBasic/EventIds.h>
 #include <clusters/ApplicationLauncher/EventIds.h>
+#include <clusters/AudioControl/EventIds.h>
 #include <clusters/AudioOutput/EventIds.h>
 #include <clusters/AvAnalysis/EventIds.h>
 #include <clusters/BallastConfiguration/EventIds.h>
@@ -48,6 +49,7 @@
 #include <clusters/ClosureDimension/EventIds.h>
 #include <clusters/ColorControl/EventIds.h>
 #include <clusters/CommissionerControl/EventIds.h>
+#include <clusters/CommissioningProxy/EventIds.h>
 #include <clusters/CommodityMetering/EventIds.h>
 #include <clusters/CommodityPrice/EventIds.h>
 #include <clusters/CommodityTariff/EventIds.h>

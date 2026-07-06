@@ -63,6 +63,10 @@
 #include <clusters/ApplicationLauncher/Commands.ipp>
 #include <clusters/ApplicationLauncher/Events.ipp>
 #include <clusters/ApplicationLauncher/Structs.ipp>
+#include <clusters/AudioControl/Attributes.ipp>
+#include <clusters/AudioControl/Commands.ipp>
+#include <clusters/AudioControl/Events.ipp>
+#include <clusters/AudioControl/Structs.ipp>
 #include <clusters/AudioOutput/Attributes.ipp>
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
@@ -135,6 +139,10 @@
 #include <clusters/CommissionerControl/Commands.ipp>
 #include <clusters/CommissionerControl/Events.ipp>
 #include <clusters/CommissionerControl/Structs.ipp>
+#include <clusters/CommissioningProxy/Attributes.ipp>
+#include <clusters/CommissioningProxy/Commands.ipp>
+#include <clusters/CommissioningProxy/Events.ipp>
+#include <clusters/CommissioningProxy/Structs.ipp>
 #include <clusters/CommodityMetering/Attributes.ipp>
 #include <clusters/CommodityMetering/Commands.ipp>
 #include <clusters/CommodityMetering/Events.ipp>
@@ -1342,6 +1350,19 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::CommissioningProxy::Id: {
+        switch (aCommand)
+        {
+        case Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::Channel::Id: {
         switch (aCommand)
         {
@@ -1428,6 +1449,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ContentAppObserver::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AudioControl::Id: {
         switch (aCommand)
         {
         default:
@@ -1614,6 +1642,41 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::CommodityPrice::Id) &&
         (aCommand == Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyConnectResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyScanRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyScanResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Id))
     {
         return true;
     }

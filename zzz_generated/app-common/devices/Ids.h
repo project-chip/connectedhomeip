@@ -158,6 +158,9 @@ constexpr uint8_t kNetworkInfrastructureManagerDeviceTypeRevision = 2;
 constexpr DeviceTypeId kThreadBorderRouterDeviceTypeId  = 0x00000091;
 constexpr uint8_t kThreadBorderRouterDeviceTypeRevision = 1;
 
+constexpr DeviceTypeId kCommissioningByProxyDeviceTypeId  = 0x00000092;
+constexpr uint8_t kCommissioningByProxyDeviceTypeRevision = 1;
+
 constexpr DeviceTypeId kOnOffLightDeviceTypeId  = 0x00000100;
 constexpr uint8_t kOnOffLightDeviceTypeRevision = 4;
 
@@ -240,13 +243,13 @@ constexpr DeviceTypeId kWindowCoveringControllerDeviceTypeId  = 0x00000203;
 constexpr uint8_t kWindowCoveringControllerDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kClosureDeviceTypeId  = 0x00000230;
-constexpr uint8_t kClosureDeviceTypeRevision = 1;
+constexpr uint8_t kClosureDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kClosurePanelDeviceTypeId  = 0x00000231;
-constexpr uint8_t kClosurePanelDeviceTypeRevision = 1;
+constexpr uint8_t kClosurePanelDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kClosureControllerDeviceTypeId  = 0x0000023E;
-constexpr uint8_t kClosureControllerDeviceTypeRevision = 1;
+constexpr uint8_t kClosureControllerDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kThermostatDeviceTypeId  = 0x00000301;
 constexpr uint8_t kThermostatDeviceTypeRevision = 4;

@@ -41,7 +41,8 @@ DEFAULT_SYSROOT="$HOME/.cache/matter/msan_sysroot"
 IGNORELIST="$CHIP_ROOT/build/config/compiler/msan_ignorelist.txt"
 SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 SRC="${TMPDIR:-/tmp}/msan-build"
-MSAN="-fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer -fPIC"
+# MSAN flags and the dep compiler are mode-dependent (local vs --oss-fuzz); computed below
+# once arguments and the environment have been parsed.
 
 # Pinned for reproducibility and to keep msan_ignorelist.txt source paths
 # matching. On bump: verify clean MSAN build, no new false positives, and
@@ -55,7 +56,7 @@ GLIB_SERIES="${GLIB_VERSION%.*}" # GNOME download path uses major.minor (e.g. 2.
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [--out-dir PATH] [--force] [--check] [--help]
+Usage: $(basename "$0") [--out-dir PATH] [--force] [--check] [--oss-fuzz] [--help]
 
 Builds an MSan-instrumented sysroot for Matter MSAN tests.
 
@@ -64,6 +65,10 @@ Options:
   --force          Rebuild even if the existing sysroot is current
   --check          Report freshness only; exit 0 if current, 2 if missing,
                    3 if stale. Does not start a build.
+  --oss-fuzz       Build for an OSS-Fuzz container: use the OSS-Fuzz compiler
+                   (\$CC/\$CXX) and \$CFLAGS (which already carry -fsanitize=memory),
+                   and SKIP building libc++ (OSS-Fuzz ships its own instrumented
+                   libc++ at /usr/msan). Builds only the C dependencies.
   --help           Show this message
 
 Environment:
@@ -82,6 +87,7 @@ EOF
 
 FORCE=0
 CHECK_ONLY=0
+OSS_FUZZ=0
 OUT_DIR=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -95,6 +101,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --check)
             CHECK_ONLY=1
+            shift
+            ;;
+        --oss-fuzz)
+            OSS_FUZZ=1
             shift
             ;;
         --help | -h)
@@ -113,20 +123,36 @@ SYSROOT="${OUT_DIR:-${SYSROOT_MSAN:-$DEFAULT_SYSROOT}}"
 STAMP="$SYSROOT/.build_complete"
 LOCKFILE="$SYSROOT/.build.lock"
 
-if [[ ! -x "$PW_CLANG" ]] || [[ ! -x "$PW_CLANGXX" ]]; then
-    echo "ERROR: Pigweed clang/clang++ not found on PATH" >&2
-    echo "  clang:   ${PW_CLANG:-<none>}" >&2
-    echo "  clang++: ${PW_CLANGXX:-<none>}" >&2
-    echo "Run: source scripts/activate.sh" >&2
-    exit 1
-fi
+# Resolve the dependency compiler and the MSAN compile flags.
+#   Local:    Pigweed's clang builds an instrumented libc++ and the C deps; the
+#             "is this Pigweed's clang" guard below catches a forgotten activate.sh.
+#   OSS-Fuzz: the container provides $CC/$CXX and $CFLAGS (already carrying
+#             -fsanitize=memory -fsanitize-memory-track-origins). libc++ is shipped
+#             instrumented at /usr/msan, so it is NOT built here.
+if [[ "$OSS_FUZZ" -eq 1 ]]; then
+    CC_BIN="${CC:-clang}"
+    CXX_BIN="${CXX:-clang++}"
+    MSAN="${CFLAGS:-} -fPIC"
+else
+    if [[ ! -x "$PW_CLANG" ]] || [[ ! -x "$PW_CLANGXX" ]]; then
+        echo "ERROR: Pigweed clang/clang++ not found on PATH" >&2
+        echo "  clang:   ${PW_CLANG:-<none>}" >&2
+        echo "  clang++: ${PW_CLANGXX:-<none>}" >&2
+        echo "Run: source scripts/activate.sh" >&2
+        exit 1
+    fi
 
-LLVM_COMMIT="$("$PW_CLANG" --version | grep -oP '[0-9a-f]{40}' || true)"
-if [[ -z "$LLVM_COMMIT" ]]; then
-    echo "ERROR: clang on PATH is not Pigweed's (no LLVM commit in --version)" >&2
-    echo "  clang: $PW_CLANG" >&2
-    echo "Run: source scripts/activate.sh" >&2
-    exit 1
+    LLVM_COMMIT="$("$PW_CLANG" --version | grep -oP '[0-9a-f]{40}' || true)"
+    if [[ -z "$LLVM_COMMIT" ]]; then
+        echo "ERROR: clang on PATH is not Pigweed's (no LLVM commit in --version)" >&2
+        echo "  clang: $PW_CLANG" >&2
+        echo "Run: source scripts/activate.sh" >&2
+        exit 1
+    fi
+
+    CC_BIN="$PW_CLANG"
+    CXX_BIN="$PW_CLANGXX"
+    MSAN="-fsanitize=memory -fsanitize-memory-track-origins -fno-omit-frame-pointer -fPIC"
 fi
 
 if [[ ! -f "$IGNORELIST" ]]; then
@@ -143,7 +169,7 @@ compute_input_hash() {
     {
         sha256sum <"$SCRIPT_PATH" | cut -d' ' -f1
         sha256sum <"$IGNORELIST" | cut -d' ' -f1
-        "$PW_CLANG" --version
+        "$CC_BIN" --version
     } | sha256sum | cut -d' ' -f1
 }
 
@@ -197,28 +223,32 @@ trap on_error ERR
 
 echo ">>> Building MSAN sysroot at $SYSROOT (this takes 5-15 min)"
 
-# libc++ / libc++abi (MSan-instrumented)
-echo ">>> libc++ / libc++abi"
-if [[ ! -d "$SRC/llvm-project" ]]; then
-    git clone --depth 1 https://llvm.googlesource.com/llvm-project "$SRC/llvm-project"
+# libc++ / libc++abi (MSan-instrumented). Skipped under --oss-fuzz: the OSS-Fuzz base image
+# already ships an instrumented libc++ at /usr/msan built with its own clang, and reusing
+# ours (built with Pigweed clang) would mismatch the fuzzer's compiler.
+if [[ "$OSS_FUZZ" -eq 0 ]]; then
+    echo ">>> libc++ / libc++abi"
+    if [[ ! -d "$SRC/llvm-project" ]]; then
+        git clone --depth 1 https://llvm.googlesource.com/llvm-project "$SRC/llvm-project"
+    fi
+    cd "$SRC/llvm-project"
+    git fetch --depth 1 origin "$LLVM_COMMIT"
+    git checkout FETCH_HEAD
+    cmake -GNinja -S "$SRC/llvm-project/runtimes" -B "$SRC/libcxx" \
+        -DCMAKE_C_COMPILER="$CC_BIN" -DCMAKE_CXX_COMPILER="$CXX_BIN" \
+        -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" -DCMAKE_BUILD_TYPE=Release \
+        -DLLVM_USE_SANITIZER=MemoryWithOrigins -DCMAKE_INSTALL_PREFIX="$SYSROOT" \
+        -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=OFF
+    ninja -C "$SRC/libcxx" -j"$(nproc)" cxx cxxabi
+    ninja -C "$SRC/libcxx" install-cxx install-cxxabi
 fi
-cd "$SRC/llvm-project"
-git fetch --depth 1 origin "$LLVM_COMMIT"
-git checkout FETCH_HEAD
-cmake -GNinja -S "$SRC/llvm-project/runtimes" -B "$SRC/libcxx" \
-    -DCMAKE_C_COMPILER="$PW_CLANG" -DCMAKE_CXX_COMPILER="$PW_CLANGXX" \
-    -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" -DCMAKE_BUILD_TYPE=Release \
-    -DLLVM_USE_SANITIZER=MemoryWithOrigins -DCMAKE_INSTALL_PREFIX="$SYSROOT" \
-    -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_USE_LLVM_UNWINDER=OFF
-ninja -C "$SRC/libcxx" -j"$(nproc)" cxx cxxabi
-ninja -C "$SRC/libcxx" install-cxx install-cxxabi
 
 # OpenSSL
 echo ">>> OpenSSL"
 cd "$SRC"
 [[ -d "openssl-$OPENSSL_VERSION" ]] || { wget -q "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" && tar xzf "openssl-$OPENSSL_VERSION.tar.gz"; }
 cd "openssl-$OPENSSL_VERSION"
-CC="$PW_CLANG $MSAN" ./Configure linux-x86_64 --prefix="$SYSROOT" --openssldir="$SYSROOT/ssl" no-asm no-shared -DPURIFY
+CC="$CC_BIN $MSAN" ./Configure linux-x86_64 --prefix="$SYSROOT" --openssldir="$SYSROOT/ssl" no-asm no-shared -DPURIFY
 make -j"$(nproc)" build_libs
 make install_dev
 
@@ -227,7 +257,7 @@ echo ">>> zlib"
 cd "$SRC"
 [[ -d "zlib-$ZLIB_VERSION" ]] || { wget -q -O - "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.gz" | tar xz; }
 cd "zlib-$ZLIB_VERSION"
-CC="$PW_CLANG" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" ./configure --prefix="$SYSROOT" --static
+CC="$CC_BIN" CFLAGS="$MSAN" LDFLAGS="-fsanitize=memory ${LDFLAGS:-}" ./configure --prefix="$SYSROOT" --static
 make -j"$(nproc)" && make install
 
 # libffi
@@ -235,7 +265,7 @@ echo ">>> libffi"
 cd "$SRC"
 [[ -d "libffi-$LIBFFI_VERSION" ]] || { wget -q "https://github.com/libffi/libffi/releases/download/v$LIBFFI_VERSION/libffi-$LIBFFI_VERSION.tar.gz" && tar xzf "libffi-$LIBFFI_VERSION.tar.gz"; }
 cd "libffi-$LIBFFI_VERSION"
-CC="$PW_CLANG" CXX="$PW_CLANGXX" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
+CC="$CC_BIN" CXX="$CXX_BIN" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory ${LDFLAGS:-}" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
 
@@ -244,7 +274,7 @@ echo ">>> pcre2"
 cd "$SRC"
 [[ -d "pcre2-$PCRE2_VERSION" ]] || { wget -q "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$PCRE2_VERSION/pcre2-$PCRE2_VERSION.tar.gz" && tar xzf "pcre2-$PCRE2_VERSION.tar.gz"; }
 cd "pcre2-$PCRE2_VERSION"
-CC="$PW_CLANG" CXX="$PW_CLANGXX" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory" \
+CC="$CC_BIN" CXX="$CXX_BIN" CFLAGS="$MSAN" CXXFLAGS="$MSAN" LDFLAGS="-fsanitize=memory ${LDFLAGS:-}" \
     ./configure --prefix="$SYSROOT" --disable-shared --enable-static --quiet
 make -j"$(nproc)" && make install
 
@@ -253,17 +283,27 @@ echo ">>> GLib"
 cd "$SRC"
 [[ -d "glib-$GLIB_VERSION" ]] || { wget -q "https://download.gnome.org/sources/glib/$GLIB_SERIES/glib-$GLIB_VERSION.tar.xz" && tar xf "glib-$GLIB_VERSION.tar.xz"; }
 
+# Meson wants the flags as a quoted array (one element per flag). Split $MSAN on whitespace
+# into individual flags so the GLib build uses the same flag set as the other deps (the
+# OSS-Fuzz $CFLAGS or the local default). NOTE: $MSAN must NOT be a single quoted word here,
+# or meson collapses every flag into one c_args element and clang rejects it
+# ("unsupported argument ... to option '-fsanitize='"). read -ra splits explicitly and keeps
+# shellcheck happy (vs. an unquoted $MSAN, which a linter is prone to "fix" back into one word).
+read -ra _msan_flags <<<"$MSAN"
+_msan_meson=""
+for _f in "${_msan_flags[@]}"; do _msan_meson+="'$_f', "; done
+
 cat >"$SRC/msan-native.ini" <<EOF
 [binaries]
-c = '$PW_CLANG'
-cpp = '$PW_CLANGXX'
+c = '$CC_BIN'
+cpp = '$CXX_BIN'
 ar = 'ar'
 strip = 'strip'
 pkgconfig = 'pkg-config'
 
 [built-in options]
-c_args = ['-fsanitize=memory', '-fsanitize-memory-track-origins', '-fno-omit-frame-pointer', '-fPIC', '-Wno-error=implicit-function-declaration', '-fsanitize-ignorelist=$IGNORELIST']
-cpp_args = ['-fsanitize=memory', '-fsanitize-memory-track-origins', '-fno-omit-frame-pointer', '-fPIC', '-fsanitize-ignorelist=$IGNORELIST']
+c_args = [${_msan_meson}'-fsanitize-ignorelist=$IGNORELIST', '-Wno-error=implicit-function-declaration']
+cpp_args = [${_msan_meson}'-fsanitize-ignorelist=$IGNORELIST']
 c_link_args = ['-fsanitize=memory']
 cpp_link_args = ['-fsanitize=memory']
 
