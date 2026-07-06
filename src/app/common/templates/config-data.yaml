@@ -156,11 +156,11 @@ CodeDrivenClusters:
     - Software Diagnostics
     - Soil Measurement
     - Switch
-    - Thermostat
     - TLS Certificate Management
     - TLS Client Management
     - Temperature Control
     - Temperature Measurement
+    - Thermostat
     - Thread Border Router Management
     - Thread Network Diagnostics
     - Time Format Localization

@@ -19,16 +19,16 @@
 #include "PresetStructWithOwnedMembers.h"
 #include "ThermostatClusterEvents.h"
 
-#include <clusters/Thermostat/Attributes.h>
-#include <clusters/Thermostat/Events.h>
-#include <clusters/Thermostat/Structs.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server/Server.h>
+#include <clusters/Thermostat/Attributes.h>
+#include <clusters/Thermostat/Events.h>
 #include <clusters/Thermostat/Metadata.h>
+#include <clusters/Thermostat/Structs.h>
 #include <lib/core/CHIPEncoding.h>
 
 #include <algorithm>
@@ -84,10 +84,9 @@ int16_t ThermostatCluster::EnforceCoolingSetpointLimits(int16_t coolingSetpoint)
     return coolingSetpoint;
 }
 
-
 ThermostatCluster::ThermostatCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, Thermostat::Id }),
-    mFabricTable(config.mFabricTable), mFeatures(config.mFeatureMap), mOptionalAttributes(config.mOptionalAttributes)
+    DefaultServerCluster({ config.mEndpointId, Thermostat::Id }), mFabricTable(config.mFabricTable), mFeatures(config.mFeatureMap),
+    mOptionalAttributes(config.mOptionalAttributes)
 {
     mAbsMinHeatSetpointLimit          = config.mAbsMinHeatSetpointLimit;
     mAbsMaxHeatSetpointLimit          = config.mAbsMaxHeatSetpointLimit;
@@ -116,24 +115,24 @@ void ThermostatCluster::LoadPersistentAttributes()
 {
     AttributePersistence attrPersistence{ DefaultServerCluster::mContext->attributeStorage };
 
-    const auto defaultLocalTempCalib    = mLocalTemperatureCalibration;
-    const auto defaultOccupiedCoolingSetpoint = mOccupiedCoolingSetpoint;
-    const auto defaultOccupiedHeatingSetpoint = mOccupiedHeatingSetpoint;
-    const auto defaultUnoccupiedCoolingSetpoint = mUnoccupiedCoolingSetpoint;
-    const auto defaultUnoccupiedHeatingSetpoint = mUnoccupiedHeatingSetpoint;
-    const auto defaultMinSetpointDeadBand = mMinSetpointDeadBand;
-    const auto defaultRemoteSensing = mRemoteSensing.Raw();
+    const auto defaultLocalTempCalib             = mLocalTemperatureCalibration;
+    const auto defaultOccupiedCoolingSetpoint    = mOccupiedCoolingSetpoint;
+    const auto defaultOccupiedHeatingSetpoint    = mOccupiedHeatingSetpoint;
+    const auto defaultUnoccupiedCoolingSetpoint  = mUnoccupiedCoolingSetpoint;
+    const auto defaultUnoccupiedHeatingSetpoint  = mUnoccupiedHeatingSetpoint;
+    const auto defaultMinSetpointDeadBand        = mMinSetpointDeadBand;
+    const auto defaultRemoteSensing              = mRemoteSensing.Raw();
     const auto defaultControlSequenceOfOperation = mControlSequenceOfOperation;
-    const auto defaultSystemMode = mSystemMode;
-    const auto defaultTsph              = mTemperatureSetpointHold;
-    const auto defaultTsphDuration      = mTemperatureSetpointHoldDuration;
-    const auto defaultEhd               = mEmergencyHeatDelta;
-    const auto defaultACType            = mACType;
-    const auto defaultACCapacity        = mACCapacity;
-    const auto defaultACRefrigerantType = mACRefrigerantType;
-    const auto defaultACCompressorType  = mACCompressorType;
-    const auto defaultACLouverPos       = mACLouverPosition;
-    const auto defaultACCapacityFmt     = mACCapacityFormat;
+    const auto defaultSystemMode                 = mSystemMode;
+    const auto defaultTsph                       = mTemperatureSetpointHold;
+    const auto defaultTsphDuration               = mTemperatureSetpointHoldDuration;
+    const auto defaultEhd                        = mEmergencyHeatDelta;
+    const auto defaultACType                     = mACType;
+    const auto defaultACCapacity                 = mACCapacity;
+    const auto defaultACRefrigerantType          = mACRefrigerantType;
+    const auto defaultACCompressorType           = mACCompressorType;
+    const auto defaultACLouverPos                = mACLouverPosition;
+    const auto defaultACCapacityFmt              = mACCapacityFormat;
 
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
                                           mLocalTemperatureCalibration, defaultLocalTempCalib);
@@ -145,40 +144,39 @@ void ThermostatCluster::LoadPersistentAttributes()
                                           mUnoccupiedCoolingSetpoint, defaultUnoccupiedCoolingSetpoint);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, UnoccupiedHeatingSetpoint::Id },
                                           mUnoccupiedHeatingSetpoint, defaultUnoccupiedHeatingSetpoint);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinHeatSetpointLimit::Id },
-                                          mMinHeatSetpointLimit, mAbsMinHeatSetpointLimit);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id },
-                                          mMaxHeatSetpointLimit, mAbsMaxHeatSetpointLimit);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinCoolSetpointLimit::Id },
-                                          mMinCoolSetpointLimit, mAbsMinCoolSetpointLimit);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id },
-                                          mMaxCoolSetpointLimit, mAbsMaxCoolSetpointLimit);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id },
-                                          mMinSetpointDeadBand, defaultMinSetpointDeadBand);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinHeatSetpointLimit::Id }, mMinHeatSetpointLimit,
+                                          mAbsMinHeatSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MaxHeatSetpointLimit::Id }, mMaxHeatSetpointLimit,
+                                          mAbsMaxHeatSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinCoolSetpointLimit::Id }, mMinCoolSetpointLimit,
+                                          mAbsMinCoolSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MaxCoolSetpointLimit::Id }, mMaxCoolSetpointLimit,
+                                          mAbsMaxCoolSetpointLimit);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id }, mMinSetpointDeadBand,
+                                          defaultMinSetpointDeadBand);
     uint8_t tempRemoteSensing;
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, RemoteSensing::Id },
-                                          tempRemoteSensing, defaultRemoteSensing);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, RemoteSensing::Id }, tempRemoteSensing,
+                                          defaultRemoteSensing);
     mRemoteSensing.SetRaw(tempRemoteSensing);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id },
                                           mControlSequenceOfOperation, defaultControlSequenceOfOperation);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SystemMode::Id },
-                                          mSystemMode, defaultSystemMode);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, SystemMode::Id }, mSystemMode, defaultSystemMode);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHold::Id },
                                           mTemperatureSetpointHold, defaultTsph);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, TemperatureSetpointHoldDuration::Id },
                                           mTemperatureSetpointHoldDuration, defaultTsphDuration);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, EmergencyHeatDelta::Id },
-                                          mEmergencyHeatDelta, defaultEhd);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, EmergencyHeatDelta::Id }, mEmergencyHeatDelta,
+                                          defaultEhd);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACType::Id }, mACType, defaultACType);
     attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCapacity::Id }, mACCapacity, defaultACCapacity);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id },
-                                          mACRefrigerantType, defaultACRefrigerantType);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id },
-                                          mACCompressorType, defaultACCompressorType);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
-                                          mACLouverPosition, defaultACLouverPos);
-    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
-                                          mACCapacityFormat, defaultACCapacityFmt);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id }, mACRefrigerantType,
+                                          defaultACRefrigerantType);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id }, mACCompressorType,
+                                          defaultACCompressorType);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id }, mACLouverPosition,
+                                          defaultACLouverPos);
+    attrPersistence.LoadNativeEndianValue({ mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id }, mACCapacityFormat,
+                                          defaultACCapacityFmt);
 
     // Load binary handle attributes using raw ReadValue.
     {
@@ -589,16 +587,15 @@ bool ThermostatCluster::SetAndPersistSetpoint(int16_t & member, int16_t value, A
         return false;
     }
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, attributeId },
-        { reinterpret_cast<const uint8_t *>(&member), sizeof(member) }));
+        { mPath.mEndpointId, Thermostat::Id, attributeId }, { reinterpret_cast<const uint8_t *>(&member), sizeof(member) }));
     return true;
 }
 
 Protocols::InteractionModel::Status ThermostatCluster::HandleOccupancyHeatingSetpoint(int16_t value, AttributeId attributeId)
 {
-    VerifyOrReturnError(value >= mAbsMinHeatSetpointLimit && value >= mMinHeatSetpointLimit &&
-                                value <= mAbsMaxHeatSetpointLimit && value <= mMaxHeatSetpointLimit,
-                            Status::InvalidValue);
+    VerifyOrReturnError(value >= mAbsMinHeatSetpointLimit && value >= mMinHeatSetpointLimit && value <= mAbsMaxHeatSetpointLimit &&
+                            value <= mMaxHeatSetpointLimit,
+                        Status::InvalidValue);
     if (mFeatures.Has(Feature::kAutoMode))
     {
         int16_t maxCooling = std::min(mMaxCoolSetpointLimit, mAbsMaxCoolSetpointLimit);
@@ -619,8 +616,8 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleOccupancyHeatingSet
 
 Protocols::InteractionModel::Status ThermostatCluster::HandleOccupancyCoolingSetpoint(int16_t value, AttributeId attributeId)
 {
-    VerifyOrReturnError(value >= mAbsMinCoolSetpointLimit && value >= mMinCoolSetpointLimit &&
-                            value <= mAbsMaxCoolSetpointLimit && value <= mMaxCoolSetpointLimit,
+    VerifyOrReturnError(value >= mAbsMinCoolSetpointLimit && value >= mMinCoolSetpointLimit && value <= mAbsMaxCoolSetpointLimit &&
+                            value <= mMaxCoolSetpointLimit,
                         Status::InvalidValue);
     if (mFeatures.Has(Feature::kAutoMode))
     {
@@ -642,8 +639,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleOccupancyCoolingSet
 
 Protocols::InteractionModel::Status ThermostatCluster::HandleMinHeatSetpointLimit(int16_t value)
 {
-    VerifyOrReturnError(value >= mAbsMinHeatSetpointLimit && value <= mMaxHeatSetpointLimit &&
-                            value <= mAbsMaxHeatSetpointLimit,
+    VerifyOrReturnError(value >= mAbsMinHeatSetpointLimit && value <= mMaxHeatSetpointLimit && value <= mAbsMaxHeatSetpointLimit,
                         Status::InvalidValue);
     if (mFeatures.Has(Feature::kAutoMode))
     {
@@ -655,8 +651,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinHeatSetpointLimi
 
 Protocols::InteractionModel::Status ThermostatCluster::HandleMaxHeatSetpointLimit(int16_t value)
 {
-    VerifyOrReturnError(value >= mAbsMinHeatSetpointLimit && value >= mMinHeatSetpointLimit &&
-                            value <= mAbsMaxHeatSetpointLimit,
+    VerifyOrReturnError(value >= mAbsMinHeatSetpointLimit && value >= mMinHeatSetpointLimit && value <= mAbsMaxHeatSetpointLimit,
                         Status::InvalidValue);
     if (mFeatures.Has(Feature::kAutoMode))
     {
@@ -668,8 +663,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMaxHeatSetpointLimi
 
 Protocols::InteractionModel::Status ThermostatCluster::HandleMinCoolSetpointLimit(int16_t value)
 {
-    VerifyOrReturnError(value >= mAbsMinCoolSetpointLimit && value <= mMaxCoolSetpointLimit &&
-                            value <= mAbsMaxCoolSetpointLimit,
+    VerifyOrReturnError(value >= mAbsMinCoolSetpointLimit && value <= mMaxCoolSetpointLimit && value <= mAbsMaxCoolSetpointLimit,
                         Status::InvalidValue);
     if (mFeatures.Has(Feature::kAutoMode))
     {
@@ -681,8 +675,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMinCoolSetpointLimi
 
 Protocols::InteractionModel::Status ThermostatCluster::HandleMaxCoolSetpointLimit(int16_t value)
 {
-    VerifyOrReturnError(value >= mAbsMinCoolSetpointLimit && value >= mMinCoolSetpointLimit &&
-                            value <= mAbsMaxCoolSetpointLimit,
+    VerifyOrReturnError(value >= mAbsMinCoolSetpointLimit && value >= mMinCoolSetpointLimit && value <= mAbsMaxCoolSetpointLimit,
                         Status::InvalidValue);
     if (mFeatures.Has(Feature::kAutoMode))
     {
@@ -735,13 +728,11 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleSystemMode(SystemMo
     {
     case ControlSequenceOfOperationEnum::kCoolingOnly:
     case ControlSequenceOfOperationEnum::kCoolingWithReheat:
-        VerifyOrReturnError(value != SystemModeEnum::kHeat && value != SystemModeEnum::kEmergencyHeat,
-                            Status::InvalidValue);
+        VerifyOrReturnError(value != SystemModeEnum::kHeat && value != SystemModeEnum::kEmergencyHeat, Status::InvalidValue);
         break;
     case ControlSequenceOfOperationEnum::kHeatingOnly:
     case ControlSequenceOfOperationEnum::kHeatingWithReheat:
-        VerifyOrReturnError(value != SystemModeEnum::kCool && value != SystemModeEnum::kPrecooling,
-                            Status::InvalidValue);
+        VerifyOrReturnError(value != SystemModeEnum::kCool && value != SystemModeEnum::kPrecooling, Status::InvalidValue);
         break;
     default:
         break;
@@ -825,29 +816,32 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         return HandleSystemMode(requested);
     }
     case LocalTemperatureCalibration::Id:
-        return NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id,
+        return NotifyAttributeChangedIfSuccess(
+            LocalTemperatureCalibration::Id,
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalTemperatureCalibration));
     case TemperatureSetpointHold::Id:
-        return NotifyAttributeChangedIfSuccess(TemperatureSetpointHold::Id,
+        return NotifyAttributeChangedIfSuccess(
+            TemperatureSetpointHold::Id,
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mTemperatureSetpointHold));
     case TemperatureSetpointHoldDuration::Id:
-        return NotifyAttributeChangedIfSuccess(TemperatureSetpointHoldDuration::Id,
+        return NotifyAttributeChangedIfSuccess(
+            TemperatureSetpointHoldDuration::Id,
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mTemperatureSetpointHoldDuration));
     case EmergencyHeatDelta::Id:
-        return NotifyAttributeChangedIfSuccess(EmergencyHeatDelta::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mEmergencyHeatDelta));
+        return NotifyAttributeChangedIfSuccess(
+            EmergencyHeatDelta::Id, persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mEmergencyHeatDelta));
     case ACType::Id:
         return NotifyAttributeChangedIfSuccess(ACType::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACType));
+                                               persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACType));
     case ACCapacity::Id:
         return NotifyAttributeChangedIfSuccess(ACCapacity::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacity));
+                                               persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacity));
     case ACRefrigerantType::Id:
-        return NotifyAttributeChangedIfSuccess(ACRefrigerantType::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACRefrigerantType));
+        return NotifyAttributeChangedIfSuccess(
+            ACRefrigerantType::Id, persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACRefrigerantType));
     case ACCompressorType::Id:
-        return NotifyAttributeChangedIfSuccess(ACCompressorType::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCompressorType));
+        return NotifyAttributeChangedIfSuccess(
+            ACCompressorType::Id, persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCompressorType));
     case ACErrorCode::Id: {
         Attributes::ACErrorCode::TypeInfo::Type requested;
         ReturnErrorOnFailure(decoder.Decode(requested));
@@ -855,11 +849,11 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteAttribute(const DataModel:
         return CHIP_NO_ERROR;
     }
     case ACLouverPosition::Id:
-        return NotifyAttributeChangedIfSuccess(ACLouverPosition::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACLouverPosition));
+        return NotifyAttributeChangedIfSuccess(
+            ACLouverPosition::Id, persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACLouverPosition));
     case ACCapacityformat::Id:
-        return NotifyAttributeChangedIfSuccess(ACCapacityformat::Id,
-            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacityFormat));
+        return NotifyAttributeChangedIfSuccess(
+            ACCapacityformat::Id, persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mACCapacityFormat));
     default:
         return Status::UnsupportedWrite;
     }
@@ -1022,8 +1016,8 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
             if (coolLimit != 0 || heatLimit != 0)
             {
                 int16_t adjust = (abs(coolLimit) <= abs(heatLimit)) ? heatLimit : coolLimit;
-                desiredHeating  = static_cast<int16_t>(desiredHeating - adjust);
-                desiredCooling  = static_cast<int16_t>(desiredCooling - adjust);
+                desiredHeating = static_cast<int16_t>(desiredHeating - adjust);
+                desiredCooling = static_cast<int16_t>(desiredCooling - adjust);
             }
             if (SetAndPersistSetpoint(mOccupiedCoolingSetpoint, desiredCooling, OccupiedCoolingSetpoint::Id))
             {
@@ -1123,25 +1117,30 @@ ThermostatCluster::HandleSetpointRaiseLower(const Commands::SetpointRaiseLower::
 CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    const bool heat = mFeatures.Has(Feature::kHeating);
-    const bool cool = mFeatures.Has(Feature::kCooling);
-    const bool occ  = mFeatures.Has(Feature::kOccupancy);
+    const bool heat  = mFeatures.Has(Feature::kHeating);
+    const bool cool  = mFeatures.Has(Feature::kCooling);
+    const bool occ   = mFeatures.Has(Feature::kOccupancy);
     const bool autoM = mFeatures.Has(Feature::kAutoMode);
-    const bool ltne = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
-    const bool msch = mFeatures.Has(Feature::kMatterScheduleConfiguration);
-    const bool pres = mFeatures.Has(Feature::kPresets);
-    const bool sugg = mFeatures.Has(Feature::kThermostatSuggestions);
-    const bool tevt = mFeatures.Has(Feature::kEvents);
+    const bool ltne  = mFeatures.Has(Feature::kLocalTemperatureNotExposed);
+    const bool msch  = mFeatures.Has(Feature::kMatterScheduleConfiguration);
+    const bool pres  = mFeatures.Has(Feature::kPresets);
+    const bool sugg  = mFeatures.Has(Feature::kThermostatSuggestions);
+    const bool tevt  = mFeatures.Has(Feature::kEvents);
 
-    using Entry = AttributeListBuilder::OptionalAttributeEntry;
+    using Entry                      = AttributeListBuilder::OptionalAttributeEntry;
     const Entry optionalAttributes[] = {
         { mOptionalAttributes.Has(OptionalAttributesBits::kOutdoorTemperature), OutdoorTemperature::kMetadataEntry },
         { occ, Occupancy::kMetadataEntry },
-        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMinHeatSetpointLimit), AbsMinHeatSetpointLimit::kMetadataEntry },
-        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMaxHeatSetpointLimit), AbsMaxHeatSetpointLimit::kMetadataEntry },
-        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMinCoolSetpointLimit), AbsMinCoolSetpointLimit::kMetadataEntry },
-        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMaxCoolSetpointLimit), AbsMaxCoolSetpointLimit::kMetadataEntry },
-        { !ltne && mOptionalAttributes.Has(OptionalAttributesBits::kLocalTemperatureCalibration), LocalTemperatureCalibration::kMetadataEntry },
+        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMinHeatSetpointLimit),
+          AbsMinHeatSetpointLimit::kMetadataEntry },
+        { heat && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMaxHeatSetpointLimit),
+          AbsMaxHeatSetpointLimit::kMetadataEntry },
+        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMinCoolSetpointLimit),
+          AbsMinCoolSetpointLimit::kMetadataEntry },
+        { cool && mOptionalAttributes.Has(OptionalAttributesBits::kAbsMaxCoolSetpointLimit),
+          AbsMaxCoolSetpointLimit::kMetadataEntry },
+        { !ltne && mOptionalAttributes.Has(OptionalAttributesBits::kLocalTemperatureCalibration),
+          LocalTemperatureCalibration::kMetadataEntry },
         { cool, OccupiedCoolingSetpoint::kMetadataEntry },
         { heat, OccupiedHeatingSetpoint::kMetadataEntry },
         { cool && occ, UnoccupiedCoolingSetpoint::kMetadataEntry },
@@ -1152,13 +1151,16 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
         { cool && mOptionalAttributes.Has(OptionalAttributesBits::kMaxCoolSetpointLimit), MaxCoolSetpointLimit::kMetadataEntry },
         { autoM, MinSetpointDeadBand::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kRemoteSensing), RemoteSensing::kMetadataEntry },
-        { (autoM && tevt) || (autoM && mOptionalAttributes.Has(OptionalAttributesBits::kThermostatRunningMode)), ThermostatRunningMode::kMetadataEntry },
+        { (autoM && tevt) || (autoM && mOptionalAttributes.Has(OptionalAttributesBits::kThermostatRunningMode)),
+          ThermostatRunningMode::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kTemperatureSetpointHold), TemperatureSetpointHold::kMetadataEntry },
-        { mOptionalAttributes.Has(OptionalAttributesBits::kTemperatureSetpointHoldDuration), TemperatureSetpointHoldDuration::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kTemperatureSetpointHoldDuration),
+          TemperatureSetpointHoldDuration::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kThermostatRunningState), ThermostatRunningState::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointChangeSource), SetpointChangeSource::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointChangeAmount), SetpointChangeAmount::kMetadataEntry },
-        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointChangeSourceTimestamp), SetpointChangeSourceTimestamp::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointChangeSourceTimestamp),
+          SetpointChangeSourceTimestamp::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kEmergencyHeatDelta), EmergencyHeatDelta::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kACType), ACType::kMetadataEntry },
         { mOptionalAttributes.Has(OptionalAttributesBits::kACCapacity), ACCapacity::kMetadataEntry },
@@ -1178,7 +1180,8 @@ CHIP_ERROR ThermostatCluster::Attributes(const ConcreteClusterPath & path,
         { msch, ActiveScheduleHandle::kMetadataEntry },
         { pres, Presets::kMetadataEntry },
         { msch, Schedules::kMetadataEntry },
-        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointHoldExpiryTimestamp), SetpointHoldExpiryTimestamp::kMetadataEntry },
+        { mOptionalAttributes.Has(OptionalAttributesBits::kSetpointHoldExpiryTimestamp),
+          SetpointHoldExpiryTimestamp::kMetadataEntry },
         { sugg, MaxThermostatSuggestions::kMetadataEntry },
         { sugg, ThermostatSuggestions::kMetadataEntry },
         { sugg, CurrentThermostatSuggestion::kMetadataEntry },
@@ -1240,9 +1243,9 @@ CHIP_ERROR ThermostatCluster::AcceptedCommands(const ConcreteClusterPath & path,
 
 CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    static constexpr CommandId kGetWeeklyScheduleResponse[]      = { Commands::GetWeeklyScheduleResponse::Id };
+    static constexpr CommandId kGetWeeklyScheduleResponse[]       = { Commands::GetWeeklyScheduleResponse::Id };
     static constexpr CommandId kAddThermostatSuggestionResponse[] = { Commands::AddThermostatSuggestionResponse::Id };
-    static constexpr CommandId kAtomicResponse[]                 = { Commands::AtomicResponse::Id };
+    static constexpr CommandId kAtomicResponse[]                  = { Commands::AtomicResponse::Id };
 
     if (mFeatures.Has(Feature::kScheduleConfiguration))
     {
@@ -1298,8 +1301,11 @@ BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> ThermostatCluster::Get
 void ThermostatCluster::SetLocalTemperatureCalibration(int8_t value)
 {
     VerifyOrReturn(value != mLocalTemperatureCalibration);
-    NotifyAttributeChangedIfSuccess(LocalTemperatureCalibration::Id, DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id }, { reinterpret_cast<const uint8_t *>(&mLocalTemperatureCalibration), sizeof(mLocalTemperatureCalibration) }));
+    NotifyAttributeChangedIfSuccess(
+        LocalTemperatureCalibration::Id,
+        DefaultServerCluster::mContext->attributeStorage.WriteValue(
+            { mPath.mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
+            { reinterpret_cast<const uint8_t *>(&mLocalTemperatureCalibration), sizeof(mLocalTemperatureCalibration) }));
 }
 
 int8_t ThermostatCluster::GetLocalTemperatureCalibration()
@@ -1529,9 +1535,7 @@ void ThermostatCluster::SetACType(ACTypeEnum value)
 {
     VerifyOrReturn(SetAttributeValue(mACType, value, ACType::Id));
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
-        { mPath.mEndpointId, Thermostat::Id, ACType::Id },
-        { reinterpret_cast<const uint8_t *>(&mACType), sizeof(mACType) }));
-
+        { mPath.mEndpointId, Thermostat::Id, ACType::Id }, { reinterpret_cast<const uint8_t *>(&mACType), sizeof(mACType) }));
 }
 
 ACTypeEnum ThermostatCluster::GetACType()
@@ -1545,7 +1549,6 @@ void ThermostatCluster::SetACCapacity(uint16_t value)
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, ACCapacity::Id },
         { reinterpret_cast<const uint8_t *>(&mACCapacity), sizeof(mACCapacity) }));
-
 }
 
 uint16_t ThermostatCluster::GetACCapacity()
@@ -1559,7 +1562,6 @@ void ThermostatCluster::SetACRefrigerantType(ACRefrigerantTypeEnum value)
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, ACRefrigerantType::Id },
         { reinterpret_cast<const uint8_t *>(&mACRefrigerantType), sizeof(mACRefrigerantType) }));
-
 }
 
 ACRefrigerantTypeEnum ThermostatCluster::GetACRefrigerantType()
@@ -1573,7 +1575,6 @@ void ThermostatCluster::SetACCompressorType(ACCompressorTypeEnum value)
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, ACCompressorType::Id },
         { reinterpret_cast<const uint8_t *>(&mACCompressorType), sizeof(mACCompressorType) }));
-
 }
 
 ACCompressorTypeEnum ThermostatCluster::GetACCompressorType()
@@ -1597,7 +1598,6 @@ void ThermostatCluster::SetACLouverPosition(ACLouverPositionEnum value)
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, ACLouverPosition::Id },
         { reinterpret_cast<const uint8_t *>(&mACLouverPosition), sizeof(mACLouverPosition) }));
-
 }
 
 ACLouverPositionEnum ThermostatCluster::GetACLouverPosition()
@@ -1621,7 +1621,6 @@ void ThermostatCluster::SetACCapacityFormat(ACCapacityFormatEnum value)
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, ACCapacityformat::Id },
         { reinterpret_cast<const uint8_t *>(&mACCapacityFormat), sizeof(mACCapacityFormat) }));
-
 }
 
 ACCapacityFormatEnum ThermostatCluster::GetACCapacityFormat()
@@ -1736,7 +1735,6 @@ void ThermostatCluster::SetActiveScheduleHandle(DataModel::Nullable<ByteSpan> va
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, ActiveScheduleHandle::Id }, toStore));
 }
-
 
 } // namespace Thermostat
 } // namespace Clusters

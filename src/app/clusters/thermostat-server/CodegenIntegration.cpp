@@ -54,34 +54,34 @@ struct OptionalAttributeMapping
 };
 
 constexpr OptionalAttributeMapping kOptionalAttributeMap[] = {
-    { OutdoorTemperature::Id,              OptionalAttributesBits::kOutdoorTemperature },
-    { AbsMinHeatSetpointLimit::Id,         OptionalAttributesBits::kAbsMinHeatSetpointLimit },
-    { AbsMaxHeatSetpointLimit::Id,         OptionalAttributesBits::kAbsMaxHeatSetpointLimit },
-    { AbsMinCoolSetpointLimit::Id,         OptionalAttributesBits::kAbsMinCoolSetpointLimit },
-    { AbsMaxCoolSetpointLimit::Id,         OptionalAttributesBits::kAbsMaxCoolSetpointLimit },
-    { LocalTemperatureCalibration::Id,     OptionalAttributesBits::kLocalTemperatureCalibration },
-    { MinHeatSetpointLimit::Id,            OptionalAttributesBits::kMinHeatSetpointLimit },
-    { MaxHeatSetpointLimit::Id,            OptionalAttributesBits::kMaxHeatSetpointLimit },
-    { MinCoolSetpointLimit::Id,            OptionalAttributesBits::kMinCoolSetpointLimit },
-    { MaxCoolSetpointLimit::Id,            OptionalAttributesBits::kMaxCoolSetpointLimit },
-    { RemoteSensing::Id,                   OptionalAttributesBits::kRemoteSensing },
-    { ThermostatRunningMode::Id,           OptionalAttributesBits::kThermostatRunningMode },
-    { TemperatureSetpointHold::Id,         OptionalAttributesBits::kTemperatureSetpointHold },
+    { OutdoorTemperature::Id, OptionalAttributesBits::kOutdoorTemperature },
+    { AbsMinHeatSetpointLimit::Id, OptionalAttributesBits::kAbsMinHeatSetpointLimit },
+    { AbsMaxHeatSetpointLimit::Id, OptionalAttributesBits::kAbsMaxHeatSetpointLimit },
+    { AbsMinCoolSetpointLimit::Id, OptionalAttributesBits::kAbsMinCoolSetpointLimit },
+    { AbsMaxCoolSetpointLimit::Id, OptionalAttributesBits::kAbsMaxCoolSetpointLimit },
+    { LocalTemperatureCalibration::Id, OptionalAttributesBits::kLocalTemperatureCalibration },
+    { MinHeatSetpointLimit::Id, OptionalAttributesBits::kMinHeatSetpointLimit },
+    { MaxHeatSetpointLimit::Id, OptionalAttributesBits::kMaxHeatSetpointLimit },
+    { MinCoolSetpointLimit::Id, OptionalAttributesBits::kMinCoolSetpointLimit },
+    { MaxCoolSetpointLimit::Id, OptionalAttributesBits::kMaxCoolSetpointLimit },
+    { RemoteSensing::Id, OptionalAttributesBits::kRemoteSensing },
+    { ThermostatRunningMode::Id, OptionalAttributesBits::kThermostatRunningMode },
+    { TemperatureSetpointHold::Id, OptionalAttributesBits::kTemperatureSetpointHold },
     { TemperatureSetpointHoldDuration::Id, OptionalAttributesBits::kTemperatureSetpointHoldDuration },
-    { ThermostatRunningState::Id,          OptionalAttributesBits::kThermostatRunningState },
-    { SetpointChangeSource::Id,            OptionalAttributesBits::kSetpointChangeSource },
-    { SetpointChangeAmount::Id,            OptionalAttributesBits::kSetpointChangeAmount },
-    { SetpointChangeSourceTimestamp::Id,   OptionalAttributesBits::kSetpointChangeSourceTimestamp },
-    { EmergencyHeatDelta::Id,              OptionalAttributesBits::kEmergencyHeatDelta },
-    { ACType::Id,                          OptionalAttributesBits::kACType },
-    { ACCapacity::Id,                      OptionalAttributesBits::kACCapacity },
-    { ACRefrigerantType::Id,               OptionalAttributesBits::kACRefrigerantType },
-    { ACCompressorType::Id,                OptionalAttributesBits::kACCompressorType },
-    { ACErrorCode::Id,                     OptionalAttributesBits::kACErrorCode },
-    { ACLouverPosition::Id,                OptionalAttributesBits::kACLouverPosition },
-    { ACCoilTemperature::Id,               OptionalAttributesBits::kACCoilTemperature },
-    { ACCapacityformat::Id,                OptionalAttributesBits::kACCapacityFormat },
-    { SetpointHoldExpiryTimestamp::Id,     OptionalAttributesBits::kSetpointHoldExpiryTimestamp },
+    { ThermostatRunningState::Id, OptionalAttributesBits::kThermostatRunningState },
+    { SetpointChangeSource::Id, OptionalAttributesBits::kSetpointChangeSource },
+    { SetpointChangeAmount::Id, OptionalAttributesBits::kSetpointChangeAmount },
+    { SetpointChangeSourceTimestamp::Id, OptionalAttributesBits::kSetpointChangeSourceTimestamp },
+    { EmergencyHeatDelta::Id, OptionalAttributesBits::kEmergencyHeatDelta },
+    { ACType::Id, OptionalAttributesBits::kACType },
+    { ACCapacity::Id, OptionalAttributesBits::kACCapacity },
+    { ACRefrigerantType::Id, OptionalAttributesBits::kACRefrigerantType },
+    { ACCompressorType::Id, OptionalAttributesBits::kACCompressorType },
+    { ACErrorCode::Id, OptionalAttributesBits::kACErrorCode },
+    { ACLouverPosition::Id, OptionalAttributesBits::kACLouverPosition },
+    { ACCoilTemperature::Id, OptionalAttributesBits::kACCoilTemperature },
+    { ACCapacityformat::Id, OptionalAttributesBits::kACCapacityFormat },
+    { SetpointHoldExpiryTimestamp::Id, OptionalAttributesBits::kSetpointHoldExpiryTimestamp },
 };
 
 /// Reads the Ember/ZAP configured default for a single int16_t attribute.
@@ -182,7 +182,6 @@ void MatterThermostatClusterShutdownCallback(EndpointId endpointId, MatterCluste
         },
         integrationDelegate, shutdownType);
 }
-
 
 void MatterThermostatPluginServerInitCallback() {}
 

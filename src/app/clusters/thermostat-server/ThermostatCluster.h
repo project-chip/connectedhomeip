@@ -26,11 +26,11 @@
 
 #include "ThermostatDelegate.h"
 
-#include <clusters/Thermostat/Commands.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Thermostat/Attributes.h>
+#include <clusters/Thermostat/Commands.h>
 #include <clusters/Thermostat/Ids.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <credentials/FabricTable.h>
@@ -50,34 +50,34 @@ enum class AtomicWriteState
 
 enum class OptionalAttributesBits : uint32_t
 {
-    kOutdoorTemperature                     = 0x1,
-    kAbsMinHeatSetpointLimit                = 0x2,
-    kAbsMaxHeatSetpointLimit                = 0x4,
-    kAbsMinCoolSetpointLimit                = 0x8,
-    kAbsMaxCoolSetpointLimit                = 0x10,
-    kLocalTemperatureCalibration            = 0x20,
-    kMinHeatSetpointLimit                   = 0x40,
-    kMaxHeatSetpointLimit                   = 0x80,
-    kMinCoolSetpointLimit                   = 0x100,
-    kMaxCoolSetpointLimit                   = 0x200,
-    kRemoteSensing                          = 0x400,
-    kThermostatRunningMode                  = 0x800,
-    kTemperatureSetpointHold                = 0x1000,
-    kTemperatureSetpointHoldDuration        = 0x2000,
-    kThermostatRunningState                 = 0x4000,
-    kSetpointChangeSource                   = 0x8000,
-    kSetpointChangeAmount                   = 0x10000,
-    kSetpointChangeSourceTimestamp          = 0x20000,
-    kEmergencyHeatDelta                     = 0x40000,
-    kACType                                 = 0x80000,
-    kACCapacity                             = 0x100000,
-    kACRefrigerantType                      = 0x200000,
-    kACCompressorType                       = 0x400000,
-    kACErrorCode                            = 0x800000,
-    kACLouverPosition                       = 0x1000000,
-    kACCoilTemperature                      = 0x2000000,
-    kACCapacityFormat                       = 0x4000000,
-    kSetpointHoldExpiryTimestamp            = 0x8000000,
+    kOutdoorTemperature              = 0x1,
+    kAbsMinHeatSetpointLimit         = 0x2,
+    kAbsMaxHeatSetpointLimit         = 0x4,
+    kAbsMinCoolSetpointLimit         = 0x8,
+    kAbsMaxCoolSetpointLimit         = 0x10,
+    kLocalTemperatureCalibration     = 0x20,
+    kMinHeatSetpointLimit            = 0x40,
+    kMaxHeatSetpointLimit            = 0x80,
+    kMinCoolSetpointLimit            = 0x100,
+    kMaxCoolSetpointLimit            = 0x200,
+    kRemoteSensing                   = 0x400,
+    kThermostatRunningMode           = 0x800,
+    kTemperatureSetpointHold         = 0x1000,
+    kTemperatureSetpointHoldDuration = 0x2000,
+    kThermostatRunningState          = 0x4000,
+    kSetpointChangeSource            = 0x8000,
+    kSetpointChangeAmount            = 0x10000,
+    kSetpointChangeSourceTimestamp   = 0x20000,
+    kEmergencyHeatDelta              = 0x40000,
+    kACType                          = 0x80000,
+    kACCapacity                      = 0x100000,
+    kACRefrigerantType               = 0x200000,
+    kACCompressorType                = 0x400000,
+    kACErrorCode                     = 0x800000,
+    kACLouverPosition                = 0x1000000,
+    kACCoilTemperature               = 0x2000000,
+    kACCapacityFormat                = 0x4000000,
+    kSetpointHoldExpiryTimestamp     = 0x8000000,
 };
 
 /**
@@ -87,21 +87,19 @@ enum class OptionalAttributesBits : uint32_t
 class ThermostatCluster : public DefaultServerCluster, public chip::FabricTable::Delegate
 {
 public:
-    static constexpr uint16_t kAbsMinHeatSetpointLimitDefault = 700; // 7C (44.5 F) is the default
-    static constexpr uint16_t kAbsMaxHeatSetpointLimitDefault = 3000; // 30C (86 F) is the default
-    static constexpr uint16_t kAbsMinCoolSetpointLimitDefault = 1600; // 16C (61 F) is the default
-    static constexpr uint16_t kAbsMaxCoolSetpointLimitDefault = 3200; // 32C (90 F) is the default
+    static constexpr uint16_t kAbsMinHeatSetpointLimitDefault  = 700;  // 7C (44.5 F) is the default
+    static constexpr uint16_t kAbsMaxHeatSetpointLimitDefault  = 3000; // 30C (86 F) is the default
+    static constexpr uint16_t kAbsMinCoolSetpointLimitDefault  = 1600; // 16C (61 F) is the default
+    static constexpr uint16_t kAbsMaxCoolSetpointLimitDefault  = 3200; // 32C (90 F) is the default
     static constexpr uint16_t kOccupancyCoolingSetpointDefault = 2600; // 26C (78.8 F) is the default
     static constexpr uint16_t kOccupancyHeatingSetpointDefault = 2000; // 20C (68 F) is the default
-    static constexpr uint8_t kMinSetpointDeadbancDefault = 20; // 2C is the default
-    static constexpr uint8_t kEmergencyHeatDeltaDefault = 255; // 25.5C is the default
+    static constexpr uint8_t kMinSetpointDeadbancDefault       = 20;   // 2C is the default
+    static constexpr uint8_t kEmergencyHeatDeltaDefault        = 255;  // 25.5C is the default
 
     /// Aggregates every construction-time parameter for the cluster.
     struct Config
     {
-        Config(EndpointId endpointId, chip::FabricTable & fabricTable) :
-            mEndpointId(endpointId), mFabricTable(fabricTable)
-        {}
+        Config(EndpointId endpointId, chip::FabricTable & fabricTable) : mEndpointId(endpointId), mFabricTable(fabricTable) {}
 
         Config & WithFeatures(BitFlags<Thermostat::Feature> features)
         {
@@ -134,12 +132,12 @@ public:
         chip::FabricTable & mFabricTable;
         BitFlags<Thermostat::Feature> mFeatureMap;
         BitFlags<Thermostat::OptionalAttributesBits> mOptionalAttributes;
-        int16_t mAbsMinHeatSetpointLimit = kAbsMinHeatSetpointLimitDefault;
-        int16_t mAbsMaxHeatSetpointLimit = kAbsMaxHeatSetpointLimitDefault;
-        int16_t mAbsMinCoolSetpointLimit = kAbsMinCoolSetpointLimitDefault;
-        int16_t mAbsMaxCoolSetpointLimit = kAbsMaxCoolSetpointLimitDefault;
-        uint8_t mNumberOfSchedules              = 0;
-        uint8_t mNumberOfScheduleTransitions    = 0;
+        int16_t mAbsMinHeatSetpointLimit     = kAbsMinHeatSetpointLimitDefault;
+        int16_t mAbsMaxHeatSetpointLimit     = kAbsMaxHeatSetpointLimitDefault;
+        int16_t mAbsMinCoolSetpointLimit     = kAbsMinCoolSetpointLimitDefault;
+        int16_t mAbsMaxCoolSetpointLimit     = kAbsMaxCoolSetpointLimitDefault;
+        uint8_t mNumberOfSchedules           = 0;
+        uint8_t mNumberOfScheduleTransitions = 0;
         DataModel::Nullable<uint8_t> mNumberOfScheduleTransitionPerDay;
     };
 
@@ -314,7 +312,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-
     uint32_t GetFeatureMap() const { return mFeatures.Raw(); }
 
     //
@@ -331,7 +328,6 @@ public:
 
     /// @brief Resets (closes) the atomic write, clears the pending preset list and cancels the timeout timer.
     void ResetAtomicWrite(EndpointId endpoint);
-
 
     /// @brief Checks if an atomic write is open, optionally filtered by an attribute ID.
     bool InAtomicWrite(EndpointId endpoint, Optional<AttributeId> attributeId = NullOptional);
@@ -394,10 +390,7 @@ private:
     int16_t EnforceCoolingSetpointLimits(int16_t coolingSetpoint) const;
 
     // Deadband, in 0.01C units, or 0 when AutoMode is not supported.
-    int16_t DeadBandTemp() const
-    {
-        return mFeatures.Has(Feature::kAutoMode) ? static_cast<int16_t>(mMinSetpointDeadBand * 10) : 0;
-    }
+    int16_t DeadBandTemp() const { return mFeatures.Has(Feature::kAutoMode) ? static_cast<int16_t>(mMinSetpointDeadBand * 10) : 0; }
 
     // Post-write side effects for a setpoint attribute
     void HandleSetpointPostWrite(AttributeId attributeId);
@@ -442,16 +435,16 @@ private:
     int16_t mAbsMaxHeatSetpointLimit;
     int16_t mAbsMinCoolSetpointLimit;
     int16_t mAbsMaxCoolSetpointLimit;
-    int8_t mLocalTemperatureCalibration {};
-    int16_t mOccupiedCoolingSetpoint { kOccupancyCoolingSetpointDefault };
-    int16_t mOccupiedHeatingSetpoint { kOccupancyHeatingSetpointDefault };
-    int16_t mUnoccupiedCoolingSetpoint { kOccupancyCoolingSetpointDefault };
-    int16_t mUnoccupiedHeatingSetpoint { kOccupancyHeatingSetpointDefault };
+    int8_t mLocalTemperatureCalibration{};
+    int16_t mOccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
+    int16_t mOccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
+    int16_t mUnoccupiedCoolingSetpoint{ kOccupancyCoolingSetpointDefault };
+    int16_t mUnoccupiedHeatingSetpoint{ kOccupancyHeatingSetpointDefault };
     int16_t mMinHeatSetpointLimit;
     int16_t mMaxHeatSetpointLimit;
     int16_t mMinCoolSetpointLimit;
     int16_t mMaxCoolSetpointLimit;
-    int8_t mMinSetpointDeadBand { kMinSetpointDeadbancDefault };
+    int8_t mMinSetpointDeadBand{ kMinSetpointDeadbancDefault };
     BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing{ 0 };
     ControlSequenceOfOperationEnum mControlSequenceOfOperation;
     SystemModeEnum mSystemMode;

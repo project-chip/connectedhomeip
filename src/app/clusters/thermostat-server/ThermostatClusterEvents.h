@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include <clusters/Thermostat/Enums.h>
 #include <app/data-model/Nullable.h>
+#include <clusters/Thermostat/Enums.h>
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>

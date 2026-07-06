@@ -86,8 +86,7 @@ struct ClusterFixture
     ThermostatCluster cluster;
     ClusterTester tester{ cluster };
 
-    ClusterFixture(uint32_t featureMap,
-                   const BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes = AllAttributes(),
+    ClusterFixture(uint32_t featureMap, const BitFlags<Thermostat::OptionalAttributesBits> optionalAttributes = AllAttributes(),
                    const ConfigCustomizer & customize = {}) :
         cluster(MakeConfig(fabricTable, featureMap, optionalAttributes, customize))
     {
@@ -186,16 +185,14 @@ TEST_F(TestThermostatCluster, CommandFeatureGating_PresetCommandRequiresPresetsF
     {
         ClusterFixture fixture(kHeatCool);
         auto result = fixture.tester.Invoke<Commands::SetActivePresetRequest::Type>(Commands::SetActivePresetRequest::Type());
-        EXPECT_EQ(result.GetStatusCode(),
-                  Protocols::InteractionModel::ClusterStatusCode(Status::UnsupportedCommand));
+        EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::UnsupportedCommand));
     }
     {
         // With Presets enabled the command is accepted (it then reaches the delegate path, which is null in
         // this test and yields a failure status — but crucially NOT UnsupportedCommand).
         ClusterFixture fixture(kHeatCool | kFeatPres);
         auto result = fixture.tester.Invoke<Commands::SetActivePresetRequest::Type>(Commands::SetActivePresetRequest::Type());
-        EXPECT_NE(result.GetStatusCode(),
-                  Protocols::InteractionModel::ClusterStatusCode(Status::UnsupportedCommand));
+        EXPECT_NE(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::UnsupportedCommand));
     }
 }
 
@@ -380,8 +377,7 @@ TEST_F(TestThermostatCluster, WriteReadOnlyAttributeRejected)
     ClusterFixture fixture(kHeatCool);
 
     // AbsMinHeatSetpointLimit is present (Heat feature) but read-only.
-    EXPECT_EQ(fixture.tester.WriteAttribute(AbsMinHeatSetpointLimit::Id, static_cast<int16_t>(800)),
-              Status::UnsupportedWrite);
+    EXPECT_EQ(fixture.tester.WriteAttribute(AbsMinHeatSetpointLimit::Id, static_cast<int16_t>(800)), Status::UnsupportedWrite);
 }
 
 TEST_F(TestThermostatCluster, SystemModeRejectedAgainstControlSequence)
