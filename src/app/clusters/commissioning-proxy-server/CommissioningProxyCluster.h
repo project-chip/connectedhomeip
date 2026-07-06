@@ -99,18 +99,25 @@ public:
 
     ~CommissioningProxyCluster() override
     {
-        // Cancel any subsystem timers before teardown so none outlives the cluster.
+        // Safety net: idempotent if the application already called Shutdown().
+        Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Cancel subsystem timers, detach transports, and clear IM context.  Must be
+    // called (or destructor invoked) before any stack-allocated CommandHandler
+    // that was passed to InvokeCommand() goes out of scope.
+    void Shutdown(ClusterShutdownType type) override
+    {
         mScanCache.Shutdown();
         mScanAggregator.Shutdown();
         mSessions.Shutdown();
-
-        // Detach registered transports so their timers stop and their host pointer
-        // never dangles (a transport may outlive the cluster in unit tests).
         for (size_t i = 0; i < mTransportCount; i++)
         {
             mTransports[i]->Shutdown();
             mTransports[i]->SetHost(nullptr);
         }
+        mTransportCount = 0;
+        DefaultServerCluster::Shutdown(type);
     }
 
     /**
