@@ -18,10 +18,10 @@ source_set("camera-av-stream-management-server") {
   sources = [
     "CameraAVStreamManagementCluster.cpp",
     "CameraAVStreamManagementCluster.h",
-    "MigratorCameraAVStreamManagementStorage.cpp",
-    "MigratorCameraAVStreamManagementStorage.h",
     "MigrationCameraAVStreamManagementCluster.cpp",
     "MigrationCameraAVStreamManagementCluster.h",
+    "MigratorCameraAVStreamManagementStorage.cpp",
+    "MigratorCameraAVStreamManagementStorage.h",
   ]
 
   deps = [
