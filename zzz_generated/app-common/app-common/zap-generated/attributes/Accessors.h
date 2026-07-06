@@ -2475,18 +2475,6 @@ namespace Attributes {} // namespace Attributes
 namespace ServiceArea {
 namespace Attributes {
 
-namespace CurrentArea {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
-} // namespace CurrentArea
-
-namespace EstimatedEndTime {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
-} // namespace EstimatedEndTime
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ClusterRevision
