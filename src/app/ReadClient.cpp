@@ -537,6 +537,13 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     Status status     = Status::InvalidAction;
+    // Based on Matter specification (10.7.3. ReportDataMessage), SuppressResponse in ReportDataMessage is omitted if `false`.
+    // If this is a single ReportDataMessage for the current transaction, or this is the last ReportDataMessage in the
+    // transaction (i.e. there is no pending data anymore), then this ReportDataMessage should not have SuppressResponse.
+    // Otherwise, this ReportDataMessage should have SuppressResponse.
+    // For each recevied message, we assume mSuppressResponse to be false. If it is set true, it will be updated in
+    // ProcessReportData call below.
+    // For all other message types (e.g. SubscribeResponse, StatusResponse etc), mSuppressResponse is not relevant and always false.
     mSuppressResponse = false;
     VerifyOrExit(!IsIdle() && !IsInactiveICDSubscription(), err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -642,11 +649,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
 #endif
 
     err = report.GetSuppressResponse(&mSuppressResponse);
-    if (CHIP_END_OF_TLV == err)
-    {
-        mSuppressResponse = false;
-        err               = CHIP_NO_ERROR;
-    }
     SuccessOrExit(err);
 
     err = report.GetSubscriptionId(&subscriptionId);

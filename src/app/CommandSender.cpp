@@ -201,18 +201,19 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
+    SendFlags sendFlags;
+    sendFlags.Set(SendMessageFlags::kExpectResponse, !mSuppressResponse);
+    
+    ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), sendFlags));
+    
     if (mSuppressResponse)
     {
-        ReturnErrorOnFailure(
-            mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kNone));
+        // No response, so we can immediately terminate
         Close();
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData),
-                                                       SendMessageFlags::kExpectResponse));
-        MoveToState(State::AwaitingResponse);
-    }
+    
+    MoveToState(State::AwaitingResponse);
 
     return CHIP_NO_ERROR;
 }
@@ -358,7 +359,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
     // Only report error when response is expected
-    if (mSuppressResponse == false)
+    if (!mSuppressResponse)
     {
         ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
                         ChipLogValueExchange(apExchangeContext));

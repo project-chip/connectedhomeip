@@ -542,14 +542,12 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 
     if (mSuppressResponse)
     {
-        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone));
+        return mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone);
     }
-    else
-    {
-        // kExpectResponse is ignored by ExchangeContext in case of groupcast
-        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
-        MoveToState(State::AwaitingResponse);
-    }
+
+    // kExpectResponse is ignored by ExchangeContext in case of groupcast
+    ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
+    MoveToState(State::AwaitingResponse);
     return CHIP_NO_ERROR;
 }
 
