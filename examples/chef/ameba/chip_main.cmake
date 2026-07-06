@@ -117,7 +117,7 @@ list(
   -std=c++17
   -fno-rtti
 )
-target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags})
+target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} CONFIG_CHEF_SAMPLE_NAME="${SAMPLE_NAME}")
 target_compile_options(${chip_main} PRIVATE ${chip_main_cpp_flags})
 
 # move static library post build command
