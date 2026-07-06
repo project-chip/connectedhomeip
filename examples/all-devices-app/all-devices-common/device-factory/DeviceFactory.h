@@ -29,12 +29,16 @@
 #include <devices/device-energy-management/DeviceEnergyManagementDevice.h>
 #include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
 #include <devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.h>
+#include <devices/dishwasher/DishwasherDevice.h>
 #include <devices/extractor-hood/ExtractorHoodDevice.h>
 #include <devices/fan/impl/LoggingFanDevice.h>
 #include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
 #include <devices/generic-switch/GenericSwitchDevice.h>
 #include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
+#include <devices/laundry-dryer/LaundryDryerDevice.h>
+#include <devices/laundry-washer/LaundryWasherDevice.h>
 #include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
+#include <devices/microwave-oven/MicrowaveOvenDevice.h>
 #include <devices/mounted-dimmable-load-control/MountedDimmableLoadControlDevice.h>
 #include <devices/mounted-on-off-control/MountedOnOffControlDevice.h>
 #include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
@@ -48,6 +52,7 @@
 #include <devices/proximity-ranger/ProximityRangerDevice.h>
 #include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
 #include <devices/refrigerator/impl/LoggingRefrigeratorDevice.h>
+#include <devices/robotic-vacuum-cleaner/RoboticVacuumCleanerDevice.h>
 #include <devices/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarmDevice.h>
 #include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
@@ -296,6 +301,10 @@ private:
                     DimmableLoadDevice::Config{ .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults() });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
+        {
+            RegisterCreator("dishwasher", []() { return std::make_unique<DishwasherDevice>(); });
+        }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
         {
             RegisterCreator("mounted-dimmable-load-control", [this]() {
@@ -490,12 +499,24 @@ private:
                 return std::make_unique<IncreasingHumiditySensorDevice>(mContext->timerDelegate);
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
+        {
+            RegisterCreator("laundry-dryer", []() { return std::make_unique<LaundryDryerDevice>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
+        {
+            RegisterCreator("laundry-washer", []() { return std::make_unique<LaundryWasherDevice>(); });
+        }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
             RegisterCreator("light-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<IncreasingLightSensorDevice>(mContext->timerDelegate);
             });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
+        {
+            RegisterCreator("microwave-oven", []() { return std::make_unique<MicrowaveOvenDevice>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {
@@ -510,6 +531,10 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return std::make_unique<IncreasingFlowSensorDevice>(mContext->timerDelegate);
             });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
+        {
+            RegisterCreator("robotic-vacuum-cleaner", []() { return std::make_unique<RoboticVacuumCleanerDevice>(); });
         }
 
         // at least one device type MUST be enabled
