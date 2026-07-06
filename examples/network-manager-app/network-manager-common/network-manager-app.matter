@@ -1411,7 +1411,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -1450,7 +1450,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -1504,7 +1503,7 @@ provisional cluster NetworkIdentityManagement = 1104 {
   revision 1;
 
   enum IdentityTypeEnum : enum8 {
-    kECDSA = 0 [spec_name = "ECDSA"];
+    kECDSA = 1 [spec_name = "ECDSA"];
   }
 
   struct ActiveNetworkIdentityStruct {
@@ -1519,7 +1518,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   struct ClientStruct {
     int16u clientIndex = 0;
     octet_string<20> clientIdentifier = 1;
-    nullable int16u networkIdentityIndex = 2;
+    IdentityTypeEnum clientIdentityType = 2;
+    nullable int16u networkIdentityIndex = 3;
   }
 
   readonly attribute access(read: manage) ActiveNetworkIdentityStruct activeNetworkIdentities[] = 0;
@@ -1547,7 +1547,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   request struct QueryIdentityRequest {
     optional int16u networkIdentityIndex = 0;
     optional IdentityTypeEnum networkIdentityType = 1;
-    optional octet_string<20> identifier = 2;
+    optional int16u clientIndex = 2;
+    optional octet_string<20> identifier = 3;
   }
 
   response struct QueryIdentityResponse = 4 {
@@ -1682,7 +1683,7 @@ cluster ThreadNetworkDirectory = 1107 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {

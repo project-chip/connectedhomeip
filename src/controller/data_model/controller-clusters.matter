@@ -1152,9 +1152,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Provides an interface for providing OTA software updates */
+/** This cluster implements the Provider role in the OTA process. */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -1190,18 +1190,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional octet_string<512> metadataForProvider = 7;
+    optional long_octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional char_string<256> imageURI = 2;
+    optional long_char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional octet_string<512> metadataForRequestor = 7;
+    optional long_octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -1219,17 +1219,17 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Determine availability of a new Software Image */
+  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** Determine next action to take for a downloaded Software Image */
+  /** This command requests the specified version be installed on the device. */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** Notify OTA Provider that an update was applied */
+  /** This command tells the Provider that the specified update has been applied. */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
+/** This cluster implements the Requestor role in the OTA process. */
 cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
@@ -1296,11 +1296,11 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
     AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
+    optional long_octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  /** Announce the presence of an OTA Provider */
+  /** This command MAY be invoked by Administrators to announce the presence of a particular OTA Provider. */
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
@@ -2946,7 +2946,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2985,7 +2985,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -3356,6 +3355,24 @@ cluster LaundryDryerControls = 74 {
 
   readonly attribute DrynessLevelEnum supportedDrynessLevels[] = 0;
   attribute nullable DrynessLevelEnum selectedDrynessLevel = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides contextual information with respect to the disablement or otherwise of Temperature Controlled Cabinet Endpoints that may be composed as part of a Device. */
+provisional cluster TemperatureControlledCabinetTopology = 75 {
+  revision 1;
+
+  enum TopologyEnum : enum8 {
+    kHorizontal = 0;
+    kVertical = 1;
+  }
+
+  provisional readonly attribute endpoint_no disabledCabinets[] = 0;
+  provisional readonly attribute TopologyEnum topology = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6317,8 +6334,8 @@ cluster DoorLock = 257 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kDUPLICATE = 2 [spec_name = "DUPLICATE"];
-    kOCCUPIED = 3 [spec_name = "OCCUPIED"];
+    kDuplicate = 2;
+    kOccupied = 3;
   }
 
   enum UserStatusEnum : enum8 {
@@ -6939,8 +6956,8 @@ cluster WindowCovering = 258 {
 }
 
 /** This cluster provides an interface for controlling a Closure. */
-provisional cluster ClosureControl = 260 {
-  revision 1;
+cluster ClosureControl = 260 {
+  revision 2;
 
   enum ClosureErrorEnum : enum8 {
     kPhysicallyBlocked = 0;
@@ -6988,6 +7005,7 @@ provisional cluster ClosureControl = 260 {
     kCalibration = 0x40;
     kProtection = 0x80;
     kManuallyOperable = 0x100;
+    kAccess = 0x200;
   }
 
   bitmap LatchControlModesBitmap : bitmap8 {
@@ -7041,17 +7059,25 @@ provisional cluster ClosureControl = 260 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
+  request struct GroupedMoveToRequest {
+    optional TargetPositionEnum position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
   /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
   /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
   timed command MoveTo(MoveToRequest): DefaultSuccess = 1;
   /** This command is used to trigger a calibration of the closure. */
   timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures to a target position, latch, and/or perform the movement at a specific speed. */
+  command GroupedMoveTo(GroupedMoveToRequest): DefaultSuccess = 3;
 }
 
 /** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
-provisional cluster ClosureDimension = 261 {
-  revision 1;
+cluster ClosureDimension = 261 {
+  revision 2;
 
   enum ClosureUnitEnum : enum8 {
     kMillimeter = 0;
@@ -7123,6 +7149,7 @@ provisional cluster ClosureDimension = 261 {
     kTranslation = 0x20;
     kRotation = 0x40;
     kModulation = 0x80;
+    kAccess = 0x100;
   }
 
   bitmap LatchControlModesBitmap : bitmap8 {
@@ -7176,10 +7203,26 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
+  request struct GroupedSetTargetRequest {
+    optional percent100ths position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  request struct GroupedStepRequest {
+    StepDirectionEnum direction = 0;
+    int16u numberOfSteps = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
   /** This command is used to move a dimension of the closure to a target position. */
   timed command SetTarget(SetTargetRequest): DefaultSuccess = 0;
   /** This command is used to move a dimension of the closure to a target position by a number of steps. */
   timed command Step(StepRequest): DefaultSuccess = 1;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position, latch, and/or perform the movement at a specific speed. */
+  command GroupedSetTarget(GroupedSetTargetRequest): DefaultSuccess = 2;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position by a number of steps. */
+  command GroupedStep(GroupedStepRequest): DefaultSuccess = 3;
 }
 
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
@@ -9577,7 +9620,7 @@ provisional cluster NetworkIdentityManagement = 1104 {
   revision 1;
 
   enum IdentityTypeEnum : enum8 {
-    kECDSA = 0 [spec_name = "ECDSA"];
+    kECDSA = 1 [spec_name = "ECDSA"];
   }
 
   struct ActiveNetworkIdentityStruct {
@@ -9592,7 +9635,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   struct ClientStruct {
     int16u clientIndex = 0;
     octet_string<20> clientIdentifier = 1;
-    nullable int16u networkIdentityIndex = 2;
+    IdentityTypeEnum clientIdentityType = 2;
+    nullable int16u networkIdentityIndex = 3;
   }
 
   readonly attribute access(read: manage) ActiveNetworkIdentityStruct activeNetworkIdentities[] = 0;
@@ -9620,7 +9664,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   request struct QueryIdentityRequest {
     optional int16u networkIdentityIndex = 0;
     optional IdentityTypeEnum networkIdentityType = 1;
-    optional octet_string<20> identifier = 2;
+    optional int16u clientIndex = 2;
+    optional octet_string<20> identifier = 3;
   }
 
   response struct QueryIdentityResponse = 4 {
@@ -9752,6 +9797,114 @@ cluster ThreadNetworkDirectory = 1107 {
   timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
   /** Retrieves the Thread Operational Dataset with the given Extended PAN ID. */
   command access(invoke: manage) GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
+}
+
+/** This cluster provides a proxy service allowing a Commissioner to utilize commissioning transports not supported locally, or to extend the commissioning range of the Commissioner. */
+provisional cluster CommissioningProxy = 1109 {
+  revision 1;
+
+  bitmap CapabilitiesBitmap : bitmap8 {
+    kBLE = 0x2 [spec_name = "BLE"];
+    kWiFiPAF = 0x8;
+    kNTL = 0x10 [spec_name = "NTL"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kWiFiNetworkInterface = 0x1;
+    kBackgroundScan = 0x2;
+  }
+
+  bitmap WiFiBandBitmap : bitmap16 {
+    k2G4 = 0x1 [spec_name = "2G4"];
+    k5G = 0x4 [spec_name = "5G"];
+  }
+
+  struct ScanResultStruct {
+    nullable octet_string<100> address = 0;
+    CapabilitiesBitmap transport = 1;
+    int16u discriminator = 2;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    nullable octet_string<128> extendedData = 5;
+    optional WiFiBandBitmap wiFiBand = 6;
+  }
+
+  readonly attribute CapabilitiesBitmap transport = 0;
+  attribute int8u scanMaxTime = 1;
+  readonly attribute int8u maxSessions = 2;
+  readonly attribute optional int8u maxCachedResults = 3;
+  readonly attribute optional int8u numCachedResults = 4;
+  attribute optional int16u cacheTimeout = 5;
+  readonly attribute optional nullable ScanResultStruct cachedResults[] = 6;
+  readonly attribute optional WiFiBandBitmap wiFiBand = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ProxyConnectRequestRequest {
+    nullable octet_string<100> address = 0;
+    CapabilitiesBitmap transport = 1;
+    int16u discriminator = 2;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    int16u timeout = 5;
+    optional WiFiBandBitmap wiFiBand = 6;
+  }
+
+  response struct ProxyConnectResponse = 1 {
+    int16u sessionID = 0;
+  }
+
+  request struct ProxyDisconnectRequestRequest {
+    nullable int16u sessionID = 0;
+  }
+
+  request struct ProxyScanRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    optional WiFiBandBitmap wiFiBands = 1;
+  }
+
+  response struct ProxyScanResponse = 4 {
+    int8u numberOfResults = 0;
+    ScanResultStruct proxyScanResult[] = 1;
+  }
+
+  request struct ProxyBackGroundScanStartRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    int16u timeout = 1;
+    optional WiFiBandBitmap wiFiBands = 2;
+  }
+
+  request struct ProxyBackGroundScanStopRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    optional WiFiBandBitmap wiFiBands = 1;
+  }
+
+  request struct ProxyMessageRequestRequest {
+    int16u sessionID = 0;
+    int8u responseTimeout = 1;
+    nullable long_octet_string<1280> message = 2;
+  }
+
+  response struct ProxyMessageResponse = 8 {
+    int16u sessionID = 0;
+    nullable long_octet_string<1280> message = 1;
+  }
+
+  /** This command serves to establish a transport connection to a commissionable device discovered by the proxy. */
+  fabric command ProxyConnectRequest(ProxyConnectRequestRequest): ProxyConnectResponse = 0;
+  /** This disconnects a transport connection created via the ProxyConnectRequest command. */
+  fabric command ProxyDisconnectRequest(ProxyDisconnectRequestRequest): DefaultSuccess = 2;
+  /** This command requests the proxy to provide a list of all commissionable devices found on the requested transports and bands. */
+  command ProxyScanRequest(ProxyScanRequestRequest): ProxyScanResponse = 3;
+  /** This command requests the proxy to start background scanning for commissionable devices on the selected transports. */
+  command ProxyBackGroundScanStartRequest(ProxyBackGroundScanStartRequestRequest): DefaultSuccess = 5;
+  /** This command requests the proxy to stop background scanning for commissionable devices on the selected transports. */
+  command ProxyBackGroundScanStopRequest(ProxyBackGroundScanStopRequestRequest): DefaultSuccess = 6;
+  /** This command sends a message packet to the proxy. */
+  fabric command ProxyMessageRequest(ProxyMessageRequestRequest): ProxyMessageResponse = 7;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
@@ -10869,6 +11022,83 @@ cluster ContentAppObserver = 1296 {
 
   /** Upon receipt, the data field MAY be parsed and interpreted. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
+}
+
+/** This cluster provides attributes and commands to control the audio output volume and frequency corrections of a device. */
+provisional cluster AudioControl = 1298 {
+  revision 1;
+
+  enum UnmutePolicyEnum : enum8 {
+    kUnmuteOrChangeVolume = 0;
+    kUnmuteOrDoNotChangeVolume = 1;
+    kDoNotUnmuteAndChangeVolume = 2;
+    kDoNotUnmuteAndDoNotChangeVolume = 3;
+  }
+
+  enum UnmuteVolumeEnum : enum8 {
+    kMinDeviceVolume = 0;
+    kVolume = 1;
+    kVolumePlusStepSize = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDecibel = 0x1;
+    kBasicEqualizer = 0x2;
+  }
+
+  readonly attribute boolean softMuted = 0;
+  readonly attribute optional boolean physicallyMuted = 1;
+  readonly attribute int16u volume = 2;
+  readonly attribute int16u minDeviceVolume = 3;
+  readonly attribute int16u maxDeviceVolume = 4;
+  readonly attribute optional int16u maxDeviceVolumeDB = 5;
+  attribute access(write: manage) optional int16u maxUserVolume = 6;
+  attribute access(write: manage) int16u defaultStepSize = 7;
+  attribute access(write: manage) UnmutePolicyEnum setVolumeUnmutePolicy = 8;
+  attribute access(write: manage) UnmutePolicyEnum increaseVolumeUnmutePolicy = 9;
+  attribute access(write: manage) UnmuteVolumeEnum increaseVolumeUnmuteVolume = 10;
+  attribute access(write: manage) UnmutePolicyEnum decreaseVolumeUnmutePolicy = 11;
+  attribute optional nullable boolean startUpMuted = 12;
+  attribute optional nullable int16u startUpVolume = 13;
+  attribute optional int16s bass = 14;
+  attribute optional int16s mid = 15;
+  attribute optional int16s treble = 16;
+  readonly attribute optional int16s minCorrection = 17;
+  readonly attribute optional int16s maxCorrection = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetVolumeRequest {
+    int16u newVolume = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  request struct IncreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+    optional UnmuteVolumeEnum unmuteVolume = 2;
+  }
+
+  request struct DecreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  /** This command SHALL set the value of the SoftMuted attribute to TRUE. */
+  command Mute(): DefaultSuccess = 0;
+  /** This command SHALL set the value of the SoftMuted attribute to FALSE. */
+  command Unmute(): DefaultSuccess = 1;
+  /** This command SHALL toggle the state of the SoftMuted attribute. */
+  command ToggleMuted(): DefaultSuccess = 2;
+  /** Sets the volume to a specified level. */
+  command SetVolume(SetVolumeRequest): DefaultSuccess = 3;
+  /** Increases the volume by a specified level. */
+  command IncreaseVolume(IncreaseVolumeRequest): DefaultSuccess = 4;
+  /** Decreases the volume by a specified level. */
+  command DecreaseVolume(DecreaseVolumeRequest): DefaultSuccess = 5;
 }
 
 /** This cluster provides an interface to manage regions of interest, or Zones, which can be either manufacturer or user defined. */
@@ -13316,5 +13546,17 @@ cluster SampleMei = 4294048800 {
   command Ping(): DefaultSuccess = 0;
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
+}
+
+/** Test cluster for validating manufacturer-specific cluster handling without controller-side implementation */
+internal cluster TestHiddenManufacturerSpecific = 4294048801 {
+  revision 1; // NOTE: Default/not specifically set
+
+  readonly attribute boolean testAttribute = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 

@@ -315,10 +315,12 @@ CHIP_ERROR GroupAuxiliaryAccessControlDelegateImpl::Check(const SubjectDescripto
             (requestPath.requestType == Access::RequestType::kCommandInvokeRequest) && (requestPrivilege == Privilege::kOperate) &&
             (subjectDescriptor.authMode == Access::AuthMode::kGroup))
         {
+            ChipLogProgress(SecureChannel, "AccessControl: Approved (from Auxiliary ACL)");
             return CHIP_NO_ERROR;
         }
     }
 
+    ChipLogProgress(DataManagement, "AccessControl: Denied (from Auxiliary ACL)");
     return CHIP_ERROR_ACCESS_DENIED;
 }
 

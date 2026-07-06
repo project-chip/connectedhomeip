@@ -16,6 +16,7 @@
         "ambient-sensing-union-cluster.xml",
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
+        "audio-control-cluster.xml",
         "audio-output-cluster.xml",
         "av-analysis-cluster.xml",
         "ballast-configuration-cluster.xml",
@@ -28,13 +29,13 @@
         "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",
-        "chip-ota.xml",
         "channel-cluster.xml",
         "closure-control-cluster.xml",
         "closure-dimension-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
         "commissioner-control-cluster.xml",
+        "commissioning-proxy-cluster.xml",
         "commodity-metering-cluster.xml",
         "commodity-price-cluster.xml",
         "commodity-tariff-cluster.xml",
@@ -97,6 +98,8 @@
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
         "network-identity-management-cluster.xml",
+        "ota-provider-cluster.xml",
+        "ota-requestor-cluster.xml",
         "proximity-ranging-cluster.xml",
         "push-av-stream-transport-cluster.xml",
         "semantic-tag-namespace-enums.xml",
@@ -131,8 +134,10 @@
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
+        "temperature-controlled-cabinet-topology-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
+        "test-hidden-manufacturer-specific-cluster.xml",
         "thermostat-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
         "thread-border-router-management-cluster.xml",
@@ -257,6 +262,16 @@
             "FeatureMap",
             "ClusterRevision"
         ],
+        "Commissioning Proxy": [
+            "Transport",
+            "ScanMaxTime",
+            "MaxSessions",
+            "MaxCachedResults",
+            "NumCachedResults",
+            "CacheTimeout",
+            "CachedResults",
+            "WiFiBand"
+        ],
         "Commodity Price": [
             "TariffUnit",
             "Currency",
@@ -342,6 +357,17 @@
             "TxErrCount",
             "CollisionCount",
             "OverrunCount",
+            "ClusterRevision"
+        ],
+        "Fan Control": [
+            "FanMode",
+            "PercentSetting",
+            "PercentCurrent",
+            "SpeedSetting",
+            "SpeedCurrent",
+            "RockSetting",
+            "WindSetting",
+            "AirflowDirection",
             "ClusterRevision"
         ],
         "General Commissioning": [
@@ -603,6 +629,7 @@
             "ClusterRevision"
         ],
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -611,24 +638,30 @@
         "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
-            "OperationalState",
-            "OperationalError",
+            "PhaseList",
             "CurrentPhase",
             "CountdownTime",
+            "OperationalStateList",
+            "OperationalState",
+            "OperationalError",
             "ClusterRevision"
         ],
         "RVC Operational State": [
-            "OperationalState",
-            "OperationalError",
+            "PhaseList",
             "CurrentPhase",
             "CountdownTime",
+            "OperationalStateList",
+            "OperationalState",
+            "OperationalError",
             "ClusterRevision"
         ],
         "Oven Cavity Operational State": [
-            "OperationalState",
-            "OperationalError",
+            "PhaseList",
             "CurrentPhase",
             "CountdownTime",
+            "OperationalStateList",
+            "OperationalState",
+            "OperationalError",
             "ClusterRevision"
         ],
         "Activated Carbon Filter Monitoring": [
@@ -839,7 +872,13 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
-        "Power Source": ["ClusterRevision"],
+        "Power Source": [
+            "ClusterRevision",
+            "ActiveWiredFaults",
+            "ActiveBatFaults",
+            "ActiveBatChargeFaults",
+            "EndpointList"
+        ],
         "Valve Configuration and Control": [
             "OpenDuration",
             "AutoCloseTime",

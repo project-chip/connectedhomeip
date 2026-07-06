@@ -137,16 +137,16 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
             key=checkin_key,
             clientType=ClientTypeEnum.kPermanent,
         ))
-        log.info(f"RegisterClient SUCCESS for checkInNodeID={TH.nodeId}")
+        log.info("RegisterClient SUCCESS for checkInNodeID=%s", TH.nodeId)
 
         icd_counter_at_registration = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-        log.info(f"ICDCounter at registration: {icd_counter_at_registration}")
+        log.info("ICDCounter at registration: %s", icd_counter_at_registration)
 
         # *** STEP 2 ***
         # TH reads from the DUT the RegisteredClients attribute
         self.step(2)
         registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
-        log.info(f"RegisteredClients: {registered_clients}")
+        log.info("RegisteredClients: %s", registered_clients)
 
         # Verify exactly one RegisteredClients entry is present
         asserts.assert_equal(len(registered_clients), 1,
@@ -155,7 +155,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         # Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH's node ID
         rc_entry = registered_clients[0]
         log.info(
-            f"Registered ICD Client entry: checkInNodeID={rc_entry.checkInNodeID}, monitoredSubject={rc_entry.monitoredSubject}")
+            "Registered ICD Client entry: checkInNodeID=%s, monitoredSubject=%s", rc_entry.checkInNodeID, rc_entry.monitoredSubject)
         asserts.assert_equal(rc_entry.checkInNodeID, TH.nodeId,
                              f"checkInNodeID must match TH node ID. Expected: {TH.nodeId}, Got: {rc_entry.checkInNodeID}")
         asserts.assert_equal(rc_entry.monitoredSubject, TH.nodeId,
@@ -167,8 +167,8 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         self.step(3)
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
-        log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
-        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
+        log.info("IdleModeDuration: %ss", idle_mode_duration_s)
+        log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
 
         # *** STEP 4 ***
         # Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration)
@@ -187,7 +187,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         # TH sends the UnregisterClient command to the DUT with the checkInNodeID from Step 2
         self.step(5)
         await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=rc_entry.checkInNodeID))
-        log.info(f"UnregisterClient SUCCESS for checkInNodeID={rc_entry.checkInNodeID}")
+        log.info("UnregisterClient SUCCESS for checkInNodeID=%s", rc_entry.checkInNodeID)
 
         # Verify the RegisteredClients attribute no longer contains TH's checkInNodeID
         registered_clients_after = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
@@ -267,13 +267,13 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
             key=checkin_key,
             clientType=ClientTypeEnum.kPermanent,
         ))
-        log.info(f"RegisterClient SUCCESS for checkInNodeID={TH.nodeId}")
+        log.info("RegisterClient SUCCESS for checkInNodeID=%s", TH.nodeId)
 
         # *** STEP 2 ***
         # TH reads from the DUT the RegisteredClients attribute
         self.step(2)
         registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
-        log.info(f"RegisteredClients: {registered_clients}")
+        log.info("RegisteredClients: %s", registered_clients)
 
         # Verify exactly one RegisteredClients entry is present
         asserts.assert_equal(len(registered_clients), 1,
@@ -282,7 +282,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         # Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH's node ID
         rc_entry = registered_clients[0]
         log.info(
-            f"Registered ICD Client entry: checkInNodeID={rc_entry.checkInNodeID}, monitoredSubject={rc_entry.monitoredSubject}")
+            "Registered ICD Client entry: checkInNodeID=%s, monitoredSubject=%s", rc_entry.checkInNodeID, rc_entry.monitoredSubject)
         asserts.assert_equal(rc_entry.checkInNodeID, TH.nodeId,
                              f"checkInNodeID must match TH node ID. Expected: {TH.nodeId}, Got: {rc_entry.checkInNodeID}")
         asserts.assert_equal(rc_entry.monitoredSubject, TH.nodeId,
@@ -294,8 +294,8 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         self.step(3)
         idle_mode_duration_s = await self.read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
-        log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
-        log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
+        log.info("IdleModeDuration: %ss", idle_mode_duration_s)
+        log.info("ActiveModeDuration: %sms", active_mode_duration_ms)
 
         # *** STEP 4 ***
         # TH subscribes to the NodeLabel attribute with MinIntervalFloor=0 and MaxIntervalCeiling=IdleModeDuration.
@@ -309,12 +309,12 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
             autoResubscribe=False
         )
         _, max_interval_s = subscription.GetReportingIntervalsSeconds()
-        log.info(f"Subscription established. subscriptionId={subscription.subscriptionId}, MaxInterval={max_interval_s}s")
+        log.info("Subscription established. subscriptionId=%s, MaxInterval=%ss", subscription.subscriptionId, max_interval_s)
 
         # TH reads the current ICDCounter value
         #   - Store the ICDCounter value as icd_counter_at_subscription
         icd_counter_at_subscription = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-        log.info(f"ICDCounter at subscription: {icd_counter_at_subscription}")
+        log.info("ICDCounter at subscription: %s", icd_counter_at_subscription)
 
         # *** STEP 5 ***
         # Wait for a full active-to-idle-to-active ICD transition cycle (IdleModeDuration + ActiveModeDuration)
@@ -328,7 +328,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         # TH reads the ICDCounter attribute
         self.step(6)
         icd_counter_while_subscribed = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
-        log.info(f"ICDCounter while subscribed: {icd_counter_while_subscribed}")
+        log.info("ICDCounter while subscribed: %s", icd_counter_while_subscribed)
 
         # Verify ICDCounter is unchanged from icd_counter_at_subscription. An unchanged counter confirms no check-in was sent.
         asserts.assert_equal(icd_counter_while_subscribed, icd_counter_at_subscription,
@@ -360,7 +360,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
         # The subscription receives a report for the NodeLabel attribute within MaxInterval
         try:
             await asyncio.wait_for(report_received.wait(), timeout=max_interval_s + 1)
-            log.info(f"Subscription received report for NodeLabel within MaxInterval ({max_interval_s}s)")
+            log.info("Subscription received report for NodeLabel within MaxInterval (%ss)", max_interval_s)
         except TimeoutError:
             asserts.fail(f"Subscription did not receive report for NodeLabel within MaxInterval ({max_interval_s}s)")
 
@@ -384,7 +384,7 @@ class TC_ICDB_2_1_2_2(ICDBaseTest):
 
         # Cleanup: unregister TH so the RegisteredClients list is clean after the test
         await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=TH.nodeId))
-        log.info(f"UnregisterClient cleanup SUCCESS for checkInNodeID={TH.nodeId}")
+        log.info("UnregisterClient cleanup SUCCESS for checkInNodeID=%s", TH.nodeId)
 
 
 if __name__ == "__main__":

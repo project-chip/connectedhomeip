@@ -33,7 +33,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -153,7 +152,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("2a")
         attribute_list: list[uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-        log.info(f"AttributeList: {attribute_list}")
+        log.info("AttributeList: %s", attribute_list)
 
         self.step("2b")
         is_countdown_time_supported: bool = attributes.CountdownTime.attribute_id in attribute_list
@@ -180,17 +179,17 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
             self.step("2f")
             latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-            log.info(f"LatchControlModes: {latch_control_modes}")
+            log.info("LatchControlModes: %s", latch_control_modes)
 
             self.step("2g")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_latch: bool = None
 
             if overall_current_state is NullValue:
                 current_latch: bool = NullValue
             else:
                 current_latch: bool = overall_current_state.latch
-            log.info(f"CurrentLatch: {current_latch}")
+            log.info("CurrentLatch: %s", current_latch)
 
             self.step("2h")
             if current_latch is False:
@@ -227,20 +226,20 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         # STEP 3: Verify the CountdownTime when no operation is in progress
         self.step(3)
-        countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        countdown_time: NullValue | uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == 0 or countdown_time == NullValue,
                             f"CountdownTime should be 0 or null when no operation is in progress, got: {countdown_time}.")
 
         # STEP 4: Verify the CountdownTime when an operation is triggered
         self.step("4a")
-        overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+        overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
         current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = None
 
         if overall_current_state is NullValue:
             current_position = NullValue
         else:
             current_position = overall_current_state.position
-        log.info(f"CurrentPosition: {current_position}")
+        log.info("CurrentPosition: %s", current_position)
 
         self.step("4b")
         if current_position == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
@@ -272,10 +271,10 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
 
         self.step("4g")
-        current_countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        current_countdown_time: NullValue | uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == NullValue or (1 <= current_countdown_time <= countdown_time_max),
                             f"CountdownTime should be between 1 and {countdown_time_max}, or null, got: {current_countdown_time}.")
-        log.info(f"CurrentCountdownTime: {current_countdown_time}")
+        log.info("CurrentCountdownTime: %s", current_countdown_time)
 
         self.step("4h")
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
@@ -290,7 +289,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             countdown_time_after_operation: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_equal(countdown_time_after_operation, 0,
                                  f"CountdownTime should be 0 after operation completes, got: {countdown_time_after_operation}.")
-            log.info(f"CountdownTime after operation: {countdown_time_after_operation}")
+            log.info("CountdownTime after operation: %s", countdown_time_after_operation)
         sub_handler.reset()
 
         # STEP 5: Verify the CountdownTime behavior when an operation is interrupted
@@ -309,7 +308,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             countdown_time_before_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_before_interruption > 0 and countdown_time_before_interruption <
                                 countdown_time_max, f"CountdownTime before interruption: {countdown_time_before_interruption}.")
-            log.info(f"CountdownTime before interruption: {countdown_time_before_interruption}")
+            log.info("CountdownTime before interruption: %s", countdown_time_before_interruption)
 
             self.step("5d")
             try:
@@ -326,7 +325,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             countdown_time_after_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_after_interruption == 0,
                                 f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}.")
-            log.info(f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}")
+            log.info("CountdownTime after interruption not 0, but: %s", countdown_time_after_interruption)
             sub_handler.reset()
 
 

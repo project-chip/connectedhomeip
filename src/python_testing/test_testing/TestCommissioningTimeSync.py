@@ -41,6 +41,8 @@ kConfigureTrustedTimeSource = 19
 
 
 class TestCommissioningTimeSync(MatterBaseTest):
+    disable_wildcard_subscription = True
+
     def setup_class(self):
         self.commissioner = None
         self.commissioned = False
@@ -116,7 +118,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
         await self.create_commissioner()
 
         log.info(
-            f'Running Commissioning test - time_zone: {time_zone}, dst: {dst}, default_ntp: {default_ntp}, trusted_time_source: {trusted_time_source}')
+            'Running Commissioning test - time_zone: %s, dst: %s, default_ntp: %s, trusted_time_source: %s', time_zone, dst, default_ntp, trusted_time_source)
 
         if time_zone:
             self.commissioner.SetTimeZone(offset=3600, validAt=0)

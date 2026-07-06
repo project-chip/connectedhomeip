@@ -177,11 +177,13 @@ TEST_F(TestClosureDimensionCluster, TestAttributesList)
 
 TEST_F(TestClosureDimensionCluster, TestMandatoryAcceptedCommands)
 {
-    // Step command is added by default as Positioning feature is available by default.
+    // Step and grouped commands are added by default as Positioning feature is available by default.
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(mCluster,
                                               {
                                                   ClosureDimension::Commands::SetTarget::kMetadataEntry,
                                                   ClosureDimension::Commands::Step::kMetadataEntry,
+                                                  ClosureDimension::Commands::GroupedSetTarget::kMetadataEntry,
+                                                  ClosureDimension::Commands::GroupedStep::kMetadataEntry,
                                               }));
 }
 
@@ -192,7 +194,31 @@ TEST_F(TestClosureDimensionCluster, TestAcceptedCommandsSetTargetOnlyWithoutPosi
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
                                                   ClosureDimension::Commands::SetTarget::kMetadataEntry,
+                                                  ClosureDimension::Commands::GroupedSetTarget::kMetadataEntry,
                                               }));
+}
+
+TEST_F(TestClosureDimensionCluster, TestAccessFeatureMapAndAcceptedCommands)
+{
+    ClosureDimensionCluster accessCluster(
+        ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(100, 1000).WithAccess());
+    ClusterTester tester(accessCluster);
+    BitFlags<Feature> featureMap;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, BitFlags<Feature>(Feature::kPositioning).Set(Feature::kAccess));
+
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(accessCluster,
+                                              {
+                                                  ClosureDimension::Commands::SetTarget::kMetadataEntry,
+                                                  ClosureDimension::Commands::Step::kMetadataEntry,
+                                              }));
+}
+
+TEST_F(TestClosureDimensionCluster, TestConformanceAccess)
+{
+    ClosureDimensionCluster cluster(
+        ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(100, 1000).WithAccess());
+    EXPECT_EQ(cluster.GetFeatureMap(), BitFlags<Feature>(Feature::kPositioning).Set(Feature::kAccess));
 }
 
 TEST_F(TestClosureDimensionCluster, TestReadClusterRevision)
@@ -624,6 +650,60 @@ TEST_F(TestClosureDimensionCluster, TestHandleStepSpeedConstraintError)
     request.numberOfSteps = 1;
     request.speed.SetValue(static_cast<Globals::ThreeLevelAutoEnum>(99));
     EXPECT_EQ(tester.Invoke(request).status, Status::ConstraintError);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestClosureDimensionCluster, TestInvokeGroupedSetTargetSuccess)
+{
+    ClosureDimension::Commands::GroupedSetTarget::Type request;
+    request.position.SetValue(static_cast<Percent100ths>(5200));
+    EXPECT_TRUE(mClusterTester.Invoke(request).IsSuccess());
+    EXPECT_EQ(mockDelegate.setTargetCalls, 1);
+    DataModel::Nullable<GenericDimensionStateStruct> ts = mCluster.GetTargetState();
+    ASSERT_FALSE(ts.IsNull());
+    EXPECT_EQ(ts.Value().position.Value().Value(), static_cast<Percent100ths>(5200));
+}
+
+TEST_F(TestClosureDimensionCluster, TestInvokeGroupedStepSuccess)
+{
+    ClosureDimension::Commands::GroupedStep::Type request;
+    request.direction     = StepDirectionEnum::kIncrease;
+    request.numberOfSteps = 2;
+    EXPECT_TRUE(mClusterTester.Invoke(request).IsSuccess());
+    EXPECT_EQ(mockDelegate.stepCalls, 1);
+    DataModel::Nullable<GenericDimensionStateStruct> ts = mCluster.GetTargetState();
+    ASSERT_FALSE(ts.IsNull());
+    EXPECT_EQ(ts.Value().position.Value().Value(), static_cast<Percent100ths>(7000));
+}
+
+TEST_F(TestClosureDimensionCluster, TestInvokeGroupedSetTargetUnsupportedWithAccess)
+{
+    ClosureDimensionCluster cluster(
+        ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(100, 1000).WithAccess());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetCurrentState(PositionState(5000)), CHIP_NO_ERROR);
+
+    ClosureDimension::Commands::GroupedSetTarget::Type request;
+    request.position.SetValue(static_cast<Percent100ths>(5200));
+    EXPECT_EQ(tester.Invoke(request).status, Status::UnsupportedCommand);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestClosureDimensionCluster, TestInvokeGroupedStepUnsupportedWithAccess)
+{
+    ClosureDimensionCluster cluster(
+        ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(100, 1000).WithAccess());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetCurrentState(PositionState(5000)), CHIP_NO_ERROR);
+
+    ClosureDimension::Commands::GroupedStep::Type request;
+    request.direction     = StepDirectionEnum::kIncrease;
+    request.numberOfSteps = 1;
+    EXPECT_EQ(tester.Invoke(request).status, Status::UnsupportedCommand);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
