@@ -936,7 +936,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
 {
     TestServerClusterContext context;
     // MaxSessions == 2: the second concurrent connect is still below the gate.
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*maxSessions=*/2));
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2));
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -997,7 +997,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_AfterConnect)
     Commands::ProxyDisconnectRequest::Type cmd;
     if (connectResult.response.has_value())
     {
-        cmd.sessionID.SetNonNull(connectResult.response->sessionID);
+        cmd.sessionID.SetNonNull(connectResult.response.value().sessionID);
         EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     }
 
@@ -1034,7 +1034,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionStateTransition)
 {
     TestServerClusterContext context;
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*maxSessions=*/2));
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2));
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -2338,7 +2338,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WrongFabricEstabli
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHaveDistinctSessionIds)
 {
     TestServerClusterContext context;
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*maxSessions=*/2));
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2));
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
