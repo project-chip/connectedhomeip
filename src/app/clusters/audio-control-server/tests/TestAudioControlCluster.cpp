@@ -3102,7 +3102,7 @@ TEST_F(TestAudioControlCluster, StartupCorruptedMaxUserVolumeKvsClampedToValidRa
     // std::clamp(mVolume, mMinDeviceVolume, EffectiveMaxVolume()) call would violate std::clamp's
     // precondition (lower <= upper).
     const uint16_t corruptValue = 0; // BasicConfig() has MinDeviceVolume == 1
-    auto key = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, MaxUserVolume::Id);
+    auto key                    = DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, AudioControl::Id, MaxUserVolume::Id);
     ASSERT_EQ(testContext.StorageDelegate().SyncSetKeyValue(key.KeyName(), &corruptValue, sizeof(corruptValue)), CHIP_NO_ERROR);
 
     AudioControlCluster::OptionalAttributeSet optionalSet;
