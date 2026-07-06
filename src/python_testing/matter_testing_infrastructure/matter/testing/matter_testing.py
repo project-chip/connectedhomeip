@@ -1121,10 +1121,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("[CLN] wildcard not available, skipping scene cleanup")
             return
 
+        found_any = False
         for endpoint_id in self.stored_global_wildcard.attributes:
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.ScenesManagement):  # type: ignore[arg-type]
                 continue
+            found_any = True
             if not _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint_id,
                                 cluster=Clusters.Groups):  # type: ignore[arg-type]
                 continue
@@ -1148,6 +1150,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info("[CLN] scenes cleared on endpoint %d", endpoint_id)
             except Exception as e:  # DUT may be unreachable or the group may have been removed by the test
                 LOGGER.warning("[CLN] scene removal failed on endpoint %d: %s", endpoint_id, e)
+        if not found_any:
+            LOGGER.info("[CLN] ScenesManagement cluster not present on any endpoint, skipping scene cleanup")
 
     async def _purge_group_memberships(self) -> None:
         """Removes all group memberships from the DUT's group table.
@@ -1408,21 +1412,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
-        # in teardown_class. Skip when the DUT is not known to be available: unit tests
-        # never commission a device so _dut_confirmed_available stays False, and
-        # commissioning_method is None, eliminating any network overhead for them.
-        # For runner-commissioned tests commissioning_method is set; for in-test
-        # commissioning the flag is set by commission_devices() on success.
-        # is_commissioning is True for CommissionDeviceTest, where the DUT is not yet
-        # on the fabric, an operational read there would send CASE Sigma1 to an
-        # uncommissioned device, triggering unexpected DUT behaviour.
-        dut_expected = (
-            not self.is_commissioning
-            and (
-                self._dut_confirmed_available
-                or self.matter_test_config.commissioning_method is not None
-            )
-        )
+        dut_expected = not self.is_commissioning and self.requires_dut
         if dut_expected:
             try:
                 self._original_acl = self.event_loop.run_until_complete(
