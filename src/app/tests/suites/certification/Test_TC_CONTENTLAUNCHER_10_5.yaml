@@ -177,8 +177,6 @@ tests:
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
 # for details about the block below.
-# TODO: Re-enable once chip-tool/darwinframeworktool positional arg parsing
-# is fixed for LaunchURL with multiple optional struct/array parameters.
-# CI:
-#     - name: tv
-#       app: tv
+CI:
+    - name: tv
+      app: tv
