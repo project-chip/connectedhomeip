@@ -396,7 +396,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
         # STEP 5: Verify the CountdownTime behavior when an operation is interrupted
         self.step("5a")
         if current_countdown_time is NullValue:
-            log.info("CurrentCountdownTime is Null, skipping steps 5b to 5f.")
+            log.info("CurrentCountdownTime is Null, skipping steps 5b to 5g.")
             self.mark_step_range_skipped("5b", "5f")
         else:
             self.step("5b")
@@ -409,20 +409,24 @@ class TC_CLCTRL_7_4(MatterBaseTest):
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.GroupedMoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
 
             self.step("5c")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
+
+            self.step("5d")
             countdown_time_before_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_before_interruption > 0 and countdown_time_before_interruption <=
                                 countdown_time_max, f"CountdownTime before interruption: {countdown_time_before_interruption}.")
             log.info("CountdownTime before interruption: %s", countdown_time_before_interruption)
 
-            self.step("5d")
+            self.step("5e")
             await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.Stop())
             log.info("Stop command sent, waiting for MainState to become Stopped")
 
-            self.step("5e")
+            self.step("5f")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
                 Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
-            self.step("5f")
+            self.step("5g")
             countdown_time_after_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_after_interruption == 0,
                                 f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}.")
