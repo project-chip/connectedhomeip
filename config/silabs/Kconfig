@@ -28,9 +28,7 @@ config CHIP_DEVICE_VENDOR_NAME
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA Requestor"
 	default n
-	imply DFU_MULTI_IMAGE
-	imply DFU_TARGET
-	#imply BOOTLOADER_MCUBOOT # TODO MATTER-4888
+	imply BOOTLOADER_MCUBOOT
 	imply IMG_MANAGER
 	imply STREAM_FLASH
 	imply STREAM_FLASH_ERASE
@@ -39,7 +37,12 @@ config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
 	depends on SIGN_IMAGES
-	select DFU_MULTI_IMAGE_PACKAGE_BUILD
+
+# Sign the application with the MCUboot ECDSA-P256 development key. Only relevant
+# for MCUboot/OTA builds; replace with a private key for production.
+config MCUBOOT_SIGNATURE_KEY_FILE
+	default "bootloader/mcuboot/root-ec-p256.pem"
+	depends on BOOTLOADER_MCUBOOT
 
 config CHIP_LOG_VERIFY_OR_DIE
 	bool "Log source code location on VerifyOrDie failure"
@@ -478,11 +481,11 @@ config BOOT_IMAGE_ACCESS_HOOKS
     default n 
 
 config UPDATEABLE_IMAGE_NUMBER
-    default 2 
+    default 1
 
 config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
     int "Maximum number of images for multi-image DFU"
-    default 2
+    default 1
 
 # ==============================================================================
 # OpenThread configuration

@@ -375,6 +375,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeThreadNetworkDirectoryID:
         result = @"ThreadNetworkDirectory";
         break;
+    case MTRClusterIDTypeCommissioningProxyID:
+        result = @"CommissioningProxy";
+        break;
     case MTRClusterIDTypeWakeOnLANID:
         result = @"WakeOnLAN";
         break;
@@ -416,6 +419,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
+        break;
+    case MTRClusterIDTypeAudioControlID:
+        result = @"AudioControl";
         break;
     case MTRClusterIDTypeZoneManagementID:
         result = @"ZoneManagement";
@@ -8254,6 +8260,70 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (attributeID) {
+
+            // Cluster CommissioningProxy attributes
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeTransportID:
+            result = @"Transport";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeScanMaxTimeID:
+            result = @"ScanMaxTime";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeMaxSessionsID:
+            result = @"MaxSessions";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeMaxCachedResultsID:
+            result = @"MaxCachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeNumCachedResultsID:
+            result = @"NumCachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeCacheTimeoutID:
+            result = @"CacheTimeout";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeCachedResultsID:
+            result = @"CachedResults";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeWiFiBandID:
+            result = @"WiFiBand";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommissioningProxyAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known CommissioningProxy attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (attributeID) {
@@ -8877,6 +8947,114 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ContentAppObserver attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
+
+        switch (attributeID) {
+
+            // Cluster AudioControl attributes
+        case MTRAttributeIDTypeClusterAudioControlAttributeSoftMutedID:
+            result = @"SoftMuted";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributePhysicallyMutedID:
+            result = @"PhysicallyMuted";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeVolumeID:
+            result = @"Volume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMinDeviceVolumeID:
+            result = @"MinDeviceVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxDeviceVolumeID:
+            result = @"MaxDeviceVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxDeviceVolumeDBID:
+            result = @"MaxDeviceVolumeDB";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxUserVolumeID:
+            result = @"MaxUserVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeDefaultStepSizeID:
+            result = @"DefaultStepSize";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeSetVolumeUnmutePolicyID:
+            result = @"SetVolumeUnmutePolicy";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeIncreaseVolumeUnmutePolicyID:
+            result = @"IncreaseVolumeUnmutePolicy";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeIncreaseVolumeUnmuteVolumeID:
+            result = @"IncreaseVolumeUnmuteVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeDecreaseVolumeUnmutePolicyID:
+            result = @"DecreaseVolumeUnmutePolicy";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeStartUpMutedID:
+            result = @"StartUpMuted";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeStartUpVolumeID:
+            result = @"StartUpVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeBassID:
+            result = @"Bass";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMidID:
+            result = @"Mid";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeTrebleID:
+            result = @"Treble";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMinCorrectionID:
+            result = @"MinCorrection";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxCorrectionID:
+            result = @"MaxCorrection";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AudioControl attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -11958,6 +12136,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Calibrate";
             break;
 
+        case MTRCommandIDTypeClusterClosureControlCommandGroupedMoveToID:
+            result = @"GroupedMoveTo";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -11974,6 +12156,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterClosureDimensionCommandStepID:
             result = @"Step";
+            break;
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandGroupedSetTargetID:
+            result = @"GroupedSetTarget";
+            break;
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandGroupedStepID:
+            result = @"GroupedStep";
             break;
 
         default:
@@ -12518,6 +12708,40 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyConnectRequestID:
+            result = @"ProxyConnectRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyDisconnectRequestID:
+            result = @"ProxyDisconnectRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyScanRequestID:
+            result = @"ProxyScanRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyBackGroundScanStartRequestID:
+            result = @"ProxyBackGroundScanStartRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyBackGroundScanStopRequestID:
+            result = @"ProxyBackGroundScanStopRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyMessageRequestID:
+            result = @"ProxyMessageRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (commandID) {
@@ -12866,6 +13090,40 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageID:
             result = @"ContentAppMessage";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAudioControlCommandMuteID:
+            result = @"Mute";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandUnmuteID:
+            result = @"Unmute";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandToggleMutedID:
+            result = @"ToggleMuted";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandSetVolumeID:
+            result = @"SetVolume";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandIncreaseVolumeID:
+            result = @"IncreaseVolume";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandDecreaseVolumeID:
+            result = @"DecreaseVolume";
             break;
 
         default:
@@ -14988,6 +15246,28 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyConnectResponseID:
+            result = @"ProxyConnectResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyScanResponseID:
+            result = @"ProxyScanResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommissioningProxyCommandProxyMessageResponseID:
+            result = @"ProxyMessageResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (commandID) {
@@ -15161,6 +15441,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         case MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageResponseID:
             result = @"ContentAppMessageResponse";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -17284,6 +17574,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeCommissioningProxyID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWakeOnLANID:
 
         switch (eventID) {
@@ -17439,6 +17739,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeContentAppObserverID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
 
         switch (eventID) {
 

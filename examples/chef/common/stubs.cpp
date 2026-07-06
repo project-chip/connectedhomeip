@@ -493,7 +493,11 @@ void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
                                                        MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
-    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager[ep]);
+    if (ep < MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        targetNavigatorManager[ep].SetEndpointId(endpoint);
+        TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager[ep]);
+    }
 }
 #endif
 
@@ -611,9 +615,6 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
         TEMPORARY_RETURN_IGNORED SetTagList(
             kTemperatureControlledCabinetEpId,
             Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
-#ifdef MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
-        Clusters::OvenCavityOperationalState::InitChefOvenCavityOperationalStateCluster();
-#endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
     }
     CooktopCookSurfaceInit(kCooktopEpId);
 }

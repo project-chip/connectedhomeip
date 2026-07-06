@@ -240,6 +240,9 @@ class TestTarget:
     # arguments to pass in to the command to execute
     arguments: list[str] = field(default_factory=list)
 
+    # arguments to pass in to the test runner (e.g. chiptool.py)
+    test_arguments: list[str] = field(default_factory=list)
+
 
 @dataclass
 class KnownSubprocessEntry:
@@ -583,6 +586,7 @@ class TestDefinition:
                 pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
             test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))
+            test_cmd = test_cmd.with_args(*target.test_arguments)
             if value_wait_extra_duration_ms is not None:
                 test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(value_wait_extra_duration_ms))
 

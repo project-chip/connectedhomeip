@@ -29,7 +29,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
 from importlib.resources.abc import Traversable
-from typing import Optional, Union
+from typing import Optional
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
@@ -70,7 +70,7 @@ def get_access_privilege_or_unknown(access_value: Optional[int]) -> int:
     return ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
 
 
-def _parse_numeric_constraint_value(value_str: str) -> Optional[Union[int, float]]:
+def _parse_numeric_constraint_value(value_str: str) -> Optional[int | float]:
     """Parse a numeric constraint value, handling integers, floats, and hex strings.
 
     Returns None if the value is not purely numeric (e.g., 'MaxMeasuredValue - 1'),
@@ -116,8 +116,8 @@ class ConstraintReference:
 @dataclass
 class Constraints:
     """Constraint information for attributes, commands, and device types."""
-    min_value: Optional[Union[int, float]] = None
-    max_value: Optional[Union[int, float]] = None
+    min_value: Optional[int | float] = None
+    max_value: Optional[int | float] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
     min_count: Optional[int] = None
@@ -1289,7 +1289,8 @@ class DataModelLevel(Enum):
         raise KeyError("Invalid enum: %r" % self)
 
 
-def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
+def get_data_model_directory(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                             data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
     """
     Get the directory of the data model for a specific version and level from the installed package.
 
@@ -1315,7 +1316,8 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return zip_root / data_model_level.dirname
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], errata_path: Union[str, Traversable, None] = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                       errata_path: str | Traversable | None = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -1358,7 +1360,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
 
-    def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
+    def remove_problem(location: CommandPathLocation | FeaturePathLocation):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
 
@@ -1607,7 +1609,7 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
     return namespace, problems
 
 
-def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
+def build_xml_namespaces(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
     """Build a dictionary of namespaces from XML files in the given directory"""
     namespace_dir = get_data_model_directory(data_model_directory, DataModelLevel.kNamespace)
     namespaces: dict[int, XmlNamespace] = {}
@@ -1838,7 +1840,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable], cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: PrebuiltDataModelDirectory | Traversable, cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
@@ -1889,7 +1891,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     return device_types, problems
 
 
-def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[str, dict[str, XmlDataType]], list[ProblemNotice]]:
+def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> tuple[dict[str, dict[str, XmlDataType]], list[ProblemNotice]]:
     """
     Build XML global data types from the globals data model directory.
 
