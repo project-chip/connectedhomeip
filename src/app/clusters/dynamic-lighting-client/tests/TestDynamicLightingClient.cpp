@@ -60,8 +60,7 @@ struct MockDelegate : public DynamicLightingClientDelegate
     // and whether the list was empty.
     bool lastAvailableEffectsWasEmpty = false;
 
-    void OnAvailableEffectsChanged(
-        const DataModel::DecodableList<Structs::EffectStruct::DecodableType> & availableEffects) override
+    void OnAvailableEffectsChanged(const DataModel::DecodableList<Structs::EffectStruct::DecodableType> & availableEffects) override
     {
         ++availableEffectsCallCount;
         auto it                      = availableEffects.begin();

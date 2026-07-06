@@ -43,8 +43,7 @@ public:
      *
      * @param availableEffects  The decoded list of effects supported by the server.
      */
-    virtual void
-    OnAvailableEffectsChanged(const DataModel::DecodableList<Structs::EffectStruct::DecodableType> & availableEffects)
+    virtual void OnAvailableEffectsChanged(const DataModel::DecodableList<Structs::EffectStruct::DecodableType> & availableEffects)
     {}
 
     /**
