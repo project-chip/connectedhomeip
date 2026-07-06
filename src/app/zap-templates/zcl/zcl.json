@@ -55,6 +55,7 @@
         "electrical-protection-alarm-cluster.xml",
         "groupcast-cluster.xml",
         "humidistat-cluster.xml",
+        "media-file-management-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "meter-identification-cluster.xml",
         "door-lock-cluster.xml",

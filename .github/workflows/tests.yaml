@@ -144,6 +144,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/groupcast-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/humidistat-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/media-file-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ota-provider-cluster.xml \

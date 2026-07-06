@@ -214,6 +214,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeAccountLoginID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000050E,
     MTRClusterIDTypeContentControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000050F,
     MTRClusterIDTypeContentAppObserverID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000510,
+    MTRClusterIDTypeMediaFileManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000511,
     MTRClusterIDTypeAudioControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000512,
     MTRClusterIDTypeZoneManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000550,
     MTRClusterIDTypeCameraAVStreamManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000551,
@@ -4064,6 +4065,17 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterContentAppObserverAttributeFeatureMapID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster MediaFileManagement attributes
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeTotalStorageID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableStorageID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableFilesID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeSupportedMimeTypesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterMediaFileManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster AudioControl attributes
     MTRAttributeIDTypeClusterAudioControlAttributeSoftMutedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterAudioControlAttributePhysicallyMutedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -6496,6 +6508,15 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageResponseID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
 
+    // Cluster MediaFileManagement commands
+    MTRCommandIDTypeClusterMediaFileManagementCommandAddFileID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterMediaFileManagementCommandAddFileResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterMediaFileManagementCommandDeleteFileID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterMediaFileManagementCommandRequestSharedFilesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterMediaFileManagementCommandGetSharedFileID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterMediaFileManagementCommandGetSharedFileResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterMediaFileManagementCommandOfferFileID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+
     // Cluster AudioControl commands
     MTRCommandIDTypeClusterAudioControlCommandMuteID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterAudioControlCommandUnmuteID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -7265,6 +7286,9 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster ContentControl events
     MTREventIDTypeClusterContentControlEventRemainingScreenTimeExpiredID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterContentControlEventEnteringBlockContentTimeWindowID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
+    // Cluster MediaFileManagement events
+    MTREventIDTypeClusterMediaFileManagementEventSharedFilesAddedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster ZoneManagement events
     MTREventIDTypeClusterZoneManagementEventZoneTriggeredID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
