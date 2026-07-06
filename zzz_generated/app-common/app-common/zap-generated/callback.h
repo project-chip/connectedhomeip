@@ -8502,7 +8502,6 @@ bool emberAfContentAppObserverClusterContentAppMessageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
 /**
-<<<<<<< HEAD
  * @brief Media File Management Cluster AddFile Command callback (from client)
  */
 bool emberAfMediaFileManagementClusterAddFileCallback(
