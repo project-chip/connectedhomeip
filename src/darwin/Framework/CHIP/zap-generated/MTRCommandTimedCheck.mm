@@ -1316,6 +1316,15 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInAudioControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AudioControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInZoneManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ZoneManagement;
@@ -1901,6 +1910,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::AudioControl::Id: {
+        return CommandNeedsTimedInvokeInAudioControlCluster(commandID);
     }
     case Clusters::ZoneManagement::Id: {
         return CommandNeedsTimedInvokeInZoneManagementCluster(commandID);

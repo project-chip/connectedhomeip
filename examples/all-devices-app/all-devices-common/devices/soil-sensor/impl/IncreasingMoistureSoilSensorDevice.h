@@ -25,8 +25,7 @@ namespace chip {
 namespace app {
 
 /**
- * @brief An implementation of a Soil Sensor Device that increases moisture over time.
- *
+ * Simulated soil sensor that increases the reported moisture level over time.
  */
 class IncreasingMoistureSoilSensorDevice : public SoilSensorDevice, public TimerContext
 {

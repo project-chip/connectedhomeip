@@ -63,6 +63,10 @@
 #include <clusters/ApplicationLauncher/Commands.ipp>
 #include <clusters/ApplicationLauncher/Events.ipp>
 #include <clusters/ApplicationLauncher/Structs.ipp>
+#include <clusters/AudioControl/Attributes.ipp>
+#include <clusters/AudioControl/Commands.ipp>
+#include <clusters/AudioControl/Events.ipp>
+#include <clusters/AudioControl/Structs.ipp>
 #include <clusters/AudioOutput/Attributes.ipp>
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
@@ -1445,6 +1449,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ContentAppObserver::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AudioControl::Id: {
         switch (aCommand)
         {
         default:

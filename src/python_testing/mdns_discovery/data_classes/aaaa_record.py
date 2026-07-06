@@ -18,7 +18,7 @@
 import socket
 from dataclasses import dataclass, field
 from ipaddress import IPv6Address
-from typing import Optional, Union
+from typing import Optional
 
 from zeroconf._utils.ipaddress import ZeroconfIPv6Address
 
@@ -94,7 +94,7 @@ class AaaaRecord(JsonSerializable):
     ipv6: ZeroconfIPv6Address = field(repr=False, compare=False)
     address: str = field(init=False)
     version: int = field(init=False)
-    interface: Union[str, int] = field(init=False)
+    interface: str | int = field(init=False)
 
     type_info: AddressTypeInfo = field(init=False)
     special_types: SpecialAddressTypes = field(init=False)

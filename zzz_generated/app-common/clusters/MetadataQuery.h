@@ -30,6 +30,8 @@
 #include <clusters/ApplicationBasic/MetadataProvider.h>
 #include <clusters/ApplicationLauncher/Ids.h>
 #include <clusters/ApplicationLauncher/MetadataProvider.h>
+#include <clusters/AudioControl/Ids.h>
+#include <clusters/AudioControl/MetadataProvider.h>
 #include <clusters/AudioOutput/Ids.h>
 #include <clusters/AudioOutput/MetadataProvider.h>
 #include <clusters/AvAnalysis/Ids.h>
@@ -384,6 +386,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == ApplicationLauncher::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ApplicationLauncher::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioControl::Id) || ...))
+    {
+        if (id == AudioControl::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, AudioControl::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AudioOutput::Id) || ...))
     {

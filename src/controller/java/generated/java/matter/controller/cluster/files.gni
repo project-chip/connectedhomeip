@@ -403,6 +403,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/AmbientSensingUnionCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ApplicationBasicCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ApplicationLauncherCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/AudioControlCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/AudioOutputCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/AvAnalysisCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/BallastConfigurationCluster.kt",

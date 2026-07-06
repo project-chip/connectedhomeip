@@ -269,21 +269,96 @@ CONFIG_NVS_LOOKUP_CACHE_SIZE=1024
 
 ## OTA Software Update
 
-The supported Silicon Labs platforms support Over-The-Air (OTA) software
-updates. To enable OTA:
+This example supports Matter Over-The-Air (OTA) software updates via the generic
+Zephyr image processor (`src/platform/Zephyr/OTAImageProcessorImpl`) and
+MCUboot.
 
-1. Build with OTA support:
+Enabling `CONFIG_CHIP_OTA_REQUESTOR` implies `CONFIG_BOOTLOADER_MCUBOOT`.
 
-    ```bash
-    west build -b <board> examples/lighting-app/silabs/zephyr -- -DCONFIG_CHIP_OTA_REQUESTOR=y
-    ```
+The app is signed with the MCUboot ECDSA-P256 development key
+(`CONFIG_MCUBOOT_SIGNATURE_KEY_FILE`, set in `config/silabs/Kconfig`); replace
+it with a private key for production.
 
-2. The device will advertise OTA capability and can receive firmware updates
-   from a Matter OTA Provider.
+### Build
 
-3. Refer to the
-   [Matter OTA guide](../../../../docs/guides/ota_software_update.md) for
-   detailed instructions on setting up an OTA Provider.
+```bash
+west build -b xg24_rb4187c -p always examples/lighting-app/silabs/zephyr \
+    -- -DCONFIG_CHIP_OTA_REQUESTOR=y -DCONFIG_CHIP_OTA_IMAGE_BUILD=y
+```
+
+Build the update image with a higher software version so the provider offers it
+as newer version:
+
+```bash
+west build -b xg24_rb4187c -p always examples/lighting-app/silabs/zephyr \
+    -- -DCONFIG_CHIP_OTA_REQUESTOR=y -DCONFIG_CHIP_OTA_IMAGE_BUILD=y \
+       -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 \
+       -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"
+```
+
+Outputs in `build/zephyr/` (produced by
+`config/silabs/app/zephyr-post-build.cmake`):
+
+-   `zephyr_full.bin` — MCUboot + signed application; flash this for the initial
+    (factory) image.
+-   `matter.ota` — the image to serve from a Matter OTA Provider.
+
+### Flash the base image
+
+Use the following commander command to flash the app and bootloader.
+
+```bash
+commander flash ./build/zephyr/zephyr_full.bin --address 0x8000000
+```
+
+### Run an update
+
+The following commands are provided as examples using a
+[Silicon Labs Matter Hub image.](https://docs.silabs.com/matter/latest/matter-thread/raspi-img)
+Refer to the [Matter OTA guide](../../../../docs/guides/ota_software_update.md)
+for detailed instructions on setting up an OTA Provider.
+
+1. Flash the base (v1) image and commission the device.
+2. Serve the candidate (v2) image with `chip-ota-provider-app`
+
+```bash
+./chip-ota-provider-app \
+    --KVS /tmp/chip_kvs_provider \
+    --filepath /tmp/lighting-v2.ota \
+    --discriminator 1111 \
+    --passcode 123456789 \
+    --secured-device-port 5541 \
+    -q updateAvailable
+
+```
+
+3. Commission the OTA provider and update ACLs
+
+```bash
+PROVIDER_NODE_ID=1
+LIGHT_NODE_ID=<your-lighting-app-node-id>
+
+mattertool pairing onnetwork ${PROVIDER_NODE_ID} 123456789
+
+mattertool accesscontrol write acl \
+    '[{"fabricIndex":1,"privilege":5,"authMode":2,"subjects":[112233],"targets":null},{"fabricIndex":1,"privilege":3,"authMode":2,"subjects":null,"targets":[{"cluster":41,"endpoint":null,"deviceType":null}]}]' \
+    ${PROVIDER_NODE_ID} 0
+
+```
+
+3. Announce the provider to the device with `chip-tool`
+
+```bash
+mattertool otasoftwareupdaterequestor announce-otaprovider \
+    ${PROVIDER_NODE_ID} 0 0 0 ${LIGHT_NODE_ID} 0
+```
+
+4. Device will download and apply the OTA.
+5. Verify the OTA was applied
+
+```bash
+mattertool basicinformation read software-version ${LIGHT_NODE_ID} 0
+```
 
 ## Limitations
 
