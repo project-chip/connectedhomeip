@@ -19,13 +19,13 @@ import logging
 
 from mobly import asserts
 
+import matter.clusters as Clusters
 import matter.testing.nfc
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import TestStep
 from matter.testing.device_conformance_tests import DeviceConformanceTests
+from matter.testing.matter_testing import TestStep
 from matter.testing.runner import default_matter_test_main
-import matter.clusters as Clusters
 
 log = logging.getLogger(__name__)
 
@@ -42,17 +42,17 @@ class TC_IDM_10_7(DeviceConformanceTests):
             TestStep(2, "Perform a wildcard read on Endpoint 0 over NTL and save the result as limited_data_model.",
                      "Wildcard read successful."),
             TestStep(3, "Limited Data Model : Check clusters presence",
-                      "All the mandatory clusters should be present."),
+                     "All the mandatory clusters should be present."),
             TestStep(4, "Limited Data Model : Check clusters revisions.",
-                      "All the clusters revisions should be up-to-date."),
+                     "All the clusters revisions should be up-to-date."),
             TestStep(5, "Limited Data Model : Check clusters conformance.",
-                      "All the clusters should be compliant."),
+                     "All the clusters should be compliant."),
             TestStep(6, "Complete the commissioning",
-                      "Commissioning successful."),
+                     "Commissioning successful."),
             TestStep(7, "Discovery of full Data Model (over the operational channel) with a wildcard read.",
-                      "Wildcard read successful."),
+                     "Wildcard read successful."),
             TestStep(8, "Lmited and Full Data Model comparison: For each endpoint, compare the Descriptor Cluster present in the Limited Data Model and full Data Model.",
-                      "The Descriptor Clusters should be exactly the same (DeviceTypeList, ServerList, ClientList, PartsList, TagList, EndpointUniqueID)."),
+                     "The Descriptor Clusters should be exactly the same (DeviceTypeList, ServerList, ClientList, PartsList, TagList, EndpointUniqueID)."),
         ]
 
     def setup_test(self):
@@ -170,7 +170,6 @@ class TC_IDM_10_7(DeviceConformanceTests):
             self.fail_current_test("Limited and Full Data Model Descriptor clusters differ")
             return
 
-
     def _check_mandatory_clusters_presence(self) -> bool:
         """
         Check that the limited data model contains the mandatory clusters:
@@ -269,7 +268,6 @@ class TC_IDM_10_7(DeviceConformanceTests):
             log.exception("Conformance check failed with exception: %s", e)
             return False
 
-
     async def _wildcard_read(self, node_id: int) -> bool:
         """
         Perform a wildcard read on the node and populate:
@@ -360,6 +358,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
         except Exception as e:
             log.exception("Descriptor cluster comparison failed: %s", e)
             return False
+
 
 if __name__ == "__main__":
     default_matter_test_main()
