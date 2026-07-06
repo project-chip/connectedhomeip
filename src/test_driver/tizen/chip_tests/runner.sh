@@ -43,7 +43,7 @@ else
 fi
 
 # Try to apply the custom pattern needed for the test execution
-echo "/mnt/chip/dump/core.%e.%p.%t" > /proc/sys/kernel/core_pattern 2>/dev/null
+echo "/mnt/chip/dump/core.%e.%p.%t" >/proc/sys/kernel/core_pattern 2>/dev/null
 
 FAILED=()
 STATUS=0
