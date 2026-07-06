@@ -56,7 +56,7 @@ void LoggingOperationalStateDelegate::HandlePauseStateCallback(GenericOperationa
     ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Pause command received.");
     if (mCluster)
     {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kPaused)));
+        LogErrorOnFailure(mCluster->SetOperationalState(OperationalStateEnum::kPaused));
     }
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
@@ -66,7 +66,7 @@ void LoggingOperationalStateDelegate::HandleResumeStateCallback(GenericOperation
     ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Resume command received.");
     if (mCluster)
     {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kRunning)));
+        LogErrorOnFailure(mCluster->SetOperationalState(OperationalStateEnum::kRunning));
     }
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
@@ -76,7 +76,7 @@ void LoggingOperationalStateDelegate::HandleStartStateCallback(GenericOperationa
     ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Start command received.");
     if (mCluster)
     {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kRunning)));
+        LogErrorOnFailure(mCluster->SetOperationalState(OperationalStateEnum::kRunning));
     }
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
@@ -86,7 +86,7 @@ void LoggingOperationalStateDelegate::HandleStopStateCallback(GenericOperational
     ChipLogProgress(Zcl, "LoggingOperationalStateDelegate: Stop command received.");
     if (mCluster)
     {
-        LogErrorOnFailure(mCluster->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
+        LogErrorOnFailure(mCluster->SetOperationalState(OperationalStateEnum::kStopped));
     }
     err.Set(to_underlying(ErrorStateEnum::kNoError));
 }
