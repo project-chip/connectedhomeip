@@ -112,11 +112,11 @@ CHIP_ERROR ServiceAreaCluster::Attributes(const ConcreteClusterPath & path,
     OptionalAttributeSet enabledOptionalAttributes = mOptionalAttributes;
     if (!mFeature.Has(Feature::kMaps))
     {
-        enabledOptionalAttributes.template Clear<ServiceArea::Attributes::SupportedMaps::Id>();
+        enabledOptionalAttributes.template Set<ServiceArea::Attributes::SupportedMaps::Id>(false);
     }
     if (!mFeature.Has(Feature::kProgressReporting))
     {
-        enabledOptionalAttributes.template Clear<ServiceArea::Attributes::Progress::Id>();
+        enabledOptionalAttributes.template Set<ServiceArea::Attributes::Progress::Id>(false);
     }
 
     return listBuilder.Append(Span(ServiceArea::Attributes::kMandatoryMetadata), Span(optionalAttrs), enabledOptionalAttributes);
