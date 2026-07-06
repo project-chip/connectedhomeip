@@ -68,22 +68,17 @@
 import asyncio
 import logging
 
+from mobly import asserts
+from TC_GC_common import is_groupcast_on_root_node
+from TC_S_common import (_build_extension_fields, _is_writable, _read_scenable_value, _select_scenable_attribute, _value_bounds,
+                         _value_other_than)
+
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from mobly import asserts
-from TC_GC_common import is_groupcast_on_root_node
-from TC_S_common import (
-    _build_extension_fields,
-    _read_scenable_value,
-    _select_scenable_attribute,
-    _is_writable,
-    _value_bounds,
-    _value_other_than,
-)
 
 log = logging.getLogger(__name__)
 

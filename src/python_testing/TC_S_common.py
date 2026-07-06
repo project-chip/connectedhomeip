@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
+from mobly import asserts
+
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.spec_parsing import Clusters, XmlAttribute, build_xml_clusters, dm_from_spec_version
-from mobly import asserts
 
 # Maps a scenable attribute's spec data type to the typed value field of the
 # Scenes cluster AttributeValuePairStruct used to carry its value.
