@@ -280,7 +280,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         uint8_t * privacyHeader = packetHeader.PrivacyHeader(message->Start());
         size_t privacyLength    = packetHeader.PrivacyHeaderLength();
 
-        // We must ensure that:
+        // We must ensure that
         // 1. The privacy header starts within the message buffer.
         // 2. The privacy header lies entirely within the encoded packet header bounds (to prevent encrypting payload).
         // 3. The packet header lies entirely within the valid message buffer bounds.
