@@ -1534,11 +1534,16 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
 void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrExit(commissioner != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(commissioner->mCommissioningStage == CommissioningStage::kICDRegistration, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // On any failed check below, do NOT call CommissioningStageComplete: this response tells us
+    // nothing about whatever stage is actually in progress, and completing it here would report
+    // that unrelated stage as finished (or die on a null mDeviceBeingCommissioned).
+    VerifyOrReturn(commissioner != nullptr, ChipLogError(Controller, "RegisterClientResponse received with null context"));
+    VerifyOrReturn(commissioner->mCommissioningStage == CommissioningStage::kICDRegistration,
+                   ChipLogError(Controller, "RegisterClientResponse received in incorrect stage '%s'",
+                                StageToString(commissioner->mCommissioningStage)));
+    VerifyOrReturn(commissioner->mDeviceBeingCommissioned != nullptr,
+                   ChipLogError(Controller, "RegisterClientResponse received while no device is being commissioned"));
 
     if (commissioner->mPairingDelegate != nullptr)
     {
@@ -1546,31 +1551,35 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
             ScopedNodeId(commissioner->mDeviceBeingCommissioned->GetDeviceId(), commissioner->GetFabricIndex()), data.ICDCounter);
     }
 
-exit:
+    // All checks passed: a successful RegisterClientResponse means the kICDRegistration stage is complete.
     CommissioningDelegate::CommissioningReport report;
-    commissioner->CommissioningStageComplete(err, report);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 void DeviceCommissioner::OnICDManagementStayActiveResponse(
     void * context, const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrExit(commissioner != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(commissioner->mCommissioningStage == CommissioningStage::kICDSendStayActive, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // On any failed check below, do NOT call CommissioningStageComplete: this response tells us
+    // nothing about whatever stage is actually in progress, and completing it here would report
+    // that unrelated stage as finished (or die on a null mDeviceBeingCommissioned).
+    VerifyOrReturn(commissioner != nullptr, ChipLogError(Controller, "StayActiveResponse received with null context"));
+    VerifyOrReturn(commissioner->mCommissioningStage == CommissioningStage::kICDSendStayActive,
+                   ChipLogError(Controller, "StayActiveResponse received in incorrect stage '%s'",
+                                StageToString(commissioner->mCommissioningStage)));
+    VerifyOrReturn(commissioner->mDeviceBeingCommissioned != nullptr,
+                   ChipLogError(Controller, "StayActiveResponse received while no device is being commissioned"));
 
     if (commissioner->mPairingDelegate != nullptr)
     {
         commissioner->mPairingDelegate->OnICDStayActiveComplete(
-
             ScopedNodeId(commissioner->mDeviceBeingCommissioned->GetDeviceId(), commissioner->GetFabricIndex()),
             data.promisedActiveDuration);
     }
 
-exit:
+    // All checks passed: a successful StayActiveResponse means the kICDSendStayActive stage is complete.
     CommissioningDelegate::CommissioningReport report;
-    commissioner->CommissioningStageComplete(err, report);
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 bool DeviceCommissioner::ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
