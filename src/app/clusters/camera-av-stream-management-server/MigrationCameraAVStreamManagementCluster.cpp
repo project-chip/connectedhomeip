@@ -17,8 +17,8 @@
  */
 
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/camera-av-stream-management-server/MigratorCameraAVStreamManagementStorage.h>
 #include <app/clusters/camera-av-stream-management-server/MigrationCameraAVStreamManagementCluster.h>
+#include <app/clusters/camera-av-stream-management-server/MigratorCameraAVStreamManagementStorage.h>
 #include <lib/support/CodeUtils.h>
 
 CHIP_ERROR

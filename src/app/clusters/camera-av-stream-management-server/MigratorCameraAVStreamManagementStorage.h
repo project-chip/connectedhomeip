@@ -35,7 +35,7 @@ namespace CameraAvStreamManagement {
  * lists are excluded because they are large and ephemeral.
  */
 CHIP_ERROR MigratorCameraAVStreamManagementStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
-                                                  AttributePersistenceProvider & dstProvider);
+                                                   AttributePersistenceProvider & dstProvider);
 
 } // namespace CameraAvStreamManagement
 } // namespace Clusters

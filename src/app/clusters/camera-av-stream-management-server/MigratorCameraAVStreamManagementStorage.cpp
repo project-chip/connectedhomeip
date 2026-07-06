@@ -27,8 +27,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 
 CHIP_ERROR CameraAvStreamManagement::MigratorCameraAVStreamManagementStorage(EndpointId endpointId,
-                                                                            SafeAttributePersistenceProvider & safeProvider,
-                                                                            AttributePersistenceProvider & dstProvider)
+                                                                             SafeAttributePersistenceProvider & safeProvider,
+                                                                             AttributePersistenceProvider & dstProvider)
 {
     static constexpr AttrMigrationData kAttributesToMigrate[] = {
         { Attributes::HDRModeEnabled::Id, sizeof(bool), true },
