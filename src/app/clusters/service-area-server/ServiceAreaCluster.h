@@ -44,10 +44,9 @@ namespace ServiceArea {
 class ServiceAreaCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet = app::OptionalAttributeSet<ServiceArea::Attributes::SupportedMaps::Id,
-                                                             ServiceArea::Attributes::CurrentArea::Id,
-                                                             ServiceArea::Attributes::EstimatedEndTime::Id,
-                                                             ServiceArea::Attributes::Progress::Id>;
+    using OptionalAttributeSet =
+        app::OptionalAttributeSet<ServiceArea::Attributes::SupportedMaps::Id, ServiceArea::Attributes::CurrentArea::Id,
+                                  ServiceArea::Attributes::EstimatedEndTime::Id, ServiceArea::Attributes::Progress::Id>;
 
     /**
      * @param[in] endpointId The endpoint on which this cluster exists.

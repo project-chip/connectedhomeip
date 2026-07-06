@@ -37,8 +37,8 @@ namespace ServiceArea {
 
 ServiceAreaCluster::ServiceAreaCluster(EndpointId endpointId, StorageDelegate & storageDelegate, Delegate & delegate,
                                        BitMask<ServiceArea::Feature> feature, OptionalAttributeSet optionalAttributes) :
-    DefaultServerCluster({ endpointId, Id }), mStorageDelegate(storageDelegate), mDelegate(delegate), mFeature(feature),
-    mOptionalAttributes(optionalAttributes)
+    DefaultServerCluster({ endpointId, Id }),
+    mStorageDelegate(storageDelegate), mDelegate(delegate), mFeature(feature), mOptionalAttributes(optionalAttributes)
 {
     ChipLogProgress(Zcl, "Service Area: cluster constructor");
 }
@@ -214,13 +214,15 @@ CHIP_ERROR ServiceAreaCluster::ReadProgress(AttributeValueEncoder & aEncoder)
 //*************************************************************************
 // command handlers
 
-std::optional<DataModel::ActionReturnStatus> ServiceAreaCluster::HandleSelectAreasCmd(
-    const DataModel::InvokeRequest & request, const Commands::SelectAreas::DecodableType & req, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus>
+ServiceAreaCluster::HandleSelectAreasCmd(const DataModel::InvokeRequest & request, const Commands::SelectAreas::DecodableType & req,
+                                         CommandHandler * handler)
 {
     ChipLogDetail(Zcl, "Service Area: HandleSelectAreasCmd");
 
     // On receipt of this command the device SHALL respond with a SelectAreasResponse command.
-    auto exitResponse = [&request, handler](SelectAreasStatus status, CharSpan statusText) -> std::optional<DataModel::ActionReturnStatus> {
+    auto exitResponse = [&request, handler](SelectAreasStatus status,
+                                            CharSpan statusText) -> std::optional<DataModel::ActionReturnStatus> {
         Commands::SelectAreasResponse::Type response{
             .status     = status,
             .statusText = statusText,
@@ -370,7 +372,8 @@ std::optional<DataModel::ActionReturnStatus> ServiceAreaCluster::HandleSkipAreaC
     ChipLogDetail(Zcl, "Service Area: HandleSkipArea");
 
     // On receipt of this command the device SHALL respond with a SkipAreaResponse command.
-    auto exitResponse = [&request, handler](SkipAreaStatus status, CharSpan statusText) -> std::optional<DataModel::ActionReturnStatus> {
+    auto exitResponse = [&request, handler](SkipAreaStatus status,
+                                            CharSpan statusText) -> std::optional<DataModel::ActionReturnStatus> {
         Commands::SkipAreaResponse::Type response{
             .status     = status,
             .statusText = statusText,
@@ -1129,7 +1132,8 @@ bool ServiceAreaCluster::GetProgressElementByIndex(uint32_t listIndex, Structs::
     return mStorageDelegate.GetProgressElementByIndex(listIndex, aProgressElement);
 }
 
-bool ServiceAreaCluster::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex, Structs::ProgressStruct::Type & aProgressElement)
+bool ServiceAreaCluster::GetProgressElementById(uint32_t aAreaId, uint32_t & listIndex,
+                                                Structs::ProgressStruct::Type & aProgressElement)
 {
     return mStorageDelegate.GetProgressElementById(aAreaId, listIndex, aProgressElement);
 }
@@ -1207,7 +1211,8 @@ bool ServiceAreaCluster::SetProgressStatus(uint32_t aAreaId, OperationalStatusEn
     return true;
 }
 
-bool ServiceAreaCluster::SetProgressTotalOperationalTime(uint32_t aAreaId, const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
+bool ServiceAreaCluster::SetProgressTotalOperationalTime(uint32_t aAreaId,
+                                                         const DataModel::Nullable<uint32_t> & aTotalOperationalTime)
 {
     uint32_t listIndex;
     Structs::ProgressStruct::Type progressElement;

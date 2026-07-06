@@ -57,9 +57,9 @@ ServiceAreaCluster::OptionalAttributeSet BuildOptionalAttributes(EndpointId endp
 } // namespace
 
 Instance::Instance(StorageDelegate * storageDelegate, Delegate * aDelegate, EndpointId aEndpointId,
-                     BitMask<ServiceArea::Feature> aFeature) :
-    mStorageDelegate(storageDelegate), mDelegate(aDelegate),
-    mCluster(aEndpointId, *storageDelegate, *aDelegate, aFeature, BuildOptionalAttributes(aEndpointId))
+                   BitMask<ServiceArea::Feature> aFeature) :
+    mStorageDelegate(storageDelegate),
+    mDelegate(aDelegate), mCluster(aEndpointId, *storageDelegate, *aDelegate, aFeature, BuildOptionalAttributes(aEndpointId))
 {
     ChipLogProgress(Zcl, "Service Area: Instance constructor");
     aDelegate->SetInstance(this);
