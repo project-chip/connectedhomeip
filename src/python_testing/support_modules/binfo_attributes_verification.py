@@ -33,7 +33,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         return [
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
             TestStep(1, "TH reads DataModelRevision from the DUT.",
-                     "Verify that the value is DataModelRevision of current matter version 1.5 which is value 19"),
+                     "Verify that the value is DataModelRevision of current matter version 1.6 which is value 21"),
             TestStep(2, "TH reads VendorName from the DUT.", "Verify that the VendorName returns a string with max 32 bytes"),
             TestStep(3, "TH reads VendorID from the DUT.", "Verify value is in the range of 0x0001 to 0xFFF4"),
             TestStep(4, "TH reads ProductName from the DUT.", "Verify it is a string with max length of 32 bytes."),
@@ -87,10 +87,11 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         self.step(0)  # commissioning already done
 
+        # Step 1: DataModelRevision
         self.step(1)
         if hasattr(cluster.Attributes, 'DataModelRevision') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DataModelRevision):
             ret1 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DataModelRevision)
-            asserts.assert_equal(ret1, 19, "DataModelRevision should be 19")
+            asserts.assert_equal(ret1, 21, "DataModelRevision should be 21")
         elif not hasattr(cluster.Attributes, 'DataModelRevision'):
             self.mark_current_step_skipped()
 
