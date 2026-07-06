@@ -936,7 +936,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_BelowMaxSessionsSu
 {
     TestServerClusterContext context;
     // MaxSessions == 2: the second concurrent connect is still below the gate.
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*maxSessions=*/2));
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2));
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -997,7 +997,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_AfterConnect)
     Commands::ProxyDisconnectRequest::Type cmd;
     if (connectResult.response.has_value())
     {
-        cmd.sessionID.SetNonNull(connectResult.response->sessionID);
+        cmd.sessionID.SetNonNull(connectResult.response.value().sessionID);
         EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     }
 
@@ -1034,7 +1034,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_StateTransition
 TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionStateTransition)
 {
     TestServerClusterContext context;
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*maxSessions=*/2));
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2));
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -1052,12 +1052,12 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_MultiSessionSta
     Commands::ProxyDisconnectRequest::Type cmd;
 
     // First disconnect: one session remains, so state SHALL stay Connected.
-    cmd.sessionID.SetNonNull(r1.response->sessionID);
+    cmd.sessionID.SetNonNull(r1.response.value().sessionID);
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
 
     // Second disconnect: no sessions remain, so state SHALL revert to Disconnected.
-    cmd.sessionID.SetNonNull(r2.response->sessionID);
+    cmd.sessionID.SetNonNull(r2.response.value().sessionID);
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
 
@@ -1084,7 +1084,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_TransportFailur
     mockBle.SetDisconnectStatus(Protocols::InteractionModel::Status::Failure);
 
     Commands::ProxyDisconnectRequest::Type cmd;
-    cmd.sessionID.SetNonNull(connectResult.response->sessionID);
+    cmd.sessionID.SetNonNull(connectResult.response.value().sessionID);
     EXPECT_FALSE(tester.Invoke(cmd).IsSuccess());
 
     // State SHALL remain Connected since the transport rejected the disconnect.
@@ -1289,9 +1289,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_BleAndWiFiPAFTogether
     auto result = tester.Invoke(command);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->numberOfResults, 4u);
+    EXPECT_EQ(result.response.value().numberOfResults, 4u);
     size_t listCount = 0;
-    auto iter        = result.response->proxyScanResult.begin();
+    auto iter        = result.response.value().proxyScanResult.begin();
     while (iter.Next())
         ++listCount;
     EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
@@ -2322,7 +2322,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WrongFabricEstabli
 TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHaveDistinctSessionIds)
 {
     TestServerClusterContext context;
-    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*maxSessions=*/2));
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}, /*aMaxSessions=*/2));
     RegisterMocks(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -2336,9 +2336,9 @@ TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_MultipleSessionsHa
     ASSERT_TRUE(second.IsSuccess());
     ASSERT_TRUE(second.response.has_value());
 
-    EXPECT_NE(first.response->sessionID, 0u);
-    EXPECT_NE(second.response->sessionID, 0u);
-    EXPECT_NE(first.response->sessionID, second.response->sessionID);
+    EXPECT_NE(first.response.value().sessionID, 0u);
+    EXPECT_NE(second.response.value().sessionID, 0u);
+    EXPECT_NE(first.response.value().sessionID, second.response.value().sessionID);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2395,8 +2395,8 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimeoutZer
     auto result = tester.Invoke(cmd);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->sessionID, sid);
-    EXPECT_TRUE(result.response->message.IsNull());
+    EXPECT_EQ(result.response.value().sessionID, sid);
+    EXPECT_TRUE(result.response.value().message.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -2476,7 +2476,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_PartialStart_ReturnsS
     auto result = tester.Invoke(command);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->numberOfResults, 2u);
+    EXPECT_EQ(result.response.value().numberOfResults, 2u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
