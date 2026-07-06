@@ -3134,8 +3134,15 @@ TEST_F(TestAudioControlCluster, SetVolumeInvalidUnmutePolicyReturnsConstraintErr
     auto result = tester.Invoke(cmd);
     EXPECT_FALSE(result.IsSuccess());
     auto statusCode = result.GetStatusCode();
-    ASSERT_TRUE(statusCode.has_value());
-    EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
+    // validation to make clang-tidy happy.
+    if (statusCode.has_value())
+    {
+        EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
 
     // State unchanged.
     EXPECT_EQ(cluster.GetVolume(), 50u);
@@ -3202,16 +3209,30 @@ TEST_F(TestAudioControlCluster, IncreaseDecreaseVolumeRejectZeroStepSize)
     auto increaseResult = tester.Invoke(increaseCmd);
     EXPECT_FALSE(increaseResult.IsSuccess());
     auto increaseStatusCode = increaseResult.GetStatusCode();
-    ASSERT_TRUE(increaseStatusCode.has_value());
-    EXPECT_EQ(increaseStatusCode->GetStatus(), Status::ConstraintError);
+    // validation to make clang-tidy happy.
+    if (increaseStatusCode.has_value())
+    {
+        EXPECT_EQ(increaseStatusCode->GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
 
     DecreaseVolume::Type decreaseCmd;
     decreaseCmd.stepSize.SetValue(0);
     auto decreaseResult = tester.Invoke(decreaseCmd);
     EXPECT_FALSE(decreaseResult.IsSuccess());
     auto decreaseStatusCode = decreaseResult.GetStatusCode();
-    ASSERT_TRUE(decreaseStatusCode.has_value());
-    EXPECT_EQ(decreaseStatusCode->GetStatus(), Status::ConstraintError);
+    // validation to make clang-tidy happy.
+    if (decreaseStatusCode.has_value())
+    {
+        EXPECT_EQ(decreaseStatusCode->GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
 
     EXPECT_EQ(cluster.GetVolume(), 50u);
 
