@@ -203,16 +203,16 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 
     SendFlags sendFlags;
     sendFlags.Set(SendMessageFlags::kExpectResponse, !mSuppressResponse);
-    
+
     ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), sendFlags));
-    
+
     if (mSuppressResponse)
     {
         // No response, so we can immediately terminate
         Close();
         return CHIP_NO_ERROR;
     }
-    
+
     MoveToState(State::AwaitingResponse);
 
     return CHIP_NO_ERROR;

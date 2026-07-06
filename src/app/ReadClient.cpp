@@ -535,8 +535,8 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    Status status     = Status::InvalidAction;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Status status  = Status::InvalidAction;
     // Based on Matter specification (10.7.3. ReportDataMessage), SuppressResponse in ReportDataMessage is omitted if `false`.
     // If this is a single ReportDataMessage for the current transaction, or this is the last ReportDataMessage in the
     // transaction (i.e. there is no pending data anymore), then this ReportDataMessage should not have SuppressResponse.
