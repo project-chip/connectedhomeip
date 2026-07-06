@@ -387,8 +387,8 @@ public:
             ChipLogProgress(AppServer, "ProxyConnectRequest: BLE connected, proxy session %u (disc %u)", sessionId,
                             ctx->discriminator);
 
-            CHIP_ERROR stateErr = ctx->cluster->SetCPState(
-                chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPConnected);
+            CHIP_ERROR stateErr =
+                ctx->cluster->SetCPState(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPConnected);
             if (stateErr != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "BleProxyDelegate: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
