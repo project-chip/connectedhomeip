@@ -1535,9 +1535,7 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    // On any failed check below, do NOT call CommissioningStageComplete: this response tells us
-    // nothing about whatever stage is actually in progress, and completing it here would report
-    // that unrelated stage as finished (or die on a null mDeviceBeingCommissioned).
+    // On any failed check, log and return: this response says nothing about the stage actually in progress.
     VerifyOrReturn(commissioner != nullptr, ChipLogError(Controller, "RegisterClientResponse received with null context"));
     VerifyOrReturn(commissioner->mCommissioningStage == CommissioningStage::kICDRegistration,
                    ChipLogError(Controller, "RegisterClientResponse received in incorrect stage '%s'",
@@ -1551,7 +1549,7 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
             ScopedNodeId(commissioner->mDeviceBeingCommissioned->GetDeviceId(), commissioner->GetFabricIndex()), data.ICDCounter);
     }
 
-    // All checks passed: a successful RegisterClientResponse means the kICDRegistration stage is complete.
+    // All checks passed: the kICDRegistration stage is complete.
     CommissioningDelegate::CommissioningReport report;
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
@@ -1560,9 +1558,7 @@ void DeviceCommissioner::OnICDManagementStayActiveResponse(
     void * context, const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    // On any failed check below, do NOT call CommissioningStageComplete: this response tells us
-    // nothing about whatever stage is actually in progress, and completing it here would report
-    // that unrelated stage as finished (or die on a null mDeviceBeingCommissioned).
+    // On any failed check, log and return: this response says nothing about the stage actually in progress.
     VerifyOrReturn(commissioner != nullptr, ChipLogError(Controller, "StayActiveResponse received with null context"));
     VerifyOrReturn(commissioner->mCommissioningStage == CommissioningStage::kICDSendStayActive,
                    ChipLogError(Controller, "StayActiveResponse received in incorrect stage '%s'",
@@ -1577,7 +1573,7 @@ void DeviceCommissioner::OnICDManagementStayActiveResponse(
             data.promisedActiveDuration);
     }
 
-    // All checks passed: a successful StayActiveResponse means the kICDSendStayActive stage is complete.
+    // All checks passed: the kICDSendStayActive stage is complete.
     CommissioningDelegate::CommissioningReport report;
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
