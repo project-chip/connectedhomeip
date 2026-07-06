@@ -34,11 +34,17 @@ constexpr System::Clock::Timeout kSweepInterval = System::Clock::Seconds16(1);
 bool CommissioningProxyScanCache::Key::operator<(const Key & o) const
 {
     if (transport != o.transport)
+    {
         return transport < o.transport;
+    }
     if (discriminator != o.discriminator)
+    {
         return discriminator < o.discriminator;
+    }
     if (vid != o.vid)
+    {
         return vid < o.vid;
+    }
     return pid < o.pid;
 }
 
@@ -50,9 +56,13 @@ void CommissioningProxyScanCache::SweepTimerCallback(System::Layer * /*layer*/, 
 void CommissioningProxyScanCache::ArmSweepIfNeeded()
 {
     if (mSweepArmed || mEntries.empty())
+    {
         return;
+    }
     if (DeviceLayer::SystemLayer().StartTimer(kSweepInterval, SweepTimerCallback, this) == CHIP_NO_ERROR)
+    {
         mSweepArmed = true;
+    }
 }
 
 void CommissioningProxyScanCache::OnSweep()
@@ -77,7 +87,9 @@ void CommissioningProxyScanCache::OnSweep()
     }
 
     if (removed)
+    {
         mCluster.MarkCachedResultsDirty();
+    }
 
     ArmSweepIfNeeded();
 }
@@ -150,7 +162,9 @@ void CommissioningProxyScanCache::ClearTransport(BitMask<CapabilitiesBitmap> tra
     }
 
     if (removed)
+    {
         mCluster.MarkCachedResultsDirty();
+    }
 }
 
 uint8_t CommissioningProxyScanCache::Count() const
@@ -171,7 +185,9 @@ CHIP_ERROR CommissioningProxyScanCache::Encode(AttributeValueEncoder & encoder) 
         {
             ScanResultEntry r{};
             if (e.hasAddress)
+            {
                 r.address.SetNonNull(ByteSpan(e.address.data(), e.address.size()));
+            }
             else
                 r.address.SetNull();
             r.transport     = e.transport;
@@ -179,7 +195,9 @@ CHIP_ERROR CommissioningProxyScanCache::Encode(AttributeValueEncoder & encoder) 
             r.vendorID      = e.vendorID;
             r.productID     = e.productID;
             if (e.hasExtendedData)
+            {
                 r.extendedData.SetNonNull(ByteSpan(e.extendedData.data(), e.extendedData.size()));
+            }
             else
                 r.extendedData.SetNull();
             r.wiFiBand = e.wiFiBand;
