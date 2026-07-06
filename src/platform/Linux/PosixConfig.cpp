@@ -109,9 +109,17 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation());
-    path /= CHIP_DEFAULT_DATA_FILENAME;
-    return PersistedStorage::KeyValueStoreMgrImpl().Init(path.c_str());
+    auto & provider = chip::DeviceLayer::GetFilesystemStorageLocationProvider();
+    if (provider.LegacyKVS() == nullptr)
+    {
+        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation());
+        path /= CHIP_DEFAULT_DATA_FILENAME;
+        return PersistedStorage::KeyValueStoreMgrImpl().Init(path.c_str());
+    }
+    else
+    {
+        return PersistedStorage::KeyValueStoreMgrImpl().Init(provider.LegacyKVS());
+    }
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
@@ -493,21 +501,21 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     {
         storage = &gChipLinuxFactoryStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetFactoryDataLocation());
-        path /= "chip_factory.ini";
+        path /= CHIP_DEFAULT_FACTORY_FILENAME;
         err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
         storage = &gChipLinuxConfigStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetConfigDataLocation());
-        path /= "chip_config.ini";
+        path /= CHIP_DEFAULT_CONFIG_FILENAME;
         err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         storage = &gChipLinuxCountersStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetCountersDataLocation());
-        path /= "chip_counters.ini";
+        path /= CHIP_DEFAULT_COUNTERS_FILENAME;
         err = storage->Init(path.c_str());
     }
 

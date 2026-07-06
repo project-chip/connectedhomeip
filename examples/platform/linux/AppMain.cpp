@@ -51,7 +51,6 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/FilesystemStorageLocationProvider.h>
-#include <platform/Linux/FilesystemStorageLocationProviderImpl.h>
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
@@ -464,6 +463,7 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 class ExampleFilesystemStorageLocationProvider : public chip::DeviceLayer::FilesystemStorageLocationProvider
 {
     static std::string Default() { return std::filesystem::temp_directory_path().string(); }
+    const char * LegacyKVS() const { return LinuxDeviceOptions::GetInstance().KVS; }
     std::string GetFactoryDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSFactoryDirectory.ValueOr(Default()); }
     std::string GetConfigDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSConfigDirectory.ValueOr(Default()); }
     std::string GetCountersDataLocation() const
@@ -633,14 +633,6 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     ChipLogProgress(NotSpecified, "Storage location provider returned %s",
                     GetFilesystemStorageLocationProvider().GetConfigDataLocation().c_str());
-
-#ifdef CHIP_CONFIG_KVS_PATH
-    if (LinuxDeviceOptions::GetInstance().KVS != nullptr)
-    {
-        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
-    }
-    SuccessOrExit(err);
-#endif
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread

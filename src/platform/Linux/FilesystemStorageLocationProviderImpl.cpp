@@ -27,6 +27,11 @@ static const std::string configroot   = "/tmp";
 static const std::string countersroot = "/tmp";
 static const std::string kvsroot      = "/tmp";
 
+const char * DefaultFilesystemStorageLocationProviderImpl::LegacyKVS() const
+{
+    return nullptr;
+}
+
 std::string DefaultFilesystemStorageLocationProviderImpl::GetFactoryDataLocation() const
 {
     return factoryroot;

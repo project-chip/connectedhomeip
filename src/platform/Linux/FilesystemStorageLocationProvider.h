@@ -29,6 +29,9 @@ public:
     FilesystemStorageLocationProvider()          = default;
     virtual ~FilesystemStorageLocationProvider() = default;
 
+    // Support for the deprecated KVS flag which specifies full file path for the `data` variant and only that variant.
+    virtual const char * LegacyKVS(void) const = 0;
+
     virtual std::string GetFactoryDataLocation(void) const  = 0;
     virtual std::string GetConfigDataLocation(void) const   = 0;
     virtual std::string GetCountersDataLocation(void) const = 0;

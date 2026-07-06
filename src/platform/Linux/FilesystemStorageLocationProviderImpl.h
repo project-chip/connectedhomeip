@@ -28,6 +28,7 @@ class DefaultFilesystemStorageLocationProviderImpl : public FilesystemStorageLoc
 public:
     static DefaultFilesystemStorageLocationProviderImpl & GetDefaultInstance();
 
+    virtual const char * LegacyKVS(void) const override;
     virtual std::string GetFactoryDataLocation(void) const override;
     virtual std::string GetConfigDataLocation(void) const override;
     virtual std::string GetCountersDataLocation(void) const override;

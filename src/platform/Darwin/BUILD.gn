@@ -115,10 +115,6 @@ static_library("Darwin") {
       "DeviceInstanceInfoProviderImpl.h",
       "KeyValueStoreManagerImpl.h",
       "KeyValueStoreManagerImpl.mm",
-      "FilesystemStorageLocationProvider.cpp",
-      "FilesystemStorageLocationProvider.h",
-      "FilesystemStorageLocationProviderImpl.cpp",
-      "FilesystemStorageLocationProviderImpl.h",
     ]
   }
 
