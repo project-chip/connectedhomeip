@@ -1927,7 +1927,7 @@ cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
   /** This command MAY be used by a current Administrator to instruct a Node to go into commissioning mode, if the node supports the Basic Commissioning Method. */
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  /** This command is used by a current Administrator to instruct a Node to revoke any active xrefstyle=full or xrefstyle=full command. */
+  /** This command is used by a current Administrator to instruct a Node to revoke any active OpenCommissioningWindow or OpenBasicCommissioningWindow command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
