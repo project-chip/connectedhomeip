@@ -201,7 +201,7 @@ public:
     /**
      * @brief Add a selected area.
      * @param[in] aSelectedArea The areaID to add.
-     * @bool true if successfully added.
+     * @return true if successfully added.
      */
     bool AddSelectedArea(uint32_t & aSelectedArea);
 
@@ -212,7 +212,7 @@ public:
 
     /**
      * @param areaId the area ID to be removed from the SelectedAreas attribute.
-     * @return ture if this ID was removed, false otherwise.
+     * @return true if this ID was removed, false otherwise.
      */
     bool RemoveSelectedAreas(uint32_t areaId);
 
@@ -308,7 +308,7 @@ public:
 
     /**
      * @param areaId the area ID of the progress element to be removed.
-     * @return ture if the progress element was removed, false otherwise.
+     * @return true if the progress element was removed, false otherwise.
      */
     bool RemoveProgressElement(uint32_t areaId);
 

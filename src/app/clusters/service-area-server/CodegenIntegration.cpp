@@ -70,7 +70,7 @@ Instance::~Instance()
     if (mRegistered)
     {
         ChipLogError(AppServer, "Service Area Instance destroyed without Init() completing shutdown; unregistering now.");
-        TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
+        LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster()));
         mRegistered = false;
     }
 }
