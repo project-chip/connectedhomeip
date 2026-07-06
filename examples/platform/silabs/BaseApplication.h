@@ -122,7 +122,7 @@ public:
      *
      * @return Set to true when Init() was called successfully
      */
-    bool IsApplicationInitialized() { return mIsApplicationInitialized; }
+    bool IsApplicationInitialized() const { return mIsApplicationInitialized; }
 
     /**
      * @brief PostEvent function that add event to AppTask queue for processing

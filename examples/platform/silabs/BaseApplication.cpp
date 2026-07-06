@@ -290,7 +290,7 @@ CHIP_ERROR BaseApplication::Init()
         return err;
     }
 
-    mIsApplicationInitialized = (err == CHIP_NO_ERROR);
+    mIsApplicationInitialized = true;
     return err;
 }
 
