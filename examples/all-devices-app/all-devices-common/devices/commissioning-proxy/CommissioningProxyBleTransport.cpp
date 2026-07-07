@@ -60,10 +60,11 @@ struct BleConnectCtx
 
 // Single in-flight proxy connect (MaxSessions=1 shared across transports).
 static BleConnectCtx * sBlePendingConnect = nullptr;
-// Endpoint currently mid-BTP-handshake (set in OnBleConnectionComplete, cleared when
-// moved to sBleEndpoints on success or before Close() on failure/cancel/timeout).
-// Used in OnEndPointConnectionClosed to suppress fallthrough to mOriginalTransport
-// for endpoints we own that were never added to sBleEndpoints.
+// Endpoint that owns a close we initiated but do not want forwarded to mOriginalTransport.
+// Set in two cases: (a) mid-BTP-handshake endpoint being closed on timeout/cancel/failure
+// (set in OnBleConnectionComplete, cleared by OnEndPointConnectionClosed); (b) a promoted
+// session being closed by Disconnect() (set/cleared around ep->Close()).
+// OnEndPointConnectionClosed matches this sentinel and returns early — no forwarding.
 static BLEEndPoint * sBtpHandshakeEndpoint = nullptr;
 
 // Host cluster (set via the transport's SetHost). All transport-agnostic
@@ -253,7 +254,8 @@ static bool FindSessionId(BLEEndPoint * ep, uint16_t & outSessionId)
     return false;
 }
 
-// Forward-declarations for the IM-thread connect callbacks (defined below the delegate).
+// Forward-declarations for helpers and IM-thread connect callbacks (defined below the delegate).
+static void FailPendingConnect(chip::Protocols::InteractionModel::Status status);
 static void OnBleConnect_Found(void * appState, BLE_CONNECTION_OBJECT connObj);
 static void OnBleConnect_Error(void * appState, CHIP_ERROR err);
 static void OnBleConnect_Timeout(chip::System::Layer * layer, void * appState);
@@ -316,18 +318,7 @@ public:
         if (sBlePendingConnect != nullptr && sBlePendingConnect->endpoint == nullptr)
         {
             ChipLogError(AppServer, "BleProxyDelegate: OnBleConnectionError: %" CHIP_ERROR_FORMAT, err.Format());
-            chip::DeviceLayer::SystemLayer().CancelTimer(OnBleConnect_Timeout, nullptr);
-            auto * ctx                      = sBlePendingConnect;
-            sBlePendingConnect              = nullptr;
-            chip::app::CommandHandler * cmd = ctx->handle.Get();
-            if (cmd != nullptr)
-            {
-                cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
-            }
-            delete ctx;
-            // The connect that paused the background scan failed before any
-            // session was established; release the scanner back to the bg scan.
-            ResumeBleBgScanIfNeeded();
+            FailPendingConnect(chip::Protocols::InteractionModel::Status::Failure);
             return;
         }
         if (mOriginalTransport != nullptr)
@@ -359,6 +350,12 @@ public:
                 {
                     endpoint->Close();
                 }
+                // Clear the sentinel after Close(): if Close() fired synchronously
+                // (normal BTP failure), OnEndPointConnectionClosed already cleared it;
+                // if Close() was a no-op (StartConnect failed internally and the
+                // endpoint was already kState_Closed), the sentinel remains stale and
+                // must be cleared here.
+                sBtpHandshakeEndpoint = nullptr;
                 delete ctx;
                 // BTP handshake failed: no session was established, so release the
                 // scanner back to a background scan paused for this connect.
@@ -373,6 +370,7 @@ public:
                 {
                     endpoint->Close();
                 }
+                sBtpHandshakeEndpoint = nullptr;
                 cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
                 delete ctx;
                 ResumeBleBgScanIfNeeded();
@@ -545,16 +543,7 @@ static void OnBleConnect_Error(void * /*appState*/, CHIP_ERROR err)
         return;
     }
     ChipLogError(AppServer, "ProxyConnectRequest: BLE scan/connect failed: %" CHIP_ERROR_FORMAT, err.Format());
-    chip::DeviceLayer::SystemLayer().CancelTimer(OnBleConnect_Timeout, nullptr);
-    auto * ctx                      = sBlePendingConnect;
-    sBlePendingConnect              = nullptr;
-    chip::app::CommandHandler * cmd = ctx->handle.Get();
-    if (cmd != nullptr)
-    {
-        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
-    }
-    delete ctx;
-    ResumeBleBgScanIfNeeded();
+    FailPendingConnect(chip::Protocols::InteractionModel::Status::Failure);
 }
 
 static void OnBleConnect_Timeout(chip::System::Layer * /*layer*/, void * /*appState*/)
@@ -582,9 +571,10 @@ static void OnBleConnect_Timeout(chip::System::Layer * /*layer*/, void * /*appSt
     }
 
     // If the endpoint was already created (BTP handshake in flight), close it.
+    // Leave sBtpHandshakeEndpoint set: OnEndPointConnectionClosed checks it to
+    // suppress forwarding the close to mOriginalTransport.  The callback clears it.
     if (ctx->endpoint != nullptr)
     {
-        sBtpHandshakeEndpoint = nullptr; // prevent OnEndPointConnectionClosed fallthrough
         ctx->endpoint->Close();
     }
 
@@ -796,9 +786,10 @@ chip::Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex
         }
     }
 
+    // Leave sBtpHandshakeEndpoint set so OnEndPointConnectionClosed suppresses
+    // forwarding the close to mOriginalTransport.  The callback clears it.
     if (ctx->endpoint != nullptr)
     {
-        sBtpHandshakeEndpoint = nullptr; // prevent OnEndPointConnectionClosed fallthrough
         ctx->endpoint->Close();
     }
 
@@ -825,12 +816,17 @@ chip::Protocols::InteractionModel::Status Disconnect(uint16_t sessionId)
     BLEEndPoint * ep = it->second;
     sBleEndpoints.erase(it);
 
-    // Gracefully close the endpoint.  OnEndPointConnectionClosed will fire later
-    // but will be a no-op for this session because we've already erased it from
-    // sBleEndpoints; the dispatcher's RemoveSession is the source of truth.
+    // Erase before Close so OnEndPointConnectionClosed (which fires synchronously)
+    // finds no matching session via FindSessionId and does not call
+    // DispatchMessageFailure for this local-initiated disconnect.  Set the BTP
+    // sentinel so the close is not forwarded to mOriginalTransport.
     if (ep != nullptr)
     {
+        sBtpHandshakeEndpoint = ep;
         ep->Close();
+        // Close() fires synchronously; the callback clears sBtpHandshakeEndpoint.
+        // Clear explicitly here in case Close() was a no-op (already-closed endpoint).
+        sBtpHandshakeEndpoint = nullptr;
     }
 
     return chip::Protocols::InteractionModel::Status::Success;
@@ -1048,17 +1044,17 @@ bool IsConnectPending()
 
 void Shutdown()
 {
-    // Close all active BLE proxy sessions.  OnEndPointConnectionClosed will fire
-    // for each, but FindSessionId won't match (we've already erased from sBleEndpoints)
-    // so the callbacks are no-ops.
-    for (auto & [sid, ep] : sBleEndpoints)
+    // Move the map out first so sBleEndpoints is empty when Close() fires
+    // OnEndPointConnectionClosed synchronously — FindSessionId returns false and
+    // the callbacks are no-ops rather than erasing the iterator mid-iteration.
+    auto endpoints = std::move(sBleEndpoints);
+    for (auto & [sid, ep] : endpoints)
     {
         if (ep != nullptr)
         {
             ep->Close();
         }
     }
-    sBleEndpoints.clear();
 
     // If a ProxyConnectRequest was in flight, cancel its timeout and fail the
     // exchange.  Do not call FailPendingConnect() here — that would invoke

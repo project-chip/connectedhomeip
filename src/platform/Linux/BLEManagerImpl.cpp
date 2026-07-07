@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -870,6 +870,17 @@ CHIP_ERROR BLEManagerImpl::SwitchToCentralMode()
     if (mEndpoint.GetNumConnections() > 0)
     {
         ChipLogProgress(DeviceLayer, "SwitchToCentralMode: BLE connection still active, deferring");
+        return CHIP_ERROR_BUSY;
+    }
+
+    // Refuse if an advertising start/stop D-Bus call is in-flight.  The async
+    // completion callback (kPlatformLinuxBLEPeripheralAdvStartComplete) runs
+    // unconditionally and re-arms kAdvertising=true after we clear it below,
+    // which would cause DriveBLEState to call Stop() on an already-Shutdown()
+    // BluezAdvertisement object and permanently disable BLE via DisableBLEService.
+    if (mFlags.Has(Flags::kControlOpInProgress))
+    {
+        ChipLogProgress(DeviceLayer, "SwitchToCentralMode: BLE control operation in progress, deferring");
         return CHIP_ERROR_BUSY;
     }
 
