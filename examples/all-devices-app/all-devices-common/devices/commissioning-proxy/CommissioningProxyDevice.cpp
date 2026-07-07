@@ -68,20 +68,30 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
                 {
                     uint32_t freq = static_cast<uint32_t>(std::strtoul(p, nullptr, 10));
                     if (freq >= 2412 && freq <= 2484)
+                    {
                         bands.Set(WiFiBandBitmap::k2g4);
+                    }
                     else if (freq >= 5035 && freq <= 5980)
+                    {
                         bands.Set(WiFiBandBitmap::k5g);
+                    }
                     while (*p != '\0' && *p != ',' && *p != ' ')
+                    {
                         ++p;
+                    }
                     if (*p == ',')
+                    {
                         ++p;
+                    }
                 }
             }
         }
         // Spec WiFiBand attribute has Fallback: 2G4 — if no valid frequency was parsed,
         // default to 2.4 GHz rather than leaving the bitmap empty.
         if (!bands.HasAny())
+        {
             bands.Set(WiFiBandBitmap::k2g4);
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
@@ -116,6 +126,10 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
 void CommissioningProxyDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnDeviceEvent, 0);
+#endif
 
     if (mCluster.IsConstructed())
     {
