@@ -19,7 +19,7 @@
 #pragma once
 
 #include <Options.h>
-#include <devices/device-type-parser/DeviceTypeParser.h>
+#include <device-type-parser/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 

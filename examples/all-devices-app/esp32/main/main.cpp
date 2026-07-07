@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <ESP32DimmableLightDevice.h>
+#include <ESP32DimmableLight.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -26,8 +26,8 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
-#include <devices/root-node/WifiRootNodeDevice.h>
+#include <device/api/allocator/ConsecutiveIdAllocator.h>
+#include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <esp_system.h>
@@ -104,7 +104,7 @@ chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-std::unique_ptr<DeviceInterface> gRootNodeDevice;
+std::unique_ptr<DeviceInterface> gRootNode;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 DefaultTimerDelegate gTimerDelegate;
 
@@ -223,8 +223,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
-        RootNodeDevice::Context {
+    gRootNode = std::make_unique<WifiRootNode>(
+        RootNode::Context {
             .commissioningWindowManager           = Server::GetInstance().GetCommissioningWindowManager(),   //
                 .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
                 .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
@@ -248,12 +248,12 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        WifiRootNodeDevice::WifiContext{
+        WifiRootNode::WifiContext{
             .wifiDriver = sWiFiDriver,
         });
 
-    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-    err = gRootNodeDevice->Register(rootAllocator, dataModelProvider);
+    ConsecutiveIdAllocator rootAllocator(kRootEndpointId);
+    err = gRootNode->Register(rootAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -275,7 +275,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    ConsecutiveEndpointIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
+    ConsecutiveIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
     err = gConstructedDevice->Register(allocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
@@ -306,7 +306,7 @@ void InitServer(intptr_t context)
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
     DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return std::make_unique<ESP32DimmableLightDevice>(ESP32DimmableLightDevice::Context{
+        return std::make_unique<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,

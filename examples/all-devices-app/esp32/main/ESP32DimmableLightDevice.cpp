@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <ESP32DimmableLightDevice.h>
+#include <ESP32DimmableLight.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -24,110 +24,110 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 
-ESP32DimmableLightDevice::ESP32DimmableLightDevice(const Context & context) :
-    DimmableLightDevice(context, { .onOff = *this, .levelControl = *this, .effect = *this, .identify = *this })
+ESP32DimmableLight::ESP32DimmableLight(const Context & context) :
+    DimmableLight(context, { .onOff = *this, .levelControl = *this, .effect = *this, .identify = *this })
 {
     mLED.Init();
 }
 
 // OnOffDelegate
 
-void ESP32DimmableLightDevice::OnOffStartup(bool on)
+void ESP32DimmableLight::OnOffStartup(bool on)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnOffStartup -> %s", on ? "ON" : "OFF");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: OnOffStartup -> %s", on ? "ON" : "OFF");
     mLED.Set(on);
 }
 
-void ESP32DimmableLightDevice::OnOnOffChanged(bool on)
+void ESP32DimmableLight::OnOnOffChanged(bool on)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnOnOffChanged -> %s", on ? "ON" : "OFF");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: OnOnOffChanged -> %s", on ? "ON" : "OFF");
     mLED.Set(on);
 }
 
 // LevelControlDelegate
 
-void ESP32DimmableLightDevice::OnLevelChanged(uint8_t level)
+void ESP32DimmableLight::OnLevelChanged(uint8_t level)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnLevelChanged -> %u", level);
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: OnLevelChanged -> %u", level);
     mLED.SetBrightness(level);
 }
 
-void ESP32DimmableLightDevice::OnOptionsChanged(BitMask<LevelControl::OptionsBitmap> options)
+void ESP32DimmableLight::OnOptionsChanged(BitMask<LevelControl::OptionsBitmap> options)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnOptionsChanged -> 0x%02X", options.Raw());
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: OnOptionsChanged -> 0x%02X", options.Raw());
 }
 
-void ESP32DimmableLightDevice::OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel)
+void ESP32DimmableLight::OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnOnLevelChanged -> %s", onLevel.IsNull() ? "NULL" : "set");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: OnOnLevelChanged -> %s", onLevel.IsNull() ? "NULL" : "set");
 }
 
-void ESP32DimmableLightDevice::OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate)
+void ESP32DimmableLight::OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: OnDefaultMoveRateChanged -> %s",
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: OnDefaultMoveRateChanged -> %s",
                     defaultMoveRate.IsNull() ? "NULL" : "set");
 }
 
 // OnOffEffectDelegate
 
-DataModel::ActionReturnStatus ESP32DimmableLightDevice::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum e)
+DataModel::ActionReturnStatus ESP32DimmableLight::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum e)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: TriggerDelayedAllOff");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: TriggerDelayedAllOff");
     mLED.Set(false);
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus ESP32DimmableLightDevice::TriggerDyingLight(OnOff::DyingLightEffectVariantEnum e)
+DataModel::ActionReturnStatus ESP32DimmableLight::TriggerDyingLight(OnOff::DyingLightEffectVariantEnum e)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: TriggerDyingLight");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: TriggerDyingLight");
     mLED.SetBrightness(1);
     return Status::Success;
 }
 
 // IdentifyDelegate
 
-void ESP32DimmableLightDevice::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
+void ESP32DimmableLight::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: Identify START");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: Identify START");
     mLED.Blink(500);
     StartBlinkTimer();
 }
 
-void ESP32DimmableLightDevice::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
+void ESP32DimmableLight::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: Identify STOP");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: Identify STOP");
     StopBlinkTimer();
     mLED.Set(mLED.IsTurnedOn());
 }
 
-void ESP32DimmableLightDevice::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
+void ESP32DimmableLight::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
 {
-    ChipLogProgress(DeviceLayer, "ESP32DimmableLightDevice: TriggerEffect");
+    ChipLogProgress(DeviceLayer, "ESP32DimmableLight: TriggerEffect");
     mLED.Blink(250);
     StartBlinkTimer();
 }
 
-void ESP32DimmableLightDevice::BlinkTimerCallback(TimerHandle_t handle)
+void ESP32DimmableLight::BlinkTimerCallback(TimerHandle_t handle)
 {
-    auto * self = static_cast<ESP32DimmableLightDevice *>(pvTimerGetTimerID(handle));
+    auto * self = static_cast<ESP32DimmableLight *>(pvTimerGetTimerID(handle));
     self->mLED.Animate();
 }
 
-void ESP32DimmableLightDevice::StartBlinkTimer()
+void ESP32DimmableLight::StartBlinkTimer()
 {
     if (mBlinkTimer == nullptr)
     {
         mBlinkTimer = xTimerCreate("LedBlink", pdMS_TO_TICKS(50), pdTRUE, this, BlinkTimerCallback);
         if (mBlinkTimer == nullptr)
         {
-            ChipLogError(DeviceLayer, "ESP32DimmableLightDevice: Failed to create blink timer");
+            ChipLogError(DeviceLayer, "ESP32DimmableLight: Failed to create blink timer");
             return;
         }
     }
     xTimerStart(mBlinkTimer, 0);
 }
 
-void ESP32DimmableLightDevice::StopBlinkTimer()
+void ESP32DimmableLight::StopBlinkTimer()
 {
     if (mBlinkTimer != nullptr)
     {
@@ -135,7 +135,7 @@ void ESP32DimmableLightDevice::StopBlinkTimer()
     }
 }
 
-bool ESP32DimmableLightDevice::IsTriggerEffectEnabled() const
+bool ESP32DimmableLight::IsTriggerEffectEnabled() const
 {
     return true;
 }

@@ -15,7 +15,7 @@ To update or validate this list manually, follow these steps:
       `RegisterCreator("name", ...)` call corresponds to an implemented device
       type.
     - Note: `Root Node` (0x0016) is a special device type that is always
-      implemented on Endpoint 0, and is represented by `RootNodeDevice.h/cpp`
+      implemented on Endpoint 0, and is represented by `RootNode.h/cpp`
       under `examples/all-devices-app/all-devices-common/devices/root-node/`.
 
 2. **Verify Server Clusters per Device Type**:

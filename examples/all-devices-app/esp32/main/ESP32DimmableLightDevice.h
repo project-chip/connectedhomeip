@@ -22,7 +22,7 @@
 #include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffEffectDelegate.h>
-#include <devices/dimmable-light/DimmableLightDevice.h>
+#include <device/types/dimmable-light/DimmableLight.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
 
@@ -34,15 +34,15 @@ namespace app {
  *
  * Drives a real LED (GPIO or RMT/WS2812) via LEDWidget instead of just logging.
  */
-class ESP32DimmableLightDevice : public DimmableLightDevice,
+class ESP32DimmableLight : public DimmableLight,
                                  public Clusters::OnOffDelegate,
                                  public Clusters::LevelControlDelegate,
                                  public Clusters::OnOffEffectDelegate,
                                  public Clusters::IdentifyDelegate
 {
 public:
-    ESP32DimmableLightDevice(const Context & context);
-    ~ESP32DimmableLightDevice() override = default;
+    ESP32DimmableLight(const Context & context);
+    ~ESP32DimmableLight() override = default;
 
     // OnOffDelegate
     void OnOffStartup(bool on) override;

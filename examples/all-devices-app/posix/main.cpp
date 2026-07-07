@@ -40,8 +40,8 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/device-type-parser/DeviceTypeParser.h>
-#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
+#include <device-type-parser/DeviceTypeParser.h>
+#include <device/api/allocator/DynamicIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CommissionableDataProvider.h>
@@ -59,10 +59,10 @@
 #include <oob-accessors/pigweed/PigweedAttributeAccessor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
-#include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
-#include <devices/interface/SingleEndpointDevice.h>
-#include <devices/occupancy-sensor/OccupancySensorDevice.h>
-#include <devices/on-off-light/impl/LoggingOnOffLightDevice.h>
+#include <device/types/boolean-state-sensor/BooleanStateSensor.h>
+#include <device/api/SingleEndpoint.h>
+#include <device/types/occupancy-sensor/OccupancySensor.h>
+#include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -185,7 +185,7 @@ public:
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-        DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
+        DynamicIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
 
@@ -261,19 +261,19 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
 
         if (config.type == "occupancy-sensor")
         {
-            auto * occupancyDevice = static_cast<OccupancySensorDevice *>(device);
+            auto * occupancyDevice = static_cast<OccupancySensor *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::OccupancySensingCluster>(&occupancyDevice->OccupancySensingCluster());
         }
         else if (config.type == "contact-sensor" || config.type == "water-leak-detector")
         {
-            auto * booleanStateDevice = static_cast<BooleanStateSensorDevice *>(device);
+            auto * booleanStateDevice = static_cast<BooleanStateSensor *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::BooleanStateCluster>(&booleanStateDevice->BooleanState());
         }
         else if (config.type == "on-off-light")
         {
-            auto * lightDevice = static_cast<LoggingOnOffLightDevice *>(device);
+            auto * lightDevice = static_cast<LoggingOnOffLight *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::OnOffCluster>(&lightDevice->OnOffCluster());
         }
@@ -281,7 +281,7 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
 
     gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
         .RegisterClusterInstance<chip::app::Clusters::BasicInformationCluster>(
-            &devices.RootNode().GetRootNodeDevice().BasicInformation());
+            &devices.RootNode().GetRootNode().BasicInformation());
     gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
 
     CHIP_ERROR err = gNamedPipeCommands.Start(namedPipePath, &gAllDevicesAppCommandDelegate);

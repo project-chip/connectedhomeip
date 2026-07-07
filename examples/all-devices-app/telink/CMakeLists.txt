@@ -71,9 +71,9 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c)
 
 if(CONFIG_NET_L2_OPENTHREAD)
-  target_sources(app PRIVATE ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/ThreadRootNodeDevice.cpp)
+  target_sources(app PRIVATE ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/ThreadRootNode.cpp)
 elseif(CONFIG_CHIP_WIFI)
-  target_sources(app PRIVATE ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/WifiRootNodeDevice.cpp)
+  target_sources(app PRIVATE ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/WifiRootNode.cpp)
 endif()
 
 if(CONFIG_PWM)

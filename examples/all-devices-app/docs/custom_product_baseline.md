@@ -48,14 +48,14 @@ endpoints and Interaction Model clusters.
 
 ### The Device Manager Header (`MyBulbDeviceManager.h`)
 
-Instantiate device classes (such as `LoggingDimmableLightDevice`) directly.
+Instantiate device classes (such as `LoggingDimmableLight`) directly.
 
 ```cpp
 #pragma once
 
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
+#include <device/types/dimmable-light/LoggingDimmableLight.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -108,7 +108,7 @@ CHIP_ERROR MyBulbDeviceManager::Init(PersistentStorageDelegate & storageDelegate
     mDataModelProvider = std::make_unique<CodeDrivenDataModelProvider>(storageDelegate, mAttributePersistence);
 
     // 2. Instantiate the precise C++ functional device object for our Smart Bulb
-    mMainLightEndpoint = std::make_unique<LoggingDimmableLightDevice>(LoggingDimmableLightDevice::Context{
+    mMainLightEndpoint = std::make_unique<LoggingDimmableLight>(LoggingDimmableLight::Context{
         .groupDataProvider = groupDataProvider,
         .fabricTable       = fabricTable,
         .timerDelegate     = mTimerDelegate,
