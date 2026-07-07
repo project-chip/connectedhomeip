@@ -2670,6 +2670,21 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMediaFileManagementClusterFileDescriptionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull fileID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull size MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull mimeType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull imageUri MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMediaFileManagementClusterSharedFilesAddedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull requestID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull responseID MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRZoneManagementClusterTwoDCartesianVertexStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull x MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull y MTR_PROVISIONALLY_AVAILABLE;

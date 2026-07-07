@@ -7179,6 +7179,56 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("FileID", indent + 1, value.fileID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FileID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Name'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Size", indent + 1, value.size);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Size'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MimeType", indent + 1, value.mimeType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MimeType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ImageUri", indent + 1, value.imageUri);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ImageUri'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -13179,6 +13229,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const MediaFileManagement::Events::SharedFilesAdded::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("RequestID", indent + 1, value.requestID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RequestID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ResponseID", indent + 1, value.responseID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ResponseID'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const ZoneManagement::Events::ZoneTriggered::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -14354,6 +14428,24 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
     ReturnErrorOnFailure(DataModelLogger::LogValue("data", indent + 1, value.data));
     ReturnErrorOnFailure(DataModelLogger::LogValue("encodingHint", indent + 1, value.encodingHint));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const MediaFileManagement::Commands::AddFileResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("fileID", indent + 1, value.fileID));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const MediaFileManagement::Commands::GetSharedFileResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("fileDescription", indent + 1, value.fileDescription));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -24387,6 +24479,59 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case MediaFileManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case MediaFileManagement::Attributes::TotalStorage::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TotalStorage", 1, value);
+        }
+        case MediaFileManagement::Attributes::AvailableStorage::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AvailableStorage", 1, value);
+        }
+        case MediaFileManagement::Attributes::AvailableFiles::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AvailableFiles", 1, value);
+        }
+        case MediaFileManagement::Attributes::SupportedMimeTypes::Id: {
+            chip::app::DataModel::DecodableList<chip::CharSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedMimeTypes", 1, value);
+        }
+        case MediaFileManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, MediaFileManagement::Id);
+        }
+        case MediaFileManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, MediaFileManagement::Id);
+        }
+        case MediaFileManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, MediaFileManagement::Id);
+        }
+        case MediaFileManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case MediaFileManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case AudioControl::Id: {
         switch (path.mAttributeId)
         {
@@ -27011,6 +27156,22 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
+    case MediaFileManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case MediaFileManagement::Commands::AddFileResponse::Id: {
+            MediaFileManagement::Commands::AddFileResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AddFileResponse", 1, value);
+        }
+        case MediaFileManagement::Commands::GetSharedFileResponse::Id: {
+            MediaFileManagement::Commands::GetSharedFileResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetSharedFileResponse", 1, value);
+        }
+        }
+        break;
+    }
     case ZoneManagement::Id: {
         switch (path.mCommandId)
         {
@@ -28278,6 +28439,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ContentControl::Events::EnteringBlockContentTimeWindow::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnteringBlockContentTimeWindow", 1, value);
+        }
+        }
+        break;
+    }
+    case MediaFileManagement::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case MediaFileManagement::Events::SharedFilesAdded::Id: {
+            chip::app::Clusters::MediaFileManagement::Events::SharedFilesAdded::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SharedFilesAdded", 1, value);
         }
         }
         break;
