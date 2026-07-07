@@ -66,7 +66,7 @@
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
 #endif
-#endif //SILABS_LOG_ENABLED
+#endif // SILABS_LOG_ENABLED
 using namespace chip::Logging::Platform;
 
 #if SILABS_LOG_ENABLED

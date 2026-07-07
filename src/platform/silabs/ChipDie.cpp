@@ -27,7 +27,7 @@
 #else
 #include "SEGGER_RTT.h"
 #endif
-#endif //SILABS_LOG_ENABLED
+#endif // SILABS_LOG_ENABLED
 // TODO: The FreeRTOS CMSIS OS2 wrapper does not implement osKernelSuspend().
 // Using vTaskSuspendAll() directly until the SDK provides the wrapper.
 #include "FreeRTOS.h"
