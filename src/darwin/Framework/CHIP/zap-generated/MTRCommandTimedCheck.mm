@@ -1160,6 +1160,15 @@ static BOOL CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(AttributeId a
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommissioningProxyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommissioningProxy;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -1301,6 +1310,24 @@ static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttribut
 static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ContentAppObserver;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInMediaFileManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MediaFileManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInAudioControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AudioControl;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1478,6 +1505,15 @@ static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId
 static BOOL CommandNeedsTimedInvokeInSampleMEICluster(AttributeId aAttributeId)
 {
     using namespace Clusters::SampleMei;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInTestHiddenManufacturerSpecificCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TestHiddenManufacturerSpecific;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1839,6 +1875,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ThreadNetworkDirectory::Id: {
         return CommandNeedsTimedInvokeInThreadNetworkDirectoryCluster(commandID);
     }
+    case Clusters::CommissioningProxy::Id: {
+        return CommandNeedsTimedInvokeInCommissioningProxyCluster(commandID);
+    }
     case Clusters::WakeOnLan::Id: {
         return CommandNeedsTimedInvokeInWakeOnLANCluster(commandID);
     }
@@ -1880,6 +1919,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::MediaFileManagement::Id: {
+        return CommandNeedsTimedInvokeInMediaFileManagementCluster(commandID);
+    }
+    case Clusters::AudioControl::Id: {
+        return CommandNeedsTimedInvokeInAudioControlCluster(commandID);
     }
     case Clusters::ZoneManagement::Id: {
         return CommandNeedsTimedInvokeInZoneManagementCluster(commandID);
@@ -1937,6 +1982,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::SampleMei::Id: {
         return CommandNeedsTimedInvokeInSampleMEICluster(commandID);
+    }
+    case Clusters::TestHiddenManufacturerSpecific::Id: {
+        return CommandNeedsTimedInvokeInTestHiddenManufacturerSpecificCluster(commandID);
     }
     default: {
         return NO;

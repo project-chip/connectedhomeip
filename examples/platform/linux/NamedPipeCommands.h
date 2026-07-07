@@ -39,17 +39,15 @@ public:
 };
 
 /**
- * This class implements a listener for named pipes (FIFOs). It uses a UNIX daemon
- * best-practice pattern of opening the FIFO with O_RDWR. This prevents the `read()`
- * call from constantly busy-looping and returning 0 (EOF) when external writers
- * (like a one-shot `echo` command) connect, write, and immediately disconnect.
+ * This class implements a listener for named pipes (FIFOs) to implement debug
+ * command input/ouput for POSIX-based samples.
  *
  * Each handler has an input `inPath` (e.g. "/tmp/matter_test_pipe") and may also
  * have an `outPath` which can be used with `WriteToOutPipe` to communicate
  * payloads to another app's input pipe.
  *
  * All payloads should be JSON to work with existing conventions (although the
- * NamedPipeCommands class does no parsing of its own or any real JSON checks.
+ * NamedPipeCommands class does no parsing of its own or any real JSON checks).
  *
  * The handling of incoming payloads is done via NamedPipeCommandDelegate class
  * instances which expect a single JSON string payload, usually of the shape:
@@ -60,11 +58,12 @@ public:
  *
  *   echo '{"Name": "SimulateSwitchIdle", "EndpointId": 3}' > /tmp/chip_all_clusters_fifo_1146610
  *
+ * Take care to delegate Matter stack actions done in NamedPipeCommandDelegate
+ * using ScheduleWork!
+ *
  * NOTE: Start() and Stop() must be called from the same thread (e.g., during outer
  * application initialization and shutdown sequencing) to ensure proper lifecycle
- * and synchronization.
- *
- * NOTE: Instances of NamedPipeCommands are one-time use. Once Stop() is called,
+ * and synchronization. Instances of NamedPipeCommands are one-time use. Once Stop() is called,
  * the instance cannot be restarted.
  *
  */

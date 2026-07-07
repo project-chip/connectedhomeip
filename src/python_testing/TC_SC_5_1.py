@@ -100,8 +100,12 @@ class TC_SC_5_1(MatterBaseTest):
             TestStep("6a", "TH sends ViewGroup command with GroupID 0x0103 (GroupNames supported)."),
             TestStep("6b", "TH sends ViewGroup command with GroupID 0x0103 (GroupNames not supported)."),
             TestStep("7", "If Groupcast NOT enabled, skip to step 10. TH sends LeaveGroup(groupID=0) to Groupcast cluster on EP0."),
-            TestStep("8", "TH sends JoinGroup command to Groupcast cluster on EP0 with GroupID 0x0103, Endpoints, KeySetID 0x01a3."),
-            TestStep("9", "TH reads Membership attribute from Groupcast cluster on EP0."),
+            TestStep("8a", "TH sends JoinGroup command to Groupcast cluster on EP0 with GroupID 0x0103, Endpoints, KeySetID 0x01a3."),
+            TestStep("8b", "TH reads Membership attribute from Groupcast cluster on EP0."),
+            TestStep("9a", "TH sends JoinGroup with a new GroupID 0x0104 and a new KeySetID 0x01a4 carrying a 16-byte Key (auto-creates a key set via Groupcast)."),
+            TestStep("9b", "TH reads GroupKeyMap and verifies the Groupcast-created GroupID 0x0104 -> KeySetID 0x01a4 mapping."),
+            TestStep("9c", "TH sends KeySetRead for GroupKeySetID 0x01a4 and verifies the auto-created GroupKeySet fields."),
+            TestStep("9d", "TH cleans up by sending LeaveGroup(0x0104) and KeySetRemove(0x01a4)."),
             TestStep("10", "TH sends KeySetRead command to GroupKeyManagement cluster with GroupKeySetID 0x01a3."),
             TestStep("11", "TH reads GroupKeyMap Attribute from the GroupKeyManagement cluster."),
             TestStep("12a", "TH reads GroupTable attribute (GroupNames supported)."),
@@ -228,7 +232,7 @@ class TC_SC_5_1(MatterBaseTest):
 
         # Step 7: LeaveGroup (Groupcast path only)
         if not groupcast_enabled:
-            self.mark_step_range_skipped("7", "9")
+            self.mark_step_range_skipped("7", "9d")
         else:
             self.step("7")
             membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
@@ -236,20 +240,52 @@ class TC_SC_5_1(MatterBaseTest):
                 # LeaveGroup with groupID 0 will leave all groups on the fabric.
                 await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
 
-            # Step 8: JoinGroup
-            self.step("8")
+            # Step 8a: JoinGroup
+            self.step("8a")
             ln_enabled, _, _ = await get_feature_map(self)
             join_endpoints = [groups_endpoint] if ln_enabled else []
             await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
                 groupID=0x0103, endpoints=join_endpoints, keySetID=0x01a3))
 
-            # Step 9: Read Membership
-            self.step("9")
+            # Step 8b: Read Membership
+            self.step("8b")
             membership = await self.read_single_attribute_check_success(
                 cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership, endpoint=0)
             asserts.assert_equal(len(membership), 1, "Membership should have 1 entry")
             group_ids = [entry.groupID for entry in membership]
             asserts.assert_in(0x0103, group_ids, "GroupID 0x0103 not found in Membership")
+
+            # Step 9a: Send JoinGroup that creates a new key set through the Groupcast cluster
+            self.step("9a")
+            await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
+                groupID=0x0104, endpoints=join_endpoints, keySetID=0x01a4,
+                key=bytes.fromhex("e0e1e2e3e4e5e6e7e8e9eaebecedeeef")))
+
+            # Step 9b: Groupcast-created key set is visible in GroupKeyMap
+            self.step("9b")
+            group_key_map = await self.read_single_attribute_check_success(
+                cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap, endpoint=0)
+            mappings = [(entry.groupId, entry.groupKeySetID) for entry in group_key_map]
+            asserts.assert_in((0x0104, 0x01a4), mappings,
+                              "GroupKeyMap missing Groupcast-created GroupID 0x0104 -> KeySetID 0x01a4")
+
+            # Step 9c: KeySetRead returns the auto-created GroupKeySet
+            self.step("9c")
+            result = await dev_ctrl.SendCommand(
+                commissioner_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetRead(0x01a4))
+            asserts.assert_equal(result.groupKeySet.groupKeySetID, 0x01a4, "KeySetRead groupKeySetID mismatch")
+            asserts.assert_equal(result.groupKeySet.groupKeySecurityPolicy, 0, "KeySetRead securityPolicy mismatch")
+            asserts.assert_equal(result.groupKeySet.epochKey0, NullValue, "EpochKey0 should be null in read response")
+            asserts.assert_equal(result.groupKeySet.epochStartTime0, 1, "EpochStartTime0 mismatch")
+            asserts.assert_equal(result.groupKeySet.epochKey1, NullValue, "EpochKey1 should be null")
+            asserts.assert_equal(result.groupKeySet.epochStartTime1, NullValue, "EpochStartTime1 should be null")
+            asserts.assert_equal(result.groupKeySet.epochKey2, NullValue, "EpochKey2 should be null")
+            asserts.assert_equal(result.groupKeySet.epochStartTime2, NullValue, "EpochStartTime2 should be null")
+
+            # Step 9d: Clean up the Groupcast-created group and key set
+            self.step("9d")
+            await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0x0104))
+            await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetRemove(0x01a4))
 
         # Step 10: KeySetRead
         self.step("10")
