@@ -674,6 +674,83 @@ TEST_F(TestHumidistatCluster, SetSettingsModeFailStopsProcessing)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestHumidistatCluster, SetSettingsCanDisallowContinuousTrueIndependently)
+{
+    const BitFlags<Feature> features{ Feature::kContinuous, Feature::kHumidifier, Feature::kColdMist };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    cluster.SetSetSettingsAllowContinuous(false);
+
+    Commands::SetSettings::Type request;
+    request.continuous.SetValue(true);
+
+    auto result = tester.Invoke(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    EXPECT_FALSE(cluster.GetContinuous());
+    EXPECT_FALSE(tester.IsAttributeDirty(Continuous::Id));
+
+    // Policy now enforced in setter as well.
+    EXPECT_EQ(cluster.SetContinuous(true), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    EXPECT_FALSE(cluster.GetContinuous());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, SetSettingsCanDisallowSleepTrueIndependently)
+{
+    HumidistatCluster::OptionalAttributeSet optionalAttrs;
+    optionalAttrs.Set<Sleep::Id>();
+
+    HumidistatCluster cluster(kTestEndpointId, {Feature::kHumidifier, Feature::kColdMist}, optionalAttrs);
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    cluster.SetSetSettingsAllowSleep(false);
+
+    Commands::SetSettings::Type request;
+    request.sleep.SetValue(true);
+
+    auto result = tester.Invoke(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    EXPECT_FALSE(cluster.GetSleep());
+    EXPECT_FALSE(tester.IsAttributeDirty(Sleep::Id));
+
+    // Policy now enforced in setter as well.
+    EXPECT_EQ(cluster.SetSleep(true), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    EXPECT_FALSE(cluster.GetSleep());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, SetSettingsCanDisallowOptimalTrueIndependently)
+{
+    const BitFlags<Feature> features{ Feature::kOptimal, Feature::kSensor, Feature::kHumidifier, Feature::kColdMist };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    cluster.SetSetSettingsAllowOptimal(false);
+
+    Commands::SetSettings::Type request;
+    request.optimal.SetValue(true);
+
+    auto result = tester.Invoke(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    EXPECT_FALSE(cluster.GetOptimal());
+    EXPECT_FALSE(tester.IsAttributeDirty(Optimal::Id));
+
+    // Policy now enforced in setter as well.
+    EXPECT_EQ(cluster.SetOptimal(true), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    EXPECT_FALSE(cluster.GetOptimal());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestHumidistatCluster, TestPersistence)
 {
     const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kSensor, Feature::kContinuous, Feature::kOptimal,

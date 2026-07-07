@@ -583,6 +583,10 @@ CHIP_ERROR HumidistatCluster::SetTargetSetpoint(chip::Percent targetSetpoint)
 CHIP_ERROR HumidistatCluster::SetContinuous(bool continuous)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kContinuous), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    if (continuous)
+    {
+        VerifyOrReturnError(mAllowSetSettingsContinuous, CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    }
 
     VerifyOrReturnValue(SetAttributeValue(mContinuous, continuous, Continuous::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
@@ -603,6 +607,10 @@ CHIP_ERROR HumidistatCluster::SetContinuous(bool continuous)
 CHIP_ERROR HumidistatCluster::SetSleep(bool sleep)
 {
     VerifyOrReturnError(mOptionalAttributes.IsSet(Sleep::Id), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    if (sleep)
+    {
+        VerifyOrReturnError(mAllowSetSettingsSleep, CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    }
 
     VerifyOrReturnValue(SetAttributeValue(mSleep, sleep, Sleep::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
@@ -625,6 +633,10 @@ CHIP_ERROR HumidistatCluster::SetSleep(bool sleep)
 CHIP_ERROR HumidistatCluster::SetOptimal(bool optimal)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kOptimal), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    if (optimal)
+    {
+        VerifyOrReturnError(mAllowSetSettingsOptimal, CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    }
 
     VerifyOrReturnValue(SetAttributeValue(mOptimal, optimal, Optimal::Id), CHIP_NO_ERROR);
     if (mContext != nullptr)
