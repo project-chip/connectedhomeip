@@ -1405,31 +1405,43 @@ def assert_valid_ipv6_addresses(addresses: list[str]) -> None:
         asserts.fail(f"Invalid IPv6 addresses: {invalid}")
 
 @not_none_args
-async def assert_txt_record_present(instance_name: str, service_type: str) -> None:
+async def assert_txt_record_present(instance_name: str, service_type: MdnsServiceType, require_keys: bool = False) -> None:
     """
     Verifies the presence of the TXT record for the given instance name and service type.
 
     Args:
         instance_name (str): The instance name of the DUT.
         service_type (str): The service type identifying the service to query.
+        require_keys (bool): If True, additionally verifies that the TXT record
+            contains at least one key/value pair. Use for services where at least
+            one TXT key is mandatory (e.g. commissionable, or operational when the
+            DUT is an ICD or claims TCP support).
 
     Raises:
-        TestFailure: If the TXT record cannot be retrieved from the DUT.
+        TestFailure: If the TXT record cannot be retrieved from the DUT, or if
+            require_keys is True and the TXT record contains no key/value pairs.
     """
+    instance_qname = f"{instance_name}.{service_type.value}"
     try:
-        instance_qname = f"{instance_name}.{service_type}"
         txt_record = await MdnsDiscovery().get_txt_record(
             service_name=instance_qname,
-            service_type=service_type,
+            service_type=service_type.value,
         )
     except Exception as e:
         asserts.fail(
-            f"TXT record expected but not found for instance name '{instance_name}' "
+            f"{service_type.name.lower().title()} TXT record expected but not found for instance name '{instance_name}' "
             f"of type '{service_type}': {e}"
         )
 
-    if txt_record is None:
-        asserts.fail(
-            f"TXT record expected but not found for instance name '{instance_name}' "
-            f"of type '{service_type}'"
+    asserts.assert_is_not_none(
+        txt_record,
+        f"{service_type.name.lower().title()} TXT record expected but not found for instance name '{instance_name}' "
+        f"of type '{service_type}'"
+    )
+
+    if require_keys:
+        asserts.assert_greater(
+            len(txt_record.txt), 0,
+            f"{service_type.name.lower().title()} TXT record found but contains no key/value pairs for instance name "
+            f"'{instance_name}' of type '{service_type}'"
         )
