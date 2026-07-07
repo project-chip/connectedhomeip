@@ -72,7 +72,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_onboarding_data = reader.read_nfc_tag_data()
-        log.info(f"NFC Tag data : '{nfc_onboarding_data}'")
+        log.info("NFC Tag data : '%s'", nfc_onboarding_data)
         asserts.assert_true(
             reader.is_onboarding_data(nfc_onboarding_data),
             f"'{nfc_onboarding_data}' is not a valid Matter URI"
