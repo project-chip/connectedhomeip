@@ -50,6 +50,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/DimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-light/impl/LoggingDimmableLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/dishwasher/DishwasherDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/extractor-hood/ExtractorHoodDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/fan/FanDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/fan/impl/LoggingFanDevice.cpp"
@@ -58,8 +59,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/generic-switch/GenericSwitchDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/HumiditySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/laundry-dryer/LaundryDryerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/laundry-washer/LaundryWasherDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/LightSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/light-sensor/impl/IncreasingLightSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/microwave-oven/MicrowaveOvenDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/mounted-dimmable-load-control/MountedDimmableLoadControlDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/mounted-on-off-control/MountedOnOffControlDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.cpp"
@@ -77,6 +81,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/ProximityRangerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/refrigerator/RefrigeratorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/refrigerator/impl/LoggingRefrigeratorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/robotic-vacuum-cleaner/RoboticVacuumCleanerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingProximityRangerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/proximity-ranger/impl/LoggingRangingAdapter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
@@ -97,13 +102,15 @@ set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/DimmableLoadDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/dimmable-load/impl/LoggingDimmableLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/FanLoadDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/fan-load/impl/LoggingFanLoadDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/OnOffLoadDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/on-off-load/impl/LoggingOnOffLoadDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingOperationalStateDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/capabilities/operational-state/LoggingRvcOperationalStateDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/endpoint-id-allocator/DynamicEndpointIdAllocator.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     # keep-sorted: end
 )
 
@@ -154,12 +161,16 @@ foreach(_key
         device-energy-management
         dimmable-light
         dimmable-plug-in-unit
+        dishwasher
         extractor-hood
         fan
         flow-sensor
         generic-switch
         humidity-sensor
+        laundry-dryer
+        laundry-washer
         light-sensor
+        microwave-oven
         mounted-dimmable-load-control
         mounted-on-off-control
         network-infrastructure-manager
@@ -173,6 +184,7 @@ foreach(_key
         proximity-ranger
         rain-sensor
         refrigerator
+        robotic-vacuum-cleaner
         smoke-co-alarm
         soil-sensor
         speaker

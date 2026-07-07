@@ -10926,6 +10926,62 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::MediaFileManagement::Id: {
+        using namespace app::Clusters::MediaFileManagement;
+        switch (aPath.mEventId)
+        {
+        case Events::SharedFilesAdded::Id: {
+            Events::SharedFilesAdded::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_requestID;
+            std::string value_requestIDClassName     = "java/lang/Integer";
+            std::string value_requestIDCtorSignature = "(I)V";
+            jint jnivalue_requestID                  = static_cast<jint>(cppValue.requestID);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_requestIDClassName.c_str(), value_requestIDCtorSignature.c_str(), jnivalue_requestID, value_requestID);
+
+            jobject value_responseID;
+            std::string value_responseIDClassName     = "java/lang/Integer";
+            std::string value_responseIDCtorSignature = "(I)V";
+            jint jnivalue_responseID                  = static_cast<jint>(cppValue.responseID);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_responseIDClassName.c_str(), value_responseIDCtorSignature.c_str(), jnivalue_responseID, value_responseID);
+
+            jclass sharedFilesAddedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MediaFileManagementClusterSharedFilesAddedEvent",
+                sharedFilesAddedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MediaFileManagementClusterSharedFilesAddedEvent");
+                return nullptr;
+            }
+
+            jmethodID sharedFilesAddedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, sharedFilesAddedStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                &sharedFilesAddedStructCtor);
+            if (err != CHIP_NO_ERROR || sharedFilesAddedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MediaFileManagementClusterSharedFilesAddedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(sharedFilesAddedStructClass, sharedFilesAddedStructCtor, value_requestID, value_responseID);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::AudioControl::Id: {
         using namespace app::Clusters::AudioControl;
         switch (aPath.mEventId)
