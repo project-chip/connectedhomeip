@@ -129,12 +129,13 @@ class TC_CLCTRL_7_4(MatterBaseTest):
             TestStep("4h", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
             TestStep("4i", "If CurrentCountdownTime is null skip step 4j"),
             TestStep("4j", "Read the CountdownTime attribute", "CountdownTime should be 0"),
-            TestStep("5a", "If CurrentCountdownTime is null, skip steps 5b to 5f"),
+            TestStep("5a", "If CurrentCountdownTime is null, skip steps 5b to 5g"),
             TestStep("5b", "Send GroupedMoveTo command with Position = MoveToFullyClosed", "Receive SUCCESS response from the DUT"),
-            TestStep("5c", "Read the CountdownTime attribute", "CountdownTime should be between 1 and countdown_time_max"),
-            TestStep("5d", "Send Stop command", "Receive SUCCESS response from the DUT"),
-            TestStep("5e", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
-            TestStep("5f", "Read the CountdownTime attribute", "CountdownTime should be 0"),
+            TestStep("5c", "Wait until a subscription report with MainState is received", "MainState should be Moving"),
+            TestStep("5d", "Read the CountdownTime attribute", "CountdownTime should be between 1 and countdown_time_max"),
+            TestStep("5e", "Send Stop command", "Receive SUCCESS response from the DUT"),
+            TestStep("5f", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
+            TestStep("5g", "Read the CountdownTime attribute", "CountdownTime should be 0"),
         ]
 
     def pics_TC_CLCTRL_7_4(self) -> list[str]:
