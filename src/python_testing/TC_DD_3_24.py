@@ -16,7 +16,6 @@
 
 import asyncio
 import logging
-import matter.testing.nfc
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
