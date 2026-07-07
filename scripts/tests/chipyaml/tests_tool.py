@@ -30,9 +30,31 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
     kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'specifications_paths': specifications_paths, 'pics': pics,
               'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
 
+    # Naming translation map from command-line options (e.g. --PICS or --value-wait-extra-duration-ms)
+    # to the exact click option parameter variable names expected by runner_base (e.g. pics, valueWaitExtraDurationMs).
+    # Since command line parsing collects unknown options manually as strings inside the commands list,
+    # we bypass click's automatic option name mapping and type conversion. This map restores the naming
+    # translation.
+    option_mapping = {
+        'PICS': 'pics',
+        'value-wait-extra-duration-ms': 'valueWaitExtraDurationMs',
+    }
+
     index = 0
     while len(commands) - index > 1:
-        kwargs[commands[index].replace('--', '')] = commands[index+1]
+        key = commands[index].replace('--', '')
+        mapped_key = option_mapping.get(key, key)
+        val = commands[index+1]
+        # Because options are manually parsed as strings from the argv commands list,
+        # we must perform manual type casting to match the types expected by runner_base.
+        # Otherwise, passing them as strings would lead to TypeErrors or unexpected truthiness (e.g. bool("False")).
+        if mapped_key == 'valueWaitExtraDurationMs':
+            val = int(val)
+        elif mapped_key == 'stop_on_error':
+            val = val.lower() in ('true', '1', 'yes')
+        elif mapped_key == 'use_default_pseudo_clusters':
+            val = val.lower() in ('true', '1', 'yes')
+        kwargs[mapped_key] = val
         index += 2
     ctx.invoke(runner_base, **kwargs)
 
