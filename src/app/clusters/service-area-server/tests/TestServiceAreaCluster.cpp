@@ -81,7 +81,7 @@ TEST_F(ServiceAreaClusterTest, MandatoryAttributesAreAdvertised)
 
 TEST_F(ServiceAreaClusterTest, OptionalAttributesAreAdvertisedWhenEnabled)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps, Feature::kProgressReporting),
+    CreateCluster({ .features           = BitMask<Feature>(Feature::kMaps, Feature::kProgressReporting),
                     .optionalAttributes = AllOptionalAttributes() });
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
@@ -138,9 +138,9 @@ TEST_F(ServiceAreaClusterTest, SupportedAreasStartsEmpty)
 
 TEST_F(ServiceAreaClusterTest, MeaningfulAreaDescriptionsAppearInSupportedAreas)
 {
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeNamedArea(0, "blue room")));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeFloorArea(1, 2)));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeLandmarkOnlyArea(2, LandmarkTag::kTable)));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeNamedArea(0, "blue room")));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeFloorArea(1, 2)));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeLandmarkOnlyArea(2, LandmarkTag::kTable)));
 
     EXPECT_EQ(CountSupportedAreas(*mTester), 3u);
 }
@@ -149,7 +149,7 @@ TEST_F(ServiceAreaClusterTest, InvalidAreaDescriptionsDoNotAppearInSupportedArea
 {
     AreaStructureWrapper missingDescription;
     missingDescription.SetAreaId(0).SetMapId(DataModel::NullNullable).SetLocationInfoNull().SetLandmarkInfoNull();
-    AddSupportedArea(*mCluster,missingDescription);
+    AddSupportedArea(*mCluster, missingDescription);
     EXPECT_EQ(CountSupportedAreas(*mTester), 0u);
 
     AreaStructureWrapper emptySemantics;
@@ -157,51 +157,49 @@ TEST_F(ServiceAreaClusterTest, InvalidAreaDescriptionsDoNotAppearInSupportedArea
         .SetMapId(DataModel::NullNullable)
         .SetLocationInfo(""_span, DataModel::NullNullable, DataModel::NullNullable)
         .SetLandmarkInfoNull();
-    AddSupportedArea(*mCluster,emptySemantics);
+    AddSupportedArea(*mCluster, emptySemantics);
     EXPECT_EQ(CountSupportedAreas(*mTester), 0u);
 }
 
 TEST_F(ServiceAreaClusterTest, DuplicateAreaIdsAreNotAddedToSupportedAreas)
 {
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeNamedArea(0, "room a")));
-    AddSupportedArea(*mCluster,MakeNamedArea(0, "room b"));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeNamedArea(0, "room a")));
+    AddSupportedArea(*mCluster, MakeNamedArea(0, "room b"));
     EXPECT_EQ(CountSupportedAreas(*mTester), 1u);
 }
 
 TEST_F(ServiceAreaClusterTest, DuplicateAreaInfoIsNotAddedWhenMapsAreEmpty)
 {
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeNamedArea(0, "hallway")));
-    AddSupportedArea(*mCluster,MakeNamedArea(1, "hallway"));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeNamedArea(0, "hallway")));
+    AddSupportedArea(*mCluster, MakeNamedArea(1, "hallway"));
     EXPECT_EQ(CountSupportedAreas(*mTester), 1u);
 }
 
 TEST_F(ServiceAreaClusterTest, SameAreaInfoOnDifferentMapsIsAllowed)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps),
-                    .optionalAttributes = AllOptionalAttributes() });
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
 
     ASSERT_TRUE(mCluster->AddSupportedMap(1, "floor one"_span));
     ASSERT_TRUE(mCluster->AddSupportedMap(2, "floor two"_span));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeMappedArea(5, 1, "hallway")));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeMappedArea(3, 2, "hallway")));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(5, 1, "hallway")));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(3, 2, "hallway")));
 
     EXPECT_EQ(CountSupportedAreas(*mTester), 2u);
 }
 
 TEST_F(ServiceAreaClusterTest, AreasWithoutMapsMustHaveNullMapId)
 {
-    AddSupportedArea(*mCluster,MakeMappedArea(0, 1, "room"));
+    AddSupportedArea(*mCluster, MakeMappedArea(0, 1, "room"));
     EXPECT_EQ(CountSupportedAreas(*mTester), 0u);
 }
 
 TEST_F(ServiceAreaClusterTest, AreasMustReferenceKnownMapsWhenMapsExist)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps),
-                    .optionalAttributes = AllOptionalAttributes() });
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
 
     ASSERT_TRUE(mCluster->AddSupportedMap(1, "main floor"_span));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeMappedArea(0, 1, "kitchen")));
-    AddSupportedArea(*mCluster,MakeMappedArea(1, 99, "garage"));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(0, 1, "kitchen")));
+    AddSupportedArea(*mCluster, MakeMappedArea(1, 99, "garage"));
 
     EXPECT_EQ(CountSupportedAreas(*mTester), 1u);
 }
@@ -213,8 +211,8 @@ TEST_F(ServiceAreaClusterTest, RemovingSupportedAreaUpdatesSelectedAreasAndCurre
     CreateCluster({ .optionalAttributes = optionalAttributes });
 
     SeedBasicAreas();
-    ASSERT_TRUE(AddSelectedArea(*mCluster,static_cast<uint32_t>(0)));
-    ASSERT_TRUE(AddSelectedArea(*mCluster,static_cast<uint32_t>(1)));
+    ASSERT_TRUE(AddSelectedArea(*mCluster, static_cast<uint32_t>(0)));
+    ASSERT_TRUE(AddSelectedArea(*mCluster, static_cast<uint32_t>(1)));
     ASSERT_TRUE(mCluster->SetCurrentArea(DataModel::MakeNullable(static_cast<uint32_t>(1))));
 
     ASSERT_TRUE(mCluster->RemoveSupportedArea(1));
@@ -236,7 +234,7 @@ TEST_F(ServiceAreaClusterTest, ClearingSupportedAreasClearsDependentAttributes)
     CreateCluster({ .features = BitMask<Feature>(Feature::kProgressReporting), .optionalAttributes = optionalAttributes });
 
     SeedBasicAreas();
-    ASSERT_TRUE(AddSelectedArea(*mCluster,static_cast<uint32_t>(0)));
+    ASSERT_TRUE(AddSelectedArea(*mCluster, static_cast<uint32_t>(0)));
     ASSERT_TRUE(mCluster->SetCurrentArea(DataModel::MakeNullable(static_cast<uint32_t>(0))));
     ASSERT_TRUE(mCluster->AddPendingProgressElement(0));
 
@@ -257,14 +255,14 @@ TEST_F(ServiceAreaClusterTest, ClearingSupportedAreasClearsDependentAttributes)
 TEST_F(ServiceAreaClusterTest, SupportedAreasListIsUnchangedWhenDelegateDisallowsUpdates)
 {
     mDelegate.mSupportedAreasChangeAllowed = false;
-    AddSupportedArea(*mCluster,MakeNamedArea(0, "room"));
+    AddSupportedArea(*mCluster, MakeNamedArea(0, "room"));
     EXPECT_EQ(CountSupportedAreas(*mTester), 0u);
 }
 
 TEST_F(ServiceAreaClusterTest, ModifyingSupportedAreaUpdatesReadableAreaInfo)
 {
     SeedBasicAreas();
-    ASSERT_TRUE(ModifySupportedArea(*mCluster,MakeNamedArea(0, "renamed bedroom")));
+    ASSERT_TRUE(ModifySupportedArea(*mCluster, MakeNamedArea(0, "renamed bedroom")));
 
     DataModel::DecodableList<Structs::AreaStruct::DecodableType> areas;
     EXPECT_TRUE(mTester->ReadAttribute(Attributes::SupportedAreas::Id, areas).IsSuccess());
@@ -303,8 +301,7 @@ TEST_F(ServiceAreaClusterTest, SupportedMapsIsUnsupportedWithoutMapsFeature)
 
 TEST_F(ServiceAreaClusterTest, DuplicateMapIdsOrNamesAreNotAdded)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps),
-                    .optionalAttributes = AllOptionalAttributes() });
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
 
     ASSERT_TRUE(mCluster->AddSupportedMap(1, "Main Floor"_span));
     mCluster->AddSupportedMap(1, "Duplicate Id"_span);
@@ -316,12 +313,11 @@ TEST_F(ServiceAreaClusterTest, DuplicateMapIdsOrNamesAreNotAdded)
 
 TEST_F(ServiceAreaClusterTest, RemovingMapRemovesItsAreas)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps),
-                    .optionalAttributes = AllOptionalAttributes() });
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
 
     ASSERT_TRUE(mCluster->AddSupportedMap(1, "floor one"_span));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeMappedArea(0, 1, "kitchen")));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeMappedArea(1, 1, "bedroom")));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(0, 1, "kitchen")));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(1, 1, "bedroom")));
     ASSERT_TRUE(mCluster->RemoveSupportedMap(1));
 
     EXPECT_EQ(CountSupportedMaps(*mTester), 0u);
@@ -330,11 +326,10 @@ TEST_F(ServiceAreaClusterTest, RemovingMapRemovesItsAreas)
 
 TEST_F(ServiceAreaClusterTest, ClearingSupportedMapsClearsSupportedAreas)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps),
-                    .optionalAttributes = AllOptionalAttributes() });
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
 
     ASSERT_TRUE(mCluster->AddSupportedMap(1, "floor one"_span));
-    ASSERT_TRUE(AddSupportedArea(*mCluster,MakeMappedArea(0, 1, "kitchen")));
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(0, 1, "kitchen")));
     ASSERT_TRUE(mCluster->ClearSupportedMaps());
 
     EXPECT_EQ(CountSupportedMaps(*mTester), 0u);
@@ -343,8 +338,7 @@ TEST_F(ServiceAreaClusterTest, ClearingSupportedMapsClearsSupportedAreas)
 
 TEST_F(ServiceAreaClusterTest, RenamedMapIsVisibleOnRead)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps),
-                    .optionalAttributes = AllOptionalAttributes() });
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
 
     ASSERT_TRUE(mCluster->AddSupportedMap(1, "old name"_span));
     ASSERT_TRUE(mCluster->RenameSupportedMap(1, "new name"_span));
@@ -359,8 +353,7 @@ TEST_F(ServiceAreaClusterTest, RenamedMapIsVisibleOnRead)
 
 TEST_F(ServiceAreaClusterTest, SupportedMapsListIsUnchangedWhenDelegateDisallowsClear)
 {
-    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps),
-                    .optionalAttributes = AllOptionalAttributes() });
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
 
     ASSERT_TRUE(mCluster->AddSupportedMap(1, "floor"_span));
     mDelegate.mSupportedMapChangeAllowed = false;
@@ -379,11 +372,11 @@ TEST_F(ServiceAreaClusterTest, SelectedAreasStartsEmpty)
 
 TEST_F(ServiceAreaClusterTest, SelectedAreasOnlyContainsSupportedAreaIds)
 {
-    AddSelectedArea(*mCluster,static_cast<uint32_t>(0));
+    AddSelectedArea(*mCluster, static_cast<uint32_t>(0));
     EXPECT_TRUE(ReadSelectedAreasList(*mTester).empty());
 
     SeedBasicAreas();
-    ASSERT_TRUE(AddSelectedArea(*mCluster,static_cast<uint32_t>(0)));
+    ASSERT_TRUE(AddSelectedArea(*mCluster, static_cast<uint32_t>(0)));
 
     auto selected = ReadSelectedAreasList(*mTester);
     ASSERT_EQ(selected.size(), 1u);
@@ -393,8 +386,8 @@ TEST_F(ServiceAreaClusterTest, SelectedAreasOnlyContainsSupportedAreaIds)
 TEST_F(ServiceAreaClusterTest, SelectedAreasDoesNotContainDuplicates)
 {
     SeedBasicAreas();
-    ASSERT_TRUE(AddSelectedArea(*mCluster,static_cast<uint32_t>(0)));
-    AddSelectedArea(*mCluster,static_cast<uint32_t>(0));
+    ASSERT_TRUE(AddSelectedArea(*mCluster, static_cast<uint32_t>(0)));
+    AddSelectedArea(*mCluster, static_cast<uint32_t>(0));
 
     auto selected = ReadSelectedAreasList(*mTester);
     ASSERT_EQ(selected.size(), 1u);
@@ -405,7 +398,7 @@ TEST_F(ServiceAreaClusterTest, SelectedAreasIsUnchangedWhenDelegateDisallowsSele
 {
     SeedBasicAreas();
     mDelegate.mSetSelectedAreasAllowed = false;
-    AddSelectedArea(*mCluster,static_cast<uint32_t>(0));
+    AddSelectedArea(*mCluster, static_cast<uint32_t>(0));
     EXPECT_TRUE(ReadSelectedAreasList(*mTester).empty());
 }
 
@@ -663,7 +656,7 @@ TEST_F(ServiceAreaClusterTest, SelectAreasUpdatesSelectedAreasAttribute)
 TEST_F(ServiceAreaClusterTest, SelectAreasWithEmptyListRemovesAreaConstraint)
 {
     SeedBasicAreas();
-    ASSERT_TRUE(AddSelectedArea(*mCluster,static_cast<uint32_t>(0)));
+    ASSERT_TRUE(AddSelectedArea(*mCluster, static_cast<uint32_t>(0)));
 
     auto result = mTester->Invoke(MakeSelectAreasRequest({}));
     ASSERT_TRUE(result.IsSuccess());

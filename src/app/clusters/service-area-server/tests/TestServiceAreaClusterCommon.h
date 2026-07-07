@@ -310,7 +310,7 @@ public:
     CharSpan mInvalidModeText               = "device not idle"_span;
     CharSpan mSelectAreasSetStatusText      = "invalid set"_span;
     CharSpan mSkipAreaStatusText            = "cannot skip in current mode"_span;
-    uint32_t mLastSkippedArea = 0;
+    uint32_t mLastSkippedArea               = 0;
 
     void Reset()
     {
@@ -346,12 +346,15 @@ inline AreaStructureWrapper MakeNamedArea(uint32_t areaId, const char * name)
 {
     AreaStructureWrapper area;
     CharSpan nameSpan(name, strlen(name));
-    area.SetAreaId(areaId).SetMapId(DataModel::NullNullable).SetLocationInfo(nameSpan, DataModel::NullNullable, DataModel::NullNullable);
+    area.SetAreaId(areaId)
+        .SetMapId(DataModel::NullNullable)
+        .SetLocationInfo(nameSpan, DataModel::NullNullable, DataModel::NullNullable);
     return area;
 }
 
-inline AreaStructureWrapper MakeLandmarkOnlyArea(uint32_t areaId, LandmarkTag landmark,
-                                                 const DataModel::Nullable<RelativePositionTag> & position = DataModel::NullNullable)
+inline AreaStructureWrapper
+MakeLandmarkOnlyArea(uint32_t areaId, LandmarkTag landmark,
+                     const DataModel::Nullable<RelativePositionTag> & position = DataModel::NullNullable)
 {
     AreaStructureWrapper area;
     area.SetAreaId(areaId).SetMapId(DataModel::NullNullable).SetLocationInfoNull().SetLandmarkInfo(landmark, position);
@@ -516,9 +519,9 @@ protected:
         }
         mStorage = InMemoryStorageDelegate{};
         mDelegate.Reset();
-        mCluster = std::make_unique<ServiceAreaCluster>(kTestEndpoint, mStorage, mDelegate, config.features,
-                                                        config.optionalAttributes);
-        mTester   = std::make_unique<ClusterTester>(*mCluster);
+        mCluster =
+            std::make_unique<ServiceAreaCluster>(kTestEndpoint, mStorage, mDelegate, config.features, config.optionalAttributes);
+        mTester = std::make_unique<ClusterTester>(*mCluster);
         ASSERT_EQ(mCluster->Startup(mTester->GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
