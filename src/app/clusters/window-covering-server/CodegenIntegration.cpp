@@ -130,27 +130,30 @@ public:
         gDelegateWrappers[clusterInstanceIndex].SetEndpoint(endpointId);
         WindowCoveringCluster::Config config(gDelegateWrappers[clusterInstanceIndex]);
         config.WithFeatures(features).WithOptionalAttributes(optionalAttributes);
-        gServers[clusterInstanceIndex].Create(endpointId, config);
 
-        auto & cluster = gServers[clusterInstanceIndex].Cluster();
-
-        // Load mandatory attribute values from ZAP-defined defaults.
+        // RAM attributes whose default is defined per-endpoint in the application Matter files
+        // are passed to the constructor via Config (per the Default Value Rule). If a default is
+        // not present in ZAP, the Config's own default (spec conformance value) is used.
         WindowCovering::Type type{};
         if (Attributes::Type::GetDefault(endpointId, &type) == Status::Success)
         {
-            cluster.SetType(type);
-        }
-
-        chip::BitMask<WindowCovering::ConfigStatus> configStatus;
-        if (Attributes::ConfigStatus::GetDefault(endpointId, &configStatus) == Status::Success)
-        {
-            cluster.SetConfigStatus(configStatus);
+            config.WithType(type);
         }
 
         WindowCovering::EndProductType endProductType{};
         if (Attributes::EndProductType::GetDefault(endpointId, &endProductType) == Status::Success)
         {
-            cluster.SetEndProductType(endProductType);
+            config.WithEndProductType(endProductType);
+        }
+
+        gServers[clusterInstanceIndex].Create(endpointId, config);
+
+        auto & cluster = gServers[clusterInstanceIndex].Cluster();
+
+        chip::BitMask<WindowCovering::ConfigStatus> configStatus;
+        if (Attributes::ConfigStatus::GetDefault(endpointId, &configStatus) == Status::Success)
+        {
+            cluster.SetConfigStatus(configStatus);
         }
 
         chip::BitMask<WindowCovering::Mode> mode;

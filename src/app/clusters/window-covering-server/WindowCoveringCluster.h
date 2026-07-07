@@ -97,9 +97,23 @@ public:
             return *this;
         }
 
+        Config & WithType(Type type)
+        {
+            mType = type;
+            return *this;
+        }
+
+        Config & WithEndProductType(EndProductType endProductType)
+        {
+            mEndProductType = endProductType;
+            return *this;
+        }
+
         WindowCoveringDelegate & mDelegate;
         BitFlags<Feature> mFeatures;
         OptionalAttributeSet mOptionalAttributes;
+        Type mType                     = Type::kRollerShade;
+        EndProductType mEndProductType = EndProductType::kRollerShade;
     };
 
     WindowCoveringCluster(EndpointId endpointId, const Config & config);

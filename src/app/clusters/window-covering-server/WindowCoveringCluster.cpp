@@ -82,7 +82,8 @@ namespace WindowCovering {
 
 WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, WindowCovering::Id)), mDelegate(config.mDelegate),
-    mFeatureMap(config.mFeatures), mOptionalAttributes(config.mOptionalAttributes)
+    mFeatureMap(config.mFeatures), mOptionalAttributes(config.mOptionalAttributes), mType(config.mType),
+    mEndProductType(config.mEndProductType)
 {
     // Lift or Tilt must be enabled.
     VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kLift) || mFeatureMap.Has(Feature::kTilt), AppServer,
