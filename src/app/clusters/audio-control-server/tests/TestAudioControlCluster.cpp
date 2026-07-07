@@ -369,6 +369,70 @@ TEST_F(TestAudioControlCluster, ReadUnsupportedAttribute)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// ---------- default-case coverage: bypass ClusterTester's AttributeList/AcceptedCommands
+// pre-checks and call the cluster directly, since those checks otherwise short-circuit before ever
+// reaching ReadAttribute()/WriteAttribute()/InvokeCommand()'s `default:` branches. ----------
+
+TEST_F(TestAudioControlCluster, ReadAttributeDefaultCaseReturnsUnsupportedAttribute)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    chip::Testing::ReadOperation readOperation(kRootEndpointId, AudioControl::Id, 0xFFFF);
+    MockCommandHandler handler;
+    readOperation.SetSubjectDescriptor(handler.GetSubjectDescriptor());
+    std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
+    auto status                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
+    EXPECT_FALSE(status.IsSuccess());
+    EXPECT_EQ(status.GetStatusCode().GetStatus(), Status::UnsupportedAttribute);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, WriteAttributeDefaultCaseReturnsUnsupportedAttribute)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    chip::Testing::WriteOperation writeOp(kRootEndpointId, AudioControl::Id, 0xFFFF);
+    MockCommandHandler handler;
+    writeOp.SetSubjectDescriptor(handler.GetSubjectDescriptor());
+    auto decoder = writeOp.DecoderFor<uint16_t>(0);
+    auto status  = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
+    EXPECT_FALSE(status.IsSuccess());
+    EXPECT_EQ(status.GetStatusCode().GetStatus(), Status::UnsupportedAttribute);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, InvokeCommandDefaultCaseReturnsUnsupportedCommand)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    MockCommandHandler handler;
+    const DataModel::InvokeRequest invokeRequest({ kRootEndpointId, AudioControl::Id, 0xFFFF }, handler.GetSubjectDescriptor());
+
+    uint8_t buffer[16];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType outerContainerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+
+    auto result = cluster.InvokeCommand(invokeRequest, reader, &handler);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_FALSE(result->IsSuccess());
+    EXPECT_EQ(result->GetStatusCode().GetStatus(), Status::UnsupportedCommand);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestAudioControlCluster, ReadMaxDeviceVolumeDB)
 {
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithMaxDeviceVolumeDB(1200));
