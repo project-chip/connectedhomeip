@@ -21,12 +21,13 @@
 
 #include <string.h>
 
+#if SILABS_LOG_ENABLED
 #if SILABS_LOG_OUT_UART
 #include "uart.h"
 #else
 #include "SEGGER_RTT.h"
 #endif
-
+#endif //SILABS_LOG_ENABLED
 // TODO: The FreeRTOS CMSIS OS2 wrapper does not implement osKernelSuspend().
 // Using vTaskSuspendAll() directly until the SDK provides the wrapper.
 #include "FreeRTOS.h"
@@ -84,12 +85,13 @@ static void PrintAddr(const char (&prefix)[N], uintptr_t addr)
     msg[suffixPos]     = '\r';
     msg[suffixPos + 1] = '\n';
     msg[totalLen]      = '\0';
-
+#if SILABS_LOG_ENABLED
 #if SILABS_LOG_OUT_UART
     uartForceTransmit(msg, totalLen);
 #else
     SEGGER_RTT_WriteNoLock(0, msg, totalLen);
 #endif
+#endif // SILABS_LOG_ENABLED
 }
 
 extern "C" void chipDie(void)
