@@ -20000,6 +20000,159 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedMediaFileManagementClusterAddFileResponseCallback implements ChipClusters.MediaFileManagementCluster.AddFileResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer status, @Nullable Long fileID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
+      responseValues.put(statusResponseValue, status);
+      CommandResponseInfo fileIDResponseValue = new CommandResponseInfo("fileID", "Long");
+      responseValues.put(fileIDResponseValue, fileID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterGetSharedFileResponseCallback implements ChipClusters.MediaFileManagementCluster.GetSharedFileResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer status, @Nullable Optional<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> fileDescription) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
+      responseValues.put(statusResponseValue, status);
+      // fileDescription: Struct FileDescriptionStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedMediaFileManagementClusterAvailableFilesAttributeCallback implements ChipClusters.MediaFileManagementCluster.AvailableFilesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.MediaFileManagementClusterFileDescriptionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterSupportedMimeTypesAttributeCallback implements ChipClusters.MediaFileManagementCluster.SupportedMimeTypesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<String> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.MediaFileManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.MediaFileManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterAttributeListAttributeCallback implements ChipClusters.MediaFileManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedAudioControlClusterStartUpMutedAttributeCallback implements ChipClusters.AudioControlCluster.StartUpMutedAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -25374,6 +25527,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ContentAppObserverCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("contentAppObserver", contentAppObserverClusterInfo);
 
+    ClusterInfo mediaFileManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.MediaFileManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("mediaFileManagement", mediaFileManagementClusterInfo);
+
     ClusterInfo audioControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.AudioControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("audioControl", audioControlClusterInfo);
@@ -25600,6 +25757,7 @@ public class ClusterInfoMapping {
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("contentControl").combineCommands(source.get("contentControl"));
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
+    destination.get("mediaFileManagement").combineCommands(source.get("mediaFileManagement"));
     destination.get("audioControl").combineCommands(source.get("audioControl"));
     destination.get("zoneManagement").combineCommands(source.get("zoneManagement"));
     destination.get("cameraAvStreamManagement").combineCommands(source.get("cameraAvStreamManagement"));
@@ -32835,6 +32993,145 @@ public class ClusterInfoMapping {
     contentAppObserverClusterInteractionInfoMap.put("contentAppMessage", contentAppObservercontentAppMessageInteractionInfo);
 
     commandMap.put("contentAppObserver", contentAppObserverClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> mediaFileManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> mediaFileManagementaddFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementaddFilenameCommandParameterInfo = new CommandParameterInfo("name", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("name",mediaFileManagementaddFilenameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementaddFilesizeCommandParameterInfo = new CommandParameterInfo("size", Long.class, Long.class);
+    mediaFileManagementaddFileCommandParams.put("size",mediaFileManagementaddFilesizeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementaddFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("mimeType",mediaFileManagementaddFilemimeTypeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementaddFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("imageUri",mediaFileManagementaddFileimageUriCommandParameterInfo);
+    InteractionInfo mediaFileManagementaddFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+          .addFile((ChipClusters.MediaFileManagementCluster.AddFileResponseCallback) callback
+           , (String)
+             commandArguments.get("name")
+
+           , (Long)
+             commandArguments.get("size")
+
+           , (String)
+             commandArguments.get("mimeType")
+
+           , (String)
+             commandArguments.get("imageUri")
+
+            );
+        },
+        () -> new DelegatedMediaFileManagementClusterAddFileResponseCallback(),
+        mediaFileManagementaddFileCommandParams
+      );
+    mediaFileManagementClusterInteractionInfoMap.put("addFile", mediaFileManagementaddFileInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementdeleteFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementdeleteFilefileIDCommandParameterInfo = new CommandParameterInfo("fileID", Long.class, Long.class);
+    mediaFileManagementdeleteFileCommandParams.put("fileID",mediaFileManagementdeleteFilefileIDCommandParameterInfo);
+    InteractionInfo mediaFileManagementdeleteFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+        .deleteFile((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("fileID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        mediaFileManagementdeleteFileCommandParams
+    );
+    mediaFileManagementClusterInteractionInfoMap.put("deleteFile", mediaFileManagementdeleteFileInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementrequestSharedFilesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementrequestSharedFilesclientNameCommandParameterInfo = new CommandParameterInfo("clientName", String.class, String.class);
+    mediaFileManagementrequestSharedFilesCommandParams.put("clientName",mediaFileManagementrequestSharedFilesclientNameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementrequestSharedFilesrequestIDCommandParameterInfo = new CommandParameterInfo("requestID", Integer.class, Integer.class);
+    mediaFileManagementrequestSharedFilesCommandParams.put("requestID",mediaFileManagementrequestSharedFilesrequestIDCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementrequestSharedFilessupportedMimeTypesCommandParameterInfo = new CommandParameterInfo("supportedMimeTypes", Optional.class, ArrayList.class);
+    mediaFileManagementrequestSharedFilesCommandParams.put("supportedMimeTypes",mediaFileManagementrequestSharedFilessupportedMimeTypesCommandParameterInfo);
+    InteractionInfo mediaFileManagementrequestSharedFilesInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+        .requestSharedFiles((DefaultClusterCallback) callback
+        , (String)
+        commandArguments.get("clientName")
+        , (Integer)
+        commandArguments.get("requestID")
+        , (Optional<ArrayList<String>>)
+        commandArguments.get("supportedMimeTypes")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        mediaFileManagementrequestSharedFilesCommandParams
+    );
+    mediaFileManagementClusterInteractionInfoMap.put("requestSharedFiles", mediaFileManagementrequestSharedFilesInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementgetSharedFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementgetSharedFileresponseIDCommandParameterInfo = new CommandParameterInfo("responseID", Integer.class, Integer.class);
+    mediaFileManagementgetSharedFileCommandParams.put("responseID",mediaFileManagementgetSharedFileresponseIDCommandParameterInfo);
+    InteractionInfo mediaFileManagementgetSharedFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+          .getSharedFile((ChipClusters.MediaFileManagementCluster.GetSharedFileResponseCallback) callback
+           , (Integer)
+             commandArguments.get("responseID")
+
+            );
+        },
+        () -> new DelegatedMediaFileManagementClusterGetSharedFileResponseCallback(),
+        mediaFileManagementgetSharedFileCommandParams
+      );
+    mediaFileManagementClusterInteractionInfoMap.put("getSharedFile", mediaFileManagementgetSharedFileInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementofferFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementofferFileclientNameCommandParameterInfo = new CommandParameterInfo("clientName", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("clientName",mediaFileManagementofferFileclientNameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFilenameCommandParameterInfo = new CommandParameterInfo("name", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("name",mediaFileManagementofferFilenameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFilesizeCommandParameterInfo = new CommandParameterInfo("size", Long.class, Long.class);
+    mediaFileManagementofferFileCommandParams.put("size",mediaFileManagementofferFilesizeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("mimeType",mediaFileManagementofferFilemimeTypeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("imageUri",mediaFileManagementofferFileimageUriCommandParameterInfo);
+    InteractionInfo mediaFileManagementofferFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+        .offerFile((DefaultClusterCallback) callback
+        , (String)
+        commandArguments.get("clientName")
+        , (String)
+        commandArguments.get("name")
+        , (Long)
+        commandArguments.get("size")
+        , (String)
+        commandArguments.get("mimeType")
+        , (String)
+        commandArguments.get("imageUri")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        mediaFileManagementofferFileCommandParams
+    );
+    mediaFileManagementClusterInteractionInfoMap.put("offerFile", mediaFileManagementofferFileInteractionInfo);
+
+    commandMap.put("mediaFileManagement", mediaFileManagementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> audioControlClusterInteractionInfoMap = new LinkedHashMap<>();
 
