@@ -20,7 +20,7 @@ import inspect
 import ipaddress
 import re
 
-from mdns_discovery.mdns_discovery import MdnsServiceType
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 from mobly.signals import TestFailure
 
@@ -1403,3 +1403,33 @@ def assert_valid_ipv6_addresses(addresses: list[str]) -> None:
 
     if invalid:
         asserts.fail(f"Invalid IPv6 addresses: {invalid}")
+
+@not_none_args
+async def assert_txt_record_present(instance_name: str, service_type: str) -> None:
+    """
+    Verifies the presence of the TXT record for the given instance name and service type.
+
+    Args:
+        instance_name (str): The instance name of the DUT.
+        service_type (str): The service type identifying the service to query.
+
+    Raises:
+        TestFailure: If the TXT record cannot be retrieved from the DUT.
+    """
+    try:
+        instance_qname = f"{instance_name}.{service_type}"
+        txt_record = await MdnsDiscovery().get_txt_record(
+            service_name=instance_qname,
+            service_type=service_type,
+        )
+    except Exception as e:
+        asserts.fail(
+            f"TXT record expected but not found for instance name '{instance_name}' "
+            f"of type '{service_type}': {e}"
+        )
+
+    if txt_record is None:
+        asserts.fail(
+            f"TXT record expected but not found for instance name '{instance_name}' "
+            f"of type '{service_type}'"
+        )
