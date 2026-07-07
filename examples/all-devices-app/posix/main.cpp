@@ -72,6 +72,8 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 using namespace chip::ArgParser;
 
+void ApplicationShutdown();
+
 namespace {
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
@@ -480,6 +482,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #if defined(ENABLE_TRACING) && ENABLE_TRACING
     tracing_setup.StopTracing();
 #endif
+
+    ApplicationShutdown();
 }
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)

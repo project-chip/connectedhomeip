@@ -21,6 +21,13 @@ config("miniaudio_config") {
   # Use -isystem instead of include_dirs to treat miniaudio.h as a system header
   # and suppress warnings originating from it for dependents.
   cflags = [ "-isystem" + rebase_path("repo", root_build_dir) ]
+  if (current_os == "linux") {
+    defines = [
+      "MA_NO_ALSA",
+      "MA_NO_PULSEAUDIO",
+      "MA_NO_JACK",
+    ]
+  }
 }
 
 config("miniaudio_warnings") {

@@ -352,6 +352,10 @@ void PosixAudioManager::Shutdown()
 {
     if (mImpl)
     {
+        if (mImpl->engineInitialized)
+        {
+            ma_engine_stop(&mImpl->engine);
+        }
         mImpl->soundResources.clear();
         if (mImpl->engineInitialized)
         {
