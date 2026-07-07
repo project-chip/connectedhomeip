@@ -166,7 +166,6 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .testEventTriggerDelegate         = nullptr,
         .dacProvider                      = *chip::Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement                  = chip::app::EventManagement::GetInstance(),
-        .safeAttributePersistenceProvider = sSafeAttributePersistenceProvider,
         .timerDelegate                    = sTimerDelegate,
     };
 

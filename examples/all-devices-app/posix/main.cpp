@@ -123,7 +123,6 @@ public:
         TestEventTriggerDelegate * testEventTriggerDelegate;
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
-        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
         TimerDelegate & timerDelegate;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -151,7 +150,6 @@ public:
                     .testEventTriggerDelegate         = mContext.testEventTriggerDelegate,         //
                     .dacProvider                      = mContext.dacProvider,                      //
                     .eventManagement                  = mContext.eventManagement,                  //
-                    .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
                     .timerDelegate                    = mContext.timerDelegate,                    //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
@@ -358,7 +356,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                     //
             .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement                  = EventManagement::GetInstance(),                          //
-            .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
             .timerDelegate                    = gTimerDelegate,                                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

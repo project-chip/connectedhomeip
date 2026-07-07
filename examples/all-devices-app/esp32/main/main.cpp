@@ -242,7 +242,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .testEventTriggerDelegate         = testEventTriggerDelegate,                                //
                 .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
                 .eventManagement                  = EventManagement::GetInstance(),                          //
-                .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
                 .timerDelegate                    = gTimerDelegate,                                          //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
