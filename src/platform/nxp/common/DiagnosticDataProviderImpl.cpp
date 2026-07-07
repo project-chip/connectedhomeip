@@ -57,7 +57,6 @@ inline size_t GetMinimumEverFreeHeapSize()
 namespace chip {
 namespace DeviceLayer {
 
-
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     size_t freeHeapSize;
