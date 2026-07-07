@@ -20,7 +20,7 @@ import io
 import json
 import pathlib
 import sys
-from typing import IO, Any, Callable, Mapping, Optional, Protocol, Sequence, Union
+from typing import IO, Any, Callable, Mapping, Optional, Protocol, Sequence, TypeAlias
 
 import cxxfilt  # type: ignore
 import memdf.df
@@ -155,7 +155,7 @@ def postprocess_output_metadata(config: Config, key: str,
     config.put(key, metadata)
 
 
-OutputOption = Union[IO, str, None]
+OutputOption: TypeAlias = IO | str | None
 
 
 @contextlib.contextmanager

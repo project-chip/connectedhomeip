@@ -107,8 +107,6 @@ if [ "$#" == "0" ]; then
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
-        rs91x_wpa3_transition
-            Support for WPA3 transition mode on RS91x
         slc_gen_path
             Allow users to define a path where slc generates board files. (requires --slc_generate or --slc_reuse_files)
             (default: /third_party/silabs/slc_gen/<board>/)

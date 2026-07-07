@@ -1866,7 +1866,7 @@ cluster WindowCovering = 258 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2052,7 +2052,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_windowcovering = 514, version 6;
+  device type ma_windowcovering = 514, version 7;
 
   binding cluster Binding;
 

@@ -20,7 +20,6 @@ import os
 import zipfile
 from enum import Enum, auto
 from importlib.resources.abc import Traversable
-from typing import Union
 
 
 class CredentialSource(Enum):
@@ -49,7 +48,7 @@ class CertificatePurpose(Enum):
         raise KeyError("Invalid enum: %r" % self)
 
 
-def _get_credentials(credential_source: Union[CredentialSource, Traversable], certificate_purpose: CertificatePurpose) -> Traversable:
+def _get_credentials(credential_source: CredentialSource | Traversable, certificate_purpose: CertificatePurpose) -> Traversable:
     # Early return if data_model_directory is already a Traversable type
     if not isinstance(credential_source, CredentialSource):
         # data_model_directory is a Traversable (e.g. pathlib.Path to an extracted root)
@@ -69,7 +68,7 @@ def _get_credentials(credential_source: Union[CredentialSource, Traversable], ce
     return zip_root / certificate_purpose.dirname
 
 
-def get_paa_root_certs(credential_source: Union[CredentialSource, Traversable]) -> Traversable:
+def get_paa_root_certs(credential_source: CredentialSource | Traversable) -> Traversable:
     """
     Get the directory of the PAA root certs of a specific source from either a directory or stored zip.
 
@@ -78,7 +77,7 @@ def get_paa_root_certs(credential_source: Union[CredentialSource, Traversable]) 
     return _get_credentials(credential_source, CertificatePurpose.kPAA)
 
 
-def get_cd_certs(credential_source: Union[CredentialSource, Traversable]) -> Traversable:
+def get_cd_certs(credential_source: CredentialSource | Traversable) -> Traversable:
     """
     Get the directory of the CD certs of a specific source from either a directory or stored zip.
 

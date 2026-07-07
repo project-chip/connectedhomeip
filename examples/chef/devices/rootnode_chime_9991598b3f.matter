@@ -1460,7 +1460,7 @@ cluster Chime = 1366 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
@@ -1620,7 +1620,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_chime = 326, version 1;
+  device type ma_chime = 326, version 2;
 
 
   server cluster Identify {

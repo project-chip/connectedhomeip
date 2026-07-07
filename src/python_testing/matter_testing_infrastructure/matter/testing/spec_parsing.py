@@ -29,7 +29,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
 from importlib.resources.abc import Traversable
-from typing import Optional, Union
+from typing import Optional
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
@@ -70,7 +70,7 @@ def get_access_privilege_or_unknown(access_value: Optional[int]) -> int:
     return ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue
 
 
-def _parse_numeric_constraint_value(value_str: str) -> Optional[Union[int, float]]:
+def _parse_numeric_constraint_value(value_str: str) -> Optional[int | float]:
     """Parse a numeric constraint value, handling integers, floats, and hex strings.
 
     Returns None if the value is not purely numeric (e.g., 'MaxMeasuredValue - 1'),
@@ -107,12 +107,17 @@ class ConstraintReference:
     attribute: str
     field: Optional[str] = None
 
+    def __str__(self):
+        if self.field:
+            return f"ref:{self.attribute}.{self.field}"
+        return f"ref:{self.attribute}"
+
 
 @dataclass
 class Constraints:
     """Constraint information for attributes, commands, and device types."""
-    min_value: Optional[Union[int, float]] = None
-    max_value: Optional[Union[int, float]] = None
+    min_value: Optional[int | float] = None
+    max_value: Optional[int | float] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
     min_count: Optional[int] = None
@@ -122,6 +127,7 @@ class Constraints:
     max_value_ref: Optional[ConstraintReference] = None
     min_count_ref: Optional[ConstraintReference] = None
     max_count_ref: Optional[ConstraintReference] = None
+    allowed: Optional[list[str]] = None
 
     def has_constraints(self) -> bool:
         """Check if any constraints are defined."""
@@ -136,7 +142,34 @@ class Constraints:
             self.max_value_ref is not None,
             self.min_count_ref is not None,
             self.max_count_ref is not None,
+            self.allowed is not None,
         ])
+
+    def __str__(self):
+        parts = []
+        if self.min_value is not None:
+            parts.append(f"min_value={self.min_value}")
+        if self.max_value is not None:
+            parts.append(f"max_value={self.max_value}")
+        if self.min_length is not None:
+            parts.append(f"min_length={self.min_length}")
+        if self.max_length is not None:
+            parts.append(f"max_length={self.max_length}")
+        if self.min_count is not None:
+            parts.append(f"min_count={self.min_count}")
+        if self.max_count is not None:
+            parts.append(f"max_count={self.max_count}")
+        if self.min_value_ref is not None:
+            parts.append(f"min_value_ref={self.min_value_ref}")
+        if self.max_value_ref is not None:
+            parts.append(f"max_value_ref={self.max_value_ref}")
+        if self.min_count_ref is not None:
+            parts.append(f"min_count_ref={self.min_count_ref}")
+        if self.max_count_ref is not None:
+            parts.append(f"max_count_ref={self.max_count_ref}")
+        if self.allowed is not None:
+            parts.append(f"allowed={self.allowed}")
+        return "Constraints(" + ", ".join(parts) + ")"
 
 
 @dataclass
@@ -186,6 +219,7 @@ class XmlAttribute:
     # Quality flags from the spec XML <quality> element
     changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
     quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
+    atomic_write: bool = False  # Atomic Write quality: written via atomic transaction; staged values not reported until commit
     constraints: Optional[Constraints] = None
 
     def access_string(self):
@@ -196,7 +230,8 @@ class XmlAttribute:
         return f'{read_marker}{write_marker} {read_access_marker}{write_access_marker}'
 
     def __str__(self):
-        return f'{self.name}: datatype: {self.datatype} conformance: {str(self.conformance)}, access = {self.access_string()}'
+        constraint_str = f', constraints: {self.constraints}' if self.constraints and self.constraints.has_constraints() else ""
+        return f'{self.name}: datatype: {self.datatype} conformance: {str(self.conformance)}, access = {self.access_string()}{constraint_str}'
 
 
 @dataclass
@@ -654,7 +689,8 @@ class ClusterParser:
 
     @staticmethod
     def _is_change_omitted_attribute(xml_attribute: ElementTree.Element) -> bool:
-        """Returns True if the attribute carries the Changes Omitted (C) quality.
+        """
+        Returns True if the attribute carries the Changes Omitted (C) quality.
 
         Attributes with this quality do not report value changes in subscription reports.
         They correspond to <quality changeOmitted="true"/> in the cluster XML.
@@ -664,7 +700,8 @@ class ClusterParser:
 
     @staticmethod
     def _is_quieter_reporting_attribute(xml_attribute: ElementTree.Element) -> bool:
-        """Returns True if the attribute carries the Quieter Reporting (Q) quality.
+        """
+        Returns True if the attribute carries the Quieter Reporting (Q) quality.
 
         Attributes with this quality may be reported less frequently than the normal
         minimum interval allows.  They correspond to <quality quieterReporting="true"/>
@@ -672,6 +709,19 @@ class ClusterParser:
         """
         quality = xml_attribute.find('./quality')
         return quality is not None and quality.get('quieterReporting', 'false').lower() == 'true'
+
+    @staticmethod
+    def _is_atomic_write_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """
+        Returns True if the attribute carries the Atomic Write quality.
+
+        Attributes with this quality are modified only within an atomic write
+        transaction (AtomicRequest Begin/Commit); intermediate values are staged
+        and not reported until the transaction commits.
+        They correspond to <quality atomicWrite="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('atomicWrite', 'false').lower() == 'true'
 
     def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Optional[Constraints]:
         """
@@ -922,6 +972,7 @@ class ClusterParser:
         max_value_ref = None
         min_count_ref = None
         max_count_ref = None
+        allowed = None
 
         # Parse min/max/between constraints
         min_elem = constraint_elem.find('./min')
@@ -1009,6 +1060,17 @@ class ClusterParser:
             else:
                 max_count_ref = parse_reference(max_count_elem)
 
+        allowed_elems = constraint_elem.findall('./allowed')
+        if allowed_elems:
+            allowed = []
+            for a in allowed_elems:
+                if 'value' in a.attrib:
+                    allowed.append(a.attrib['value'])
+                else:
+                    for child in a:
+                        if 'value' in child.attrib:
+                            allowed.append(child.attrib['value'])
+
         # Create and return the Constraints object
         return Constraints(
             min_value=min_value,
@@ -1020,7 +1082,8 @@ class ClusterParser:
             min_value_ref=min_value_ref,
             max_value_ref=max_value_ref,
             min_count_ref=min_count_ref,
-            max_count_ref=max_count_ref
+            max_count_ref=max_count_ref,
+            allowed=allowed
         )
 
     def parse_attributes(self) -> dict[uint, XmlAttribute]:
@@ -1052,6 +1115,7 @@ class ClusterParser:
                                             write_optional=write_optional,
                                             changes_omitted=self._is_change_omitted_attribute(element),
                                             quieter_reporting=self._is_quieter_reporting_attribute(element),
+                                            atomic_write=self._is_atomic_write_attribute(element),
                                             constraints=constraints)
         # Add in the global attributes for the base class
         for aid in GlobalAttributeIds:
@@ -1198,6 +1262,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_5 = auto()
     k1_5_1 = auto()
     k1_6 = auto()
+    k1_6_1 = auto()
 
     @property
     def dirname(self):
@@ -1217,6 +1282,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.5.1"
         if self == PrebuiltDataModelDirectory.k1_6:
             return "1.6"
+        if self == PrebuiltDataModelDirectory.k1_6_1:
+            return "1.6.1"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -1239,7 +1306,8 @@ class DataModelLevel(Enum):
         raise KeyError("Invalid enum: %r" % self)
 
 
-def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
+def get_data_model_directory(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                             data_model_level: DataModelLevel = DataModelLevel.kCluster) -> Traversable:
     """
     Get the directory of the data model for a specific version and level from the installed package.
 
@@ -1265,7 +1333,8 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
     return zip_root / data_model_level.dirname
 
 
-def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable], errata_path: Union[str, Traversable, None] = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
+def build_xml_clusters(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                       errata_path: str | Traversable | None = None) -> tuple[dict[uint, XmlCluster], list[ProblemNotice]]:
     """
     Build XML clusters from the specified data model directory.
     This function supports both pre-built locations and full paths.
@@ -1308,7 +1377,7 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
 
-    def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
+    def remove_problem(location: CommandPathLocation | FeaturePathLocation):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
 
@@ -1557,7 +1626,7 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
     return namespace, problems
 
 
-def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
+def build_xml_namespaces(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
     """Build a dictionary of namespaces from XML files in the given directory"""
     namespace_dir = get_data_model_directory(data_model_directory, DataModelLevel.kNamespace)
     namespaces: dict[int, XmlNamespace] = {}
@@ -1788,7 +1857,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable], cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: PrebuiltDataModelDirectory | Traversable, cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
@@ -1839,7 +1908,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
     return device_types, problems
 
 
-def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[str, dict[str, XmlDataType]], list[ProblemNotice]]:
+def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> tuple[dict[str, dict[str, XmlDataType]], list[ProblemNotice]]:
     """
     Build XML global data types from the globals data model directory.
 
@@ -1955,6 +2024,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         0x01050000: PrebuiltDataModelDirectory.k1_5,
         0x01050100: PrebuiltDataModelDirectory.k1_5_1,
         0x01060000: PrebuiltDataModelDirectory.k1_6,
+        0x01060100: PrebuiltDataModelDirectory.k1_6_1,
     }
 
     if specification_version not in version_to_dm:
