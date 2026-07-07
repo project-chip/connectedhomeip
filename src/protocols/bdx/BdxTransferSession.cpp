@@ -29,7 +29,12 @@ constexpr uint8_t kBdxVersion = 0; ///< The version of this implementation of th
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize = msgStruct.MessageSize();
-    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgDataSize), msgDataSize);
+    chip::System::PacketBufferHandle packetBufHandle = chip::MessagePacketBuffer::New(msgDataSize);
+    if (packetBufHandle.IsNull())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    ::chip::Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(packetBufHandle), msgDataSize);
     if (bbuf.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;

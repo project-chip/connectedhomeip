@@ -154,8 +154,10 @@ public:
      */
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     static constexpr size_t kMaxAllocSize = kLargeBufMaxSizeWithoutReserve;
+    static constexpr size_t kBufMaxSize   = kLargeBufMaxSize;
 #else
     static constexpr size_t kMaxAllocSize          = kMaxSizeWithoutReserve;
+    static constexpr size_t kBufMaxSize            = kMaxSize;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**
