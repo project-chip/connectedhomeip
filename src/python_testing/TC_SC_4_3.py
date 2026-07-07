@@ -163,37 +163,6 @@ class TC_SC_4_3(MatterBaseTest):
         except ValueError:
             return (False, f"Input ({input_value}) is not a valid decimal number.")
 
-    # def verify_t_value(self, operational_record):
-    #     has_t = operational_record and operational_record.txt and 'T' in operational_record.txt
-    #     if not has_t:
-    #         asserts.assert_false(self.check_pics(TCP_PICS_STR),
-    #                              f"T key must be included if TCP is supported - returned TXT record: {operational_record}")
-    #         return True, 'T is not provided or required'
-
-    #     t_value = operational_record.txt['T']
-    #     log.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
-    #     # Verify t_value is a decimal number without leading zeros and less than or equal to 6
-    #     try:
-    #         assert_valid_t_key(t_value, enforce_provisional=False)
-
-    #         # Convert to bitmap and verify bit 0 is clear
-    #         T_int = int(t_value)
-    #         if T_int & 1 == 0:
-    #             return True, f"T value ({t_value}) is valid and bit 0 is clear."
-    #         return False, f"Bit 0 is not clear. T value ({t_value})"
-
-    #         # Check that the value can be either 2, 4 or 6 depending on whether
-    #         # DUT is a TCPClient, TCPServer or both.
-    #         if self.check_pics(TCP_PICS_STR):
-    #             if (T_int & 0x04 != 0):
-    #                 return True, f"T value ({t_value}) represents valid TCP support info."
-    #             return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
-    #         if (T_int & 0x04 != 0):
-    #             return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
-    #         return True, f"T value ({t_value}) is valid."
-    #     except ValueError:
-    #         return False, f"T value ({t_value}) is not a valid integer"
-
     @async_test_body
     async def test_TC_SC_4_3(self):
         supports_icd = None
