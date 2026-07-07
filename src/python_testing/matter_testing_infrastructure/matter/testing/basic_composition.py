@@ -53,17 +53,14 @@ class ArlData:
 
 
 def arls_populated(tlv_data: dict[int, Any]) -> ArlData:
-    """Returns a tuple indicating if the ARL and CommissioningARL are populated.
-    Requires a wildcard read of the device TLV.
+    """ Returns a tuple indicating if the ARL and CommissioningARL are populated.
+        Requires a wildcard read of the device TLV.
     """
     # ACL is always on endpoint 0
     if 0 not in tlv_data or Clusters.AccessControl.id not in tlv_data[0]:
         return ArlData(have_arl=False, have_carl=False)
     # Both attributes are mandatory for this feature, so if one doesn't exist, neither should the other.
-    if (
-        Clusters.AccessControl.Attributes.Arl.attribute_id
-        not in tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.AttributeList.attribute_id]
-    ):
+    if Clusters.AccessControl.Attributes.Arl.attribute_id not in tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.AttributeList.attribute_id]:
         return ArlData(have_arl=False, have_carl=False)
 
     have_arl = tlv_data[0][Clusters.AccessControl.id][Clusters.AccessControl.Attributes.Arl.attribute_id]
@@ -158,8 +155,8 @@ class BasicCompositionTests(MatterBaseTest):
     xml_device_types: dict[int, XmlDeviceType]
 
     def dump_wildcard(self, dump_device_composition_path: typing.Optional[str]) -> tuple[str, str]:
-        """Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
-        Returns the json and txt as strings.
+        """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
+            Returns the json and txt as strings.
         """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
         json_dump_string = json.dumps(node_dump_dict, indent=2)
@@ -193,38 +190,27 @@ class BasicCompositionTests(MatterBaseTest):
 
         node_id = self.dut_node_id
 
-        # When the harness already commissioned the DUT, use CASE only. Starting PASE here
-        # leaves a stale commissionee entry in the controller; later reads default to PASE
-        # and fail with CHIP_ERROR_NOT_CONNECTED even though CASE is available.
-        harness_commissioned = (
-            self.matter_test_config.commissioning_method is not None
-            or getattr(self, '_dut_confirmed_available', False)
-        )
+        task_list = []
+        if allow_pase and self.first_setup_code:
+            pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
+            task_list.append(asyncio.create_task(pase_future))
 
-        if harness_commissioned:
-            await dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
-        else:
-            task_list = []
-            if allow_pase and self.first_setup_code:
-                pase_future = dev_ctrl.FindOrEstablishPASESession(self.first_setup_code, self.dut_node_id)
-                task_list.append(asyncio.create_task(pase_future))
+        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
+        task_list.append(asyncio.create_task(case_future))
 
-            case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
-            task_list.append(asyncio.create_task(case_future))
+        for task in task_list:
+            asyncio.ensure_future(task)
 
-            for task in task_list:
-                asyncio.ensure_future(task)
+        done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
 
-            _done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
+        for task in pending:
+            try:
+                task.cancel()
+                await task
+            except asyncio.CancelledError:
+                pass
 
-            for task in pending:
-                try:
-                    task.cancel()
-                    await task
-                except asyncio.CancelledError:
-                    pass
-
-        wildcard_read = await dev_ctrl.Read(node_id, [()])  # type: ignore[list-item]
+        wildcard_read = (await dev_ctrl.Read(node_id, [()]))  # type: ignore[list-item]
 
         # ======= State kept for use by all tests =======
         # All endpoints in "full object" indexing format
@@ -239,13 +225,9 @@ class BasicCompositionTests(MatterBaseTest):
 
         arl_data = arls_populated(self.endpoints_tlv)
         asserts.assert_false(
-            arl_data.have_arl,
-            "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test",
-        )
+            arl_data.have_arl, "ARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
         asserts.assert_false(
-            arl_data.have_carl,
-            "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test",
-        )
+            arl_data.have_carl, "CommissioningARL cannot be populated for this test - Please follow manufacturer-specific steps to remove the access restrictions and re-run this test")
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""
