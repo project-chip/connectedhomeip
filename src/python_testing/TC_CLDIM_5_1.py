@@ -150,7 +150,7 @@ class TC_CLDIM_5_1(MatterBaseTest):
     async def teardown_test(self):
         if getattr(self, 'groupcast_enabled', False):
             try:
-                # Leave all groups created.
+                log.info("Leave all groups created")
                 await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
             except InteractionModelError as e:
                 if e.status != Status.NotFound:
@@ -158,17 +158,15 @@ class TC_CLDIM_5_1(MatterBaseTest):
                 log.info("LeaveGroup(groupID=0) returned NotFound during teardown; no groups to clean up")
 
             try:
-                # Remove the KeySetID on the DUT.
+                log.info("Remove the KeySetID on the DUT")
                 await self.send_single_cmd(cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=self.kGroupKeysetId), endpoint=0)
             except InteractionModelError as e:
                 if e.status != Status.NotFound:
                     raise
                 log.info("KeySetRemove(groupKeySetID=%s) returned NotFound during teardown; keyset already removed", self.kGroupKeysetId)
 
-            # Restore the default ACL post commissioning setting for the controller.
+            log.info("Restore the default ACL post commissioning setting for the controller")
             await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(self._admin_only_acl()))])
-
-        super().teardown_test()
 
     @async_test_body
     async def test_TC_CLDIM_5_1(self):
