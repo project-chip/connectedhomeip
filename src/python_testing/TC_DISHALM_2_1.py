@@ -54,9 +54,6 @@ logger = logging.getLogger(__name__)
 
 
 class TC_DISHALM_2_1(BasicCompositionTests):
-    # Composition tests already wildcard-read in setup_class_helper; skip the per-test
-    # background subscription (see TC_DeviceBasicComposition).
-    disable_wildcard_subscription = True
 
     @async_test_body
     async def setup_class(self):
