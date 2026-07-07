@@ -30,12 +30,12 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
     kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'specifications_paths': specifications_paths, 'pics': pics,
               'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
 
-    # Translate command-line to invoke variable names for unknown parameters
-    #   - need option to variable name translation (i.e. underscores: --stop_on_error is stop_on_error in python)
-    #   - need type conversion (click would convert things to ints, bools and such instead of strings)
-    #
-    # Example: --value-wait-extra-duration-ms must map to valueWaitExtraDurationMs (int)
-    # as defined by the option and signature of runner_base in scripts/tests/chipyaml/runner.py.
+    # Translate command-line arguments to Click/Python parameter names:
+    #   - option to variable name translation (e.g. `--stop-on-error` translates to `stop_on_error`)
+    #   - custom mapping for option destination variables (e.g. `--PICS` maps to `pics`,
+    #     `--value-wait-extra-duration-ms` maps to `valueWaitExtraDurationMs`)
+    #   - manual type conversion (since options are parsed manually as strings, we must cast
+    #     to expected types like int or bool to match the function signature)
     #
     # These are known mappings between one argument and the corresponding known name. Everything else
     # would just replace '-' with '_':
