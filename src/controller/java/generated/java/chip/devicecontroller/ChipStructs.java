@@ -17011,6 +17011,112 @@ public static class ContentControlClusterRatingNameStruct {
     return output.toString();
   }
 }
+public static class MediaFileManagementClusterFileDescriptionStruct {
+  public Long fileID;
+  public String name;
+  public Long size;
+  public String mimeType;
+  public String imageUri;
+  private static final long FILE_ID_ID = 0L;
+  private static final long NAME_ID = 1L;
+  private static final long SIZE_ID = 2L;
+  private static final long MIME_TYPE_ID = 3L;
+  private static final long IMAGE_URI_ID = 4L;
+
+  public MediaFileManagementClusterFileDescriptionStruct(
+    Long fileID,
+    String name,
+    Long size,
+    String mimeType,
+    String imageUri
+  ) {
+    this.fileID = fileID;
+    this.name = name;
+    this.size = size;
+    this.mimeType = mimeType;
+    this.imageUri = imageUri;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(FILE_ID_ID, new UIntType(fileID)));
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(SIZE_ID, new UIntType(size)));
+    values.add(new StructElement(MIME_TYPE_ID, new StringType(mimeType)));
+    values.add(new StructElement(IMAGE_URI_ID, new StringType(imageUri)));
+
+    return new StructType(values);
+  }
+
+  public static MediaFileManagementClusterFileDescriptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long fileID = null;
+    String name = null;
+    Long size = null;
+    String mimeType = null;
+    String imageUri = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == FILE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fileID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SIZE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          size = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MIME_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          mimeType = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == IMAGE_URI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          imageUri = castingValue.value(String.class);
+        }
+      }
+    }
+    return new MediaFileManagementClusterFileDescriptionStruct(
+      fileID,
+      name,
+      size,
+      mimeType,
+      imageUri
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MediaFileManagementClusterFileDescriptionStruct {\n");
+    output.append("\tfileID: ");
+    output.append(fileID);
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tsize: ");
+    output.append(size);
+    output.append("\n");
+    output.append("\tmimeType: ");
+    output.append(mimeType);
+    output.append("\n");
+    output.append("\timageUri: ");
+    output.append(imageUri);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ZoneManagementClusterTwoDCartesianVertexStruct {
   public Integer x;
   public Integer y;

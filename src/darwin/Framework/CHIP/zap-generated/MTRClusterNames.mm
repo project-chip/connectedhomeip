@@ -420,6 +420,12 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeContentAppObserverID:
         result = @"ContentAppObserver";
         break;
+    case MTRClusterIDTypeMediaFileManagementID:
+        result = @"MediaFileManagement";
+        break;
+    case MTRClusterIDTypeAudioControlID:
+        result = @"AudioControl";
+        break;
     case MTRClusterIDTypeZoneManagementID:
         result = @"ZoneManagement";
         break;
@@ -8949,6 +8955,162 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (attributeID) {
+
+            // Cluster MediaFileManagement attributes
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeTotalStorageID:
+            result = @"TotalStorage";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableStorageID:
+            result = @"AvailableStorage";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAvailableFilesID:
+            result = @"AvailableFiles";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeSupportedMimeTypesID:
+            result = @"SupportedMimeTypes";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaFileManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known MediaFileManagement attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
+
+        switch (attributeID) {
+
+            // Cluster AudioControl attributes
+        case MTRAttributeIDTypeClusterAudioControlAttributeSoftMutedID:
+            result = @"SoftMuted";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributePhysicallyMutedID:
+            result = @"PhysicallyMuted";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeVolumeID:
+            result = @"Volume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMinDeviceVolumeID:
+            result = @"MinDeviceVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxDeviceVolumeID:
+            result = @"MaxDeviceVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxDeviceVolumeDBID:
+            result = @"MaxDeviceVolumeDB";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxUserVolumeID:
+            result = @"MaxUserVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeDefaultStepSizeID:
+            result = @"DefaultStepSize";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeSetVolumeUnmutePolicyID:
+            result = @"SetVolumeUnmutePolicy";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeIncreaseVolumeUnmutePolicyID:
+            result = @"IncreaseVolumeUnmutePolicy";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeIncreaseVolumeUnmuteVolumeID:
+            result = @"IncreaseVolumeUnmuteVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeDecreaseVolumeUnmutePolicyID:
+            result = @"DecreaseVolumeUnmutePolicy";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeStartUpMutedID:
+            result = @"StartUpMuted";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeStartUpVolumeID:
+            result = @"StartUpVolume";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeBassID:
+            result = @"Bass";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMidID:
+            result = @"Mid";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeTrebleID:
+            result = @"Treble";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMinCorrectionID:
+            result = @"MinCorrection";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeMaxCorrectionID:
+            result = @"MaxCorrection";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAudioControlAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AudioControl attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeZoneManagementID:
 
         switch (attributeID) {
@@ -12025,6 +12187,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Calibrate";
             break;
 
+        case MTRCommandIDTypeClusterClosureControlCommandGroupedMoveToID:
+            result = @"GroupedMoveTo";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -12041,6 +12207,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterClosureDimensionCommandStepID:
             result = @"Step";
+            break;
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandGroupedSetTargetID:
+            result = @"GroupedSetTarget";
+            break;
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandGroupedStepID:
+            result = @"GroupedStep";
             break;
 
         default:
@@ -12967,6 +13141,70 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterContentAppObserverCommandContentAppMessageID:
             result = @"ContentAppMessage";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandAddFileID:
+            result = @"AddFile";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandDeleteFileID:
+            result = @"DeleteFile";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandRequestSharedFilesID:
+            result = @"RequestSharedFiles";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandGetSharedFileID:
+            result = @"GetSharedFile";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandOfferFileID:
+            result = @"OfferFile";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterAudioControlCommandMuteID:
+            result = @"Mute";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandUnmuteID:
+            result = @"Unmute";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandToggleMutedID:
+            result = @"ToggleMuted";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandSetVolumeID:
+            result = @"SetVolume";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandIncreaseVolumeID:
+            result = @"IncreaseVolume";
+            break;
+
+        case MTRCommandIDTypeClusterAudioControlCommandDecreaseVolumeID:
+            result = @"DecreaseVolume";
             break;
 
         default:
@@ -15291,6 +15529,34 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandAddFileResponseID:
+            result = @"AddFileResponse";
+            break;
+
+        case MTRCommandIDTypeClusterMediaFileManagementCommandGetSharedFileResponseID:
+            result = @"GetSharedFileResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeZoneManagementID:
 
         switch (commandID) {
@@ -17572,6 +17838,31 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeContentAppObserverID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMediaFileManagementID:
+
+        switch (eventID) {
+
+            // Cluster MediaFileManagement events
+        case MTREventIDTypeClusterMediaFileManagementEventSharedFilesAddedID:
+            result = @"SharedFilesAdded";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAudioControlID:
 
         switch (eventID) {
 

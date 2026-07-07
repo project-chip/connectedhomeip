@@ -329,6 +329,40 @@ private:
     void UpdateMPDParams(const std::string & mpdPath);
 
     /**
+     * @brief Inserts SegmentTimeline into each SegmentTemplate in the MPD.
+     *
+     * After av_write_trailer converts the MPD to static, this function adds the
+     * SegmentTimeline element per the Push AV spec, which requires the final static
+     * manifest to include SegmentTimeline with accurate segment durations.
+     *
+     * Example transformation (SegmentTemplate with 3 segments):
+     *   Before:
+     *     <SegmentTemplate timescale="90000" duration="360000" ...>
+     *     </SegmentTemplate>
+     *   After:
+     *     <SegmentTemplate timescale="90000" duration="360000" ...>
+     *       <SegmentTimeline>
+     *           <S t="0" d="360000" r="2" />
+     *       </SegmentTimeline>
+     *     </SegmentTemplate>
+     *
+     * @param mpdPath Path to the MPD file to finalize
+     */
+    void FinalizeMPD(const std::string & mpdPath);
+
+    /**
+     * @brief Gets the path to the upload-ready MPD file (.upload snapshot if it exists).
+     *
+     * UpdateMPDParams() writes modified content to a .upload file to avoid the FFmpeg
+     * overwrite race condition. This helper returns the .upload path if it exists,
+     * otherwise falls back to the original MPD path.
+     *
+     * @param mpdPath Path to the original MPD file
+     * @return The .upload path if it exists, otherwise the original MPD path
+     */
+    std::string GetUploadMpdPath(const std::filesystem::path & mpdPath) const;
+
+    /**
      * @brief Determines if H.264 data contains an I-frame (IDR frame).
      * @param data Pointer to the H.264 NALU data.
      * @param length Length of the data in bytes.

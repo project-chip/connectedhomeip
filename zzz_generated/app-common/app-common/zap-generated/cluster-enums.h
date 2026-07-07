@@ -32,6 +32,7 @@
 #include <clusters/AmbientSensingUnion/Enums.h>
 #include <clusters/ApplicationBasic/Enums.h>
 #include <clusters/ApplicationLauncher/Enums.h>
+#include <clusters/AudioControl/Enums.h>
 #include <clusters/AudioOutput/Enums.h>
 #include <clusters/AvAnalysis/Enums.h>
 #include <clusters/BallastConfiguration/Enums.h>
@@ -100,6 +101,7 @@
 #include <clusters/LevelControl/Enums.h>
 #include <clusters/LocalizationConfiguration/Enums.h>
 #include <clusters/LowPower/Enums.h>
+#include <clusters/MediaFileManagement/Enums.h>
 #include <clusters/MediaInput/Enums.h>
 #include <clusters/MediaPlayback/Enums.h>
 #include <clusters/Messages/Enums.h>
