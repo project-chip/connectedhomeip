@@ -997,7 +997,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_AfterConnect)
     Commands::ProxyDisconnectRequest::Type cmd;
     if (connectResult.response.has_value())
     {
-        cmd.sessionID.SetNonNull(connectResult.response->sessionID);
+        cmd.sessionID.SetNonNull(connectResult.response.value().sessionID);
         EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
     }
 
