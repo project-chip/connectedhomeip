@@ -17,7 +17,9 @@
 #pragma once
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/operational-state-server/OvenCavityOperationalStateCluster.h>
 #include <app/clusters/temperature-control-server/TemperatureControlCluster.h>
+#include <devices/capabilities/operational-state/LoggingOperationalStateDelegate.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -46,6 +48,10 @@ public:
     // Public cluster getters for programmatic control
     Clusters::TemperatureControlCluster & TemperatureControlCluster() { return mTemperatureControlCluster.Cluster(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::OvenCavityOperationalState::OvenCavityOperationalStateCluster & OperationalState()
+    {
+        return mOperationalStateCluster.Cluster();
+    }
 
 private:
     TimerDelegate & mTimerDelegate;
@@ -54,6 +60,9 @@ private:
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureControlCluster> mTemperatureControlCluster;
+
+    Clusters::OperationalState::LoggingOperationalStateDelegate mOperationalStateDelegate;
+    LazyRegisteredServerCluster<Clusters::OvenCavityOperationalState::OvenCavityOperationalStateCluster> mOperationalStateCluster;
 };
 
 } // namespace chip::app

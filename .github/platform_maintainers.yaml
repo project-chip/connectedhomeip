@@ -56,18 +56,19 @@ esp32:
     - "config/esp32/**"
     - "docs/platforms/esp32/**"
 
+telink:
+  maintainers:
+    - s07641069
+    - interfer
+  paths:
+    - "src/platform/telink/**"
+    - "examples/platform/telink/**"
+    - "examples/**/telink/**"
+    - "config/telink/**"
+    - "scripts/tools/telink/**"
+
 # --- Proposals / Opt-In Templates ---
 
-# telink:
-#   maintainers:
-#     - s07641069
-#     - interfer
-#   paths:
-#     - "src/platform/telink/**"
-#     - "examples/platform/telink/**"
-#     - "examples/**/telink/**"
-#     - "config/telink/**"
-# 
 # nrfconnect:
 #   maintainers:
 #     - ArekBalysNordic
