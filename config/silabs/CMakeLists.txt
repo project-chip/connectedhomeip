@@ -80,13 +80,11 @@ if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
     set_compiler_property(PROPERTY debug -g0)
 endif()
 
-# Determine if ccache should be used
-
-get_property(CHIP_COMPILER_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
-
 # ==============================================================================
 # Generate configuration for CHIP GN build system
 # ==============================================================================
+
+get_property(ZEPHYR_COMMAND_LAUNCHER GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
 
 matter_common_gn_args(
     DEBUG           CONFIG_DEBUG
@@ -98,6 +96,9 @@ matter_common_gn_args(
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
+if (ZEPHYR_COMMAND_LAUNCHER)
+    matter_add_gn_arg_string("zephyr_command_launcher"           "${ZEPHYR_COMMAND_LAUNCHER} ")
+endif()
 
 matter_add_gn_arg_string("chip_crypto"                           ${CONFIG_CHIP_CRYPTO})
 
