@@ -496,9 +496,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     Wildcard subscription (see setup_test):
 
     * Set class attribute requires_dut = False for tests that do not interact with a
-      real DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
-      will skip the background wildcard subscription so they don't try to subscribe to a
-      device that isn't there.  Default is True.
+      DUT (e.g. parser/conformance unit tests under test_testing/).  Such tests
+      will skip the background wildcard subscription and the pre-test DUT-state capture,
+      so they don't attempt network operations against a device that isn't there.
+      Default is True.
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
     * When a wildcard subscription is active, read_single_attribute_check_success compares
@@ -1409,6 +1410,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
         # Capture the ACL before the test runs so _reset_acls_to_default can restore it
+        # during framework cleanup. Gated on requires_dut so the capture applies no matter
+        # how or when the DUT is commissioned (runner or in-test), while unit tests skip it.
+        # Skipped while commissioning: the DUT is not on the fabric yet, and an operational
+        # read would send CASE Sigma1 to an uncommissioned device.
         dut_expected = not self.is_commissioning and self.requires_dut
         if dut_expected:
             try:
@@ -1424,7 +1429,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if self.runner_hook and not self.is_commissioning:
             # Start the background wildcard subscription only for tests that interact with a
-            # real DUT (requires_dut = True, the default) and unless the test has opted out
+            # DUT (requires_dut = True, the default) and unless the test has opted out
             # via --no-wildcard-subscription or disable_wildcard_subscription = True on
             # the test class (e.g. tests that directly manipulate the ACL or tests that count
             # the TH entries).
