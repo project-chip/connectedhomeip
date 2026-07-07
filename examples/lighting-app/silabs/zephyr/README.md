@@ -91,7 +91,7 @@ SoC and the network transport used by Matter.
 
     -   Follow the
         [Silicon Labs Zephyr Repo](https://github.com/SiliconLabsSoftware/zephyr-silabs)
-    -   With additionnal instructions
+    -   With additional instructions
         [here](https://docs.silabs.com/zephyr/2026.6.0/zephyr-getting-started/getting-started-guide)
 
 -   Build the example application for your target:
