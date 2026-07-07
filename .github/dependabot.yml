@@ -16,6 +16,14 @@ updates:
       - "/.github/actions/**"
     schedule:
       interval: "weekly"
+    groups:
+      # github/codeql-action/{init,analyze,upload-sarif} are distinct Dependabot
+      # dependencies, so ungrouped bumps land in separate PRs and diverge the pinned
+      # SHAs, which trips the "CodeQL action pins are consistent" check in lint.yml.
+      # Group them (across both directory scopes) so every ref moves in one PR.
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
 
   - package-ecosystem: "gitsubmodule"
     directory: "/"
