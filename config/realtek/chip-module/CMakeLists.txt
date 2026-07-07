@@ -76,10 +76,14 @@ zephyr_include_directories(
 if (CONFIG_BOARD_RTL87X3G_EVB)
     zephyr_include_directories(
         ${CHIP_ROOT}/src/platform/realtek/zephyr/rtl87x3g
-        ${CHIP_ROOT}/../vendor
-        ${CHIP_ROOT}/../vendor/matter_ble
-        ${CHIP_ROOT}/../vendor/rtl87x3g
+        ${CHIP_ROOT}/../platform
+        ${CHIP_ROOT}/../platform/bluetooth
+        ${CHIP_ROOT}/../platform/port/rtl87x3g
     )
+endif()
+
+if (CONFIG_BOARD_RTL87X3G_EVB)
+    zephyr_compile_options(-fno-inline-atomics)
 endif()
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
