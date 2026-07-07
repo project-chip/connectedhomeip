@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
@@ -31,9 +32,14 @@
 
 #include <app/server/Server.h>
 
-// NOTE: this is part of AppConfig, so this has to be checked for AFTER the inclusion
-//       of that header
-#if TIME_SYNC_ENABLE_TSC_FEATURE
+// The Time Synchronization Client (TSC) feature requires a Read Client to query time from a
+// trusted time source. On resource-constrained devices, the Read Client may be disabled
+// (CHIP_CONFIG_ENABLE_READ_CLIENT = 0) to save space. We must only enable the TSC feature
+// if the Read Client is available, otherwise compilation will fail due to inheriting from
+// the incomplete ReadClient::Callback type.
+#define TIME_SYNC_TSC_FEATURE_ENABLED (TIME_SYNC_ENABLE_TSC_FEATURE && CHIP_CONFIG_ENABLE_READ_CLIENT)
+
+#if TIME_SYNC_TSC_FEATURE_ENABLED
 #include <app/ReadClient.h>
 #endif
 
@@ -69,7 +75,7 @@ enum class TimeSyncEventFlag : uint8_t
 
 class TimeSynchronizationCluster : public DefaultServerCluster,
                                    public FabricTable::Delegate
-#if TIME_SYNC_ENABLE_TSC_FEATURE
+#if TIME_SYNC_TSC_FEATURE_ENABLED
     ,
                                    public ReadClient::Callback
 #endif
@@ -112,7 +118,7 @@ public:
     // Fabric Table delegate functions
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-#if TIME_SYNC_ENABLE_TSC_FEATURE
+#if TIME_SYNC_TSC_FEATURE_ENABLED
     // CASE connection functions
     void OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void OnDeviceConnectionFailureFn();
@@ -200,7 +206,7 @@ private:
 
     CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 
-#if TIME_SYNC_ENABLE_TSC_FEATURE
+#if TIME_SYNC_TSC_FEATURE_ENABLED
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     struct TimeReadInfo
