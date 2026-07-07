@@ -38,7 +38,5 @@ source_set("logging") {
     "impl/LoggingOccupancySensor.h",
   ]
 
-  public_deps = [
-    ":occupancy-sensor",
-  ]
+  public_deps = [ ":occupancy-sensor" ]
 }

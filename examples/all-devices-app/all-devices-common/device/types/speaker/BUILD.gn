@@ -39,7 +39,5 @@ source_set("logging") {
     "impl/LoggingSpeaker.h",
   ]
 
-  public_deps = [
-    ":speaker",
-  ]
+  public_deps = [ ":speaker" ]
 }

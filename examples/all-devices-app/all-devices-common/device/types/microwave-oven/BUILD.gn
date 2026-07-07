@@ -22,8 +22,8 @@ source_set("microwave-oven") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/operational-state:operational-state-delegate",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/operational-state:operational-state-delegate",
     "${chip_root}/src/app/clusters/operational-state-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",

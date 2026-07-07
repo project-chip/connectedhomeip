@@ -40,7 +40,5 @@ source_set("logging") {
     "impl/LoggingRangingAdapter.h",
   ]
 
-  public_deps = [
-    ":proximity-ranger",
-  ]
+  public_deps = [ ":proximity-ranger" ]
 }

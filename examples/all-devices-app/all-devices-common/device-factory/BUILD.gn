@@ -30,6 +30,7 @@ source_set("device-factory") {
 
   public_deps = [
     ":enabled_devices_buildconfig",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-quality-sensor",
@@ -41,7 +42,6 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor:increasing",
@@ -55,8 +55,8 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor:logging",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",

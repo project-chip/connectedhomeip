@@ -38,7 +38,5 @@ source_set("increasing") {
     "impl/IncreasingFlowSensor.h",
   ]
 
-  public_deps = [
-    ":flow-sensor",
-  ]
+  public_deps = [ ":flow-sensor" ]
 }

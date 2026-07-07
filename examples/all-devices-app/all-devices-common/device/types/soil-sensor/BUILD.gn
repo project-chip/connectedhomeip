@@ -39,7 +39,5 @@ source_set("increasing") {
     "impl/IncreasingMoistureSoilSensor.h",
   ]
 
-  public_deps = [
-    ":soil-sensor",
-  ]
+  public_deps = [ ":soil-sensor" ]
 }
