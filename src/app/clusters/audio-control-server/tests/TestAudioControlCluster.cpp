@@ -383,6 +383,24 @@ TEST_F(TestAudioControlCluster, ReadMaxDeviceVolumeDB)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestAudioControlCluster, ReadMaxUserVolume)
+{
+    AudioControlCluster::OptionalAttributeSet optionalSet;
+    optionalSet.Set<MaxUserVolume::Id>();
+
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
+                                BasicConfig().WithOptionalAttributes(optionalSet).WithInitialMaxUserVolume(70));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    uint16_t maxUserVolume{};
+    ASSERT_EQ(tester.ReadAttribute(MaxUserVolume::Id, maxUserVolume), CHIP_NO_ERROR);
+    EXPECT_EQ(maxUserVolume, 70u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestAudioControlCluster, ReadCorrectionRangeAttributes)
 {
     AudioControlCluster::OptionalAttributeSet optionalSet;
