@@ -380,7 +380,10 @@ TEST_F(TestAudioControlCluster, ReadAttributeDefaultCaseReturnsUnsupportedAttrib
 
     chip::Testing::ReadOperation readOperation(kRootEndpointId, AudioControl::Id, 0xFFFF);
     MockCommandHandler handler;
-    readOperation.SetSubjectDescriptor(handler.GetSubjectDescriptor());
+    // OperationRequest stores subjectDescriptor by reference, so it must be a named local that
+    // outlives readOperation/encoder -- not a temporary passed directly to SetSubjectDescriptor().
+    const Access::SubjectDescriptor subjectDescriptor = handler.GetSubjectDescriptor();
+    readOperation.SetSubjectDescriptor(subjectDescriptor);
     std::unique_ptr<AttributeValueEncoder> encoder = readOperation.StartEncoding();
     auto status                                    = cluster.ReadAttribute(readOperation.GetRequest(), *encoder);
     EXPECT_FALSE(status.IsSuccess());
@@ -396,7 +399,10 @@ TEST_F(TestAudioControlCluster, WriteAttributeDefaultCaseReturnsUnsupportedAttri
 
     chip::Testing::WriteOperation writeOp(kRootEndpointId, AudioControl::Id, 0xFFFF);
     MockCommandHandler handler;
-    writeOp.SetSubjectDescriptor(handler.GetSubjectDescriptor());
+    // OperationRequest stores subjectDescriptor by reference; must use a named local (see the
+    // matching comment in ReadAttributeDefaultCaseReturnsUnsupportedAttribute).
+    const Access::SubjectDescriptor subjectDescriptor = handler.GetSubjectDescriptor();
+    writeOp.SetSubjectDescriptor(subjectDescriptor);
     auto decoder = writeOp.DecoderFor<uint16_t>(0);
     auto status  = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
     EXPECT_FALSE(status.IsSuccess());
@@ -411,7 +417,10 @@ TEST_F(TestAudioControlCluster, InvokeCommandDefaultCaseReturnsUnsupportedComman
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     MockCommandHandler handler;
-    const DataModel::InvokeRequest invokeRequest({ kRootEndpointId, AudioControl::Id, 0xFFFF }, handler.GetSubjectDescriptor());
+    // OperationRequest stores subjectDescriptor by reference; must use a named local (see the
+    // matching comment in ReadAttributeDefaultCaseReturnsUnsupportedAttribute).
+    const Access::SubjectDescriptor subjectDescriptor = handler.GetSubjectDescriptor();
+    const DataModel::InvokeRequest invokeRequest({ kRootEndpointId, AudioControl::Id, 0xFFFF }, subjectDescriptor);
 
     uint8_t buffer[16];
     TLV::TLVWriter writer;
