@@ -14,15 +14,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import logging, time
-import matter.testing.nfc
-
-from mobly import asserts
+import logging
+import time
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.utils.asserts import (assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
-                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_sii_key, assert_valid_t_key)
-from mdns_discovery.utils.network import is_dut_tcp_supported
+from mobly import asserts
+
+import matter.testing.nfc
 from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
