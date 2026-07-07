@@ -110,6 +110,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/power-source-server/tests",
       "${chip_root}/src/app/clusters/resource-monitoring-server/tests",
       "${chip_root}/src/app/clusters/scenes-server/tests",
+      "${chip_root}/src/app/clusters/service-area-server/tests",
       "${chip_root}/src/app/clusters/smoke-co-alarm-server/tests",
       "${chip_root}/src/app/clusters/flow-measurement-server/tests",
       "${chip_root}/src/app/clusters/pressure-measurement-server/tests",
