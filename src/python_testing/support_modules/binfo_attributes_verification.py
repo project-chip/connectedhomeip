@@ -124,7 +124,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                                      f"DataModelRevision should be {expected_data_model_revision} for SpecificationVersion 0x{specification_version:08X}")
             else:
                 # Pre-1.3 devices do not expose SpecificationVersion; DataModelRevision is 1, 16, or 17.
-                asserts.assert_in(ret1, (1, 16, 17), "DataModelRevision should be 1, 16, or 17 for devices without SpecificationVersion")
+                asserts.assert_in(ret1, (1, 16, 17),
+                                  "DataModelRevision should be 1, 16, or 17 for devices without SpecificationVersion")
         elif not hasattr(cluster.Attributes, 'DataModelRevision'):
             self.mark_current_step_skipped()
         exit()
