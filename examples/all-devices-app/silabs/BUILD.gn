@@ -146,9 +146,9 @@ silabs_executable("all_devices_app") {
   ]
 
   if (chip_enable_wifi) {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi" ]
   } else {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:thread" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread" ]
   }
 
   deps += [ "${examples_plat_dir}:efr32-common" ]
