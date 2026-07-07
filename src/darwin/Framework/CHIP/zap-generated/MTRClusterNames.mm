@@ -8820,8 +8820,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster AccountLogin attributes
-        case MTRAttributeIDTypeClusterAccountLoginAttributeLoggedInID:
-            result = @"LoggedIn";
+        case MTRAttributeIDTypeClusterAccountLoginAttributeOAuthLoggedInID:
+            result = @"OAuthLoggedIn";
             break;
 
         case MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID:

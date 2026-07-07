@@ -28960,7 +28960,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace AccountLogin {
 namespace Attributes {
 
-namespace LoggedIn {
+namespace OAuthLoggedIn {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 {
@@ -29005,7 +29005,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
     return emberAfWriteAttribute(endpoint, Clusters::AccountLogin::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace LoggedIn
+} // namespace OAuthLoggedIn
 
 namespace FeatureMap {
 

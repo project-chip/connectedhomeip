@@ -21,10 +21,10 @@ inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
-namespace LoggedIn {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LoggedIn::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace OAuthLoggedIn {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OAuthLoggedIn::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace LoggedIn
+} // namespace OAuthLoggedIn
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };

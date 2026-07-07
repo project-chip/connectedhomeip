@@ -4686,8 +4686,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::AccountLogin::Id: {
         switch (id)
         {
-        case chip::app::Clusters::AccountLogin::Attributes::LoggedIn::Id:
-            return "LoggedIn";
+        case chip::app::Clusters::AccountLogin::Attributes::OAuthLoggedIn::Id:
+            return "OAuthLoggedIn";
         case chip::app::Clusters::AccountLogin::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AccountLogin::Attributes::AcceptedCommandList::Id:

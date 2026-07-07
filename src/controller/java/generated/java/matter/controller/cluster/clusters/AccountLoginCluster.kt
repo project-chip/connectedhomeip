@@ -273,7 +273,7 @@ class AccountLoginCluster(
     )
   }
 
-  suspend fun readLoggedInAttribute(): Boolean? {
+  suspend fun readOAuthLoggedInAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -295,7 +295,7 @@ class AccountLoginCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Loggedin attribute not found in response" }
+    requireNotNull(attributeData) { "Oauthloggedin attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -309,7 +309,7 @@ class AccountLoginCluster(
     return decodedValue
   }
 
-  suspend fun subscribeLoggedInAttribute(
+  suspend fun subscribeOAuthLoggedInAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
@@ -344,7 +344,7 @@ class AccountLoginCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Loggedin attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Oauthloggedin attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)

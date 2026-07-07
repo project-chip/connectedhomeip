@@ -16,9 +16,9 @@ namespace Attributes {
 // Total number of attributes supported by the cluster, including global attributes
 inline constexpr uint32_t kAttributesCount = 6;
 
-namespace LoggedIn {
+namespace OAuthLoggedIn {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace LoggedIn
+} // namespace OAuthLoggedIn
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

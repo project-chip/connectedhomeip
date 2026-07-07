@@ -8635,7 +8635,7 @@ cluster AccountLogin = 1294 {
     fabric_idx fabricIndex = 254;
   }
 
-  provisional readonly attribute optional boolean loggedIn = 0;
+  provisional readonly attribute optional boolean OAuthLoggedIn = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8691,7 +8691,7 @@ cluster AccountLogin = 1294 {
     fabric_idx fabricIndex = 254;
   }
 
-  provisional readonly attribute optional boolean loggedIn = 0;
+  provisional readonly attribute optional boolean OAuthLoggedIn = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

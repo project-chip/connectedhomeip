@@ -46492,8 +46492,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::AccountLogin;
         switch (aPath.mAttributeId)
         {
-        case Attributes::LoggedIn::Id: {
-            using TypeInfo = Attributes::LoggedIn::TypeInfo;
+        case Attributes::OAuthLoggedIn::Id: {
+            using TypeInfo = Attributes::OAuthLoggedIn::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

@@ -13770,7 +13770,7 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "LoggedIn",
+                "attributeName": "OAuthLoggedIn",
                 "attributeId": 0x00000000,
                 "type": "bool",
                 "reportable": True,

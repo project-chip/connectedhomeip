@@ -24342,10 +24342,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case AccountLogin::Id: {
         switch (path.mAttributeId)
         {
-        case AccountLogin::Attributes::LoggedIn::Id: {
+        case AccountLogin::Attributes::OAuthLoggedIn::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LoggedIn", 1, value);
+            return DataModelLogger::LogValue("OAuthLoggedIn", 1, value);
         }
         case AccountLogin::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
