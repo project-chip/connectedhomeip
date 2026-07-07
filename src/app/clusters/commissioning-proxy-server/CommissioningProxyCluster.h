@@ -65,8 +65,8 @@ public:
 
         Config(BitMask<CommissioningProxy::Feature> aFeatures, uint8_t aMaxSessions = 1, uint8_t aMaxCachedResults = 10,
                BitMask<CommissioningProxy::WiFiBandBitmap> aSupportedWiFiBands = {}) :
-            featureFlags(aFeatures), maxSessions(aMaxSessions), maxCachedResults(aMaxCachedResults),
-            supportedWiFiBands(aSupportedWiFiBands)
+            featureFlags(aFeatures),
+            maxSessions(aMaxSessions), maxCachedResults(aMaxCachedResults), supportedWiFiBands(aSupportedWiFiBands)
         {}
     };
 
