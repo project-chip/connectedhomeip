@@ -72,7 +72,7 @@ jobs:
                 platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+              uses: github/codeql-action/init@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4.36.3
               with:
                   languages: "cpp"
                   queries: security-extended, security-and-quality
@@ -196,7 +196,7 @@ jobs:
             # deactivate until a better workaround is found
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+            #   uses: github/codeql-action/init@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4.36.3
             #   with:
             #       languages: "cpp"
             - name: Setup and Build Simulated Device
@@ -476,7 +476,7 @@ jobs:
             #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
             # - name: Initialize CodeQL
             #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+            #   uses: github/codeql-action/init@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4.36.3
             #   with:
             #       languages: "cpp"
 
