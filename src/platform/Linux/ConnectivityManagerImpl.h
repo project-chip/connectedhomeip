@@ -225,7 +225,7 @@ private:
     bool mPafChannelAvailable = true;
 #endif
 
-    bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+    CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
     CHIP_ERROR _StartWiFiManagement();
     CHIP_ERROR _StopWiFiManagement();

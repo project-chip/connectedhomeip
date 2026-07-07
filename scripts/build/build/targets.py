@@ -53,12 +53,16 @@ _ALL_DEVICES_APP_DEVICES = [
     'device-energy-management',
     'dimmable-light',
     'dimmable-plug-in-unit',
+    'dishwasher',
     'extractor-hood',
     'fan',
     'flow-sensor',
     'generic-switch',
     'humidity-sensor',
+    'laundry-dryer',
+    'laundry-washer',
     'light-sensor',
+    'microwave-oven',
     'mounted-dimmable-load-control',
     'mounted-on-off-control',
     'occupancy-sensor',
@@ -71,6 +75,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'proximity-ranger',
     'rain-sensor',
     'refrigerator',
+    'robotic-vacuum-cleaner',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
@@ -245,7 +250,7 @@ def BuildHostTarget():
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("msan", use_msan=True).OnlyIfRe("-clang").OnlyIfRe("-x64").ExceptIfRe(
-        "-(asan|tsan|ubsan|libfuzzer|ossfuzz|pw-fuzztest)")
+        "-(asan|tsan|ubsan|ossfuzz)")
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
     target.AppendModifier("ossfuzz", pw_fuzz_libfuzzer_compat=True).OnlyIfRe("-pw-fuzztest")

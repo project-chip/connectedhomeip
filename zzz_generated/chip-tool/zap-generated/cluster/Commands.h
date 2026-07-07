@@ -169,6 +169,8 @@
 | AccountLogin                                                        | 0x050E |
 | ContentControl                                                      | 0x050F |
 | ContentAppObserver                                                  | 0x0510 |
+| MediaFileManagement                                                 | 0x0511 |
+| AudioControl                                                        | 0x0512 |
 | ZoneManagement                                                      | 0x0550 |
 | CameraAvStreamManagement                                            | 0x0551 |
 | CameraAvSettingsUserLevelManagement                                 | 0x0552 |
@@ -9526,6 +9528,7 @@ private:
 | * Stop                                                              |   0x00 |
 | * MoveTo                                                            |   0x01 |
 | * Calibrate                                                         |   0x02 |
+| * GroupedMoveTo                                                     |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CountdownTime                                                     | 0x0000 |
@@ -9658,12 +9661,53 @@ private:
     chip::app::Clusters::ClosureControl::Commands::Calibrate::Type mRequest;
 };
 
+/*
+ * Command GroupedMoveTo
+ */
+class ClosureControlGroupedMoveTo : public ClusterCommand
+{
+public:
+    ClosureControlGroupedMoveTo(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("grouped-move-to", credsIssuerConfig)
+    {
+        AddArgument("Position", 0, UINT8_MAX, &mRequest.position);
+        AddArgument("Latch", 0, 1, &mRequest.latch);
+        AddArgument("Speed", 0, UINT8_MAX, &mRequest.speed);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureControl::Commands::GroupedMoveTo::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureControl::Commands::GroupedMoveTo::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClosureControl::Commands::GroupedMoveTo::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster ClosureDimension                                            | 0x0105 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * SetTarget                                                         |   0x00 |
 | * Step                                                              |   0x01 |
+| * GroupedSetTarget                                                  |   0x02 |
+| * GroupedStep                                                       |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentState                                                      | 0x0000 |
@@ -9763,6 +9807,85 @@ public:
 
 private:
     chip::app::Clusters::ClosureDimension::Commands::Step::Type mRequest;
+};
+
+/*
+ * Command GroupedSetTarget
+ */
+class ClosureDimensionGroupedSetTarget : public ClusterCommand
+{
+public:
+    ClosureDimensionGroupedSetTarget(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("grouped-set-target", credsIssuerConfig)
+    {
+        AddArgument("Position", 0, UINT16_MAX, &mRequest.position);
+        AddArgument("Latch", 0, 1, &mRequest.latch);
+        AddArgument("Speed", 0, UINT8_MAX, &mRequest.speed);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureDimension::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureDimension::Commands::GroupedSetTarget::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureDimension::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureDimension::Commands::GroupedSetTarget::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClosureDimension::Commands::GroupedSetTarget::Type mRequest;
+};
+
+/*
+ * Command GroupedStep
+ */
+class ClosureDimensionGroupedStep : public ClusterCommand
+{
+public:
+    ClosureDimensionGroupedStep(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("grouped-step", credsIssuerConfig)
+    {
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
+        AddArgument("NumberOfSteps", 0, UINT16_MAX, &mRequest.numberOfSteps);
+        AddArgument("Speed", 0, UINT8_MAX, &mRequest.speed);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureDimension::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureDimension::Commands::GroupedStep::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ClosureDimension::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ClosureDimension::Commands::GroupedStep::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClosureDimension::Commands::GroupedStep::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -15376,6 +15499,492 @@ public:
 
 private:
     chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster MediaFileManagement                                         | 0x0511 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddFile                                                           |   0x00 |
+| * DeleteFile                                                        |   0x02 |
+| * RequestSharedFiles                                                |   0x03 |
+| * GetSharedFile                                                     |   0x04 |
+| * OfferFile                                                         |   0x06 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TotalStorage                                                      | 0x0000 |
+| * AvailableStorage                                                  | 0x0001 |
+| * AvailableFiles                                                    | 0x0002 |
+| * SupportedMimeTypes                                                | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * SharedFilesAdded                                                  | 0x0000 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddFile
+ */
+class MediaFileManagementAddFile : public ClusterCommand
+{
+public:
+    MediaFileManagementAddFile(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("add-file", credsIssuerConfig)
+    {
+        AddArgument("Name", &mRequest.name);
+        AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
+        AddArgument("MimeType", &mRequest.mimeType);
+        AddArgument("ImageUri", &mRequest.imageUri);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type mRequest;
+};
+
+/*
+ * Command DeleteFile
+ */
+class MediaFileManagementDeleteFile : public ClusterCommand
+{
+public:
+    MediaFileManagementDeleteFile(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("delete-file", credsIssuerConfig)
+    {
+        AddArgument("FileID", 0, UINT64_MAX, &mRequest.fileID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Type mRequest;
+};
+
+/*
+ * Command RequestSharedFiles
+ */
+class MediaFileManagementRequestSharedFiles : public ClusterCommand
+{
+public:
+    MediaFileManagementRequestSharedFiles(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("request-shared-files", credsIssuerConfig), mComplex_SupportedMimeTypes(&mRequest.supportedMimeTypes)
+    {
+        AddArgument("ClientName", &mRequest.clientName);
+        AddArgument("RequestID", 0, UINT16_MAX, &mRequest.requestID);
+        AddArgument("SupportedMimeTypes", &mComplex_SupportedMimeTypes, "", Argument::kOptional);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>>>
+        mComplex_SupportedMimeTypes;
+};
+
+/*
+ * Command GetSharedFile
+ */
+class MediaFileManagementGetSharedFile : public ClusterCommand
+{
+public:
+    MediaFileManagementGetSharedFile(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-shared-file", credsIssuerConfig)
+    {
+        AddArgument("ResponseID", 0, UINT16_MAX, &mRequest.responseID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type mRequest;
+};
+
+/*
+ * Command OfferFile
+ */
+class MediaFileManagementOfferFile : public ClusterCommand
+{
+public:
+    MediaFileManagementOfferFile(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("offer-file", credsIssuerConfig)
+    {
+        AddArgument("ClientName", &mRequest.clientName);
+        AddArgument("Name", &mRequest.name);
+        AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
+        AddArgument("MimeType", &mRequest.mimeType);
+        AddArgument("ImageUri", &mRequest.imageUri);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MediaFileManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster AudioControl                                                | 0x0512 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Mute                                                              |   0x00 |
+| * Unmute                                                            |   0x01 |
+| * ToggleMuted                                                       |   0x02 |
+| * SetVolume                                                         |   0x03 |
+| * IncreaseVolume                                                    |   0x04 |
+| * DecreaseVolume                                                    |   0x05 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SoftMuted                                                         | 0x0000 |
+| * PhysicallyMuted                                                   | 0x0001 |
+| * Volume                                                            | 0x0002 |
+| * MinDeviceVolume                                                   | 0x0003 |
+| * MaxDeviceVolume                                                   | 0x0004 |
+| * MaxDeviceVolumeDB                                                 | 0x0005 |
+| * MaxUserVolume                                                     | 0x0006 |
+| * DefaultStepSize                                                   | 0x0007 |
+| * SetVolumeUnmutePolicy                                             | 0x0008 |
+| * IncreaseVolumeUnmutePolicy                                        | 0x0009 |
+| * IncreaseVolumeUnmuteVolume                                        | 0x000A |
+| * DecreaseVolumeUnmutePolicy                                        | 0x000B |
+| * StartUpMuted                                                      | 0x000C |
+| * StartUpVolume                                                     | 0x000D |
+| * Bass                                                              | 0x000E |
+| * Mid                                                               | 0x000F |
+| * Treble                                                            | 0x0010 |
+| * MinCorrection                                                     | 0x0011 |
+| * MaxCorrection                                                     | 0x0012 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command Mute
+ */
+class AudioControlMute : public ClusterCommand
+{
+public:
+    AudioControlMute(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("mute", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::Mute::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::Mute::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AudioControl::Commands::Mute::Type mRequest;
+};
+
+/*
+ * Command Unmute
+ */
+class AudioControlUnmute : public ClusterCommand
+{
+public:
+    AudioControlUnmute(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("unmute", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::Unmute::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::Unmute::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AudioControl::Commands::Unmute::Type mRequest;
+};
+
+/*
+ * Command ToggleMuted
+ */
+class AudioControlToggleMuted : public ClusterCommand
+{
+public:
+    AudioControlToggleMuted(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("toggle-muted", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::ToggleMuted::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::ToggleMuted::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AudioControl::Commands::ToggleMuted::Type mRequest;
+};
+
+/*
+ * Command SetVolume
+ */
+class AudioControlSetVolume : public ClusterCommand
+{
+public:
+    AudioControlSetVolume(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-volume", credsIssuerConfig)
+    {
+        AddArgument("NewVolume", 0, UINT16_MAX, &mRequest.newVolume);
+        AddArgument("UnmutePolicy", 0, UINT8_MAX, &mRequest.unmutePolicy);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::SetVolume::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::SetVolume::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AudioControl::Commands::SetVolume::Type mRequest;
+};
+
+/*
+ * Command IncreaseVolume
+ */
+class AudioControlIncreaseVolume : public ClusterCommand
+{
+public:
+    AudioControlIncreaseVolume(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("increase-volume", credsIssuerConfig)
+    {
+        AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
+        AddArgument("UnmutePolicy", 0, UINT8_MAX, &mRequest.unmutePolicy);
+        AddArgument("UnmuteVolume", 0, UINT8_MAX, &mRequest.unmuteVolume);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::IncreaseVolume::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::IncreaseVolume::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AudioControl::Commands::IncreaseVolume::Type mRequest;
+};
+
+/*
+ * Command DecreaseVolume
+ */
+class AudioControlDecreaseVolume : public ClusterCommand
+{
+public:
+    AudioControlDecreaseVolume(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("decrease-volume", credsIssuerConfig)
+    {
+        AddArgument("StepSize", 0, UINT16_MAX, &mRequest.stepSize);
+        AddArgument("UnmutePolicy", 0, UINT8_MAX, &mRequest.unmutePolicy);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::DecreaseVolume::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AudioControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AudioControl::Commands::DecreaseVolume::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AudioControl::Commands::DecreaseVolume::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -27949,10 +28558,11 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),      //
-        make_unique<ClosureControlStop>(credsIssuerConfig),      //
-        make_unique<ClosureControlMoveTo>(credsIssuerConfig),    //
-        make_unique<ClosureControlCalibrate>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),          //
+        make_unique<ClosureControlStop>(credsIssuerConfig),          //
+        make_unique<ClosureControlMoveTo>(credsIssuerConfig),        //
+        make_unique<ClosureControlCalibrate>(credsIssuerConfig),     //
+        make_unique<ClosureControlGroupedMoveTo>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -28036,9 +28646,11 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),        //
-        make_unique<ClosureDimensionSetTarget>(credsIssuerConfig), //
-        make_unique<ClosureDimensionStep>(credsIssuerConfig),      //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
+        make_unique<ClosureDimensionSetTarget>(credsIssuerConfig),        //
+        make_unique<ClosureDimensionStep>(credsIssuerConfig),             //
+        make_unique<ClosureDimensionGroupedSetTarget>(credsIssuerConfig), //
+        make_unique<ClosureDimensionGroupedStep>(credsIssuerConfig),      //
         //
         // Attributes
         //
@@ -32818,6 +33430,217 @@ void registerClusterContentAppObserver(Commands & commands, CredentialIssuerComm
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterMediaFileManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::MediaFileManagement;
+
+    const char * clusterName = "MediaFileManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
+        make_unique<MediaFileManagementAddFile>(credsIssuerConfig),            //
+        make_unique<MediaFileManagementDeleteFile>(credsIssuerConfig),         //
+        make_unique<MediaFileManagementRequestSharedFiles>(credsIssuerConfig), //
+        make_unique<MediaFileManagementGetSharedFile>(credsIssuerConfig),      //
+        make_unique<MediaFileManagementOfferFile>(credsIssuerConfig),          //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "total-storage", Attributes::TotalStorage::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "available-storage", Attributes::AvailableStorage::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "available-files", Attributes::AvailableFiles::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<uint64_t>>(Id, "total-storage", 0, UINT64_MAX, Attributes::TotalStorage::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint64_t>>(Id, "available-storage", 0, UINT64_MAX, Attributes::AvailableStorage::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type>>>(
+            Id, "available-files", Attributes::AvailableFiles::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CharSpan>>>(
+            Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "total-storage", Attributes::TotalStorage::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "available-storage", Attributes::AvailableStorage::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "available-files", Attributes::AvailableFiles::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "supported-mime-types", Attributes::SupportedMimeTypes::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                          //
+        make_unique<ReadEvent>(Id, "shared-files-added", Events::SharedFilesAdded::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeEvent>(Id, "shared-files-added", Events::SharedFilesAdded::Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterAudioControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::AudioControl;
+
+    const char * clusterName = "AudioControl";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),         //
+        make_unique<AudioControlMute>(credsIssuerConfig),           //
+        make_unique<AudioControlUnmute>(credsIssuerConfig),         //
+        make_unique<AudioControlToggleMuted>(credsIssuerConfig),    //
+        make_unique<AudioControlSetVolume>(credsIssuerConfig),      //
+        make_unique<AudioControlIncreaseVolume>(credsIssuerConfig), //
+        make_unique<AudioControlDecreaseVolume>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                    //
+        make_unique<ReadAttribute>(Id, "soft-muted", Attributes::SoftMuted::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "physically-muted", Attributes::PhysicallyMuted::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "volume", Attributes::Volume::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "min-device-volume", Attributes::MinDeviceVolume::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "max-device-volume", Attributes::MaxDeviceVolume::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "max-device-volume-db", Attributes::MaxDeviceVolumeDB::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "max-user-volume", Attributes::MaxUserVolume::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "default-step-size", Attributes::DefaultStepSize::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "set-volume-unmute-policy", Attributes::SetVolumeUnmutePolicy::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "increase-volume-unmute-policy", Attributes::IncreaseVolumeUnmutePolicy::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "increase-volume-unmute-volume", Attributes::IncreaseVolumeUnmuteVolume::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "decrease-volume-unmute-policy", Attributes::DecreaseVolumeUnmutePolicy::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "start-up-muted", Attributes::StartUpMuted::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "start-up-volume", Attributes::StartUpVolume::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "bass", Attributes::Bass::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "mid", Attributes::Mid::Id, credsIssuerConfig),                                     //
+        make_unique<ReadAttribute>(Id, "treble", Attributes::Treble::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "min-correction", Attributes::MinCorrection::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-correction", Attributes::MaxCorrection::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<bool>>(Id, "soft-muted", 0, 1, Attributes::SoftMuted::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "physically-muted", 0, 1, Attributes::PhysicallyMuted::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "volume", 0, UINT16_MAX, Attributes::Volume::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "min-device-volume", 0, UINT16_MAX, Attributes::MinDeviceVolume::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "max-device-volume", 0, UINT16_MAX, Attributes::MaxDeviceVolume::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "max-device-volume-db", 0, UINT16_MAX, Attributes::MaxDeviceVolumeDB::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "max-user-volume", 0, UINT16_MAX, Attributes::MaxUserVolume::Id,
+                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "default-step-size", 0, UINT16_MAX, Attributes::DefaultStepSize::Id,
+                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::AudioControl::UnmutePolicyEnum>>(
+            Id, "set-volume-unmute-policy", 0, UINT8_MAX, Attributes::SetVolumeUnmutePolicy::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::AudioControl::UnmutePolicyEnum>>(
+            Id, "increase-volume-unmute-policy", 0, UINT8_MAX, Attributes::IncreaseVolumeUnmutePolicy::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::AudioControl::UnmuteVolumeEnum>>(
+            Id, "increase-volume-unmute-volume", 0, UINT8_MAX, Attributes::IncreaseVolumeUnmuteVolume::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::AudioControl::UnmutePolicyEnum>>(
+            Id, "decrease-volume-unmute-policy", 0, UINT8_MAX, Attributes::DecreaseVolumeUnmutePolicy::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<bool>>>(Id, "start-up-muted", 0, 1, Attributes::StartUpMuted::Id,
+                                                                          WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
+            Id, "start-up-volume", 0, UINT16_MAX, Attributes::StartUpVolume::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int16_t>>(Id, "bass", INT16_MIN, INT16_MAX, Attributes::Bass::Id, WriteCommandType::kWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int16_t>>(Id, "mid", INT16_MIN, INT16_MAX, Attributes::Mid::Id, WriteCommandType::kWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int16_t>>(Id, "treble", INT16_MIN, INT16_MAX, Attributes::Treble::Id, WriteCommandType::kWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int16_t>>(Id, "min-correction", INT16_MIN, INT16_MAX, Attributes::MinCorrection::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<int16_t>>(Id, "max-correction", INT16_MIN, INT16_MAX, Attributes::MaxCorrection::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "soft-muted", Attributes::SoftMuted::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "physically-muted", Attributes::PhysicallyMuted::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "volume", Attributes::Volume::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "min-device-volume", Attributes::MinDeviceVolume::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "max-device-volume", Attributes::MaxDeviceVolume::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "max-device-volume-db", Attributes::MaxDeviceVolumeDB::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "max-user-volume", Attributes::MaxUserVolume::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "default-step-size", Attributes::DefaultStepSize::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "set-volume-unmute-policy", Attributes::SetVolumeUnmutePolicy::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "increase-volume-unmute-policy", Attributes::IncreaseVolumeUnmutePolicy::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "increase-volume-unmute-volume", Attributes::IncreaseVolumeUnmuteVolume::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "decrease-volume-unmute-policy", Attributes::DecreaseVolumeUnmutePolicy::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "start-up-muted", Attributes::StartUpMuted::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "start-up-volume", Attributes::StartUpVolume::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "bass", Attributes::Bass::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "mid", Attributes::Mid::Id, credsIssuerConfig),                                     //
+        make_unique<SubscribeAttribute>(Id, "treble", Attributes::Treble::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "min-correction", Attributes::MinCorrection::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "max-correction", Attributes::MaxCorrection::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterZoneManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ZoneManagement;
@@ -35138,6 +35961,8 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterAccountLogin(commands, credsIssuerConfig);
     registerClusterContentControl(commands, credsIssuerConfig);
     registerClusterContentAppObserver(commands, credsIssuerConfig);
+    registerClusterMediaFileManagement(commands, credsIssuerConfig);
+    registerClusterAudioControl(commands, credsIssuerConfig);
     registerClusterZoneManagement(commands, credsIssuerConfig);
     registerClusterCameraAvStreamManagement(commands, credsIssuerConfig);
     registerClusterCameraAvSettingsUserLevelManagement(commands, credsIssuerConfig);
