@@ -262,7 +262,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
-        # Requestor did not receive the second ApplyUpdateRequest from the Provider as it was terminated before resending.
+        # Requestor did not receive the ApplyUpdateResponse from the Provider as it was terminated before resending.
         await self._wait_for_idle_after_software_update(update_state_handler=update_state_attr_handler)
 
         # Software version should stay the same as the second ApplyUpdateRequest was not sent when the provider was terminated before re-sending the ApplyUpdateRequest
