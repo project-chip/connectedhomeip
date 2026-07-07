@@ -678,7 +678,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             (int(cluster_id), int(attr_id))
             for cluster_id, cluster in xml_clusters.items()
             for attr_id, attr in cluster.attributes.items()
-            if attr.changes_omitted or attr.quieter_reporting
+            if attr.changes_omitted or attr.quieter_reporting or attr.atomic_write
         )
         return xml_ids | MatterBaseTest._CQ_EXPECTED_BUT_NOT_YET_MARKED
 
