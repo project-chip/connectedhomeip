@@ -263,8 +263,8 @@ public:
             sPafSessions.erase(sid);
             if (sHost != nullptr)
             {
-                CHIP_ERROR stateErr = sHost->SetCPState(
-                    chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPDisconnected);
+                CHIP_ERROR stateErr =
+                    sHost->SetCPState(chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::kState_CPDisconnected);
                 if (stateErr != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer, "WiFiPAFCloseSession: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
@@ -954,8 +954,7 @@ void Shutdown()
             sHost->Sessions().DispatchMessageFailure(sid, chip::Protocols::InteractionModel::Status::Failure);
             sHost->Sessions().RemoveSession(sid);
         }
-        (void) chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccSessionId,
-                                                                            pafSession);
+        (void) chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccSessionId, pafSession);
         chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseEndPoint(pafSession);
         if (pafSession.id != 0)
         {
