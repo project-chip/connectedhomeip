@@ -32,14 +32,7 @@
 
 #include <app/server/Server.h>
 
-// The Time Synchronization Client (TSC) feature requires a Read Client to query time from a
-// trusted time source. On resource-constrained devices, the Read Client may be disabled
-// (CHIP_CONFIG_ENABLE_READ_CLIENT = 0) to save space. We must only enable the TSC feature
-// if the Read Client is available, otherwise compilation will fail due to inheriting from
-// the incomplete ReadClient::Callback type.
-#define TIME_SYNC_TSC_FEATURE_ENABLED (TIME_SYNC_ENABLE_TSC_FEATURE && CHIP_CONFIG_ENABLE_READ_CLIENT)
-
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/ReadClient.h>
 #endif
 
@@ -75,7 +68,7 @@ enum class TimeSyncEventFlag : uint8_t
 
 class TimeSynchronizationCluster : public DefaultServerCluster,
                                    public FabricTable::Delegate
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
     ,
                                    public ReadClient::Callback
 #endif
@@ -118,7 +111,7 @@ public:
     // Fabric Table delegate functions
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
     // CASE connection functions
     void OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void OnDeviceConnectionFailureFn();
@@ -206,7 +199,7 @@ private:
 
     CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     struct TimeReadInfo

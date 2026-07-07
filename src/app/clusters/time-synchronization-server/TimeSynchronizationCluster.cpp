@@ -22,7 +22,7 @@
 
 #include <system/SystemClock.h>
 
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/InteractionModelEngine.h>
 #endif
 
@@ -39,7 +39,7 @@ namespace chip::app::Clusters {
 
 namespace {
 
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
 void OnDeviceConnectedWrapper(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     TimeSynchronizationCluster * timeSynchronization = reinterpret_cast<TimeSynchronizationCluster *>(context);
@@ -174,7 +174,7 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, cons
     mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
     mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
     mDelegate(config.delegate), mTimeSyncContext(context),
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
 #endif
@@ -397,7 +397,7 @@ void TimeSynchronizationCluster::AttemptToGetFallbackNTPTimeFromDelegate()
     }
 }
 
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
 void TimeSynchronizationCluster::OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     // Connected to our trusted time source, let's read the time.
@@ -524,7 +524,7 @@ void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessf
 
 CHIP_ERROR TimeSynchronizationCluster::AttemptToGetTimeFromTrustedNode()
 {
-#if TIME_SYNC_TSC_FEATURE_ENABLED
+#if TIME_SYNC_ENABLE_TSC_FEATURE
     if (!mTrustedTimeSource.IsNull())
     {
         ScopedNodeId nodeId(mTrustedTimeSource.Value().nodeID, mTrustedTimeSource.Value().fabricIndex);
