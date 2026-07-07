@@ -34,6 +34,9 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
     #   - need option to variable name translation (i.e. underscores: --stop_on_error is stop_on_error in python)
     #   - need type conversion (click would convert things to ints, bools and such instead of strings)
     #
+    # Example: --value-wait-extra-duration-ms must map to valueWaitExtraDurationMs (int)
+    # as defined by the option and signature of runner_base in scripts/tests/chipyaml/runner.py.
+    #
     # These are known mappings between one argument and the corresponding known name. Everything else
     # would just replace '-' with '_':
     option_mapping = {
