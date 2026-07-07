@@ -14,11 +14,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import logging
+import logging, time
+import matter.testing.nfc
 
 from mobly import asserts
 
-import matter.testing.nfc
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import (assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
+                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_sii_key, assert_valid_t_key)
+from mdns_discovery.utils.network import is_dut_tcp_supported
 from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
@@ -37,7 +41,9 @@ class TC_DD_3_24(MatterBaseTest):
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
             TestStep(2, "Validate the NFC bit in payload and perform the first phase of the commissioning, over NFC"),
             TestStep(3, "DUT is powered ON."),
-            TestStep(4, "Commissioning is completed on the operational network."),
+            TestStep(4, "Perform DNS-SD Discovery and check the presence of a mDNS service with “_IC” subtype."),
+            TestStep(5, "Commissioning is completed on the operational network."),
+            TestStep(6, "Perform DNS-SD Discovery and check that the “_IC” subtype is no more present."),
         ]
 
     def setup_test(self):
@@ -114,11 +120,17 @@ class TC_DD_3_24(MatterBaseTest):
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
         asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen!")
 
-        self.step(3)
-
+        self.step(3)    # Power ON the DUT
         self.wait_for_user_input(prompt_msg="Power ON the device")
 
-        self.step(4)
+        self.step(4)    # Perform DNS-SD Discovery and check the presence of a mDNS service with “_IC” subtype.
+
+        asserts.assert_true(
+            await self.check_operational_service_has_txt_ic(),
+            'TXT key "IC" was not found!'
+        )
+
+        self.step(5)    # Complete commissioning
 
         asserts.assert_not_equal(
             self.commissionee_node_id, 0,
@@ -139,6 +151,72 @@ class TC_DD_3_24(MatterBaseTest):
         )
 
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
+
+        self.step(6)    # Perform DNS-SD Discovery and check that the “_IC” subtype is no more present.
+
+        # Wait a bit that mDNS service gets updated and propagated
+        time.sleep(1)
+
+        asserts.assert_false(
+            await self.check_operational_service_has_txt_ic(),
+            'TXT key "IC" is still present!'
+        )
+
+    def get_dut_instance_name(self, log_result: bool = False) -> str:
+        node_id = self.dut_node_id
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        if log_result:
+            log.info("\n\n\tDUT Instance Name: %s\n", instance_name)
+        return instance_name
+
+    def get_operational_subtype(self, log_result: bool = False) -> str:
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
+        if log_result:
+            log.info("\n\n\tOperational Subtype: %s\n", operational_subtype)
+        return operational_subtype
+
+    async def check_operational_service_has_txt_ic(self) -> bool:
+        # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
+        # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
+        # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
+        instance_name = self.get_dut_instance_name(log_result=True)
+        log.info("instance_name: %s", instance_name)
+
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+        log.info("instance_qname: %s", instance_qname)
+
+        mdns = MdnsDiscovery()
+        srv_record = await mdns.get_srv_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            log_output=True
+        )
+
+        asserts.assert_true(
+            srv_record is not None,
+            f"Operational mDNS service '{instance_qname}' was not found"
+        )
+
+        asserts.assert_true(
+            hasattr(srv_record, "txt"),
+            f"Operational mDNS service '{instance_qname}' does not contain TXT data"
+        )
+
+        asserts.assert_is_not_none(
+            srv_record.txt,
+            f"Operational mDNS service '{instance_qname}' has no TXT record"
+        )
+
+        asserts.assert_true(
+            isinstance(srv_record.txt, dict),
+            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {srv_record.txt}"
+        )
+
+        log.info("Operational TXT record: %s", srv_record.txt)
+
+        return "IC" in srv_record.txt and srv_record.txt["IC"] == "1"
 
 
 if __name__ == "__main__":
