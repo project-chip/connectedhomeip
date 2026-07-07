@@ -168,8 +168,8 @@ void ApplicationShutdownHook()
 
 1. **Link Specific Devices**: In `BUILD.gn` or `CMakeLists.txt`, link directly
    against required device modules (e.g.,
-   `all-devices-common/device/types/dimmable-light`) rather than `device-factory` to
-   minimize RAM and Flash usage.
+   `all-devices-common/device/types/dimmable-light`) rather than
+   `device-factory` to minimize RAM and Flash usage.
 2. **Statically Define Topologies**: Configure fixed `EndpointId` parameters
    instead of using auto-incrementing IDs to ensure a fixed data model.
 3. **Persist Hardware State**: Replace simulated cluster implementations with
