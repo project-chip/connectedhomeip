@@ -8137,6 +8137,57 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentControl::Struct
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.fileID", "fileID", value.isMember("fileID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.size", "size", value.isMember("size")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.mimeType", "mimeType", value.isMember("mimeType")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.imageUri", "imageUri", value.isMember("imageUri")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fileID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fileID, value["fileID"]));
+    valueCopy.removeMember("fileID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    valueCopy.removeMember("name");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "size");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.size, value["size"]));
+    valueCopy.removeMember("size");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mimeType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mimeType, value["mimeType"]));
+    valueCopy.removeMember("mimeType");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageUri");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageUri, value["imageUri"]));
+    valueCopy.removeMember("imageUri");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.fileID);
+    ComplexArgumentParser::Finalize(request.name);
+    ComplexArgumentParser::Finalize(request.size);
+    ComplexArgumentParser::Finalize(request.mimeType);
+    ComplexArgumentParser::Finalize(request.imageUri);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::Type & request,
                                         Json::Value & value)
 {
