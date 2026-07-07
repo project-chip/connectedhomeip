@@ -530,9 +530,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self._extra_cas: list[matter.CertificateAuthority.CertificateAuthority] = []
         self._original_acl = None
         self._framework_cleanup_done = False
-        # Set to True by commission_devices() on success; gates the per-test ACL read in
-        # setup_test so unit tests (which never commission) incur zero network overhead.
-        self._dut_confirmed_available = False
         # Prevents double-execution when the override calls super().teardown_test()
         # and __init_subclass__ also calls it afterward.
         self._teardown_ran = False
@@ -2140,10 +2137,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             thread_ba_port=self.matter_test_config.thread_ba_port,
         )
 
-        result = await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
-        if result:
-            self._dut_confirmed_available = True
-        return result
+        return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
