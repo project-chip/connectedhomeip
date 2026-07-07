@@ -14,7 +14,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import logging, time
+import asyncio
+import logging
 import matter.testing.nfc
 
 from mobly import asserts
@@ -155,7 +156,7 @@ class TC_DD_3_24(MatterBaseTest):
         self.step(6)    # Perform DNS-SD Discovery and check that the “_IC” subtype is no more present.
 
         # Wait a bit that mDNS service gets updated and propagated
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         asserts.assert_false(
             await self.check_operational_service_has_txt_ic(),
