@@ -455,7 +455,8 @@ inline size_t CountSupportedMaps(chip::Testing::ClusterTester & tester)
     return count;
 }
 
-inline std::optional<Structs::ProgressStruct::DecodableType> FindProgressForArea(chip::Testing::ClusterTester & tester, uint32_t areaId)
+inline std::optional<Structs::ProgressStruct::DecodableType> FindProgressForArea(chip::Testing::ClusterTester & tester,
+                                                                                 uint32_t areaId)
 {
     DataModel::DecodableList<Structs::ProgressStruct::DecodableType> progressList;
     if (!tester.ReadAttribute(Attributes::Progress::Id, progressList).IsSuccess())
