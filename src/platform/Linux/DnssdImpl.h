@@ -167,7 +167,7 @@ private:
 
     bool ClientHasFailed() const;
 
-    CHIP_ERROR RebuildClient();
+    CHIP_ERROR ResetClientForLookup();
 
     /// Allocates a new resolve context with a unique `mNumber`
     ResolveContext * AllocateResolveContext();
@@ -204,7 +204,7 @@ private:
     size_t mResolveCount = 0;
     std::list<ResolveContext *> mAllocatedResolves;
 
-    std::list<BrowseContext *> mAllocatedBrowses;
+    size_t mBrowseCount = 0;
 };
 
 } // namespace Dnssd
