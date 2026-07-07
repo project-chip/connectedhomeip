@@ -43,7 +43,7 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
     index = 0
     while len(commands) - index > 1:
         key = commands[index].replace('--', '')
-        mapped_key = option_mapping.get(key, key)
+        mapped_key = option_mapping.get(key, key.replace('-', '_'))
         val = commands[index+1]
         # Because options are manually parsed as strings from the argv commands list,
         # we must perform manual type casting to match the types expected by runner_base.
