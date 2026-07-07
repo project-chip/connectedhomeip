@@ -33,10 +33,6 @@ namespace Clusters {
 namespace ServiceArea {
 namespace Testing {
 
-using namespace chip::app::Clusters::Globals;
-using namespace chip::app::Clusters::ServiceArea;
-using namespace chip::Testing;
-
 inline constexpr EndpointId kTestEndpoint = 1;
 
 class InMemoryStorageDelegate : public StorageDelegate
@@ -353,8 +349,8 @@ inline AreaStructureWrapper MakeNamedArea(uint32_t areaId, const char * name)
 }
 
 inline AreaStructureWrapper
-MakeLandmarkOnlyArea(uint32_t areaId, LandmarkTag landmark,
-                     const DataModel::Nullable<RelativePositionTag> & position = DataModel::NullNullable)
+MakeLandmarkOnlyArea(uint32_t areaId, Globals::LandmarkTag landmark,
+                     const DataModel::Nullable<Globals::RelativePositionTag> & position = DataModel::NullNullable)
 {
     AreaStructureWrapper area;
     area.SetAreaId(areaId).SetMapId(DataModel::NullNullable).SetLocationInfoNull().SetLandmarkInfo(landmark, position);
@@ -408,7 +404,7 @@ inline Commands::SelectAreas::Type MakeSelectAreasRequest(std::initializer_list<
     return request;
 }
 
-inline std::vector<uint32_t> ReadSelectedAreasList(ClusterTester & tester)
+inline std::vector<uint32_t> ReadSelectedAreasList(chip::Testing::ClusterTester & tester)
 {
     std::vector<uint32_t> result;
     DataModel::DecodableList<uint32_t> selected;
@@ -425,7 +421,7 @@ inline std::vector<uint32_t> ReadSelectedAreasList(ClusterTester & tester)
     return result;
 }
 
-inline size_t CountSupportedAreas(ClusterTester & tester)
+inline size_t CountSupportedAreas(chip::Testing::ClusterTester & tester)
 {
     DataModel::DecodableList<Structs::AreaStruct::DecodableType> areas;
     if (!tester.ReadAttribute(Attributes::SupportedAreas::Id, areas).IsSuccess())
@@ -442,7 +438,7 @@ inline size_t CountSupportedAreas(ClusterTester & tester)
     return count;
 }
 
-inline size_t CountSupportedMaps(ClusterTester & tester)
+inline size_t CountSupportedMaps(chip::Testing::ClusterTester & tester)
 {
     DataModel::DecodableList<Structs::MapStruct::DecodableType> maps;
     if (!tester.ReadAttribute(Attributes::SupportedMaps::Id, maps).IsSuccess())
@@ -459,7 +455,7 @@ inline size_t CountSupportedMaps(ClusterTester & tester)
     return count;
 }
 
-inline std::optional<Structs::ProgressStruct::DecodableType> FindProgressForArea(ClusterTester & tester, uint32_t areaId)
+inline std::optional<Structs::ProgressStruct::DecodableType> FindProgressForArea(chip::Testing::ClusterTester & tester, uint32_t areaId)
 {
     DataModel::DecodableList<Structs::ProgressStruct::DecodableType> progressList;
     if (!tester.ReadAttribute(Attributes::Progress::Id, progressList).IsSuccess())
@@ -478,7 +474,7 @@ inline std::optional<Structs::ProgressStruct::DecodableType> FindProgressForArea
     return std::nullopt;
 }
 
-inline bool DirtyListContainsAttribute(ClusterTester & tester, AttributeId attributeId)
+inline bool DirtyListContainsAttribute(chip::Testing::ClusterTester & tester, AttributeId attributeId)
 {
     for (const auto & path : tester.GetDirtyList())
     {
@@ -521,7 +517,7 @@ protected:
         mDelegate.Reset();
         mCluster =
             std::make_unique<ServiceAreaCluster>(kTestEndpoint, mStorage, mDelegate, config.features, config.optionalAttributes);
-        mTester = std::make_unique<ClusterTester>(*mCluster);
+        mTester = std::make_unique<chip::Testing::ClusterTester>(*mCluster);
         ASSERT_EQ(mCluster->Startup(mTester->GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
@@ -534,7 +530,7 @@ protected:
     InMemoryStorageDelegate mStorage;
     MockDelegate mDelegate;
     std::unique_ptr<ServiceAreaCluster> mCluster;
-    std::unique_ptr<ClusterTester> mTester;
+    std::unique_ptr<chip::Testing::ClusterTester> mTester;
 };
 
 } // namespace Testing
