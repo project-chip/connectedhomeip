@@ -133,6 +133,16 @@ class TC_CLDIM_6_1(MatterBaseTest):
             "CLDIM.S", "CLDIM.S.F00", "CLDIM.S.C03.Rsp"
         ]
 
+    def _admin_only_acl(self) -> list:
+        """ACL entry granting only CASE admin access to the controller. The default ACL post commissioning setting for the controller."""
+        return [
+            Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[self.default_controller.nodeId],
+                targets=NullValue),
+        ]
+
     @property
     def default_endpoint(self) -> int:
         return 1
@@ -140,18 +150,25 @@ class TC_CLDIM_6_1(MatterBaseTest):
     @async_test_body
     async def teardown_test(self):
         if getattr(self, 'groupcast_enabled', False):
-            membership = await self.read_single_attribute_check_success(
-                endpoint=0,
-                cluster=Clusters.Groupcast,
-                attribute=Clusters.Groupcast.Attributes.Membership,
-            )
-            if membership:
-                try:
-                    await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
-                except InteractionModelError as e:
-                    if e.status != Status.NotFound:
-                        raise
-                    log.info("LeaveGroup(groupID=0) returned NotFound during teardown; no groups to clean up")
+            try:
+                # Leave all groups created.
+                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0), endpoint=0)
+            except InteractionModelError as e:
+                if e.status != Status.NotFound:
+                    raise
+                log.info("LeaveGroup(groupID=0) returned NotFound during teardown; no groups to clean up")
+
+            try:
+                # Remove the KeySetID on the DUT.
+                await self.send_single_cmd(cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=self.kGroupKeysetId), endpoint=0)
+            except InteractionModelError as e:
+                if e.status != Status.NotFound:
+                    raise
+                log.info("KeySetRemove(groupKeySetID=%s) returned NotFound during teardown; keyset already removed", self.kGroupKeysetId)
+
+            # Restore the default ACL post commissioning setting for the controller.
+            await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(self._admin_only_acl()))])
+
         super().teardown_test()
 
     @async_test_body
@@ -304,21 +321,13 @@ class TC_CLDIM_6_1(MatterBaseTest):
                 keySetID=self.kGroupKeysetId,
                 key=self.kGroupKey), endpoint=0)
 
-            acl = [
-                # ACL entry granting CASE admin access to the controller.
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                    subjects=[self.default_controller.nodeId],
-                    targets=NullValue),
-                # Grant a additional Group Operate access to the closure cluster.
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
-                    subjects=[self.kGroupId],
-                    targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                        endpoint=endpoint, cluster=Clusters.ClosureDimension.id)]),
-            ]
+            acl = self._admin_only_acl()
+            acl.append(Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
+                subjects=[self.kGroupId],
+                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                    endpoint=endpoint, cluster=Clusters.ClosureDimension.id)]))
             await dev_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         else:
             log.info("Groupcast cluster is not enabled on EP0, skipping step")
