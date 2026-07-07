@@ -1404,6 +1404,7 @@ def assert_valid_ipv6_addresses(addresses: list[str]) -> None:
     if invalid:
         asserts.fail(f"Invalid IPv6 addresses: {invalid}")
 
+
 @not_none_args
 async def assert_txt_record_present(instance_name: str, service_type: MdnsServiceType, require_keys: bool = False) -> None:
     """

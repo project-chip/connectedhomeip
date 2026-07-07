@@ -51,9 +51,9 @@
 import logging
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.utils.asserts import (assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
-                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_sii_key, assert_valid_t_key,
-                                          assert_txt_record_present)
+from mdns_discovery.utils.asserts import (assert_txt_record_present, assert_valid_hostname, assert_valid_icd_key,
+                                          assert_valid_ipv6_addresses, assert_valid_sai_key, assert_valid_sat_key,
+                                          assert_valid_sii_key, assert_valid_t_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
 from mobly import asserts
 
