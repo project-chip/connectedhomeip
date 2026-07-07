@@ -37,6 +37,8 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
     #   - manual type conversion (since options are parsed manually as strings, we must cast
     #     to expected types like int or bool to match the function signature)
     #
+    # See runner_base definition in scripts/tests/chipyaml/runner.py for the full parameter list and target types.
+    #
     # These are known mappings between one argument and the corresponding known name. Everything else
     # would just replace '-' with '_':
     option_mapping = {
