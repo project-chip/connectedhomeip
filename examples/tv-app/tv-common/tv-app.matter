@@ -2541,7 +2541,7 @@ cluster UserLabel = 65 {
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
 cluster Messages = 151 {
-  revision 3;
+  revision 4;
 
   enum FutureMessagePreferenceEnum : enum8 {
     kAllowed = 0;
@@ -2563,6 +2563,9 @@ cluster Messages = 151 {
     kConfirmationResponse = 0x2;
     kConfirmationReply = 0x4;
     kProtectedMessages = 0x8;
+    kSpokenMessages = 0x10;
+    kAudioMessages = 0x20;
+    kMultiModalMessages = 0x40;
   }
 
   bitmap MessageControlBitmap : bitmap8 {
@@ -2571,6 +2574,8 @@ cluster Messages = 151 {
     kReplyMessage = 0x4;
     kMessageConfirmed = 0x8;
     kMessageProtected = 0x10;
+    kSpokenMessage = 0x20;
+    kAudioMessage = 0x40;
   }
 
   struct MessageResponseOptionStruct {
@@ -2586,6 +2591,8 @@ cluster Messages = 151 {
     nullable int64u duration = 4;
     long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
+    optional fabric_sensitive char_string<32> languageCode = 7;
+    optional fabric_sensitive long_char_string<256> messageURI = 8;
   }
 
   info event MessageQueued = 0 {
@@ -2603,8 +2610,16 @@ cluster Messages = 151 {
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
+  provisional fabric_sensitive info event MessageNotPresented = 3 {
+    octet_string messageID = 0;
+    boolean removedFromQueue = 1;
+    fabric_idx fabricIndex = 254;
+  }
+
   readonly attribute MessageStruct messages[] = 0;
   readonly attribute octet_string activeMessageIDs[] = 1;
+  provisional readonly attribute optional char_string supportedLanguageCodes[] = 2;
+  provisional readonly attribute optional char_string supportedMimeTypes[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2619,6 +2634,8 @@ cluster Messages = 151 {
     nullable int64u duration = 4;
     long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
+    optional char_string<32> languageCode = 7;
+    optional long_char_string<256> messageURI = 8;
   }
 
   request struct CancelMessagesRequestRequest {
