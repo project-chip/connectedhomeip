@@ -56,6 +56,10 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // Public getters for programmatic control
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::ProximityRanging::ProximityRangingCluster & ProximityRangingCluster() { return mProximityRangingCluster.Cluster(); }
+
 private:
     /// Derive the cluster's feature map from the supplied adapters.
     ///

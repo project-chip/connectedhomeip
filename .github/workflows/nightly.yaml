@@ -78,7 +78,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -199,7 +199,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v5
+              uses: actions/cache/save@v6
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -247,7 +247,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
 
             # NOTE: we need bootstrap to be able to use ASAN symbolizer and get ASAN Stack traces
             - name: Checkout submodules & Bootstrap
@@ -336,7 +336,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
 
             - name: Download all JUnit XML results
               uses: actions/download-artifact@v8
@@ -354,7 +354,7 @@ jobs:
                   annotate_only: true
 
             - name: Checkout gh-pages for Allure history
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
               with:
                   ref: gh-pages
                   path: gh-pages

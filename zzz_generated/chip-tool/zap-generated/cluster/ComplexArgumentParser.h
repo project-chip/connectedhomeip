@@ -906,6 +906,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl:
 
 static void Finalize(chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::Type & request,
                         Json::Value & value);
 
