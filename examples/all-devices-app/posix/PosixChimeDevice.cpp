@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <PosixChimeDevice.h>
 #include <PosixAudioManager.h>
+#include <PosixChimeDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <vector>

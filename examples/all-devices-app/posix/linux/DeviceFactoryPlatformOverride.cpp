@@ -24,7 +24,8 @@
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
+                                    PosixAudioManager & audioManager)
 {
     // Initialize the shared audio manager for miniaudio engine access and pre-load sounds
     CHIP_ERROR err = audioManager.Init();
@@ -42,9 +43,8 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
 
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
-        DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate, &audioManager]() {
-            return std::make_unique<PosixChimeDevice>(timerDelegate, audioManager);
-        });
+        DeviceFactory::GetInstance().RegisterCreator(
+            "chime", [&timerDelegate, &audioManager]() { return std::make_unique<PosixChimeDevice>(timerDelegate, audioManager); });
     }
 }
 

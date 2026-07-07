@@ -50,8 +50,7 @@ void PosixSpeakerDevice::UpdateEngineVolume()
     uint8_t volume = !muted ? level : 0;
     mAudioManager.SetVolume(volume);
 
-    ChipLogProgress(DeviceLayer, "PosixSpeakerDevice: Updated master volume to %u (Muted: %d, Level: %u)",
-                    volume, muted, level);
+    ChipLogProgress(DeviceLayer, "PosixSpeakerDevice: Updated master volume to %u (Muted: %d, Level: %u)", volume, muted, level);
 }
 
 } // namespace app

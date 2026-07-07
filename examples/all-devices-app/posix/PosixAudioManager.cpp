@@ -27,7 +27,6 @@
 namespace chip {
 namespace app {
 
-
 // Define the Pimpl struct containing all miniaudio-specific structures
 struct PosixAudioManager::Impl
 {
@@ -79,7 +78,7 @@ ma_result custom_data_source_read(ma_data_source * pDataSource, void * pFramesOu
     auto * pOut = reinterpret_cast<int16_t *>(pFramesOut);
 
     const ma_uint64 totalSamples = static_cast<ma_uint64>(pCustomDS->duration_sec * kSampleRateHz);
-    ma_uint64 framesToRead        = frameCount;
+    ma_uint64 framesToRead       = frameCount;
 
     // Limit read count to the remaining samples
     if (pCustomDS->cursor + framesToRead > totalSamples)
@@ -293,7 +292,7 @@ static const PosixAudioManager::Sound kSupportedSounds[] = {
     { 1, "Ring Ring" },
 };
 
-PosixAudioManager::PosixAudioManager() = default;
+PosixAudioManager::PosixAudioManager()  = default;
 PosixAudioManager::~PosixAudioManager() = default;
 
 CHIP_ERROR PosixAudioManager::Init()

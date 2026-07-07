@@ -24,7 +24,8 @@
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate, PosixAudioManager & audioManager);
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
+                                    PosixAudioManager & audioManager);
 
 } // namespace app
 } // namespace chip
