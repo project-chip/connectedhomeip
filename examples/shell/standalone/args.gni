@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,3 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
+
+# Standalone chip-shell uses the all-clusters-app ZAP for the Matter cmd server.
+shell_use_all_clusters_data_model = true
+chip_app_data_model_target = "${chip_root}/examples/all-clusters-app/all-clusters-common:all-clusters-common"

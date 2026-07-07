@@ -198,20 +198,20 @@ EdgeLock2go services could be used to securely provisioned DAC key/cert during
 manufacturing.
 
 Prior to the generation of the factory data binary. `EL2GO` data needs to be
-generated following `EL2GO` process.
+generated following [EL2GO process](https://docs.nxp.com/bundle/AN14705).
 
 For the factory data generation following option need to be added:
 
 `--EL2GO_bin ~/secure_objects.bin` containing `EL2GO` information including
-encrypted DAC private key and certificate. `--EL2GO_DAC_KEY_ID 1234` containing
-corresponding to the ID of the DAC key chosen during `EL2GO` key generation.
-`--EL2GO_DAC_CERT_ID 4321` containing corresponding to the ID of the DAC
-certification chosen during `EL2GO` key generation.
+encrypted DAC private key and certificate. `--EL2GO_DAC_KEY_ID 0x40000`
+containing corresponding to the ID of the DAC key chosen during `EL2GO` key
+generation. `--EL2GO_DAC_CERT_ID 0x40001` containing corresponding to the ID of
+the DAC certification chosen during `EL2GO` key generation.
 
 Reference factory data generation command:
 
 ```shell
-python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p ${passcode} -d ${discriminator} --vid "0x$VID" --pid "0x$PID" --vendor_name "NXP Semiconductors" --product_name "Thermostat" --serial_num "12345678" --date "$DATE" --hw_version 1 --hw_version_str "1.0" --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --EL2GO_bin ~/secure_objects.bin --EL2GO_DAC_KEY_ID 1234 --EL2GO_DAC_CERT_ID 4321 --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --out $FACTORY_DATA_DEST/factory_data.bin
+python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p ${passcode} -d ${discriminator} --vid "0x$VID" --pid "0x$PID" --vendor_name "NXP Semiconductors" --product_name "Thermostat" --serial_num "12345678" --date "$DATE" --hw_version 1 --hw_version_str "1.0" --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --EL2GO_bin ~/secure_objects.bin --EL2GO_DAC_KEY_ID 0x40000 --EL2GO_DAC_CERT_ID 0x40001 --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --out $FACTORY_DATA_DEST/factory_data.bin
 ```
 
 Supported platforms:
