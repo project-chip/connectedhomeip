@@ -11286,6 +11286,75 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRMediaFileManagementClusterFileDescriptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fileID = @(0);
+
+        _name = @"";
+
+        _size = @(0);
+
+        _mimeType = @"";
+
+        _imageUri = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMediaFileManagementClusterFileDescriptionStruct alloc] init];
+
+    other.fileID = self.fileID;
+    other.name = self.name;
+    other.size = self.size;
+    other.mimeType = self.mimeType;
+    other.imageUri = self.imageUri;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageUri];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaFileManagementClusterSharedFilesAddedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _requestID = @(0);
+
+        _responseID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMediaFileManagementClusterSharedFilesAddedEvent alloc] init];
+
+    other.requestID = self.requestID;
+    other.responseID = self.responseID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestID:%@; responseID:%@; >", NSStringFromClass([self class]), _requestID, _responseID];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRZoneManagementClusterTwoDCartesianVertexStruct
 - (instancetype)init
 {

@@ -178,11 +178,10 @@ class TC_SC_3_5(MatterBaseTest):
         # Instructing TH Server to accept a new Commissioner, which is the DUT
         params = await self.th_client.OpenCommissioningWindow(
             nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
-        new_random_passcode = params.setupPinCode
         await asyncio.sleep(1)
         log.info("OpenCommissioningWindow complete")
 
-        return new_random_passcode
+        return params.setupManualCode, params.setupPinCode
 
     async def revoke_and_open_commissioning_window(self):
         ''' Before reopening Commissioning Window, we need to instruct TH_SERVER to revoke any active OpenCommissioningWindows.'''
@@ -260,12 +259,12 @@ class TC_SC_3_5(MatterBaseTest):
 
         else:
             self.step("1a")
-            th_server_passcode = await self.open_commissioning_window()
+            th_server_manual_code, th_server_passcode = await self.open_commissioning_window()
 
             self.step("1b")
             prompt_msg = (
-                "\nPlease commission the TH_SERVER app from DUT:\n"
-                f"  pairing onnetwork 1 {th_server_passcode}\n"
+                "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
+                f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 1 {th_server_passcode})\n"
                 "Input 'Y' if commissioner DUT commissions TH server app successfully \n"
                 "Input 'N' if commissioner DUT fails commissioning \n "
             )
@@ -318,15 +317,15 @@ class TC_SC_3_5(MatterBaseTest):
 
         # ------------------------------------------- Inject Fault into Sigma2 TBEData2Encrypted---------------------------------------------
         self.step("2a")
-        th_server_passcode = await self.open_commissioning_window()
+        th_server_manual_code, th_server_passcode = await self.open_commissioning_window()
 
         self.step("2b")
         await self.send_fault_injection_command(CHIPFaultId.CASECorruptTBEData2Encrypted)
 
         self.step("2c")
         prompt_msg = (
-            "\nPlease commission the TH_SERVER app from DUT:\n"
-            f"  pairing onnetwork 1 {th_server_passcode}\n"
+            "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
+            f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 1 {th_server_passcode})\n"
             "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
             "Input 'N' if commissioner DUT commissions successfully \n "
             "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
@@ -351,16 +350,16 @@ class TC_SC_3_5(MatterBaseTest):
         # ------------------------------------------- Inject Fault into Sigma2 responderNOC---------------------------------------------
 
         self.step("3a")
-        th_server_passcode = await self.revoke_and_open_commissioning_window()
+        th_server_manual_code, th_server_passcode = await self.revoke_and_open_commissioning_window()
 
         self.step("3b")
         await self.send_fault_injection_command(CHIPFaultId.CASECorruptSigma2NOC)
 
         self.step("3c")
         prompt_msg = (
-            "\nPlease commission the TH_SERVER app from DUT:\n"
+            "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
             "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
-            f"  pairing onnetwork 2 {th_server_passcode}\n"
+            f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 2 {th_server_passcode})\n"
             "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
             "Input 'N' if commissioner DUT commissions successfully \n "
             "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
@@ -391,16 +390,16 @@ class TC_SC_3_5(MatterBaseTest):
             self.skip_step("4c")
         else:
             self.step("4a")
-            th_server_passcode = await self.revoke_and_open_commissioning_window()
+            th_server_manual_code, th_server_passcode = await self.revoke_and_open_commissioning_window()
 
             self.step("4b")
             await self.send_fault_injection_command(CHIPFaultId.CASECorruptSigma2ICAC)
 
             self.step("4c")
             prompt_msg = (
-                "\nPlease commission the TH_SERVER app from DUT:\n"
+                "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
                 "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
-                f"  pairing onnetwork 3 {th_server_passcode}\n"
+                f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 3 {th_server_passcode})\n"
                 "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
                 "Input 'N' if commissioner DUT commissions successfully \n "
                 "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
@@ -425,16 +424,16 @@ class TC_SC_3_5(MatterBaseTest):
         # ------------------------------------------- Inject Fault into Sigma2 Signature---------------------------------------------
 
         self.step("5a")
-        th_server_passcode = await self.revoke_and_open_commissioning_window()
+        th_server_manual_code, th_server_passcode = await self.revoke_and_open_commissioning_window()
 
         self.step("5b")
         await self.send_fault_injection_command(CHIPFaultId.CASECorruptSigma2Signature)
 
         self.step("5c")
         prompt_msg = (
-            "\nPlease commission the TH_SERVER app from DUT:\n"
+            "\nPlease commission the TH_SERVER app from DUT using the Manual Pairing Code below:\n"
             "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
-            f"  pairing onnetwork 4 {th_server_passcode}\n"
+            f"  Manual Pairing Code: {th_server_manual_code}  (chip-tool: pairing onnetwork 4 {th_server_passcode})\n"
             "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
             "Input 'N' if commissioner DUT commissions successfully \n "
             "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"

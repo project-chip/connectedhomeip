@@ -430,6 +430,9 @@ public class ClusterIDMapping {
         if (clusterId == ContentAppObserver.ID) {
             return new ContentAppObserver();
         }
+        if (clusterId == MediaFileManagement.ID) {
+            return new MediaFileManagement();
+        }
         if (clusterId == AudioControl.ID) {
             return new AudioControl();
         }
@@ -12131,7 +12134,8 @@ public class ClusterIDMapping {
         public enum Command {
             Stop(0L),
             MoveTo(1L),
-            Calibrate(2L),;
+            Calibrate(2L),
+            GroupedMoveTo(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -12160,6 +12164,23 @@ public class ClusterIDMapping {
                     }
                     public static MoveToCommandField value(int id) throws NoSuchFieldError {
                         for (MoveToCommandField field : MoveToCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupedMoveToCommandField {Position(0),Latch(1),Speed(2),;
+                    private final int id;
+                    GroupedMoveToCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupedMoveToCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupedMoveToCommandField field : GroupedMoveToCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -12261,7 +12282,9 @@ public class ClusterIDMapping {
 
         public enum Command {
             SetTarget(0L),
-            Step(1L),;
+            Step(1L),
+            GroupedSetTarget(2L),
+            GroupedStep(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -12307,6 +12330,40 @@ public class ClusterIDMapping {
                     }
                     public static StepCommandField value(int id) throws NoSuchFieldError {
                         for (StepCommandField field : StepCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupedSetTargetCommandField {Position(0),Latch(1),Speed(2),;
+                    private final int id;
+                    GroupedSetTargetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupedSetTargetCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupedSetTargetCommandField field : GroupedSetTargetCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupedStepCommandField {Direction(0),NumberOfSteps(1),Speed(2),;
+                    private final int id;
+                    GroupedStepCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupedStepCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupedStepCommandField field : GroupedStepCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -19243,6 +19300,200 @@ public class ClusterIDMapping {
                     }
                     public static ContentAppMessageCommandField value(int id) throws NoSuchFieldError {
                         for (ContentAppMessageCommandField field : ContentAppMessageCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class MediaFileManagement implements BaseCluster {
+        public static final long ID = 1297L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            TotalStorage(0L),
+            AvailableStorage(1L),
+            AvailableFiles(2L),
+            SupportedMimeTypes(3L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            SharedFilesAdded(0L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            AddFile(0L),
+            DeleteFile(2L),
+            RequestSharedFiles(3L),
+            GetSharedFile(4L),
+            OfferFile(6L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum AddFileCommandField {Name(0),Size(1),MimeType(2),ImageUri(3),;
+                    private final int id;
+                    AddFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddFileCommandField value(int id) throws NoSuchFieldError {
+                        for (AddFileCommandField field : AddFileCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum DeleteFileCommandField {FileID(0),;
+                    private final int id;
+                    DeleteFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static DeleteFileCommandField value(int id) throws NoSuchFieldError {
+                        for (DeleteFileCommandField field : DeleteFileCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RequestSharedFilesCommandField {ClientName(0),RequestID(1),SupportedMimeTypes(2),;
+                    private final int id;
+                    RequestSharedFilesCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RequestSharedFilesCommandField value(int id) throws NoSuchFieldError {
+                        for (RequestSharedFilesCommandField field : RequestSharedFilesCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GetSharedFileCommandField {ResponseID(0),;
+                    private final int id;
+                    GetSharedFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GetSharedFileCommandField value(int id) throws NoSuchFieldError {
+                        for (GetSharedFileCommandField field : GetSharedFileCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum OfferFileCommandField {ClientName(0),Name(1),Size(2),MimeType(3),ImageUri(4),;
+                    private final int id;
+                    OfferFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static OfferFileCommandField value(int id) throws NoSuchFieldError {
+                        for (OfferFileCommandField field : OfferFileCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

@@ -172,6 +172,7 @@ __all__ = [
     "AccountLogin",
     "ContentControl",
     "ContentAppObserver",
+    "MediaFileManagement",
     "AudioControl",
     "ZoneManagement",
     "CameraAvStreamManagement",
@@ -31692,6 +31693,7 @@ class ClosureControl(Cluster):
             kCalibration = 0x40
             kProtection = 0x80
             kManuallyOperable = 0x100
+            kAccess = 0x200
 
         class LatchControlModesBitmap(IntFlag):
             kRemoteLatching = 0x1
@@ -31784,6 +31786,26 @@ class ClosureControl(Cluster):
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
+
+        @dataclass
+        class GroupedMoveTo(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000104
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                    ])
+
+            position: typing.Optional[ClosureControl.Enums.TargetPositionEnum] = None
+            latch: typing.Optional[bool] = None
+            speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
 
     class Attributes:
         @dataclass
@@ -32178,6 +32200,7 @@ class ClosureDimension(Cluster):
             kTranslation = 0x20
             kRotation = 0x40
             kModulation = 0x80
+            kAccess = 0x100
 
         class LatchControlModesBitmap(IntFlag):
             kRemoteLatching = 0x1
@@ -32269,6 +32292,46 @@ class ClosureDimension(Cluster):
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
+
+            direction: ClosureDimension.Enums.StepDirectionEnum = 0
+            numberOfSteps: uint = 0
+            speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
+
+        @dataclass
+        class GroupedSetTarget(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000105
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                    ])
+
+            position: typing.Optional[uint] = None
+            latch: typing.Optional[bool] = None
+            speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
+
+        @dataclass
+        class GroupedStep(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000105
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=ClosureDimension.Enums.StepDirectionEnum),
+                        ClusterObjectFieldDescriptor(Label="numberOfSteps", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                    ])
 
             direction: ClosureDimension.Enums.StepDirectionEnum = 0
             numberOfSteps: uint = 0
@@ -51625,6 +51688,377 @@ class ContentAppObserver(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+
+@dataclass
+class MediaFileManagement(Cluster):
+    id: typing.ClassVar[int] = 0x00000511
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="totalStorage", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="availableStorage", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="availableFiles", Tag=0x00000002, Type=typing.List[MediaFileManagement.Structs.FileDescriptionStruct]),
+                ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=0x00000003, Type=typing.List[str]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    totalStorage: uint = 0
+    availableStorage: uint = 0
+    availableFiles: typing.List[MediaFileManagement.Structs.FileDescriptionStruct] = field(default_factory=lambda: [])
+    supportedMimeTypes: typing.List[str] = field(default_factory=lambda: [])
+    generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
+    attributeList: typing.List[uint] = field(default_factory=lambda: [])
+    featureMap: uint = 0
+    clusterRevision: uint = 0
+
+    class Enums:
+        class FileStatusEnum(MatterIntEnum):
+            kSuccess = 0x00
+            kInsufficientStorage = 0x01
+            kInvalidFileID = 0x02
+            kAuthenticationFailed = 0x03
+            kFileNotAvailable = 0x04
+            kInvalidRequest = 0x05
+            kUnsupportedMimeType = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
+
+    class Bitmaps:
+        class Feature(IntFlag):
+            kMediaSharing = 0x1
+
+    class Structs:
+        @dataclass
+        class FileDescriptionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="fileID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                    ])
+
+            fileID: 'uint' = 0
+            name: 'str' = ""
+            size: 'uint' = 0
+            mimeType: 'str' = ""
+            imageUri: 'str' = ""
+
+    class Commands:
+        @dataclass
+        class AddFile(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000511
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'AddFileResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="size", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mimeType", Tag=2, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=3, Type=str),
+                    ])
+
+            name: str = ""
+            size: uint = 0
+            mimeType: str = ""
+            imageUri: str = ""
+
+        @dataclass
+        class AddFileResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000511
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaFileManagement.Enums.FileStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="fileID", Tag=1, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            status: MediaFileManagement.Enums.FileStatusEnum = 0
+            fileID: typing.Union[Nullable, uint] = NullValue
+
+        @dataclass
+        class DeleteFile(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000511
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="fileID", Tag=0, Type=uint),
+                    ])
+
+            fileID: uint = 0
+
+        @dataclass
+        class RequestSharedFiles(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000511
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="clientName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="requestID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Union[None, Nullable, typing.List[str]]),
+                    ])
+
+            clientName: str = ""
+            requestID: uint = 0
+            supportedMimeTypes: typing.Union[None, Nullable, typing.List[str]] = None
+
+        @dataclass
+        class GetSharedFile(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000511
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetSharedFileResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="responseID", Tag=0, Type=uint),
+                    ])
+
+            responseID: uint = 0
+
+        @dataclass
+        class GetSharedFileResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000511
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaFileManagement.Enums.FileStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
+                    ])
+
+            status: MediaFileManagement.Enums.FileStatusEnum = 0
+            fileDescription: typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = None
+
+        @dataclass
+        class OfferFile(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000511
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="clientName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                    ])
+
+            clientName: str = ""
+            name: str = ""
+            size: uint = 0
+            mimeType: str = ""
+            imageUri: str = ""
+
+    class Attributes:
+        @dataclass
+        class TotalStorage(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class AvailableStorage(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class AvailableFiles(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[MediaFileManagement.Structs.FileDescriptionStruct])
+
+            value: typing.List[MediaFileManagement.Structs.FileDescriptionStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class SupportedMimeTypes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[str])
+
+            value: typing.List[str] = field(default_factory=lambda: [])
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+    class Events:
+        @dataclass
+        class SharedFilesAdded(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000511
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="requestID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="responseID", Tag=1, Type=uint),
+                    ])
+
+            requestID: uint = 0
+            responseID: uint = 0
 
 
 @dataclass

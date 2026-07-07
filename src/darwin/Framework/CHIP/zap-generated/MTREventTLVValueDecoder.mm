@@ -5840,6 +5840,41 @@ static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEven
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForMediaFileManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::MediaFileManagement;
+    switch (aEventId) {
+    case Events::SharedFilesAdded::Id: {
+        Events::SharedFilesAdded::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRMediaFileManagementClusterSharedFilesAddedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.requestID];
+            value.requestID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.responseID];
+            value.responseID = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known MediaFileManagement event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForAudioControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AudioControl;
@@ -7174,6 +7209,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::MediaFileManagement::Id: {
+        return DecodeEventPayloadForMediaFileManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::AudioControl::Id: {
         return DecodeEventPayloadForAudioControlCluster(aPath.mEventId, aReader, aError);
