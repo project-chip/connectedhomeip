@@ -28,6 +28,11 @@ using namespace chip::ubus;
 
 // Optionally enable verbose notification and UCI response debugging
 // #define CHIP_WIFI_MANAGER_UBUS_DEBUGGING
+#ifdef CHIP_WIFI_MANAGER_UBUS_DEBUGGING
+#define ChipWifiDebug(...) ChipLogProgress(AppServer, __VA_ARGS__)
+#else
+#define ChipWifiDebug(...)
+#endif
 
 namespace chip {
 
@@ -94,18 +99,18 @@ void WiFiManagerUbus::Init()
     mService.SetNotificationCallback(
         [](UbusWatch & /*watch*/, void * appState, ubus_request_data * /*req*/, const char * notification, blob_attr * msg) {
 #ifdef CHIP_WIFI_MANAGER_UBUS_DEBUGGING
-            ChipLogProgress(AppServer, "WiFiManagerUbus: service notification '%s'", notification);
+            ChipWifiDebug("WiFiManagerUbus: service notification '%s'", notification);
             blob_attr * dbgCur;
             int dbgRem;
             blobmsg_for_each_attr(dbgCur, msg, dbgRem)
             {
                 if (blobmsg_type(dbgCur) == BLOBMSG_TYPE_STRING)
                 {
-                    ChipLogProgress(AppServer, "  [string] %s = %s", blobmsg_name(dbgCur), blobmsg_get_string(dbgCur));
+                    ChipWifiDebug("  [string] %s = %s", blobmsg_name(dbgCur), blobmsg_get_string(dbgCur));
                 }
                 else
                 {
-                    ChipLogProgress(AppServer, "  [type=%d] %s", blobmsg_type(dbgCur), blobmsg_name(dbgCur));
+                    ChipWifiDebug("  [type=%d] %s", blobmsg_type(dbgCur), blobmsg_name(dbgCur));
                 }
             }
 #endif
@@ -116,9 +121,7 @@ void WiFiManagerUbus::Init()
                 ChipLogError(AppServer, "WiFiManagerUbus: failed to parse service event");
                 return;
             }
-#ifdef CHIP_WIFI_MANAGER_UBUS_DEBUGGING
-            ChipLogProgress(AppServer, "WiFiManagerUbus: event type = '%s'", eventType.value());
-#endif
+            ChipWifiDebug("WiFiManagerUbus: event type = '%s'", eventType.value());
             if (strcmp(eventType.value(), "netifd.wireless.done") != 0)
                 return;
 
@@ -155,22 +158,22 @@ void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
     }
     blobmsg_for_each_attr(cur, values, rem)
     {
-        ChipLogProgress(AppServer, "Found section: %s", blobmsg_name(cur));
+        ChipWifiDebug("Found section: %s", blobmsg_name(cur));
         blobmsg_for_each_attr(i, cur, r)
         {
             if (blobmsg_type(i) == BLOBMSG_TYPE_STRING)
             {
-                ChipLogProgress(AppServer, "  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
+                ChipWifiDebug("  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
                 if (strcmp(blobmsg_name(i), "wifi_iface") == 0)
                 {
                     free(desired_radio);
                     desired_radio = strdup(blobmsg_get_string(i));
-                    ChipLogProgress(AppServer, "Preferences: desired radio: %s", desired_radio);
+                    ChipWifiDebug("Preferences: desired radio: %s", desired_radio);
                 }
             }
             else
             {
-                ChipLogProgress(AppServer, "  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
+                ChipWifiDebug("  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
             }
         }
     }
@@ -213,7 +216,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
         {
             if (blobmsg_type(i) == BLOBMSG_TYPE_STRING)
             {
-                ChipLogDetail(AppServer, "  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
+                ChipWifiDebug("  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
                 if (strcmp(blobmsg_name(i), "mode") == 0 && strcmp(blobmsg_get_string(i), "ap") != 0)
                 {
                     ChipLogProgress(AppServer, "Found non-AP radio, SKIPPING");
@@ -222,7 +225,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
             }
             else
             {
-                ChipLogDetail(AppServer, "  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
+                ChipWifiDebug("  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
             }
         }
         if (!station_mode && (desired_radio == nullptr || strcmp(desired_radio, blobmsg_name(cur)) == 0))
@@ -249,7 +252,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
     VerifyOrReturn(ssid != nullptr, ChipLogError(AppServer, "Radio %s does not have a set SSID!", blobmsg_name(radio)));
     VerifyOrReturn(key != nullptr, ChipLogError(AppServer, "Radio %s does not have a set key!", blobmsg_name(radio)));
 
-    ChipLogProgress(AppServer, "Chosen radio '%s' has SSID '%s' and key '%s'", blobmsg_name(radio), ssid, key);
+    ChipLogProgress(AppServer, "Chosen radio '%s' has SSID '%s'", blobmsg_name(radio), ssid);
 
     CHIP_ERROR err = mServer.SetNetworkCredentials(ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid)),
                                                    ByteSpan(reinterpret_cast<const uint8_t *>(key), strlen(key)));
