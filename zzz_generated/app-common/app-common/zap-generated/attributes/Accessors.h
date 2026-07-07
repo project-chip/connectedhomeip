@@ -4943,6 +4943,36 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace ContentAppObserver
 
+namespace MediaFileManagement {
+namespace Attributes {
+
+namespace TotalStorage {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint64_t * value); // int64u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
+} // namespace TotalStorage
+
+namespace AvailableStorage {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint64_t * value); // int64u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
+} // namespace AvailableStorage
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MediaFileManagement
+
 namespace AudioControl {
 namespace Attributes {
 
