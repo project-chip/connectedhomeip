@@ -41,7 +41,7 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
         'value-wait-extra-duration-ms': 'valueWaitExtraDurationMs',
     }
 
-    str_to_bool = lambda val: val.lower() in ('true', '1', 'yes')
+    def str_to_bool(val): return val.lower() in ('true', '1', 'yes')
 
     type_conversions = {
         'valueWaitExtraDurationMs': int,
