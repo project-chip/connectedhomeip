@@ -82,9 +82,9 @@ public:
 class TestableWindowCoveringCluster : public WindowCoveringCluster
 {
 public:
-    using WindowCoveringCluster::WindowCoveringCluster;
     using WindowCoveringCluster::SetEndProductType;
     using WindowCoveringCluster::SetType;
+    using WindowCoveringCluster::WindowCoveringCluster;
 };
 
 // ---------------------------------------------------------------------------
@@ -362,8 +362,7 @@ TEST_F(TestWindowCoveringCluster, ReadDisabledOptionalIsUnsupported)
     ASSERT_EQ(h.Startup(), CHIP_NO_ERROR);
 
     uint16_t actuationsLift = 0;
-    EXPECT_EQ(h.tester.ReadAttribute(Attributes::NumberOfActuationsLift::Id, actuationsLift),
-              Status::UnsupportedAttribute);
+    EXPECT_EQ(h.tester.ReadAttribute(Attributes::NumberOfActuationsLift::Id, actuationsLift), Status::UnsupportedAttribute);
 }
 
 // Nullable persistent attributes must round-trip both a concrete value and null
@@ -668,8 +667,8 @@ TEST_F(TestWindowCoveringCluster, Delegate_MovementFailureIsNotPropagated)
     cmd.liftPercent100thsValue = 6000;
     auto result                = h.tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
 
-    EXPECT_TRUE(result.IsSuccess());                    // failure swallowed (logged only)
-    EXPECT_EQ(h.delegate.mHandleMovementCallCount, 1);  // delegate was still called
+    EXPECT_TRUE(result.IsSuccess());                                         // failure swallowed (logged only)
+    EXPECT_EQ(h.delegate.mHandleMovementCallCount, 1);                       // delegate was still called
     EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), 6000); // target still committed
 }
 
