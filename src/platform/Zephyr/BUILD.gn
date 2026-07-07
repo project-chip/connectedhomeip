@@ -103,6 +103,7 @@ static_library("Zephyr") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   cflags = [ "-Wconversion" ]
