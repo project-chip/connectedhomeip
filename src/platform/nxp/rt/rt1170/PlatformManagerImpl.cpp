@@ -299,7 +299,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&GetDiagnosticDataProviderImpl());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     /* Initialize LwIP via Wi-Fi layer. */
