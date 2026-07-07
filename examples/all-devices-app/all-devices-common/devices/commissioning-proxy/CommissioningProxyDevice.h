@@ -27,9 +27,6 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include "CommissioningProxyBleTransport.h"
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include "CommissioningProxyPafTransport.h"
-#endif
 
 namespace chip {
 namespace app {
@@ -50,13 +47,6 @@ private:
     // Platform transport drivers registered on the cluster (owned here).
 #if CONFIG_NETWORK_LAYER_BLE
     Clusters::CommissioningProxy::CommissioningProxyBleTransport mBleTransport;
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    Clusters::CommissioningProxy::CommissioningProxyPafTransport mPafTransport;
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    static void OnDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 #endif
 };
 
