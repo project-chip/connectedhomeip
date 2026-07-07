@@ -18,4 +18,5 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/ModeSelectCluster.cpp"
     "${CLUSTER_DIR}/SupportedModesManager.h"
+    "${CLUSTER_DIR}/supported-modes-manager.h"
 )
