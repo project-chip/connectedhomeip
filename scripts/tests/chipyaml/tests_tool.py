@@ -41,6 +41,14 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
         'value-wait-extra-duration-ms': 'valueWaitExtraDurationMs',
     }
 
+    str_to_bool = lambda val: val.lower() in ('true', '1', 'yes')
+
+    type_conversions = {
+        'valueWaitExtraDurationMs': int,
+        'stop_on_error': str_to_bool,
+        'use_default_pseudo_clusters': str_to_bool,
+    }
+
     index = 0
     while len(commands) - index > 1:
         key = commands[index].replace('--', '')
@@ -49,12 +57,9 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
         val = commands[index+1]
 
         # convert known typed values
-        if mapped_key == 'valueWaitExtraDurationMs':
-            val = int(val)
-        elif mapped_key == 'stop_on_error':
-            val = val.lower() in ('true', '1', 'yes')
-        elif mapped_key == 'use_default_pseudo_clusters':
-            val = val.lower() in ('true', '1', 'yes')
+        if mapped_key in type_conversions:
+            val = type_conversions[mapped_key](val)
+
         kwargs[mapped_key] = val
         index += 2
     ctx.invoke(runner_base, **kwargs)
