@@ -27,8 +27,7 @@ namespace app {
 class TemperatureSensor : public SingleEndpoint
 {
 public:
-    TemperatureSensor(TimerDelegate & timerDelegate,
-                            Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
+    TemperatureSensor(TimerDelegate & timerDelegate, Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
     ~TemperatureSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

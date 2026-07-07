@@ -26,15 +26,14 @@ namespace chip {
 namespace app {
 
 FanLoad::FanLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
-                             Clusters::OnOffDelegate * onOffDelegate, const Context & context) :
+                 Clusters::OnOffDelegate * onOffDelegate, const Context & context) :
     SingleEndpoint(deviceTypes),
     mFanDelegate(fanDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(context.timerDelegate), mContext(context)
 {
     VerifyOrDie(mContext.includeOnOffCluster == (mOnOffDelegate != nullptr));
 }
 
-CHIP_ERROR FanLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                   EndpointComposition composition)
+CHIP_ERROR FanLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

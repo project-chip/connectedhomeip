@@ -59,7 +59,7 @@ SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarm
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                        EndpointComposition composition)
+                                  EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

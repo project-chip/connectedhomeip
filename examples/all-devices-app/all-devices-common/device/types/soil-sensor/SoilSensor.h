@@ -29,8 +29,8 @@ class SoilSensor : public SingleEndpoint
 {
 public:
     SoilSensor(TimerDelegate & timerDelegate,
-                     Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
-                     Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
+               Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
+               Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
     ~SoilSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

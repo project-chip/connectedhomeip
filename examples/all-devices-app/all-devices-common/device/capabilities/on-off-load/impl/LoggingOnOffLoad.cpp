@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/capabilities/on-off-load/impl/LoggingOnOffLoad.h>
+#include <devices/Types.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -27,11 +27,11 @@ namespace chip {
 namespace app {
 
 LoggingOnOffLoad::LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                               Clusters::OnOffDelegate * customOnOff, Clusters::OnOffEffectDelegate * customEffect,
-                                               Clusters::IdentifyDelegate * customIdentify) :
+                                   Clusters::OnOffDelegate * customOnOff, Clusters::OnOffEffectDelegate * customEffect,
+                                   Clusters::IdentifyDelegate * customIdentify) :
     OnOffLoad(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
-                    customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
-                    customIdentify ? *customIdentify : static_cast<Clusters::IdentifyDelegate &>(*this), context)
+              customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
+              customIdentify ? *customIdentify : static_cast<Clusters::IdentifyDelegate &>(*this), context)
 {}
 
 // OnOffDelegate

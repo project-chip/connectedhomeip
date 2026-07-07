@@ -41,9 +41,7 @@ const FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
 
 } // namespace
 
-IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate) :
-    FlowSensor(timerDelegate, kDefaultFlowConfig)
-{}
+IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate) : FlowSensor(timerDelegate, kDefaultFlowConfig) {}
 
 IncreasingFlowSensor::~IncreasingFlowSensor()
 {
@@ -51,7 +49,7 @@ IncreasingFlowSensor::~IncreasingFlowSensor()
 }
 
 CHIP_ERROR IncreasingFlowSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                EndpointComposition composition)
+                                          EndpointComposition composition)
 {
     ReturnErrorOnFailure(FlowSensor::Register(endpoint, provider, composition));
 

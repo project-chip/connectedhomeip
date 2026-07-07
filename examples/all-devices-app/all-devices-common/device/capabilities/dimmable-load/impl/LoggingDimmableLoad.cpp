@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/capabilities/dimmable-load/impl/LoggingDimmableLoad.h>
+#include <devices/Types.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -27,9 +27,9 @@ namespace chip {
 namespace app {
 
 LoggingDimmableLoad::LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                                     const Config & config) :
+                                         const Config & config) :
     DimmableLoad(deviceTypes, context, Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .identify = *this },
-                       config)
+                 config)
 {}
 
 // OnOffDelegate

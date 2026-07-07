@@ -35,10 +35,10 @@ namespace app {
  * Drives a real LED (GPIO or RMT/WS2812) via LEDWidget instead of just logging.
  */
 class ESP32DimmableLight : public DimmableLight,
-                                 public Clusters::OnOffDelegate,
-                                 public Clusters::LevelControlDelegate,
-                                 public Clusters::OnOffEffectDelegate,
-                                 public Clusters::IdentifyDelegate
+                           public Clusters::OnOffDelegate,
+                           public Clusters::LevelControlDelegate,
+                           public Clusters::OnOffEffectDelegate,
+                           public Clusters::IdentifyDelegate
 {
 public:
     ESP32DimmableLight(const Context & context);

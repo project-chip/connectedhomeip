@@ -15,17 +15,14 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/microwave-oven/MicrowaveOven.h>
+#include <devices/Types.h>
 
 namespace chip::app {
 
-MicrowaveOven::MicrowaveOven() :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMicrowaveOven, 1))
-{}
+MicrowaveOven::MicrowaveOven() : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMicrowaveOven, 1)) {}
 
-CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                         EndpointComposition composition)
+CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     DeviceRegistrationTransaction transaction(*this, provider);
 

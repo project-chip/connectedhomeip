@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/flow-sensor/FlowSensor.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;

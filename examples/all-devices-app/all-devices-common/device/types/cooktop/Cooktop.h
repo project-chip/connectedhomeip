@@ -19,9 +19,9 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
-#include <devices/Types.h>
 #include <device/api/Interface.h>
 #include <device/api/SingleEndpoint.h>
+#include <devices/Types.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
@@ -55,7 +55,7 @@ class Cooktop : public DeviceInterface
 {
 public:
     Cooktop(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surface1OnOff, Clusters::OnOffDelegate & surface2OnOff,
-                  Clusters::IdentifyDelegate & surface1Identify, Clusters::IdentifyDelegate & surface2Identify);
+            Clusters::IdentifyDelegate & surface1Identify, Clusters::IdentifyDelegate & surface2Identify);
     ~Cooktop() override = default;
 
     CHIP_ERROR Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,

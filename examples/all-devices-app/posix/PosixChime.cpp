@@ -228,8 +228,7 @@ static ma_data_source_vtable g_custom_data_source_vtable = {
 } // namespace
 
 // SoundResource Factory: Initializes a specific sound based on its ID.
-std::unique_ptr<PosixChime::SoundResource> PosixChime::SoundResource::Create(ma_engine * engine,
-                                                                                         const Chime::Sound & soundInfo)
+std::unique_ptr<PosixChime::SoundResource> PosixChime::SoundResource::Create(ma_engine * engine, const Chime::Sound & soundInfo)
 {
     auto resource = std::make_unique<SoundResource>();
     resource->id  = soundInfo.id;

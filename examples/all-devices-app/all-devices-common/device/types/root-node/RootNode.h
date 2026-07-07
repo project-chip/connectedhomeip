@@ -31,8 +31,8 @@
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <credentials/GroupDataProvider.h>
-#include <devices/Types.h>
 #include <device/api/SingleEndpoint.h>
+#include <devices/Types.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 

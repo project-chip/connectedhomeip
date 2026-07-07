@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/capabilities/dimmable-load/DimmableLoad.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -24,15 +24,15 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-DimmableLoad::DimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                       const Delegates & delegates, const Config & config) :
+DimmableLoad::DimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Delegates & delegates,
+                           const Config & config) :
     SingleEndpoint(deviceTypes),
     mOnOffDelegate(delegates.onOff), mLevelControlDelegate(delegates.levelControl), mEffectDelegate(delegates.effect),
     mIdentifyDelegate(delegates.identify), mContext(context), mConfig(config)
 {}
 
 CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                        EndpointComposition composition)
+                                  EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

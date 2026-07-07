@@ -14,19 +14,18 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/fan/Fan.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {
 
-Fan::Fan(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,
-                     const Context & context) :
+Fan::Fan(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate, const Context & context) :
     Fan(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFan, 1), fanDelegate, onOffDelegate, context)
 {}
 
 Fan::Fan(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
-                     Clusters::OnOffDelegate * onOffDelegate, const Context & context) :
+         Clusters::OnOffDelegate * onOffDelegate, const Context & context) :
     FanLoad(deviceTypes, fanDelegate, onOffDelegate, context)
 {}
 

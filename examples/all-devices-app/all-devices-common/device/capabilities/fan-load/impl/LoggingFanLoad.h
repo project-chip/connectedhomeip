@@ -31,7 +31,7 @@ class LoggingFanLoad : public FanLoad, public Clusters::OnOffDelegate, public Cl
 {
 public:
     LoggingFanLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                         Clusters::FanControl::Delegate * customFan = nullptr, Clusters::OnOffDelegate * customOnOff = nullptr);
+                   Clusters::FanControl::Delegate * customFan = nullptr, Clusters::OnOffDelegate * customOnOff = nullptr);
 
     ~LoggingFanLoad() override = default;
 

@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -24,13 +24,12 @@ namespace chip {
 namespace app {
 
 TemperatureSensor::TemperatureSensor(TimerDelegate & timerDelegate,
-                                                 TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
+                                     TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureSensor, 1)),
     mTimerDelegate(timerDelegate), mTempConfig(tempConfig)
 {}
 
-CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                             EndpointComposition composition)
+CHIP_ERROR TemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

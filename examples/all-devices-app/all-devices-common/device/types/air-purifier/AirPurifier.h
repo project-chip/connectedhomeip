@@ -24,8 +24,7 @@ namespace app {
 class AirPurifier : public FanLoad
 {
 public:
-    AirPurifier(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,
-                      const Context & context);
+    AirPurifier(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate, const Context & context);
     ~AirPurifier() override = default;
 };
 

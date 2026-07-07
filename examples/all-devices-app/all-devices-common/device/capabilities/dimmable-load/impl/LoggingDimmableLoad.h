@@ -31,14 +31,13 @@ namespace app {
  * and operations, with support for custom delegate injection.
  */
 class LoggingDimmableLoad : public DimmableLoad,
-                                  public Clusters::OnOffDelegate,
-                                  public Clusters::LevelControlDelegate,
-                                  public Clusters::OnOffEffectDelegate,
-                                  public Clusters::IdentifyDelegate
+                            public Clusters::OnOffDelegate,
+                            public Clusters::LevelControlDelegate,
+                            public Clusters::OnOffEffectDelegate,
+                            public Clusters::IdentifyDelegate
 {
 public:
-    LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                              const Config & config = {});
+    LoggingDimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Config & config = {});
     ~LoggingDimmableLoad() override = default;
 
 protected:

@@ -15,17 +15,14 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/laundry-washer/LaundryWasher.h>
+#include <devices/Types.h>
 
 namespace chip::app {
 
-LaundryWasher::LaundryWasher() :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLaundryWasher, 1))
-{}
+LaundryWasher::LaundryWasher() : SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLaundryWasher, 1)) {}
 
-CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                         EndpointComposition composition)
+CHIP_ERROR LaundryWasher::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     DeviceRegistrationTransaction transaction(*this, provider);
 

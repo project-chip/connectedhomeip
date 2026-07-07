@@ -114,7 +114,7 @@ public:
     };
 
     DimmableLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context, const Delegates & delegates,
-                       const Config & config);
+                 const Config & config);
     ~DimmableLoad() override = default;
 
     // Public cluster getters for application and testing

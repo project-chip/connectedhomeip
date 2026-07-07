@@ -20,14 +20,12 @@
 
 namespace chip::app {
 
-Refrigerator::Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify,
-                                       const Config & config) :
+Refrigerator::Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify, const Config & config) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRefrigerator, 1)),
     mCabinet(timerDelegate, config.cabinetConfig, cabinetIdentify)
 {}
 
-CHIP_ERROR Refrigerator::Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                        EndpointComposition composition)
+CHIP_ERROR Refrigerator::Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

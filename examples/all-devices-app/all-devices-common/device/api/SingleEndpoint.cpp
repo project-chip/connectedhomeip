@@ -22,7 +22,7 @@ using namespace chip::app::Clusters;
 namespace chip::app {
 
 CHIP_ERROR SingleEndpoint::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                EndpointComposition composition)
+                                              EndpointComposition composition)
 {
     VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);

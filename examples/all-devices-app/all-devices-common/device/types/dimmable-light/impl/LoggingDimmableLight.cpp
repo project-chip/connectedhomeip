@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {

@@ -45,7 +45,7 @@ public:
     };
 
     Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify,
-                       const Config & config = Config::Default());
+                 const Config & config = Config::Default());
     ~Refrigerator() override = default;
 
     CHIP_ERROR Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,

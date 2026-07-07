@@ -76,16 +76,16 @@ void ApplyOnOffToFan(FanControlCluster & fan, bool on)
 } // namespace
 
 LoggingFanLoad::LoggingFanLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                           Clusters::FanControl::Delegate * customFan, Clusters::OnOffDelegate * customOnOff) :
-    FanLoad(
-        deviceTypes, customFan ? *customFan : static_cast<Clusters::FanControl::Delegate &>(*this),
-        context.includeOnOffCluster ? (customOnOff ? customOnOff : static_cast<Clusters::OnOffDelegate *>(this)) : nullptr, context)
+                               Clusters::FanControl::Delegate * customFan, Clusters::OnOffDelegate * customOnOff) :
+    FanLoad(deviceTypes, customFan ? *customFan : static_cast<Clusters::FanControl::Delegate &>(*this),
+            context.includeOnOffCluster ? (customOnOff ? customOnOff : static_cast<Clusters::OnOffDelegate *>(this)) : nullptr,
+            context)
 {}
 
 // FanControl::Delegate
 
 Protocols::InteractionModel::Status LoggingFanLoad::HandleStep(FanControl::StepDirectionEnum aDirection, bool aWrap,
-                                                                     bool aLowestOff)
+                                                               bool aLowestOff)
 {
     ChipLogProgress(DeviceLayer, "LoggingFanLoad::HandleStep() -> direction=%u wrap=%d lowestOff=%d",
                     static_cast<unsigned>(to_underlying(aDirection)), aWrap, aLowestOff);
@@ -176,28 +176,25 @@ void LoggingFanLoad::OnFanDriveStateChanged(const FanControl::FanDriveState & ne
 
     if (!percentSettingIsNull && !speedSettingIsNull)
     {
-        ChipLogProgress(
-            DeviceLayer,
-            "LoggingFanLoad::OnFanDriveStateChanged() -> mode=%u percentSetting=%u percentCurrent=%u speedSetting=%u "
-            "speedCurrent=%u",
-            mode, static_cast<unsigned>(newState.percentSetting.Value()), percentCurrent,
-            static_cast<unsigned>(newState.speedSetting.Value()), speedCurrent);
+        ChipLogProgress(DeviceLayer,
+                        "LoggingFanLoad::OnFanDriveStateChanged() -> mode=%u percentSetting=%u percentCurrent=%u speedSetting=%u "
+                        "speedCurrent=%u",
+                        mode, static_cast<unsigned>(newState.percentSetting.Value()), percentCurrent,
+                        static_cast<unsigned>(newState.speedSetting.Value()), speedCurrent);
     }
     else if (!percentSettingIsNull)
     {
-        ChipLogProgress(
-            DeviceLayer,
-            "LoggingFanLoad::OnFanDriveStateChanged() -> mode=%u percentSetting=%u percentCurrent=%u speedSetting=NULL "
-            "speedCurrent=%u",
-            mode, static_cast<unsigned>(newState.percentSetting.Value()), percentCurrent, speedCurrent);
+        ChipLogProgress(DeviceLayer,
+                        "LoggingFanLoad::OnFanDriveStateChanged() -> mode=%u percentSetting=%u percentCurrent=%u speedSetting=NULL "
+                        "speedCurrent=%u",
+                        mode, static_cast<unsigned>(newState.percentSetting.Value()), percentCurrent, speedCurrent);
     }
     else if (!speedSettingIsNull)
     {
-        ChipLogProgress(
-            DeviceLayer,
-            "LoggingFanLoad::OnFanDriveStateChanged() -> mode=%u percentSetting=NULL percentCurrent=%u speedSetting=%u "
-            "speedCurrent=%u",
-            mode, percentCurrent, static_cast<unsigned>(newState.speedSetting.Value()), speedCurrent);
+        ChipLogProgress(DeviceLayer,
+                        "LoggingFanLoad::OnFanDriveStateChanged() -> mode=%u percentSetting=NULL percentCurrent=%u speedSetting=%u "
+                        "speedCurrent=%u",
+                        mode, percentCurrent, static_cast<unsigned>(newState.speedSetting.Value()), speedCurrent);
     }
     else
     {

@@ -35,9 +35,7 @@ const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureCon
 
 } // namespace
 
-IncreasingTemperatureSensor::IncreasingTemperatureSensor() :
-    TemperatureSensor(mTimerDelegate, kDefaultTemperatureConfig)
-{}
+IncreasingTemperatureSensor::IncreasingTemperatureSensor() : TemperatureSensor(mTimerDelegate, kDefaultTemperatureConfig) {}
 
 IncreasingTemperatureSensor::~IncreasingTemperatureSensor()
 {
@@ -45,7 +43,7 @@ IncreasingTemperatureSensor::~IncreasingTemperatureSensor()
 }
 
 CHIP_ERROR IncreasingTemperatureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                       EndpointComposition composition)
+                                                 EndpointComposition composition)
 {
     ReturnErrorOnFailure(TemperatureSensor::Register(endpoint, provider, composition));
     // Kick off the timer loop to increase temperature every few seconds

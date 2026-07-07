@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/aggregator/Aggregator.h>
+#include <devices/Types.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>

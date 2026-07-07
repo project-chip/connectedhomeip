@@ -60,7 +60,7 @@ IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()
 }
 
 CHIP_ERROR IncreasingMoistureSoilSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                        EndpointComposition composition)
+                                                  EndpointComposition composition)
 {
     ReturnErrorOnFailure(SoilSensor::Register(endpoint, provider, composition));
     // Kick off the timer loop to increase moisture every few seconds

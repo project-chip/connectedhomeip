@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/air-purifier/AirPurifier.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {
 
 AirPurifier::AirPurifier(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate,
-                                     const Context & context) :
+                         const Context & context) :
     FanLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirPurifier, 1), fanDelegate, onOffDelegate, context)
 {}
 

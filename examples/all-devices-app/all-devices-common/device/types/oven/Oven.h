@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <device/types/cooktop/Cooktop.h>
 #include <device/api/Interface.h>
+#include <device/types/cooktop/Cooktop.h>
 #include <device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.h>
 
 namespace chip::app {
@@ -46,7 +46,7 @@ public:
     };
 
     Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff, Clusters::IdentifyDelegate & cavityIdentify,
-               Clusters::IdentifyDelegate & surfaceIdentify, const Config & config = Config::Default());
+         Clusters::IdentifyDelegate & surfaceIdentify, const Config & config = Config::Default());
     ~Oven() override = default;
 
     CHIP_ERROR Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,

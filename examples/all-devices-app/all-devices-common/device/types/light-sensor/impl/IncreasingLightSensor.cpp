@@ -59,7 +59,7 @@ IncreasingLightSensor::~IncreasingLightSensor()
 }
 
 CHIP_ERROR IncreasingLightSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                 EndpointComposition composition)
+                                           EndpointComposition composition)
 {
     ReturnErrorOnFailure(LightSensor::Register(endpoint, provider, composition));
 

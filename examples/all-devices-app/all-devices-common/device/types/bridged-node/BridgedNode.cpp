@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/bridged-node/BridgedNode.h>
+#include <devices/Types.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

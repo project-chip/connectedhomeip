@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {

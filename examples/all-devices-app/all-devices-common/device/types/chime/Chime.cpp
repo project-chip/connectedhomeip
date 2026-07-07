@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/chime/Chime.h>
+#include <devices/Types.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -25,8 +25,7 @@ namespace chip {
 namespace app {
 
 Chime::Chime(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mTimerDelegate(timerDelegate),
-    mSounds(sounds)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kChime, 1)), mTimerDelegate(timerDelegate), mSounds(sounds)
 {}
 
 CHIP_ERROR Chime::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)

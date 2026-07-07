@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -25,14 +25,13 @@ namespace chip {
 namespace app {
 
 OnOffLoad::OnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
-                                 Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
-                                 const Context & context) :
+                     Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
+                     const Context & context) :
     SingleEndpoint(deviceTypes),
     mOnOffDelegate(onOffDelegate), mEffectDelegate(effectDelegate), mIdentifyDelegate(identifyDelegate), mContext(context)
 {}
 
-CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                     EndpointComposition composition)
+CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

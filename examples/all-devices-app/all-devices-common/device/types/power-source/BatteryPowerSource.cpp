@@ -23,15 +23,14 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-BatteryPowerSource::BatteryPowerSource(CharSpan description,
-                                                   Clusters::PowerSource::BatReplaceabilityEnum replaceability,
-                                                   TimerDelegate & timerDelegate) :
+BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
+                                       TimerDelegate & timerDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
     mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability)
 {}
 
 CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                              EndpointComposition composition)
+                                        EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

@@ -18,8 +18,8 @@
 
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
-#include <devices/Types.h>
 #include <device/api/Interface.h>
+#include <devices/Types.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <device/types/root-node/WifiRootNode.h>

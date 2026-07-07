@@ -37,7 +37,7 @@ OnOffLightSwitch::OnOffLightSwitch(TimerDelegate & timerDelegate) :
 {}
 
 CHIP_ERROR OnOffLightSwitch::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                            EndpointComposition composition)
+                                      EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

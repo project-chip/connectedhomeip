@@ -22,7 +22,7 @@ constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock
 
 DecreasingBatteryPowerSource::DecreasingBatteryPowerSource() :
     BatteryPowerSource("Decreasing Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
-                             mTimerDelegate)
+                       mTimerDelegate)
 {}
 
 DecreasingBatteryPowerSource::~DecreasingBatteryPowerSource()
@@ -31,7 +31,7 @@ DecreasingBatteryPowerSource::~DecreasingBatteryPowerSource()
 }
 
 CHIP_ERROR DecreasingBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                        EndpointComposition composition)
+                                                  EndpointComposition composition)
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
     // Kick off the timer loop to decrease battery level every few seconds

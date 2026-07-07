@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/fan/impl/LoggingFan.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {

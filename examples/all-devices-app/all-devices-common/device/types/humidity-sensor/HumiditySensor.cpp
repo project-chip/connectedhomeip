@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/humidity-sensor/HumiditySensor.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -23,14 +23,12 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-HumiditySensor::HumiditySensor(TimerDelegate & timerDelegate,
-                                           RelativeHumidityMeasurementCluster::Config humidityConfig) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHumiditySensor, 1)),
-    mTimerDelegate(timerDelegate), mHumidityConfig(humidityConfig)
+HumiditySensor::HumiditySensor(TimerDelegate & timerDelegate, RelativeHumidityMeasurementCluster::Config humidityConfig) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHumiditySensor, 1)), mTimerDelegate(timerDelegate),
+    mHumidityConfig(humidityConfig)
 {}
 
-CHIP_ERROR HumiditySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                          EndpointComposition composition)
+CHIP_ERROR HumiditySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

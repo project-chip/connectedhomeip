@@ -31,7 +31,7 @@ class LightSensor : public SingleEndpoint
 {
 public:
     LightSensor(TimerDelegate & timerDelegate, Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
-                      Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
+                Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~LightSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

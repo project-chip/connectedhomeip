@@ -51,7 +51,7 @@ IncreasingPressureSensor::~IncreasingPressureSensor()
 }
 
 CHIP_ERROR IncreasingPressureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                    EndpointComposition composition)
+                                              EndpointComposition composition)
 {
     ReturnErrorOnFailure(PressureSensor::Register(endpoint, provider, composition));
 

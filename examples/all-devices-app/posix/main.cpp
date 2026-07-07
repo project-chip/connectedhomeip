@@ -59,8 +59,8 @@
 #include <oob-accessors/pigweed/PigweedAttributeAccessor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
-#include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/api/SingleEndpoint.h>
+#include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 

@@ -34,7 +34,7 @@ public:
                                                                          OptionalAttributeSet<BatPercentRemainingId>::All()>;
     // Takes delegates for the clusters.
     BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
-                             TimerDelegate & timerDelegate);
+                       TimerDelegate & timerDelegate);
     ~BatteryPowerSource() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/speaker/Speaker.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -25,13 +25,12 @@ namespace chip {
 namespace app {
 
 Speaker::Speaker(Clusters::LevelControlDelegate & levelDelegate, Clusters::OnOffDelegate & onOffDelegate,
-                             TimerDelegate & timerDelegate) :
+                 TimerDelegate & timerDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSpeaker, 1)),
     mLevelDelegate(levelDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(timerDelegate)
 {}
 
-CHIP_ERROR Speaker::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                   EndpointComposition composition)
+CHIP_ERROR Speaker::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

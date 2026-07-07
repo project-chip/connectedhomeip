@@ -14,20 +14,18 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
+#include <devices/Types.h>
 
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 namespace chip::app {
 
 EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)),
-    mTimerDelegate(timerDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mTimerDelegate(timerDelegate)
 {}
 
-CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                  EndpointComposition composition)
+CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(SingleEndpoint::mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
@@ -66,7 +64,7 @@ void EnergyManagement::Unregister(CodeDrivenDataModelProvider & provider)
 }
 
 Protocols::InteractionModel::Status EnergyManagement::PowerAdjustRequest(const int64_t power, const uint32_t duration,
-                                                                                     AdjustmentCauseEnum cause)
+                                                                         AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
@@ -77,7 +75,7 @@ Protocols::InteractionModel::Status EnergyManagement::CancelPowerAdjustRequest()
 }
 
 Protocols::InteractionModel::Status EnergyManagement::StartTimeAdjustRequest(const uint32_t requestedStartTime,
-                                                                                         AdjustmentCauseEnum cause)
+                                                                             AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
@@ -92,15 +90,17 @@ Protocols::InteractionModel::Status EnergyManagement::ResumeRequest()
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status EnergyManagement::ModifyForecastRequest(
-    const uint32_t forecastID, const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
-    AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status
+EnergyManagement::ModifyForecastRequest(const uint32_t forecastID,
+                                        const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
+                                        AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status EnergyManagement::RequestConstraintBasedForecast(
-    const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints, AdjustmentCauseEnum cause)
+Protocols::InteractionModel::Status
+EnergyManagement::RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints,
+                                                 AdjustmentCauseEnum cause)
 {
     return Protocols::InteractionModel::Status::Success;
 }

@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/pressure-sensor/PressureSensor.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -28,8 +28,7 @@ PressureSensor::PressureSensor(TimerDelegate & timerDelegate, PressureMeasuremen
     mPressureConfig(pressureConfig)
 {}
 
-CHIP_ERROR PressureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                          EndpointComposition composition)
+CHIP_ERROR PressureSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

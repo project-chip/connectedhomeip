@@ -25,8 +25,7 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-CHIP_ERROR WifiRootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
-                                        EndpointComposition composition)
+CHIP_ERROR WifiRootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     ReturnErrorOnFailure(RootNode::Register(endpointId, provider, composition));
 

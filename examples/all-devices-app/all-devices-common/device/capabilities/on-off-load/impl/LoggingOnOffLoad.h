@@ -41,14 +41,14 @@ namespace app {
  * LoggingOnOffLight, OnOffPlugInUnit, and MountedOnOffControl.
  */
 class LoggingOnOffLoad : public OnOffLoad,
-                               public Clusters::OnOffDelegate,
-                               public Clusters::OnOffEffectDelegate,
-                               public Clusters::IdentifyDelegate
+                         public Clusters::OnOffDelegate,
+                         public Clusters::OnOffEffectDelegate,
+                         public Clusters::IdentifyDelegate
 {
 public:
     LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                           Clusters::OnOffDelegate * customOnOff = nullptr, Clusters::OnOffEffectDelegate * customEffect = nullptr,
-                           Clusters::IdentifyDelegate * customIdentify = nullptr);
+                     Clusters::OnOffDelegate * customOnOff = nullptr, Clusters::OnOffEffectDelegate * customEffect = nullptr,
+                     Clusters::IdentifyDelegate * customIdentify = nullptr);
     ~LoggingOnOffLoad() override = default;
 
 protected:

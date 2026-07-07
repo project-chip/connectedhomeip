@@ -33,8 +33,7 @@ public:
         DeviceLayer::NetworkCommissioning::ThreadDriver & threadDriver;
     };
 
-    ThreadRootNode(const Context & context, const ThreadContext & threadContext) :
-        RootNode(context), mThreadContext(threadContext)
+    ThreadRootNode(const Context & context, const ThreadContext & threadContext) : RootNode(context), mThreadContext(threadContext)
     {}
 
     ~ThreadRootNode() override = default;

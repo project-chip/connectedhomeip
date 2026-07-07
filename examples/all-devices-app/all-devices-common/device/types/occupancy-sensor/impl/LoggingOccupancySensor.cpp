@@ -42,7 +42,7 @@ LoggingOccupancySensor::LoggingOccupancySensor(TimerDelegate & timerDelegate) :
 {}
 
 CHIP_ERROR LoggingOccupancySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                  EndpointComposition composition)
+                                            EndpointComposition composition)
 {
     return OccupancySensor::Register(endpoint, provider, composition);
 }

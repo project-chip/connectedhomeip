@@ -26,7 +26,7 @@ class OnOffLight : public OnOffLoad
 {
 public:
     OnOffLight(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
-                     Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
+               Clusters::IdentifyDelegate & identifyDelegate, const Context & context);
     ~OnOffLight() override = default;
 };
 

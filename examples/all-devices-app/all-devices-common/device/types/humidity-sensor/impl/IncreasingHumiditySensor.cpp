@@ -51,7 +51,7 @@ IncreasingHumiditySensor::~IncreasingHumiditySensor()
 }
 
 CHIP_ERROR IncreasingHumiditySensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                    EndpointComposition composition)
+                                              EndpointComposition composition)
 {
     ReturnErrorOnFailure(HumiditySensor::Register(endpoint, provider, composition));
 

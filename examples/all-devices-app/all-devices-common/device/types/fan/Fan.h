@@ -29,7 +29,7 @@ public:
 
 protected:
     Fan(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::FanControl::Delegate & fanDelegate,
-              Clusters::OnOffDelegate * onOffDelegate, const Context & context);
+        Clusters::OnOffDelegate * onOffDelegate, const Context & context);
 };
 
 } // namespace app

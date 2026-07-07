@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/soil-sensor/SoilSensor.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -26,13 +26,12 @@ namespace chip {
 namespace app {
 
 SoilSensor::SoilSensor(TimerDelegate & timerDelegate, SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
-                                   TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
+                       TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSoilSensor, 1)),
     mTimerDelegate(timerDelegate), mMoistureLimits(moistureLimits), mTempConfig(tempConfig)
 {}
 
-CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                      EndpointComposition composition)
+CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -25,12 +25,12 @@ namespace chip {
 namespace app {
 
 AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)),
-    mTimerDelegate(timerDelegate), mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
+    mConfig(config)
 {}
 
 CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                            EndpointComposition composition)
+                                      EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

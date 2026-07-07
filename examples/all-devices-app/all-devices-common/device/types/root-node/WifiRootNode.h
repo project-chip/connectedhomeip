@@ -32,9 +32,7 @@ public:
         DeviceLayer::NetworkCommissioning::WiFiDriver & wifiDriver;
     };
 
-    WifiRootNode(const Context & context, const WifiContext & wifiContext) :
-        RootNode(context), mWifiContext(wifiContext)
-    {}
+    WifiRootNode(const Context & context, const WifiContext & wifiContext) : RootNode(context), mWifiContext(wifiContext) {}
     ~WifiRootNode() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

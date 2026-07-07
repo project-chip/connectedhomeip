@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {

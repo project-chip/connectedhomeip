@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/proximity-ranger/ProximityRanger.h>
+#include <devices/Types.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
@@ -49,13 +49,13 @@ BitMask<ProximityRanging::Feature> ProximityRanger::DeriveFeatures() const
 }
 
 ProximityRanger::ProximityRanger(TimerDelegate & timerDelegate,
-                                             std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters) :
+                                 std::vector<Clusters::ProximityRanging::RangingAdapter *> adapters) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kProximityRanger, 1)),
     mTimerDelegate(timerDelegate), mAdapters(std::move(adapters))
 {}
 
 CHIP_ERROR ProximityRanger::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                           EndpointComposition composition)
+                                     EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

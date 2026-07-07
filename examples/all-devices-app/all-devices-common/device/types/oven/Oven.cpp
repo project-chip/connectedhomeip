@@ -20,15 +20,13 @@
 
 namespace chip::app {
 
-Oven::Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff,
-                       Clusters::IdentifyDelegate & cavityIdentify, Clusters::IdentifyDelegate & surfaceIdentify,
-                       const Config & config) :
+Oven::Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff, Clusters::IdentifyDelegate & cavityIdentify,
+           Clusters::IdentifyDelegate & surfaceIdentify, const Config & config) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOven, 1)),
     mCavity(timerDelegate, config.cavityConfig, cavityIdentify), mSurface(timerDelegate, surfaceOnOff, surfaceIdentify)
 {}
 
-CHIP_ERROR Oven::Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                EndpointComposition composition)
+CHIP_ERROR Oven::Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

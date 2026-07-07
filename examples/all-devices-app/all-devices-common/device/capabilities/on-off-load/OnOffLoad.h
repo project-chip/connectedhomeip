@@ -64,8 +64,8 @@ public:
     };
 
     OnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
-                    Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
-                    const Context & context);
+              Clusters::OnOffEffectDelegate & effectDelegate, Clusters::IdentifyDelegate & identifyDelegate,
+              const Context & context);
     ~OnOffLoad() override = default;
 
     // Public cluster getters for application and testing

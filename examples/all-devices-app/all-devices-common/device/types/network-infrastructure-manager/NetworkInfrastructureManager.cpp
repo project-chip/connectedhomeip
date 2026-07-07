@@ -16,8 +16,8 @@
  */
 
 #include <app/server/Server.h>
-#include <devices/Types.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <devices/Types.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -48,7 +48,7 @@ NetworkInfrastructureManager::~NetworkInfrastructureManager()
 }
 
 CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                        EndpointComposition composition)
+                                                  EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
@@ -168,7 +168,7 @@ CHIP_ERROR NetworkInfrastructureManager::GetDataset(Thread::OperationalDataset &
 }
 
 void NetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                                          ActivateDatasetCallback * callback)
+                                                    ActivateDatasetCallback * callback)
 {
     ChipLogProgress(AppServer, "NetworkInfrastructureManager::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
     if (mActivateDatasetCallback != nullptr)

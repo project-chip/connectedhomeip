@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app_config/enabled_devices.h>
-#include <devices/Types.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
@@ -58,6 +57,7 @@
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/water-valve/WaterValve.h>
+#include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -218,7 +218,7 @@ private:
                 sBridgedNodeCount++;
                 std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
                 return std::make_unique<BridgedNode>(mContext->timerDelegate,
-                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+                                                     "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
@@ -369,8 +369,7 @@ private:
         {
             RegisterCreator("speaker", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingSpeaker>(
-                    LoggingSpeaker::Context{ .timerDelegate = mContext->timerDelegate });
+                return std::make_unique<LoggingSpeaker>(LoggingSpeaker::Context{ .timerDelegate = mContext->timerDelegate });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_OVEN)
@@ -473,8 +472,8 @@ private:
         {
             RegisterCreator("rain-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<BooleanStateSensor>(
-                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+                return std::make_unique<BooleanStateSensor>(mContext->timerDelegate,
+                                                            Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)

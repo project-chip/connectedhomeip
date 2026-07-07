@@ -15,16 +15,16 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/on-off-light/OnOffLight.h>
+#include <devices/Types.h>
 
 namespace chip {
 namespace app {
 
 OnOffLight::OnOffLight(Clusters::OnOffDelegate & onOffDelegate, Clusters::OnOffEffectDelegate & effectDelegate,
-                                   Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
+                       Clusters::IdentifyDelegate & identifyDelegate, const Context & context) :
     OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), onOffDelegate, effectDelegate,
-                    identifyDelegate, context)
+              identifyDelegate, context)
 {}
 
 } // namespace app

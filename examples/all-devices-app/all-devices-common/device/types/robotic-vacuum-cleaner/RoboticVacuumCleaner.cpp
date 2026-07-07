@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <devices/Types.h>
 #include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <devices/Types.h>
 
 namespace chip::app {
 
@@ -25,7 +25,7 @@ RoboticVacuumCleaner::RoboticVacuumCleaner() :
 {}
 
 CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                EndpointComposition composition)
+                                          EndpointComposition composition)
 {
     DeviceRegistrationTransaction transaction(*this, provider);
 
