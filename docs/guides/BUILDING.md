@@ -160,7 +160,7 @@ Complete the following steps:
 #### Enable experimental Bluetooth support and disable battery plugin in BlueZ
 
 The Matter application on Linux uses BlueZ to communicate with the Bluetooth
-controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
+controller. The BlueZ version that comes with Ubuntu 22.04 and 24.04 does not support all
 the features required by the Matter application by default. To enable these
 features, you need to enable experimental Bluetooth support in BlueZ.
 
