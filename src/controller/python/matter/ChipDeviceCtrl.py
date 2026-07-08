@@ -2101,6 +2101,7 @@ class ChipDeviceControllerBase():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
+<<<<<<< HEAD
         allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
                                                   TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
         transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
@@ -2112,6 +2113,37 @@ class ChipDeviceControllerBase():
                               fabricFiltered=fabricFiltered,
                               keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe, allowLargePayload=allowLargePayload).raise_on_error()
         await future
+=======
+            # keepSubscriptions=False -> Server purges existing subscriptions.
+            # Proactively shut down corresponding client-side objects here to:
+            # - Prevent client-side liveness timeouts from marking the secure session defunct.
+            # - Free C++ ReadClient/Exchange context resources early.
+            if reportInterval is not None and not keepSubscriptions:
+                for subscription in list(builtins.chipStack._subscriptions.values()):
+                    if getattr(subscription, 'nodeId', None) == nodeId and subscription._devCtrl == self:
+                        LOGGER.info("Auto-cancelling previous subscription 0x%08x to node %d due to keepSubscriptions=False",
+                                    subscription.subscriptionId, nodeId)
+                        try:
+                            subscription.Shutdown()
+                        except Exception as e:
+                            # Benign: the obsolete subscription might already be terminated by the C++ stack or server.
+                            LOGGER.info("Failed to shut down obsolete subscription: %s", e)
+
+            allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
+                                                      TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
+            transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject, nodeId=nodeId)
+            ClusterAttribute.Read(transaction, device=device.deviceProxy,
+                                  attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
+                                  eventNumberFilter=eventNumberFilter,
+                                  subscriptionParameters=ClusterAttribute.SubscriptionParameters(
+                                      reportInterval[0], reportInterval[1]) if reportInterval else None,
+                                  fabricFiltered=fabricFiltered,
+                                  keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe, allowLargePayload=allowLargePayload).raise_on_error()
+            await future
+            if result := transaction.GetSubscriptionHandler():
+                return result
+            return transaction.GetReadResponse()
+>>>>>>> c25bcb19fd (controller: python: Clean up obsolete subscriptions on keepSubscriptions=False (#72904))
 
         if result := transaction.GetSubscriptionHandler():
             return result
