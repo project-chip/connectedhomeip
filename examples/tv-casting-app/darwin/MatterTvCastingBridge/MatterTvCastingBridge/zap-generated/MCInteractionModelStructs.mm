@@ -106,6 +106,37 @@
 }
 @end
 
+@implementation MCMediaPlaybackClusterContentInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _contentType = @(0);
+        _title = nil;
+        _show = nil;
+        _season = nil;
+        _episode = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MCMediaPlaybackClusterContentInfoStruct alloc] init];
+    other.contentType = self.contentType;
+    other.title = self.title;
+    other.show = self.show;
+    other.season = self.season;
+    other.episode = self.episode;
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentType:%@; title:%@; >", NSStringFromClass([self class]), _contentType, _title];
+    return descriptionString;
+}
+@end
+
 @implementation MCApplicationBasicClusterApplicationStruct
 - (instancetype)init
 {

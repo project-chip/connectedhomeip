@@ -35,6 +35,15 @@
 @property (nonatomic, copy) MCMediaPlaybackClusterTrackAttributesStruct * _Nullable trackAttributes;
 @end
 
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCMediaPlaybackClusterContentInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contentType;
+@property (nonatomic, copy) NSString * _Nullable title;
+@property (nonatomic, copy) NSString * _Nullable show;
+@property (nonatomic, copy) NSString * _Nullable season;
+@property (nonatomic, copy) NSString * _Nullable episode;
+@end
+
 @interface MCApplicationBasicClusterApplicationStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull catalogVendorID;
 @property (nonatomic, copy) NSString * _Nonnull applicationID;
