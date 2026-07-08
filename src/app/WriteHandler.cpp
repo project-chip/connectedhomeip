@@ -170,10 +170,11 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     // The write transaction will be alive only when the message was handled successfully and there are more chunks.
     if (!(status == Status::Success && mStateFlags.Has(StateBits::kHasMoreChunks)))
     {
+        const bool suppressResponse = mStateFlags.Has(StateBits::kSuppressResponse);
         Close();
         // Return Success if SuppressResponse is set to avoid sending StatusResponse when error is caught
         // in InteractionModelEngine.
-        if (mStateFlags.Has(StateBits::kSuppressResponse))
+        if (suppressResponse)
         {
             return Status::Success;
         }

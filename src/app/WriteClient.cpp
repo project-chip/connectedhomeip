@@ -33,12 +33,6 @@ namespace app {
 
 void WriteClient::Close()
 {
-    // avoid mpCallback::OnDone being called more than once
-    if (mState == State::AwaitingDestruction)
-    {
-        return;
-    }
-
     MoveToState(State::AwaitingDestruction);
     mExchangeCtx.Release();
 

@@ -145,7 +145,12 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
         return CHIP_NO_ERROR;
     }
 
-    return SendInvokeRequest();
+    CHIP_ERROR err = SendInvokeRequest();
+    if (err == CHIP_NO_ERROR && mSuppressResponse)
+    {
+        Close();
+    }
+    return err;
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -216,7 +221,6 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     if (mSuppressResponse)
     {
         // No response, so we can immediately terminate
-        Close();
         return CHIP_NO_ERROR;
     }
 
@@ -393,11 +397,6 @@ void CommandSender::Close()
 {
     mSuppressResponse = false;
     mTimedRequest     = false;
-    // avoid OnDoneCallback being called more than once
-    if (mState == State::AwaitingDestruction)
-    {
-        return;
-    }
     MoveToState(State::AwaitingDestruction);
     OnDoneCallback();
 }

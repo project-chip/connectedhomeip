@@ -1731,8 +1731,7 @@ class ChipDeviceControllerBase:
             commandRefsOverride=commandRefsOverride).raise_on_error()
 
         if suppressResponse:
-            if not future.done():
-                future.set_result(None)
+            return None
 
         return await future
 
@@ -1871,8 +1870,7 @@ class ChipDeviceControllerBase:
             res.raise_on_error()
 
             if suppressResponse:
-                if not future.done():
-                    future.set_result(None)
+                return None
 
             return await future
 

@@ -541,7 +541,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     // If this is a single ReportDataMessage for the current transaction, or this is the last ReportDataMessage in the
     // transaction (i.e. there is no pending data anymore), then this ReportDataMessage should not have SuppressResponse.
     // Otherwise, this ReportDataMessage should have SuppressResponse.
-    // For each recevied message, we assume mSuppressResponse to be false. If it is set true, it will be updated in
+    // For each received message, we assume mSuppressResponse to be false. If it is set true, it will be updated in
     // ProcessReportData call below.
     // For all other message types (e.g. SubscribeResponse, StatusResponse etc), mSuppressResponse is not relevant and always false.
     mSuppressResponse = false;
