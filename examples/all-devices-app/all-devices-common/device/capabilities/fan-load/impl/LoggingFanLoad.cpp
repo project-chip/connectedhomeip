@@ -168,9 +168,9 @@ Protocols::InteractionModel::Status LoggingFanLoad::HandleStep(FanControl::StepD
 
 void LoggingFanLoad::OnFanDriveStateChanged(const FanControl::FanDriveState & newState)
 {
-    const unsigned mode             = static_cast<unsigned>(to_underlying(newState.mode));
-    const unsigned percentCurrent   = static_cast<unsigned>(newState.percentCurrent);
-    const unsigned speedCurrent     = static_cast<unsigned>(newState.speedCurrent);
+    [[maybe_unused]] const unsigned mode             = static_cast<unsigned>(to_underlying(newState.mode));
+    [[maybe_unused]] const unsigned percentCurrent   = static_cast<unsigned>(newState.percentCurrent);
+    [[maybe_unused]] const unsigned speedCurrent     = static_cast<unsigned>(newState.speedCurrent);
     const bool percentSettingIsNull = newState.percentSetting.IsNull();
     const bool speedSettingIsNull   = newState.speedSetting.IsNull();
 

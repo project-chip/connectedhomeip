@@ -28,21 +28,21 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
-#include <devices/interface/DeviceInterface.h>
-#include <devices/root-node/RootNodeDevice.h>
+#include <device/api/allocator/IdAllocator.h>
+#include <device/api/DeviceInterface.h>
+#include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <devices/root-node/WifiRootNodeDevice.h>
+#include <device/types/root-node/WifiRootNode.h>
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <devices/root-node/ThreadRootNodeDevice.h>
+#include <device/types/root-node/ThreadRootNode.h>
 #include <platform/NetworkCommissioning.h>
 #endif
 
@@ -79,10 +79,10 @@ std::unique_ptr<DeviceInterface> gConstructedDevice;
 DeviceLayer::NetworkCommissioning::GenericThreadDriver gThreadDriver;
 #endif
 
-RootNodeDevice::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & initParams,
-                                            DeviceInstanceInfoProvider & deviceInfoProvider)
+RootNode::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & initParams,
+                                      DeviceInstanceInfoProvider & deviceInfoProvider)
 {
-    return RootNodeDevice::Context{
+    return RootNode::Context{
         .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),
         .configurationManager             = ConfigurationMgr(),
         .deviceControlServer              = DeviceControlServer::DeviceControlSvr(),
@@ -100,7 +100,6 @@ RootNodeDevice::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & i
         .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,
         .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(),
         .eventManagement                  = EventManagement::GetInstance(),
-        .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,
         .timerDelegate                    = gTimerDelegate,
     };
 }
@@ -111,22 +110,22 @@ CHIP_ERROR CreateAndRegisterRootNode(CommonCaseDeviceServerInitParams & initPara
     VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(MakeRootNodeContext(initParams, *deviceInfoProvider),
-                                                           WifiRootNodeDevice::WifiContext{
-                                                               .wifiDriver = NetworkCommissioning::TelinkWiFiDriver::Instance(),
-                                                           });
+    gRootNodeDevice = std::make_unique<WifiRootNode>(MakeRootNodeContext(initParams, *deviceInfoProvider),
+                                                     WifiRootNode::WifiContext{
+                                                         .wifiDriver = NetworkCommissioning::TelinkWiFiDriver::Instance(),
+                                                     });
 #elif CHIP_ENABLE_OPENTHREAD
-    gRootNodeDevice = std::make_unique<ThreadRootNodeDevice>(MakeRootNodeContext(initParams, *deviceInfoProvider),
-                                                             ThreadRootNodeDevice::ThreadContext{
-                                                                 .threadDriver = gThreadDriver,
-                                                             });
+    gRootNodeDevice = std::make_unique<ThreadRootNode>(MakeRootNodeContext(initParams, *deviceInfoProvider),
+                                                       ThreadRootNode::ThreadContext{
+                                                           .threadDriver = gThreadDriver,
+                                                       });
 #else
-    gRootNodeDevice = std::make_unique<RootNodeDevice>(MakeRootNodeContext(initParams, *deviceInfoProvider));
+    gRootNodeDevice = std::make_unique<RootNode>(MakeRootNodeContext(initParams, *deviceInfoProvider));
 #endif
 
     VerifyOrReturnError(gRootNodeDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    ConsecutiveIdAllocator rootAllocator(kRootEndpointId);
     return gRootNodeDevice->Register(rootAllocator, *gDataModelProvider);
 }
 
@@ -170,7 +169,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
     gConstructedDevice = deviceFactory.Create(gDeviceType);
     VerifyOrReturnError(gConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
+    ConsecutiveIdAllocator allocator(kDeviceEndpointId);
     ReturnErrorOnFailure(gConstructedDevice->Register(allocator, *gDataModelProvider));
 
     initParams.dataModelProvider = gDataModelProvider.get();
