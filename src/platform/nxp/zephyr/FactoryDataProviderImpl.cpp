@@ -276,8 +276,8 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
     size_t newSize                  = sizeof(Header) + mFactoryData.header.size + (ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD);
     uint8_t blob[DAC_KEY_BLOB_SIZE] = { 0 };
     uint32_t keyAddr;
-    off_t factoryDataOffset   = PARTITION_OFFSET(factory_partition);
-    size_t factoryDataSize    = PARTITION_SIZE(factory_partition);
+    off_t factoryDataOffset = PARTITION_OFFSET(factory_partition);
+    size_t factoryDataSize  = PARTITION_SIZE(factory_partition);
     int ret;
 
     uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
@@ -366,12 +366,11 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
     size_t newSize                           = mFactoryData.header.size + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
     FactoryDataProviderImpl::Header * header = reinterpret_cast<FactoryDataProviderImpl::Header *>(data);
     uint8_t * payload                        = data + sizeof(FactoryDataProviderImpl::Header);
-    uint8_t offset                           = (uint8_t *) (KeyAddr - kValueOffset) - (uint8_t *) &mFactoryData.factoryDataBuffer[0];
-    size_t subsequentDataOffset              = offset + kValueOffset + Crypto::kP256_PrivateKey_Length;
+    uint8_t offset              = (uint8_t *) (KeyAddr - kValueOffset) - (uint8_t *) &mFactoryData.factoryDataBuffer[0];
+    size_t subsequentDataOffset = offset + kValueOffset + Crypto::kP256_PrivateKey_Length;
 
     /* Move subsequent data to make room for the larger blob */
-    memmove(payload + subsequentDataOffset + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD,
-            payload + subsequentDataOffset,
+    memmove(payload + subsequentDataOffset + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD, payload + subsequentDataOffset,
             mFactoryData.header.size - subsequentDataOffset);
 
     header->size = newSize;
