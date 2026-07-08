@@ -462,15 +462,70 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 
 class ExampleFilesystemStorageLocationProvider : public chip::DeviceLayer::FilesystemStorageLocationProvider
 {
-    static std::string Default() { return std::filesystem::temp_directory_path().string(); }
-    const char * LegacyKVS() const { return LinuxDeviceOptions::GetInstance().KVS; }
-    std::string GetFactoryDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSFactoryDirectory.ValueOr(Default()); }
-    std::string GetConfigDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSConfigDirectory.ValueOr(Default()); }
-    std::string GetCountersDataLocation() const
+private:
+    static std::string DefaultBase() { return std::filesystem::temp_directory_path().string(); }
+
+    /**
+     * @brief Compute the effective DIRECTORY path for a storage file based on priority:
+     * 1. Explicit file path (--kvs-data, --kvs-factory, etc.) -> return parent directory
+     * 2. Legacy --KVS (only for data file) -> return parent directory
+     * 3. Base directory (--kvs-directory)
+     * 4. Default: /tmp
+     *
+     * Note: Returns directory path, not full file path. The filename is appended by the caller.
+     */
+    static std::string GetEffectiveDirectory(const chip::Optional<std::string> & explicitFile, const char * legacyKVS,
+                                             const chip::Optional<std::string> & baseDirectory)
     {
-        return LinuxDeviceOptions::GetInstance().KVSCountersDirectory.ValueOr(Default());
+        // Priority 1: Explicit file path - return parent directory
+        if (explicitFile.HasValue() && !explicitFile.Value().empty())
+        {
+            std::filesystem::path path(explicitFile.Value());
+            return path.parent_path().string();
+        }
+
+        // Priority 2: Legacy KVS (only applies to data file) - return parent directory
+        if (legacyKVS != nullptr && strlen(legacyKVS) > 0)
+        {
+            std::filesystem::path path(legacyKVS);
+            return path.parent_path().string();
+        }
+
+        // Priority 3: Base directory
+        std::string base = baseDirectory.HasValue() && !baseDirectory.Value().empty() ? baseDirectory.Value() : DefaultBase();
+        return base;
     }
-    std::string GetKVSDataLocation() const { return LinuxDeviceOptions::GetInstance().KVSDataDirectory.ValueOr(Default()); }
+
+public:
+    const char * LegacyKVS() const override { return LinuxDeviceOptions::GetInstance().KVS; }
+
+    std::string GetFactoryDataLocation() const override
+    {
+        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSFactoryFile,
+                                     nullptr, // Legacy KVS doesn't apply to factory
+                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+    }
+
+    std::string GetConfigDataLocation() const override
+    {
+        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSConfigFile,
+                                     nullptr, // Legacy KVS doesn't apply to config
+                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+    }
+
+    std::string GetCountersDataLocation() const override
+    {
+        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSCountersFile,
+                                     nullptr, // Legacy KVS doesn't apply to counters
+                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+    }
+
+    std::string GetKVSDataLocation() const override
+    {
+        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSDataFile,
+                                     LinuxDeviceOptions::GetInstance().KVS, // Legacy KVS applies here
+                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+    }
 };
 
 // Wrapper for DeviceInstanceInfoProvider that allows the example app to set
@@ -1077,9 +1132,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif

@@ -85,10 +85,11 @@ struct LinuxDeviceOptions
     const char * command = nullptr;
     const char * PICS    = nullptr;
     const char * KVS     = nullptr;
-    chip::Optional<std::string> KVSDataDirectory;
-    chip::Optional<std::string> KVSFactoryDirectory;
-    chip::Optional<std::string> KVSConfigDirectory;
-    chip::Optional<std::string> KVSCountersDirectory;
+    chip::Optional<std::string> KVSDirectory;
+    chip::Optional<std::string> KVSDataFile;
+    chip::Optional<std::string> KVSFactoryFile;
+    chip::Optional<std::string> KVSConfigFile;
+    chip::Optional<std::string> KVSCountersFile;
     const char * app_pipe               = "";
     const char * app_pipe_out           = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();

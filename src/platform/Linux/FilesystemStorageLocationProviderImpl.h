@@ -33,6 +33,13 @@ public:
     virtual std::string GetConfigDataLocation(void) const override;
     virtual std::string GetCountersDataLocation(void) const override;
     virtual std::string GetKVSDataLocation(void) const override;
+
+private:
+    static constexpr const char * kDefaultBaseDir      = "/tmp";
+    static constexpr const char * kDefaultDataFile     = "chip_kvs";
+    static constexpr const char * kDefaultFactoryFile  = "chip_factory.ini";
+    static constexpr const char * kDefaultConfigFile   = "chip_config.ini";
+    static constexpr const char * kDefaultCountersFile = "chip_counters.ini";
 };
 
 } // namespace DeviceLayer

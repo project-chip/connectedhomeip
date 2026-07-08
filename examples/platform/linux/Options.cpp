@@ -93,10 +93,11 @@ enum
     kDeviceOption_Command,
     kDeviceOption_PICS,
     kDeviceOption_KVSFilePath,
-    kDeviceOption_KVSDataDirectory,
-    kDeviceOption_KVSFactoryDataDirectory,
-    kDeviceOption_KVSConfigDataDirectory,
-    kDeviceOption_KVSCountersDataDirectory,
+    kDeviceOption_KVSDirectory,
+    kDeviceOption_KVSDataFile,
+    kDeviceOption_KVSFactoryFile,
+    kDeviceOption_KVSConfigFile,
+    kDeviceOption_KVSCountersFile,
     kDeviceOption_InterfaceId,
     kDeviceOption_AppPipe,
     kDeviceOption_AppPipeOut,
@@ -212,10 +213,11 @@ OptionDef sDeviceOptionDefs[] = {
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVSFilePath },
-    { "kvs-data-directory", kArgumentRequired, kDeviceOption_KVSDataDirectory },
-    { "kvs-factory-directory", kArgumentRequired, kDeviceOption_KVSFactoryDataDirectory },
-    { "kvs-config-directory", kArgumentRequired, kDeviceOption_KVSConfigDataDirectory },
-    { "kvs-counters-directory", kArgumentRequired, kDeviceOption_KVSCountersDataDirectory },
+    { "kvs-directory", kArgumentRequired, kDeviceOption_KVSDirectory },
+    { "kvs-data", kArgumentRequired, kDeviceOption_KVSDataFile },
+    { "kvs-factory", kArgumentRequired, kDeviceOption_KVSFactoryFile },
+    { "kvs-config", kArgumentRequired, kDeviceOption_KVSConfigFile },
+    { "kvs-counters", kArgumentRequired, kDeviceOption_KVSCountersFile },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
     { "app-pipe-out", kArgumentRequired, kDeviceOption_AppPipeOut },
@@ -382,19 +384,23 @@ const char * sDeviceOptionHelp =
     "       A file containing PICS items.\n"
     "\n"
     "  --KVS <filepath>\n"
-    "       A file to store Key Value Store items.\n"
+    "       A file to store Key Value Store items. (deprecated, use --kvs-data instead)\n"
     "\n"
-    "  --kvs-data-directory <filepath>\n"
-    "       Base directory for Data KVS file.\n"
+    "  --kvs-directory <dirpath>\n"
+    "       Base directory for all KVS files. Individual file locations will be derived from this path.\n"
+    "       Default: /tmp\n"
     "\n"
-    "  --kvs-factory-directory <filepath>\n"
-    "       Base directory for Factory KVS file.\n"
+    "  --kvs-data <filepath>\n"
+    "       Full path to the KVS data file. Default: /tmp/chip_kvs\n"
     "\n"
-    "  --kvs-config-directory <filepath>\n"
-    "       Base directory for Config KVS file.\n"
+    "  --kvs-factory <filepath>\n"
+    "       Full path to the Factory KVS file. Default: /tmp/chip_factory.ini\n"
     "\n"
-    "  --kvs-counters-directory <filepath>\n"
-    "       Base directory for Counters KVS file.\n"
+    "  --kvs-config <filepath>\n"
+    "       Full path to the Config KVS file. Default: /tmp/chip_config.ini\n"
+    "\n"
+    "  --kvs-counters <filepath>\n"
+    "       Full path to the Counters KVS file. Default: /tmp/chip_counters.ini\n"
     "\n"
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
@@ -766,20 +772,24 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().KVS = aValue;
         break;
 
-    case kDeviceOption_KVSDataDirectory:
-        LinuxDeviceOptions::GetInstance().KVSDataDirectory.SetValue(std::string(aValue));
+    case kDeviceOption_KVSDirectory:
+        LinuxDeviceOptions::GetInstance().KVSDirectory.SetValue(std::string(aValue));
         break;
 
-    case kDeviceOption_KVSFactoryDataDirectory:
-        LinuxDeviceOptions::GetInstance().KVSFactoryDirectory.SetValue(std::string(aValue));
+    case kDeviceOption_KVSDataFile:
+        LinuxDeviceOptions::GetInstance().KVSDataFile.SetValue(std::string(aValue));
         break;
 
-    case kDeviceOption_KVSConfigDataDirectory:
-        LinuxDeviceOptions::GetInstance().KVSConfigDirectory.SetValue(std::string(aValue));
+    case kDeviceOption_KVSFactoryFile:
+        LinuxDeviceOptions::GetInstance().KVSFactoryFile.SetValue(std::string(aValue));
         break;
 
-    case kDeviceOption_KVSCountersDataDirectory:
-        LinuxDeviceOptions::GetInstance().KVSCountersDirectory.SetValue(std::string(aValue));
+    case kDeviceOption_KVSConfigFile:
+        LinuxDeviceOptions::GetInstance().KVSConfigFile.SetValue(std::string(aValue));
+        break;
+
+    case kDeviceOption_KVSCountersFile:
+        LinuxDeviceOptions::GetInstance().KVSCountersFile.SetValue(std::string(aValue));
         break;
 
     case kDeviceOption_AppPipe:

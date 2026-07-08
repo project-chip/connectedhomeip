@@ -22,34 +22,33 @@
 namespace chip {
 namespace DeviceLayer {
 
-static const std::string factoryroot  = "/tmp";
-static const std::string configroot   = "/tmp";
-static const std::string countersroot = "/tmp";
-static const std::string kvsroot      = "/tmp";
-
 const char * DefaultFilesystemStorageLocationProviderImpl::LegacyKVS() const
 {
     return nullptr;
 }
 
+// Note: These methods return DIRECTORY paths, not full file paths.
+// The file name is appended by the caller (PosixConfig.cpp).
+// Default directory for all files is /tmp (no subdirectories).
+
 std::string DefaultFilesystemStorageLocationProviderImpl::GetFactoryDataLocation() const
 {
-    return factoryroot;
+    return kDefaultBaseDir;
 }
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetConfigDataLocation() const
 {
-    return configroot;
+    return kDefaultBaseDir;
 }
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetCountersDataLocation() const
 {
-    return countersroot;
+    return kDefaultBaseDir;
 }
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetKVSDataLocation() const
 {
-    return kvsroot;
+    return kDefaultBaseDir;
 }
 
 DefaultFilesystemStorageLocationProviderImpl & DefaultFilesystemStorageLocationProviderImpl::GetDefaultInstance()
