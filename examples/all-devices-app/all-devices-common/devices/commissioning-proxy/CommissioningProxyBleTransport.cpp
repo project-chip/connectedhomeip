@@ -593,8 +593,7 @@ static void OnConnectTimeout(chip::System::Layer * /*layer*/, void * /*appState*
 // Free-function callback fired by BLEManagerImpl::StartProxyScan once per
 // discovered CHIP-bearing BLE peripheral.  We buffer results and emit a
 // ProxyScanResponse when the scan timer expires.
-static void OnScanResult(void * /*context*/, const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId,
-                         uint16_t productId)
+static void OnScanResult(void * /*context*/, const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId, uint16_t productId)
 {
     // Fires on the Matter event loop (dispatched via ScheduleWork by ProxyScanForwarder),
     // so access to sScanResults (also touched by OnScanTimer) is serialized.

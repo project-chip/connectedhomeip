@@ -416,8 +416,7 @@ static void OnConnectTimeout(chip::System::Layer * /*layer*/, void * /*appState*
     {
         return; // Success or error callback already fired first; nothing to do.
     }
-    ChipLogError(AppServer, "ProxyConnectRequest: timeout waiting for WiFiPAF connect (disc %u)",
-                 sPendingConnect->discriminator);
+    ChipLogError(AppServer, "ProxyConnectRequest: timeout waiting for WiFiPAF connect (disc %u)", sPendingConnect->discriminator);
     FailPendingConnect(sPendingConnect, chip::Protocols::InteractionModel::Status::Timeout, /*cancelTimer=*/false);
 }
 
@@ -454,7 +453,7 @@ static void OnConnectSuccess(void * /*context*/)
         return;
     }
 
-    uint16_t sessionId      = ctx->cluster->Sessions().AllocSessionId();
+    uint16_t sessionId   = ctx->cluster->Sessions().AllocSessionId();
     sSessions[sessionId] = *pPafInfo;
     ctx->cluster->Sessions().RegisterSession(sessionId, CapabilitiesBitmap::kWiFiPAF, ctx->fabricIndex);
 
@@ -607,7 +606,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
     ctx->subscribeId   = 0;
     ctx->cluster       = sHost;
     ctx->fabricIndex   = request.subjectDescriptor.fabricIndex;
-    sPendingConnect = ctx;
+    sPendingConnect    = ctx;
     commandObj->FlushAcksRightAwayOnSlowCommand();
 
     if (auto * exchange = commandObj->GetExchangeContext())
@@ -619,8 +618,7 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         exchange->SetResponseTimeout(hasTimeout ? chip::System::Clock::Seconds16(responseSecs) : chip::System::Clock::kZero);
     }
 
-    CHIP_ERROR err =
-        chip::DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, ctx, OnConnectSuccess, OnConnectError);
+    CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, ctx, OnConnectSuccess, OnConnectError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAFSubscribe failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1015,7 +1013,7 @@ void Shutdown()
     // timer nor the heap context outlive the cluster.
     if (sPendingConnect != nullptr)
     {
-        auto * ctx         = sPendingConnect;
+        auto * ctx      = sPendingConnect;
         sPendingConnect = nullptr;
 
         chip::DeviceLayer::SystemLayer().CancelTimer(OnConnectTimeout, nullptr);
