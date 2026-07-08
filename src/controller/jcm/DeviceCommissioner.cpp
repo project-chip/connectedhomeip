@@ -396,8 +396,13 @@ TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure(
 
     if (mTrustVerificationDelegate == nullptr)
     {
+<<<<<<< HEAD
         ChipLogError(Controller, "JCM: TrustVerificationDelegate is not set");
         return TrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
+=======
+        ChipLogError(Controller, "Failed to send Verify VendorId: %s", ErrorStr(err));
+        return TrustVerificationError::kVendorIdVerificationFailed;
+>>>>>>> 512611bc67 (Implement AI-requested changes for Joint Fabric (#72456))
     }
 
     mTrustVerificationDelegate->OnVerifyVendorId(*this, mInfo);

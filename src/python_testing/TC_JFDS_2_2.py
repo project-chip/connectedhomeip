@@ -202,11 +202,11 @@ class TC_JFDS_2_2(MatterBaseTest):
         step2_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
             groupKeySetID=0x000a,
             groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0=b'00000000000000000000000000000000',
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
             epochStartTime0=2220000,
-            epochKey1=b'11111111111111111111111111111111',
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
             epochStartTime1=2220001,
-            epochKey2=b'22222222222222222222222222222222',
+            epochKey2=bytes.fromhex('22222222222222222222222222222222'),
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step2_groupKeySet)
         await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
@@ -225,6 +225,7 @@ class TC_JFDS_2_2(MatterBaseTest):
                 break
         asserts.assert_true(_found, "GroupKeySet from step2 was not found on DUT!")
 
+<<<<<<< HEAD
         # TODO Uncomment step 4 and 5 when UpdateKeySet command will work propery
         # self.step("4")
         # step4_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
@@ -255,6 +256,60 @@ class TC_JFDS_2_2(MatterBaseTest):
         self.step("6")
         cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x000a)
         await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
+=======
+        self.step("4")
+        step4_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x000a,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
+            epochStartTime0=2220000,
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
+            epochStartTime1=2220001,
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
+            epochStartTime2=2220002)
+        cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step4_groupKeySet)
+        # Verify that the DUT responds with Status as CONSTRAINT_ERROR
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
+
+        self.step("5")
+        step5_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x000a,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
+            epochStartTime0=2220001,
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
+            epochStartTime1=2220002,
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
+            epochStartTime2=2220003)
+        cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step5_groupKeySet)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when updating KeySet: {e}")
+
+        self.step("6")
+        step6_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x000a,
+            groupKeySecurityPolicy=2,
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
+            epochStartTime0=2220001,
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
+            epochStartTime1=2220002,
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
+            epochStartTime2=2220003)
+        cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step6_groupKeySet)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
+>>>>>>> 512611bc67 (Implement AI-requested changes for Joint Fabric (#72456))
 
         self.step("7")
         response = await devCtrlEcoA.ReadAttribute(
@@ -284,8 +339,93 @@ class TC_JFDS_2_2(MatterBaseTest):
         # else:
         #     asserts.assert_true(False, 'Expected InteractionModelError with CONSTRANT_ERROR, but no exception occurred!')
 
+<<<<<<< HEAD
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
+=======
+        self.step("8")
+        step8_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x0FFF,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
+            epochStartTime0=2220001,
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
+            epochStartTime1=2220002,
+            epochKey2=bytes.fromhex('99999999999999999999999999999999'),
+            epochStartTime2=2220003)
+        cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step8_groupKeySet)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+            asserts.fail("Expected NOT_FOUND but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Expected NOT_FOUND but got {e.status}")
+
+        self.step("9")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x0fff)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+            asserts.fail("Expected NOT_FOUND but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Expected NOT_FOUND but got {e.status}")
+
+        self.step("10")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x0000)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
+
+        self.step("11")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x000a)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected error when removing KeySet: {e}")
+
+        self.step("12")
+        response = await self.devCtrlEcoA.ReadAttribute(
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[
+                (jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            returnClusterObject=True)
+        _groupKeySetList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupKeySetList
+        _found = False
+        for _item in _groupKeySetList:
+            if _item.groupKeySetID == 0x000a:
+                _found = True
+                break
+        asserts.assert_false(_found, "GroupKeySetID=0x000a should not exist in the list")
+
+        self.step("13")
+        _groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x0000,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=bytes.fromhex('00000000000000000000000000000000'),
+            epochStartTime0=2220000,
+            epochKey1=bytes.fromhex('11111111111111111111111111111111'),
+            epochStartTime1=2220001,
+            epochKey2=bytes.fromhex('22222222222222222222222222222222'),
+            epochStartTime2=2220002)
+        cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(_groupKeySet)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
+
+        self.step("14")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x0000)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_fabric_a_node_id, endpoint=jfds_endpoint)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
+>>>>>>> 512611bc67 (Implement AI-requested changes for Joint Fabric (#72456))
 
 
 if __name__ == "__main__":
