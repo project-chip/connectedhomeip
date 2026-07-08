@@ -186,7 +186,12 @@ void NetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDat
 
     mActivateDatasetCallback = callback;
     mActivateDatasetSequence = sequenceNum;
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset, this);
+    err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        mActivateDatasetCallback = nullptr;
+        callback->OnActivateDatasetComplete(sequenceNum, err);
+    }
 }
 
 CHIP_ERROR NetworkInfrastructureManager::CommitActiveDataset()

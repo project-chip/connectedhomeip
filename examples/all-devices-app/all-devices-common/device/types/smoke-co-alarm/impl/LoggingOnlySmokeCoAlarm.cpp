@@ -47,7 +47,14 @@ LoggingOnlySmokeCoAlarm::~LoggingOnlySmokeCoAlarm()
 void LoggingOnlySmokeCoAlarm::OnSelfTestRequested()
 {
     ChipLogDetail(NotSpecified, "SmokeCoAlarm: self-test started");
-    mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kSelfTestTimeoutSec));
+    CHIP_ERROR err = mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kSelfTestTimeoutSec));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start self-test timer: %" CHIP_ERROR_FORMAT, err.Format());
+        Clusters::SmokeCoAlarmCluster & cluster = GetSmokeCoAlarmCluster();
+        cluster.SetTestInProgress(false);
+        cluster.SetExpressedStateByPriority(sPriorityOrder);
+    }
 }
 
 void LoggingOnlySmokeCoAlarm::TimerFired()

@@ -40,7 +40,7 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <device-type-parser/DeviceTypeParser.h>
+#include <app_options/DeviceTypeParser.h>
 #include <device/api/allocator/DynamicIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>

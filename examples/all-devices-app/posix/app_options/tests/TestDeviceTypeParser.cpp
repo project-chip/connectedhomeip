@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <device-type-parser/DeviceTypeParser.h>
+#include <app_options/DeviceTypeParser.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
