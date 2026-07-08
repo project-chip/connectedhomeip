@@ -19,7 +19,6 @@ bluetooth_le_controller
 bluetooth_le_host
 bluetooth_le_middleware
 boards
-board_drivers
 bootloader
 cmsis
 common_15_4
