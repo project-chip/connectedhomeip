@@ -171,7 +171,7 @@ ma_result custom_data_source_get_data_format(ma_data_source * pDataSource, ma_fo
     }
     if (pSampleRate)
     {
-        *pSampleRate = kSampleRateHz;
+        *pSampleRate = static_cast<ma_uint32>(kSampleRateHz);
     }
 
     if (pChannelMap && channelMapCap > 0)
