@@ -448,6 +448,7 @@ class SubscriptionTransaction:
             SubscriptionTransaction], None]] = None
         self._onResubscriptionSucceededCb_isAsync = False
         self._onResubscriptionAttemptedCb_isAsync = False
+        self._nodeId = transaction._nodeId
         builtins.chipStack.RegisterSubscription(self)
 
     def GetAttributes(self):
@@ -578,6 +579,10 @@ class SubscriptionTransaction:
     def subscriptionId(self) -> int:
         return self._subscriptionId
 
+    @property
+    def nodeId(self) -> int | None:
+        return self._nodeId
+
     def Shutdown(self):
         if self._isDone:
             LOGGER.warning(
@@ -652,7 +657,7 @@ class AsyncReadTransaction:
         events: list[ClusterEvent]
         tlvAttributes: dict[int, Any]
 
-    def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool):
+    def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool, nodeId: Optional[int] = None):
         self._event_loop = eventLoop
         self._future = future
         self._subscription_handler = None
@@ -662,6 +667,11 @@ class AsyncReadTransaction:
         self._changedPathSet: Set[AttributePath] = set()
         self._pReadClient = None
         self._resultError: Optional[PyChipError] = None
+<<<<<<< HEAD:src/controller/python/chip/clusters/Attribute.py
+=======
+        self._notify_subscription_still_active_callback = None
+        self._nodeId = nodeId
+>>>>>>> c25bcb19fd (controller: python: Clean up obsolete subscriptions on keepSubscriptions=False (#72904)):src/controller/python/matter/clusters/Attribute.py
 
     def SetClientObjPointers(self, pReadClient):
         self._pReadClient = pReadClient
