@@ -41,14 +41,12 @@
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
-#       --int-arg ota_image_download_timeout:300
 #       --timeout 2100
 #     factory-reset: true
 #     app-ready-pattern: Server initialization complete
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 
 from mobly import asserts
@@ -76,7 +74,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     provider_node_id = 321
     provider_discriminator = 321
     provider_setup_pincode = 2321
-    ota_image_download_timeout = None
+
     requestor_node_id = None
 
     @async_test_body
@@ -95,15 +93,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
-        # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
-        self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
-        logger.info("Image download timeout is set to %s seconds", self.ota_image_download_timeout)
+        self.applying_timeout = 180
 
         if not self.provider_kvs_path.startswith('/tmp'):
             asserts.fail("Provider KVS path must be placed in the /tmp directory.")
-
-        if self.ota_image_download_timeout <= 0:
-            asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
 
         if not self.expected_software_version:
             asserts.fail("Missing OTA image software version. Specify using --int-arg ota_image_expected_version:<ota_image_expected_version>")
@@ -215,11 +208,14 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
+        # Trackt most of the download and let the Test wait for the next UpdateState
+        await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.ota_image_download_timeout)
+            [update_state_match], timeout_sec=self.applying_timeout)
 
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
 
@@ -235,7 +231,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         self.step(2)
         # Set values for step 2
-        delayed_apply_action_time = 60*3
+        delayed_apply_action_time = 180
         current_sw_version = await self.read_single_attribute_check_success(
             dev_ctrl=self.controller,
             cluster=Clusters.BasicInformation,
@@ -277,11 +273,15 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
+        # Track the download progress up to 99% then wait for th kApplying state
+        await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.ota_image_download_timeout)
+            [update_state_match], timeout_sec=self.applying_timeout)
+        update_state_attr_handler.reset()
 
         # Device should stay in ApplyingState During 180 seconds and not Apply the software Update after the 60 seconds.
         software_version_match = AttributeMatcher.from_callable(
@@ -330,8 +330,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
-        await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
-                                                  fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
@@ -341,30 +339,37 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
+        # Track the download progress up to 99% then wait for the kDelayedOnApply state
+        await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+
         # Waits for nextAction
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kDelayedOnApply",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
         update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.ota_image_download_timeout)
+            [update_state_match], timeout_sec=self.applying_timeout)
 
-        # Wwitches to Applying
+        # Switches to Applying
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kApplying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         update_state_attr_handler.await_all_expected_report_matches(
             [update_state_match], timeout_sec=5)
 
+        # Start the handler
+        await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                                  fabric_filtered=False, min_interval_sec=0, max_interval_sec=1)
+
         # Device should stay in ApplyingState During 120 seconds and not Apply the software Update after the 60 seconds.
         software_version_match = AttributeMatcher.from_callable(
-            f"Sofware Version should be: {current_sw_version}",
+            f"Sofware Version should be: {current_sw_version} during a period of time of {spec_wait_time} seconds",
             lambda report: report.value == current_sw_version)
         software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=spec_wait_time)
-        software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
         await self._wait_for_idle_after_softwareaupdate(update_state_handler=update_state_attr_handler)
+        update_state_attr_handler.cancel()
 
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
@@ -410,13 +415,15 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
+        # Track the download progress up to 99% then wait for th kDelayedOnApply state
+        await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kDelayedOnApply",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
         update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.ota_image_download_timeout)
-        logger.info("Waiting the time of DelayedApplyAction of %s seconds.", delayed_apply_action_time)
-
+            [update_state_match], timeout_sec=self.applying_timeout)
+        logger.info("Waiting the time of DelayedApplyAction of %d seconds.", delayed_apply_action_time)
         # Device should stay in ApplyingState and not apply the update during the 180 seconds. Only after this timeframe.
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
@@ -473,7 +480,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # This can be only be tested on CI or Locally, real devices might not have this path available.
         if self.is_pics_sdk_ci_only:
             # State is Downloading, let it run a few seconds to have some data to check.
-            await asyncio.sleep(3)
+
+            # Let the device download some data this case is 2%
+            await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=2)
             # Verify the default download path and the file size
             # Read file for /tmp/test.bin should exists and greater than 0
             ota_file_data = self.get_downloaded_ota_image_info()
@@ -481,35 +490,9 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             asserts.assert_equal(True, ota_file_data['exists'], f"File is was not downloaded  at {ota_file_data['path']}")
             asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
 
-        # Device is downloading the image
-        progress_seen = False
-        last_progress = 0
+        # Track the download, as is set to discontinue the device should reach the kIdle State
+        await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
 
-        def check_ota_download_matcher(report):
-            """Check for the UpdateStateProgress and confirms it downloaded the image when the
-                status reach to NullValue
-            Args:
-                report : Report value
-            """
-            value = report.value
-            nonlocal progress_seen, last_progress
-            if value is not NullValue and isinstance(value, int) and 1 <= value <= 100:
-                # Just check if we see some progress to confirm is downloading
-                last_progress = value
-                if not progress_seen:
-                    progress_seen = True
-            return bool(value is NullValue and progress_seen)
-
-        download_progress_attr_matcher_obj = AttributeMatcher.from_callable(
-            description="Waiting Download to Complete ", matcher=check_ota_download_matcher)
-        download_progress_attr_handler.await_all_expected_report_matches(
-            [download_progress_attr_matcher_obj], timeout_sec=self.ota_image_download_timeout)
-        download_progress_attr_handler.reset()
-        download_progress_attr_handler.cancel()
-
-        # Did not apply the software update
-        update_state_attr_handler.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.ota_image_download_timeout)
         update_state_match = AttributeMatcher.from_callable(
             "Waiting Update state is Idle",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
