@@ -653,9 +653,254 @@ NodeOperationalCertStatusEnum ConvertToNOCResponseStatus(CHIP_ERROR err)
 
 } // namespace
 
+<<<<<<< HEAD:src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
 bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::AddNOC::DecodableType & commandData)
+=======
+    commandObj->AddResponse(path, payload);
+}
+
+CHIP_ERROR ReadNOCs(AttributeValueEncoder & aEncoder, FabricTable & fabricTable)
+{
+    return aEncoder.EncodeList([&fabricTable](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & fabricInfo : fabricTable)
+        {
+            OperationalCredentials::Structs::NOCStruct::Type nocStruct;
+            uint8_t nocBuf[kMaxCHIPCertLength];
+            uint8_t icacOrVvscBuf[kMaxCHIPCertLength];
+            MutableByteSpan nocSpan{ nocBuf };
+            MutableByteSpan icacOrVvscSpan{ icacOrVvscBuf };
+            FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
+
+            nocStruct.fabricIndex = fabricIndex;
+
+            ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocSpan));
+            nocStruct.noc = nocSpan;
+
+            // ICAC and VVSC are mutually exclusive. ICAC is nullable, VVSC is optional.
+            ReturnErrorOnFailure(fabricTable.FetchICACert(fabricIndex, icacOrVvscSpan));
+            if (!icacOrVvscSpan.empty())
+            {
+                nocStruct.icac.SetNonNull(icacOrVvscSpan);
+            }
+            else
+            {
+                icacOrVvscSpan = MutableByteSpan{ icacOrVvscBuf };
+                ReturnErrorOnFailure(fabricTable.FetchVVSC(fabricIndex, icacOrVvscSpan));
+                if (!icacOrVvscSpan.empty())
+                {
+                    nocStruct.vvsc = MakeOptional(icacOrVvscSpan);
+                }
+            }
+
+            ReturnErrorOnFailure(encoder.Encode(nocStruct));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR ReadFabricsList(AttributeValueEncoder & aEncoder, FabricTable & fabricTable)
+{
+    return aEncoder.EncodeList([&fabricTable](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & fabricInfo : fabricTable)
+        {
+            OperationalCredentials::Structs::FabricDescriptorStruct::Type fabricDescriptor;
+            FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
+
+            fabricDescriptor.fabricIndex = fabricIndex;
+            fabricDescriptor.nodeID      = fabricInfo.GetPeerId().GetNodeId();
+            fabricDescriptor.vendorID    = fabricInfo.GetVendorId();
+            fabricDescriptor.fabricID    = fabricInfo.GetFabricId();
+
+            fabricDescriptor.label = fabricInfo.GetFabricLabel();
+
+            Crypto::P256PublicKey pubKey;
+            ReturnErrorOnFailure(fabricTable.FetchRootPubkey(fabricIndex, pubKey));
+            fabricDescriptor.rootPublicKey = ByteSpan{ pubKey.ConstBytes(), pubKey.Length() };
+
+            uint8_t vidVerificationStatement[Crypto::kVendorIdVerificationStatementV1Size];
+            MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatement };
+            ReturnErrorOnFailure(fabricTable.FetchVIDVerificationStatement(fabricIndex, vidVerificationStatementSpan));
+            if (!vidVerificationStatementSpan.empty())
+            {
+                fabricDescriptor.VIDVerificationStatement = MakeOptional(vidVerificationStatementSpan);
+            }
+
+            ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & fabricTable)
+{
+    // It is OK to have duplicates.
+    return aEncoder.EncodeList([&fabricTable](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & fabricInfo : fabricTable)
+        {
+            uint8_t certBuf[kMaxCHIPCertLength];
+            MutableByteSpan cert{ certBuf };
+            ReturnErrorOnFailure(fabricTable.FetchRootCert(fabricInfo.GetFabricIndex(), cert));
+            ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
+        }
+
+        {
+            uint8_t certBuf[kMaxCHIPCertLength];
+            MutableByteSpan cert{ certBuf };
+            CHIP_ERROR err = fabricTable.FetchPendingNonFabricAssociatedRootCert(cert);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                // No pending root cert, do nothing
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+            else
+            {
+                ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
+
+std::optional<DataModel::ActionReturnStatus>
+HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, TLV::TLVReader & input_arguments,
+                 FabricTable & fabricTable, FailSafeContext & failSafeContext,
+                 Credentials::DeviceAttestationCredentialsProvider & dacProvider,
+                 const ByteSpan (&vendorReserved)[OperationalCredentialsCluster::kMaxCSRVendorReservedFields])
+{
+    MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
+    Commands::CSRRequest::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+
+    ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
+    MutableByteSpan nocsrElementsSpan;
+    auto errorStatus = Status::Failure;
+    ByteSpan tbsSpan;
+
+    // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
+    // logs by the end. We use finalStatus as our overall success marker, not error
+    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+
+    auto & CSRNonce     = commandData.CSRNonce;
+    bool isForUpdateNoc = commandData.isForUpdateNOC.ValueOr(false);
+
+    ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
+
+    failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj, fabricTable);
+
+    VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, errorStatus = Status::InvalidCommand);
+
+    // If current fabric is not available, command was invoked over PASE which is not legal if IsForUpdateNOC is true.
+    VerifyOrExit(!isForUpdateNoc || (fabricInfo != nullptr), errorStatus = Status::InvalidCommand);
+
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), errorStatus = Status::FailsafeRequired);
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), errorStatus = Status::ConstraintError);
+
+    // Prepare NOCSRElements structure
+    {
+        constexpr size_t csrLength = Crypto::kMIN_CSR_Buffer_Size;
+        size_t nocsrLengthEstimate = 0;
+        Platform::ScopedMemoryBuffer<uint8_t> csr;
+        MutableByteSpan csrSpan;
+
+        // Generate the actual CSR from the ephemeral key
+        if (!csr.Alloc(csrLength))
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::ResourceExhausted);
+        }
+        csrSpan = MutableByteSpan{ csr.Get(), csrLength };
+
+        Optional<FabricIndex> fabricIndexForCsr;
+        if (isForUpdateNoc)
+        {
+            fabricIndexForCsr.SetValue(commandObj->GetAccessingFabricIndex());
+        }
+
+        err = fabricTable.AllocatePendingOperationalKey(fabricIndexForCsr, csrSpan);
+
+        if (csrSpan.size() > csrLength)
+        {
+            err = CHIP_ERROR_INTERNAL;
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: AllocatePendingOperationalKey returned %" CHIP_ERROR_FORMAT, err.Format());
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+        }
+
+        ChipLogProgress(Zcl, "OpCreds: AllocatePendingOperationalKey succeeded");
+
+        // Encode the NOCSR elements with the CSR and Nonce
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),            // CSR buffer
+                                                          CSRNonce.size(),           // CSR Nonce
+                                                          vendorReserved[0].size(),  // vendor_reserved1
+                                                          vendorReserved[1].size(),  // vendor_reserved2
+                                                          vendorReserved[2].size()); // vendor_reserved3
+
+        if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::ResourceExhausted);
+        }
+
+        nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
+
+        VerifyOrExit(nocsrElementsSpan.size() >= nocsrLengthEstimate, errorStatus = Status::ConstraintError);
+
+        err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, vendorReserved[0],
+                                                  vendorReserved[1], vendorReserved[2], nocsrElementsSpan);
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+
+        // Append attestation challenge in the back of the reserved space for the signature
+        memcpy(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
+        tbsSpan = ByteSpan{ nocsrElements.Get(), nocsrElementsSpan.size() + attestationChallenge.size() };
+
+        {
+            Crypto::P256ECDSASignature signature;
+            MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
+
+            // Generate attestation signature
+            err = dacProvider.SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+            Crypto::ClearSecretData(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.size());
+            VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+            VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), errorStatus = Status::Failure);
+
+            Commands::CSRResponse::Type response;
+
+            response.NOCSRElements        = nocsrElementsSpan;
+            response.attestationSignature = signatureSpan;
+
+            ChipLogProgress(Zcl, "OpCreds: CSRRequest successful.");
+            commandObj->AddResponse(commandPath, response);
+            return std::nullopt;
+        }
+    }
+exit:
+    // If failed constraints or internal errors, send a status report instead of the response sent above
+    ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
+                 to_underlying(errorStatus), err.Format());
+    return errorStatus;
+}
+
+std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                          TLV::TLVReader & input_arguments, FabricTable & fabricTable,
+                                                          FailSafeContext & failSafeContext, DnssdServer & dnssdServer,
+                                                          CommissioningWindowManager & commissioningWindowManager,
+                                                          Credentials::GroupDataProvider & groupDataProvider,
+                                                          Access::AccessControl & accessControl, bool & reportChange)
+>>>>>>> ca48b666e4 (Add support to input vendor_reserved fields in NOCSR elements (#72811)):src/app/clusters/operational-credentials-server/OperationalCredentialsCluster.cpp
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     auto & NOCValue          = commandData.NOCValue;
@@ -1363,5 +1608,407 @@ bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     response.signature            = responseData.signature.Span();
     commandObj->AddResponse(commandPath, response);
 
+<<<<<<< HEAD:src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
     return true;
+=======
+    return std::nullopt;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                              TLV::TLVReader & input_arguments, Credentials::DeviceAttestationCredentialsProvider & dacProvider)
+{
+    MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
+    Commands::CertificateChainRequest::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+
+    auto & certificateType = commandData.certificateType;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint8_t derBuf[Credentials::kMaxDERCertLength];
+    MutableByteSpan derBufSpan(derBuf);
+
+    Commands::CertificateChainResponse::Type response;
+
+    if (certificateType == kDACCertificate)
+    {
+        ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
+        SuccessOrExit(err = dacProvider.GetDeviceAttestationCert(derBufSpan));
+    }
+    else if (certificateType == kPAICertificate)
+    {
+        ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
+        SuccessOrExit(err = dacProvider.GetProductAttestationIntermediateCert(derBufSpan));
+    }
+    else
+    {
+        ChipLogError(Zcl, "OpCreds: Certificate Chain request received for unknown type: %d", static_cast<int>(certificateType));
+        return Status::InvalidCommand;
+    }
+
+    response.certificate = derBufSpan;
+    commandObj->AddResponse(commandPath, response);
+    return std::nullopt;
+
+exit:
+    ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
+    return err;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, TLV::TLVReader & input_arguments,
+                         Credentials::DeviceAttestationCredentialsProvider & dacProvider)
+{
+    MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
+    OperationalCredentials::Commands::AttestationRequest::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+
+    auto & attestationNonce = commandData.attestationNonce;
+    auto errorStatus        = Status::Failure;
+    CHIP_ERROR err          = CHIP_ERROR_INVALID_ARGUMENT;
+    ByteSpan tbsSpan;
+
+    Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
+    size_t attestationElementsLen = 0;
+    MutableByteSpan attestationElementsSpan;
+    uint8_t certDeclBuf[Credentials::kMaxCMSSignedCDMessage]; // Sized to hold the example certificate declaration with 100 PIDs.
+                                                              // See DeviceAttestationCredsExample
+    MutableByteSpan certDeclSpan(certDeclBuf);
+
+    ByteSpan attestationChallenge = GetAttestationChallengeFromCurrentSession(commandObj);
+
+    // TODO: in future versions, retrieve vendor information to populate the fields below.
+    uint32_t timestamp = 0;
+    Credentials::DeviceAttestationVendorReservedConstructor emptyVendorReserved(nullptr, 0);
+
+    // TODO: in future versions, also retrieve and use firmware Information
+    const ByteSpan kEmptyFirmwareInfo;
+
+    ChipLogProgress(Zcl, "OpCreds: Received an AttestationRequest command");
+
+    VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, errorStatus = Status::InvalidCommand);
+
+    err = dacProvider.GetCertificationDeclaration(certDeclSpan);
+    VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+
+    attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
+
+    if (!attestationElements.Alloc(attestationElementsLen + attestationChallenge.size()))
+    {
+        err = CHIP_ERROR_NO_MEMORY;
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::ResourceExhausted);
+    }
+
+    attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
+    err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
+                                                    emptyVendorReserved, attestationElementsSpan);
+    VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+
+    // Append attestation challenge in the back of the reserved space for the signature
+    memcpy(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
+    tbsSpan = ByteSpan{ attestationElements.Get(), attestationElementsSpan.size() + attestationChallenge.size() };
+
+    {
+        Crypto::P256ECDSASignature signature;
+        MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
+
+        // Generate attestation signature
+        err = dacProvider.SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+        Crypto::ClearSecretData(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.size());
+        VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
+        VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), errorStatus = Status::Failure);
+
+        Commands::AttestationResponse::Type response;
+
+        response.attestationElements  = attestationElementsSpan;
+        response.attestationSignature = signatureSpan;
+
+        ChipLogProgress(Zcl, "OpCreds: AttestationRequest successful.");
+        commandObj->AddResponse(commandPath, response);
+        return std::nullopt;
+    }
+
+exit:
+    ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
+                 to_underlying(errorStatus), err.Format());
+    return errorStatus;
+}
+
+void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
+        OperationalCredentialsCluster::FailSafeCleanup(event, reinterpret_cast<OperationalCredentialsCluster *>(arg));
+    }
+}
+} // anonymous namespace
+
+CHIP_ERROR OperationalCredentialsCluster::SetCSRVendorReserved(CSRVendorReservedField field, ByteSpan data)
+{
+    auto index = static_cast<size_t>(field);
+    VerifyOrReturnError(index < kMaxCSRVendorReservedFields, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mCsrVendorReserved[index] = data;
+
+    ChipLogProgress(Zcl, "OpCreds: CSR vendor_reserved%u set (%u bytes)", static_cast<unsigned>(index + 1),
+                    static_cast<unsigned>(data.size()));
+    return CHIP_NO_ERROR;
+}
+
+void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDeviceEvent * event,
+                                                    OperationalCredentialsCluster * cluster)
+{
+    VerifyOrDie(cluster != nullptr);
+    ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
+
+    bool nocAddedDuringFailsafe          = event->FailSafeTimerExpired.addNocCommandHasBeenInvoked;
+    bool nocUpdatedDuringFailsafe        = event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked;
+    bool nocAddedOrUpdatedDuringFailsafe = nocAddedDuringFailsafe || nocUpdatedDuringFailsafe;
+
+    FabricIndex fabricIndex = event->FailSafeTimerExpired.fabricIndex;
+
+    // Report Fabrics table change if SetVIDVerificationStatement had been called.
+    // There are 4 cases:
+    //   1- Fail-safe started, AddNOC/UpdateNOC for fabric A, VVS set for fabric A after that: Need to mark dirty here.
+    //   2- Fail-safe started, UpdateNOC/AddNOC for fabric A, VVS set for fabric B after that: No need to mark dirty.
+    //   3- Fail-safe started, no UpdateNOC/AddNOC, VVS set for fabric X: No need to mark dirty.
+    //   4- ail-safe started, VVS set for fabric A, UpdateNOC for fabric A: No need to mark dirty.
+    //
+    // Right now we will mark dirty no matter what, as the state-keeping logic for cases 2-4 above
+    // was very complex and more likely to be less maintainable than possibly over-reporting Fabrics
+    // attribute in this corner case of fail-safe expiry.
+    if (event->FailSafeTimerExpired.setVidVerificationStatementHasBeenInvoked)
+    {
+        // Opcreds cluster is always on Endpoint 0.
+        // Only `Fabrics` attribute is reported since `NOCs` is not reportable (`C` quality).```
+        cluster->NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
+    }
+
+    // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
+    // whose Fabric Index is recorded in the Fail-Safe context (see ArmFailSafe Command) by clearing any associated Secure
+    // Session Context at the Server.
+    if (nocAddedOrUpdatedDuringFailsafe)
+    {
+        cluster->mOpCredsContext.sessionManager.ExpireAllSessionsForFabric(fabricIndex);
+    }
+
+    cluster->mOpCredsContext.fabricTable.RevertPendingFabricData();
+
+    // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
+    // against the Fabric Index stored in the Fail-Safe Context for the Fabric Index that was the subject of the AddNOC
+    // command.
+    if (nocAddedDuringFailsafe)
+    {
+        CHIP_ERROR err = cluster->mOpCredsContext.fabricTable.Delete(fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
+        }
+    }
+
+    if (nocUpdatedDuringFailsafe)
+    {
+        // Operational identities/records available may have changed due to NodeID update. Need to refresh all records.
+        // The case of fabric removal that reverts AddNOC is handled by the `DeleteFabricFromTable` flow above.
+        cluster->mOpCredsContext.dnssdServer.StartServer();
+    }
+}
+
+CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    ReturnErrorOnFailure(mOpCredsContext.fabricTable.AddFabricDelegate(this));
+    return mOpCredsContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+}
+
+void OperationalCredentialsCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    mOpCredsContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    mOpCredsContext.fabricTable.RemoveFabricDelegate(this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
+CHIP_ERROR OperationalCredentialsCluster::Attributes(const ConcreteClusterPath & path,
+                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    return listBuilder.Append(Span(OperationalCredentials::Attributes::kMandatoryMetadata),
+                              Span<const AttributeListBuilder::OptionalAttributeEntry>());
+}
+
+DataModel::ActionReturnStatus OperationalCredentialsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                           AttributeValueEncoder & encoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case OperationalCredentials::Attributes::ClusterRevision::Id:
+        return encoder.Encode(OperationalCredentials::kRevision);
+    case OperationalCredentials::Attributes::FeatureMap::Id:
+        return encoder.Encode(static_cast<uint32_t>(0));
+    case OperationalCredentials::Attributes::NOCs::Id:
+        return ReadNOCs(encoder, mOpCredsContext.fabricTable);
+    case OperationalCredentials::Attributes::Fabrics::Id:
+        return ReadFabricsList(encoder, mOpCredsContext.fabricTable);
+    case OperationalCredentials::Attributes::SupportedFabrics::Id:
+        return encoder.Encode(static_cast<uint8_t>(CHIP_CONFIG_MAX_FABRICS));
+    case OperationalCredentials::Attributes::CommissionedFabrics::Id:
+        return encoder.Encode(mOpCredsContext.fabricTable.FabricCount());
+    case OperationalCredentials::Attributes::TrustedRootCertificates::Id:
+        return ReadRootCertificates(encoder, mOpCredsContext.fabricTable);
+    case OperationalCredentials::Attributes::CurrentFabricIndex::Id:
+        return encoder.Encode(static_cast<uint8_t>(encoder.AccessingFabricIndex()));
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
+CHIP_ERROR OperationalCredentialsCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::AttestationRequest::kMetadataEntry,
+                                                                             Commands::CertificateChainRequest::kMetadataEntry,
+                                                                             Commands::CSRRequest::kMetadataEntry,
+                                                                             Commands::AddNOC::kMetadataEntry,
+                                                                             Commands::UpdateNOC::kMetadataEntry,
+                                                                             Commands::UpdateFabricLabel::kMetadataEntry,
+                                                                             Commands::RemoveFabric::kMetadataEntry,
+                                                                             Commands::AddTrustedRootCertificate::kMetadataEntry,
+                                                                             Commands::SetVIDVerificationStatement::kMetadataEntry,
+                                                                             Commands::SignVIDVerificationRequest::kMetadataEntry };
+
+    return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+CHIP_ERROR OperationalCredentialsCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                            ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    static constexpr CommandId kGeneratedCommands[] = { Commands::AttestationResponse::Id, Commands::CertificateChainResponse::Id,
+                                                        Commands::CSRResponse::Id, Commands::NOCResponse::Id,
+                                                        Commands::SignVIDVerificationResponse::Id };
+
+    return builder.ReferenceExisting(kGeneratedCommands);
+}
+
+std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                          TLV::TLVReader & input_arguments,
+                                                                                          CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case OperationalCredentials::Commands::AttestationRequest::Id:
+        return HandleAttestationRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
+    case OperationalCredentials::Commands::CertificateChainRequest::Id:
+        return HandleCertificateChainRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
+    case OperationalCredentials::Commands::CSRRequest::Id:
+        return HandleCSRRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable,
+                                mOpCredsContext.failSafeContext, mOpCredsContext.dacProvider, mCsrVendorReserved);
+    case OperationalCredentials::Commands::AddNOC::Id: {
+        bool reportChange = false;
+        std::optional<DataModel::ActionReturnStatus> returnStatus =
+            HandleAddNOC(handler, request.path, input_arguments, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext,
+                         mOpCredsContext.dnssdServer, mOpCredsContext.commissioningWindowManager, mOpCredsContext.groupDataProvider,
+                         mOpCredsContext.accessControl, reportChange);
+        if (reportChange)
+        {
+            // Notify the attributes containing fabric metadata can be read with new data
+            NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
+            // Notify we have one more fabric
+            NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
+        }
+        return returnStatus;
+    }
+    case OperationalCredentials::Commands::UpdateNOC::Id:
+        return HandleUpdateNOC(handler, input_arguments, request, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext,
+                               mOpCredsContext.dnssdServer);
+    case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
+        std::optional<DataModel::ActionReturnStatus> returnStatus =
+            HandleUpdateFabricLabel(handler, input_arguments, request, mOpCredsContext.fabricTable);
+        if (!returnStatus.has_value())
+        {
+            // Succeeded at updating the label, mark Fabrics table changed.
+            NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
+        }
+        return returnStatus;
+    }
+    case OperationalCredentials::Commands::RemoveFabric::Id:
+        return HandleRemoveFabric(handler, request.path, input_arguments, mOpCredsContext.fabricTable);
+    case OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
+        return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, mOpCredsContext.fabricTable,
+                                               mOpCredsContext.failSafeContext);
+    case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
+        bool reportChange                                         = false;
+        std::optional<DataModel::ActionReturnStatus> returnStatus = HandleSetVIDVerificationStatement(
+            handler, input_arguments, request, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext, reportChange);
+        if (reportChange)
+        {
+            // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
+            // is not reportable (`C` quality).
+            mOpCredsContext.failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
+            // Report if Fabric attribute has changed.
+            NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
+        }
+        return returnStatus;
+    }
+    case OperationalCredentials::Commands::SignVIDVerificationRequest::Id:
+        return HandleSignVIDVerificationRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+void OperationalCredentialsCluster::FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+
+    // TODO: Most of this implementation seems to be related to BasicInformation cluster, not sure if this link with OpCreds is ok.
+    // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
+    // This applies only for the BasicInformation cluster that is always in the Root endpoint and it
+    // is mandatory.
+    BasicInformation::Events::Leave::Type event;
+    event.fabricIndex = fabricIndex;
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
+
+    // Try to send the queued events as soon as possible for this fabric. If the just emitted leave event won't
+    // be sent this time, it will likely not be delivered at all for the following reasons:
+    // - removing the fabric expires all associated ReadHandlers, so all subscriptions to
+    //   the leave event will be cancelled.
+    // - removing the fabric removes all associated access control entries, so generating
+    //   subsequent reports containing the leave event will fail the access control check.
+    mContext->interactionContext.eventsGenerator.ScheduleUrgentEventDeliverySync(fabricIndex);
+}
+
+void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+    // We need to withdraw the advertisement for the now-removed fabric, so need
+    // to restart advertising altogether.
+    mOpCredsContext.dnssdServer.StartServer();
+
+    TEMPORARY_RETURN_IGNORED mOpCredsContext.eventManagement.FabricRemoved(fabricIndex);
+
+    NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
+    NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
+}
+
+void OperationalCredentialsCluster::OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
+    NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
+}
+
+void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    const FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+    // Safety check, but should not happen by the code paths involved
+    VerifyOrReturn(fabric != nullptr);
+
+    ChipLogProgress(Zcl,
+                    "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
+                    ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
+                    static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
+                    ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+>>>>>>> ca48b666e4 (Add support to input vendor_reserved fields in NOCSR elements (#72811)):src/app/clusters/operational-credentials-server/OperationalCredentialsCluster.cpp
 }
