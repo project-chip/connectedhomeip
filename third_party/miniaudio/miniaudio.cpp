@@ -21,6 +21,24 @@
 // we tell the header to include the actual function definitions.
 // This file should be compiled exactly once in the project to avoid
 // duplicate symbol errors during linking.
+#if defined(__SANITIZE_ADDRESS__)
+#define MA_PREVENT_DLCLOSE
+#elif defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define MA_PREVENT_DLCLOSE
+#endif
+#endif
+
+#ifdef MA_PREVENT_DLCLOSE
+#include <dlfcn.h>
+static inline int dummy_dlclose(void * handle)
+{
+    (void) handle;
+    return 0;
+}
+#define dlclose(handle) dummy_dlclose(handle)
+#endif
+
 #define MINIAUDIO_IMPLEMENTATION
 
 #include <miniaudio.h>

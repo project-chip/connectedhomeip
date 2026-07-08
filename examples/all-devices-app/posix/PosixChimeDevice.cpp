@@ -40,7 +40,13 @@ Span<const ChimeDevice::Sound> MapSounds(PosixAudioManager & audioManager)
 
 PosixChimeDevice::PosixChimeDevice(TimerDelegate & timerDelegate, PosixAudioManager & audioManager) :
     ChimeDevice(timerDelegate, MapSounds(audioManager)), mAudioManager(audioManager)
-{}
+{
+    CHIP_ERROR err = mAudioManager.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "PosixChimeDevice: Failed to initialize audio manager: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
 
 Protocols::InteractionModel::Status PosixChimeDevice::PlayChimeSound(uint8_t chimeID)
 {

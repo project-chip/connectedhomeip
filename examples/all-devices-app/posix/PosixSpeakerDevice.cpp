@@ -23,7 +23,13 @@ namespace app {
 
 PosixSpeakerDevice::PosixSpeakerDevice(const Context & context, PosixAudioManager & audioManager) :
     SpeakerDevice(*this, *this, context.timerDelegate), mAudioManager(audioManager)
-{}
+{
+    CHIP_ERROR err = mAudioManager.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "PosixSpeakerDevice: Failed to initialize audio manager: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
 
 PosixSpeakerDevice::~PosixSpeakerDevice() {}
 

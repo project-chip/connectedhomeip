@@ -27,13 +27,6 @@ namespace app {
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
                                     PosixAudioManager & audioManager)
 {
-    // Initialize the shared audio manager for miniaudio engine access and pre-load sounds
-    CHIP_ERROR err = audioManager.Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize PosixAudioManager: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
