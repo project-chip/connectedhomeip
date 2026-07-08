@@ -21,7 +21,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "TestCommissioningProxyCluster"
 
-  test_sources = [ "TestCommissioningProxyCluster.cpp" ]
+  test_sources = [
+    "TestCommissioningProxyBgScanRegistry.cpp",
+    "TestCommissioningProxyCluster.cpp",
+  ]
 
   # Compile only the cluster logic files.  CodegenIntegration.cpp is
   # intentionally excluded: it calls CodegenDataModelProvider::Instance()
