@@ -60,7 +60,8 @@ enum class EndpointChangeType
 
 struct AttributeChangeListenerConfiguration
 {
-    std::optional<uint32_t> delay;
+    std::optional<uint16_t> delayMinMs;
+    std::optional<uint16_t> delayJitterWindowMs;
 };
 
 /// Interface for components wishing to be notified of attribute changes.

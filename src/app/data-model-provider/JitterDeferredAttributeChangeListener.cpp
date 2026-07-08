@@ -53,8 +53,13 @@ void JitterDeferredAttributeChangeListener::OnAttributeChanged(const ConcreteAtt
     if (!mTimer.IsTimerActive(this))
     {
         uint32_t jitterMs =
-            (mDeferAttributePathJitterTimeoutMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterTimeoutMs;
-        (void) mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathBaseTimeoutMs + jitterMs));
+            (mDeferAttributePathJitterWindowMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterWindowMs;
+        CHIP_ERROR err = mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathMinMs + jitterMs));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "Failed to start deferred attribute change timer: %" CHIP_ERROR_FORMAT, err.Format());
+            FlushDirtyPaths();
+        }
     }
 }
 
@@ -81,24 +86,35 @@ void JitterDeferredAttributeChangeListener::FlushDirtyPaths()
 void JitterDeferredAttributeChangeListener::TimerFired()
 {
     FlushDirtyPaths();
-    mDeferAttributePathBaseTimeoutMs   = kDefaultDeferAttributePathBaseTimeoutMs;
-    mDeferAttributePathJitterTimeoutMs = kDefaultDeferAttributePathJitterTimeoutMs;
+    mDeferAttributePathMinMs          = 0;
+    mDeferAttributePathJitterWindowMs = 0;
 }
 
 void JitterDeferredAttributeChangeListener::UpdateListenerConfiguration(const AttributeChangeListenerConfiguration & config)
 {
-    if (config.delay.has_value())
-    {
-        uint32_t delay                     = config.delay.value();
-        mDeferAttributePathBaseTimeoutMs   = (uint16_t) (delay >> 16);
-        mDeferAttributePathJitterTimeoutMs = (uint16_t) (delay & 0xFFFF);
+    bool isConfigurationChanged = false;
 
-        if (mTimer.IsTimerActive(this))
+    if (config.delayMinMs.has_value())
+    {
+        mDeferAttributePathMinMs = config.delayMinMs.value();
+        isConfigurationChanged = true;
+    }
+    if (config.delayJitterWindowMs.has_value())
+    {
+        mDeferAttributePathJitterWindowMs = config.delayJitterWindowMs.value();
+        isConfigurationChanged = true;
+    }
+
+    if (isConfigurationChanged && mTimer.IsTimerActive(this))
+    {
+        mTimer.CancelTimer(this);
+        uint32_t jitterMs =
+            (mDeferAttributePathJitterWindowMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterWindowMs;
+        CHIP_ERROR err = mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathMinMs + jitterMs));
+        if (err != CHIP_NO_ERROR)
         {
-            mTimer.CancelTimer(this);
-            uint32_t jitterMs =
-                (mDeferAttributePathJitterTimeoutMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterTimeoutMs;
-            (void) mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathBaseTimeoutMs + jitterMs));
+            ChipLogError(DataManagement, "Failed to start deferred attribute change timer: %" CHIP_ERROR_FORMAT, err.Format());
+            FlushDirtyPaths();
         }
     }
 }

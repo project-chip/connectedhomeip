@@ -319,8 +319,6 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-    GetCustomizedAttributeChangeListener().SetUnderlyingListener(
-        &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine());
     AppFabricTableDelegate::Init();
 
 #ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
@@ -788,6 +786,6 @@ void AppTask::UpdateClusterState()
 chip::app::DataModel::JitterDeferredAttributeChangeListener & AppTask::GetCustomizedAttributeChangeListener()
 {
     static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::DataModel::JitterDeferredAttributeChangeListener sCustomizedAttributeChangeListener(nullptr, sTimerDelegate);
+    static chip::app::DataModel::JitterDeferredAttributeChangeListener sCustomizedAttributeChangeListener(&chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(), sTimerDelegate);
     return sCustomizedAttributeChangeListener;
 }

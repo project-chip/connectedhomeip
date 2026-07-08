@@ -37,20 +37,13 @@ namespace DataModel {
 class JitterDeferredAttributeChangeListener : public AttributeChangeListener, public TimerContext
 {
 public:
-    static constexpr uint32_t kMaxAttributePathsBufferSize              = 10;
-    static constexpr uint16_t kDefaultDeferAttributePathBaseTimeoutMs   = 200;
-    static constexpr uint16_t kDefaultDeferAttributePathJitterTimeoutMs = 500;
+    static constexpr uint32_t kMaxAttributePathsBufferSize = 10;
 
     JitterDeferredAttributeChangeListener(AttributeChangeListener * aUnderlyingListener, TimerDelegate & aTimer,
-                                          uint16_t aDeferAttributePathBaseTimeoutMs, uint16_t aDeferAttributePathJitterTimeoutMs) :
+                                          uint16_t aDeferAttributePathMinMs = 0, uint16_t aDeferAttributePathJitterWindowMs = 0) :
         mUnderlyingListener(aUnderlyingListener),
-        mTimer(aTimer), mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
-        mDeferAttributePathJitterTimeoutMs(aDeferAttributePathJitterTimeoutMs)
-    {}
-
-    JitterDeferredAttributeChangeListener(AttributeChangeListener * aUnderlyingListener, TimerDelegate & aTimer) :
-        JitterDeferredAttributeChangeListener(aUnderlyingListener, aTimer, kDefaultDeferAttributePathBaseTimeoutMs,
-                                              kDefaultDeferAttributePathJitterTimeoutMs)
+        mTimer(aTimer), mDeferAttributePathMinMs(aDeferAttributePathMinMs),
+        mDeferAttributePathJitterWindowMs(aDeferAttributePathJitterWindowMs)
     {}
 
     void SetUnderlyingListener(AttributeChangeListener * listener) { mUnderlyingListener = listener; }
@@ -65,8 +58,8 @@ private:
 
     AttributeChangeListener * mUnderlyingListener;
     TimerDelegate & mTimer;
-    uint16_t mDeferAttributePathBaseTimeoutMs;
-    uint16_t mDeferAttributePathJitterTimeoutMs;
+    uint16_t mDeferAttributePathMinMs;
+    uint16_t mDeferAttributePathJitterWindowMs;
     std::array<ConcreteAttributePath, kMaxAttributePathsBufferSize> mAttributePaths;
     uint32_t mCurrentIndex = 0;
 };

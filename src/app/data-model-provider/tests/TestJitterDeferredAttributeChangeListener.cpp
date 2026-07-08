@@ -141,7 +141,7 @@ TEST_F(TestJitterDeferredAttributeChangeListener, TestUpdateListenerConfiguratio
 
     // Verify configuration updates dynamically
     AttributeChangeListenerConfiguration newConfig;
-    newConfig.delay = (5000 << 16) | 0;
+    newConfig.delayMinMs = 5000;
     jitteryListener.UpdateListenerConfiguration(newConfig);
 
     // Advance clock past original timeout of 1000ms. It shouldn't trigger since the new timeout is 5000ms.
