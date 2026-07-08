@@ -74,9 +74,9 @@ Status CommissioningProxyBgScanRegistry::Start(FabricIndex fabricIndex, NodeId n
         CancelLifetime(it->second);
     }
 
-    Record & rec  = mFabrics[key];
-    rec.transport = transport;
-    rec.wiFiBands = wiFiBands;
+    Record & rec    = mFabrics[key];
+    rec.transport   = transport;
+    rec.wiFiBands   = wiFiBands;
     rec.lifetimeCtx = nullptr;
 
     // Start (or resume) the hardware scan on the first fabric, or whenever we are
@@ -138,10 +138,10 @@ Status CommissioningProxyBgScanRegistry::Stop(FabricIndex fabricIndex, NodeId no
         return Status::NotFound;
     }
 
-    const uint8_t reqTransportBits  = transport.Raw();
-    const uint16_t reqBandBits      = wiFiBands.Raw();
-    const uint8_t fabTransportBits  = it->second.transport.Raw();
-    const uint16_t fabBandBits      = it->second.wiFiBands.Raw();
+    const uint8_t reqTransportBits = transport.Raw();
+    const uint16_t reqBandBits     = wiFiBands.Raw();
+    const uint8_t fabTransportBits = it->second.transport.Raw();
+    const uint16_t fabBandBits     = it->second.wiFiBands.Raw();
 
     // A transport bitmap of zero means "stop only the given bands" (spec); otherwise
     // stop the intersection of the requested and registered transports/bands.
@@ -237,7 +237,7 @@ void CommissioningProxyBgScanRegistry::Shutdown()
 
 void CommissioningProxyBgScanRegistry::LifetimeExpiryCallback(System::Layer * /*layer*/, void * appState)
 {
-    auto * ctx = static_cast<LifetimeCtx *>(appState);
+    auto * ctx                              = static_cast<LifetimeCtx *>(appState);
     CommissioningProxyBgScanRegistry * self = ctx->registry;
     const FabricKey key                     = ctx->key;
     self->OnLifetimeExpiry(key);
