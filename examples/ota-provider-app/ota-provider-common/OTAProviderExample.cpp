@@ -320,7 +320,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         if (mBdxOtaSender.InitializeTransfer(commandObj->GetSubjectDescriptor().fabricIndex,
                                              commandObj->GetSubjectDescriptor().subject) == CHIP_NO_ERROR)
         {
-            uint16_t blockSize = mMaxBDXBlockSize;
+            uint16_t blockSize                = mMaxBDXBlockSize;
             chip::SessionHandle sessionHandle = commandObj->GetExchangeContext()->GetSessionHandle();
             if (sessionHandle->AllowsLargePayload())
             {
