@@ -67,3 +67,10 @@
 
 // Max Binding entries per fabric for CI tests
 #define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 1
+
+// Enable the Commissioning Proxy cluster (code-driven) on its dedicated endpoint.
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
+
+// Send the ConnectNetwork response early on shared-radio (NAN + WiFi-AP) devices
+// so the WiFi-PAF data path is ready before the commissionee's first SDU.
+#define CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 1

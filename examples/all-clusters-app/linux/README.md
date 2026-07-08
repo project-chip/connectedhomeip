@@ -35,6 +35,47 @@ And to compile on Linux ARM run:
 $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
 ```
 
+## Commissioning Proxy cluster
+
+This example builds in the Commissioning Proxy cluster (a code-driven cluster)
+on a dedicated endpoint **5**, with the `MA-commissioning-by-proxy` device type.
+It is enabled by `CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY` in
+`include/CHIPProjectAppConfig.h` and lets the all-clusters-app act as a
+commissioning proxy over WiFi-PAF and/or BLE.
+
+The transport(s) compiled in follow the build configuration:
+
+-   **WiFi-PAF** is included when `chip_device_config_enable_wifipaf` is true
+    (the default for Linux builds with WiFi enabled). When WiFi-PAF is compiled
+    in, the cluster advertises the `WiFiNetworkInterface` feature and the
+    `WiFiBand` attribute; the supported bands are derived from the `freq_list`
+    passed via `--wifipaf`.
+-   **BLE** is included when `chip_config_network_layer_ble` is true.
+
+`ProxyScanRequest` and the proxy connect/message/disconnect flow work over
+whichever transport(s) are compiled in, independent of the feature map.
+
+The `-no-ble` build variants disable the BLE transport. To build with both BLE
+and WiFi-PAF on Linux x86-64 run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-clang build"
+```
+
+And to compile on Linux ARM run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-clang build"
+```
+
+To start the app as a proxy over WiFi-PAF on channel 6 (2437 MHz):
+
+```
+$ ./out/linux-x64-all-clusters-clang/chip-all-clusters-app --wifi --wifipaf freq_list=2437
+```
+
+The cluster's attributes and commands can then be exercised on endpoint 5.
+
 ## Fuzzing integration
 
 This example also supports compilation with libfuzzer enabled. This should be

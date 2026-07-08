@@ -47,4 +47,11 @@
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Bulb"
 
+// The lighting-app Linux example is intended to run on hardware that shares
+// the radio between NAN and WiFi-AP, where post-association NAN TX is
+// unreliable.  Enable the early-response path so ConnectNetworkResponse is
+// sent over WiFi-PAF before WiFi association starts.  See base config
+// (src/include/platform/CHIPDeviceConfig.h) for the tradeoff.
+#define CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 1
+
 #define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 1

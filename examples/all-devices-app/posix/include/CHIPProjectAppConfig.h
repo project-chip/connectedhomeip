@@ -27,5 +27,8 @@
 
 #pragma once
 
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 1
+#define CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE 1
+
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>

@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 
+import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -75,10 +76,35 @@ source_set("chip-all-clusters-common") {
     "main-common.cpp",
   ]
 
+  # Commissioning Proxy code-driven cluster (Linux only).  The transport-agnostic
+  # delegate, dispatcher and background-scan cache are always built; the
+  # per-transport modules are compiled only when their transport stack is enabled.
+  sources += [
+    "CommissioningProxyBgScanCache.cpp",
+    "CommissioningProxyBgScanCache.h",
+    "CommissioningProxyCommandDelegate.cpp",
+    "CommissioningProxyDispatcher.h",
+    "commissioning-proxy-delegate-impl.cpp",
+    "commissioning-proxy-delegate-impl.h",
+  ]
+  if (chip_device_config_enable_wifipaf) {
+    sources += [
+      "CommissioningProxyPafTransport.cpp",
+      "CommissioningProxyPafTransport.h",
+    ]
+  }
+  if (chip_config_network_layer_ble) {
+    sources += [
+      "CommissioningProxyBleTransport.cpp",
+      "CommissioningProxyBleTransport.h",
+    ]
+  }
+
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/commissioning-proxy-server",
     "${chip_root}/src/app/clusters/groupcast",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",

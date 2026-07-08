@@ -74,6 +74,15 @@ bool IsConnectNetworkRequestOverPASE(CommandHandler & handler)
 
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+bool IsConnectNetworkRequestOverWiFiPAF(CommandHandler & handler)
+{
+    Messaging::ExchangeContext * exchangeCtx = handler.GetExchangeContext();
+    return exchangeCtx && exchangeCtx->HasSessionHandle() && exchangeCtx->GetSessionHandle()->IsSecureSession() &&
+        exchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF;
+}
+#endif
+
 // Note: CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE can be 0, this disables debug text
 using DebugTextStorage = std::array<char, CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE>;
 
@@ -236,6 +245,44 @@ void NetworkCommissioningCluster::SendNonConcurrentConnectNetworkResponse()
     commandHandle->AddResponse(mAsyncCommandPath, response);
 }
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+void NetworkCommissioningCluster::SendEarlyConnectNetworkResponseForWiFiPAF()
+{
+    auto commandHandleRef = std::move(mAsyncCommandHandle);
+    auto commandHandle    = commandHandleRef.Get();
+    if (commandHandle == nullptr)
+    {
+        return;
+    }
+    ChipLogProgress(NetworkProvisioning,
+                    "WiFi-PAF concurrent mode: sending ConnectNetworkResponse(Success) before WiFi association");
+    Commands::ConnectNetworkResponse::Type response;
+    response.networkingStatus = Status::kSuccess;
+    commandHandle->AddResponse(mAsyncCommandPath, response);
+}
+
+void NetworkCommissioningCluster::StartWiFiConnectAfterPafAck(intptr_t arg)
+{
+    auto self = reinterpret_cast<NetworkCommissioningCluster *>(arg);
+    // `self` is a pointer to the cluster instance captured when HandleConnectNetwork
+    // scheduled this work.  The cluster is endpoint-scoped and outlives this work
+    // item under normal operation; platform shutdown would cancel pending work
+    // before deinit.  Defensive null check for mpWirelessDriver in case this
+    // path is ever reached on a cluster instance without a wireless driver.
+    VerifyOrReturn(self->mpWirelessDriver != nullptr);
+    ChipLogProgress(NetworkProvisioning, "WiFi-PAF: starting deferred WiFi association after early response");
+    for (auto & node : sInstances)
+    {
+        auto instance = static_cast<NetworkCommissioningCluster *>(&node);
+        if (instance != self)
+        {
+            instance->DisconnectLingeringConnection();
+        }
+    }
+    self->mpWirelessDriver->ConnectNetwork(ByteSpan(self->mConnectingNetworkID, self->mConnectingNetworkIDLen), self);
+}
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
 
 void NetworkCommissioningCluster::SetLastNetworkingStatusValue(
     Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue)
@@ -640,6 +687,23 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
     mCurrentOperationBreadcrumb = req.breadcrumb;
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#if CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+    mConnectNetworkResponseSentEarly = false;
+    // PAF-over-shared-radio: after WiFi association the radio is camped on
+    // the AP channel and the PAF Follow-up carrying ConnectNetworkResponse
+    // cannot reliably transmit on the NAN channel.  Send Success now so the
+    // response goes out while NAN is still primary, then defer the actual
+    // WiFi association to the next event-loop iteration so the IM-queued
+    // response has time to flush through PAFTP TX queue. Recovery for an
+    // association failure after this point relies on failsafe expiry.
+    if (IsConnectNetworkRequestOverWiFiPAF(handler))
+    {
+        mConnectNetworkResponseSentEarly = true;
+        SendEarlyConnectNetworkResponseForWiFiPAF();
+        LogErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(StartWiFiConnectAfterPafAck, reinterpret_cast<intptr_t>(this)));
+        return std::nullopt;
+    }
+#endif
     // Per spec, lingering connections on any other interfaces need to be disconnected at this point.
     for (auto & node : sInstances)
     {
@@ -840,6 +904,30 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (commandHandle == nullptr)
     {
+#if CHIP_DEVICE_CONFIG_WIFIPAF_EARLY_CONNECT_NETWORK_RESPONSE
+        if (mConnectNetworkResponseSentEarly)
+        {
+            if (commissioningError == Status::kSuccess)
+            {
+                TEMPORARY_RETURN_IGNORED mClusterContext.deviceControlServer.PostConnectedToOperationalNetworkEvent(
+                    ByteSpan(mLastNetworkID, mLastNetworkIDLen));
+                SetLastConnectErrorValue(NullNullable);
+                CommitSavedBreadcrumb();
+            }
+            else
+            {
+                ChipLogError(NetworkProvisioning,
+                             "WiFi-PAF early-response: association reported error %u after Success was sent; "
+                             "failsafe-expiry will recover",
+                             chip::to_underlying(commissioningError));
+                SetLastConnectErrorValue(MakeNullable(interfaceStatus));
+            }
+            SetLastNetworkId(ByteSpan{ mConnectingNetworkID, mConnectingNetworkIDLen });
+            SetLastNetworkingStatusValue(MakeNullable(commissioningError));
+            mConnectNetworkResponseSentEarly = false;
+            return;
+        }
+#endif
         // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
