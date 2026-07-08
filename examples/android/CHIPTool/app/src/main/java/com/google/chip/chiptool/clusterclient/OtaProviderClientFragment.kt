@@ -503,7 +503,11 @@ class OtaProviderClientFragment : Fragment() {
 
     val devicePtr =
       try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId, enableLargePayload)
+        ChipClient.getConnectedDevicePointer(
+          requireContext(),
+          addressUpdateFragment.deviceId,
+          enableLargePayload
+        )
       } catch (e: IllegalStateException) {
         Log.d(TAG, "getConnectedDevicePointer exception", e)
         showMessage("Get DevicePointer fail!")
