@@ -17,7 +17,6 @@ import io
 import sys
 import unittest
 from pathlib import Path
-from typing import Union
 
 try:
     from matter.idl.zapxml import ParseSource, ParseXmls
@@ -30,7 +29,7 @@ from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQu
                                          Idl, Struct, StructQuality, StructTag)
 
 
-def XmlToIdl(what: Union[str, list[str]]) -> Idl:
+def XmlToIdl(what: str | list[str]) -> Idl:
     if not isinstance(what, list):
         what = [what]
 

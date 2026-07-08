@@ -550,7 +550,13 @@ class HostBuilder(GnBuilder):
         if use_msan:
             if not runner.dry_run:
                 _msan_validate_sysroot(chip_root)
-            self.extra_gn_options.append('is_msan=true')
+            if fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+                # pw_fuzzer FuzzTest targets build in the chip_pw_fuzztest secondary toolchain,
+                # which does not consume chip's global is_msan/sanitize_default. Drive MSAN via
+                # the toolchain arg instead (it swaps pigweed's ASan for chip's sanitize_memory).
+                self.extra_gn_options.append('chip_pw_fuzz_msan=true')
+            else:
+                self.extra_gn_options.append('is_msan=true')
             # Tell GN to build against the same sysroot we just validated.
             self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 

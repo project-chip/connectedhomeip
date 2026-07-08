@@ -36,8 +36,6 @@ namespace DeviceLayer {
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
-    static DiagnosticDataProviderImpl & GetDefaultInstance();
-
     // ===== Methods that implement the PlatformManager abstract interface.
 
     bool SupportsWatermarks() override { return true; }
