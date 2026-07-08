@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "CodegenIntegration.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
@@ -23,7 +24,6 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DefaultTimerDelegate.h>
-#include "CodegenIntegration.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -47,8 +47,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        AmbientContextSensingCluster::Config config(
-            AmbientContextSensing::AllocateDelegate(), gDefaultTimerDelegate);
+        AmbientContextSensingCluster::Config config(AmbientContextSensing::AllocateDelegate(), gDefaultTimerDelegate);
         config.WithFeatures(BitMask<AmbientContextSensing::Feature>(featureMap));
         config.WithOptionalAttributes(optionalAttributeBits);
         constexpr chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
