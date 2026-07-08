@@ -406,39 +406,3 @@ def get_per_group_multicast_address(fabric_id: int, group_id: int) -> bytes:
     # Combine all portions into 128-bit address
     addr_int = (prefix_scope_plen << 96) | (network_prefix << 32) | group_id_field
     return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
-    return ipaddress.IPv6Address(addr_int).packed
