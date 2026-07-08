@@ -19,7 +19,6 @@ MANUAL_ALLOWLIST:
     - chip-ota.xml
     - chip-types.xml
     - clusters-extensions.xml
-    - content-launch-cluster.xml
     - fault-injection-cluster.xml
     - global-attributes.xml
     - global-bitmaps.xml

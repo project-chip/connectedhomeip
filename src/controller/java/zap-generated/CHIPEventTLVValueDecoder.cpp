@@ -10744,6 +10744,43 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::ContentLauncher;
         switch (aPath.mEventId)
         {
+        case Events::ContentReplication::Id: {
+            Events::ContentReplication::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_status;
+            std::string value_statusClassName     = "java/lang/Integer";
+            std::string value_statusCtorSignature = "(I)V";
+            jint jnivalue_status                  = static_cast<jint>(cppValue.status);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_statusClassName.c_str(), value_statusCtorSignature.c_str(), jnivalue_status, value_status);
+
+            jclass contentReplicationStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ContentLauncherClusterContentReplicationEvent",
+                contentReplicationStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ContentLauncherClusterContentReplicationEvent");
+                return nullptr;
+            }
+
+            jmethodID contentReplicationStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, contentReplicationStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;)V", &contentReplicationStructCtor);
+            if (err != CHIP_NO_ERROR || contentReplicationStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ContentLauncherClusterContentReplicationEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(contentReplicationStructClass, contentReplicationStructCtor, value_status);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
