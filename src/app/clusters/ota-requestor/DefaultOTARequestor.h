@@ -119,10 +119,7 @@ public:
         return mAttributes ? mAttributes->GetDefaultOtaProviderListIterator() : ProviderLocationList::Iterator(nullptr, 0);
     }
 
-    void SetLargePayload(bool supportLargePayload)
-    {
-        mSupportLargePayload = supportLargePayload;
-    }
+    void SetLargePayload(bool supportLargePayload) { mSupportLargePayload = supportLargePayload; }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,

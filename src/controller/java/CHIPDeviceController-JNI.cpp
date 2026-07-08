@@ -1485,7 +1485,8 @@ JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(commissioneeDevice);
 }
 
-JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jboolean allowLargePayload, jlong callbackHandle)
+JNI_METHOD(void, getConnectedDevicePointer)
+(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jboolean allowLargePayload, jlong callbackHandle)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -1493,8 +1494,9 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
     VerifyOrExit(connectedDeviceCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    err = wrapper->Controller()->GetConnectedDevice(static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess,
-                                                    &connectedDeviceCallback->mOnFailure, allowLargePayload == JNI_TRUE ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload);
+    err = wrapper->Controller()->GetConnectedDevice(
+        static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure,
+        allowLargePayload == JNI_TRUE ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload);
 exit:
     if (err != CHIP_NO_ERROR)
     {

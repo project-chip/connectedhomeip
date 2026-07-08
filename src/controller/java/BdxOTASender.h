@@ -22,7 +22,7 @@
 #include <protocols/bdx/BdxUri.h>
 #include <protocols/bdx/TransferFacilitator.h>
 
-constexpr uint32_t kMaxBDXURILen = 256;
+constexpr uint32_t kMaxBDXURILen        = 256;
 constexpr uint16_t kDefaultBdxBlockSize = 1024;
 
 class BdxOTASender : public chip::bdx::Responder
@@ -34,7 +34,8 @@ public:
 
     CHIP_ERROR PrepareForTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
-    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeMgr, uint16_t maxBDXBlockSize = kDefaultBdxBlockSize);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeMgr,
+                    uint16_t maxBDXBlockSize = kDefaultBdxBlockSize);
 
     CHIP_ERROR Shutdown();
 

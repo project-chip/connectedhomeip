@@ -48,7 +48,8 @@ CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId node
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
 
-    chip::Optional<SessionHandle> sessionHandle = mExchangeMgr->GetSessionManager()->FindSecureSessionForNode(chip::ScopedNodeId(nodeId, fabricIndex));
+    chip::Optional<SessionHandle> sessionHandle =
+        mExchangeMgr->GetSessionManager()->FindSecureSessionForNode(chip::ScopedNodeId(nodeId, fabricIndex));
     if (!sessionHandle.HasValue())
     {
         return CHIP_ERROR_INCORRECT_STATE;
