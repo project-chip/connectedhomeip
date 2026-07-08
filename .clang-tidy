@@ -1,6 +1,20 @@
 ---
+# NOTE: `Checks:` below is a YAML folded block scalar, so `#` is NOT a comment there
+# (it becomes literal text parsed as a check glob). Keep rationale here, above the block.
+#
+# clang-analyzer checks intentionally left disabled (false-positive-only on this codebase;
+# enabling them would require ongoing NOLINTs for zero real findings):
+#   - clang-analyzer-cplusplus.Move: only fires on intentional moved-from-state test
+#     assertions (already NOLINTed for bugprone-use-after-move) plus a TLVReader.h false positive.
+#   - clang-analyzer-cplusplus.NewDeleteLeaks: std::function / self-deleting-callback lifetimes
+#     that the analyzer cannot model (e.g. controller InvokeInteraction/ReadInteraction templates).
 Checks: >
   bugprone-*,
+  clang-analyzer-core.*,
+  clang-analyzer-cplusplus.*,
+  clang-analyzer-security*,
+  clang-analyzer-unix.Malloc,
+  cppcoreguidelines-virtual-class-destructor,
   modernize-redundant-void-arg,
   modernize-use-bool-literals,
   modernize-use-nullptr,
@@ -17,7 +31,6 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   -bugprone-forward-declaration-namespace,
   -bugprone-forwarding-reference-overload,
-  -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-inc-dec-in-conditions,
   -bugprone-macro-parentheses,
   -bugprone-misplaced-widening-cast,
@@ -32,21 +45,17 @@ Checks: >
   -bugprone-switch-missing-default-case,
   -bugprone-undelegated-constructor,
   -bugprone-unused-return-value,
-  -clang-analyzer-core.CallAndMessage,
-  -clang-analyzer-core.NonNullParamChecker,
-  -clang-analyzer-core.NullDereference,
   -clang-analyzer-cplusplus.Move,
+  -clang-analyzer-cplusplus.NewDeleteLeaks,
   -clang-analyzer-deadcode.DeadStores,
   -clang-analyzer-nullability.NullablePassedToNonnull,
   -clang-analyzer-optin.core.EnumCastOutOfRange,
   -clang-analyzer-optin.cplusplus.UninitializedObject,
-  -clang-analyzer-optin.cplusplus.VirtualCall,
   -clang-analyzer-optin.osx.cocoa.localizability.EmptyLocalizationContextChecker,
   -clang-analyzer-optin.performance,
   -clang-analyzer-optin.performance.Padding,
   -clang-analyzer-security.insecureAPI.rand,
   -clang-analyzer-security.insecureAPI.strcpy,
-  -clang-analyzer-unix.Malloc,
   -clang-analyzer-webkit.NoUncountedMemberChecker,
   -clang-diagnostic-implicit-int-conversion,
   -clang-diagnostic-missing-template-arg-list-after-template-kw

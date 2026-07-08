@@ -27,9 +27,12 @@
 #include <clusters/AdministratorCommissioning/ClusterId.h>
 #include <clusters/AirQuality/ClusterId.h>
 #include <clusters/AmbientContextSensing/ClusterId.h>
+#include <clusters/AmbientSensingUnion/ClusterId.h>
 #include <clusters/ApplicationBasic/ClusterId.h>
 #include <clusters/ApplicationLauncher/ClusterId.h>
+#include <clusters/AudioControl/ClusterId.h>
 #include <clusters/AudioOutput/ClusterId.h>
+#include <clusters/AvAnalysis/ClusterId.h>
 #include <clusters/BallastConfiguration/ClusterId.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <clusters/Binding/ClusterId.h>
@@ -46,6 +49,7 @@
 #include <clusters/ClosureDimension/ClusterId.h>
 #include <clusters/ColorControl/ClusterId.h>
 #include <clusters/CommissionerControl/ClusterId.h>
+#include <clusters/CommissioningProxy/ClusterId.h>
 #include <clusters/CommodityMetering/ClusterId.h>
 #include <clusters/CommodityPrice/ClusterId.h>
 #include <clusters/CommodityTariff/ClusterId.h>
@@ -61,6 +65,7 @@
 #include <clusters/DoorLock/ClusterId.h>
 #include <clusters/DynamicLighting/ClusterId.h>
 #include <clusters/EcosystemInformation/ClusterId.h>
+#include <clusters/ElectricalAlarm/ClusterId.h>
 #include <clusters/ElectricalDistribution/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalGridConditions/ClusterId.h>
@@ -94,6 +99,7 @@
 #include <clusters/LevelControl/ClusterId.h>
 #include <clusters/LocalizationConfiguration/ClusterId.h>
 #include <clusters/LowPower/ClusterId.h>
+#include <clusters/MediaFileManagement/ClusterId.h>
 #include <clusters/MediaInput/ClusterId.h>
 #include <clusters/MediaPlayback/ClusterId.h>
 #include <clusters/Messages/ClusterId.h>
@@ -144,7 +150,9 @@
 #include <clusters/Switch/ClusterId.h>
 #include <clusters/TargetNavigator/ClusterId.h>
 #include <clusters/TemperatureControl/ClusterId.h>
+#include <clusters/TemperatureControlledCabinetTopology/ClusterId.h>
 #include <clusters/TemperatureMeasurement/ClusterId.h>
+#include <clusters/TestHiddenManufacturerSpecific/ClusterId.h>
 #include <clusters/Thermostat/ClusterId.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/ClusterId.h>
 #include <clusters/ThreadBorderRouterManagement/ClusterId.h>

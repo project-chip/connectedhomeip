@@ -48,6 +48,7 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -690,6 +691,20 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
                                        resolutionData);
 }
 
+CHIP_ERROR DeviceCommissioner::GetLastThreadMeshcopDiscoveryDiagnosticJson(char * buffer, size_t bufferSize)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    VerifyOrReturnError(buffer != nullptr && bufferSize > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const std::string json = mThreadMeshcopCommissionProxy.GetLastDiscoveryDiagnosticJson();
+    VerifyOrReturnError(json.size() < bufferSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    Platform::CopyString(buffer, bufferSize, json.c_str());
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
+}
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
                                           Optional<Dnssd::CommonResolutionData> resolutionData)
 {
@@ -904,15 +919,19 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                             params.GetPeerAddress().GetRemoteId());
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
-            const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
-            VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
-                                ChipLogError(Controller, "Error, Long discriminator is required"));
+            auto setupDiscriminator                             = params.GetSetupDiscriminator();
+            VerifyOrExit(setupDiscriminator.has_value(), ChipLogError(Controller, "WiFi-PAF: Missing setup discriminator");
+                         err = CHIP_ERROR_INVALID_ARGUMENT);
+            const SetupDiscriminator connDiscriminator(setupDiscriminator.value());
+            VerifyOrExit(!connDiscriminator.IsShortDiscriminator(),
+                         ChipLogError(Controller, "Error, Long discriminator is required");
+                         err = CHIP_ERROR_INVALID_ARGUMENT);
             uint16_t discriminator              = connDiscriminator.GetLongValue();
             WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
-            ReturnErrorOnFailure(
-                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+            SuccessOrExit(err = DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo,
+                                                                                           sessionInfo));
             ExitNow(err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
                                                                           OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
         }

@@ -65,6 +65,12 @@ config CHIP_DEVICE_USE_TEST_PAIRING_CODE
 		Use a default pairing code if one hasn't been provisioned in flash.
 		(Macro value is in quotes.)
 
+config CHIP_SE05X
+	bool "Enable Secure Element support"
+	select SE05X_LIB
+	help
+		Enable SE05x Secure element for offloading crypto operations.
+
 config CHIP_NXP_CRYPTO_IMPL
 	string "NXP Crypto Implementation chosen"
 	default "se05x" if CHIP_SE05X
@@ -260,5 +266,15 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	  Enables the generation of a random Rotating device ID unique ID.
 
 endif #CHIP_FACTORY_DATA_BUILD
+
+config CHIP_DIAGNOSTIC_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
+	bool "Custom diagnostic data provider singleton implementation"
+	help
+		Allows to use a custom diagnostic data provider singleton implementation.
+		If enabled, the user must define GetDiagnosticDataProviderImpl() returning
+		a DiagnosticDataProvider reference. The platform default singleton wrapper
+		is not compiled, but DiagnosticDataProviderImpl remains available as a base class.
+		This is useful when an application needs to customize the diagnostic
+		data provider behavior, for example to override GetActiveHardwareFaults().
 
 endif # CHIP

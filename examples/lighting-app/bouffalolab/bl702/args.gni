@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,3 +33,9 @@ pw_build_LINK_DEPS = [
   "$dir_pw_log:impl",
 ]
 chip_app_data_model_target = "//:bouffalolab-lighting"
+shell_use_all_clusters_data_model = false
+
+openthread_project_include_dirs = [
+  "${chip_root}/examples/lighting-app/bouffalolab/bl702",
+  "${bouffalolab_iot_sdk_build_root}/repo/components/network/thread/openthread_port/include",
+]

@@ -33,6 +33,21 @@
 #       --timeout 600
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --timeout 600
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -153,18 +168,18 @@ class TC_FAN_3_1(MatterBaseTest):
     def log_scenario(self, attr_to_update, value_range, order) -> None:
         # Logging support info
         log.info("[FC] ====================================================================")
-        log.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
-        log.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
+        log.info("[FC] *** Supported fan modes: %s", self.fan_mode_sequence.name)
+        log.info("[FC] *** MultiSpeed feature supported: %s", self.supports_multispeed)
 
         # Logging initial FanMode state
         init_fan_mode = "Off" if order == OrderEnum.Ascending else "High"
-        log.info(f"[FC] *** Initial FanMode: {init_fan_mode}")
+        log.info("[FC] *** Initial FanMode: %s", init_fan_mode)
 
         # Logging the scenario being tested
         attr_to_verify = "FanMode" if attr_to_update == Clusters.FanControl.Attributes.PercentSetting else "PercentSetting, PercentCurrent"
         speed_setting_scenario = ", SpeedSetting, and SpeedCurrent" if self.supports_multispeed else ""
-        log.info(f"[FC] *** Update {attr_to_update.__name__} {order.name}, verify {attr_to_verify}{speed_setting_scenario}")
-        log.info(f"[FC] *** Value range to update: {value_range[0]} - {value_range[-1]}")
+        log.info("[FC] *** Update %s %s, verify %s%s", attr_to_update.__name__, order.name, attr_to_verify, speed_setting_scenario)
+        log.info("[FC] *** Value range to update: %s - %s", value_range[0], value_range[-1])
         log.info("[FC]")
 
     async def subscribe_to_attributes(self) -> None:
@@ -188,9 +203,9 @@ class TC_FAN_3_1(MatterBaseTest):
 
     def log_results(self) -> None:
         for sub in self.subscriptions:
-            log.info(f"[FC] - {sub._expected_attribute.__name__} Sub -")
+            log.info("[FC] - %s Sub -", sub._expected_attribute.__name__)
             for q in sub.attribute_queue.queue:
-                log.info(f"[FC] {q.attribute.__name__}: {q.value}")
+                log.info("[FC] %s: %s", q.attribute.__name__, q.value)
             log.info("[FC]")
 
     def verify_attribute_progression(self, order) -> None:

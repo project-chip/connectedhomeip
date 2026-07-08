@@ -29,9 +29,12 @@
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AirQuality/Enums.h>
 #include <clusters/AmbientContextSensing/Enums.h>
+#include <clusters/AmbientSensingUnion/Enums.h>
 #include <clusters/ApplicationBasic/Enums.h>
 #include <clusters/ApplicationLauncher/Enums.h>
+#include <clusters/AudioControl/Enums.h>
 #include <clusters/AudioOutput/Enums.h>
+#include <clusters/AvAnalysis/Enums.h>
 #include <clusters/BallastConfiguration/Enums.h>
 #include <clusters/BasicInformation/Enums.h>
 #include <clusters/Binding/Enums.h>
@@ -48,6 +51,7 @@
 #include <clusters/ClosureDimension/Enums.h>
 #include <clusters/ColorControl/Enums.h>
 #include <clusters/CommissionerControl/Enums.h>
+#include <clusters/CommissioningProxy/Enums.h>
 #include <clusters/CommodityMetering/Enums.h>
 #include <clusters/CommodityPrice/Enums.h>
 #include <clusters/CommodityTariff/Enums.h>
@@ -63,6 +67,7 @@
 #include <clusters/DoorLock/Enums.h>
 #include <clusters/DynamicLighting/Enums.h>
 #include <clusters/EcosystemInformation/Enums.h>
+#include <clusters/ElectricalAlarm/Enums.h>
 #include <clusters/ElectricalDistribution/Enums.h>
 #include <clusters/ElectricalEnergyMeasurement/Enums.h>
 #include <clusters/ElectricalGridConditions/Enums.h>
@@ -96,6 +101,7 @@
 #include <clusters/LevelControl/Enums.h>
 #include <clusters/LocalizationConfiguration/Enums.h>
 #include <clusters/LowPower/Enums.h>
+#include <clusters/MediaFileManagement/Enums.h>
 #include <clusters/MediaInput/Enums.h>
 #include <clusters/MediaPlayback/Enums.h>
 #include <clusters/Messages/Enums.h>
@@ -146,7 +152,9 @@
 #include <clusters/Switch/Enums.h>
 #include <clusters/TargetNavigator/Enums.h>
 #include <clusters/TemperatureControl/Enums.h>
+#include <clusters/TemperatureControlledCabinetTopology/Enums.h>
 #include <clusters/TemperatureMeasurement/Enums.h>
+#include <clusters/TestHiddenManufacturerSpecific/Enums.h>
 #include <clusters/Thermostat/Enums.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/Enums.h>
 #include <clusters/ThreadBorderRouterManagement/Enums.h>

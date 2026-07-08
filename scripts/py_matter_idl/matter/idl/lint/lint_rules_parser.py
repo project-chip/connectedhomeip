@@ -17,7 +17,7 @@ import os
 import xml.etree.ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import MutableMapping, Optional, Union
+from typing import MutableMapping, Optional
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
@@ -67,7 +67,7 @@ class ClusterActionEnum(Enum):
 @dataclass
 class ServerClusterRequirement:
     action: ClusterActionEnum
-    id: Union[str, int]
+    id: str | int
 
 
 def _isRequired(attr: xml.etree.ElementTree.Element) -> bool:
@@ -315,7 +315,7 @@ class LintRulesTransformer(Transformer):
     def instruction(self, instruction):
         return Discard
 
-    def all_endpoint_rule(self, rules: list[Union[AttributeRequirement, ClusterAttributeDeny]]):
+    def all_endpoint_rule(self, rules: list[AttributeRequirement | ClusterAttributeDeny]):
         for rule in rules:
             if type(rule) is AttributeRequirement:
                 self.context.RequireAttribute(rule)

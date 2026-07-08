@@ -275,7 +275,7 @@ class TC_GC_2_7(MatterBaseTest):
         else:
             self.step(11)
             # Use TH1 to remove TH2's fabric
-            logger.info(f"Cleaning up: Removing TH2 fabric at index {self.th2.fabricId}")
+            logger.info("Cleaning up: Removing TH2 fabric at index %s", self.th2.fabricId)
             await self.th1.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=0,

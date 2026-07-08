@@ -774,9 +774,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Provides an interface for providing OTA software updates */
+/** This cluster implements the Provider role in the OTA process. */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -812,18 +812,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional octet_string<512> metadataForProvider = 7;
+    optional long_octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional char_string<256> imageURI = 2;
+    optional long_char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional octet_string<512> metadataForRequestor = 7;
+    optional long_octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -841,17 +841,17 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Determine availability of a new Software Image */
+  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** Determine next action to take for a downloaded Software Image */
+  /** This command requests the specified version be installed on the device. */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** Notify OTA Provider that an update was applied */
+  /** This command tells the Provider that the specified update has been applied. */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
+/** This cluster implements the Requestor role in the OTA process. */
 cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
@@ -918,11 +918,11 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
     AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
+    optional long_octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  /** Announce the presence of an OTA Provider */
+  /** This command MAY be invoked by Administrators to announce the presence of a particular OTA Provider. */
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
@@ -2331,7 +2331,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2370,7 +2370,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -2566,7 +2565,7 @@ cluster ZoneManagement = 1360 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 2;
+  revision 3;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -2606,6 +2605,7 @@ cluster PushAvStreamTransport = 1365 {
     kCommand = 0;
     kMotion = 1;
     kContinuous = 2;
+    kAmbientContext = 3;
   }
 
   enum TriggerActivationReasonEnum : enum8 {
@@ -2654,10 +2654,8 @@ cluster PushAvStreamTransport = 1365 {
     CMAFInterfaceEnum CMAFInterface = 0;
     int16u segmentDuration = 1;
     int16u chunkDuration = 2;
-    int8u sessionGroup = 3;
-    char_string<16> trackName = 4;
-    optional octet_string<16> CENCKey = 5;
-    optional octet_string<16> CENCKeyID = 6;
+    optional int8u sessionGroup = 3;
+    optional char_string<16> trackName = 4;
     optional boolean metadataEnabled = 7;
   }
 
@@ -2696,13 +2694,13 @@ cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TransportTriggerTypeEnum triggerType = 1;
     optional TriggerActivationReasonEnum activationReason = 2;
-    ContainerFormatEnum containerType = 3;
+    optional ContainerFormatEnum containerType = 3;
     optional int64u CMAFSessionNumber = 4;
   }
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    ContainerFormatEnum containerType = 1;
+    optional ContainerFormatEnum containerType = 1;
     optional int64u CMAFSessionNumber = 2;
   }
 
@@ -3010,7 +3008,7 @@ internal cluster FaultInjection = 4294048774 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 4;
+  device type ma_rootdevice = 22, version 5;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;

@@ -23,9 +23,6 @@ declare_args() {
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   sl_wfx_config_softap = false
 
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = true
-
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -75,11 +72,6 @@ config("wifi-platform-config") {
 
   if (chip_enable_wifi_ipv4) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
-  }
-
-  if (rs91x_wpa3_transition) {
-    # TODO: Change this macro once WF200 support is provided
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
   }
 
   # TODO: This defines needs to be here for the spi_multiplex.h configuration header.

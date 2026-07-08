@@ -211,7 +211,9 @@ def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str, port: int)
 def _DiscoverFailure(fabric: int, node: int, errorCode: PyChipError):
     # Many discovery errors currently do not include a useful node/fabric id
     # hence we just log and rely on discovery timeouts to return 'no data'
-    LOGGER.error("Discovery failure, error %d", errorCode.code)
+
+    # We need to eagerly convert to int as specified in PyChipError docstring.
+    LOGGER.error("Discovery failure, error %d", int(errorCode.code))
 
 
 def FindAddressAsync(fabricId: int, nodeId: int, callback, timeoutMs=1000):
