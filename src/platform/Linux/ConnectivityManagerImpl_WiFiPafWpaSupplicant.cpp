@@ -230,20 +230,24 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, no valid session with discriminator: %u", pPublishSSI->DevInfo);
         return;
     }
+    // The connect and background-scan discovery handlers are both connected to the
+    // shared "nandiscovery-result" signal, so GLib delivers every discovery to both.
+    // Act only on discovery for THIS session's own subscribe (pPafInfo->id was set to
+    // the connect subscribe_id in _WiFiPAFSubscribe); a (possibly stale) background-
+    // scan subscribe cross-fires here and must not hijack or overwrite the connect
+    // session — before or after it is established.  Matching on subscribe_id rather
+    // than on "peer_id already set" keeps a legitimate re-discovery on the connect's
+    // own (re)subscribe working for the controller path.
+    if (pPafInfo->id != subscribe_id)
+    {
+        ChipLogDetail(DeviceLayer, "WiFi-PAF: DiscoveryResult, subscribe_id=%u not for this session (id=%u), ignoring",
+                      subscribe_id, pPafInfo->id);
+        return;
+    }
     if (pPafInfo->peer_id != UINT32_MAX)
     {
-        // Session already established — ignore all subsequent discovery events,
-        // including those from a stale background-scan subscribe whose cancel has
-        // not yet taken effect in wpa_supplicant.
-        if (pPafInfo->id == subscribe_id)
-        {
-            ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, reentrance, subscribe_id: %u", subscribe_id);
-        }
-        else
-        {
-            ChipLogDetail(DeviceLayer, "WiFi-PAF: DiscoveryResult, session active (peer_id=%u), ignoring stale subscribe_id=%u",
-                          pPafInfo->peer_id, subscribe_id);
-        }
+        // Reentrance: a duplicate discovery for our own, already-established session.
+        ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, reentrance, subscribe_id: %u", subscribe_id);
         return;
     }
     if (srv_proto_type != nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER)
