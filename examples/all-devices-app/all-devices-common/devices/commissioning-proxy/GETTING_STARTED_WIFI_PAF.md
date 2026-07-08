@@ -1,8 +1,8 @@
 # Getting Started: Wi-Fi PAF for the Commissioning Proxy
 
 This guide is a self-contained walkthrough for getting the **Commissioning Proxy
-(CP)** device in `all-devices-app` working over **Wi-Fi PAF** (Wi-Fi Aware /
-NAN — Neighbor Awareness Networking).
+(CP)** device in `all-devices-app` working over **Wi-Fi PAF** (Wi-Fi Aware / NAN
+— Neighbor Awareness Networking).
 
 The Commissioning Proxy tunnels commissioning traffic between a Commissioner
 (chip-tool) and a Commissionee that the Commissioner cannot reach directly:
@@ -11,10 +11,11 @@ The Commissioning Proxy tunnels commissioning traffic between a Commissioner
 chip-tool  ──Matter (TCP/IP)──►  all-devices-app (CP)  ──Wi-Fi PAF (NAN)──►  Commissionee
 ```
 
-Wi-Fi PAF is one of the transports the CP device can be built with (BLE is another). Both are compiled in by default on Linux; the transport used to reach a
-commissionee is chosen **per command** by the `Transport` field of the request,
-not by a command-line flag. This guide covers Wi-Fi PAF end to end — everything
-you need to do to make PAF work, from hardware to a completed
+Wi-Fi PAF is one of the transports the CP device can be built with (BLE is
+another). Both are compiled in by default on Linux; the transport used to reach
+a commissionee is chosen **per command** by the `Transport` field of the
+request, not by a command-line flag. This guide covers Wi-Fi PAF end to end —
+everything you need to do to make PAF work, from hardware to a completed
 commission-through-proxy.
 
 <hr>
@@ -40,10 +41,10 @@ commission-through-proxy.
 Wi-Fi PAF needs a radio and driver that support **NAN USD** (Wi-Fi Aware
 Unsynchronized Service Discovery). Both the proxy and the commissionee need it.
 
-| Role                      | Requirement                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------- |
-| Commissioning Proxy (DUT) | Linux host (e.g. Raspberry Pi 4/5) with a **USB Wi-Fi dongle that supports NAN USD.** See https://groups.csa-iot.org/wg/members-all/document/44361          |
-| End Device (commissionee) | Same NAN-USD-capable USB Wi-Fi dongle requirement                                                 |
+| Role                      | Requirement                                                                                                                                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Commissioning Proxy (DUT) | Linux host (e.g. Raspberry Pi 4/5) with a **USB Wi-Fi dongle that supports NAN USD.** See https://groups.csa-iot.org/wg/members-all/document/44361 |
+| End Device (commissionee) | Same NAN-USD-capable USB Wi-Fi dongle requirement                                                                                                  |
 
 > The **on-board Raspberry Pi Wi-Fi does not support NAN USD** and cannot be
 > used for Wi-Fi PAF. The USB dongle must be the interface wpa_supplicant
@@ -240,12 +241,12 @@ PAF channel, permitted in all regulatory regions:
     --discriminator 3947
 ```
 
-| Argument                       | Description                                                                                    |
-| ------------------------------ | ---------------------------------------------------------------------------------------------- |
-| `--device commissioning-proxy:5` | Instantiate the CP device on endpoint 5                                                        |
-| `--wifi`                       | Enable Wi-Fi management via wpa_supplicant (required for PAF)                                   |
-| `--wifipaf "freq_list=<MHz>"`  | NAN operating frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz      |
-| `--discriminator <value>`      | 12-bit value identifying the proxy during its own commissioning                                |
+| Argument                         | Description                                                                               |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `--device commissioning-proxy:5` | Instantiate the CP device on endpoint 5                                                   |
+| `--wifi`                         | Enable Wi-Fi management via wpa_supplicant (required for PAF)                             |
+| `--wifipaf "freq_list=<MHz>"`    | NAN operating frequencies in MHz. `2437` = channel 6 (2.4 GHz); add e.g. `5745` for 5 GHz |
+| `--discriminator <value>`        | 12-bit value identifying the proxy during its own commissioning                           |
 
 The `WiFiBand` attribute advertised by the cluster is derived from `freq_list`
 at startup: 2412–2484 MHz → 2.4 GHz, 5035–5980 MHz → 5 GHz. If no valid
@@ -375,23 +376,23 @@ accessors. See
 for the full design.
 
 For Wi-Fi PAF the driver is `CommissioningProxyPafTransport`
-(`GetTransportType()` returns `kWiFiPAF`). It bridges the cluster to the platform
-Wi-Fi PAF layer:
+(`GetTransportType()` returns `kWiFiPAF`). It bridges the cluster to the
+platform Wi-Fi PAF layer:
 
--   `Connect()` → `ConnectivityMgr().WiFiPAFSubscribe()` to open a NAN session to
-    the discriminator of the commissionee.
+-   `Connect()` → `ConnectivityMgr().WiFiPAFSubscribe()` to open a NAN session
+    to the discriminator of the commissionee.
 -   `SendMessage()` → `WiFiPAFLayer::SendMessage()` to tunnel a commissioning
     packet over PAFTP (the PAFTP endpoint, not the raw NAN transmit).
--   `Scan()` / `BgScanStart()` / `BgScanStop()` →
-    `WiFiPAFScan()` / `WiFiPAFStartBackgroundScan()` / `WiFiPAFStopBackgroundScan()`.
+-   `Scan()` / `BgScanStart()` / `BgScanStop()` → `WiFiPAFScan()` /
+    `WiFiPAFStartBackgroundScan()` / `WiFiPAFStopBackgroundScan()`.
 -   `Disconnect()` / `CancelPendingConnect()` → `RmPafSession()` and
     `WiFiPAFCancelSubscribe()` / `WiFiPAFCancelIncompleteSubscribe()` to release
     the session.
 
 The driver is registered in `CommissioningProxyDevice::Register()`, guarded by
 `#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF`, which also sets the
-`WiFiNetworkInterface` cluster feature and derives the advertised `WiFiBand` from
-`--wifipaf freq_list=`.
+`WiFiNetworkInterface` cluster feature and derives the advertised `WiFiBand`
+from `--wifipaf freq_list=`.
 
 <hr>
 
@@ -413,8 +414,8 @@ The driver is registered in `CommissioningProxyDevice::Register()`, guarded by
 The proxy waited for the connect timeout on the NAN session and gave up. Common
 causes:
 
--   The End Device is not running or is on a different NAN channel — confirm both
-    sides use the same `freq_list`.
+-   The End Device is not running or is on a different NAN channel — confirm
+    both sides use the same `freq_list`.
 -   The End Device host also needs a NAN-capable USB Wi-Fi dongle.
 -   The NAN frequency is not allowed by the regulatory domain. `freq_list=2437`
     (channel 6, 2.4 GHz) is permitted everywhere.
