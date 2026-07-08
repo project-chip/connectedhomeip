@@ -19,6 +19,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyBgScanRegistry.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <clusters/CommissioningProxy/Commands.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -78,38 +79,15 @@ static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sHos
 static bool sScanInProgress = false;
 
 // ------------------------------------------------------------------
-// Background scan state — PAF only for now.
+// Background scan (PAF).
+//
+// The transport-agnostic per-fabric bookkeeping (records, lifetime timers,
+// Start/Stop transport/band arithmetic, paused/deferred state) lives in the
+// shared CommissioningProxyBgScanRegistry; this transport supplies only the PAF
+// hardware start/stop/clear hooks (PafBgScanHardware below).  The single NAN
+// subscribe slot is shared with the connect subscribe, so StartHardwareScan
+// reports BUSY while a ProxyConnect is in flight and the registry defers/resumes.
 // ------------------------------------------------------------------
-
-struct FabricKey
-{
-    chip::FabricIndex fabricIndex;
-    chip::NodeId nodeId;
-    bool operator<(const FabricKey & o) const
-    {
-        if (fabricIndex != o.fabricIndex)
-        {
-            return fabricIndex < o.fabricIndex;
-        }
-        return nodeId < o.nodeId;
-    }
-};
-
-struct FabricLifetimeCtx
-{
-    FabricKey key;
-};
-
-struct FabricScanRecord
-{
-    chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport;
-    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands;
-    FabricLifetimeCtx * lifetimeCtx = nullptr;
-};
-
-static std::map<FabricKey, FabricScanRecord> sBgScanFabrics;
-static bool sBgScanPaused                                                                  = false;
-static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sBgScanCluster = nullptr;
 
 static ScanResultT MakeScanResult(const chip::DeviceLayer::NanPeerInfo & p)
 {
@@ -143,40 +121,47 @@ static void OnBgScanDiscovery(void * /*ctx*/, const chip::DeviceLayer::NanPeerIn
 {
     // Runs on the Matter event loop (wpa_supplicant NAN callbacks are dispatched
     // there), so the shared cache may be touched directly.
-    if (sBgScanCluster != nullptr)
+    if (sHost != nullptr)
     {
-        sBgScanCluster->ScanCache().Report(MakeScanResult(peer));
+        sHost->ScanCache().Report(MakeScanResult(peer));
     }
 }
 
-static void OnBgScanLifetimeExpiry(chip::System::Layer * /*layer*/, void * appState)
+// ------------------------------------------------------------------
+// Background-scan hardware hooks + shared registry.
+//
+// The registry owns the per-fabric records, lifetime timers, and paused state;
+// this HardwareControl supplies only the PAF-specific start/stop/clear.  The
+// single NAN subscribe slot is shared with the connect subscribe, so
+// StartHardwareScan reports BUSY while a ProxyConnect is in flight — the registry
+// treats that as "defer and resume later" (its paused state).
+// ------------------------------------------------------------------
+class PafBgScanHardware : public CommissioningProxyBgScanRegistry::HardwareControl
 {
-    auto * ctx    = static_cast<FabricLifetimeCtx *>(appState);
-    FabricKey key = ctx->key;
-    delete ctx;
-
-    auto it = sBgScanFabrics.find(key);
-    if (it == sBgScanFabrics.end())
+public:
+    CHIP_ERROR StartHardwareScan() override
     {
-        return;
-    }
-    it->second.lifetimeCtx = nullptr;
-    sBgScanFabrics.erase(it);
-
-    ChipLogProgress(AppServer, "BgScan: lifetime expired for fabricIndex=%u nodeId=0x" ChipLogFormatX64, key.fabricIndex,
-                    ChipLogValueX64(key.nodeId));
-
-    if (sBgScanFabrics.empty())
-    {
-        chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
-        sBgScanPaused = false;
-        if (sBgScanCluster != nullptr)
+        if (sPendingConnect != nullptr)
         {
-            sBgScanCluster->ScanCache().ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
+            // A ProxyConnect owns the single NAN subscribe slot; defer.
+            return CHIP_ERROR_BUSY;
         }
-        sBgScanCluster = nullptr;
+        return chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
     }
-}
+    void StopHardwareScan() override { chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan(); }
+    void ClearCachedResults() override
+    {
+        if (sHost != nullptr)
+        {
+            sHost->ScanCache().ClearTransport(CapabilitiesBitmap::kWiFiPAF);
+        }
+    }
+};
+
+// Declared before the registry so it outlives it (the registry's destructor may
+// call back into these hooks).
+static PafBgScanHardware sPafBgScanHardware;
+static CommissioningProxyBgScanRegistry sBgScan(sPafBgScanHardware);
 
 // ------------------------------------------------------------------
 // WiFiPAFLayerDelegate wrapper.
@@ -559,14 +544,9 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         return chip::Protocols::InteractionModel::Status::Busy;
     }
 
-    // If background scanning is active, pause it so the NAN subscribe slot can be
-    // reused for the PAF connect subscribe; it resumes on OnAllSessionsClosed().
-    if (!sBgScanFabrics.empty() && !sBgScanPaused)
-    {
-        ChipLogProgress(AppServer, "ProxyConnectRequest: pausing background scan");
-        chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
-        sBgScanPaused = true;
-    }
+    // Pause any background scan so the NAN subscribe slot can be reused for the PAF
+    // connect subscribe; the registry resumes it on OnAllSessionsClosed().
+    sBgScan.Pause();
 
     // The WiFiPAF layer is initialized once by the platform ConnectivityManager at
     // startup (ConnectivityManagerImpl::_Init -> WiFiPAFLayer::Init).  Do NOT call
@@ -769,200 +749,21 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
 chip::Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, chip::BitMask<WiFiBandBitmap> wiFiBandsMask,
                                                       chip::FabricIndex fabricIndex, chip::NodeId nodeId)
 {
-    // This driver services the kWiFiPAF transport; the requested bands are recorded
-    // per-fabric so a later stop can match on them.
-    const CapabilitiesBitmap transport = CapabilitiesBitmap::kWiFiPAF;
-    const WiFiBandBitmap wiFiBands     = static_cast<WiFiBandBitmap>(wiFiBandsMask.Raw());
-    FabricKey fabricKey{ fabricIndex, nodeId };
-    bool wasEmpty      = sBgScanFabrics.empty();
-    bool alreadyExists = (sBgScanFabrics.count(fabricKey) > 0);
-
-    if (alreadyExists)
-    {
-        auto & rec = sBgScanFabrics[fabricKey];
-        if (rec.lifetimeCtx != nullptr)
-        {
-            chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanLifetimeExpiry, rec.lifetimeCtx);
-            delete rec.lifetimeCtx;
-            rec.lifetimeCtx = nullptr;
-        }
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: updating timeout for existing fabric");
-    }
-
-    sBgScanFabrics[fabricKey] = FabricScanRecord{ transport, wiFiBands, nullptr };
-    if (sBgScanCluster == nullptr)
-    {
-        sBgScanCluster = sHost;
-    }
-
-    if (sPendingConnect != nullptr)
-    {
-        // A ProxyConnect is in flight and has taken the single NAN subscribe slot
-        // (Connect pauses any background scan for exactly this reason).  Register
-        // this fabric but defer starting the hardware scan, and mark it paused;
-        // starting it now would re-create the subscribe-slot contention the pause
-        // avoids.  If the connect FAILS, FailPendingConnect -> OnAllSessionsClosed
-        // resumes it.  If the connect SUCCEEDS, the session keeps holding the single
-        // subscribe slot for its whole lifetime, so the deferred scan cannot run
-        // until that session closes: it is resumed by OnAllSessionsClosed() on
-        // ProxyDisconnect (dispatcher) or on a peer-initiated close
-        // (WiFiPAFCloseSession) — never while the session is up.
-        sBgScanPaused = true;
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: connect in flight, deferring hardware scan start");
-    }
-    else if (wasEmpty || sBgScanPaused)
-    {
-        CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: WiFiPAFStartBackgroundScan failed: %" CHIP_ERROR_FORMAT,
-                         err.Format());
-            sBgScanFabrics.erase(fabricKey);
-            if (sBgScanFabrics.empty())
-            {
-                sBgScanCluster = nullptr;
-            }
-            return chip::Protocols::InteractionModel::Status::Failure;
-        }
-        sBgScanPaused = false;
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: hardware scan started");
-    }
-    else
-    {
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: hardware scan already running, registering fabric (%zu total)",
-                        sBgScanFabrics.size());
-    }
-
-    if (timeout > 0)
-    {
-        auto * lCtx = new FabricLifetimeCtx{ fabricKey };
-        CHIP_ERROR timerErr =
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeout), OnBgScanLifetimeExpiry, lCtx);
-        if (timerErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: StartTimer failed: %" CHIP_ERROR_FORMAT, timerErr.Format());
-            delete lCtx;
-            sBgScanFabrics.erase(fabricKey);
-            if (sBgScanFabrics.empty())
-            {
-                sBgScanCluster = nullptr;
-                (void) chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
-            }
-            return chip::Protocols::InteractionModel::Status::Failure;
-        }
-        else
-        {
-            sBgScanFabrics[fabricKey].lifetimeCtx = lCtx;
-        }
-    }
-
-    return chip::Protocols::InteractionModel::Status::Success;
+    // This driver services the kWiFiPAF transport.  The registry starts or defers
+    // the hardware scan (StartHardwareScan reports BUSY while a ProxyConnect holds
+    // the single NAN subscribe slot) and records the requested bands per fabric.
+    return sBgScan.Start(fabricIndex, nodeId, chip::BitMask<CapabilitiesBitmap>(CapabilitiesBitmap::kWiFiPAF), wiFiBandsMask,
+                         timeout);
 }
 
 chip::Protocols::InteractionModel::Status BgScanStop(chip::BitMask<CapabilitiesBitmap> transport,
                                                      chip::BitMask<WiFiBandBitmap> wiFiBands, chip::FabricIndex fabricIndex,
                                                      chip::NodeId nodeId)
 {
-    FabricKey fabricKey{ fabricIndex, nodeId };
-    auto it = sBgScanFabrics.find(fabricKey);
-
-    if (it == sBgScanFabrics.end())
-    {
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: no matching fabric record");
-        return chip::Protocols::InteractionModel::Status::NotFound;
-    }
-
-    uint8_t reqTransportBits = transport.Raw();
-    uint16_t reqBandBits     = wiFiBands.Raw();
-    uint8_t fabTransportBits = static_cast<uint8_t>(it->second.transport);
-    uint16_t fabBandBits     = static_cast<uint16_t>(it->second.wiFiBands);
-
-    uint8_t stopTransportBits;
-    uint16_t stopBandBits;
-    if (reqTransportBits == 0)
-    {
-        stopTransportBits = 0;
-        stopBandBits      = reqBandBits & fabBandBits;
-    }
-    else
-    {
-        stopTransportBits = reqTransportBits & fabTransportBits;
-        stopBandBits      = reqBandBits & fabBandBits;
-    }
-
-    if (stopTransportBits == 0 && stopBandBits == 0)
-    {
-        ChipLogProgress(AppServer,
-                        "ProxyBackgroundScanStopRequest: no overlap with started transports/bands (started transport:0x%x "
-                        "bands:0x%x), returning SUCCESS",
-                        fabTransportBits, fabBandBits);
-        return chip::Protocols::InteractionModel::Status::Success;
-    }
-
-    uint8_t remainTransport = fabTransportBits & ~stopTransportBits;
-    uint16_t remainBands    = fabBandBits & ~stopBandBits;
-    bool fabricNowEmpty     = (remainTransport == 0 || remainBands == 0);
-
-    if (fabricNowEmpty)
-    {
-        if (it->second.lifetimeCtx != nullptr)
-        {
-            chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanLifetimeExpiry, it->second.lifetimeCtx);
-            delete it->second.lifetimeCtx;
-            it->second.lifetimeCtx = nullptr;
-        }
-        sBgScanFabrics.erase(it);
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: fabric fully stopped");
-    }
-    else
-    {
-        it->second.transport = static_cast<CapabilitiesBitmap>(remainTransport);
-        it->second.wiFiBands = static_cast<WiFiBandBitmap>(remainBands);
-        ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: fabric partially stopped, remaining transport:0x%x bands:0x%x",
-                        remainTransport, remainBands);
-    }
-
-    bool otherFabricCovers = false;
-    for (const auto & [key, rec] : sBgScanFabrics)
-    {
-        uint8_t ot  = static_cast<uint8_t>(rec.transport);
-        uint16_t ob = static_cast<uint16_t>(rec.wiFiBands);
-        if ((ot & stopTransportBits) != 0 || (ob & stopBandBits) != 0)
-        {
-            otherFabricCovers = true;
-            break;
-        }
-    }
-
-    if (!otherFabricCovers)
-    {
-        if (sBgScanFabrics.empty())
-        {
-            chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
-            if (sBgScanCluster != nullptr)
-            {
-                sBgScanCluster->ScanCache().ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
-            }
-            sBgScanCluster = nullptr;
-            ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: last fabric stopped, hardware scan stopped");
-        }
-        else
-        {
-            ChipLogProgress(AppServer,
-                            "ProxyBackgroundScanStopRequest: stopped bands not covered by other fabrics, "
-                            "%zu fabric(s) scanning other bands",
-                            sBgScanFabrics.size());
-        }
-    }
-    else
-    {
-        ChipLogProgress(AppServer,
-                        "ProxyBackgroundScanStopRequest: %zu other fabric(s) still cover stopped bands, "
-                        "hardware scan continues",
-                        sBgScanFabrics.size());
-    }
-
-    return chip::Protocols::InteractionModel::Status::Success;
+    // The registry applies the spec transport/band overlap semantics (NOT_FOUND for
+    // an unknown fabric, SUCCESS for a non-overlapping request, keep-scanning while
+    // any fabric still covers the transport, stop+clear on the last fabric).
+    return sBgScan.Stop(fabricIndex, nodeId, transport, wiFiBands);
 }
 
 // Resume a paused background scan on the next event-loop iteration.  Deferred via
@@ -972,27 +773,14 @@ chip::Protocols::InteractionModel::Status BgScanStop(chip::BitMask<CapabilitiesB
 // inline would re-enter the WiFiPAF layer mid-teardown and stall the event loop.
 static void ResumeBgScanWork(intptr_t /*arg*/)
 {
-    // A new connect may have started between scheduling and running; if so, leave
-    // the scan paused (it would contend for the single NAN subscribe slot).
-    if (sPendingConnect != nullptr || !sBgScanPaused || sBgScanFabrics.empty())
-    {
-        return;
-    }
-    ChipLogProgress(AppServer, "Resuming background scan");
-    CHIP_ERROR resumeErr = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
-    if (resumeErr == CHIP_NO_ERROR)
-    {
-        sBgScanPaused = false;
-    }
-    else
-    {
-        ChipLogError(AppServer, "Resume background scan failed: %" CHIP_ERROR_FORMAT, resumeErr.Format());
-    }
+    // The registry re-checks whether a connect is now pending (its StartHardwareScan
+    // returns BUSY in that case) and stays paused if so.
+    sBgScan.ResumeIfNeeded();
 }
 
 void OnAllSessionsClosed()
 {
-    if (sBgScanPaused && !sBgScanFabrics.empty())
+    if (sBgScan.IsPaused() && !sBgScan.IsEmpty())
     {
         LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(ResumeBgScanWork, 0));
     }
@@ -1045,26 +833,9 @@ void Shutdown()
         delete ctx;
     }
 
-    // Cancel every outstanding per-fabric lifetime timer and free its context.
-    for (auto & [key, rec] : sBgScanFabrics)
-    {
-        if (rec.lifetimeCtx != nullptr)
-        {
-            chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanLifetimeExpiry, rec.lifetimeCtx);
-            delete rec.lifetimeCtx;
-            rec.lifetimeCtx = nullptr;
-        }
-    }
-
-    // Stop the hardware background scan only if it currently owns the radio.
-    if (!sBgScanFabrics.empty() && !sBgScanPaused)
-    {
-        (void) chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
-    }
-
-    sBgScanFabrics.clear();
-    sBgScanPaused  = false;
-    sBgScanCluster = nullptr;
+    // Tear down the background scan: cancel every per-fabric lifetime timer and stop
+    // the hardware scan if the registry currently owns it.
+    sBgScan.Shutdown();
 
     sProxyWiFiPAFDelegate.Uninstall();
     sHost = nullptr;
