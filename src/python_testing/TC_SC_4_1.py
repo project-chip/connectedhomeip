@@ -64,7 +64,7 @@ import logging
 from typing import Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_valid_cm_key,
+from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_txt_record_present, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
@@ -72,7 +72,7 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
                                           assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_ri_key,
                                           assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
                                           assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
-                                          assert_valid_vp_key, assert_txt_record_present)
+                                          assert_valid_vp_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
 from mobly import asserts
 
@@ -116,11 +116,11 @@ class TC_SC_4_1(MatterBaseTest):
 
 
             TestStep(2, "If supports_icd is true:",
-                         """- TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms
+                     """- TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms
                             - TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature is set, set supports_lit to True. Otherwise set supports_lit to False."""),
 
             TestStep(3, "TH checks if TCP is supported by the PICS.",
-                         "Set supports_tcp_pics to True if supported, otherwise, to False"),
+                     "Set supports_tcp_pics to True if supported, otherwise, to False"),
 
             TestStep(4, "TH determines if the operational TXT record is required.",
                         "If supports_icd or supports_tcp_pics is True, set txt_record_required to True, otherwise set txt_record_required to False."),
@@ -132,10 +132,10 @@ class TC_SC_4_1(MatterBaseTest):
                             - Verify the TXT record is returned and contains at least one key/value pair."""),
 
             TestStep(7, "TH checks if TCP is supported by the DUT.",
-                         "Set supports_tcp_dut to True if supported, otherwise, to False"),
+                     "Set supports_tcp_dut to True if supported, otherwise, to False"),
 
             TestStep(8, "TH checks the setup code type used during commissioning (QR or Manual)",
-                         "Save as setup_code_type"),
+                     "Save as setup_code_type"),
 
             TestStep(9, "TH checks if the Open Basic Commissioning Window command is supported",
                         "Set supports_obcw to True if supported, otherwise, to False"),
@@ -143,10 +143,10 @@ class TC_SC_4_1(MatterBaseTest):
             # OPEN BASIC COMMISSIONING WINDOW
             #
             TestStep(10, """DUT is put in Commissioning Mode using the Open Basic Commissioning Window command if supported (supports_obcw)""",
-                        """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
+                     """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
 
             TestStep(11, """TH gets the discriminator from the DUT and constructs the Discriminator subtype (Long or Short) based on the setup code type (QR or Manual)""",
-                        """If setup code type is QR, construct the 'Long Discriminator Subtype'
+                     """If setup code type is QR, construct the 'Long Discriminator Subtype'
                             - Verify that the discriminator value is a valid 12-bit variable length decimal number in ASCII text, omitting any leading zeros
                             If setup code type is Manual, construct the 'Short Discriminator Subtype'
                             - Verify that the discriminator value is a valid 4-bit variable length decimal number in ASCII text, omitting any leading zeros
@@ -480,13 +480,13 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Verify that the TXT record is returned
         asserts.assert_is_not_none(txt_record,
-                            f"TXT record expected but not found for instance name '{long_discriminator_ptr_instance_name}' "
-                            f"of type '{MdnsServiceType.COMMISSIONABLE.value}'")
+                                   f"TXT record expected but not found for instance name '{long_discriminator_ptr_instance_name}' "
+                                   f"of type '{MdnsServiceType.COMMISSIONABLE.value}'")
 
         # Verify that the TXT record is non-empty
         asserts.assert_greater(len(txt_record.txt), 0,
-                            f"TXT record found but empty for instance name '{long_discriminator_ptr_instance_name}' "
-                            f"of type '{MdnsServiceType.COMMISSIONABLE.value}'")
+                               f"TXT record found but empty for instance name '{long_discriminator_ptr_instance_name}' "
+                               f"of type '{MdnsServiceType.COMMISSIONABLE.value}'")
 
         # Verify that the TXT record's instance name is equal to 'long_discriminator_subtype_ptr_instance_name'
         asserts.assert_equal(txt_record.instance_name, long_discriminator_ptr_instance_name,
