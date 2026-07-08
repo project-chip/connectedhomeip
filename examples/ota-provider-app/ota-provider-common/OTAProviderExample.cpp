@@ -320,9 +320,19 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         if (mBdxOtaSender.InitializeTransfer(commandObj->GetSubjectDescriptor().fabricIndex,
                                              commandObj->GetSubjectDescriptor().subject) == CHIP_NO_ERROR)
         {
+            uint16_t blockSize = mMaxBDXBlockSize;
+            chip::SessionHandle sessionHandle = commandObj->GetExchangeContext()->GetSessionHandle();
+            if (sessionHandle->AllowsLargePayload())
+            {
+                blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxLargeAppMessageLen - kMaxTagLen));
+            }
+            else
+            {
+                blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxAppMessageLen - kMaxTagLen));
+            }
             CHIP_ERROR error =
                 mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                                 mMaxBDXBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
+                                                 blockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Cannot prepare for transfer: %" CHIP_ERROR_FORMAT, error.Format());

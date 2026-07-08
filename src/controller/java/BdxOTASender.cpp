@@ -29,9 +29,6 @@ using namespace chip::app;
 using namespace chip::bdx;
 using Protocols::InteractionModel::Status;
 
-// TODO Expose a method onto the delegate to make that configurable.
-constexpr uint32_t kMaxBdxBlockSize = 1024;
-
 // Since the BDX timeout is 5 minutes and we are starting this after query image is available and before the BDX init comes,
 // we just double the timeout to give enough time for the BDX init to come in a reasonable amount of time.
 constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Seconds16(10 * 60);
@@ -50,10 +47,26 @@ CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId node
     ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
-    return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
+
+    chip::Optional<SessionHandle> sessionHandle = mExchangeMgr->GetSessionManager()->FindSecureSessionForNode(chip::ScopedNodeId(nodeId, fabricIndex));
+    if (!sessionHandle.HasValue())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    uint16_t blockSize = 0;
+    if (sessionHandle.Value()->AllowsLargePayload())
+    {
+        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxLargeAppMessageLen - kMaxTagLen));
+    }
+    else
+    {
+        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxAppMessageLen - kMaxTagLen));
+    }
+    return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, blockSize, kBdxTimeout, kBdxPollIntervalMs);
 }
 
-CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
+CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr, uint16_t maxBDXBlockSize)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -66,6 +79,8 @@ CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeMa
 
     mSystemLayer = systemLayer;
     mExchangeMgr = exchangeMgr;
+
+    mMaxBDXBlockSize = maxBDXBlockSize;
 
     return CHIP_NO_ERROR;
 }
@@ -261,8 +276,6 @@ CHIP_ERROR BdxOTASender::OnBlockQuery(TransferSession::OutputEvent & event)
     {
         bytesToSkip = event.bytesToSkip.BytesToSkip;
     }
-
-    // uint64_t transferGeneration = mTransferGeneration;
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 

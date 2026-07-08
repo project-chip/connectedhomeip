@@ -557,7 +557,7 @@ exit:
     }
 }
 
-JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
+JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate, jint maxBDXBlockSize)
 {
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
@@ -567,7 +567,7 @@ JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, job
     VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Controller, "startOTAProvider() called");
-    err = wrapper->StartOTAProvider(otaProviderDelegate);
+    err = wrapper->StartOTAProvider(otaProviderDelegate, static_cast<uint16_t>(maxBDXBlockSize));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1485,7 +1485,7 @@ JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(commissioneeDevice);
 }
 
-JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
+JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jboolean allowLargePayload, jlong callbackHandle)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -1494,7 +1494,7 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
     VerifyOrExit(connectedDeviceCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     err = wrapper->Controller()->GetConnectedDevice(static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess,
-                                                    &connectedDeviceCallback->mOnFailure);
+                                                    &connectedDeviceCallback->mOnFailure, allowLargePayload == JNI_TRUE ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload);
 exit:
     if (err != CHIP_NO_ERROR)
     {

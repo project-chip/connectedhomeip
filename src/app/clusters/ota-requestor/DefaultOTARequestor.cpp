@@ -366,7 +366,16 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
 
-    mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    chip::Optional<SessionHandle> sessionHandle = mServer->GetSecureSessionManager().FindSecureSessionForNode(chip::ScopedNodeId(mProviderLocation.Value().providerNodeID, mProviderLocation.Value().fabricIndex));
+    bool supportLargePayload = mSupportLargePayload;
+
+    // If a current session exists and it does not support LargePayload, disable LargePayload support.
+    if (sessionHandle.HasValue() && !sessionHandle.Value()->AllowsLargePayload())
+    {
+        supportLargePayload = false;
+    }
+
+    mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback, supportLargePayload ? TransportPayloadCapability::kLargePayload : TransportPayloadCapability::kMRPPayload);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -820,7 +829,14 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
-    initOptions.MaxBlockSize     = mOtaRequestorDriver->GetMaxDownloadBlockSize();
+    if (sessionHandle->AllowsLargePayload())
+    {
+        initOptions.MaxBlockSize = std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(), static_cast<uint16_t>(kMaxLargeAppMessageLen - kMaxTagLen));
+    }
+    else
+    {
+        initOptions.MaxBlockSize = std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(), static_cast<uint16_t>(kMaxAppMessageLen - kMaxTagLen));
+    }
     initOptions.FileDesLength    = static_cast<uint16_t>(mFileDesignator.size());
     initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(mFileDesignator.data());
 

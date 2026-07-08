@@ -119,6 +119,11 @@ public:
         return mAttributes ? mAttributes->GetDefaultOtaProviderListIterator() : ProviderLocationList::Iterator(nullptr, 0);
     }
 
+    void SetLargePayload(bool supportLargePayload)
+    {
+        mSupportLargePayload = supportLargePayload;
+    }
+
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) override;
@@ -356,6 +361,8 @@ private:
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
     SessionHolder mSessionHolder;
+
+    bool mSupportLargePayload = false;
 };
 
 } // namespace chip
