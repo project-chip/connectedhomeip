@@ -965,21 +965,36 @@ chip::Protocols::InteractionModel::Status BgScanStop(chip::BitMask<CapabilitiesB
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
+// Resume a paused background scan on the next event-loop iteration.  Deferred via
+// ScheduleWork rather than called inline because OnAllSessionsClosed can run from
+// inside a PAFTP endpoint-close callstack (WiFiPAFCloseSession), and
+// WiFiPAFStartBackgroundScan makes a blocking D-Bus nansubscribe call: running it
+// inline would re-enter the WiFiPAF layer mid-teardown and stall the event loop.
+static void ResumeBgScanWork(intptr_t /*arg*/)
+{
+    // A new connect may have started between scheduling and running; if so, leave
+    // the scan paused (it would contend for the single NAN subscribe slot).
+    if (sPendingConnect != nullptr || !sBgScanPaused || sBgScanFabrics.empty())
+    {
+        return;
+    }
+    ChipLogProgress(AppServer, "Resuming background scan");
+    CHIP_ERROR resumeErr = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
+    if (resumeErr == CHIP_NO_ERROR)
+    {
+        sBgScanPaused = false;
+    }
+    else
+    {
+        ChipLogError(AppServer, "Resume background scan failed: %" CHIP_ERROR_FORMAT, resumeErr.Format());
+    }
+}
+
 void OnAllSessionsClosed()
 {
     if (sBgScanPaused && !sBgScanFabrics.empty())
     {
-        ChipLogProgress(AppServer, "ProxyDisconnectRequest: resuming background scan");
-        CHIP_ERROR resumeErr = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
-        if (resumeErr == CHIP_NO_ERROR)
-        {
-            sBgScanPaused = false;
-        }
-        else
-        {
-            ChipLogError(AppServer, "ProxyDisconnectRequest: resume background scan failed: %" CHIP_ERROR_FORMAT,
-                         resumeErr.Format());
-        }
+        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(ResumeBgScanWork, 0));
     }
 }
 

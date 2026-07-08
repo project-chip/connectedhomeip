@@ -860,6 +860,17 @@ void ConnectivityManagerImpl::ScanNanReceive(GVariant * obj)
 void ConnectivityManagerImpl::ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason)
 {
     ChipLogProgress(DeviceLayer, "Commissioning Proxy: Subscription terminated (%u, %s)", subscribe_id, reason);
+    // This handler shares the "nansubscribe-terminated" signal with the connect
+    // path (OnNanSubscribeTerminated).  Act only on a subscribe_id that belongs to
+    // a scan; otherwise a terminating connect subscribe would remove the connect
+    // session's PAF entry out from under an in-flight ProxyConnect.
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        if (subscribe_id != mActiveScanSubscribeId && subscribe_id != mBgScanSubscribeId)
+        {
+            return;
+        }
+    }
     WiFiPAFSession sessionInfo  = { .id = subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
     TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
@@ -875,6 +886,9 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
         VerifyOrReturnError(mBgScanCb == nullptr, CHIP_ERROR_BUSY);
         mScanCb        = cb;
         mScanCbContext = cbContext;
+        // Drop peers left over from a previous scan so this one-shot response
+        // reports only devices discovered within this scan window.
+        mNanScanPeers.clear();
     }
 
     CHIP_ERROR result = StartWiFiManagementSync();
@@ -1096,6 +1110,10 @@ void ConnectivityManagerImpl::WiFiPAFStopBackgroundScan()
         mBgScanCbCtx       = nullptr;
         mBgScanSubscribeId = 0;
         mScanFreq          = 0;
+        // Clear accumulated peers so they cannot leak into a subsequent one-shot
+        // scan's ProxyScanResponse (and so a long-lived bg scan does not grow the
+        // set without bound).
+        mNanScanPeers.clear();
     }
 
     ChipLogProgress(DeviceLayer, "WiFiPAFStopBackgroundScan: stopping subscribe_id=%u", subscribeId);
