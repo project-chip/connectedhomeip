@@ -143,7 +143,7 @@ brew install sdl2
 
 Complete the following steps:
 
-1. Using `rpi-imager`, install the Ubuntu _22.04_ 64-bit _server_ OS for arm64
+1. Using `rpi-imager`, install the Ubuntu _24.04_ 64-bit _server_ OS for arm64
    architectures on a micro SD card.
 1. Boot the SD card.
 1. Log in with the default user account "ubuntu" and password "ubuntu"
