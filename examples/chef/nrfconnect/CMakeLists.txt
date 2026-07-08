@@ -50,6 +50,7 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 #
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
+target_compile_definitions(app PRIVATE CONFIG_CHEF_SAMPLE_NAME="${CONFIG_CHEF_DEVICE_TYPE}")
 
 target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
@@ -99,6 +100,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/channel/ChannelManager.cpp
     ${CHEF}/common/clusters/chime/chef-chime-delegate.cpp
     ${CHEF}/common/clusters/content-launch/chef-content-launch-delegate.cpp
+    ${CHEF}/common/clusters/device-energy-management-mode/chef-device-energy-management-mode.cpp
     ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp
@@ -122,6 +124,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
     ${CHEF}/common/clusters/water-heater-management/chef-water-heater-management.cpp
+    ${CHEF}/common/clusters/water-heater-mode/chef-water-heater-mode.cpp
     ${CHEF}/common/clusters/window-covering/chef-window-covering.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/nrfconnect/AppTask.cpp
