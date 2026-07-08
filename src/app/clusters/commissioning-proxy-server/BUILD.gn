@@ -29,6 +29,8 @@ source_set("commissioning-proxy-server") {
   # The transport-agnostic subsystems below have NO build-flag dependency, so they
   # are compiled here in the cluster's own target.
   sources = [
+    "CommissioningProxyBgScanRegistry.cpp",
+    "CommissioningProxyBgScanRegistry.h",
     "CommissioningProxyScanAggregator.cpp",
     "CommissioningProxyScanAggregator.h",
     "CommissioningProxyScanCache.cpp",
