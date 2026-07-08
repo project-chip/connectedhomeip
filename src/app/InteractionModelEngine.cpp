@@ -1952,7 +1952,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandExistenc
     return DataModel::ValidateClusterPath(provider, aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
 }
 
-DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model, DataModel::AttributeChangeListener * listener)
+DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Provider * model,
+                                                                   DataModel::AttributeChangeListener * listener)
 {
     // Altering data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
@@ -1992,7 +1993,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
         }
     }
 
-    mDataModelProvider = model;
+    mDataModelProvider             = model;
     mActiveAttributeChangeListener = listener;
     if (mDataModelProvider != nullptr)
     {

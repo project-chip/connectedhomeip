@@ -37,7 +37,7 @@ namespace DataModel {
 class JitterDeferredAttributeChangeListener : public AttributeChangeListener, public TimerContext
 {
 public:
-    static constexpr uint32_t kMaxAttributePathsBufferSize       = 10;
+    static constexpr uint32_t kMaxAttributePathsBufferSize              = 10;
     static constexpr uint16_t kDefaultDeferAttributePathBaseTimeoutMs   = 200;
     static constexpr uint16_t kDefaultDeferAttributePathJitterTimeoutMs = 500;
 

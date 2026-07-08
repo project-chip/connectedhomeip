@@ -89,7 +89,7 @@ void JitterDeferredAttributeChangeListener::UpdateListenerConfiguration(const At
 {
     if (config.delay.has_value())
     {
-        uint32_t delay = config.delay.value();
+        uint32_t delay                     = config.delay.value();
         mDeferAttributePathBaseTimeoutMs   = (uint16_t) (delay >> 16);
         mDeferAttributePathJitterTimeoutMs = (uint16_t) (delay & 0xFFFF);
 

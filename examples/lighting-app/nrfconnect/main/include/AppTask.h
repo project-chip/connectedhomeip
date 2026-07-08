@@ -22,8 +22,8 @@
 #include "LEDWidget.h"
 #include "PWMDevice.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <app/data-model-provider/JitterDeferredAttributeChangeListener.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nrfconnect/FactoryDataProvider.h>

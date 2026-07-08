@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/data-model-provider/JitterDeferredAttributeChangeListener.h>
 #include <app/data-model-provider/AttributeChangeListener.h>
+#include <app/data-model-provider/JitterDeferredAttributeChangeListener.h>
 #include <lib/support/TimerDelegateMock.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
@@ -34,11 +34,12 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 
-constexpr size_t kTestPathsSize                                      = 10;
+constexpr size_t kTestPathsSize                                        = 10;
 constexpr std::array<ConcreteAttributePath, kTestPathsSize> kTestPaths = {
-    ConcreteAttributePath(1, 1, 1), ConcreteAttributePath(2, 2, 2),    ConcreteAttributePath(3, 3, 3), ConcreteAttributePath(4, 4, 4),
-    ConcreteAttributePath(5, 5, 5), ConcreteAttributePath(6, 6, 6),    ConcreteAttributePath(7, 7, 7), ConcreteAttributePath(8, 8, 8),
-    ConcreteAttributePath(9, 9, 9), ConcreteAttributePath(10, 10, 10),
+    ConcreteAttributePath(1, 1, 1),    ConcreteAttributePath(2, 2, 2), ConcreteAttributePath(3, 3, 3),
+    ConcreteAttributePath(4, 4, 4),    ConcreteAttributePath(5, 5, 5), ConcreteAttributePath(6, 6, 6),
+    ConcreteAttributePath(7, 7, 7),    ConcreteAttributePath(8, 8, 8), ConcreteAttributePath(9, 9, 9),
+    ConcreteAttributePath(10, 10, 10),
 };
 constexpr ConcreteAttributePath kOverflowPath(1, 2, 3);
 
@@ -81,7 +82,8 @@ public:
 TEST_F(TestJitterDeferredAttributeChangeListener, TestJitteryDelay)
 {
     MockAttributeChangeListener underlyingListener;
-    JitterDeferredAttributeChangeListener jitteryListener(&underlyingListener, mMockTimerDelegate, kBaseTimeoutMs, kJitterTimeoutMs);
+    JitterDeferredAttributeChangeListener jitteryListener(&underlyingListener, mMockTimerDelegate, kBaseTimeoutMs,
+                                                          kJitterTimeoutMs);
 
     for (size_t i = 0; i < kTestPathsSize; i++)
     {
@@ -104,7 +106,8 @@ TEST_F(TestJitterDeferredAttributeChangeListener, TestJitteryDelay)
 TEST_F(TestJitterDeferredAttributeChangeListener, TestBufferFullFlush)
 {
     MockAttributeChangeListener underlyingListener;
-    JitterDeferredAttributeChangeListener jitteryListener(&underlyingListener, mMockTimerDelegate, kBaseTimeoutMs, kJitterTimeoutMs);
+    JitterDeferredAttributeChangeListener jitteryListener(&underlyingListener, mMockTimerDelegate, kBaseTimeoutMs,
+                                                          kJitterTimeoutMs);
 
     for (size_t i = 0; i < kTestPathsSize; i++)
     {

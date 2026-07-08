@@ -41,9 +41,9 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/nrfconnect/FactoryResetTestEventTriggerHandler.h>
 #include <setup_payload/OnboardingCodesUtil.h>
-#include <platform/DefaultTimerDelegate.h>
 #include <system/SystemClock.h>
 
 #ifdef CONFIG_CHIP_WIFI
@@ -319,7 +319,8 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-    GetCustomizedAttributeChangeListener().SetUnderlyingListener(&chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+    GetCustomizedAttributeChangeListener().SetUnderlyingListener(
+        &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine());
     AppFabricTableDelegate::Init();
 
 #ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
