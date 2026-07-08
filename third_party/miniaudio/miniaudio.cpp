@@ -26,7 +26,7 @@
 // LSan loses track of their static allocations (e.g., dynamic loader caching) and reports them
 // as memory leaks from <unknown module>.
 //
-// Following the official recommendation by ASan creator Kostya Serebryany in
+// Following the official recommendation in the Google Sanitizers issue tracker:
 // https://github.com/google/sanitizers/issues/89#issuecomment-321602408:
 // "don't dlclose anything when testing under asan/lsan", we stub dlclose() to a no-op when
 // compiling under AddressSanitizer. This keeps the dynamic libraries mapped in memory at process
