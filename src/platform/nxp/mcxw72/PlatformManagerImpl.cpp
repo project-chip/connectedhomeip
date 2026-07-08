@@ -162,7 +162,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&GetDiagnosticDataProviderImpl());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     /* Initialize platform services */
