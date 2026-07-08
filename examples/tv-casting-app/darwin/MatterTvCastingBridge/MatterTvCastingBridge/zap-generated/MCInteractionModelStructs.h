@@ -105,4 +105,34 @@
 @property (nonatomic, copy) NSString * _Nonnull value;
 @end
 
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterContentAppInfo : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contentAppVendorID;
+@property (nonatomic, copy) NSNumber * _Nonnull contentAppProductID;
+@property (nonatomic, copy) NSString * _Nonnull data;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterLaunchUrlInfo : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull url;
+@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable contentType;
+@property (nonatomic, copy) NSArray * _Nullable contentHeaders;
+@property (nonatomic, copy) NSNumber * _Nullable offsetMillisecs;
+@property (nonatomic, copy) NSNumber * _Nullable queueType;
+@property (nonatomic, copy) NSString * _Nullable nextUrl;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterReplicationInfo : NSObject <NSCopying>
+@property (nonatomic, copy) MCContentLauncherClusterLaunchUrlInfo * _Nullable launchUrlInfo;
+@property (nonatomic, copy) MCContentLauncherClusterContentAppInfo * _Nullable contentAppInfo;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterContentPresetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull presetID;
+@property (nonatomic, copy) NSString * _Nonnull presetName;
+@end
+
 #endif /* MCStructsObjc_h */

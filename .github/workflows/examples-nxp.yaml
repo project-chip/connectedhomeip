@@ -56,7 +56,7 @@ jobs:
                   extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
-              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
+              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4
               id: changed_paths
               with:
                   filters: |
@@ -157,7 +157,7 @@ jobs:
               with:
                   platform: nxp
             - name: Detect changed paths
-              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
+              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4
               id: changed_paths
               with:
                   filters: |
@@ -183,14 +183,14 @@ jobs:
             - name: clean build
               run: rm -rf ./out
 
-            - name: Build NXP Zephyr thermostat Wi-Fi example
+            - name: Build NXP Zephyr thermostat Wi-Fi OTA example
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
                   == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-zephyr-thermostat \
+                      --target nxp-rw61x-zephyr-thermostat-ota \
                       build \
                   "
 
