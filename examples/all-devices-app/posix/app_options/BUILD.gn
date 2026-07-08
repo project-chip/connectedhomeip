@@ -19,15 +19,28 @@ config("option-includes") {
   include_dirs = [ ".." ]
 }
 
-source_set("app-options") {
+source_set("device-type-parser") {
   sources = [
-    "AppOptions.cpp",
-    "AppOptions.h",
     "DeviceTypeParser.cpp",
     "DeviceTypeParser.h",
   ]
 
+  public_deps = [ "${chip_root}/src/lib" ]
+
+  public_configs = [
+    "${chip_root}/src:includes",
+    ":option-includes",
+  ]
+}
+
+source_set("app-options") {
+  sources = [
+    "AppOptions.cpp",
+    "AppOptions.h",
+  ]
+
   public_deps = [
+    ":device-type-parser",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-options",

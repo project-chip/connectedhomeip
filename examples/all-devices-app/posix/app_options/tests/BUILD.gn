@@ -26,7 +26,7 @@ if (chip_build_tests) {
     cflags = [ "-Wconversion" ]
 
     public_deps = [
-      "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+      "${chip_root}/examples/all-devices-app/posix/app_options:device-type-parser",
       "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/platform",
     ]

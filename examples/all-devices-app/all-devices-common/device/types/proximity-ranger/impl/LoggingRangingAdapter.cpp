@@ -348,20 +348,20 @@ ResultCodeEnum LoggingRangingAdapter::PrepareSession(uint8_t sessionId, const St
 
     if (params.wifiRoleConfig.has_value())
     {
-        const auto & cfg = *params.wifiRoleConfig;
+        [[maybe_unused]] const auto & cfg = *params.wifiRoleConfig;
         ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s]   WiFiRoleConfig role=%s peerWiFiDevIK.size=%u pmk=%s", LogTag(),
                         RoleName(cfg.role), static_cast<unsigned>(cfg.peerWiFiDevIK.size()),
                         cfg.pmk.HasValue() ? "present" : "absent");
     }
     if (params.bleRoleConfig.has_value())
     {
-        const auto & cfg = *params.bleRoleConfig;
+        [[maybe_unused]] const auto & cfg = *params.bleRoleConfig;
         ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s]   BLERoleConfig role=%s peerBLEDeviceID=0x%016" PRIx64, LogTag(),
                         RoleName(cfg.role), cfg.peerBLEDeviceID);
     }
     if (params.bltRoleConfig.has_value())
     {
-        const auto & cfg = *params.bltRoleConfig;
+        [[maybe_unused]] const auto & cfg = *params.bltRoleConfig;
         ChipLogProgress(AppServer,
                         "[LoggingRangingAdapter:%s]   BLTRoleConfig role=%s peerBLTDevIK.size=%u "
                         "BLTCSMode=%s BLTCSSecurityLevel=%s ltk=%s",
