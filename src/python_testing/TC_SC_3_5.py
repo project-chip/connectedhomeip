@@ -259,8 +259,7 @@ class TC_SC_3_5(MatterBaseTest):
         new_fabric_admin = new_CA.NewFabricAdmin(vendorId=0xFFF1,
                                                  fabricId=self.matter_test_config.fabric_id)
 
-        th2 = new_fabric_admin.NewController(nodeId=112233)
-        return th2
+        return new_fabric_admin.NewController(nodeId=112233)
 
     @async_test_body
     async def test_TC_SC_3_5(self):
