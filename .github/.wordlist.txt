@@ -39,8 +39,8 @@ aef
 AES
 AFL
 AIDL
-aliased
 algs
+aliased
 alloc
 allocator
 allocators
@@ -193,9 +193,9 @@ bz
 bzip
 CACACACA
 cacerts
+CAfile
 callsite
 callsites
-CAfile
 cancelled
 capacitive
 CarbonDioxideConcentrationMeasurement
@@ -317,8 +317,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 contrib
@@ -405,6 +405,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+dep
 Depacketization
 deployable
 depottools
@@ -415,6 +416,7 @@ dereferencing
 desc
 descheduled
 destructor
+destructors
 detokenization
 detokenizer
 dev
@@ -539,6 +541,7 @@ endian
 EndpointId
 eno
 entrypoint
+Entrypoints
 enum
 Enums
 env
@@ -568,6 +571,7 @@ EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
+Excludable
 exe
 ExecStart
 executables
@@ -635,6 +639,7 @@ fvisibility
 FW
 Fxx
 gbl
+gc
 gcloud
 GDB
 gdbgui
@@ -645,6 +650,7 @@ generalised
 GenericConfigurationManagerImpl
 GenericConnectivityManagerImpl
 GenericImpl
+Genericity
 GenericPlatformManagerImpl
 GenericThreadConfigurationManagerImpl
 GenericThreadStackManagerImpl
@@ -675,6 +681,7 @@ googleapis
 googlesource
 GPG
 GPIO
+GPIOs
 GPL
 GPLv
 Gradle
@@ -692,7 +699,9 @@ gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
+Hardcode
 hardcoded
+hardcodes
 hardknott
 hardwarever
 HardwareVersion
@@ -774,6 +783,7 @@ integrations
 IntelliSense
 InteractionModelEngine
 InteractionModelVersion
+interop
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -814,6 +824,7 @@ jre
 js
 json
 jsoncpp
+jsontlv
 JTAG
 Jupyter
 jupyterlab
@@ -879,6 +890,7 @@ lightin
 LightingApp
 LightingColor
 LightingState
+linker's
 LinkSoftwareAndDocumentationPack
 linter
 linters
@@ -1180,10 +1192,11 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
-Pm1ConcentrationMeasurement
-Pm10ConcentrationMeasurement
-Pm25ConcentrationMeasurement
+pluggable
 PluginServerCallback
+Pm10ConcentrationMeasurement
+Pm1ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 png
 Podman
 PollControl
@@ -1208,6 +1221,7 @@ ProductID
 ProductLabel
 ProductName
 ProductURL
+programmatically
 proto
 protobuf
 protos
@@ -1258,8 +1272,8 @@ QueryImageResponse
 queryImageStatus
 Quickstart
 qvCHIP
-RADVD
 RadonConcentrationMeasurement
+RADVD
 raspberryPi
 RasPi
 rAv
@@ -1284,10 +1298,10 @@ recurse
 refrigeratoralarm
 regen
 registerAttributeAccessOverride
-registration
 RegisterCommandHandler
-registry
+registration
 registrations
+registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1300,8 +1314,8 @@ repo
 repos
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1311,6 +1325,7 @@ reviwed
 rfid
 rfids
 RGB
+ripgrep
 riscv
 rloc
 rmw
@@ -1365,8 +1380,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1464,6 +1479,7 @@ subdirectories
 subdirectory
 subflag
 subfolder
+subfolders
 submodule
 submodules
 subnet
@@ -1677,6 +1693,7 @@ vous
 VPN
 VSC
 VSCode
+vtable
 WaitNewInputEvent
 WakeOnLan
 Walkthrough
@@ -1716,9 +1733,9 @@ xbef
 xc
 xcd
 Xcode
+Xcode's
 xcodebuild
 xcodeproj
-Xcode's
 xcworkspace
 xd
 xds

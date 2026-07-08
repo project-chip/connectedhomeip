@@ -15,10 +15,10 @@
 #    limitations under the License.
 #
 import pathlib
-import typing
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import List, Optional
+from importlib.resources.abc import Traversable
+from typing import Optional
 
 from matter.testing.defaults import TestingDefaults
 
@@ -30,23 +30,24 @@ class MatterTestConfig:
     paa_trust_store_path: Optional[pathlib.Path] = None
     ble_controller: Optional[int] = None
     commission_only: bool = False
+    spec_errata_path: str | Traversable | None = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID
     case_admin_subject: Optional[int] = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
-    tests: List[str] = field(default_factory=list)
-    timeout: typing.Union[int, None] = None
-    endpoint: typing.Union[int, None] = 0
+    tests: list[str] = field(default_factory=list)
+    timeout: int | None = None
+    endpoint: int | None = 0
     app_pid: int = 0
-    pipe_name: typing.Union[str, None] = None
-    pipe_name_out: typing.Union[str, None] = None
+    pipe_name: str | None = None
+    pipe_name_out: str | None = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
     in_test_commissioning_method: Optional[str] = None
-    discriminators: List[int] = field(default_factory=list)
-    setup_passcodes: List[int] = field(default_factory=list)
+    discriminators: list[int] = field(default_factory=list)
+    setup_passcodes: list[int] = field(default_factory=list)
     commissionee_ip_address_just_for_testing: Optional[str] = None
     # By default, we start with maximized cert chains, as required for RR-1.1.
     # This allows cert tests to be run without re-commissioning for RR-1.1.
@@ -59,8 +60,8 @@ class MatterTestConfig:
     # By default, let's set validity to 10 years
     certificate_validity_period = int(timedelta(days=10*365).total_seconds())
 
-    qr_code_content: List[str] = field(default_factory=list)
-    manual_code: List[str] = field(default_factory=list)
+    qr_code_content: list[str] = field(default_factory=list)
+    manual_code: list[str] = field(default_factory=list)
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
@@ -69,14 +70,14 @@ class MatterTestConfig:
     pics: dict[str, bool] = field(default_factory=dict)
 
     # Node ID for basic DUT
-    dut_node_ids: List[int] = field(default_factory=list)
+    dut_node_ids: list[int] = field(default_factory=list)
     # Node ID to use for controller/commissioner
     controller_node_id: int = TestingDefaults.CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
     # By default, we commission with CAT tags specified for RR-1.1
     # so the cert tests can be run without re-commissioning the device
     # for this one test. This can be overwritten from the command line
-    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
+    controller_cat_tags: list[int] = field(default_factory=lambda: [0x0001_0001])
 
     # Fabric ID which to use
     fabric_id: int = 1
@@ -87,7 +88,7 @@ class MatterTestConfig:
     # If this is set, we will reuse root of trust keys at that location
     chip_tool_credentials_path: Optional[pathlib.Path] = None
 
-    trace_to: List[str] = field(default_factory=list)
+    trace_to: list[str] = field(default_factory=list)
 
     # Accepted Terms and Conditions if used
     tc_version_to_simulate: int = None
@@ -96,6 +97,12 @@ class MatterTestConfig:
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
     legacy: bool = False
+
+    # When True, skip the background wildcard attribute subscription that is normally
+    # started at the beginning of each test.  Prefer ``disable_wildcard_subscription = True``
+    # on the test class (see MatterBaseTest) so certification runs do not require this CLI flag.
+    # ``--no-wildcard-subscription`` remains for backward compatibility and local overrides.
+    no_wildcard_subscription: bool = False
 
     # Restart flag file for rebooting the DUT during test runs
     restart_flag_file: Optional[pathlib.Path] = None

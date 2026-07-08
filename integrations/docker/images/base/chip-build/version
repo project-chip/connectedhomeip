@@ -1,1 +1,1 @@
-197 : [crosscompile] Bump {armhf,aarch64} sysroot tag to `version:build-2026.05.14`
+204 : [Silabs] Update efr32 docker to SDK 2026.6.0

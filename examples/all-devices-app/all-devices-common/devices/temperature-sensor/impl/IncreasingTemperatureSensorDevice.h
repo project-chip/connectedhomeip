@@ -25,8 +25,7 @@ namespace chip {
 namespace app {
 
 /**
- * @brief An implementation of a Temperature Sensor Device that increases temperature over time.
- *
+ * Simulated temperature sensor that increases the reported temperature over time.
  */
 class IncreasingTemperatureSensorDevice : public TemperatureSensorDevice, public TimerContext
 {
@@ -34,8 +33,7 @@ public:
     IncreasingTemperatureSensorDevice();
     ~IncreasingTemperatureSensorDevice() override;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // TimerContext

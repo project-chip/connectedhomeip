@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2023-2024 Project CHIP Authors
+# Copyright (c) 2023-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@ get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/pla
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
+
+# Add secure element lib as an external module
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter)
+
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
@@ -39,6 +43,7 @@ project(chip-nxp-all-clusters-app-example)
 
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x.cmake)
 
 target_include_directories(app
     PRIVATE
@@ -117,14 +122,27 @@ endif()
 target_sources(app
     PRIVATE
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/soil-measurement-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/all-clusters-energy-mode-stubs.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/dishwasher-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/laundry-washer-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/microwave-oven-mode.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-modes.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/tcc-mode.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/operational-state-delegate-impl.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/oven-operational-state-delegate.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/test-hidden-manufacturer-specific-stub.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/rvc-operational-state-delegate-impl.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
 

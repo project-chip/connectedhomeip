@@ -19,10 +19,15 @@ Support module for ICD test modules containing shared functionality.
 """
 
 import asyncio
+import contextlib
 import logging
+import random
 import re
+import time
 from enum import IntEnum
 
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -37,6 +42,9 @@ commands = cluster.Commands
 
 # CI-specific constants
 MAX_CI_IDLE_CYCLE_WAIT_S = 10
+
+# Buffer for MaxInterval accounting for OS jitter, network latency, etc.
+SUBSCRIPTION_REPORT_TIMING_TOLERANCE_S = 1.0
 
 # Base for ICD test-event triggers: (IcdManagement cluster ID << 48).
 _ICD_CLUSTER_CODE = Clusters.Objects.IcdManagement.id << 48
@@ -93,10 +101,58 @@ def uat_bit_name(bit):
 def uat_set_hints(hint_bitmap):
     """Return a list of individual UAT bits set in the given bitmap, logging each one."""
     hints = [bit for bit in uat if hint_bitmap & bit.value]
-    log.info(f"UserActiveModeTriggerHint has {len(hints)} bit(s) set:")
+    log.info("UserActiveModeTriggerHint has %s bit(s) set:", len(hints))
     for bit in hints:
-        log.info(f"  - {uat_bit_name(bit)} (0x{bit.value:05X})")
+        log.info("  - %s (0x%05X)", uat_bit_name(bit), bit.value)
     return hints
+
+
+async def _wait_for_subscription_heartbeat(subscription, max_interval_ceiling_s: float,
+                                           buffer_s: float) -> float | None:
+    """Wait up to `max_interval_ceiling_s + buffer_s` for one empty heartbeat report.
+
+    Returns the elapsed seconds if a report arrived, or None on timeout.
+    """
+    report_time: float | None = None
+    wait_start = time.time()
+    event = asyncio.Event()
+    loop = asyncio.get_event_loop()
+
+    def on_report():
+        nonlocal report_time
+        report_time = time.time()
+        loop.call_soon_threadsafe(event.set)
+
+    subscription.SetNotifySubscriptionStillActiveCallback(on_report)
+
+    with contextlib.suppress(asyncio.TimeoutError):
+        await asyncio.wait_for(event.wait(), timeout=max_interval_ceiling_s + buffer_s)
+
+    return (report_time - wait_start) if report_time is not None else None
+
+
+async def assert_subscription_heartbeat_received(subscription, max_interval_ceiling_s: float,
+                                                 buffer_s: float = SUBSCRIPTION_REPORT_TIMING_TOLERANCE_S) -> float:
+    """Assert that a heartbeat report arrives within `max_interval_ceiling_s + buffer_s` seconds."""
+    elapsed = await _wait_for_subscription_heartbeat(subscription, max_interval_ceiling_s, buffer_s)
+    asserts.assert_is_not_none(
+        elapsed,
+        f"No subscription heartbeat report received within {max_interval_ceiling_s + buffer_s:.1f}s"
+    )
+    log.info("Subscription heartbeat received in %.1fs (MaxInterval=%ss)", elapsed, max_interval_ceiling_s)
+    return elapsed
+
+
+async def assert_subscription_no_heartbeat(subscription, max_interval_ceiling_s: float,
+                                           buffer_s: float = SUBSCRIPTION_REPORT_TIMING_TOLERANCE_S) -> None:
+    """Assert that no heartbeat report arrives within `max_interval_ceiling_s + buffer_s` seconds."""
+    elapsed = await _wait_for_subscription_heartbeat(subscription, max_interval_ceiling_s, buffer_s)
+    elapsed_str = f"{elapsed:.1f}s" if elapsed is not None else "unknown"
+    asserts.assert_is_none(
+        elapsed,
+        f"Unexpected subscription heartbeat report received after {elapsed_str}"
+    )
+
 
 # ============================================================================
 # ICDTransition - ICD state transition types for wait helpers
@@ -119,6 +175,27 @@ class ICDBaseTest(MatterBaseTest):
     """Base test class for ICD tests with shared functionality."""
 
     ROOT_NODE_ENDPOINT_ID = 0
+
+    def get_dut_instance_name(self) -> str:
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        return f'{compressed_fabric_id:016X}-{self.dut_node_id:016X}'
+
+    async def get_icd_txt_key(self) -> int:
+        """Retrieve the ICD DNS-SD TXT key from the DUT's operational service record."""
+        mdns = MdnsDiscovery()
+
+        dut_instance_name = self.get_dut_instance_name()
+        instance_qname = f"{dut_instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+
+        txt_record = await mdns.get_txt_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            log_output=True
+        )
+
+        icd_value = txt_record.txt['ICD']
+        assert_valid_icd_key(icd_value)
+        return int(icd_value)
 
     async def read_icdm_attribute_expect_success(self, attribute, controller=None, node_id=None):
         return await self.read_single_attribute_check_success(
@@ -150,7 +227,7 @@ class ICDBaseTest(MatterBaseTest):
             if idle_mode_duration_s is not None:
                 raise ValueError("ActiveToIdle does not use idle_mode_duration_s")
             wait_s = (active_mode_duration_ms / 1000.0) + 1.0
-            log.info(f"ActiveToIdle: active_mode_duration_ms={active_mode_duration_ms} -> Wait time: {wait_s}s")
+            log.info("ActiveToIdle: active_mode_duration_ms=%s -> Wait time: %ss", active_mode_duration_ms, wait_s)
             return wait_s
 
         if transition == ICDTransition.IdleToActive:
@@ -159,7 +236,7 @@ class ICDBaseTest(MatterBaseTest):
             if active_mode_duration_ms is not None:
                 raise ValueError("IdleToActive does not use active_mode_duration_ms")
             wait_s = idle_mode_duration_s + 1.0
-            log.info(f"IdleToActive: idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+            log.info("IdleToActive: idle_mode_duration_s=%s -> Wait time: %ss", idle_mode_duration_s, wait_s)
             return wait_s
 
         if transition == ICDTransition.FullCycle:
@@ -169,7 +246,7 @@ class ICDBaseTest(MatterBaseTest):
                 raise ValueError("FullCycle requires idle_mode_duration_s")
             wait_s = (active_mode_duration_ms / 1000.0) + 1.0 + idle_mode_duration_s + 1.0
             log.info(
-                f"FullCycle: active_mode_duration_ms={active_mode_duration_ms}, idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+                "FullCycle: active_mode_duration_ms=%s, idle_mode_duration_s=%s -> Wait time: %ss", active_mode_duration_ms, idle_mode_duration_s, wait_s)
             return wait_s
 
         raise ValueError(f"Unknown ICDTransition: {transition}")
@@ -181,8 +258,47 @@ class ICDBaseTest(MatterBaseTest):
         wait_s = self.compute_wait_time(transition,
                                         active_mode_duration_ms=active_mode_duration_ms,
                                         idle_mode_duration_s=idle_mode_duration_s)
-        log.info(f"Waiting {wait_s}s for {transition.name}...")
+        log.info("Waiting %ss for %s...", wait_s, transition.name)
         await asyncio.sleep(wait_s)
+
+    def create_new_controller(
+            self,
+            *,
+            same_fabric: bool = False,
+            node_id: int | None = None,
+            enable_icd_registration: bool = False):
+        """Create and return a new controller.
+
+        Args:
+            same_fabric: If True, reuse the existing CA and fabric admin.
+                If False, create a new CertificateAuthority and FabricAdmin.
+            node_id: If provided, assigned to the new controller.
+                Otherwise, a random node ID is assigned automatically.
+            enable_icd_registration: If True, enables the controller to
+                register as an ICD client on an ICD server during commissioning.
+
+        Returns:
+            The new controller.
+        """
+        if node_id is None:
+            node_id = random.randint(1, 0xFFFFFFEFFFFFFFFF)
+
+        if same_fabric:
+            fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+        else:
+            ca = self.certificate_authority_manager.NewCertificateAuthority()
+            fabric_admin = ca.NewFabricAdmin(
+                vendorId=0xFFF1,
+                fabricId=random.randint(1, 0xFFFFFFFFFFFFFFFE)
+            )
+
+        controller = fabric_admin.NewController(nodeId=node_id, useTestCommissioner=True)
+
+        if enable_icd_registration:
+            icd_params = controller.GenerateICDRegistrationParameters()
+            controller.EnableICDRegistration(icd_params)
+
+        return controller
 
     async def unregister_all_clients(self):
         """Unregisters all entries in the DUT's RegisteredClients attribute."""
@@ -195,7 +311,7 @@ class ICDBaseTest(MatterBaseTest):
         log.info("RegisteredClients is not empty; unregistering all clients...")
         for client in registeredClients:
             try:
-                log.info(f"Unregistering client: {client}...")
+                log.info("Unregistering client: %s...", client)
                 await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")

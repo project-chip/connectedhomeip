@@ -20,6 +20,11 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "AppKeys.h"
+
+#ifdef ENABLE_CHIP_SHELL
+#include <DeviceShellCommands.h>
+#endif
 
 #include <cstring>
 #include <memory>
@@ -35,7 +40,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
+#include <devices/endpoint-id-allocator/ConsecutiveEndpointIdAllocator.h>
 #include <devices/root-node/RootNodeDevice.h>
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -108,6 +114,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 CHIP_ERROR AppTask::AppInit()
 {
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&AppTask::ButtonEventHandler);
+#ifdef ENABLE_CHIP_SHELL
+    chip::Shell::DeviceCommands::GetInstance().Register();
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -177,19 +186,22 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #endif
 
     VerifyOrReturnError(sRootNodeDevice != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(sRootNodeDevice->Register(kRootEndpointId, *sDataModelProvider, chip::kInvalidEndpointId));
+
+    chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    ReturnErrorOnFailure(sRootNodeDevice->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
         .groupDataProvider = *groupDataProvider,
         .fabricTable       = chip::Server::GetInstance().GetFabricTable(),
         .timerDelegate     = sTimerDelegate,
+        .storageDelegate   = storage,
     });
 
-    std::string deviceType = "on-off-light"; // Default
+    std::string deviceType = chip::app::DeviceFactory::GetInstance().GetDefaultDevice();
 
     char storedDeviceType[64] = {};
     uint16_t storedLen        = sizeof(storedDeviceType);
-    CHIP_ERROR storedErr      = storage.SyncGetKeyValue("all-devices/dev-type", storedDeviceType, storedLen);
+    CHIP_ERROR storedErr      = storage.SyncGetKeyValue(chip::kDeviceTypeKey, storedDeviceType, storedLen);
     if (storedErr == CHIP_NO_ERROR && storedLen > 0)
     {
         deviceType = std::string(storedDeviceType, strnlen(storedDeviceType, storedLen));
@@ -205,7 +217,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     sConstructedDevice = deviceFactory.Create(deviceType);
     VerifyOrReturnError(sConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(sConstructedDevice->Register(kDeviceEndpointId, *sDataModelProvider, chip::kInvalidEndpointId));
+    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
+    ReturnErrorOnFailure(sConstructedDevice->Register(allocator, *sDataModelProvider));
 
     return CHIP_NO_ERROR;
 }

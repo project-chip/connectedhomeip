@@ -269,7 +269,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     // When commissioning starts, the peer is assumed to be active.
     mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
 
-    ReturnErrorOnFailure(mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime));
+    SuccessOrExit(err = mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime));
 
     mLocalMRPConfig = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
@@ -547,6 +547,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     // Initiator's random value
     SuccessOrExit(err = tlvReader.Next(AsTlvContextTag(PBKDFParamResponseTags::kInitiatorRandom)));
+    VerifyOrExit(tlvReader.GetLength() == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(random, sizeof(random)));
     VerifyOrExit(ByteSpan(random).data_equal(ByteSpan(mPBKDFLocalRandomData)), err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 
@@ -863,6 +864,22 @@ CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
     {
     case kProtocolCodeInvalidParam:
         err = CHIP_ERROR_INVALID_PASE_PARAMETER;
+        break;
+
+    case kProtocolCodeNoSharedRoot:
+        // kProtocolCodeNoSharedRoot only has a defined meaning in CASE (where it indicates
+        // the responder lacks a trusted root for the initiator's fabric). PASE has no
+        // shared-root semantics, so a peer sending this status during PASE is misconfigured.
+        // Mapping it to CHIP_ERROR_NO_SHARED_TRUSTED_ROOT is more useful for diagnostics
+        // than collapsing to CHIP_ERROR_INTERNAL.
+        err = CHIP_ERROR_NO_SHARED_TRUSTED_ROOT;
+        break;
+
+    case kProtocolCodeBusy:
+        // Spec doesn't explicitly forbid a peer returning kProtocolCodeBusy during PASE,
+        // even though it's not commonly seen. Distinguishing "device temporarily busy" from
+        // generic INTERNAL helps callers decide whether to retry.
+        err = CHIP_ERROR_BUSY;
         break;
 
     default:

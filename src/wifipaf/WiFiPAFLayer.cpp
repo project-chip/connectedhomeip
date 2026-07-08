@@ -242,23 +242,16 @@ CHIP_ERROR WiFiPAFLayer::Init(chip::System::Layer * systemLayer)
 
 void WiFiPAFLayer::Shutdown()
 {
-    uint8_t i;
-    WiFiPAFSession * pPafSession;
-
-    for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
-        pPafSession = &mPafInfoVect[i];
-        if ((pPafSession->id == kUndefinedWiFiPafSessionId) || (pPafSession->id == 0))
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this))
         {
-            // Unused session
             continue;
         }
-        ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", pPafSession->id);
-        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(pPafSession));
-        if (endPoint != nullptr)
-        {
-            endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
-        }
+
+        ChipLogProgress(WiFiPAF, "WiFiPAF: Canceling id: %u", endPoint->mSessionInfo.id);
+        endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
     }
 }
 
@@ -345,6 +338,10 @@ CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSess
     {
         err = newEndPoint->StartConnect();
     }
+    else
+    {
+        err = newEndPoint->StartReceiveConnectionTimer();
+    }
 
     return err;
 }
@@ -403,7 +400,6 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
     SessionInfo.peer_id       = kUndefinedWiFiPafSessionId;
     SessionInfo.nodeId        = kUndefinedNodeId;
     SessionInfo.discriminator = UINT16_MAX;
-    return;
 }
 
 CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
@@ -506,8 +502,7 @@ WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession 
         {
             if (pPafSession->id != kUndefinedWiFiPafSessionId)
                 return pPafSession;
-            else
-                continue;
+            continue;
         }
         switch (accType)
         {

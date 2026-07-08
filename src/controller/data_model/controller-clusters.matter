@@ -1155,9 +1155,9 @@ cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
-/** Provides an interface for providing OTA software updates */
+/** This cluster implements the Provider role in the OTA process. */
 cluster OtaSoftwareUpdateProvider = 41 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
@@ -1193,18 +1193,18 @@ cluster OtaSoftwareUpdateProvider = 41 {
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
-    optional octet_string<512> metadataForProvider = 7;
+    optional long_octet_string<512> metadataForProvider = 7;
   }
 
   response struct QueryImageResponse = 1 {
     StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
-    optional char_string<256> imageURI = 2;
+    optional long_char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
     optional char_string<64> softwareVersionString = 4;
     optional octet_string<32> updateToken = 5;
     optional boolean userConsentNeeded = 6;
-    optional octet_string<512> metadataForRequestor = 7;
+    optional long_octet_string<512> metadataForRequestor = 7;
   }
 
   request struct ApplyUpdateRequestRequest {
@@ -1222,17 +1222,17 @@ cluster OtaSoftwareUpdateProvider = 41 {
     int32u softwareVersion = 1;
   }
 
-  /** Determine availability of a new Software Image */
+  /** Upon receipt, this command SHALL trigger an attempt to find an updated Software Image by the OTA Provider to match the OTA Requestor's constraints provided in the payload fields. */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
-  /** Determine next action to take for a downloaded Software Image */
+  /** This command requests the specified version be installed on the device. */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
-  /** Notify OTA Provider that an update was applied */
+  /** This command tells the Provider that the specified update has been applied. */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
+/** This cluster implements the Requestor role in the OTA process. */
 cluster OtaSoftwareUpdateRequestor = 42 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
@@ -1299,11 +1299,11 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
     AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
+    optional long_octet_string<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  /** Announce the presence of an OTA Provider */
+  /** This command MAY be invoked by Administrators to announce the presence of a particular OTA Provider. */
   command access(invoke: administer) AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
@@ -2949,7 +2949,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
+  revision 4;
 
   enum GroupKeyMulticastPolicyEnum : enum8 {
     kPerGroupID = 0;
@@ -2988,7 +2988,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
@@ -3222,52 +3221,6 @@ cluster IcdManagement = 70 {
   command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster supports creating a simple timer functionality. */
-provisional cluster Timer = 71 {
-  revision 1;
-
-  enum TimerStatusEnum : enum8 {
-    kRunning = 0;
-    kPaused = 1;
-    kExpired = 2;
-    kReady = 3;
-  }
-
-  bitmap Feature : bitmap32 {
-    kReset = 0x1;
-  }
-
-  readonly attribute elapsed_s setTime = 0;
-  readonly attribute elapsed_s timeRemaining = 1;
-  readonly attribute TimerStatusEnum timerState = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SetTimerRequest {
-    elapsed_s newTime = 0;
-  }
-
-  request struct AddTimeRequest {
-    elapsed_s additionalTime = 0;
-  }
-
-  request struct ReduceTimeRequest {
-    elapsed_s timeReduction = 0;
-  }
-
-  /** This command is used to set the timer. */
-  command SetTimer(SetTimerRequest): DefaultSuccess = 0;
-  /** This command is used to reset the timer to the original value. */
-  command ResetTimer(): DefaultSuccess = 1;
-  /** This command is used to add time to the existing timer. */
-  command AddTime(AddTimeRequest): DefaultSuccess = 2;
-  /** This command is used to reduce time on the existing timer. */
-  command ReduceTime(ReduceTimeRequest): DefaultSuccess = 3;
-}
-
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
 cluster OvenCavityOperationalState = 72 {
   revision 2;
@@ -3405,6 +3358,24 @@ cluster LaundryDryerControls = 74 {
 
   readonly attribute DrynessLevelEnum supportedDrynessLevels[] = 0;
   attribute nullable DrynessLevelEnum selectedDrynessLevel = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides contextual information with respect to the disablement or otherwise of Temperature Controlled Cabinet Endpoints that may be composed as part of a Device. */
+provisional cluster TemperatureControlledCabinetTopology = 75 {
+  revision 1;
+
+  enum TopologyEnum : enum8 {
+    kHorizontal = 0;
+    kVertical = 1;
+  }
+
+  provisional readonly attribute endpoint_no disabledCabinets[] = 0;
+  provisional readonly attribute TopologyEnum topology = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5193,8 +5164,8 @@ cluster Messages = 151 {
 }
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
-provisional cluster DeviceEnergyManagement = 152 {
-  revision 4;
+cluster DeviceEnergyManagement = 152 {
+  revision 5;
 
   enum AdjustmentCauseEnum : enum8 {
     kLocalOptimization = 0;
@@ -5207,6 +5178,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     kFault = 2;
     kUserOptOut = 3;
     kCancelled = 4;
+    kInvalid = 5;
   }
 
   enum CostTypeEnum : enum8 {
@@ -5269,6 +5241,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     kPausable = 0x10;
     kForecastAdjustment = 0x20;
     kConstraintBasedAdjustment = 0x40;
+    kPowerRangeAdjustment = 0x80;
   }
 
   struct CostStruct {
@@ -5331,6 +5304,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional int8s loadControl = 4;
   }
 
+  struct PowerRangeAdjustStruct {
+    nullable power_mw minPower = 0;
+    nullable power_mw maxPower = 1;
+    PowerAdjustReasonEnum cause = 2;
+    epoch_s endTime = 3;
+  }
+
   struct SlotAdjustmentStruct {
     int8u slotIndex = 0;
     optional power_mw nominalPower = 1;
@@ -5353,6 +5333,17 @@ provisional cluster DeviceEnergyManagement = 152 {
     CauseEnum cause = 0;
   }
 
+  provisional info event PowerRangeAdjustStart = 4 {
+    PowerRangeAdjustStruct adjustment = 0;
+    elapsed_s duration = 1;
+  }
+
+  provisional info event PowerRangeAdjustEnd = 5 {
+    CauseEnum cause = 0;
+    elapsed_s duration = 1;
+    energy_mwh energyUse = 2;
+  }
+
   readonly attribute ESATypeEnum ESAType = 0;
   readonly attribute boolean ESACanGenerate = 1;
   readonly attribute ESAStateEnum ESAState = 2;
@@ -5361,6 +5352,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute optional nullable PowerAdjustCapabilityStruct powerAdjustmentCapability = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute optional OptOutStateEnum optOutState = 7;
+  provisional readonly attribute optional nullable PowerRangeAdjustStruct powerRangeAdjustment = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5394,6 +5386,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     AdjustmentCauseEnum cause = 1;
   }
 
+  request struct PowerRangeAdjustRequestRequest {
+    nullable power_mw minPower = 0;
+    nullable power_mw maxPower = 1;
+    elapsed_s duration = 2;
+    AdjustmentCauseEnum cause = 3;
+  }
+
   /** Allows a client to request an adjustment in the power consumption of an ESA for a specified duration. */
   command PowerAdjustRequest(PowerAdjustRequestRequest): DefaultSuccess = 0;
   /** Allows a client to cancel an ongoing PowerAdjustmentRequest operation. */
@@ -5410,6 +5409,10 @@ provisional cluster DeviceEnergyManagement = 152 {
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
   /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command. */
   command CancelRequest(): DefaultSuccess = 7;
+  /** Allows a client to request an adjustment in the range of powers that an ESA can operate within for a specified duration. */
+  command PowerRangeAdjustRequest(PowerRangeAdjustRequestRequest): DefaultSuccess = 8;
+  /** Allows a client to cancel an ongoing PowerRangeAdjustmentRequest operation. */
+  command CancelPowerRangeAdjustRequest(): DefaultSuccess = 9;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
@@ -5646,7 +5649,7 @@ cluster PowerTopology = 156 {
 
   readonly attribute optional endpoint_no availableEndpoints[] = 0;
   readonly attribute optional endpoint_no activeEndpoints[] = 1;
-  attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
+  provisional attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5861,6 +5864,292 @@ provisional cluster ElectricalGridConditions = 160 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to Electrical Sensor device type. */
+provisional cluster ElectricalAlarm = 161 {
+  revision 1;
+
+  bitmap AlarmBitmap : bitmap64 {
+    kOverVoltage = 0x1;
+    kUnderVoltage = 0x2;
+    kSwappedPolarity = 0x400;
+    kLossOfMeasurement = 0x800;
+    kLossOfGridPower = 0x1000;
+    kPowerImported = 0x2000;
+    kPowerExported = 0x4000;
+    kOverFrequency = 0x4;
+    kUnderFrequency = 0x8;
+    kOverPower = 0x10;
+    kUnderPower = 0x20;
+    kOverCurrent = 0x40;
+    kUnderCurrent = 0x80;
+    kFrequencyQuality = 0x100;
+    kVoltageQuality = 0x200;
+  }
+
+  bitmap Feature : bitmap32 {
+    kReset = 0x1;
+    kAdjustableThresholds = 0x100000;
+    kOverVoltage = 0x200000;
+    kUnderVoltage = 0x400000;
+    kOverFrequency = 0x800000;
+    kUnderFrequency = 0x1000000;
+    kOverPower = 0x2000000;
+    kUnderPower = 0x4000000;
+    kOverCurrent = 0x8000000;
+    kUnderCurrent = 0x10000000;
+    kPowerImport = 0x20000000;
+    kPowerExport = 0x40000000;
+  }
+
+  info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
+  readonly attribute optional voltage_mv overVoltageThreshold = 128;
+  readonly attribute optional voltage_mv underVoltageThreshold = 129;
+  readonly attribute optional int64s overFrequencyThreshold = 130;
+  readonly attribute optional int64s underFrequencyThreshold = 131;
+  readonly attribute optional power_mw overPowerThreshold = 132;
+  readonly attribute optional power_mw underPowerThreshold = 133;
+  readonly attribute optional amperage_ma overCurrentThreshold = 134;
+  readonly attribute optional amperage_ma underCurrentThreshold = 135;
+  readonly attribute optional power_mw powerImportThreshold = 136;
+  readonly attribute optional power_mw powerExportThreshold = 137;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmBitmap alarms = 0;
+  }
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  request struct SetElectricalAlarmThresholdsRequest {
+    optional voltage_mv overVoltageThreshold = 0;
+    optional voltage_mv underVoltageThreshold = 1;
+    optional int64s overFrequencyThreshold = 2;
+    optional int64s underFrequencyThreshold = 3;
+    optional power_mw overPowerThreshold = 4;
+    optional power_mw underPowerThreshold = 5;
+    optional amperage_ma overCurrentThreshold = 6;
+    optional amperage_ma underCurrentThreshold = 7;
+    optional power_mw powerImportThreshold = 8;
+    optional power_mw powerExportThreshold = 9;
+  }
+
+  /** This command resets active and latched alarms (if possible). */
+  command Reset(ResetRequest): DefaultSuccess = 0;
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
+  /** This command will set the alarm thresholds for the specified values. */
+  command SetElectricalAlarmThresholds(SetElectricalAlarmThresholdsRequest): DefaultSuccess = 128;
+}
+
+/** This cluster provides an interface for a device which distributes electrical power to other devices, providing information about the capacity of the device as well as whether it has been damaged or has reached the end of its service life. */
+provisional cluster ElectricalDistribution = 162 {
+  revision 1;
+
+  enum EndOfLifeEnum : enum8 {
+    kNone = 0;
+    kDamaged = 1;
+    kDegraded = 2;
+    kExpired = 3;
+  }
+
+  provisional readonly attribute nullable amperage_ma maxContinuousCurrent = 0;
+  provisional readonly attribute nullable voltage_mv maxVoltage = 1;
+  provisional readonly attribute nullable int16u numberOfPoles = 2;
+  provisional readonly attribute nullable EndOfLifeEnum endOfLife = 3;
+  provisional readonly attribute nullable boolean serviceEntranceRated = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is a derived cluster of the Alarm Base cluster and provides the alarm definition related to the Electrical Protection device type. */
+provisional cluster ElectricalProtectionAlarm = 163 {
+  revision 1;
+
+  enum CurrentTripCurveEnum : enum8 {
+    kTypeZ = 0;
+    kTypeB = 1;
+    kTypeC = 2;
+    kTypeK = 3;
+    kTypeD = 4;
+  }
+
+  enum CurrentWaveformEnum : enum8 {
+    kAC = 0 [spec_name = "AC"];
+    kA = 1;
+    kF = 2;
+    kB = 3;
+  }
+
+  enum GroundFaultClassEnum : enum8 {
+    kClassA = 0;
+    kClassB = 1;
+    kClassC = 2;
+    kClassD = 3;
+    kClassE = 4;
+  }
+
+  bitmap AlarmBitmap : bitmap32 {
+    kShortCircuitFault = 0x1;
+    kOverLoadFault = 0x2;
+    kOverVoltageFault = 0x4;
+    kVoltageSurgeFault = 0x8;
+    kResidualCurrentFault = 0x10;
+    kArcFault = 0x20;
+    kSelfTest = 0x40;
+  }
+
+  bitmap ArcCauseBitmap : bitmap8 {
+    kSeries = 0x1;
+    kParallelToNeutral = 0x2;
+    kParallelToGround = 0x4;
+  }
+
+  bitmap CurrentTripMechanismBitmap : bitmap8 {
+    kThermal = 0x1;
+    kMagnetic = 0x2;
+    kElectronic = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kShortCircuit = 0x100000;
+    kOverLoad = 0x200000;
+    kOverVoltage = 0x400000;
+    kSurgeProtection = 0x800000;
+    kResidualCurrent = 0x1000000;
+    kArcFault = 0x2000000;
+    kSelfTest = 0x4000000;
+  }
+
+  bitmap SurgeProtectionClassBitmap : bitmap16 {
+    kClassI = 0x1;
+    kClassII = 0x2;
+    kClassIII = 0x4;
+  }
+
+  bitmap SurgeProtectionTypeBitmap : bitmap16 {
+    kType1 = 0x1;
+    kType2 = 0x2;
+    kType3 = 0x4;
+  }
+
+  bitmap TrippingCharacteristicsBitmap : bitmap16 {
+    kShortDelay = 0x1;
+    kSelective = 0x2;
+    kSuperImmune = 0x4;
+  }
+
+  bitmap VoltageTripMechanismBitmap : bitmap8 {
+    kMOV = 0x1 [spec_name = "MOV"];
+    kSAD = 0x2 [spec_name = "SAD"];
+    kGDT = 0x4 [spec_name = "GDT"];
+  }
+
+  struct ArcFaultRatingsStruct {
+    optional amperage_ma seriesArcCurrentSensitivity = 0;
+    optional amperage_ma parallelArcCurrentSensitivity = 1;
+    optional ArcCauseBitmap supportedArcCauses = 2;
+  }
+
+  struct OverLoadRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripCurveEnum tripCurve = 1;
+    optional CurrentTripMechanismBitmap tripMechanism = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+  }
+
+  struct OverVoltageRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional voltage_mv tripVoltage = 1;
+    optional voltage_mv maxContinuousOperatingVoltage = 2;
+    optional int64u responseTime = 3;
+  }
+
+  struct ResidualCurrentFaultRatingsStruct {
+    optional amperage_ma currentSensitivity = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional boolean voltageDependent = 2;
+    optional GroundFaultClassEnum groundFaultClass = 3;
+    optional CurrentWaveformEnum waveform = 4;
+    optional TrippingCharacteristicsBitmap trippingCharacteristic = 5;
+    optional amperage_ma ultimateMaxCurrent = 6;
+    optional amperage_ma serviceMaxCurrent = 7;
+  }
+
+  struct ShortCircuitRatingsStruct {
+    optional amperage_ma tripCurrent = 0;
+    optional CurrentTripMechanismBitmap tripMechanism = 1;
+    optional CurrentTripCurveEnum tripCurve = 2;
+    optional amperage_ma ultimateMaxCurrent = 3;
+    optional amperage_ma serviceMaxCurrent = 4;
+    optional amperage_ma maxCurrent = 5;
+  }
+
+  struct SurgeProtectionRatingsStruct {
+    optional VoltageTripMechanismBitmap tripMechanism = 0;
+    optional SurgeProtectionClassBitmap protectionClass = 1;
+    optional SurgeProtectionTypeBitmap protectionType = 2;
+    optional voltage_mv maxContinuousOperatingVoltage = 3;
+    optional voltage_mv maxVoltageProtection = 4;
+    optional voltage_mv maxTemporaryVoltage = 5;
+    optional amperage_ma nominalDischargeCurrent = 6;
+    optional amperage_ma maximumDishargeCurrent = 7;
+    optional amperage_ma ratedShortCircuitCurrent = 8;
+    optional amperage_ma ratedShortTimeWithstandCurrent = 9;
+    optional int64u energyAbsorptionCapability = 10;
+    optional int64u responseTime = 11;
+  }
+
+  provisional info event Notify = 0 {
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
+  }
+
+  provisional readonly attribute AlarmBitmap mask = 0;
+  provisional readonly attribute AlarmBitmap state = 2;
+  provisional readonly attribute AlarmBitmap supported = 3;
+  provisional readonly attribute optional nullable ArcCauseBitmap arcCause = 128;
+  provisional readonly attribute optional nullable OverLoadRatingsStruct overLoadRating = 129;
+  provisional readonly attribute optional nullable OverVoltageRatingsStruct overVoltageRating = 130;
+  provisional readonly attribute optional nullable SurgeProtectionRatingsStruct surgeProtectionRating = 131;
+  provisional readonly attribute optional nullable ShortCircuitRatingsStruct shortCircuitRating = 132;
+  provisional readonly attribute optional nullable ResidualCurrentFaultRatingsStruct residualCurrentRating = 133;
+  provisional readonly attribute optional nullable ArcFaultRatingsStruct arcFaultRating = 134;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmBitmap mask = 0;
+  }
+
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
+}
+
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
   revision 10;
@@ -6048,8 +6337,8 @@ cluster DoorLock = 257 {
   }
 
   enum StatusCodeEnum : enum8 {
-    kDUPLICATE = 2 [spec_name = "DUPLICATE"];
-    kOCCUPIED = 3 [spec_name = "OCCUPIED"];
+    kDuplicate = 2;
+    kOccupied = 3;
   }
 
   enum UserStatusEnum : enum8 {
@@ -6670,8 +6959,8 @@ cluster WindowCovering = 258 {
 }
 
 /** This cluster provides an interface for controlling a Closure. */
-provisional cluster ClosureControl = 260 {
-  revision 1;
+cluster ClosureControl = 260 {
+  revision 2;
 
   enum ClosureErrorEnum : enum8 {
     kPhysicallyBlocked = 0;
@@ -6719,6 +7008,7 @@ provisional cluster ClosureControl = 260 {
     kCalibration = 0x40;
     kProtection = 0x80;
     kManuallyOperable = 0x100;
+    kAccess = 0x200;
   }
 
   bitmap LatchControlModesBitmap : bitmap8 {
@@ -6772,17 +7062,25 @@ provisional cluster ClosureControl = 260 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
+  request struct GroupedMoveToRequest {
+    optional TargetPositionEnum position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
   /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
   /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
   timed command MoveTo(MoveToRequest): DefaultSuccess = 1;
   /** This command is used to trigger a calibration of the closure. */
   timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures to a target position, latch, and/or perform the movement at a specific speed. */
+  command GroupedMoveTo(GroupedMoveToRequest): DefaultSuccess = 3;
 }
 
 /** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
-provisional cluster ClosureDimension = 261 {
-  revision 1;
+cluster ClosureDimension = 261 {
+  revision 2;
 
   enum ClosureUnitEnum : enum8 {
     kMillimeter = 0;
@@ -6854,6 +7152,7 @@ provisional cluster ClosureDimension = 261 {
     kTranslation = 0x20;
     kRotation = 0x40;
     kModulation = 0x80;
+    kAccess = 0x100;
   }
 
   bitmap LatchControlModesBitmap : bitmap8 {
@@ -6907,10 +7206,26 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
+  request struct GroupedSetTargetRequest {
+    optional percent100ths position = 0;
+    optional boolean latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  request struct GroupedStepRequest {
+    StepDirectionEnum direction = 0;
+    int16u numberOfSteps = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
   /** This command is used to move a dimension of the closure to a target position. */
   timed command SetTarget(SetTargetRequest): DefaultSuccess = 0;
   /** This command is used to move a dimension of the closure to a target position by a number of steps. */
   timed command Step(StepRequest): DefaultSuccess = 1;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position, latch, and/or perform the movement at a specific speed. */
+  command GroupedSetTarget(GroupedSetTargetRequest): DefaultSuccess = 2;
+  /** This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position by a number of steps. */
+  command GroupedStep(GroupedStepRequest): DefaultSuccess = 3;
 }
 
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
@@ -8334,7 +8649,7 @@ cluster OccupancySensing = 1030 {
 
 /** Attributes for reporting carbon monoxide concentration measurements */
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8359,6 +8674,8 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8390,7 +8707,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 
 /** Attributes for reporting carbon dioxide concentration measurements */
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8415,6 +8732,8 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8446,7 +8765,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8471,6 +8790,8 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8502,7 +8823,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 
 /** Attributes for reporting ozone concentration measurements */
 cluster OzoneConcentrationMeasurement = 1045 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8527,6 +8848,8 @@ cluster OzoneConcentrationMeasurement = 1045 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8558,7 +8881,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
 
 /** Attributes for reporting PM2.5 concentration measurements */
 cluster Pm25ConcentrationMeasurement = 1066 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8583,6 +8906,8 @@ cluster Pm25ConcentrationMeasurement = 1066 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8614,7 +8939,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
 
 /** Attributes for reporting formaldehyde concentration measurements */
 cluster FormaldehydeConcentrationMeasurement = 1067 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8639,6 +8964,8 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8670,7 +8997,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
 
 /** Attributes for reporting PM1 concentration measurements */
 cluster Pm1ConcentrationMeasurement = 1068 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8695,6 +9022,8 @@ cluster Pm1ConcentrationMeasurement = 1068 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8726,7 +9055,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
 
 /** Attributes for reporting PM10 concentration measurements */
 cluster Pm10ConcentrationMeasurement = 1069 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8751,6 +9080,8 @@ cluster Pm10ConcentrationMeasurement = 1069 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8782,7 +9113,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8807,6 +9138,8 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8838,7 +9171,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 
 /** Attributes for reporting radon concentration measurements */
 cluster RadonConcentrationMeasurement = 1071 {
-  revision 3;
+  revision 5;
 
   shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
@@ -8863,6 +9196,8 @@ cluster RadonConcentrationMeasurement = 1071 {
     kNGM3 = 5 [spec_name = "NGM3"];
     kPM3 = 6 [spec_name = "PM3"];
     kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
   }
 
   bitmap Feature : bitmap32 {
@@ -8907,7 +9242,7 @@ provisional cluster SoilMeasurement = 1072 {
 
 /** This server cluster provides an interface to ambient context sensing functionality. */
 provisional cluster AmbientContextSensing = 1073 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kHumanActivity = 0x1;
@@ -8915,11 +9250,12 @@ provisional cluster AmbientContextSensing = 1073 {
     kObjectIdentification = 0x4;
     kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
+    kSensorFusion = 0x20;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
-    optional epoch_s detectionStartTime = 1;
+    optional nullable percent detectionConfidence = 1;
   }
 
   struct HoldTimeLimitsStruct {
@@ -8944,12 +9280,13 @@ provisional cluster AmbientContextSensing = 1073 {
 
   provisional info event AmbientContextDetectStarted = 0 {
     optional AmbientContextTypeStruct ambientContextDetected = 0;
-    optional boolean objectCountReached = 1;
+    optional boolean objectCountThresholdReached = 1;
     optional int16u objectCount = 2;
   }
 
   provisional info event AmbientContextDetectEnded = 1 {
-    posix_ms eventStartTime = 0;
+    optional posix_ms eventStartTimePos = 0;
+    optional systime_ms eventStartTimeSys = 1;
   }
 
   provisional readonly attribute optional boolean humanActivityDetected = 0;
@@ -8957,13 +9294,58 @@ provisional cluster AmbientContextSensing = 1073 {
   provisional readonly attribute optional boolean audioContextDetected = 2;
   provisional readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   provisional readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
-  provisional readonly attribute optional boolean objectCountReached = 5;
+  provisional readonly attribute optional boolean objectCountThresholdReached = 5;
   provisional attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
   provisional readonly attribute optional int16u objectCount = 7;
-  provisional attribute int8u simultaneousDetectionLimit = 8;
+  provisional readonly attribute int8u simultaneousDetectionLimit = 8;
   provisional attribute access(write: manage) int16u holdTime = 9;
   provisional readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
   provisional readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
+  provisional readonly attribute optional SemanticTagStruct sensorFusionSupported[] = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides data modeling and protocol implementation of multi-node ambient sensing system. */
+provisional cluster AmbientSensingUnion = 1074 {
+  revision 1;
+
+  enum UnionContributorStatusEnum : enum8 {
+    kUnionContributorOnline = 0;
+    kUnionContributorOffline = 1;
+  }
+
+  enum UnionHealthEnum : enum8 {
+    kFullyFunctional = 0;
+    kLimitedDegraded = 1;
+    kNonFunctional = 2;
+  }
+
+  struct UnionContributorStruct {
+    nullable node_id contributorNodeID = 0;
+    nullable endpoint_no contributorEndpointID = 1;
+    optional char_string<128> contributorName = 2;
+    UnionContributorStatusEnum contributorHealth = 3;
+  }
+
+  provisional info event UnionContributorAdded = 0 {
+    UnionContributorStruct addedContributor[] = 0;
+  }
+
+  provisional info event UnionContributorRemoved = 1 {
+    UnionContributorStruct removedContributor[] = 0;
+  }
+
+  provisional info event UnionContributorStatusChanged = 2 {
+    UnionContributorStruct statusChangedContributor[] = 0;
+  }
+
+  attribute char_string<128> unionName = 0;
+  readonly attribute UnionHealthEnum unionHealth = 1;
+  readonly attribute UnionContributorStruct unionContributorList[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -9178,12 +9560,70 @@ provisional cluster ProximityRanging = 1075 {
   command StopRangingRequest(StopRangingRequestRequest): DefaultSuccess = 2;
 }
 
+/** The server cluster provides an interface to concentration measurement functionality. */
+provisional cluster SmokeConcentrationMeasurement = 1076 {
+  revision 5;
+
+  shared enum LevelValueEnum : enum8 {
+    kUnknown = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kCritical = 4;
+  }
+
+  shared enum MeasurementMediumEnum : enum8 {
+    kAir = 0;
+    kWater = 1;
+    kSoil = 2;
+  }
+
+  shared enum MeasurementUnitEnum : enum8 {
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
+    kDBPM = 8 [spec_name = "DBPM"];
+    kPCFT = 9 [spec_name = "PCFT"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kNumericMeasurement = 0x1;
+    kLevelIndication = 0x2;
+    kMediumLevel = 0x4;
+    kCriticalLevel = 0x8;
+    kPeakMeasurement = 0x10;
+    kAverageMeasurement = 0x20;
+  }
+
+  provisional readonly attribute optional nullable single measuredValue = 0;
+  provisional readonly attribute optional nullable single minMeasuredValue = 1;
+  provisional readonly attribute optional nullable single maxMeasuredValue = 2;
+  provisional readonly attribute optional nullable single peakMeasuredValue = 3;
+  provisional readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
+  provisional readonly attribute optional nullable single averageMeasuredValue = 5;
+  provisional readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
+  provisional readonly attribute optional single uncertainty = 7;
+  provisional readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
+  provisional readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  provisional readonly attribute optional LevelValueEnum levelValue = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster manages the identities and credentials of devices that connect to a managed network. */
 provisional cluster NetworkIdentityManagement = 1104 {
   revision 1;
 
   enum IdentityTypeEnum : enum8 {
-    kECDSA = 0 [spec_name = "ECDSA"];
+    kECDSA = 1 [spec_name = "ECDSA"];
   }
 
   struct ActiveNetworkIdentityStruct {
@@ -9198,7 +9638,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   struct ClientStruct {
     int16u clientIndex = 0;
     octet_string<20> clientIdentifier = 1;
-    nullable int16u networkIdentityIndex = 2;
+    IdentityTypeEnum clientIdentityType = 2;
+    nullable int16u networkIdentityIndex = 3;
   }
 
   readonly attribute access(read: manage) ActiveNetworkIdentityStruct activeNetworkIdentities[] = 0;
@@ -9226,7 +9667,8 @@ provisional cluster NetworkIdentityManagement = 1104 {
   request struct QueryIdentityRequest {
     optional int16u networkIdentityIndex = 0;
     optional IdentityTypeEnum networkIdentityType = 1;
-    optional octet_string<20> identifier = 2;
+    optional int16u clientIndex = 2;
+    optional octet_string<20> identifier = 3;
   }
 
   response struct QueryIdentityResponse = 4 {
@@ -9358,6 +9800,114 @@ cluster ThreadNetworkDirectory = 1107 {
   timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
   /** Retrieves the Thread Operational Dataset with the given Extended PAN ID. */
   command access(invoke: manage) GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
+}
+
+/** This cluster provides a proxy service allowing a Commissioner to utilize commissioning transports not supported locally, or to extend the commissioning range of the Commissioner. */
+provisional cluster CommissioningProxy = 1109 {
+  revision 1;
+
+  bitmap CapabilitiesBitmap : bitmap8 {
+    kBLE = 0x2 [spec_name = "BLE"];
+    kWiFiPAF = 0x8;
+    kNTL = 0x10 [spec_name = "NTL"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kWiFiNetworkInterface = 0x1;
+    kBackgroundScan = 0x2;
+  }
+
+  bitmap WiFiBandBitmap : bitmap16 {
+    k2G4 = 0x1 [spec_name = "2G4"];
+    k5G = 0x4 [spec_name = "5G"];
+  }
+
+  struct ScanResultStruct {
+    nullable octet_string<100> address = 0;
+    CapabilitiesBitmap transport = 1;
+    int16u discriminator = 2;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    nullable octet_string<128> extendedData = 5;
+    optional WiFiBandBitmap wiFiBand = 6;
+  }
+
+  readonly attribute CapabilitiesBitmap transport = 0;
+  attribute int8u scanMaxTime = 1;
+  readonly attribute int8u maxSessions = 2;
+  readonly attribute optional int8u maxCachedResults = 3;
+  readonly attribute optional int8u numCachedResults = 4;
+  attribute optional int16u cacheTimeout = 5;
+  readonly attribute optional nullable ScanResultStruct cachedResults[] = 6;
+  readonly attribute optional WiFiBandBitmap wiFiBand = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ProxyConnectRequestRequest {
+    nullable octet_string<100> address = 0;
+    CapabilitiesBitmap transport = 1;
+    int16u discriminator = 2;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    int16u timeout = 5;
+    optional WiFiBandBitmap wiFiBand = 6;
+  }
+
+  response struct ProxyConnectResponse = 1 {
+    int16u sessionID = 0;
+  }
+
+  request struct ProxyDisconnectRequestRequest {
+    nullable int16u sessionID = 0;
+  }
+
+  request struct ProxyScanRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    optional WiFiBandBitmap wiFiBands = 1;
+  }
+
+  response struct ProxyScanResponse = 4 {
+    int8u numberOfResults = 0;
+    ScanResultStruct proxyScanResult[] = 1;
+  }
+
+  request struct ProxyBackGroundScanStartRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    int16u timeout = 1;
+    optional WiFiBandBitmap wiFiBands = 2;
+  }
+
+  request struct ProxyBackGroundScanStopRequestRequest {
+    CapabilitiesBitmap transport = 0;
+    optional WiFiBandBitmap wiFiBands = 1;
+  }
+
+  request struct ProxyMessageRequestRequest {
+    int16u sessionID = 0;
+    int8u responseTimeout = 1;
+    nullable long_octet_string<1280> message = 2;
+  }
+
+  response struct ProxyMessageResponse = 8 {
+    int16u sessionID = 0;
+    nullable long_octet_string<1280> message = 1;
+  }
+
+  /** This command serves to establish a transport connection to a commissionable device discovered by the proxy. */
+  fabric command ProxyConnectRequest(ProxyConnectRequestRequest): ProxyConnectResponse = 0;
+  /** This disconnects a transport connection created via the ProxyConnectRequest command. */
+  fabric command ProxyDisconnectRequest(ProxyDisconnectRequestRequest): DefaultSuccess = 2;
+  /** This command requests the proxy to provide a list of all commissionable devices found on the requested transports and bands. */
+  command ProxyScanRequest(ProxyScanRequestRequest): ProxyScanResponse = 3;
+  /** This command requests the proxy to start background scanning for commissionable devices on the selected transports. */
+  command ProxyBackGroundScanStartRequest(ProxyBackGroundScanStartRequestRequest): DefaultSuccess = 5;
+  /** This command requests the proxy to stop background scanning for commissionable devices on the selected transports. */
+  command ProxyBackGroundScanStopRequest(ProxyBackGroundScanStopRequestRequest): DefaultSuccess = 6;
+  /** This command sends a message packet to the proxy. */
+  fabric command ProxyMessageRequest(ProxyMessageRequestRequest): ProxyMessageResponse = 7;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
@@ -9943,7 +10493,7 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1;
+  revision 3;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -9991,12 +10541,24 @@ cluster ContentLauncher = 1290 {
     kAny = 16;
   }
 
+  enum QueueTypeEnum : enum8 {
+    kReplace = 0;
+    kNext = 1;
+    kLast = 2;
+  }
+
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kURLNotAvailable = 1;
     kAuthFailed = 2;
     kTextTrackNotAvailable = 3;
     kAudioTrackNotAvailable = 4;
+    kInvalidData = 5;
+    kAccountMismatch = 6;
+    kContentAppNotAvailable = 7;
+    kReplicationNotAllowed = 8;
+    kReplicationNotSupported = 9;
+    kPresetNotFound = 10;
   }
 
   bitmap Feature : bitmap32 {
@@ -10005,6 +10567,9 @@ cluster ContentLauncher = 1290 {
     kAdvancedSeek = 0x4;
     kTextTracks = 0x8;
     kAudioTracks = 0x10;
+    kContentReplication = 0x20;
+    kContentQueueing = 0x40;
+    kPresets = 0x80;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
@@ -10016,6 +10581,27 @@ cluster ContentLauncher = 1290 {
     double width = 0;
     double height = 1;
     MetricTypeEnum metric = 2;
+  }
+
+  struct ContentAppInfo {
+    int16u contentAppVendorID = 0;
+    int16u contentAppProductID = 1;
+    long_char_string<1024> data = 2;
+  }
+
+  struct LaunchUrlInfo {
+    long_char_string<8192> url = 0;
+    optional nullable long_char_string<1024> data = 1;
+    optional nullable long_char_string<256> contentType = 2;
+    optional nullable char_string contentHeaders[] = 3;
+    optional nullable int32u offsetMillisecs = 4;
+    optional nullable QueueTypeEnum queueType = 5;
+    optional nullable long_char_string<8192> nextUrl = 6;
+  }
+
+  struct ReplicationInfo {
+    optional nullable LaunchUrlInfo launchUrlInfo = 0;
+    optional nullable ContentAppInfo contentAppInfo = 1;
   }
 
   struct TrackPreferenceStruct {
@@ -10031,13 +10617,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct AdditionalInfoStruct {
-    char_string<256> name = 0;
-    char_string<8192> value = 1;
+    long_char_string<256> name = 0;
+    long_char_string<8192> value = 1;
   }
 
   struct ParameterStruct {
     ParameterEnum type = 0;
-    char_string<1024> value = 1;
+    long_char_string<1024> value = 1;
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
@@ -10046,13 +10632,13 @@ cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformationStruct {
-    optional char_string<8192> imageURL = 0;
+    optional long_char_string<8192> imageURL = 0;
     optional char_string<9> color = 1;
     optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
-    char_string<256> providerName = 0;
+    long_char_string<256> providerName = 0;
     optional StyleInformationStruct background = 1;
     optional StyleInformationStruct logo = 2;
     optional StyleInformationStruct progressBar = 3;
@@ -10060,8 +10646,19 @@ cluster ContentLauncher = 1290 {
     optional StyleInformationStruct waterMark = 5;
   }
 
+  struct ContentPresetStruct {
+    int8u presetID = 0;
+    char_string<48> presetName = 1;
+  }
+
+  provisional info event ContentReplication = 0 {
+    StatusEnum status = 0;
+  }
+
   readonly attribute optional char_string acceptHeader[] = 0;
   readonly attribute optional SupportedProtocolsBitmap supportedStreamingProtocols = 1;
+  provisional readonly attribute optional boolean movable = 2;
+  provisional readonly attribute optional ContentPresetStruct presets[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -10074,12 +10671,20 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 2;
     optional PlaybackPreferencesStruct playbackPreferences = 3;
     optional boolean useCurrentContext = 4;
+    optional nullable int16u contentAppVendorID = 5;
+    optional nullable int16u contentAppProductID = 6;
   }
 
   request struct LaunchURLRequest {
-    char_string contentURL = 0;
-    optional char_string displayString = 1;
+    long_char_string<8192> contentURL = 0;
+    optional long_char_string<256> displayString = 1;
     optional BrandingInformationStruct brandingInformation = 2;
+    optional PlaybackPreferencesStruct playbackPreferences = 3;
+    optional nullable long_char_string<256> contentType = 4;
+    optional nullable char_string contentHeaders[] = 5;
+    optional nullable int32u offsetMillisecs = 6;
+    optional nullable QueueTypeEnum queueType = 7;
+    optional nullable long_char_string<8192> nextUrl = 8;
   }
 
   response struct LauncherResponse = 2 {
@@ -10087,10 +10692,23 @@ cluster ContentLauncher = 1290 {
     optional char_string data = 1;
   }
 
+  response struct ContentReplicationResponse = 4 {
+    StatusEnum status = 0;
+    optional nullable ReplicationInfo replicationInfo = 1;
+  }
+
+  request struct PlayPresetRequest {
+    int8u presetID = 0;
+  }
+
   /** Upon receipt, this SHALL launch the specified content with optional search criteria. */
   command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
   /** Upon receipt, this SHALL launch content from the specified URL. */
   command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
+  /** Upon receipt, this SHALL request replication information for the currently playing content. */
+  command ContentReplicationRequest(): ContentReplicationResponse = 3;
+  /** This command will play the preset passed in. */
+  command PlayPreset(PlayPresetRequest): DefaultSuccess = 5;
 }
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
@@ -10475,6 +11093,175 @@ cluster ContentAppObserver = 1296 {
 
   /** Upon receipt, the data field MAY be parsed and interpreted. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
+}
+
+/** This cluster provides an interface for managing and sharing media files on devices such as Streaming Speakers, Smart TVs, or other media playback devices. */
+provisional cluster MediaFileManagement = 1297 {
+  revision 1;
+
+  enum FileStatusEnum : enum8 {
+    kSuccess = 0;
+    kInsufficientStorage = 1;
+    kInvalidFileID = 2;
+    kAuthenticationFailed = 3;
+    kFileNotAvailable = 4;
+    kInvalidRequest = 5;
+    kUnsupportedMimeType = 6;
+  }
+
+  bitmap Feature : bitmap32 {
+    kMediaSharing = 0x1;
+  }
+
+  struct FileDescriptionStruct {
+    int64u fileID = 0;
+    char_string<128> name = 1;
+    int64u size = 2;
+    long_char_string<256> mimeType = 3;
+    long_char_string<256> imageUri = 4;
+  }
+
+  provisional info event SharedFilesAdded = 0 {
+    int16u requestID = 0;
+    int16u responseID = 1;
+  }
+
+  provisional readonly attribute access(read: manage) int64u totalStorage = 0;
+  provisional readonly attribute access(read: manage) int64u availableStorage = 1;
+  provisional readonly attribute access(read: manage) FileDescriptionStruct availableFiles[] = 2;
+  provisional readonly attribute access(read: manage) char_string supportedMimeTypes[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddFileRequest {
+    char_string<128> name = 0;
+    int64u size = 1;
+    long_char_string<256> mimeType = 2;
+    long_char_string<256> imageUri = 3;
+  }
+
+  response struct AddFileResponse = 1 {
+    FileStatusEnum status = 0;
+    nullable int64u fileID = 1;
+  }
+
+  request struct DeleteFileRequest {
+    int64u fileID = 0;
+  }
+
+  request struct RequestSharedFilesRequest {
+    char_string<128> clientName = 0;
+    int16u requestID = 1;
+    optional nullable char_string supportedMimeTypes[] = 2;
+  }
+
+  request struct GetSharedFileRequest {
+    int16u responseID = 0;
+  }
+
+  response struct GetSharedFileResponse = 5 {
+    FileStatusEnum status = 0;
+    optional nullable FileDescriptionStruct fileDescription = 1;
+  }
+
+  request struct OfferFileRequest {
+    char_string<128> clientName = 0;
+    char_string<128> name = 1;
+    int64u size = 2;
+    long_char_string<256> mimeType = 3;
+    long_char_string<256> imageUri = 4;
+  }
+
+  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage. */
+  command access(invoke: manage) AddFile(AddFileRequest): AddFileResponse = 0;
+  /** Upon receipt, this command SHALL delete the specified media file from the device's storage. */
+  command access(invoke: manage) DeleteFile(DeleteFileRequest): DefaultSuccess = 2;
+  /** Upon receipt, this command SHALL initiate a request for the server to share files with the requesting client. */
+  command access(invoke: view) RequestSharedFiles(RequestSharedFilesRequest): DefaultSuccess = 3;
+  /** Upon receipt, this command SHALL retrieve information about a file that was previously shared with the requesting client. */
+  command access(invoke: view) GetSharedFile(GetSharedFileRequest): GetSharedFileResponse = 4;
+  /** Upon receipt, this command SHALL indicate that the requesting client wishes to share a file with the server. */
+  command access(invoke: view) OfferFile(OfferFileRequest): DefaultSuccess = 6;
+}
+
+/** This cluster provides attributes and commands to control the audio output volume and frequency corrections of a device. */
+provisional cluster AudioControl = 1298 {
+  revision 1;
+
+  enum UnmutePolicyEnum : enum8 {
+    kUnmuteOrChangeVolume = 0;
+    kUnmuteOrDoNotChangeVolume = 1;
+    kDoNotUnmuteAndChangeVolume = 2;
+    kDoNotUnmuteAndDoNotChangeVolume = 3;
+  }
+
+  enum UnmuteVolumeEnum : enum8 {
+    kMinDeviceVolume = 0;
+    kVolume = 1;
+    kVolumePlusStepSize = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDecibel = 0x1;
+    kBasicEqualizer = 0x2;
+  }
+
+  readonly attribute boolean softMuted = 0;
+  readonly attribute optional boolean physicallyMuted = 1;
+  readonly attribute int16u volume = 2;
+  readonly attribute int16u minDeviceVolume = 3;
+  readonly attribute int16u maxDeviceVolume = 4;
+  readonly attribute optional int16u maxDeviceVolumeDB = 5;
+  attribute access(write: manage) optional int16u maxUserVolume = 6;
+  attribute access(write: manage) int16u defaultStepSize = 7;
+  attribute access(write: manage) UnmutePolicyEnum setVolumeUnmutePolicy = 8;
+  attribute access(write: manage) UnmutePolicyEnum increaseVolumeUnmutePolicy = 9;
+  attribute access(write: manage) UnmuteVolumeEnum increaseVolumeUnmuteVolume = 10;
+  attribute access(write: manage) UnmutePolicyEnum decreaseVolumeUnmutePolicy = 11;
+  attribute optional nullable boolean startUpMuted = 12;
+  attribute optional nullable int16u startUpVolume = 13;
+  attribute optional int16s bass = 14;
+  attribute optional int16s mid = 15;
+  attribute optional int16s treble = 16;
+  readonly attribute optional int16s minCorrection = 17;
+  readonly attribute optional int16s maxCorrection = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetVolumeRequest {
+    int16u newVolume = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  request struct IncreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+    optional UnmuteVolumeEnum unmuteVolume = 2;
+  }
+
+  request struct DecreaseVolumeRequest {
+    optional int16u stepSize = 0;
+    optional UnmutePolicyEnum unmutePolicy = 1;
+  }
+
+  /** This command SHALL set the value of the SoftMuted attribute to TRUE. */
+  command Mute(): DefaultSuccess = 0;
+  /** This command SHALL set the value of the SoftMuted attribute to FALSE. */
+  command Unmute(): DefaultSuccess = 1;
+  /** This command SHALL toggle the state of the SoftMuted attribute. */
+  command ToggleMuted(): DefaultSuccess = 2;
+  /** Sets the volume to a specified level. */
+  command SetVolume(SetVolumeRequest): DefaultSuccess = 3;
+  /** Increases the volume by a specified level. */
+  command IncreaseVolume(IncreaseVolumeRequest): DefaultSuccess = 4;
+  /** Decreases the volume by a specified level. */
+  command DecreaseVolume(DecreaseVolumeRequest): DefaultSuccess = 5;
 }
 
 /** This cluster provides an interface to manage regions of interest, or Zones, which can be either manufacturer or user defined. */
@@ -11117,7 +11904,7 @@ cluster WebRTCTransportRequestor = 1364 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 2;
+  revision 3;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -11157,6 +11944,7 @@ cluster PushAvStreamTransport = 1365 {
     kCommand = 0;
     kMotion = 1;
     kContinuous = 2;
+    kAmbientContext = 3;
   }
 
   enum TriggerActivationReasonEnum : enum8 {
@@ -11205,10 +11993,8 @@ cluster PushAvStreamTransport = 1365 {
     CMAFInterfaceEnum CMAFInterface = 0;
     int16u segmentDuration = 1;
     int16u chunkDuration = 2;
-    int8u sessionGroup = 3;
-    char_string<16> trackName = 4;
-    optional octet_string<16> CENCKey = 5;
-    optional octet_string<16> CENCKeyID = 6;
+    optional int8u sessionGroup = 3;
+    optional char_string<16> trackName = 4;
     optional boolean metadataEnabled = 7;
   }
 
@@ -11247,13 +12033,13 @@ cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TransportTriggerTypeEnum triggerType = 1;
     optional TriggerActivationReasonEnum activationReason = 2;
-    ContainerFormatEnum containerType = 3;
+    optional ContainerFormatEnum containerType = 3;
     optional int64u CMAFSessionNumber = 4;
   }
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
-    ContainerFormatEnum containerType = 1;
+    optional ContainerFormatEnum containerType = 1;
     optional int64u CMAFSessionNumber = 2;
   }
 
@@ -11346,9 +12132,127 @@ cluster Chime = 1366 {
   command PlayChimeSound(PlayChimeSoundRequest): DefaultSuccess = 0;
 }
 
+/** This server cluster provides an interface for controlling events pertaining to AV analysis. */
+provisional cluster AvAnalysis = 1367 {
+  revision 1;
+
+  enum AnalysisStreamStateEnum : enum8 {
+    kPendingInitiation = 0;
+    kFailure = 1;
+    kWebRTCInitiated = 2;
+    kPushAVAllocated = 3;
+    kWebRTCActive = 4;
+    kPushAVActive = 5;
+    kPushAVPendingDeactivation = 6;
+    kWebRTCPendingDeactivation = 7;
+  }
+
+  bitmap Feature : bitmap32 {
+    kLocalContextDetection = 0x1;
+    kRemoteContextDetection = 0x2;
+    kPerZoneContextDetection = 0x4;
+  }
+
+  struct AnalysisStreamStruct {
+    int16u analysisStreamID = 0;
+    optional nullable endpoint_no webRTCEndpointID = 1;
+    optional nullable endpoint_no pushAVEndpointID = 2;
+    AnalysisStreamStateEnum analysisStreamState = 3;
+  }
+
+  struct ContextTriggerStruct {
+    SemanticTagStruct context = 0;
+    optional nullable int16u zoneIDs[] = 1;
+  }
+
+  struct TrackedContext {
+    int16u identifiedContextID = 0;
+    SemanticTagStruct identifiedContext = 1;
+    optional nullable int16u previousZone = 2;
+    optional nullable int16u currentZone = 3;
+    epoch_s startTime = 4;
+    nullable epoch_s endTime = 5;
+  }
+
+  provisional info event AnalysisSessionStart = 0 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+    nullable int16u triggeredZones[] = 2;
+  }
+
+  provisional info event AnalysisSessionEnd = 1 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+  }
+
+  provisional info event PerceivedContext = 2 {
+    int16u sessionID = 0;
+    optional node_id sourceNodeId = 1;
+    optional epoch_us sourceStartTimestamp = 2;
+    optional TrackedContext newIdentifiedContexts[] = 3;
+    optional TrackedContext currentIdentifiedContexts[] = 4;
+    optional TrackedContext expiredContexts[] = 5;
+  }
+
+  readonly attribute SemanticTagStruct supportedAmbientContexts[] = 0;
+  readonly attribute ContextTriggerStruct activeAmbientContextTriggers[] = 1;
+  readonly attribute optional int8u maxAnalysisStreamCount = 2;
+  readonly attribute optional int8u currentAnalysisStreamCount = 3;
+  readonly attribute optional AnalysisStreamStruct analysisStreams[] = 4;
+  attribute access(read: manage, write: manage) boolean trackingEnabled = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct EnableContextTriggersRequest {
+    nullable ContextTriggerStruct contextTriggers[] = 0;
+  }
+
+  request struct DisableContextTriggersRequest {
+    nullable ContextTriggerStruct contextTriggers[] = 0;
+  }
+
+  request struct EstablishAnalysisStreamRequest {
+    node_id nodeID = 0;
+  }
+
+  response struct EstablishAnalysisStreamResponse = 3 {
+    int16u analysisStreamID = 0;
+  }
+
+  request struct ActivateAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+    optional endpoint_no webRTCEndpointID = 1;
+    optional endpoint_no pushAVEndpointID = 2;
+  }
+
+  request struct DeactivateAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+  }
+
+  request struct RemoveAnalysisStreamRequest {
+    int16u analysisStreamID = 0;
+  }
+
+  /** This command SHALL enable the generation of PerceivedContext events for the set of ambient context triggers that are provided, should they be detected. */
+  command EnableContextTriggers(EnableContextTriggersRequest): DefaultSuccess = 0;
+  /** This command will disable the generation of PerceivedContext events for the set of ambient context triggers that are provided, should they be detected. */
+  command DisableContextTriggers(DisableContextTriggersRequest): DefaultSuccess = 1;
+  /** This command will cause the Analysis Node to establish a video stream with a StreamUsage of Analysis Value with the identified camera. */
+  command EstablishAnalysisStream(EstablishAnalysisStreamRequest): EstablishAnalysisStreamResponse = 2;
+  /** This command will cause the Analysis Node to activate either a WebRTC livestream or PushAV recording stream with a StreamUsage of Analysis Value with the identified camera. */
+  command ActivateAnalysisStream(ActivateAnalysisStreamRequest): DefaultSuccess = 4;
+  /** This command will cause the Analysis Node to deactivate either a WebRTC livestream or PushAV recording stream with a StreamUsage of Analysis Value with the identified camera. */
+  command DeactivateAnalysisStream(DeactivateAnalysisStreamRequest): DefaultSuccess = 5;
+  /** This command will cause the Analysis Node to remove a previously allocated video stream. */
+  command RemoveAnalysisStream(RemoveAnalysisStreamRequest): DefaultSuccess = 6;
+}
+
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
 provisional cluster CommodityTariff = 1792 {
-  revision 1;
+  revision 2;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
     kOff = 0;
@@ -11429,6 +12333,7 @@ provisional cluster CommodityTariff = 1792 {
     nullable int64s threshold = 6;
     optional nullable char_string<128> label = 7;
     optional boolean predicted = 8;
+    optional char_string<36> externalID = 9;
   }
 
   struct CalendarPeriodStruct {
@@ -12804,5 +13709,17 @@ cluster SampleMei = 4294048800 {
   command Ping(): DefaultSuccess = 0;
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
+}
+
+/** Test cluster for validating manufacturer-specific cluster handling without controller-side implementation */
+internal cluster TestHiddenManufacturerSpecific = 4294048801 {
+  revision 1; // NOTE: Default/not specifically set
+
+  readonly attribute boolean testAttribute = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 

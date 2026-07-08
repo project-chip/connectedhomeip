@@ -249,6 +249,11 @@ constexpr DataModel::DeviceTypeEntry kThreadBorderRouter = {
     .deviceTypeRevision = kThreadBorderRouterDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kCommissioningByProxy = {
+    .deviceTypeId       = kCommissioningByProxyDeviceTypeId,
+    .deviceTypeRevision = kCommissioningByProxyDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kOnOffLight = {
     .deviceTypeId       = kOnOffLightDeviceTypeId,
     .deviceTypeRevision = kOnOffLightDeviceTypeRevision,
@@ -482,6 +487,16 @@ constexpr DataModel::DeviceTypeEntry kElectricalEnergyTariff = {
 constexpr DataModel::DeviceTypeEntry kElectricalMeter = {
     .deviceTypeId       = kElectricalMeterDeviceTypeId,
     .deviceTypeRevision = kElectricalMeterDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kElectricalCircuitBreaker = {
+    .deviceTypeId       = kElectricalCircuitBreakerDeviceTypeId,
+    .deviceTypeRevision = kElectricalCircuitBreakerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kElectricalDistributionEnclosure = {
+    .deviceTypeId       = kElectricalDistributionEnclosureDeviceTypeId,
+    .deviceTypeRevision = kElectricalDistributionEnclosureDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kControlBridge = {

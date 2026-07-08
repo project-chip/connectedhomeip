@@ -94,7 +94,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             return attribute_value
         except Exception as e:
             log.error(e)
-            log.info("Error reading attributes,%s" % (attribute))
+            log.info("Error reading attributes,%s", attribute)
 
     def pics_TC_DRLK_2_5(self) -> list[str]:
         return ["DRLK.S", "DRLK.S.F04"]
@@ -207,7 +207,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             number_week_day_schedules_supported_per_user = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                                                                cluster=drlkcluster,
                                                                                                attribute=Clusters.DoorLock.Attributes.NumberOfWeekDaySchedulesSupportedPerUser)
-            log.info("NumberOfWeekDaySchedulesSupportedPerUser %s" % (number_week_day_schedules_supported_per_user))
+            log.info("NumberOfWeekDaySchedulesSupportedPerUser %s", number_week_day_schedules_supported_per_user)
             asserts.assert_in(number_week_day_schedules_supported_per_user, range(
                 0, 255), "NumberOfWeekDaySchedulesSupportedPerUser value is out of range")
         self.step("2a")

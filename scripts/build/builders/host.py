@@ -79,6 +79,7 @@ class HostCryptoLibrary(Enum):
     OPENSSL = auto()
     MBEDTLS = auto()
     BORINGSSL = auto()
+    PSA = auto()
 
     @property
     def gn_argument(self):
@@ -88,6 +89,10 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="mbedtls"'
         if self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
+        if self == HostCryptoLibrary.PSA:
+            # The vendored mbedTLS (2.28) has no multi-part PSA AEAD, so use the
+            # one-shot implementation (as ESP32 does).
+            return 'chip_crypto="psa" chip_crypto_psa_aead_single_part=true'
         raise ValueError("Unknown host crypto library: %r" % self)
 
 
@@ -95,7 +100,6 @@ class HostFuzzingType(Enum):
     """Defines fuzz target options available for host targets."""
     NONE = auto()
     LIB_FUZZER = auto()
-    OSS_FUZZ = auto()
     PW_FUZZTEST = auto()
 
 
@@ -332,7 +336,7 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app'
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
-            yield 'controller/python'  # Directory containing WHL files
+            yield 'obj/src/controller/python/matter-controller-wheels'
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
@@ -458,7 +462,8 @@ class HostBuilder(GnBuilder):
     def __init__(self, root: str, runner: Runner, output_dir_lock: OutDirLock, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_groupcast=True, enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False, use_msan=False,
-                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
+                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE,
+                 pw_fuzz_libfuzzer_compat=False, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
@@ -490,7 +495,7 @@ class HostBuilder(GnBuilder):
         if not unified:
             root = os.path.join(root, 'examples', app.ExamplePath())
 
-        super(HostBuilder, self).__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
+        super().__init__(root=root, runner=runner, output_dir_lock=output_dir_lock)
 
         self.app = app
         self.board = board
@@ -545,7 +550,13 @@ class HostBuilder(GnBuilder):
         if use_msan:
             if not runner.dry_run:
                 _msan_validate_sysroot(chip_root)
-            self.extra_gn_options.append('is_msan=true')
+            if fuzzing_type == HostFuzzingType.PW_FUZZTEST:
+                # pw_fuzzer FuzzTest targets build in the chip_pw_fuzztest secondary toolchain,
+                # which does not consume chip's global is_msan/sanitize_default. Drive MSAN via
+                # the toolchain arg instead (it swaps pigweed's ASan for chip's sanitize_memory).
+                self.extra_gn_options.append('chip_pw_fuzz_msan=true')
+            else:
+                self.extra_gn_options.append('is_msan=true')
             # Tell GN to build against the same sysroot we just validated.
             self.extra_gn_options.append(f'msan_sysroot="{_msan_sysroot_path()}"')
 
@@ -567,10 +578,12 @@ class HostBuilder(GnBuilder):
 
         if fuzzing_type == HostFuzzingType.LIB_FUZZER:
             self.extra_gn_options.append('is_libfuzzer=true')
-        elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
-            self.extra_gn_options.append('oss_fuzz=true')
         elif fuzzing_type == HostFuzzingType.PW_FUZZTEST:
             self.extra_gn_options.append('pw_enable_fuzz_test_targets=true')
+            if pw_fuzz_libfuzzer_compat:
+                self.extra_gn_options.append('chip_pw_fuzz_libfuzzer_compat=true')
+            if use_ubsan:
+                self.extra_gn_options.append('chip_pw_fuzz_ubsan=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
@@ -650,8 +663,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
             if chip_casting_simplified:
                 self.extra_gn_options.append(
-                    'chip_cluster_objects_source_override='
-                    '"${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"'
+                    'chip_data_model_overrides_dir='
+                    '"${chip_root}/examples/tv-casting-app/tv-casting-common"'
                 )
 
         if enable_webrtc:
@@ -694,7 +707,7 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
-            self.build_command = 'matter-repl'
+            self.build_command = 'python_wheels'
 
         if self.app == HostApp.SIMULATED_APP1:
             self.extra_gn_options.append('chip_tests_zap_config="app1"')
@@ -783,7 +796,7 @@ class HostBuilder(GnBuilder):
 
     @lock_output_dir
     def generate(self):
-        super(HostBuilder, self).generate(dedup=self.unified)
+        super().generate(dedup=self.unified)
         if 'JAVA_HOME' in os.environ:
             self._Execute(
                 ["third_party/java_deps/set_up_java_deps.sh"],
