@@ -12,19 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("mode-select-server") {
-  sources = [
-    "ModeSelectCluster.cpp",
-    "ModeSelectCluster.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestModeSelectCluster"
+
+  test_sources = [ "TestModeSelectCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app:attribute-persistence",
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/clusters/mode-select-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
-    "${chip_root}/zzz_generated/app-common/clusters/ModeSelect",
   ]
 }
