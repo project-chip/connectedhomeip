@@ -52,9 +52,8 @@ void JitterDeferredAttributeChangeListener::OnAttributeChanged(const ConcreteAtt
     mAttributePaths[mCurrentIndex++] = path;
     if (!mTimer.IsTimerActive(this))
     {
-        uint32_t jitterMs =
-            (mDeferAttributePathJitterWindowMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterWindowMs;
-        CHIP_ERROR err = mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathMinMs + jitterMs));
+        uint32_t jitterMs = (mDeferAttributePathJitterWindowMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterWindowMs;
+        CHIP_ERROR err    = mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathMinMs + jitterMs));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "Failed to start deferred attribute change timer: %" CHIP_ERROR_FORMAT, err.Format());
@@ -97,20 +96,19 @@ void JitterDeferredAttributeChangeListener::UpdateListenerConfiguration(const At
     if (config.delayMinMs.has_value())
     {
         mDeferAttributePathMinMs = config.delayMinMs.value();
-        isConfigurationChanged = true;
+        isConfigurationChanged   = true;
     }
     if (config.delayJitterWindowMs.has_value())
     {
         mDeferAttributePathJitterWindowMs = config.delayJitterWindowMs.value();
-        isConfigurationChanged = true;
+        isConfigurationChanged            = true;
     }
 
     if (isConfigurationChanged && mTimer.IsTimerActive(this))
     {
         mTimer.CancelTimer(this);
-        uint32_t jitterMs =
-            (mDeferAttributePathJitterWindowMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterWindowMs;
-        CHIP_ERROR err = mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathMinMs + jitterMs));
+        uint32_t jitterMs = (mDeferAttributePathJitterWindowMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterWindowMs;
+        CHIP_ERROR err    = mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathMinMs + jitterMs));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "Failed to start deferred attribute change timer: %" CHIP_ERROR_FORMAT, err.Format());

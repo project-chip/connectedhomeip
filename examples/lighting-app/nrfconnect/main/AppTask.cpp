@@ -786,6 +786,7 @@ void AppTask::UpdateClusterState()
 chip::app::DataModel::JitterDeferredAttributeChangeListener & AppTask::GetCustomizedAttributeChangeListener()
 {
     static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static chip::app::DataModel::JitterDeferredAttributeChangeListener sCustomizedAttributeChangeListener(&chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(), sTimerDelegate);
+    static chip::app::DataModel::JitterDeferredAttributeChangeListener sCustomizedAttributeChangeListener(
+        &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(), sTimerDelegate);
     return sCustomizedAttributeChangeListener;
 }
