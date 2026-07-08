@@ -292,6 +292,8 @@ static const PosixAudioManager::Sound kSupportedSounds[] = {
     { 1, "Ring Ring" },
 };
 
+// Defined in the source file because PosixAudioManager::Impl is an incomplete type in the header.
+// Defaulting the constructor/destructor in the header would fail to compile due to std::unique_ptr requirements.
 PosixAudioManager::PosixAudioManager()  = default;
 PosixAudioManager::~PosixAudioManager() = default;
 
@@ -350,20 +352,19 @@ Span<const PosixAudioManager::Sound> PosixAudioManager::GetSupportedSounds() con
 
 void PosixAudioManager::Shutdown()
 {
-    if (mImpl)
+    VerifyOrReturn(mImpl != nullptr);
+
+    if (mImpl->engineInitialized)
     {
-        if (mImpl->engineInitialized)
-        {
-            ma_engine_stop(&mImpl->engine);
-        }
-        mImpl->soundResources.clear();
-        if (mImpl->engineInitialized)
-        {
-            ma_engine_uninit(&mImpl->engine);
-            ChipLogProgress(DeviceLayer, "Shared miniaudio engine uninitialized");
-        }
-        mImpl.reset();
+        ma_engine_stop(&mImpl->engine);
     }
+    mImpl->soundResources.clear();
+    if (mImpl->engineInitialized)
+    {
+        ma_engine_uninit(&mImpl->engine);
+        ChipLogProgress(DeviceLayer, "Shared miniaudio engine uninitialized");
+    }
+    mImpl.reset();
 }
 
 void PosixAudioManager::SetVolume(uint8_t volume)
