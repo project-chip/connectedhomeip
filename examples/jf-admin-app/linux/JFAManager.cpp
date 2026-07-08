@@ -74,6 +74,123 @@ void JFAManager::HandleCommissioningCompleteEvent()
                 (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
 
                 jfFabricIndex = fabricIndex;
+<<<<<<< HEAD
+=======
+
+                // Record the joint fabric index so the datastore can be purged if this fabric is ever removed.
+                Server::GetInstance().GetJointFabricDatastore().SetAnchorFabricIndex(fabricIndex);
+
+                // Set AnchorRootCA
+                uint8_t mAnchorRootCABuffer[Credentials::kMaxDERCertLength];
+                MutableByteSpan rootCertSpan(mAnchorRootCABuffer);
+                if (mServer->GetFabricTable().FetchRootCert(fabricIndex, rootCertSpan) == CHIP_NO_ERROR)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorRootCA(rootCertSpan) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorRootCA (%u bytes)", static_cast<unsigned>(rootCertSpan.size()));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorRootCA");
+                    }
+                }
+
+                // obtain nodeid and use it to set anchornodeid
+                NodeId nodeId = fb.GetNodeId();
+                if (nodeId != kUndefinedNodeId)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorNodeId(nodeId) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorNodeId to 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorNodeId to 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+                    }
+                }
+
+                VendorId vendorId = fb.GetVendorId();
+                if (vendorId != VendorId::NotSpecified)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorVendorId(vendorId) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorVendorId to %d", vendorId);
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorVendorId to %d", vendorId);
+                    }
+                }
+
+                if (vendorId != VendorId::NotSpecified && nodeId != kUndefinedNodeId)
+                {
+                    char friendlyNameBuffer[32];
+                    int written = snprintf(friendlyNameBuffer, sizeof(friendlyNameBuffer), "jfa-0x%04X-0x" ChipLogFormatX64,
+                                           to_underlying(vendorId), ChipLogValueX64(nodeId));
+                    CharSpan friendlyName = CharSpan(friendlyNameBuffer, static_cast<size_t>(written));
+
+                    if (Server::GetInstance().GetJointFabricDatastore().SetFriendlyName(friendlyName) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set FriendlyName to %.*s", static_cast<int>(friendlyName.size()),
+                                        friendlyName.data());
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set FriendlyName to %.*s", static_cast<int>(friendlyName.size()),
+                                     friendlyName.data());
+                    }
+                }
+
+                Server::GetInstance().GetJointFabricDatastore().SetStatus(
+                    Clusters::JointFabricDatastore::DatastoreStateEnum::kPending,
+                    static_cast<uint32_t>(System::SystemClock().GetMonotonicTimestamp().count()), 0);
+
+                Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type defaultGroupKeySetEntry{ 0 };
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddGroupKeySetEntry(defaultGroupKeySetEntry));
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddNodeKeySetEntry(0, nodeId));
+
+                // Add default group entry for the JFA itself
+                // Uses internal method that bypasses CAT restrictions since JFA setup needs both Admin and Anchor CATs
+                Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addGroupCommandData;
+                addGroupCommandData.groupID       = 0;
+                addGroupCommandData.friendlyName  = "Default JFA Group"_span;
+                addGroupCommandData.groupKeySetID = 0;
+                addGroupCommandData.groupCAT      = kAdminCATIdentifier; // Use Admin CAT for default group
+                addGroupCommandData.groupCATVersion.SetNonNull(1);
+                addGroupCommandData.groupPermission =
+                    Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kAdminister;
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
+                addGroupCommandData.groupID  = 1;
+                addGroupCommandData.groupCAT = kAnchorCATIdentifier; // Use Anchor CAT for second default group
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
+
+                Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type newAdmin;
+                newAdmin.nodeID       = nodeId;
+                newAdmin.friendlyName = "Default JFA Admin"_span;
+                newAdmin.vendorID     = vendorId;
+                newAdmin.icac         = ByteSpan(mICACBuffer, mICACBufferLen);
+
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddAdmin(newAdmin));
+
+                if (!mCommissionerInitialized)
+                {
+                    CHIP_ERROR err = InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
+                                                      LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort, fb.GetFabricId(),
+                                                      fabricIndex);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        mCommissionerInitialized = true;
+                        ChipLogProgress(JointFabric, "Commissioner mode initialized on commissioned fabric index %u",
+                                        static_cast<unsigned>(fabricIndex));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to initialize commissioner mode: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
+                }
+
+                ChipLogProgress(JointFabric, "Joint Fabric Administrator commissioned on fabric index %d", fabricIndex);
+>>>>>>> 512611bc67 (Implement AI-requested changes for Joint Fabric (#72456))
             }
         }
     }
