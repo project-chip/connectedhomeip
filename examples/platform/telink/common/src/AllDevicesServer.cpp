@@ -28,8 +28,8 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
-#include <device/api/allocator/IdAllocator.h>
 #include <device/api/DeviceInterface.h>
+#include <device/api/allocator/IdAllocator.h>
 #include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -83,24 +83,24 @@ RootNode::Context MakeRootNodeContext(CommonCaseDeviceServerInitParams & initPar
                                       DeviceInstanceInfoProvider & deviceInfoProvider)
 {
     return RootNode::Context{
-        .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),
-        .configurationManager             = ConfigurationMgr(),
-        .deviceControlServer              = DeviceControlServer::DeviceControlSvr(),
-        .fabricTable                      = Server::GetInstance().GetFabricTable(),
-        .accessControl                    = Server::GetInstance().GetAccessControl(),
-        .persistentStorage                = Server::GetInstance().GetPersistentStorage(),
-        .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),
-        .deviceInstanceInfoProvider       = deviceInfoProvider,
-        .platformManager                  = PlatformMgr(),
-        .groupDataProvider                = gGroupDataProvider,
-        .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),
-        .dnssdServer                      = DnssdServer::Instance(),
-        .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),
-        .diagnosticDataProvider           = GetDiagnosticDataProvider(),
-        .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,
-        .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(),
-        .eventManagement                  = EventManagement::GetInstance(),
-        .timerDelegate                    = gTimerDelegate,
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager       = ConfigurationMgr(),
+        .deviceControlServer        = DeviceControlServer::DeviceControlSvr(),
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .accessControl              = Server::GetInstance().GetAccessControl(),
+        .persistentStorage          = Server::GetInstance().GetPersistentStorage(),
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+        .deviceInstanceInfoProvider = deviceInfoProvider,
+        .platformManager            = PlatformMgr(),
+        .groupDataProvider          = gGroupDataProvider,
+        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                = DnssdServer::Instance(),
+        .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),
+        .diagnosticDataProvider     = GetDiagnosticDataProvider(),
+        .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,
+        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+        .eventManagement            = EventManagement::GetInstance(),
+        .timerDelegate              = gTimerDelegate,
     };
 }
 
