@@ -257,7 +257,7 @@ class TC_SC_3_5(MatterBaseTest):
         new_CA = self.certificate_authority_manager.NewCertificateAuthority()
 
         new_fabric_admin = new_CA.NewFabricAdmin(vendorId=0xFFF1,
-            fabricId=self.matter_test_config.fabric_id)
+                                                 fabricId=self.matter_test_config.fabric_id)
 
         th2 = new_fabric_admin.NewController(nodeId=112233)
         return th2
@@ -301,7 +301,7 @@ class TC_SC_3_5(MatterBaseTest):
                                                                     fabric_filtered=False)
 
         asserts.assert_equal(len(nocStructs), 2,
-                                f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
+                             f"Expected 2 NOCStructs (1 for TH Client, 1 for DUT Commissioner), got {len(nocStructs)}")
 
         dut_commissioner_noc_struct = next((noc for noc in nocStructs if noc.fabricIndex != self.th_client.fabricId), None)
 
