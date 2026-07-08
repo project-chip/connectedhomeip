@@ -31,6 +31,7 @@ from __future__ import absolute_import, annotations, print_function
 import asyncio
 import builtins
 import concurrent.futures
+import contextlib
 import copy
 import ctypes
 import enum
@@ -838,6 +839,32 @@ class ChipDeviceControllerBase():
                 self.devCtrl, nodeId)
         ).raise_on_error()
 
+    def StopPairing(self, nodeId: int):
+        '''
+        Stop any in-progress PASE/commissioning session with `nodeId` and release the associated
+        commissionee device proxy, if any.
+
+        Unlike ExpireSessions, this does NOT expire operational (CASE) sessions, so it is safe to
+        call while an operational session to the node is in use.
+
+        This is a best-effort teardown: if no commissionee device is currently being paired, the
+        underlying call returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR, which surfaces here as a
+        ChipStackError that the caller may choose to ignore.
+
+        Args:
+            nodeId (int): The node ID of the device whose pairing should be stopped.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            ChipStackError: On failure (including when there is no pairing in progress to stop).
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_StopPairing(
+                self.devCtrl, nodeId)
+        ).raise_on_error()
+
     def MarkSessionForEviction(self, nodeId: int):
         '''
         Marks the session with the specified node for eviction. It will first detach all SessionHolders
@@ -875,13 +902,57 @@ class ChipDeviceControllerBase():
             lambda: self._dmLib.pychip_DeviceController_DeleteAllSessionResumption(
                 self.devCtrl)).raise_on_error()
 
+<<<<<<< HEAD
     async def _establishPASESession(self, callFunct):
+=======
+    def SetLocalMRPConfig(self, idle_ms: int, active_ms: int, active_threshold_ms: int):
+        '''
+        Set the local MRP config. This will be advertised to peers and used by them for message retransmissions.
+
+        Args:
+            idle_ms (int): The idle retransmission interval in milliseconds.
+            active_ms (int): The active retransmission interval in milliseconds.
+            active_threshold_ms (int): The active threshold time in milliseconds.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetLocalMRPConfig(idle_ms, active_ms, active_threshold_ms)
+        ).raise_on_error()
+
+    def ResetLocalMRPConfig(self):
+        '''
+        Resets the local MRP config to the default values.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_ResetLocalMRPConfig()
+        ).raise_on_error()
+
+    async def _establishPASESession(self, callFunct, nodeId: int):
+>>>>>>> 0902b2ec5d (Fix TC_DISHALM_2_1 Not connected failure after harness commissioning (#72695))
         self.CheckIsActive()
 
         async with self._pase_establishment_context as ctx:
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(callFunct)
-            await asyncio.futures.wrap_future(ctx.future)
+            try:
+                await asyncio.futures.wrap_future(ctx.future)
+            except asyncio.CancelledError:
+                # The awaiting task was cancelled (e.g. a parallel CASE path won a race and this
+                # PASE attempt was cancelled). The C++ PASE handshake is already in flight and holds
+                # a commissionee device proxy; cancelling the Python await does not tear it down.
+                # Release it explicitly so a later allowPASE read does not bind to the half-open
+                # PASE session and fail with CHIP_ERROR_NOT_CONNECTED.
+                # No commissionee device to release (handshake not started / already gone) is fine.
+                with contextlib.suppress(ChipStackError):
+                    self.StopPairing(nodeId)
+                raise
 
     async def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeId: int) -> None:
         '''
@@ -900,7 +971,8 @@ class ChipDeviceControllerBase():
         '''
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
-                self.devCtrl, setupPinCode, discriminator, nodeId)
+                self.devCtrl, setupPinCode, discriminator, nodeId),
+            nodeId
         )
 
     async def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeId: int, port: int = 0) -> None:
@@ -921,9 +993,35 @@ class ChipDeviceControllerBase():
         '''
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
-                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeId, port)
+                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeId, port),
+            nodeId
         )
 
+<<<<<<< HEAD
+=======
+    async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int) -> None:
+        '''
+        Establish a PASE session over Thread MeshCoP.
+
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists.
+        For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
+
+        Args:
+            baAddr (str): IP address of BorderAgent.
+            setupCode (str): The setup code of the device.
+            nodeId (int): The node ID of the device.
+            baPort (int): IP port of BorderAgent.
+
+        Returns:
+            None
+        '''
+        await self._establishPASESession(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop(
+                self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId),
+            nodeId
+        )
+
+>>>>>>> 0902b2ec5d (Fix TC_DISHALM_2_1 Not connected failure after harness commissioning (#72695))
     async def EstablishPASESession(self, setUpCode: str, nodeId: int) -> None:
         '''
         Establish a PASE session using setUpCode.
@@ -940,7 +1038,8 @@ class ChipDeviceControllerBase():
         '''
         await self._establishPASESession(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
-                self.devCtrl, setUpCode.encode("utf-8"), nodeId)
+                self.devCtrl, setUpCode.encode("utf-8"), nodeId),
+            nodeId
         )
 
     def GetTestCommissionerUsed(self):
@@ -2433,6 +2532,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_MarkSessionDefunct.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_MarkSessionDefunct.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_StopPairing.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_StopPairing.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_MarkSessionForEviction.argtypes = [
                 c_void_p, c_uint64]
