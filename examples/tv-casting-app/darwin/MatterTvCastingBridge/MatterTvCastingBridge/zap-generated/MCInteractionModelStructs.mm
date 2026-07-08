@@ -55,6 +55,8 @@
 
         _languageCode = @"";
 
+        _characteristics = nil;
+
         _displayName = nil;
     }
     return self;
@@ -65,6 +67,7 @@
     auto other = [[MCMediaPlaybackClusterTrackAttributesStruct alloc] init];
 
     other.languageCode = self.languageCode;
+    other.characteristics = self.characteristics;
     other.displayName = self.displayName;
 
     return other;
@@ -115,6 +118,10 @@
         _show = nil;
         _season = nil;
         _episode = nil;
+        _provider = nil;
+        _artist = nil;
+        _album = nil;
+        _track = nil;
     }
     return self;
 }
@@ -127,6 +134,10 @@
     other.show = self.show;
     other.season = self.season;
     other.episode = self.episode;
+    other.provider = self.provider;
+    other.artist = self.artist;
+    other.album = self.album;
+    other.track = self.track;
     return other;
 }
 

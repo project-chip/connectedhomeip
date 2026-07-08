@@ -27,6 +27,7 @@
 
 @interface MCMediaPlaybackClusterTrackAttributesStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull languageCode;
+@property (nonatomic, copy) NSArray * _Nullable characteristics;
 @property (nonatomic, copy) NSString * _Nullable displayName;
 @end
 
@@ -42,6 +43,10 @@
 @property (nonatomic, copy) NSString * _Nullable show;
 @property (nonatomic, copy) NSString * _Nullable season;
 @property (nonatomic, copy) NSString * _Nullable episode;
+@property (nonatomic, copy) NSString * _Nullable provider;
+@property (nonatomic, copy) NSString * _Nullable artist;
+@property (nonatomic, copy) NSString * _Nullable album;
+@property (nonatomic, copy) NSString * _Nullable track;
 @end
 
 @interface MCApplicationBasicClusterApplicationStruct : NSObject <NSCopying>
