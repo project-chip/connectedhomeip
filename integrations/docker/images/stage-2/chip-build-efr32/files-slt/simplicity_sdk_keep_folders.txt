@@ -57,6 +57,11 @@ bluetooth_le_controller/build/gcc/xg27/release/liblinklayer.a
 bluetooth_le_controller/build/gcc/xg28/release/liblinklayer.a
 bluetooth_le_controller/build/gcc/xg29/release/liblinklayer.a
 bluetooth_le_controller/build/llvm/xg24/release/liblinklayer.a
+bluetooth_le_host/build/gcc/cortex-m33/privacy/rpa_resolution/release/libble_host_rpa_resolution_stub.a
+bluetooth_le_host/build/gcc/cortex-m33/privacy/resolving_list/release/libble_host_resolving_list_stub.a
+bluetooth_le_host/build/gcc/cortex-m33/privacy/local_privacy/release/libble_host_local_privacy_stub.a
+bluetooth_le_host/build/gcc/cortex-m33/advertiser/periodic_advertiser/release/libble_host_periodic_advertiser_stub.a
+bluetooth_le_host/build/gcc/cortex-m33/crypto/crypto_lib/crypto_lib_psa/release/libble_host_crypto_lib_psa.a
 bluetooth_le_host/build/gcc/cortex-m33/crypto/release/libble_host_crypto_stub.a
 bluetooth_le_host/build/gcc/cortex-m33/accept_list/release/libble_host_accept_list_stub.a
 bluetooth_le_host/build/gcc/cortex-m33/bgstack/release/libble_host.a
@@ -70,6 +75,11 @@ bluetooth_le_host/build/gcc/cortex-m33/core/release/libble_host_core.a
 bluetooth_le_host/build/gcc/cortex-m33/hal/release/libble_host_hal_series2.a
 bluetooth_le_host/build/gcc/cortex-m33/hci/release/libble_host_hci.a
 bluetooth_le_host/build/gcc/cortex-m33/system/release/libble_host_system.a
+bluetooth_le_host/build/llvm/cortex-m33/privacy/rpa_resolution/release/libble_host_rpa_resolution_stub.a
+bluetooth_le_host/build/llvm/cortex-m33/privacy/resolving_list/release/libble_host_resolving_list_stub.a
+bluetooth_le_host/build/llvm/cortex-m33/privacy/local_privacy/release/libble_host_local_privacy_stub.a
+bluetooth_le_host/build/llvm/cortex-m33/advertiser/periodic_advertiser/release/libble_host_periodic_advertiser_stub.a
+bluetooth_le_host/build/llvm/cortex-m33/crypto/crypto_lib/crypto_lib_psa/release/libble_host_crypto_lib_psa.a
 bluetooth_le_host/build/llvm/cortex-m33/crypto/release/libble_host_crypto_stub.a
 bluetooth_le_host/build/llvm/cortex-m33/accept_list/release/libble_host_accept_list_stub.a
 bluetooth_le_host/build/llvm/cortex-m33/bgstack/release/libble_host.a
