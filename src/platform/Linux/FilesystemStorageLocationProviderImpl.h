@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "CHIPLinuxStorage.h"
 #include "FilesystemStorageLocationProvider.h"
 
 #include <string>
@@ -35,11 +36,10 @@ public:
     virtual std::string GetKVSDataLocation(void) const override;
 
 private:
-    static constexpr const char * kDefaultBaseDir      = "/tmp";
-    static constexpr const char * kDefaultDataFile     = "chip_kvs";
-    static constexpr const char * kDefaultFactoryFile  = "chip_factory.ini";
-    static constexpr const char * kDefaultConfigFile   = "chip_config.ini";
-    static constexpr const char * kDefaultCountersFile = "chip_counters.ini";
+    static constexpr const char * kDefaultDataFile     = CHIP_DEFAULT_DATA_FILENAME;
+    static constexpr const char * kDefaultFactoryFile  = CHIP_DEFAULT_FACTORY_FILENAME;
+    static constexpr const char * kDefaultConfigFile   = CHIP_DEFAULT_CONFIG_FILENAME;
+    static constexpr const char * kDefaultCountersFile = CHIP_DEFAULT_COUNTERS_FILENAME;
 };
 
 } // namespace DeviceLayer

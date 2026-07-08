@@ -37,6 +37,7 @@
 #include <platform/Linux/CHIPLinuxStorageIni.h>
 #include <string>
 
+#define CHIP_DEFAULT_BASE_DIR "/tmp"
 #define CHIP_DEFAULT_DATA_FILENAME "chip_kvs"
 #define CHIP_DEFAULT_FACTORY_FILENAME "chip_factory.ini"
 #define CHIP_DEFAULT_CONFIG_FILENAME "chip_config.ini"

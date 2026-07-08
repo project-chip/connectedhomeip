@@ -16,6 +16,7 @@
  */
 
 #include "FilesystemStorageLocationProviderImpl.h"
+#include "CHIPLinuxStorage.h"
 
 #include <string>
 
@@ -29,26 +30,26 @@ const char * DefaultFilesystemStorageLocationProviderImpl::LegacyKVS() const
 
 // Note: These methods return DIRECTORY paths, not full file paths.
 // The file name is appended by the caller (PosixConfig.cpp).
-// Default directory for all files is /tmp (no subdirectories).
+// Default directory for all files is CHIP_DEFAULT_BASE_DIR (no subdirectories).
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetFactoryDataLocation() const
 {
-    return kDefaultBaseDir;
+    return CHIP_DEFAULT_BASE_DIR;
 }
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetConfigDataLocation() const
 {
-    return kDefaultBaseDir;
+    return CHIP_DEFAULT_BASE_DIR;
 }
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetCountersDataLocation() const
 {
-    return kDefaultBaseDir;
+    return CHIP_DEFAULT_BASE_DIR;
 }
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetKVSDataLocation() const
 {
-    return kDefaultBaseDir;
+    return CHIP_DEFAULT_BASE_DIR;
 }
 
 DefaultFilesystemStorageLocationProviderImpl & DefaultFilesystemStorageLocationProviderImpl::GetDefaultInstance()
