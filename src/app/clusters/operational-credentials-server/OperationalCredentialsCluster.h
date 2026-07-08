@@ -67,8 +67,8 @@ public:
     /**
      * @brief Set vendor-specific data to be included in CSRResponse NOCSRElements.
      *
-     * The caller retains ownership of the underlying memory, which must remain valid for as
-     * long as it may be used to answer a CSRRequest. Pass an empty ByteSpan to clear a field.
+     * The caller retains ownership of the underlying memory, which must remain valid for the
+     * lifetime of this cluster instance. Pass an empty ByteSpan to clear a field.
      *
      * Note: the resulting nocsr_elements_message (CSR + nonce + all vendor_reserved fields)
      * SHALL be no more than RESP_MAX (900) bytes per the Matter spec. Oversized data causes
