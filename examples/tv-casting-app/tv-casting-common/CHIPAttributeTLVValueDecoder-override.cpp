@@ -17,7 +17,7 @@
  */
 
 /**
- * @file casting-CHIPAttributeTLVValueDecoder.cpp
+ * @file CHIPAttributeTLVValueDecoder-override.cpp
  *
  * Slim attribute TLV decoder for the TV Casting App.
  * Contains DecodeAttributeValue() cases for ONLY the casting clusters.
@@ -33,7 +33,7 @@
  *   1. Copy its case block from zap-generated/CHIPAttributeTLVValueDecoder.cpp
  *   2. Add it to the switch statement below (keep alphabetical order)
  *   3. Update this cluster list
- *   4. Ensure the cluster's .ipp files are included in casting-cluster-objects.cpp
+ *   4. Ensure the cluster's .ipp files are included in cluster-objects-override.cpp
  */
 
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
