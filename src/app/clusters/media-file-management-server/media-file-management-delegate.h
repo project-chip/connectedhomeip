@@ -41,7 +41,7 @@ public:
 
     virtual void HandleRequestSharedFiles(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                           const CharSpan & clientName, uint16_t requestID,
-                                          const Optional<DataModel::DecodableList<CharSpan>> & supportedMimeTypes) = 0;
+                                          const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) = 0;
 
     virtual void HandleGetSharedFile(CommandResponseHelper<GetSharedFileResponseType> & helper, uint16_t responseID) = 0;
 
