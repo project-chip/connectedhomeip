@@ -86,8 +86,9 @@ CHIP_ERROR CommissioningProxyDevice::Register(chip::EndpointId endpoint, CodeDri
                 }
             }
         }
-        // Spec WiFiBand attribute has Fallback: 2G4 — if no valid frequency was parsed,
-        // default to 2.4 GHz rather than leaving the bitmap empty.
+        // If no valid frequency was parsed from the --wifipaf freq_list, default the
+        // advertised WiFiBand to 2.4 GHz rather than leaving the bitmap empty, so a
+        // Wi-Fi-PAF-capable proxy does not report supporting no bands at all.
         if (!bands.HasAny())
         {
             bands.Set(WiFiBandBitmap::k2g4);

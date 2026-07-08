@@ -193,7 +193,9 @@ public:
     {
         auto & layer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
         if (layer.mWiFiPAFTransport == this)
+        {
             return;
+        }
         mOriginalTransport      = layer.mWiFiPAFTransport;
         layer.mWiFiPAFTransport = this;
         ChipLogProgress(AppServer, "ProxyWiFiPAFDelegate: installed (original=%p)", (void *) mOriginalTransport);
@@ -217,12 +219,16 @@ public:
             if (sess.peer_id == RxInfo.peer_id)
             {
                 if (sHost != nullptr)
+                {
                     sHost->Sessions().DispatchMessageResponse(sid, msg->Start(), msg->DataLength());
+                }
                 return CHIP_NO_ERROR;
             }
         }
         if (mOriginalTransport != nullptr)
+        {
             return mOriginalTransport->WiFiPAFMessageReceived(RxInfo, std::move(msg));
+        }
         ChipLogError(AppServer, "ProxyWiFiPAFDelegate: no original transport for non-proxy session");
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -230,7 +236,9 @@ public:
     CHIP_ERROR WiFiPAFMessageSend(chip::WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msg) override
     {
         if (mOriginalTransport != nullptr)
+        {
             return mOriginalTransport->WiFiPAFMessageSend(TxInfo, std::move(msg));
+        }
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -287,7 +295,9 @@ public:
                 (void) chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pafSession.id);
             }
             if (sHost != nullptr)
+            {
                 sHost->Sessions().RemoveSession(sid);
+            }
             // This path does not run through the dispatcher's OnAllSessionsClosed(),
             // so resume a bg-scan paused for the connect once the last session is
             // gone and no connect is mid-flight.
@@ -297,14 +307,18 @@ public:
             }
         }
         if (mOriginalTransport != nullptr)
+        {
             return mOriginalTransport->WiFiPAFCloseSession(SessionInfo);
+        }
         return CHIP_NO_ERROR;
     }
 
     bool WiFiPAFResourceAvailable() override
     {
         if (mOriginalTransport != nullptr)
+        {
             return mOriginalTransport->WiFiPAFResourceAvailable();
+        }
         return true;
     }
 
@@ -332,15 +346,19 @@ static void FailPendingConnect(ConnectCtx * ctx, chip::Protocols::InteractionMod
     sPendingConnect = nullptr;
 
     if (cancelTimer)
+    {
         chip::DeviceLayer::SystemLayer().CancelTimer(OnConnectTimeout, nullptr);
+    }
 
     // Null the platform connect callbacks before cancelling the subscribe so the
     // kCHIPoWiFiPAFCancelConnect event posted by OnNanSubscribeTerminated does not
     // re-enter OnConnectError.
     CHIP_ERROR cancelIncompleteErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
     if (cancelIncompleteErr != CHIP_NO_ERROR)
+    {
         ChipLogDetail(AppServer, "FailPendingConnect: WiFiPAFCancelIncompleteSubscribe: %" CHIP_ERROR_FORMAT,
                       cancelIncompleteErr.Format());
+    }
 
     chip::WiFiPAF::WiFiPAFLayer & pafLayer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
     chip::WiFiPAF::WiFiPAFSession key{};
@@ -425,9 +443,14 @@ static void OnConnectSuccess(void * /*context*/)
     {
         ChipLogError(AppServer, "OnConnectSuccess: cmd=%p pPafInfo=%p for disc %u", (void *) cmd, (void *) pPafInfo,
                      ctx->discriminator);
-        if (cmd != nullptr)
-            cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Failure);
-        delete ctx;
+        // The connect completed but the session cannot be handed to the commissioner
+        // (originating exchange gone, or the PAF session vanished).  Run the full
+        // teardown so an established-but-untracked session does not leak its PAF pool
+        // slot, PAFTP endpoint, and NAN subscribe.  FailPendingConnect adds a Failure
+        // status if the command handler is still alive, frees ctx, and resumes any
+        // background scan deferred for this connect.  (The timeout timer was already
+        // cancelled above, so cancelTimer=false.)
+        FailPendingConnect(ctx, chip::Protocols::InteractionModel::Status::Failure, /*cancelTimer=*/false);
         return;
     }
 
@@ -486,13 +509,21 @@ static void OnScanDone(void * /*context*/, const std::vector<chip::DeviceLayer::
         r.vendorID      = static_cast<chip::VendorId>(p.vid);
         r.productID     = p.pid;
         if (p.hasExtendedData && !p.storage.empty())
+        {
             r.extendedData.SetNonNull(chip::ByteSpan(p.storage.data(), p.storage.size()));
+        }
         else
+        {
             r.extendedData.SetNull();
+        }
         if (p.band != 0)
+        {
             r.wiFiBand.SetValue(static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(p.band));
+        }
         else
+        {
             r.wiFiBand.ClearValue();
+        }
         out.push_back(r);
     }
 
@@ -500,7 +531,9 @@ static void OnScanDone(void * /*context*/, const std::vector<chip::DeviceLayer::
     // handle and emits the combined ProxyScanResponse once every transport's
     // sub-scan has reported.
     if (sHost != nullptr)
+    {
         sHost->ScanAggregator().Contribute(chip::Span<const ScanResultT>(out.data(), out.size()));
+    }
 }
 
 } // namespace
@@ -536,14 +569,11 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
         sBgScanPaused = true;
     }
 
-    // Init PAF layer (idempotent).
-    CHIP_ERROR initErr = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&chip::DeviceLayer::SystemLayer());
-    if (initErr != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAFLayer Init failed: %" CHIP_ERROR_FORMAT, initErr.Format());
-        OnAllSessionsClosed();
-        return chip::Protocols::InteractionModel::Status::Failure;
-    }
+    // The WiFiPAF layer is initialized once by the platform ConnectivityManager at
+    // startup (ConnectivityManagerImpl::_Init -> WiFiPAFLayer::Init).  Do NOT call
+    // Init() here: it memset()s the shared endpoint pool, which would wipe a live
+    // PAFTP session (e.g. one mid-commissioning) while leaving its scheduled ack/
+    // retransmit timers pointing at the zeroed slot.
 
     // Install the proxy receive delegate so messages arriving from the commissionee
     // over WiFiPAF are forwarded to the commissioner as ProxyMessageResponse rather
@@ -641,7 +671,9 @@ chip::Protocols::InteractionModel::Status Connect(chip::app::CommandHandler * co
 chip::Protocols::InteractionModel::Status CancelPendingConnect(chip::FabricIndex fabricIndex)
 {
     if (sPendingConnect == nullptr)
+    {
         return chip::Protocols::InteractionModel::Status::InvalidInState;
+    }
 
     if (fabricIndex != sPendingConnect->fabricIndex)
     {
@@ -721,16 +753,12 @@ chip::Protocols::InteractionModel::Status Scan(uint8_t scanMaxTime)
         return chip::Protocols::InteractionModel::Status::Busy;
     }
 
-    CHIP_ERROR err = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&chip::DeviceLayer::SystemLayer());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Commissioning Proxy PAF Scan Request Failed");
-        return chip::Protocols::InteractionModel::Status::Failure;
-    }
-
+    // The WiFiPAF layer is initialized once by the platform ConnectivityManager at
+    // startup; do NOT re-Init() here — it memset()s the shared endpoint pool and
+    // would corrupt a live PAFTP session (see ProxyConnectRequest above).
     sScanInProgress = true;
 
-    err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnScanDone, nullptr);
+    CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnScanDone, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         sScanInProgress = false;
@@ -765,15 +793,22 @@ chip::Protocols::InteractionModel::Status BgScanStart(uint16_t timeout, chip::Bi
 
     sBgScanFabrics[fabricKey] = FabricScanRecord{ transport, wiFiBands, nullptr };
     if (sBgScanCluster == nullptr)
+    {
         sBgScanCluster = sHost;
+    }
 
     if (sPendingConnect != nullptr)
     {
         // A ProxyConnect is in flight and has taken the single NAN subscribe slot
         // (Connect pauses any background scan for exactly this reason).  Register
-        // this fabric but defer starting the hardware scan, and mark it paused so
-        // OnAllSessionsClosed() starts it once the connect resolves — starting it
-        // now would re-create the subscribe-slot contention the pause avoids.
+        // this fabric but defer starting the hardware scan, and mark it paused;
+        // starting it now would re-create the subscribe-slot contention the pause
+        // avoids.  If the connect FAILS, FailPendingConnect -> OnAllSessionsClosed
+        // resumes it.  If the connect SUCCEEDS, the session keeps holding the single
+        // subscribe slot for its whole lifetime, so the deferred scan cannot run
+        // until that session closes: it is resumed by OnAllSessionsClosed() on
+        // ProxyDisconnect (dispatcher) or on a peer-initiated close
+        // (WiFiPAFCloseSession) — never while the session is up.
         sBgScanPaused = true;
         ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: connect in flight, deferring hardware scan start");
     }
@@ -907,7 +942,9 @@ chip::Protocols::InteractionModel::Status BgScanStop(chip::BitMask<CapabilitiesB
         {
             chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
             if (sBgScanCluster != nullptr)
+            {
                 sBgScanCluster->ScanCache().ClearTransport(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
+            }
             sBgScanCluster = nullptr;
             ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: last fabric stopped, hardware scan stopped");
         }
@@ -937,10 +974,14 @@ void OnAllSessionsClosed()
         ChipLogProgress(AppServer, "ProxyDisconnectRequest: resuming background scan");
         CHIP_ERROR resumeErr = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
         if (resumeErr == CHIP_NO_ERROR)
+        {
             sBgScanPaused = false;
+        }
         else
+        {
             ChipLogError(AppServer, "ProxyDisconnectRequest: resume background scan failed: %" CHIP_ERROR_FORMAT,
                          resumeErr.Format());
+        }
     }
 }
 

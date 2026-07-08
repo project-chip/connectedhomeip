@@ -878,7 +878,16 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime, PafScanResu
     }
 
     CHIP_ERROR result = StartWiFiManagementSync();
-    VerifyOrReturnError(result == CHIP_NO_ERROR, result);
+    if (result != CHIP_NO_ERROR)
+    {
+        // Reset the scan-callback state set above so a transient WiFi-management
+        // startup failure does not leave mScanCb non-null forever, which would wedge
+        // every subsequent background scan into CHIP_ERROR_BUSY for the process life.
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        mScanCb        = nullptr;
+        mScanCbContext = nullptr;
+        return result;
+    }
 
     ChipLogProgress(DeviceLayer, "WiFiPAFScan: starting one-shot NAN discovery (maxTime=%us)", scanMaxTime);
 
