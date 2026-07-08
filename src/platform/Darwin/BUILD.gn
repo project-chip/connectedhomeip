@@ -138,6 +138,14 @@ static_library("Darwin") {
 
   public_configs = [ ":darwin_config" ]
 
+  # using the implements from Linux platform
+  sources += [
+    "../Linux/FilesystemStorageLocationProvider.cpp",
+    "../Linux/FilesystemStorageLocationProvider.h",
+    "../Linux/FilesystemStorageLocationProviderImpl.cpp",
+    "../Linux/FilesystemStorageLocationProviderImpl.h",
+  ]
+
   if (chip_enable_ota_requestor) {
     sources += [
       # using the implements from Linux platform
