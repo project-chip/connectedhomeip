@@ -246,6 +246,9 @@ class TestTarget:
     # arguments to pass in to the command to execute
     arguments: list[str] = field(default_factory=list)
 
+    # arguments to pass in to the test runner (e.g. chiptool.py)
+    test_arguments: list[str] = field(default_factory=list)
+
 
 @dataclass
 class KnownSubprocessEntry:
@@ -581,6 +584,7 @@ class TestDefinition:
 
             test_cmd = config.subproc_info_repo['chip-tool-with-python'].with_args(
                 'tests', self.run_name, '--PICS', str(config.pics_file))
+            test_cmd = test_cmd.with_args(*target.test_arguments)
             if config.value_wait_extra_duration_ms is not None:
                 test_cmd = test_cmd.with_args('--value-wait-extra-duration-ms', str(config.value_wait_extra_duration_ms))
 

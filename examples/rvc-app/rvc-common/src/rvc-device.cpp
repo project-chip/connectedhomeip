@@ -16,6 +16,9 @@ void RvcDevice::Init()
     SetDeviceToIdleState();
 }
 
+void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId) {}
+void MatterRvcOperationalStateClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
+
 void RvcDevice::SetDeviceToIdleState()
 {
     if (mCharging)

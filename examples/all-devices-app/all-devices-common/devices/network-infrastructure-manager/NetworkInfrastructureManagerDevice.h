@@ -65,6 +65,18 @@ public:
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
+    // Public getters for programmatic control
+    Clusters::ThreadBorderRouterManagementCluster & ThreadBorderRouterManagementCluster()
+    {
+        return mThreadBorderRouterManagementCluster.Cluster();
+    }
+    Clusters::WiFiNetworkManagementCluster & WiFiNetworkManagementCluster() { return mWiFiNetworkManagementCluster.Cluster(); }
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
+    Clusters::ThreadNetworkDiagnosticsCluster & ThreadNetworkDiagnosticsCluster()
+    {
+        return mThreadNetworkDiagnosticsCluster.Cluster();
+    }
+
 protected:
     SimpleBreadCrumbTracker mBreadCrumbTracker;
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
