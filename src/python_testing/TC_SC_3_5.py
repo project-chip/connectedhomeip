@@ -88,6 +88,10 @@ class TC_SC_3_5(MatterBaseTest):
             "MCORE.ROLE.COMMISSIONER",
         ]
 
+    @property
+    def default_timeout(self) -> int:
+        return 1500  # 25 minutes for comprehensive subscription testing
+
     def steps_TC_SC_3_5(self) -> list[TestStep]:
         return [
 
