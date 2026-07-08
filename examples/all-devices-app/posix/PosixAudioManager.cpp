@@ -66,7 +66,7 @@ struct PosixAudioManager::Impl
 
 namespace {
 
-constexpr double kPi           = 3.14159265358979323846;
+constexpr double kPi             = 3.14159265358979323846;
 constexpr uint32_t kSampleRateHz = 44100;
 
 // Custom data source read callback. Synthesizes audio samples on-the-fly.
