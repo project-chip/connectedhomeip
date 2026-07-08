@@ -93,8 +93,8 @@ static void PrintAddr(const char (&prefix)[N], uintptr_t addr)
     SEGGER_RTT_WriteNoLock(0, msg, totalLen);
 #endif
 #else
-(void) addr;
-(void) prefix;
+    (void) addr;
+    (void) prefix;
 #endif // SILABS_LOG_ENABLED
 }
 
