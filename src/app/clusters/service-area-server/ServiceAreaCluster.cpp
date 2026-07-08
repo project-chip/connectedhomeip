@@ -959,7 +959,7 @@ bool Instance::RemoveSupportedMap(uint32_t mapId)
         {
             if (tempSupportedArea.mapID == mapId)
             {
-                supportedAreaIdsSpan[supportedAreasIndex] = tempSupportedArea.areaID;
+                supportedAreaIdsSpan[supportedAreaIdsSize] = tempSupportedArea.areaID;
                 supportedAreaIdsSize++;
             }
             supportedAreasIndex++;
