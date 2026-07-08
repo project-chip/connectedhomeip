@@ -466,34 +466,43 @@ private:
     static std::string DefaultBase() { return std::filesystem::temp_directory_path().string(); }
 
     /**
-     * @brief Compute the effective DIRECTORY path for a storage file based on priority:
-     * 1. Explicit file path (--kvs-data, --kvs-factory, etc.) -> return parent directory
-     * 2. Legacy --KVS (only for data file) -> return parent directory
-     * 3. Base directory (--kvs-directory)
-     * 4. Default: /tmp
+     * @brief Compute the effective path for a storage file based on priority:
+     * 1. Explicit file path (--kvs-data, --kvs-factory, etc.) -> return full path
+     * 2. Legacy --KVS (only for data file) -> return full path
+     * 3. Base directory (--kvs-directory) -> return directory (PosixConfig will append filename)
+     * 4. Default: /tmp (PosixConfig will append filename)
      *
-     * Note: Returns directory path, not full file path. The filename is appended by the caller.
+     * Note: Returns full path for explicit options, directory for base/default.
      */
-    static std::string GetEffectiveDirectory(const chip::Optional<std::string> & explicitFile, const char * legacyKVS,
-                                             const chip::Optional<std::string> & baseDirectory)
+    static std::string GetEffectivePath(const chip::Optional<std::string> & explicitFile, const char * legacyKVS,
+                                        const chip::Optional<std::string> & baseDirectory, const char * defaultFilename)
     {
-        // Priority 1: Explicit file path - return parent directory
+        // Priority 1: Explicit file path - return full path
         if (explicitFile.HasValue() && !explicitFile.Value().empty())
         {
-            std::filesystem::path path(explicitFile.Value());
-            return path.parent_path().string();
+            return explicitFile.Value();
         }
 
-        // Priority 2: Legacy KVS (only applies to data file) - return parent directory
+        // Priority 2: Legacy KVS (only applies to data file) - return full path
         if (legacyKVS != nullptr && strlen(legacyKVS) > 0)
         {
-            std::filesystem::path path(legacyKVS);
-            return path.parent_path().string();
+            return std::string(legacyKVS);
         }
 
-        // Priority 3: Base directory
-        std::string base = baseDirectory.HasValue() && !baseDirectory.Value().empty() ? baseDirectory.Value() : DefaultBase();
-        return base;
+        // Priority 3: Base directory - return directory path (PosixConfig will append filename)
+        if (baseDirectory.HasValue() && !baseDirectory.Value().empty())
+        {
+            std::string base = baseDirectory.Value();
+            // Ensure trailing slash so PosixConfig knows it's a directory
+            if (base.back() != '/')
+            {
+                base += '/';
+            }
+            return base;
+        }
+
+        // Priority 4: Default - return default directory (PosixConfig will append filename)
+        return DefaultBase() + "/";
     }
 
 public:
@@ -501,30 +510,30 @@ public:
 
     std::string GetFactoryDataLocation() const override
     {
-        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSFactoryFile,
-                                     nullptr, // Legacy KVS doesn't apply to factory
-                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSFactoryFile,
+                                nullptr, // Legacy KVS doesn't apply to factory
+                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_factory.ini");
     }
 
     std::string GetConfigDataLocation() const override
     {
-        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSConfigFile,
-                                     nullptr, // Legacy KVS doesn't apply to config
-                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSConfigFile,
+                                nullptr, // Legacy KVS doesn't apply to config
+                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_config.ini");
     }
 
     std::string GetCountersDataLocation() const override
     {
-        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSCountersFile,
-                                     nullptr, // Legacy KVS doesn't apply to counters
-                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSCountersFile,
+                                nullptr, // Legacy KVS doesn't apply to counters
+                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_counters.ini");
     }
 
     std::string GetKVSDataLocation() const override
     {
-        return GetEffectiveDirectory(LinuxDeviceOptions::GetInstance().KVSDataFile,
-                                     LinuxDeviceOptions::GetInstance().KVS, // Legacy KVS applies here
-                                     LinuxDeviceOptions::GetInstance().KVSDirectory);
+        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSDataFile,
+                                LinuxDeviceOptions::GetInstance().KVS, // Legacy KVS applies here
+                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_kvs");
     }
 };
 

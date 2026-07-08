@@ -113,7 +113,16 @@ CHIP_ERROR PosixConfig::Init()
     if (provider.LegacyKVS() == nullptr)
     {
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation());
-        path /= CHIP_DEFAULT_DATA_FILENAME;
+        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
+        // If it's a directory or has no extension, append the default filename
+        std::string pathStr = path.string();
+        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
+        bool hasExtension   = !path.extension().empty();
+        if (isDirectory || !hasExtension)
+        {
+            // It's a directory or has no extension, append the default filename
+            path /= CHIP_DEFAULT_DATA_FILENAME;
+        }
         return PersistedStorage::KeyValueStoreMgrImpl().Init(path.c_str());
     }
     else
@@ -501,21 +510,45 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     {
         storage = &gChipLinuxFactoryStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetFactoryDataLocation());
-        path /= CHIP_DEFAULT_FACTORY_FILENAME;
+        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
+        // If it's a directory or has no extension, append the default filename
+        std::string pathStr = path.string();
+        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
+        bool hasExtension   = !path.extension().empty();
+        if (isDirectory || !hasExtension)
+        {
+            path /= CHIP_DEFAULT_FACTORY_FILENAME;
+        }
         err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
         storage = &gChipLinuxConfigStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetConfigDataLocation());
-        path /= CHIP_DEFAULT_CONFIG_FILENAME;
+        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
+        // If it's a directory or has no extension, append the default filename
+        std::string pathStr = path.string();
+        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
+        bool hasExtension   = !path.extension().empty();
+        if (isDirectory || !hasExtension)
+        {
+            path /= CHIP_DEFAULT_CONFIG_FILENAME;
+        }
         err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         storage = &gChipLinuxCountersStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetCountersDataLocation());
-        path /= CHIP_DEFAULT_COUNTERS_FILENAME;
+        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
+        // If it's a directory or has no extension, append the default filename
+        std::string pathStr = path.string();
+        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
+        bool hasExtension   = !path.extension().empty();
+        if (isDirectory || !hasExtension)
+        {
+            path /= CHIP_DEFAULT_COUNTERS_FILENAME;
+        }
         err = storage->Init(path.c_str());
     }
 
