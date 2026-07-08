@@ -23,6 +23,7 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DefaultTimerDelegate.h>
+#include "CodegenIntegration.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -47,14 +48,14 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         AmbientContextSensingCluster::Config config(
-            endpointId, AmbientContextSensing::AmbientContextSensingDelegate::AllocateInstance(), gDefaultTimerDelegate);
-        config.WithFeatures(static_cast<Feature>(featureMap));
+            AmbientContextSensing::AllocateDelegate(), gDefaultTimerDelegate);
+        config.WithFeatures(BitMask<AmbientContextSensing::Feature>(featureMap));
         config.WithOptionalAttributes(optionalAttributeBits);
         constexpr chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
             .holdTimeMin = kDefaultHoldTimeMin, .holdTimeMax = kDefaultHoldTimeMax, .holdTimeDefault = kDefaultHoldTimeDefault
         };
         config.WithHoldTime(kDefaultHoldTimeLimits.holdTimeDefault, kDefaultHoldTimeLimits);
-        gServers[clusterInstanceIndex].Create(config);
+        gServers[clusterInstanceIndex].Create(endpointId, config);
         return gServers[clusterInstanceIndex].Registration();
     }
 

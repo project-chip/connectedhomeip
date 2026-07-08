@@ -37,7 +37,7 @@ public:
             mDelegate(acsDelegate), mHoldTimeDelegate(timerDelegate)
         {}
 
-        Config & WithFeatures(AmbientContextSensing::Feature featureMap)
+        Config & WithFeatures(BitMask<AmbientContextSensing::Feature> featureMap)
         {
             mFeatureMap = featureMap;
             return *this;

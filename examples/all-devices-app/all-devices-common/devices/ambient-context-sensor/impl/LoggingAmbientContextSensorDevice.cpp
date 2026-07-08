@@ -23,7 +23,7 @@ namespace chip::app::Clusters::AmbientContextSensing {
 
 LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelegate & timerDelegate) :
     AmbientContextSensorDevice(AmbientContextSensingConfig{ *this, timerDelegate }
-                                   .WithFeatures(AmbientContextSensing::Feature(kFeatureAllForLog))
+                                   .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeatureAllForLog))
                                    .WithHoldTime(10,
                                                  {
                                                      .holdTimeMin     = 1,

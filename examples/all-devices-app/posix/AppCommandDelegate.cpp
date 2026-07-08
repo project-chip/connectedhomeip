@@ -126,6 +126,20 @@ public:
     }
 };
 
+/**
+ * Named pipe handler for setting supported ambient context type
+ *
+ * Usage example:
+ *   echo '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":2},{"TypeId":74,
+ * "TagId":2},{"TypeId":75, "TagId":2}]}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetAmbientContextSupport"
+ *   - "EndpointId": ID of endpoint
+ *   - "AmbientContextType": array of the supported ambient context sensing type
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
 class SetAmbientContextSupportCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
@@ -213,6 +227,20 @@ static bool GetAmbientContextType(const Json::Value & actArray,
     return true;
 }
 
+/**
+ * Named pipe handler for ambient context detection
+ *
+ * Usage example:
+ *   echo '{"Name":"AddAmbientContextDetect","EndpointId":1,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73,
+ * "TagId":2}],"DetectionConfidence":100}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "AddAmbientContextDetect"
+ *   - "EndpointId": ID of endpoint
+ *   - "AmbientContextType": Type of the detection
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
 class AddAmbientContextDetectCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
@@ -265,6 +293,30 @@ public:
     }
 };
 
+/**
+ * Named pipe handler for predicted activity
+ *
+ * Usage example:
+ *   echo '{"Name":"SetPredictedActivity","EndpointId":1,"PredAct":[
+ {"StartTStamp":1769138873, "EndTStamp":1769138883,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73,
+ "TagId":2}],"CrowdDetect":true,"CrowdCnt":10,"Conf":89},
+ {"StartTStamp":1769138893, "EndTStamp":1769138903,"AmbientContextType":[{"TypeId":75, "TagId":3},{"TypeId":73,
+ "TagId":4}],"CrowdDetect":true,"CrowdCnt":11,"Conf":90}
+ ]}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetPredictedActivity"
+ *   - "EndpointId": ID of endpoint
+ *   - "PredAct": The server's prediction of upcoming changes
+ *   - "StartTStamp": Start Timestamp
+ *   - "EndTStamp": End Timestamp
+ *   - "AmbientContextType": Type of the detection
+ *   - "CrowdDetect": The predicted state of the CrowdDetected attribute
+ *   - "CrowdCnt": The predicted value of the CrowdCount attribute
+ *   - "Conf": Confidence level for the predicted activity state
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
 class SetPredictedActivityCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
@@ -372,6 +424,19 @@ public:
     }
 };
 
+/**
+ * Named pipe handler for setting object count
+ *
+ * Usage example:
+ *   echo '{"Name":"SetObjCount","EndpointId":1,"ObjectCount":11}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetObjCount"
+ *   - "EndpointId": ID of endpoint
+ *   - "ObjectCount": value of ObjectCount
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
 class SetObjCountCommandHandler : public AllDevicesAppNamedPipeCommandHandler
 {
 public:
