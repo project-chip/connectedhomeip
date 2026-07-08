@@ -159,14 +159,14 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
 
     /* Calculate hash and verify */
     ReturnErrorOnFailure(Crypto::Hash_SHA256(mFactoryData.factoryDataBuffer, mFactoryData.header.size, calculatedHash));
-    
+
     if (memcmp(calculatedHash, mFactoryData.header.hash, kHashLen) != 0)
     {
         /* Hash didn't match - data might be encrypted, try to decrypt */
         if (pAesKey != NULL)
         {
             ChipLogProgress(DeviceLayer, "Hash mismatch, attempting decryption...");
-            
+
             /* Re-read and decrypt */
             for (int i = 0; (uint32_t) i < (mFactoryData.header.size / 16U); i++)
             {
@@ -175,23 +175,23 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
                 {
                     return CHIP_ERROR_READ_FAILED;
                 }
-                
+
                 res = ReadEncryptedData(&mFactoryData.factoryDataBuffer[i * 16], &currentBlock[0]);
                 if (res != CHIP_NO_ERROR)
                 {
                     return res;
                 }
             }
-            
+
             /* Verify hash after decryption */
             ReturnErrorOnFailure(Crypto::Hash_SHA256(mFactoryData.factoryDataBuffer, mFactoryData.header.size, calculatedHash));
-            
+
             if (memcmp(calculatedHash, mFactoryData.header.hash, kHashLen) != 0)
             {
                 ChipLogError(DeviceLayer, "Hash verification failed after decryption");
                 return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
             }
-            
+
             ChipLogProgress(DeviceLayer, "Decryption successful, hash verified");
         }
         else
