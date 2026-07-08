@@ -391,7 +391,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             raise ValueError(
                 f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
-        log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
+        log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)
 
     def get_ota_image_software_version(self, ota_image_path: str) -> int:
         # Format values  from src/app/ota_image_tool.py
@@ -430,5 +430,5 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             asserts.fail(
                 f"Invalid OTA Image with version: {ota_version} to update Device running with version {basicinfo_softwareversion}.")
 
-        log.info(f"OTA Image version is {ota_version} to install on Device with version {basicinfo_softwareversion}")
+        log.info("OTA Image version is %s to install on Device with version %s", ota_version, basicinfo_softwareversion)
         return ota_version
