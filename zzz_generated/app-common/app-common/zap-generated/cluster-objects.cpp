@@ -339,6 +339,10 @@
 #include <clusters/LowPower/Commands.ipp>
 #include <clusters/LowPower/Events.ipp>
 #include <clusters/LowPower/Structs.ipp>
+#include <clusters/MediaFileManagement/Attributes.ipp>
+#include <clusters/MediaFileManagement/Commands.ipp>
+#include <clusters/MediaFileManagement/Events.ipp>
+#include <clusters/MediaFileManagement/Structs.ipp>
 #include <clusters/MediaInput/Attributes.ipp>
 #include <clusters/MediaInput/Commands.ipp>
 #include <clusters/MediaInput/Events.ipp>
@@ -1449,6 +1453,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ContentAppObserver::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::MediaFileManagement::Id: {
         switch (aCommand)
         {
         default:

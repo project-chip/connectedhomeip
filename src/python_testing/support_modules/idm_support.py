@@ -1213,6 +1213,16 @@ class IDMBaseTest(BasicCompositionTests):
             if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
                 continue
 
+            # Skip attributes carrying the Changes Omitted (C) or Quieter Reporting (Q)
+            # spec quality. The server is not required to emit a subscription report for
+            # every change to these (C suppresses change reporting entirely; Q reports
+            # less often than the reporting interval), so writing to them and asserting a
+            # report arrives produces false failures in steps 8/10/11. _cq_excluded_attr_ids
+            # (built once in MatterBaseTest from the data-model XML quality flags, unioned
+            # with the transitional allowlist) is the canonical exclusion set.
+            if (cluster_id, attribute_id) in self._cq_excluded_attr_ids:
+                continue
+
             xml_attr = xml_cluster.attributes[attribute_id]
             write_access = xml_attr.write_access
 
