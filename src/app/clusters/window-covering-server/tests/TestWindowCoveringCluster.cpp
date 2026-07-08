@@ -543,7 +543,10 @@ TEST_F(TestWindowCoveringCluster, Command_GoToLiftPercentage)
         h.delegate.Reset();
         auto result = h.tester.Invoke<Commands::GoToLiftPercentage::Type>(cmd);
         EXPECT_FALSE(result.IsSuccess());
-        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+        auto statusCode = result.GetStatusCode();
+        ASSERT_TRUE(statusCode.has_value());
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+        EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
         EXPECT_EQ(h.delegate.mHandleMovementCallCount, 0);
         EXPECT_EQ(h.cluster.GetTargetPositionLiftPercent100ths().Value(), kWcPercent100thsMaxClosed);
     }
@@ -572,7 +575,10 @@ TEST_F(TestWindowCoveringCluster, Command_GoToTiltPercentage)
         h.delegate.Reset();
         auto result = h.tester.Invoke<Commands::GoToTiltPercentage::Type>(cmd);
         EXPECT_FALSE(result.IsSuccess());
-        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::ConstraintError);
+        auto statusCode = result.GetStatusCode();
+        ASSERT_TRUE(statusCode.has_value());
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+        EXPECT_EQ(statusCode->GetStatus(), Status::ConstraintError);
         EXPECT_EQ(h.delegate.mHandleMovementCallCount, 0);
     }
 }
@@ -605,8 +611,10 @@ TEST_F(TestWindowCoveringCluster, MotionLock)
 
         auto result = h.tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
         ASSERT_FALSE(result.IsSuccess());
-        ASSERT_TRUE(result.GetStatusCode().has_value());
-        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Busy);
+        auto statusCode = result.GetStatusCode();
+        ASSERT_TRUE(statusCode.has_value());
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+        EXPECT_EQ(statusCode->GetStatus(), Status::Busy);
     }
 
     // Calibration mode -> Failure.
@@ -617,8 +625,10 @@ TEST_F(TestWindowCoveringCluster, MotionLock)
 
         auto result = h.tester.Invoke<Commands::UpOrOpen::Type>(Commands::UpOrOpen::Type());
         ASSERT_FALSE(result.IsSuccess());
-        ASSERT_TRUE(result.GetStatusCode().has_value());
-        EXPECT_EQ(result.GetStatusCode()->GetStatus(), Status::Failure);
+        auto statusCode = result.GetStatusCode();
+        ASSERT_TRUE(statusCode.has_value());
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+        EXPECT_EQ(statusCode->GetStatus(), Status::Failure);
     }
 }
 
