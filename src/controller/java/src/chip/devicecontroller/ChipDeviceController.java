@@ -676,9 +676,11 @@ public class ChipDeviceController {
     getConnectedDevicePointer(deviceControllerPtr, nodeId, false, jniCallback.getCallbackHandle());
   }
 
-  public void getConnectedDevicePointer(long nodeId, boolean allowLargePayload, GetConnectedDeviceCallback callback) {
+  public void getConnectedDevicePointer(
+      long nodeId, boolean allowLargePayload, GetConnectedDeviceCallback callback) {
     GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
-    getConnectedDevicePointer(deviceControllerPtr, nodeId, allowLargePayload, jniCallback.getCallbackHandle());
+    getConnectedDevicePointer(
+        deviceControllerPtr, nodeId, allowLargePayload, jniCallback.getCallbackHandle());
   }
 
   public void releaseConnectedDevicePointer(long devicePtr) {
@@ -1664,7 +1666,8 @@ public class ChipDeviceController {
       AttestationTrustStoreDelegate delegate,
       @Nullable List<byte[]> cdTrustKeys);
 
-  private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate, int maxBDXBlockSize);
+  private native void startOTAProvider(
+      long deviceControllerPtr, OTAProviderDelegate delegate, int maxBDXBlockSize);
 
   private native void finishOTAProvider(long deviceControllerPtr);
 
