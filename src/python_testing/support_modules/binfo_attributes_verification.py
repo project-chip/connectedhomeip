@@ -128,7 +128,6 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                                   "DataModelRevision should be 1, 16, or 17 for devices without SpecificationVersion")
         elif not hasattr(cluster.Attributes, 'DataModelRevision'):
             self.mark_current_step_skipped()
-        exit()
 
         # Step 2: VendorName
         self.step(2)
