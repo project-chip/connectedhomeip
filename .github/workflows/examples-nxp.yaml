@@ -147,7 +147,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:200
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:203
 
         steps:
             - name: Checkout
