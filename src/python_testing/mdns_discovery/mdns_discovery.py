@@ -408,17 +408,64 @@ class MdnsDiscovery:
         Returns:
             list[str]: A list of strings representing the discovered commissionable mDNS service subtypes.
         """
-        # Get service types
+        sub_types: list[str] = []
+
+        def add_subtype(subtype: str) -> None:
+            if subtype and subtype not in sub_types:
+                sub_types.append(subtype)
+
+        commissionable_type = MdnsServiceType.COMMISSIONABLE.value
+
+        # Get service types advertised via DNS-SD service type enumeration.
         service_types = await self.get_all_service_types(
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=False
         )
 
-        # Filter for commissionable subtypes
-        sub_types = [
-            st for st in service_types
-            if st.startswith('_') and f'._sub.{MdnsServiceType.COMMISSIONABLE.value}' in st
-        ]
+        # Filter for commissionable subtypes.
+        for service_type in service_types:
+            if service_type.startswith('_') and f'._sub.{commissionable_type}' in service_type:
+                add_subtype(service_type)
+
+        # Subtypes are not required to be returned by DNS-SD service type
+        # enumeration. Browse commissionable services and derive the subtype
+        # browse names from the advertised service type and TXT data.
+        commissionable_services = await self.get_commissionable_services(
+            discovery_timeout_sec=discovery_timeout_sec,
+            log_output=False
+        )
+
+        for service_info in commissionable_services:
+            service_type = service_info.service_type
+            if service_type and service_type.startswith('_') and f'._sub.{commissionable_type}' in service_type:
+                add_subtype(service_type)
+
+            txt = service_info.txt or {}
+
+            discriminator = txt.get('D')
+            if discriminator:
+                add_subtype(f"_L{discriminator}._sub.{commissionable_type}")
+                try:
+                    add_subtype(f"_S{(int(discriminator) >> 8) & 0x0F}._sub.{commissionable_type}")
+                except ValueError:
+                    pass
+
+            cm = txt.get('CM')
+            if cm:
+                try:
+                    if int(cm) != 0:
+                        add_subtype(f"_CM._sub.{commissionable_type}")
+                except ValueError:
+                    pass
+
+            vendor_and_product = txt.get('VP')
+            if vendor_and_product:
+                vendor_id = vendor_and_product.split('+', 1)[0]
+                add_subtype(f"_V{vendor_id}._sub.{commissionable_type}")
+
+            device_type = txt.get('DT')
+            if device_type:
+                add_subtype(f"_T{device_type}._sub.{commissionable_type}")
 
         if log_output:
             log.info(

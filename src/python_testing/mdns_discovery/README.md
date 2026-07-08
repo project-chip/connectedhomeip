@@ -212,9 +212,14 @@ get_commissionable_subtypes()
         ▼
    get_all_service_types()
         │
-        └── discovers all advertised mDNS service types
+        ├── discovers all advertised mDNS service types
+        │
         ▼
-filters for commissionable service subtypes
+   get_commissionable_services()
+        │
+        └── discovers commissionable service PTR and TXT data
+        ▼
+filters and derives commissionable service subtypes
         ▼
 returns List[str]
 ```
