@@ -73,6 +73,8 @@ class TC_SC_3_5(MatterBaseTest):
         if not os.path.exists(self.th_server_app):
             asserts.fail(f"The path {self.th_server_app} does not exist")
 
+        self.commissioning_timeout = int(self.user_params.get("commissioning_timeout", 90))
+
         # Start TH Server
         self.start_th_server()
 
@@ -289,7 +291,7 @@ class TC_SC_3_5(MatterBaseTest):
             th2 = self.create_second_controller()
             await th2.CommissionOnNetwork(nodeId=1, setupPinCode=th_server_passcode)
 
-        if not self.th_server.event.wait(90):
+        if not self.th_server.event.wait(self.commissioning_timeout):
             asserts.fail("DUT_Commissioner failed to commission TH_SERVER successfully within 90s.")
 
         self.step("1c")
@@ -352,7 +354,7 @@ class TC_SC_3_5(MatterBaseTest):
             with asserts.assert_raises(ChipStackError):
                 await th2.CommissionOnNetwork(nodeId=1, setupPinCode=th_server_passcode)
 
-        if not self.th_server.event.wait(90):
+        if not self.th_server.event.wait(self.commissioning_timeout):
             asserts.fail("Commissioning failure was not detected within 90s.")
 
         await self.assert_dut_commissioner_failed_to_complete_commissioning()
@@ -383,7 +385,7 @@ class TC_SC_3_5(MatterBaseTest):
             with asserts.assert_raises(ChipStackError):
                 await th2.CommissionOnNetwork(nodeId=2, setupPinCode=th_server_passcode)
 
-        if not self.th_server.event.wait(90):
+        if not self.th_server.event.wait(self.commissioning_timeout):
             asserts.fail("Commissioning failure was not detected within 90s.")
 
         await self.assert_dut_commissioner_failed_to_complete_commissioning()
@@ -420,7 +422,7 @@ class TC_SC_3_5(MatterBaseTest):
                 with asserts.assert_raises(ChipStackError):
                     await th2.CommissionOnNetwork(nodeId=3, setupPinCode=th_server_passcode)
 
-            if not self.th_server.event.wait(90):
+            if not self.th_server.event.wait(self.commissioning_timeout):
                 asserts.fail("Commissioning failure was not detected within 90s.")
 
             await self.assert_dut_commissioner_failed_to_complete_commissioning()
@@ -451,7 +453,7 @@ class TC_SC_3_5(MatterBaseTest):
             with asserts.assert_raises(ChipStackError):
                 await th2.CommissionOnNetwork(nodeId=4, setupPinCode=th_server_passcode)
 
-        if not self.th_server.event.wait(90):
+        if not self.th_server.event.wait(self.commissioning_timeout):
             asserts.fail("Commissioning failure was not detected within 90s.")
 
         await self.assert_dut_commissioner_failed_to_complete_commissioning()
