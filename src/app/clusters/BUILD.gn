@@ -86,13 +86,18 @@ source_set("clusters") {
     "thread-network-diagnostics-server",
     "thread-network-directory-server",
     "time-format-localization-server",
+    "time-synchronization-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
+    "unit-localization-server",
+    "user-label-server",
     "valve-configuration-and-control-server",
     "water-heater-management-server",
     "webrtc-transport-provider-server",
+    "webrtc-transport-requestor-server",
     "wifi-network-diagnostics-server",
     "wifi-network-management-server",
+    "zone-management-server",
 
     # keep-sorted: end
   ]
