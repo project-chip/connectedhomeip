@@ -21,6 +21,7 @@
 #include <app/clusters/service-area-server/ServiceAreaCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <clusters/ServiceArea/Attributes.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <pw_unit_test/framework.h>
 #include <vector>
@@ -473,6 +474,55 @@ inline std::optional<Structs::ProgressStruct::DecodableType> FindProgressForArea
         }
     }
     return std::nullopt;
+}
+
+// Helpers to access invoke results and progress elements without unchecked optional access.
+template <typename ResponseType, typename StatusEnum>
+std::optional<StatusEnum> InvokeResponseStatus(const chip::Testing::ClusterTester::InvokeResult<ResponseType> & result)
+{
+    VerifyOrReturnValue(result.response.has_value(), std::nullopt);
+    return result.response->status;
+}
+
+inline std::optional<SelectAreasStatus> SelectAreasResponseStatus(
+    const chip::Testing::ClusterTester::InvokeResult<Commands::SelectAreasResponse::DecodableType> & result)
+{
+    return InvokeResponseStatus<Commands::SelectAreasResponse::DecodableType, SelectAreasStatus>(result);
+}
+
+inline std::optional<SkipAreaStatus> SkipAreaResponseStatus(
+    const chip::Testing::ClusterTester::InvokeResult<Commands::SkipAreaResponse::DecodableType> & result)
+{
+    return InvokeResponseStatus<Commands::SkipAreaResponse::DecodableType, SkipAreaStatus>(result);
+}
+
+template <typename ResponseType>
+bool InvokeResponseHasNonEmptyStatusText(const chip::Testing::ClusterTester::InvokeResult<ResponseType> & result)
+{
+    VerifyOrReturnValue(result.response.has_value(), false);
+    return !result.response->statusText.empty();
+}
+
+inline std::optional<OperationalStatusEnum>
+ProgressElementStatus(const std::optional<Structs::ProgressStruct::DecodableType> & progress)
+{
+    VerifyOrReturnValue(progress.has_value(), std::nullopt);
+    return progress->status;
+}
+
+inline std::optional<bool> ProgressElementHasTotalOperationalTime(
+    const std::optional<Structs::ProgressStruct::DecodableType> & progress)
+{
+    VerifyOrReturnValue(progress.has_value(), std::nullopt);
+    return progress->totalOperationalTime.HasValue();
+}
+
+inline std::optional<uint32_t>
+ProgressElementTotalOperationalTimeSeconds(const std::optional<Structs::ProgressStruct::DecodableType> & progress)
+{
+    VerifyOrReturnValue(progress.has_value(), std::nullopt);
+    VerifyOrReturnValue(progress->totalOperationalTime.HasValue(), std::nullopt);
+    return progress->totalOperationalTime.Value().Value();
 }
 
 inline bool DirtyListContainsAttribute(chip::Testing::ClusterTester & tester, AttributeId attributeId)

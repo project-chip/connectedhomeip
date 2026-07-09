@@ -30,7 +30,9 @@ executable("all-devices-app") {
   sources = [
     "AppCommandDelegate.cpp",
     "ClusterTypeMappings.cpp",
+    "PosixAudioManager.cpp",
     "PosixChimeDevice.cpp",
+    "PosixSpeakerDevice.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
