@@ -70,8 +70,13 @@ import logging
 
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
-from TC_S_common import (_build_extension_fields, _is_writable, _read_scenable_value, _select_scenable_attribute, _value_bounds,
-                         _value_other_than)
+from TC_S_common import (
+    _build_extension_fields,
+    _is_writable,
+    _read_scenable_value,
+    _select_scenable_attribute,
+    _value_other_than,
+)
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -354,9 +359,8 @@ class TC_S_2_3(MatterBaseTest):
         # application configurations from it: AC1 (stored in scenes and restored via
         # RecallScene) and AC2 (a different device state used to prove RecallScene works).
         self._scenable = await _select_scenable_attribute(self, self._scene_endpoint)
-        scenable_lo, scenable_hi = _value_bounds(self._scenable)
         current_value = await _read_scenable_value(self, self._scenable, self._scene_endpoint)
-        ac1_value = _value_other_than(current_value, scenable_lo, scenable_hi)
+        ac1_value = _value_other_than(self._scenable, current_value)
         writable = _is_writable(self._scenable)
         log.info(
             "Using scenable attribute %s::%s (%s, writable=%s): AC1=%s, current(AC2)=%s",
@@ -561,7 +565,7 @@ class TC_S_2_3(MatterBaseTest):
         # must not already be in AC1 before the recall.
         self.step("5a")
         if writable:
-            ac2_value = _value_other_than(ac1_value, scenable_lo, scenable_hi)
+            ac2_value = _value_other_than(self._scenable, ac1_value)
             result = await dev_ctrl.WriteAttribute(self.dut_node_id, [(self._scene_endpoint, self._scenable.attribute(ac2_value))])
             asserts.assert_equal(result[0].Status, Status.Success, "Step 5a: writing AC2 failed")
             await asyncio.sleep(1)

@@ -10,17 +10,11 @@ from matter.testing.spec_parsing import Clusters, XmlAttribute, build_xml_cluste
 _SCENE_VALUE_FIELDS = {
     "bool": "valueUnsigned8",
     "uint8": "valueUnsigned8",
-    "enum8": "valueUnsigned8",
-    "map8": "valueUnsigned8",
     "percent": "valueUnsigned8",
     "uint16": "valueUnsigned16",
-    "enum16": "valueUnsigned16",
-    "map16": "valueUnsigned16",
     "percent100ths": "valueUnsigned16",
     "uint24": "valueUnsigned32",
     "uint32": "valueUnsigned32",
-    "map32": "valueUnsigned32",
-    "enum32": "valueUnsigned32",
     "uint40": "valueUnsigned64",
     "uint48": "valueUnsigned64",
     "uint56": "valueUnsigned64",
@@ -35,6 +29,15 @@ _SCENE_VALUE_FIELDS = {
     "int56": "valueSigned64",
     "int64": "valueSigned64",
     "temperature": "valueSigned16",
+    # Will discard Scenable attributes of enum and map types for now
+    # because their constraints are not defined in the datamodel xml
+    # Additionally, their range of values might be feature dependent
+    # "enum8": "valueUnsigned8",
+    # "map8": "valueUnsigned8",
+    # "enum16": "valueUnsigned16",
+    # "map16": "valueUnsigned16",
+    # "map32": "valueUnsigned32",
+    # "enum32": "valueUnsigned32",
 }
 
 # Bit width and signedness of each AttributeValuePairStruct value field.
@@ -58,6 +61,8 @@ class _ScenableAttribute:
     attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor
     xml_attribute: XmlAttribute
     value_field: str
+    min_value: int = 0
+    max_value: int = 0
 
 
 def _scene_value_field(datatype: str) -> str | None:
@@ -102,12 +107,42 @@ async def _select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) 
                 )
             except KeyError:
                 continue
+            # Boolean attributes are preferred because two distinct valid values are always available and unambiguous.
             if xml_attribute.datatype.lower() == "bool":
+                _set_scenable_attribute_value_bounds_from_spec_contraints(candidate)
                 return candidate
             if fallback is None:
                 fallback = candidate
 
     asserts.assert_true(fallback is not None, f"No scenable attribute found on endpoint {scene_endpoint}")
+
+    # There are two instances of scenable attributes which their contraints depends other attributes in their cluster
+    # LevelControl currentLevel is bounded by the cluster's MinLevel and MaxLevel attributes
+    # ColorControl ColorTemperatureMireds is bounded by the cluster's ColorTempPhysicalMinMireds and ColorTempPhysicalMaxMireds attributes
+    if fallback.cluster == Clusters.LevelControl and fallback.attribute == Clusters.LevelControl.Attributes.CurrentLevel:
+        min_level = await test.read_single_attribute_check_success(
+            endpoint=scene_endpoint, cluster=Clusters.LevelControl, attribute=Clusters.LevelControl.Attributes.MinLevel
+        )
+        max_level = await test.read_single_attribute_check_success(
+            endpoint=scene_endpoint, cluster=Clusters.LevelControl, attribute=Clusters.LevelControl.Attributes.MaxLevel
+        )
+        _set_scenable_attribute_value_bounds(fallback, int(min_level), int(max_level))
+    elif (
+        fallback.cluster == Clusters.ColorControl and fallback.attribute == Clusters.ColorControl.Attributes.ColorTemperatureMireds
+    ):
+        min_color_temp = await test.read_single_attribute_check_success(
+            endpoint=scene_endpoint,
+            cluster=Clusters.ColorControl,
+            attribute=Clusters.ColorControl.Attributes.ColorTempPhysicalMinMireds,
+        )
+        max_color_temp = await test.read_single_attribute_check_success(
+            endpoint=scene_endpoint,
+            cluster=Clusters.ColorControl,
+            attribute=Clusters.ColorControl.Attributes.ColorTempPhysicalMaxMireds,
+        )
+        _set_scenable_attribute_value_bounds(fallback, int(min_color_temp), int(max_color_temp))
+    else:
+        _set_scenable_attribute_value_bounds_from_spec_contraints(fallback)
     return fallback
 
 
@@ -130,33 +165,42 @@ def _build_extension_fields(scenable: _ScenableAttribute, value: int) -> list:
     return [Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(clusterID=scenable.cluster.id, attributeValueList=[pair])]
 
 
-def _value_bounds(scenable: _ScenableAttribute) -> tuple[int, int]:
-    """Returns a conservative [min, max] range of valid values for the scenable attribute.
+def _set_scenable_attribute_value_bounds_from_spec_contraints(scenable: _ScenableAttribute):
+    """Set the value constraints for the scenable attribute.
 
-    Uses the spec constraints when available, otherwise falls back to the data type's
+    Uses the spec constraints when available, otherwise uses the data type's
     representable range (excluding the maximum unsigned value, which is frequently reserved).
     """
     if scenable.xml_attribute.datatype.lower() == "bool":
-        return 0, 1
-    bits, signed = _VALUE_FIELD_BITS[scenable.value_field]
-    if signed:
-        lo, hi = -(2 ** (bits - 1)), 2 ** (bits - 1) - 1
+        lo, hi = 0, 1
     else:
-        lo, hi = 0, 2**bits - 2
-    constraints = scenable.xml_attribute.constraints
-    if constraints is not None:
-        if isinstance(constraints.min_value, int):
-            lo = constraints.min_value
-        if isinstance(constraints.max_value, int):
-            hi = constraints.max_value
-    return lo, hi
+        bits, signed = _VALUE_FIELD_BITS[scenable.value_field]
+        if signed:
+            lo, hi = -(2 ** (bits - 1)), 2 ** (bits - 1) - 1
+        else:
+            lo, hi = 0, 2**bits - 2
+        constraints = scenable.xml_attribute.constraints
+        if constraints is not None:
+            if isinstance(constraints.min_value, int):
+                lo = constraints.min_value
+            if isinstance(constraints.max_value, int):
+                hi = constraints.max_value
+    _set_scenable_attribute_value_bounds(scenable, lo, hi)
 
 
-def _value_other_than(value: int, lo: int, hi: int) -> int:
-    """Returns an in-range value adjacent to (and different from) the given value."""
-    value = int(value)
-    if value + 1 <= hi:
+def _set_scenable_attribute_value_bounds(scenable: _ScenableAttribute, lo: int, hi: int):
+    """Override the value constraints for the scenable attribute.
+
+    Used when the Scenable attribute value bounds might differ from its spec constraints or type range
+    e.g. LevelControl currentLevel is bounded by the cluster's MinLevel and MaxLevel attributes
+    """
+    scenable.min_value, scenable.max_value = lo, hi
+
+
+def _value_other_than(scenable: _ScenableAttribute, value: int) -> int:
+    """Returns an in-range value adjacent to (and different from) the given value within the attribute's value constraints."""
+    if value + 1 <= scenable.max_value:
         return value + 1
-    if value - 1 >= lo:
+    if value - 1 >= scenable.min_value:
         return value - 1
-    return hi if value != hi else lo
+    return scenable.min_value if value != scenable.min_value else scenable.max_value
