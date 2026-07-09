@@ -1138,19 +1138,19 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
         }
         if (paths.kvsDataFile.empty())
         {
-            paths.kvsDataFile = dir + "chip_kvs";
+            paths.kvsDataFile = dir + CHIP_DEFAULT_DATA_FILENAME;
         }
         if (paths.factoryFile.empty())
         {
-            paths.factoryFile = dir + "chip_factory.ini";
+            paths.factoryFile = dir + CHIP_DEFAULT_FACTORY_FILENAME;
         }
         if (paths.configFile.empty())
         {
-            paths.configFile = dir + "chip_config.ini";
+            paths.configFile = dir + CHIP_DEFAULT_CONFIG_FILENAME;
         }
         if (paths.countersFile.empty())
         {
-            paths.countersFile = dir + "chip_counters.ini";
+            paths.countersFile = dir + CHIP_DEFAULT_COUNTERS_FILENAME;
         }
     }
 
