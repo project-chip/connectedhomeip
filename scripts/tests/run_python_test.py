@@ -309,13 +309,15 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_manager = AppProcessManager(app_config)
         app_manager.start()
         app_manager_ref = [app_manager]
+        stop_event = threading.Event()
         restart_monitor_thread = threading.Thread(
             target=monitor_app_restart_requests,
             args=(
                 app_manager_ref,
                 app_manager_lock,
                 app_config,
-                restart_flag_file),
+                restart_flag_file,
+                stop_event),
             daemon=True)
         restart_monitor_thread.start()
 
@@ -358,6 +360,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # Stop the restart monitor thread if it exists
         if restart_monitor_thread and restart_monitor_thread.is_alive():
             log.info("Stopping app restart monitor thread")
+            stop_event.set()
             restart_monitor_thread.join(2.0)
 
         # Get the current app manager if it exists
@@ -395,6 +398,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # Stop the restart monitor thread if it exists
         if restart_monitor_thread and restart_monitor_thread.is_alive():
             log.info("Stopping app restart monitor thread")
+            stop_event.set()
             restart_monitor_thread.join(2.0)
 
         tcpdump.stop()
@@ -413,12 +417,13 @@ def monitor_app_restart_requests(
         app_manager_ref,
         app_manager_lock,
         config: TestRunConfig,
-        restart_flag_file):
+        restart_flag_file,
+        stop_event: threading.Event):
 
-    while True:
+    while not stop_event.is_set():
         # Try to read the restart flag file
         if not os.path.exists(restart_flag_file):
-            time.sleep(0.5)
+            stop_event.wait(0.5)
             continue
 
         with open(restart_flag_file) as f:
