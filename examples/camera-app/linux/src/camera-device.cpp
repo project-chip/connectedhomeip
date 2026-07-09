@@ -544,6 +544,12 @@ CameraError CameraDevice::InitializeCameraDevice()
         gstreamerInitialized = true;
     }
 
+    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
+    {
+        ChipLogProgress(Camera, "Using test video source, skipping physical camera initialization");
+        return CameraError::SUCCESS;
+    }
+
     ChipLogDetail(Camera, "InitializeCameraDevice: %s", mVideoDevicePath.c_str());
 
     videoDeviceFd = open(mVideoDevicePath.c_str(), O_RDWR);
