@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <string>
 
 #ifndef CHIP_DEFAULT_BASE_DIR
@@ -64,6 +65,11 @@ struct ChipLinuxStoragePaths
 
     // Legacy KVS file path (deprecated, use kvsDataFile instead)
     const char * legacyKvsFile = nullptr;
+
+    // Helper methods to get full file paths with default filename resolution
+    std::string GetFactoryFilePath() const;
+    std::string GetConfigFilePath() const;
+    std::string GetCountersFilePath() const;
 };
 
 /**

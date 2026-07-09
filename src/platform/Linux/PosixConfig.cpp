@@ -30,6 +30,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
 #include <platform/Linux/PosixConfig.h>
 
 #include <filesystem>
@@ -507,47 +508,17 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
     {
         storage = &gChipLinuxFactoryStorage;
-        std::filesystem::path path(paths.factoryFile.empty() ? CHIP_DEFAULT_BASE_DIR : paths.factoryFile);
-        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
-        // If it's a directory or has no extension, append the default filename
-        std::string pathStr = path.string();
-        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
-        bool hasExtension   = !path.extension().empty();
-        if (isDirectory || !hasExtension)
-        {
-            path /= CHIP_DEFAULT_FACTORY_FILENAME;
-        }
-        err = storage->Init(path.c_str());
+        err     = storage->Init(paths.GetFactoryFilePath().c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
         storage = &gChipLinuxConfigStorage;
-        std::filesystem::path path(paths.configFile.empty() ? CHIP_DEFAULT_BASE_DIR : paths.configFile);
-        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
-        // If it's a directory or has no extension, append the default filename
-        std::string pathStr = path.string();
-        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
-        bool hasExtension   = !path.extension().empty();
-        if (isDirectory || !hasExtension)
-        {
-            path /= CHIP_DEFAULT_CONFIG_FILENAME;
-        }
-        err = storage->Init(path.c_str());
+        err     = storage->Init(paths.GetConfigFilePath().c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         storage = &gChipLinuxCountersStorage;
-        std::filesystem::path path(paths.countersFile.empty() ? CHIP_DEFAULT_BASE_DIR : paths.countersFile);
-        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
-        // If it's a directory or has no extension, append the default filename
-        std::string pathStr = path.string();
-        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
-        bool hasExtension   = !path.extension().empty();
-        if (isDirectory || !hasExtension)
-        {
-            path /= CHIP_DEFAULT_COUNTERS_FILENAME;
-        }
-        err = storage->Init(path.c_str());
+        err     = storage->Init(paths.GetCountersFilePath().c_str());
     }
 
     SuccessOrExit(err);

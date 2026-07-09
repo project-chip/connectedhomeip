@@ -27,6 +27,37 @@
 namespace chip {
 namespace DeviceLayer {
 
+namespace {
+// Helper function to resolve a path by appending default filename if needed
+std::string ResolvePath(const std::string & path, const std::string & defaultFilename)
+{
+    std::filesystem::path p(path.empty() ? CHIP_DEFAULT_BASE_DIR : path);
+    std::string pathStr = p.string();
+    bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
+    bool hasExtension   = !p.extension().empty();
+    if (isDirectory || !hasExtension)
+    {
+        p /= defaultFilename;
+    }
+    return p.string();
+}
+} // namespace
+
+std::string ChipLinuxStoragePaths::GetFactoryFilePath() const
+{
+    return ResolvePath(factoryFile, CHIP_DEFAULT_FACTORY_FILENAME);
+}
+
+std::string ChipLinuxStoragePaths::GetConfigFilePath() const
+{
+    return ResolvePath(configFile, CHIP_DEFAULT_CONFIG_FILENAME);
+}
+
+std::string ChipLinuxStoragePaths::GetCountersFilePath() const
+{
+    return ResolvePath(countersFile, CHIP_DEFAULT_COUNTERS_FILENAME);
+}
+
 ChipLinuxStoragePaths & GetStoragePaths()
 {
     static ChipLinuxStoragePaths sInstance;
