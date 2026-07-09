@@ -270,8 +270,8 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 
 
 def stop_restart_monitor_thread(
-        restart_monitor_thread: typing.Optional[threading.Thread],
-        stop_event: typing.Optional[threading.Event]) -> None:
+        restart_monitor_thread: threading.Thread | None,
+        stop_event: threading.Event | None) -> None:
     if restart_monitor_thread and restart_monitor_thread.is_alive():
         log.info("Stopping app restart monitor thread")
         if stop_event:
@@ -421,7 +421,7 @@ def monitor_app_restart_requests(
         app_manager_lock,
         config: TestRunConfig,
         restart_flag_file,
-        stop_event: typing.Optional[threading.Event] = None):
+        stop_event: threading.Event | None = None):
 
     if stop_event is None:
         stop_event = threading.Event()
