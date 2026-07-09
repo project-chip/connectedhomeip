@@ -49476,6 +49476,8 @@ class ContentLauncher(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="acceptHeader", Tag=0x00000000, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="supportedStreamingProtocols", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="movable", Tag=0x00000002, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="presets", Tag=0x00000003, Type=typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -49485,6 +49487,8 @@ class ContentLauncher(Cluster):
 
     acceptHeader: typing.Optional[typing.List[str]] = None
     supportedStreamingProtocols: typing.Optional[uint] = None
+    movable: typing.Optional[bool] = None
+    presets: typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -49550,17 +49554,33 @@ class ContentLauncher(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 17
 
+        class QueueTypeEnum(MatterIntEnum):
+            kReplace = 0x00
+            kNext = 0x01
+            kLast = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kURLNotAvailable = 0x01
             kAuthFailed = 0x02
             kTextTrackNotAvailable = 0x03
             kAudioTrackNotAvailable = 0x04
+            kInvalidData = 0x05
+            kAccountMismatch = 0x06
+            kContentAppNotAvailable = 0x07
+            kReplicationNotAllowed = 0x08
+            kReplicationNotSupported = 0x09
+            kPresetNotFound = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 5
+            kUnknownEnumValue = 11
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -49569,6 +49589,9 @@ class ContentLauncher(Cluster):
             kAdvancedSeek = 0x4
             kTextTracks = 0x8
             kAudioTracks = 0x10
+            kContentReplication = 0x20
+            kContentQueueing = 0x40
+            kPresets = 0x80
 
         class SupportedProtocolsBitmap(IntFlag):
             kDash = 0x1
@@ -49589,6 +49612,57 @@ class ContentLauncher(Cluster):
             width: 'float' = 0.0
             height: 'float' = 0.0
             metric: 'ContentLauncher.Enums.MetricTypeEnum' = 0
+
+        @dataclass
+        class ContentAppInfo(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contentAppVendorID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="contentAppProductID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=2, Type=str),
+                    ])
+
+            contentAppVendorID: 'uint' = 0
+            contentAppProductID: 'uint' = 0
+            data: 'str' = ""
+
+        @dataclass
+        class LaunchUrlInfo(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="url", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contentType", Tag=2, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contentHeaders", Tag=3, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="offsetMillisecs", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="queueType", Tag=5, Type=typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="nextUrl", Tag=6, Type=typing.Union[None, Nullable, str]),
+                    ])
+
+            url: 'str' = ""
+            data: 'typing.Union[None, Nullable, str]' = None
+            contentType: 'typing.Union[None, Nullable, str]' = None
+            contentHeaders: 'typing.Union[None, Nullable, typing.List[str]]' = None
+            offsetMillisecs: 'typing.Union[None, Nullable, uint]' = None
+            queueType: 'typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum]' = None
+            nextUrl: 'typing.Union[None, Nullable, str]' = None
+
+        @dataclass
+        class ReplicationInfo(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="launchUrlInfo", Tag=0, Type=typing.Union[None, Nullable, ContentLauncher.Structs.LaunchUrlInfo]),
+                        ClusterObjectFieldDescriptor(Label="contentAppInfo", Tag=1, Type=typing.Union[None, Nullable, ContentLauncher.Structs.ContentAppInfo]),
+                    ])
+
+            launchUrlInfo: 'typing.Union[None, Nullable, ContentLauncher.Structs.LaunchUrlInfo]' = None
+            contentAppInfo: 'typing.Union[None, Nullable, ContentLauncher.Structs.ContentAppInfo]' = None
 
         @dataclass
         class TrackPreferenceStruct(ClusterObject):
@@ -49695,6 +49769,19 @@ class ContentLauncher(Cluster):
             splash: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
             waterMark: 'typing.Optional[ContentLauncher.Structs.StyleInformationStruct]' = None
 
+        @dataclass
+        class ContentPresetStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="presetName", Tag=1, Type=str),
+                    ])
+
+            presetID: 'uint' = 0
+            presetName: 'str' = ""
+
     class Commands:
         @dataclass
         class LaunchContent(ClusterCommand):
@@ -49712,6 +49799,8 @@ class ContentLauncher(Cluster):
                         ClusterObjectFieldDescriptor(Label="data", Tag=2, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="playbackPreferences", Tag=3, Type=typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct]),
                         ClusterObjectFieldDescriptor(Label="useCurrentContext", Tag=4, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="contentAppVendorID", Tag=5, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="contentAppProductID", Tag=6, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             search: ContentLauncher.Structs.ContentSearchStruct = field(default_factory=lambda: ContentLauncher.Structs.ContentSearchStruct())
@@ -49719,6 +49808,8 @@ class ContentLauncher(Cluster):
             data: typing.Optional[str] = None
             playbackPreferences: typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct] = None
             useCurrentContext: typing.Optional[bool] = None
+            contentAppVendorID: typing.Union[None, Nullable, uint] = None
+            contentAppProductID: typing.Union[None, Nullable, uint] = None
 
         @dataclass
         class LaunchURL(ClusterCommand):
@@ -49734,11 +49825,23 @@ class ContentLauncher(Cluster):
                         ClusterObjectFieldDescriptor(Label="contentURL", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="displayString", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="brandingInformation", Tag=2, Type=typing.Optional[ContentLauncher.Structs.BrandingInformationStruct]),
+                        ClusterObjectFieldDescriptor(Label="playbackPreferences", Tag=3, Type=typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct]),
+                        ClusterObjectFieldDescriptor(Label="contentType", Tag=4, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="contentHeaders", Tag=5, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="offsetMillisecs", Tag=6, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="queueType", Tag=7, Type=typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum]),
+                        ClusterObjectFieldDescriptor(Label="nextUrl", Tag=8, Type=typing.Union[None, Nullable, str]),
                     ])
 
             contentURL: str = ""
             displayString: typing.Optional[str] = None
             brandingInformation: typing.Optional[ContentLauncher.Structs.BrandingInformationStruct] = None
+            playbackPreferences: typing.Optional[ContentLauncher.Structs.PlaybackPreferencesStruct] = None
+            contentType: typing.Union[None, Nullable, str] = None
+            contentHeaders: typing.Union[None, Nullable, typing.List[str]] = None
+            offsetMillisecs: typing.Union[None, Nullable, uint] = None
+            queueType: typing.Union[None, Nullable, ContentLauncher.Enums.QueueTypeEnum] = None
+            nextUrl: typing.Union[None, Nullable, str] = None
 
         @dataclass
         class LauncherResponse(ClusterCommand):
@@ -49757,6 +49860,53 @@ class ContentLauncher(Cluster):
 
             status: ContentLauncher.Enums.StatusEnum = 0
             data: typing.Optional[str] = None
+
+        @dataclass
+        class ContentReplicationRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050A
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ContentReplicationResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class ContentReplicationResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050A
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.StatusEnum),
+                        ClusterObjectFieldDescriptor(Label="replicationInfo", Tag=1, Type=typing.Union[None, Nullable, ContentLauncher.Structs.ReplicationInfo]),
+                    ])
+
+            status: ContentLauncher.Enums.StatusEnum = 0
+            replicationInfo: typing.Union[None, Nullable, ContentLauncher.Structs.ReplicationInfo] = None
+
+        @dataclass
+        class PlayPreset(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050A
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetID", Tag=0, Type=uint),
+                    ])
+
+            presetID: uint = 0
 
     class Attributes:
         @dataclass
@@ -49790,6 +49940,38 @@ class ContentLauncher(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
             value: typing.Optional[uint] = None
+
+        @dataclass
+        class Movable(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
+
+        @dataclass
+        class Presets(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]])
+
+            value: typing.Optional[typing.List[ContentLauncher.Structs.ContentPresetStruct]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -49870,6 +50052,26 @@ class ContentLauncher(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class ContentReplication(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050A
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.StatusEnum),
+                    ])
+
+            status: ContentLauncher.Enums.StatusEnum = 0
 
 
 @dataclass

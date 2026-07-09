@@ -570,6 +570,16 @@
  */
 - (MCContentLauncherClusterLaunchURLCommand * _Nullable)launchURLCommand;
 
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterContentReplicationRequestCommand if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterContentReplicationRequestCommand * _Nullable)contentReplicationRequestCommand;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterPlayPresetCommand if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterPlayPresetCommand * _Nullable)playPresetCommand;
+
 // ContentLauncher cluster attributes:
 
 /**
@@ -581,6 +591,16 @@
  * @brief Returns non-nil pointer to MCContentLauncherClusterSupportedStreamingProtocolsAttribute if supported, nil otherwise.
  */
 - (MCContentLauncherClusterSupportedStreamingProtocolsAttribute * _Nullable)supportedStreamingProtocolsAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterMovableAttribute if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterMovableAttribute * _Nullable)movableAttribute;
+
+/**
+ * @brief Returns non-nil pointer to MCContentLauncherClusterPresetsAttribute if supported, nil otherwise.
+ */
+- (MCContentLauncherClusterPresetsAttribute * _Nullable)presetsAttribute;
 
 /**
  * @brief Returns non-nil pointer to MCContentLauncherClusterGeneratedCommandListAttribute if supported, nil otherwise.
