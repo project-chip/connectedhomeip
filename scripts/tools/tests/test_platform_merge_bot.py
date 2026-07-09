@@ -15,14 +15,14 @@
 # limitations under the License.
 #
 
-from datetime import UTC, datetime, timedelta
 import json
 import os
 import sys
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from datetime import UTC, datetime, timedelta
 from typing import cast
+from unittest.mock import MagicMock, patch
 
 # Ensure the parent directory is in the path so we can import platform_merge_bot
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -30,7 +30,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from platform_merge_bot import ELIGIBILITY_COMMENT_MARKER, PlatformMergeBot, STUCK_CHECK_SUITE_THRESHOLD_SECONDS  # noqa: E402
+from platform_merge_bot import ELIGIBILITY_COMMENT_MARKER, STUCK_CHECK_SUITE_THRESHOLD_SECONDS, PlatformMergeBot  # noqa: E402
 
 
 class TestPlatformMergeBot(unittest.TestCase):
@@ -975,6 +975,7 @@ esp32:
 
         mock_pr.merge.assert_not_called()
         mock_pr.create_issue_comment.assert_not_called()
+
     def test_check_and_process_pr_stuck_check_suite_ignored_merges(self) -> None:
         """Tests that an incomplete check suite with 0 runs and old age is ignored, allowing merge."""
         files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]

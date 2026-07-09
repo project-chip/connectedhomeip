@@ -15,11 +15,11 @@
 # limitations under the License.
 #
 
-from datetime import UTC, datetime
 import json
 import logging
 import os
 import urllib.request
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Iterable, NamedTuple
 
@@ -42,7 +42,6 @@ ELIGIBILITY_COMMENT_MARKER = "<!-- platform-merge-bot-eligibility-marker -->"
 
 # Age threshold (in seconds) to ignore stuck check suites (2 hours)
 STUCK_CHECK_SUITE_THRESHOLD_SECONDS = 7200
-
 
 
 class ValidationCheck(Enum):
