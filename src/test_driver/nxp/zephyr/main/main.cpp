@@ -19,6 +19,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <zephyr/settings/settings.h>
+#include <unistd.h>
 
 #include <zephyr/logging/log.h>
 
