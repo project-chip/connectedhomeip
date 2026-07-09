@@ -71,6 +71,7 @@ source_set("clusters") {
     "thread-border-router-management-server",
     "thread-network-diagnostics-server",
     "thread-network-directory-server",
+    "time-format-localization-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
     "valve-configuration-and-control-server",

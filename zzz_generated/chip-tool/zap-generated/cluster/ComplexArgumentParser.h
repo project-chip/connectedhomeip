@@ -824,6 +824,21 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::DimensionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::ContentAppInfo::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentAppInfo::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::LaunchUrlInfo::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::LaunchUrlInfo::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::ReplicationInfo::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ReplicationInfo::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::TrackPreferenceStruct::Type & request,
                         Json::Value & value);
 
@@ -860,6 +875,11 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type & request,
                         Json::Value & value);
