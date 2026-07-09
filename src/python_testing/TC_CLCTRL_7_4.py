@@ -438,7 +438,7 @@ class TC_CLCTRL_7_4(MatterBaseTest):
             countdown_time_after_interruption: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_true(countdown_time_after_interruption == 0,
                                 f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}.")
-            log.info("CountdownTime after interruption not 0, but: %s", countdown_time_after_interruption)
+            log.info("CountdownTime after interruption: %s", countdown_time_after_interruption)
             sub_handler.reset()
 
 
