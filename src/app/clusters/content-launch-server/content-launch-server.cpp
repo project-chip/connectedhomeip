@@ -282,6 +282,21 @@ exit:
     return true;
 }
 
+bool emberAfContentLauncherClusterContentReplicationRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const ContentLauncher::Commands::ContentReplicationRequest::DecodableType & commandData)
+{
+    commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+    return true;
+}
+
+bool emberAfContentLauncherClusterPlayPresetCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                     const ContentLauncher::Commands::PlayPreset::DecodableType & commandData)
+{
+    commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
