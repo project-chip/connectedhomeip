@@ -1050,11 +1050,11 @@ jobs:
             fail-fast: false
             matrix:
                 # This list is empirically created to have a reasonable time split of ~30 minutes each.
-                filter: ["", "TC_[A-A]", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
+                filter: ["", "TC_A", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
                 include:
                     - filter: ""
                       junitxml: out/junit-results/Other-results.xml
-                    - filter: "TC_[A-A]"
+                    - filter: "TC_A"
                       junitxml: out/junit-results/TC_A-results.xml
                     - filter: "TC_[B-C]"
                       junitxml: out/junit-results/TC_B-C-results.xml
