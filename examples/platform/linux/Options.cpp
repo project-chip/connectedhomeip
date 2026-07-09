@@ -1130,22 +1130,27 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     // use the directory as the base for all files
     if (options.KVSDirectory.HasValue())
     {
-        const std::string & dir = options.KVSDirectory.Value();
+        std::string dir = options.KVSDirectory.Value();
+        // Ensure directory ends with exactly one slash
+        if (!dir.empty() && dir.back() != '/')
+        {
+            dir += '/';
+        }
         if (paths.kvsDataFile.empty())
         {
-            paths.kvsDataFile = dir + "/chip_kvs";
+            paths.kvsDataFile = dir + "chip_kvs";
         }
         if (paths.factoryFile.empty())
         {
-            paths.factoryFile = dir + "/chip_factory.ini";
+            paths.factoryFile = dir + "chip_factory.ini";
         }
         if (paths.configFile.empty())
         {
-            paths.configFile = dir + "/chip_config.ini";
+            paths.configFile = dir + "chip_config.ini";
         }
         if (paths.countersFile.empty())
         {
-            paths.countersFile = dir + "/chip_counters.ini";
+            paths.countersFile = dir + "chip_counters.ini";
         }
     }
 
