@@ -675,6 +675,26 @@ TEST_F(TestAudioControlCluster, UnmutePolicyDoNotUnmuteAndChangeVolume)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestAudioControlCluster, UnmutePolicyUnmuteOrDoNotChangeVolumeSoftMutedOnly)
+{
+    // SoftMuted=TRUE, PhysicallyMuted=FALSE, policy=UnmuteOrDoNotChangeVolume
+    // -> unmutes and applies the requested volume
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
+                                BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(50).WithSetVolumeUnmutePolicy(
+                                    UnmutePolicyEnum::kUnmuteOrDoNotChangeVolume));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+
+    SetVolume::Type cmd;
+    cmd.newVolume = 75;
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+    EXPECT_EQ(cluster.GetVolume(), 75u);
+    EXPECT_FALSE(cluster.GetSoftMuted());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestAudioControlCluster, UnmutePolicyUnmuteOrDoNotChangeVolumePhysicallyMuted)
 {
     // PhysicallyMuted=TRUE, policy=UnmuteOrDoNotChangeVolume → INVALID_IN_STATE
