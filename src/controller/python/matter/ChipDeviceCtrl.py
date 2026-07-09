@@ -55,6 +55,7 @@ from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
+from .exceptions import ChipStackError
 from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
 
