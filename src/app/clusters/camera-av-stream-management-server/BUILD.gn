@@ -18,10 +18,14 @@ source_set("camera-av-stream-management-server") {
   sources = [
     "CameraAVStreamManagementCluster.cpp",
     "CameraAVStreamManagementCluster.h",
+    "MigrationCameraAVStreamManagementCluster.cpp",
+    "MigrationCameraAVStreamManagementCluster.h",
+    "MigratorCameraAVStreamManagementStorage.cpp",
+    "MigratorCameraAVStreamManagementStorage.h",
   ]
 
   deps = [
-    "${chip_root}/src/app/persistence:singleton",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

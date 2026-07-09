@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v7.0.0
+            - uses: actions/checkout@v7
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -125,6 +125,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-sensing-union-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/audio-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/av-analysis-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
@@ -143,6 +144,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/groupcast-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/humidistat-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/media-file-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ota-provider-cluster.xml \
@@ -552,7 +554,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v5
+              uses: actions/cache/save@v6
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -593,7 +595,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |
@@ -764,7 +766,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v5
+              uses: actions/cache/save@v6
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -812,7 +814,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -1023,7 +1025,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v5
+              uses: actions/cache/save@v6
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -1038,8 +1040,8 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        # Updating the timeout for REPL Tests - Linux (RUN)(TC_[D-O]) takes over 60 minutes consistently in CI
-        timeout-minutes: 70
+        # Updating the timeout for REPL Tests - Linux (RUN) since splits now run in under 30 minutes
+        timeout-minutes: 45
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -1047,18 +1049,23 @@ jobs:
             # Since some of these tests can be flaky, do not fail all matrix parts when a single one fails
             fail-fast: false
             matrix:
-                # This list is empirically created to have a reasonable time split. The "" that runs the "other"
-                # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
-                filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
+                # This list is empirically created to have a reasonable time split of ~30 minutes each.
+                filter: ["", "TC_A", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
                 include:
                     - filter: ""
                       junitxml: out/junit-results/Other-results.xml
-                    - filter: "TC_[A-C]"
-                      junitxml: out/junit-results/TC_A-C-results.xml
-                    - filter: "TC_[D-O]"
-                      junitxml: out/junit-results/TC_D-O-results.xml
-                    - filter: "!TC_[A-O]"
-                      junitxml: out/junit-results/TC_Non-A-O-results.xml
+                    - filter: "TC_A"
+                      junitxml: out/junit-results/TC_A-results.xml
+                    - filter: "TC_[B-C]"
+                      junitxml: out/junit-results/TC_B-C-results.xml
+                    - filter: "TC_[D-F]"
+                      junitxml: out/junit-results/TC_D-F-results.xml
+                    - filter: "TC_[G-M]"
+                      junitxml: out/junit-results/TC_G-M-results.xml
+                    - filter: "TC_[N-S]"
+                      junitxml: out/junit-results/TC_N-S-results.xml
+                    - filter: "!TC_[A-S]"
+                      junitxml: out/junit-results/TC_Non-A-S-results.xml
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
@@ -1089,7 +1096,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -1286,7 +1293,7 @@ jobs:
 
       steps:
           - name: Checkout
-            uses: actions/checkout@v7.0.0
+            uses: actions/checkout@v7
 
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
@@ -1304,7 +1311,7 @@ jobs:
                 annotate_only: true
 
           - name: Checkout gh-pages for Allure history
-            uses: actions/checkout@v7.0.0
+            uses: actions/checkout@v7
             with:
                 ref: gh-pages
                 path: gh-pages
@@ -1367,7 +1374,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v7.0.0
+              uses: actions/checkout@v7
             - name: Setup Environment
               # coreutils for stdbuf; gnubin is needed because newer coreutils only exposes 'stdbuf' under libexec/gnubin
               run: |

@@ -19,7 +19,7 @@ import abc
 import dataclasses
 import enum
 import os
-from typing import Optional, Union
+from typing import Optional
 
 ROOT_ENDPOINT_ID = 0
 
@@ -80,7 +80,7 @@ class TermsAndConditionsParameters:
 
 @dataclasses.dataclass
 class Parameters:
-    pase_param: Union[PaseOverBLEParameters, PaseOverIPParameters]
+    pase_param: PaseOverBLEParameters | PaseOverIPParameters
     regulatory_config: RegulatoryConfig
     fabric_label: str
     commissionee_info: CommissioneeInfo
