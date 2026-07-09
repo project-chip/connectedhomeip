@@ -389,7 +389,7 @@ jobs:
                      --commissioning-method ble-thread \
                      --summary-file test-summaries/ble-thread.json \
                   "
-                  rm -rf tmp/
+                  rm -rf /tmp/otbr-agent
 
             - name: Run Thread-MeshCoP commissioning test
               env:
@@ -410,7 +410,7 @@ jobs:
                      --commissioning-method thread-meshcop \
                      --summary-file test-summaries/thread-meshcop.json \
                   "
-                  rm -rf tmp/
+                  rm -rf /tmp/otbr-agent
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
