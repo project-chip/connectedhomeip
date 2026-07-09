@@ -1959,6 +1959,7 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
     DataModel::Provider * oldModel = mDataModelProvider;
+    const bool restarted           = mDataModelProviderNeedsStartup;
 
     if (model == mDataModelProvider)
     {
@@ -2007,8 +2008,8 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
         }
         mDataModelProviderNeedsStartup = false;
-        // Register to the new model (skip if same provider — already registered)
-        if (model != oldModel)
+        // Register to the new model (skip if same provider — already registered, unless we restarted)
+        if (model != oldModel || restarted)
         {
             if (mActiveAttributeChangeListener != nullptr)
             {

@@ -35,13 +35,13 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 
 constexpr size_t kTestPathsSize                                        = 10;
-constexpr std::array<ConcreteAttributePath, kTestPathsSize> kTestPaths = {
+const std::array<ConcreteAttributePath, kTestPathsSize> kTestPaths = {
     ConcreteAttributePath(1, 1, 1),    ConcreteAttributePath(2, 2, 2), ConcreteAttributePath(3, 3, 3),
     ConcreteAttributePath(4, 4, 4),    ConcreteAttributePath(5, 5, 5), ConcreteAttributePath(6, 6, 6),
     ConcreteAttributePath(7, 7, 7),    ConcreteAttributePath(8, 8, 8), ConcreteAttributePath(9, 9, 9),
     ConcreteAttributePath(10, 10, 10),
 };
-constexpr ConcreteAttributePath kOverflowPath(1, 2, 3);
+const ConcreteAttributePath kOverflowPath(1, 2, 3);
 
 constexpr uint32_t kBaseTimeoutMs   = 1000;
 constexpr uint32_t kJitterTimeoutMs = 1000;

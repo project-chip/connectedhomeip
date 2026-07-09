@@ -35,6 +35,7 @@
 #include <app/persistence/DeferredAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <app/InteractionModelEngine.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -306,7 +307,7 @@ CHIP_ERROR AppTask::Init()
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     initParams.dataModelProvider               = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    initParams.dataModelProviderChangeListener = &GetCustomizedAttributeChangeListener();
+    initParams.dataModelAttributeChangeListener = &GetCustomizedAttributeChangeListener();
     initParams.testEventTriggerDelegate        = &sTestEventTriggerDelegate;
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT

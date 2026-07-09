@@ -231,7 +231,7 @@ struct ServerInitParams
     // for ember/zap-generated models.
     chip::app::DataModel::Provider * dataModelProvider = nullptr;
 
-    chip::app::DataModel::AttributeChangeListener * dataModelProviderChangeListener = nullptr;
+    chip::app::DataModel::AttributeChangeListener * dataModelAttributeChangeListener = nullptr;
 
     bool advertiseCommissionableIfNoFabrics = CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART;
 };
