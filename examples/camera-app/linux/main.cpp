@@ -18,6 +18,7 @@
 #include "CameraAppCommandDelegate.h"
 #include "camera-app.h"
 #include "camera-device.h"
+#include "clusters/identify/identify-manager.h"
 #include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
 
@@ -64,6 +65,8 @@ void ApplicationInit()
 
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
+
+    TEMPORARY_RETURN_IGNORED IdentifyInit();
 
     sCameraAppCommandDelegate.SetCameraDevice(&gCameraDevice);
 }
