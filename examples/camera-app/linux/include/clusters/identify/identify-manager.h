@@ -18,18 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/identify-server/IdentifyCluster.h>
+#include <lib/core/CHIPError.h>
 
-using chip::app::Clusters::IdentifyCluster;
-using chip::app::Clusters::IdentifyDelegate;
-
-class IdentifyDelegateImpl : public IdentifyDelegate
-{
-public:
-    void OnIdentifyStart(IdentifyCluster & cluster) override { ChipLogProgress(Camera, "OnIdentifyStart"); }
-    void OnIdentifyStop(IdentifyCluster & cluster) override { ChipLogProgress(Camera, "OnIdentifyStop"); }
-    void OnTriggerEffect(IdentifyCluster & cluster) override {}
-    bool IsTriggerEffectEnabled() const override { return false; }
-};
-
+// Registers the Identify cluster server for the camera endpoint with the CodegenDataModelProvider registry.
 CHIP_ERROR IdentifyInit();
