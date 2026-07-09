@@ -70,13 +70,7 @@ import logging
 
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
-from TC_S_common import (
-    _build_extension_fields,
-    _is_writable,
-    _read_scenable_value,
-    _select_scenable_attribute,
-    _value_other_than,
-)
+from TC_S_common import _build_extension_fields, _is_writable, _read_scenable_value, _select_scenable_attribute, _value_other_than
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
