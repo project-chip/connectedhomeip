@@ -44,7 +44,8 @@ class ThreadBorderRouter(TerminablePopen[str]):
         self._datadir = '/tmp/otbr-agent'
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
-        cmd = self._netns_app.wrap_cmd(['otbr-agent', '--data-path', self._datadir, '-d7', '-v', f'-B{self._link_name_app}', radio_url])
+        cmd = self._netns_app.wrap_cmd(['otbr-agent', '--data-path', self._datadir, '-d7',
+                                       '-v', f'-B{self._link_name_app}', radio_url])
         super().__init__(lambda: subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='UTF-8'))
 
     def resource_start(self) -> subprocess.Popen[str]:
