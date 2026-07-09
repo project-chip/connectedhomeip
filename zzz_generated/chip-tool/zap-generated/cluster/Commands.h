@@ -13497,6 +13497,8 @@ private:
 | * AvailableAudioTracks                                              | 0x0008 |
 | * ActiveTextTrack                                                   | 0x0009 |
 | * AvailableTextTracks                                               | 0x000A |
+| * AvailableCommands                                                 | 0x000B |
+| * ContentInfo                                                       | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -32807,6 +32809,8 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<ReadAttribute>(Id, "available-audio-tracks", Attributes::AvailableAudioTracks::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "active-text-track", Attributes::ActiveTextTrack::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "available-text-tracks", Attributes::AvailableTextTracks::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "available-commands", Attributes::AvailableCommands::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "content-info", Attributes::ContentInfo::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -32843,6 +32847,11 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
             chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type>>>>(
             Id, "available-text-tracks", Attributes::AvailableTextTracks::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>>>(
+            Id, "available-commands", Attributes::AvailableCommands::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::Type>>>(
+            Id, "content-info", Attributes::ContentInfo::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -32866,6 +32875,8 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<SubscribeAttribute>(Id, "available-audio-tracks", Attributes::AvailableAudioTracks::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "active-text-track", Attributes::ActiveTextTrack::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "available-text-tracks", Attributes::AvailableTextTracks::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "available-commands", Attributes::AvailableCommands::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "content-info", Attributes::ContentInfo::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

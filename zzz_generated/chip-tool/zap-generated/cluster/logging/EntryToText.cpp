@@ -4518,6 +4518,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveTextTrack";
         case chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
             return "AvailableTextTracks";
+        case chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id:
+            return "AvailableCommands";
+        case chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id:
+            return "ContentInfo";
         case chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::Id:
