@@ -26,7 +26,7 @@ Oven::Oven(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfaceOnOff
     mCavity(timerDelegate, config.cavityConfig, cavityIdentify), mSurface(timerDelegate, surfaceOnOff, surfaceIdentify)
 {}
 
-CHIP_ERROR Oven::Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR Oven::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);

@@ -19,9 +19,9 @@ import("${chip_root}/build/chip/tests.gni")
 
 if (chip_build_tests) {
   chip_test_suite("tests") {
-    output_name = "TestIdAllocator"
+    output_name = "TestEndpointIdAllocator"
 
-    test_sources = [ "TestIdAllocator.cpp" ]
+    test_sources = [ "TestEndpointIdAllocator.cpp" ]
 
     cflags = [ "-Wconversion" ]
 

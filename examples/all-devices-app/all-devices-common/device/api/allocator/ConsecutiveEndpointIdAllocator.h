@@ -16,17 +16,17 @@
 
 #pragma once
 
-#include <device/api/allocator/IdAllocator.h>
+#include <device/api/allocator/EndpointIdAllocator.h>
 
 namespace chip::app {
 
 /// Allocates consecutive endpoint IDs starting from a specified initial ID.
 ///
 /// Intended for standalone or embedded examples that require simple incremental allocation.
-class ConsecutiveIdAllocator : public IdAllocator
+class ConsecutiveEndpointIdAllocator : public EndpointIdAllocator
 {
 public:
-    explicit ConsecutiveIdAllocator(EndpointId startEndpoint = 1) : mNext(startEndpoint) {}
+    explicit ConsecutiveEndpointIdAllocator(EndpointId startEndpoint = 1) : mNext(startEndpoint) {}
 
     EndpointId Allocate() override { return mNext++; }
 

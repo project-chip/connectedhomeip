@@ -23,10 +23,10 @@ namespace chip::app {
 /// Interface for dynamically allocating endpoint IDs across devices and sub-parts.
 ///
 /// Decouples device initialization from fixed endpoint IDs by providing on-demand allocation.
-class IdAllocator
+class EndpointIdAllocator
 {
 public:
-    virtual ~IdAllocator() = default;
+    virtual ~EndpointIdAllocator() = default;
 
     /// Allocates and returns the next usable EndpointId.
     virtual EndpointId Allocate() = 0;

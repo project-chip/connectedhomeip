@@ -16,10 +16,10 @@ import("//build_overrides/chip.gni")
 
 source_set("endpoint-id-allocator") {
   sources = [
-    "ConsecutiveIdAllocator.h",
-    "DynamicIdAllocator.cpp",
-    "DynamicIdAllocator.h",
-    "IdAllocator.h",
+    "ConsecutiveEndpointIdAllocator.h",
+    "DynamicEndpointIdAllocator.cpp",
+    "DynamicEndpointIdAllocator.h",
+    "EndpointIdAllocator.h",
   ]
 
   public_deps = [ "${chip_root}/src/lib" ]

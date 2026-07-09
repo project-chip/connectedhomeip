@@ -41,7 +41,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <device-factory/DeviceFactory.h>
-#include <device/api/allocator/ConsecutiveIdAllocator.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -186,7 +186,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 
     VerifyOrReturnError(sRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    chip::app::ConsecutiveIdAllocator rootAllocator(kRootEndpointId);
+    chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
     chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
@@ -216,7 +216,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     sConstructedDevice = deviceFactory.Create(deviceType);
     VerifyOrReturnError(sConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ConsecutiveIdAllocator allocator(kDeviceEndpointId);
+    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
     ReturnErrorOnFailure(sConstructedDevice->Register(allocator, *sDataModelProvider));
 
     return CHIP_NO_ERROR;

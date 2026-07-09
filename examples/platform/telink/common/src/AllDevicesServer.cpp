@@ -28,9 +28,9 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/Interface.h>
-#include <device/api/allocator/ConsecutiveIdAllocator.h>
-#include <device/api/allocator/IdAllocator.h>
+#include <device/api/allocator/EndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -126,7 +126,7 @@ CHIP_ERROR CreateAndRegisterRootNode(CommonCaseDeviceServerInitParams & initPara
 
     VerifyOrReturnError(gRootNodeDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ConsecutiveIdAllocator rootAllocator(kRootEndpointId);
+    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     return gRootNodeDevice->Register(rootAllocator, *gDataModelProvider);
 }
 
@@ -170,7 +170,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
     gConstructedDevice = deviceFactory.Create(gDeviceType);
     VerifyOrReturnError(gConstructedDevice != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ConsecutiveIdAllocator allocator(kDeviceEndpointId);
+    ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
     ReturnErrorOnFailure(gConstructedDevice->Register(allocator, *gDataModelProvider));
 
     initParams.dataModelProvider = gDataModelProvider.get();

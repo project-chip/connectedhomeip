@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <device/api/allocator/IdAllocator.h>
+#include <device/api/allocator/EndpointIdAllocator.h>
 #include <set>
 
 namespace chip::app {
@@ -34,10 +34,10 @@ namespace chip::app {
 /// Typical usage is a pre-defined list of endpoint allocation, like "3:thermostat, 5:rain-sensor"
 /// where the given IDs (3 and 5 in the example) are pre-allocated/resreved while the rest may
 /// be dynamic.
-class DynamicIdAllocator : public IdAllocator
+class DynamicEndpointIdAllocator : public EndpointIdAllocator
 {
 public:
-    explicit DynamicIdAllocator(std::set<EndpointId> reservedIds = {});
+    explicit DynamicEndpointIdAllocator(std::set<EndpointId> reservedIds = {});
 
     /// Forces mNext to the given value, even if it was marked reserved or used.
     void ForceNext(EndpointId endpoint);

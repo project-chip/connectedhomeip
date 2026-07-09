@@ -58,7 +58,7 @@ public:
             Clusters::IdentifyDelegate & surface1Identify, Clusters::IdentifyDelegate & surface2Identify);
     ~Cooktop() override = default;
 
-    CHIP_ERROR Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "DynamicIdAllocator.h"
+#include "DynamicEndpointIdAllocator.h"
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -22,13 +22,13 @@
 
 namespace chip::app {
 
-DynamicIdAllocator::DynamicIdAllocator(std::set<EndpointId> reservedIds) : mUsedIds(std::move(reservedIds)), mNext(1)
+DynamicEndpointIdAllocator::DynamicEndpointIdAllocator(std::set<EndpointId> reservedIds) : mUsedIds(std::move(reservedIds)), mNext(1)
 {
     mUsedIds.insert(kRootEndpointId);
     Advance();
 }
 
-void DynamicIdAllocator::Advance()
+void DynamicEndpointIdAllocator::Advance()
 {
     while (mNext < kInvalidEndpointId && mUsedIds.count(mNext))
     {
@@ -36,7 +36,7 @@ void DynamicIdAllocator::Advance()
     }
 }
 
-void DynamicIdAllocator::ForceNext(EndpointId endpoint)
+void DynamicEndpointIdAllocator::ForceNext(EndpointId endpoint)
 {
     if (endpoint != kInvalidEndpointId)
     {
@@ -44,7 +44,7 @@ void DynamicIdAllocator::ForceNext(EndpointId endpoint)
     }
 }
 
-EndpointId DynamicIdAllocator::Allocate()
+EndpointId DynamicEndpointIdAllocator::Allocate()
 {
     // Exhaustion of the 16-bit endpoint ID space is treated as a fatal configuration error.
     VerifyOrDie(mNext != kInvalidEndpointId);

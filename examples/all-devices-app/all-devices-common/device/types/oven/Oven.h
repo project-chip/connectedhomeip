@@ -49,7 +49,7 @@ public:
          Clusters::IdentifyDelegate & surfaceIdentify, const Config & config = Config::Default());
     ~Oven() override = default;
 
-    CHIP_ERROR Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 

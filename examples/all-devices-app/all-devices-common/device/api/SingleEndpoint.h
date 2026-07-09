@@ -38,7 +38,7 @@ public:
     virtual ~SingleEndpoint() = default;
 
     /// Implements DeviceInterface::Register by allocating an endpoint via allocator.
-    CHIP_ERROR Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override
     {
         return Register(allocator.Allocate(), provider, composition);

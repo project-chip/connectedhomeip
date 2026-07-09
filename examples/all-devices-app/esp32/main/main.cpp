@@ -26,7 +26,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <device/api/allocator/ConsecutiveIdAllocator.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
@@ -251,7 +251,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             .wifiDriver = sWiFiDriver,
         });
 
-    ConsecutiveIdAllocator rootAllocator(kRootEndpointId);
+    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     err = gRootNode->Register(rootAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
@@ -274,7 +274,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    ConsecutiveIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
+    ConsecutiveEndpointIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
     err = gConstructedDevice->Register(allocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {

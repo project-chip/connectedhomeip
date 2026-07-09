@@ -22,7 +22,7 @@
 #include <clusters/Descriptor/Structs.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
-#include <device/api/allocator/IdAllocator.h>
+#include <device/api/allocator/EndpointIdAllocator.h>
 #include <lib/support/Span.h>
 
 #include <cstdint>
@@ -88,7 +88,7 @@ public:
     /// will create/instantiate all clusters on the device and complete endpoint registration.
     /// It should return error if there's any failure when adding the device's clusters to the provider.
     /// An empty or default EndpointComposition represents that there is no parent or static tags.
-    virtual CHIP_ERROR Register(IdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+    virtual CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                 EndpointComposition composition = {}) = 0;
 
     /// Removes a device's clusters from the given provider. This

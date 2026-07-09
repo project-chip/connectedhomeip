@@ -42,7 +42,7 @@
 #include <app_options/DeviceTypeParser.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <device/api/allocator/DynamicIdAllocator.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CommissionableDataProvider.h>
@@ -187,7 +187,7 @@ public:
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-        DynamicIdAllocator endpointIdAllocator(GetReservedEndpointIds());
+        DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
 

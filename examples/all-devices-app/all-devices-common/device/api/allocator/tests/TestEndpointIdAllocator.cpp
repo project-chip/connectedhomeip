@@ -16,43 +16,43 @@
  *    limitations under the License.
  */
 
-#include <device/api/allocator/ConsecutiveIdAllocator.h>
-#include <device/api/allocator/DynamicIdAllocator.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::app;
 
-TEST(TestIdAllocator, ConsecutiveAllocator)
+TEST(TestEndpointIdAllocator, ConsecutiveAllocator)
 {
-    ConsecutiveIdAllocator allocator(10);
+    ConsecutiveEndpointIdAllocator allocator(10);
 
     EXPECT_EQ(allocator.Allocate(), 10);
     EXPECT_EQ(allocator.Allocate(), 11);
     EXPECT_EQ(allocator.Allocate(), 12);
 }
 
-TEST(TestIdAllocator, DynamicAllocator_SimpleAllocation)
+TEST(TestEndpointIdAllocator, DynamicAllocator_SimpleAllocation)
 {
-    DynamicIdAllocator allocator;
+    DynamicEndpointIdAllocator allocator;
 
     EXPECT_EQ(allocator.Allocate(), 1);
     EXPECT_EQ(allocator.Allocate(), 2);
     EXPECT_EQ(allocator.Allocate(), 3);
 }
 
-TEST(TestIdAllocator, DynamicAllocator_SkipReserved)
+TEST(TestEndpointIdAllocator, DynamicAllocator_SkipReserved)
 {
-    DynamicIdAllocator allocator({ 2, 4 });
+    DynamicEndpointIdAllocator allocator({ 2, 4 });
 
     EXPECT_EQ(allocator.Allocate(), 1);
     EXPECT_EQ(allocator.Allocate(), 3);
     EXPECT_EQ(allocator.Allocate(), 5);
 }
 
-TEST(TestIdAllocator, DynamicAllocator_ForceNext)
+TEST(TestEndpointIdAllocator, DynamicAllocator_ForceNext)
 {
-    DynamicIdAllocator allocator({ 10 });
+    DynamicEndpointIdAllocator allocator({ 10 });
 
     allocator.ForceNext(10);
     EXPECT_EQ(allocator.Allocate(), 10);
