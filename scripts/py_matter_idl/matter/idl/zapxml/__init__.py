@@ -16,7 +16,7 @@ import logging
 import typing
 import xml.sax.handler
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 import click
 
@@ -97,7 +97,7 @@ class ParseSource:
 
     Allows for named data sources to be parsed.
     """
-    source: Union[str, typing.IO]  # filename or stream
+    source: str | typing.IO  # filename or stream
     # actual filename to use, None if the source is a filename already
     name: Optional[str] = None
 

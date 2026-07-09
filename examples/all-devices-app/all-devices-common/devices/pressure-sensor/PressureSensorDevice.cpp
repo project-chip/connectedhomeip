@@ -28,9 +28,13 @@ PressureSensorDevice::PressureSensorDevice(TimerDelegate & timerDelegate, Pressu
     mPressureConfig(pressureConfig)
 {}
 
-CHIP_ERROR PressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR PressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition)
 {
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -38,12 +42,14 @@ CHIP_ERROR PressureSensorDevice::Register(EndpointId endpoint, CodeDrivenDataMod
     mPressureMeasurementCluster.Create(endpoint, mPressureConfig);
     ReturnErrorOnFailure(provider.AddCluster(mPressureMeasurementCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void PressureSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    UnregisterDescriptor(provider);
     if (mPressureMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mPressureMeasurementCluster.Cluster()));

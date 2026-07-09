@@ -45,25 +45,43 @@ from .target import BuildTarget, TargetPart
 _ALL_DEVICES_APP_DEVICES = [
     # keep-sorted: start
     'aggregator',
+    'air-purifier',
     'bridged-node',
     'chime',
     'contact-sensor',
+    'cooktop',
+    'device-energy-management',
     'dimmable-light',
+    'dimmable-plug-in-unit',
+    'dishwasher',
+    'extractor-hood',
     'fan',
     'flow-sensor',
+    'generic-switch',
     'humidity-sensor',
+    'laundry-dryer',
+    'laundry-washer',
     'light-sensor',
+    'microwave-oven',
+    'mounted-dimmable-load-control',
+    'mounted-on-off-control',
     'occupancy-sensor',
     'on-off-light',
+    'on-off-light-switch',
+    'on-off-plug-in-unit',
+    'oven',
     'power-source',
     'pressure-sensor',
     'proximity-ranger',
     'rain-sensor',
+    'refrigerator',
+    'robotic-vacuum-cleaner',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
     'water-freeze-detector',
     'water-leak-detector',
+    'water-valve',
     # keep-sorted: end
 ]
 
@@ -232,7 +250,7 @@ def BuildHostTarget():
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("msan", use_msan=True).OnlyIfRe("-clang").OnlyIfRe("-x64").ExceptIfRe(
-        "-(asan|tsan|ubsan|libfuzzer|ossfuzz|pw-fuzztest)")
+        "-(asan|tsan|ubsan|ossfuzz)")
     target.AppendModifier("libfuzzer", fuzzing_type=HostFuzzingType.LIB_FUZZER).OnlyIfRe(
         "-clang").ExceptIfRe('-ossfuzz')
     target.AppendModifier("ossfuzz", pw_fuzz_libfuzzer_compat=True).OnlyIfRe("-pw-fuzztest")
@@ -598,7 +616,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
-    target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="ota", enable_ota=True)
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="thread", enable_thread=True)
@@ -756,26 +774,27 @@ def BuildBouffalolabTarget():
         TargetPart('BL602DK',
                    board=BouffalolabBoard.BL602DK, module_type="BL602"),
         TargetPart('BL616DK', board=BouffalolabBoard.BL616DK, module_type="BL616"),
+        TargetPart('BL616CLDK', board=BouffalolabBoard.BL616CLDK, module_type="BL616CL"),
         TargetPart('BL704LDK', board=BouffalolabBoard.BL704LDK, module_type="BL704L"),
         TargetPart('BL706DK',
                    board=BouffalolabBoard.BL706DK, module_type="BL706C-22"),
         TargetPart('BL602-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
+                   board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
         TargetPart('BL706-NIGHT-LIGHT',
-                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
+                   board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
     ])
 
     target.AppendFixedTargets([
         TargetPart('light', app=BouffalolabApp.LIGHT),
-        TargetPart('contact-sensor', app=BouffalolabApp.CONTACT, enable_pds=True).OnlyIfRe('-(bl704l)'),
+        TargetPart('contact-sensor', app=BouffalolabApp.CONTACT, enable_pds=True),
     ])
 
     target.AppendFixedTargets([
-        TargetPart('ethernet', enable_ethernet=True).OnlyIfRe('-(bl616dk|bl706dk)'),
-        TargetPart('wifi', enable_wifi=True).OnlyIfRe('-(bl602dk|bl706dk|bl616dk)'),
-        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
-        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
-        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('ethernet', enable_ethernet=True).OnlyIfRe('-(bl616dk|bl616cldk|bl706dk)'),
+        TargetPart('wifi', enable_wifi=True).OnlyIfRe('-(bl602dk|bl706dk|bl616dk|bl616cldk)'),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl616cldk|bl704l|bl706dk)'),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl616cldk|bl704l|bl706dk)'),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD).OnlyIfRe('-(bl616dk|bl616cldk|bl704l|bl706dk)'),
     ])
 
     target.AppendFixedTargets([
@@ -787,8 +806,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('mfd', enable_mfd=True)
     target.AppendModifier('rotating_device_id', enable_rotating_device_id=True)
     target.AppendModifier('rpc', enable_rpcs=True, baudrate=115200).OnlyIfRe('-(bl602dk|bl704ldk|bl706dk)')
-    target.AppendModifier('cdc', enable_cdc=True).OnlyIfRe('-(bl706dk)')
-    target.AppendModifier('mot', use_matter_openthread=True).OnlyIfRe('-(thread)')
+    target.AppendModifier('cdc', enable_cdc=True).OnlyIfRe('-(bl706dk)(?!.*-rpc)')
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
     target.AppendModifier('coredump', enable_debug_coredump=True)
 

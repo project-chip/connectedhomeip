@@ -184,6 +184,17 @@ extern "C" void sl_ot_create_instance(void)
     // Standard single instance initialization
     sOTInstance = otInstanceInitSingle();
 #endif // SL_OPENTHREAD_MULTI_PAN_ENABLE
+
+    VerifyOrDie(sOTInstance != nullptr);
+
+#if defined(OPENTHREAD_CONFIG_IP6_INIT_EXT_ADDR_POOL_ENABLE) && OPENTHREAD_CONFIG_IP6_INIT_EXT_ADDR_POOL_ENABLE
+    static otNetifAddress sOtIp6UnicastPool[OPENTHREAD_CONFIG_IP6_MAX_EXT_UCAST_ADDRS];
+    static otNetifMulticastAddress sOtIp6MulticastPool[OPENTHREAD_CONFIG_IP6_MAX_EXT_MCAST_ADDRS];
+
+    // Required before otIp6SetEnabled() when cert prebuilt libs use runtime IPv6 address pools
+    VerifyOrDie(otIp6Init(sOTInstance, sOtIp6UnicastPool, OPENTHREAD_CONFIG_IP6_MAX_EXT_UCAST_ADDRS, sOtIp6MulticastPool,
+                          OPENTHREAD_CONFIG_IP6_MAX_EXT_MCAST_ADDRS) == OT_ERROR_NONE);
+#endif
 }
 
 extern "C" void sl_ot_cli_init(void)

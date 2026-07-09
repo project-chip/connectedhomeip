@@ -33,7 +33,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -183,7 +182,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             log.info("LatchControlModes: %s", latch_control_modes)
 
             self.step("2g")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_latch: bool = None
 
             if overall_current_state is NullValue:
@@ -227,13 +226,13 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         # STEP 3: Verify the CountdownTime when no operation is in progress
         self.step(3)
-        countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        countdown_time: NullValue | uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == 0 or countdown_time == NullValue,
                             f"CountdownTime should be 0 or null when no operation is in progress, got: {countdown_time}.")
 
         # STEP 4: Verify the CountdownTime when an operation is triggered
         self.step("4a")
-        overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+        overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
         current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = None
 
         if overall_current_state is NullValue:
@@ -272,7 +271,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
 
         self.step("4g")
-        current_countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        current_countdown_time: NullValue | uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == NullValue or (1 <= current_countdown_time <= countdown_time_max),
                             f"CountdownTime should be between 1 and {countdown_time_max}, or null, got: {current_countdown_time}.")
         log.info("CurrentCountdownTime: %s", current_countdown_time)
