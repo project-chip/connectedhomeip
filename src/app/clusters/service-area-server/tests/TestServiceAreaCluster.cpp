@@ -536,8 +536,8 @@ TEST_F(ServiceAreaClusterTest, NewProgressStartsPendingWithNullTotalOperationalT
 
     auto progress = FindProgressForArea(*mTester, 0);
     ASSERT_TRUE(progress.has_value());
-    EXPECT_EQ(progress->status, OperationalStatusEnum::kPending);
-    EXPECT_FALSE(progress->totalOperationalTime.HasValue());
+    EXPECT_EQ(progress.value().status, OperationalStatusEnum::kPending);
+    EXPECT_FALSE(progress.value().totalOperationalTime.HasValue());
 }
 
 TEST_F(ServiceAreaClusterTest, ProgressForUnsupportedAreaDoesNotAppear)
@@ -564,7 +564,7 @@ TEST_F(ServiceAreaClusterTest, LeavingCompletedOrOperatingClearsTotalOperational
 
     auto progress = FindProgressForArea(*mTester, 0);
     ASSERT_TRUE(progress.has_value());
-    EXPECT_FALSE(progress->totalOperationalTime.HasValue());
+    EXPECT_FALSE(progress.value().totalOperationalTime.HasValue());
 }
 
 TEST_F(ServiceAreaClusterTest, TotalOperationalTimeIsStoredForCompletedAreas)
@@ -580,8 +580,8 @@ TEST_F(ServiceAreaClusterTest, TotalOperationalTimeIsStoredForCompletedAreas)
 
     auto progress = FindProgressForArea(*mTester, 0);
     ASSERT_TRUE(progress.has_value());
-    ASSERT_TRUE(progress->totalOperationalTime.HasValue());
-    EXPECT_EQ(progress->totalOperationalTime.Value().Value(), 300u);
+    ASSERT_TRUE(progress.value().totalOperationalTime.HasValue());
+    EXPECT_EQ(progress.value().totalOperationalTime.Value().Value(), 300u);
 }
 
 TEST_F(ServiceAreaClusterTest, TotalOperationalTimeIsNotStoredWhileAreaIsPending)
@@ -596,7 +596,7 @@ TEST_F(ServiceAreaClusterTest, TotalOperationalTimeIsNotStoredWhileAreaIsPending
 
     auto progress = FindProgressForArea(*mTester, 0);
     ASSERT_TRUE(progress.has_value());
-    EXPECT_FALSE(progress->totalOperationalTime.HasValue());
+    EXPECT_FALSE(progress.value().totalOperationalTime.HasValue());
 }
 
 TEST_F(ServiceAreaClusterTest, ProgressContainsAtMostOneEntryPerArea)
@@ -645,7 +645,7 @@ TEST_F(ServiceAreaClusterTest, SelectAreasUpdatesSelectedAreasAttribute)
     auto result = mTester->Invoke(MakeSelectAreasRequest({ 0, 1 }));
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SelectAreasStatus::kSuccess);
+    EXPECT_EQ(result.response.value().status, SelectAreasStatus::kSuccess);
 
     auto selected = ReadSelectedAreasList(*mTester);
     ASSERT_EQ(selected.size(), 2u);
@@ -661,7 +661,7 @@ TEST_F(ServiceAreaClusterTest, SelectAreasWithEmptyListRemovesAreaConstraint)
     auto result = mTester->Invoke(MakeSelectAreasRequest({}));
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SelectAreasStatus::kSuccess);
+    EXPECT_EQ(result.response.value().status, SelectAreasStatus::kSuccess);
     EXPECT_TRUE(ReadSelectedAreasList(*mTester).empty());
 }
 
@@ -671,7 +671,7 @@ TEST_F(ServiceAreaClusterTest, SelectAreasWithUnknownAreaLeavesSelectedAreasUnch
     auto result = mTester->Invoke(MakeSelectAreasRequest({ 99 }));
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SelectAreasStatus::kUnsupportedArea);
+    EXPECT_EQ(result.response.value().status, SelectAreasStatus::kUnsupportedArea);
     EXPECT_TRUE(ReadSelectedAreasList(*mTester).empty());
 }
 
@@ -682,8 +682,8 @@ TEST_F(ServiceAreaClusterTest, SelectAreasWhileDeviceModeDisallowsSelectionLeave
     auto result                        = mTester->Invoke(MakeSelectAreasRequest({ 0 }));
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SelectAreasStatus::kInvalidInMode);
-    EXPECT_FALSE(result.response->statusText.empty());
+    EXPECT_EQ(result.response.value().status, SelectAreasStatus::kInvalidInMode);
+    EXPECT_FALSE(result.response.value().statusText.empty());
     EXPECT_TRUE(ReadSelectedAreasList(*mTester).empty());
 }
 
@@ -694,7 +694,7 @@ TEST_F(ServiceAreaClusterTest, SelectAreasWithInvalidSetLeavesSelectedAreasUncha
     auto result                     = mTester->Invoke(MakeSelectAreasRequest({ 0, 1 }));
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SelectAreasStatus::kInvalidSet);
+    EXPECT_EQ(result.response.value().status, SelectAreasStatus::kInvalidSet);
     EXPECT_TRUE(ReadSelectedAreasList(*mTester).empty());
 }
 
@@ -704,7 +704,7 @@ TEST_F(ServiceAreaClusterTest, SelectAreasIgnoresDuplicateEntriesInNewAreas)
     auto result = mTester->Invoke(MakeSelectAreasRequest({ 1, 0, 0, 1 }));
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SelectAreasStatus::kSuccess);
+    EXPECT_EQ(result.response.value().status, SelectAreasStatus::kSuccess);
 
     auto selected = ReadSelectedAreasList(*mTester);
     ASSERT_EQ(selected.size(), 2u);
@@ -721,7 +721,7 @@ TEST_F(ServiceAreaClusterTest, SelectAreasMatchingCurrentSelectionSucceedsWithou
     auto result = mTester->Invoke(MakeSelectAreasRequest({ 0, 1 }));
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SelectAreasStatus::kSuccess);
+    EXPECT_EQ(result.response.value().status, SelectAreasStatus::kSuccess);
     EXPECT_EQ(ReadSelectedAreasList(*mTester), before);
 }
 
@@ -735,7 +735,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaWithoutSelectedAreasReturnsInvalidAreaLis
     auto result = mTester->Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SkipAreaStatus::kInvalidAreaList);
+    EXPECT_EQ(result.response.value().status, SkipAreaStatus::kInvalidAreaList);
 }
 
 TEST_F(ServiceAreaClusterTest, SkipAreaWithUnknownAreaReturnsInvalidSkippedArea)
@@ -747,7 +747,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaWithUnknownAreaReturnsInvalidSkippedArea)
     auto result = mTester->Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SkipAreaStatus::kInvalidSkippedArea);
+    EXPECT_EQ(result.response.value().status, SkipAreaStatus::kInvalidSkippedArea);
 }
 
 TEST_F(ServiceAreaClusterTest, SkipAreaWhileDeviceModeDisallowsSkipReturnsInvalidInMode)
@@ -760,8 +760,8 @@ TEST_F(ServiceAreaClusterTest, SkipAreaWhileDeviceModeDisallowsSkipReturnsInvali
     auto result = mTester->Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SkipAreaStatus::kInvalidInMode);
-    EXPECT_FALSE(result.response->statusText.empty());
+    EXPECT_EQ(result.response.value().status, SkipAreaStatus::kInvalidInMode);
+    EXPECT_FALSE(result.response.value().statusText.empty());
 }
 
 TEST_F(ServiceAreaClusterTest, SkipAreaSuccessInvokesDeviceDelegate)
@@ -773,7 +773,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaSuccessInvokesDeviceDelegate)
     auto result = mTester->Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SkipAreaStatus::kSuccess);
+    EXPECT_EQ(result.response.value().status, SkipAreaStatus::kSuccess);
     EXPECT_EQ(mDelegate.mLastSkippedArea, 0u);
 }
 
@@ -786,7 +786,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaIsRejectedAfterUnconstrainedSelection)
     auto result = mTester->Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response->status, SkipAreaStatus::kInvalidAreaList);
+    EXPECT_EQ(result.response.value().status, SkipAreaStatus::kInvalidAreaList);
 }
 
 } // namespace Testing
