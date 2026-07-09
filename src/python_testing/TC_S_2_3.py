@@ -70,7 +70,7 @@ import logging
 
 from mobly import asserts
 from TC_GC_common import is_groupcast_on_root_node
-from TC_S_common import _build_extension_fields, _is_writable, _read_scenable_value, _select_scenable_attribute, _value_other_than
+from TC_S_common import build_extension_fields, is_writable, read_scenable_value, select_scenable_attribute, value_other_than
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -352,10 +352,10 @@ class TC_S_2_3(MatterBaseTest):
         # Discover a scenable attribute on the scene endpoint and derive two distinct
         # application configurations from it: AC1 (stored in scenes and restored via
         # RecallScene) and AC2 (a different device state used to prove RecallScene works).
-        self._scenable = await _select_scenable_attribute(self, self._scene_endpoint)
-        current_value = await _read_scenable_value(self, self._scenable, self._scene_endpoint)
-        ac1_value = _value_other_than(self._scenable, current_value)
-        writable = _is_writable(self._scenable)
+        self._scenable = await select_scenable_attribute(self, self._scene_endpoint)
+        current_value = await read_scenable_value(self, self._scenable, self._scene_endpoint)
+        ac1_value = value_other_than(self._scenable, current_value)
+        writable = is_writable(self._scenable)
         log.info(
             "Using scenable attribute %s::%s (%s, writable=%s): AC1=%s, current(AC2)=%s",
             self._scenable.cluster.__name__,
@@ -530,7 +530,7 @@ class TC_S_2_3(MatterBaseTest):
                 sceneID=0x01,
                 transitionTime=transition_time,
                 sceneName="",
-                extensionFieldSetStructs=_build_extension_fields(self._scenable, ac1_value),
+                extensionFieldSetStructs=build_extension_fields(self._scenable, ac1_value),
             ),
             endpoint=self._scene_endpoint,
         )
@@ -559,20 +559,20 @@ class TC_S_2_3(MatterBaseTest):
         # must not already be in AC1 before the recall.
         self.step("5a")
         if writable:
-            ac2_value = _value_other_than(self._scenable, ac1_value)
+            ac2_value = value_other_than(self._scenable, ac1_value)
             result = await dev_ctrl.WriteAttribute(self.dut_node_id, [(self._scene_endpoint, self._scenable.attribute(ac2_value))])
             asserts.assert_equal(result[0].Status, Status.Success, "Step 5a: writing AC2 failed")
             await asyncio.sleep(1)
         else:
             log.info("Step 5a: scenable attribute is read-only; using the DUT's current state as AC2.")
-        ac2_reading = await _read_scenable_value(self, self._scenable, self._scene_endpoint)
+        ac2_reading = await read_scenable_value(self, self._scenable, self._scene_endpoint)
         asserts.assert_not_equal(ac2_reading, ac1_value, "Step 5a: DUT should be in AC2 (a state different from AC1) before recall")
 
         # Step 5b: groupcast RecallScene G1/0x01 returns the device to AC1.
         self.step("5b")
         dev_ctrl.SendGroupCommand(group_g1, Clusters.ScenesManagement.Commands.RecallScene(groupID=group_g1, sceneID=0x01))
         await asyncio.sleep(3)
-        recalled = await _read_scenable_value(self, self._scenable, self._scene_endpoint)
+        recalled = await read_scenable_value(self, self._scenable, self._scene_endpoint)
         asserts.assert_equal(recalled, ac1_value, "Step 5b: DUT should return to AC1 after RecallScene")
 
         # Step 6a: groupcast AddScene G1/0x03 with AC1.
@@ -584,7 +584,7 @@ class TC_S_2_3(MatterBaseTest):
                 sceneID=0x03,
                 transitionTime=transition_time,
                 sceneName="",
-                extensionFieldSetStructs=_build_extension_fields(self._scenable, ac1_value),
+                extensionFieldSetStructs=build_extension_fields(self._scenable, ac1_value),
             ),
         )
         await asyncio.sleep(3)

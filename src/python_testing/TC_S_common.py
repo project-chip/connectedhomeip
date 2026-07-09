@@ -54,7 +54,7 @@ _VALUE_FIELD_BITS = {
 
 
 @dataclass
-class _ScenableAttribute:
+class ScenableAttribute:
     """A concrete scenable attribute discovered on the DUT's scene endpoint."""
 
     cluster: Clusters.ClusterObjects.Cluster
@@ -70,7 +70,7 @@ def _scene_value_field(datatype: str) -> str | None:
     return _SCENE_VALUE_FIELDS.get(datatype.lower())
 
 
-async def _select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) -> _ScenableAttribute:
+async def select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) -> ScenableAttribute:
     """Discovers a scenable attribute present on the scene endpoint.
 
     Cross-references the attributes the DUT actually exposes on the scene endpoint
@@ -86,7 +86,7 @@ async def _select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) 
     endpoint_data = attributes.get(scene_endpoint)
     asserts.assert_true(endpoint_data is not None, f"Scene endpoint {scene_endpoint} not found on the DUT")
 
-    fallback: _ScenableAttribute | None = None
+    fallback: ScenableAttribute | None = None
     for cluster, cluster_data in endpoint_data.items():
         xml_cluster = xml_clusters.get(cluster.id)
         if xml_cluster is None:
@@ -99,7 +99,7 @@ async def _select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) 
             if value_field is None:
                 continue
             try:
-                candidate = _ScenableAttribute(
+                candidate = ScenableAttribute(
                     cluster=Clusters.ClusterObjects.ALL_CLUSTERS[cluster.id],
                     attribute=Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster.id][attr_id],
                     xml_attribute=xml_attribute,
@@ -146,11 +146,11 @@ async def _select_scenable_attribute(test: MatterBaseTest, scene_endpoint: int) 
     return fallback
 
 
-def _is_writable(scenable: _ScenableAttribute) -> bool:
+def is_writable(scenable: ScenableAttribute) -> bool:
     return scenable.xml_attribute.write_access != Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
 
 
-async def _read_scenable_value(test: MatterBaseTest, scenable: _ScenableAttribute, scene_endpoint: int) -> int:
+async def read_scenable_value(test: MatterBaseTest, scenable: ScenableAttribute, scene_endpoint: int) -> int:
     """Reads the current value of the selected scenable attribute as an int."""
     value = await test.read_single_attribute_check_success(
         endpoint=scene_endpoint, cluster=scenable.cluster, attribute=scenable.attribute
@@ -158,14 +158,14 @@ async def _read_scenable_value(test: MatterBaseTest, scenable: _ScenableAttribut
     return int(value)
 
 
-def _build_extension_fields(scenable: _ScenableAttribute, value: int) -> list:
+def build_extension_fields(scenable: ScenableAttribute, value: int) -> list:
     """Builds the ExtensionFieldSetStructs setting the selected scenable attribute to value."""
     pair = Clusters.ScenesManagement.Structs.AttributeValuePairStruct(attributeID=scenable.attribute.attribute_id)
     setattr(pair, scenable.value_field, int(value))
     return [Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(clusterID=scenable.cluster.id, attributeValueList=[pair])]
 
 
-def _set_scenable_attribute_value_bounds_from_spec_contraints(scenable: _ScenableAttribute):
+def _set_scenable_attribute_value_bounds_from_spec_contraints(scenable: ScenableAttribute):
     """Set the value constraints for the scenable attribute.
 
     Uses the spec constraints when available, otherwise uses the data type's
@@ -188,7 +188,7 @@ def _set_scenable_attribute_value_bounds_from_spec_contraints(scenable: _Scenabl
     _set_scenable_attribute_value_bounds(scenable, lo, hi)
 
 
-def _set_scenable_attribute_value_bounds(scenable: _ScenableAttribute, lo: int, hi: int):
+def _set_scenable_attribute_value_bounds(scenable: ScenableAttribute, lo: int, hi: int):
     """Override the value constraints for the scenable attribute.
 
     Used when the Scenable attribute value bounds might differ from its spec constraints or type range
@@ -197,7 +197,7 @@ def _set_scenable_attribute_value_bounds(scenable: _ScenableAttribute, lo: int, 
     scenable.min_value, scenable.max_value = lo, hi
 
 
-def _value_other_than(scenable: _ScenableAttribute, value: int) -> int:
+def value_other_than(scenable: ScenableAttribute, value: int) -> int:
     """Returns an in-range value adjacent to (and different from) the given value within the attribute's value constraints."""
     if value + 1 <= scenable.max_value:
         return value + 1
