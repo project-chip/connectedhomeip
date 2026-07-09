@@ -6141,6 +6141,12 @@ static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
     case Attributes::AvailableTextTracks::Id: {
         return YES;
     }
+    case Attributes::AvailableCommands::Id: {
+        return YES;
+    }
+    case Attributes::ContentInfo::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
