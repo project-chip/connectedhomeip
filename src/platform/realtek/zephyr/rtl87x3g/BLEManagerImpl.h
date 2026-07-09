@@ -19,10 +19,10 @@
 #pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <ble/Ble.h>
 #include "app_msg.h"
 #include "matter_ble.h"
 #include "matter_ble_service.h"
+#include <ble/Ble.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -39,9 +39,9 @@
 
 #include "bt_types.h"
 #include "gap_msg.h"
-#include "os_sched.h"
 #include "matter_ble.h"
 #include "matter_ble_service.h"
+#include "os_sched.h"
 
 /*******************************************************************************
  * Local data types
@@ -585,7 +585,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
     matter_ble_adv_config(adv_int_min, adv_int_max, advData, index);
 
     /**************** Prepare scan response data *******************************************/
-    index = 0;
+    index            = 0;
     rspData[index++] = 0x00; // length
     rspData[index++] = 0xFF; // GAP_ADTYPE_MANUFACTURER_SPECIFIC
     rspData[index++] = 0x5D;
