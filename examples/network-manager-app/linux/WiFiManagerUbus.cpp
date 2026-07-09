@@ -38,6 +38,19 @@ namespace chip {
 
 static constexpr int kInvokeTimeout = 2000;
 
+static inline std::string debug_blob_msg(blob_attr * attr)
+{
+    std::string s;
+    const char * json = blobmsg_format_json(msg, true);
+    if (json)
+    {
+        s = std::string(json);
+        free(json);
+    }
+
+    return std::string{};
+}
+
 bool WiFiManagerUbus::GetUciBlob(const char * config, const char * type, blob_attr ** blob)
 {
     BlobMsgBuf buf;
@@ -58,6 +71,11 @@ bool WiFiManagerUbus::GetUciBlob(const char * config, const char * type, blob_at
     if (status != UBUS_STATUS_OK)
     {
         ChipLogError(AppServer, "WiFiManagerUbus: uci get failed: %s", ubus_strerror(status));
+        return false;
+    }
+    if (!*blob)
+    {
+        ChipLogError(AppServer, "WiFiManagerUbus: ubus Invoke failed or memory issue");
         return false;
     }
     return true;
@@ -143,8 +161,7 @@ void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
     int rem            = 0;
     int r              = 0;
 
-    const char * json = blobmsg_format_json(msg, true);
-    ChipLogProgress(AppServer, "preferences = %s", json);
+    ChipLogProgress(AppServer, "preferences = %s", debug_blob_msg(msg).c_str());
 
     blobmsg_for_each_attr(cur, msg, rem)
     {
@@ -156,6 +173,8 @@ void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
         values = cur;
         break;
     }
+    VerifyOrReturn(values != nullptr, ChipLogError(AppServer, "Invalid uci return value (no 'values' table found)"));
+
     blobmsg_for_each_attr(cur, values, rem)
     {
         ChipWifiDebug("Found section: %s", blobmsg_name(cur));
@@ -166,9 +185,8 @@ void WiFiManagerUbus::OnPreferencesUpdate(blob_attr * msg)
                 ChipWifiDebug("  [string] %s = %s", blobmsg_name(i), blobmsg_get_string(i));
                 if (strcmp(blobmsg_name(i), "wifi_iface") == 0)
                 {
-                    free(desired_radio);
-                    desired_radio = strdup(blobmsg_get_string(i));
-                    ChipWifiDebug("Preferences: desired radio: %s", desired_radio);
+                    mDesiredRadio = std::string(blobmsg_get_string(i));
+                    ChipWifiDebug("Preferences: desired radio: %s", mDesiredRadio.c_str());
                 }
             }
             else
@@ -189,12 +207,11 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
     int rem            = 0;
     int r              = 0;
 
-    const char * json = blobmsg_format_json(msg, true);
-    ChipLogProgress(AppServer, "radios = %s", json);
+    ChipLogProgress(AppServer, "radios = %s", debug_blob_msg(msg).c_str());
 
-    if (desired_radio)
+    if (!mDesiredRadio.empty())
     {
-        ChipLogProgress(AppServer, "Looking for radio '%s'", desired_radio);
+        ChipLogProgress(AppServer, "Looking for radio '%s'", mDesiredRadio.c_str());
     }
 
     blobmsg_for_each_attr(cur, msg, rem)
@@ -207,6 +224,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
         values = cur;
         break;
     }
+    VerifyOrReturn(values != nullptr, ChipLogError(AppServer, "Invalid uci return value (no 'values' table found)"));
 
     blobmsg_for_each_attr(cur, values, rem)
     {
@@ -228,7 +246,7 @@ void WiFiManagerUbus::OnWirelessNetworksUpdate(blob_attr * msg)
                 ChipWifiDebug("  [type=%d] %s", blobmsg_type(i), blobmsg_name(i));
             }
         }
-        if (!station_mode && (desired_radio == nullptr || strcmp(desired_radio, blobmsg_name(cur)) == 0))
+        if (!station_mode && (mDesiredRadio.empty() || mDesiredRadio == blobmsg_name(cur)))
         {
             radio = cur;
             break;
