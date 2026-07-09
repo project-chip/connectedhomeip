@@ -455,9 +455,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
                          this);
         g_signal_connect(
             mWpaSupplicant.iface.get(), "nansubscribe-terminated",
-            G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
-                return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
-            }),
+            G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason,
+                           ConnectivityManagerImpl * self) { return self->OnNanSubscribeTerminated(term_subscribe_id, reason); }),
             this);
 #endif
     }
