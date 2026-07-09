@@ -468,7 +468,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-
     GVariantBuilder builder;
     GVariant * args = nullptr;
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
