@@ -68,36 +68,31 @@ class TC_HSTAT_2_2(MatterBaseTest):
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the MinSetpoint attribute.", "Store the value as MinSetpointValue"),
                 TestStep(next(step), "TH reads from the DUT the Step attribute.", "Store the value as StepValue. "),
-
                 TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue",
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
                          "Verify that the DUT response contains MinSetpointValue."),
-
                 TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue + StepValue",
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
                          "Verify that the DUT response contains MinSetpointValue + StepValue."),
-
                 TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue + 1",
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
                          "Verify that the DUT response contains MinSetpointValue."),
-
-                TestStep(next(step), "TH sends command with UserSetpoint set toe MinSetpointValue - 1.",
+                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set toe MinSetpointValue - 1.",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-
-                TestStep(next(step), "TH sends command with mode set to Humidifier",
+                TestStep(next(step), "TH sends command SetSettings with mode set to Humidifier",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with mode set to Dehumidifier",
+                TestStep(next(step), "TH sends command SetSettings with mode set to Dehumidifier",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with mode set to FanOnly",
+                TestStep(next(step), "TH sends command SetSettings with mode set to FanOnly",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with mode set to Auto",
+                TestStep(next(step), "TH sends command SetSettings with mode set to Auto",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with MistType set to Warm",
+                TestStep(next(step), "TH sends command SetSettings with MistType set to Warm",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
-                TestStep(next(step), "TH sends command with MistType set to Cold",
+                TestStep(next(step), "TH sends command SetSettings with MistType set to Cold",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 ]
 
