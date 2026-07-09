@@ -15,40 +15,40 @@
  *    limitations under the License.
  */
 #include <PosixAudioManager.h>
-#include <PosixSpeakerDevice.h>
+#include <PosixSpeaker.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
 
-PosixSpeakerDevice::PosixSpeakerDevice(const Context & context, PosixAudioManager & audioManager) :
-    SpeakerDevice(*this, *this, context.timerDelegate), mAudioManager(audioManager)
+PosixSpeaker::PosixSpeaker(const Context & context, PosixAudioManager & audioManager) :
+    Speaker(*this, *this, context.timerDelegate), mAudioManager(audioManager)
 {
     CHIP_ERROR err = mAudioManager.Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "PosixSpeakerDevice: Failed to initialize audio manager: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "PosixSpeaker: Failed to initialize audio manager: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-PosixSpeakerDevice::~PosixSpeakerDevice() {}
+PosixSpeaker::~PosixSpeaker() {}
 
-void PosixSpeakerDevice::OnLevelChanged(uint8_t value)
+void PosixSpeaker::OnLevelChanged(uint8_t value)
 {
     UpdateEngineVolume();
 }
 
-void PosixSpeakerDevice::OnOffStartup(bool on)
+void PosixSpeaker::OnOffStartup(bool on)
 {
     UpdateEngineVolume();
 }
 
-void PosixSpeakerDevice::OnOnOffChanged(bool on)
+void PosixSpeaker::OnOnOffChanged(bool on)
 {
     UpdateEngineVolume();
 }
 
-void PosixSpeakerDevice::UpdateEngineVolume()
+void PosixSpeaker::UpdateEngineVolume()
 {
     bool muted    = !OnOffCluster().GetOnOff();
     uint8_t level = LevelControlCluster().GetCurrentLevel().ValueOr(Clusters::LevelControlCluster::kMaxLevel);
@@ -56,7 +56,7 @@ void PosixSpeakerDevice::UpdateEngineVolume()
     uint8_t volume = !muted ? level : 0;
     mAudioManager.SetVolume(volume);
 
-    ChipLogProgress(DeviceLayer, "PosixSpeakerDevice: Updated master volume to %u (Muted: %d, Level: %u)", volume, muted, level);
+    ChipLogProgress(DeviceLayer, "PosixSpeaker: Updated master volume to %u (Muted: %d, Level: %u)", volume, muted, level);
 }
 
 } // namespace app

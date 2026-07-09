@@ -16,17 +16,16 @@
  */
 #pragma once
 
-#include <devices/speaker/SpeakerDevice.h>
-
+#include <device/types/speaker/Speaker.h>
 #include <PosixAudioManager.h>
 
 namespace chip {
 namespace app {
 
-// Platform-specific implementation of SpeakerDevice for POSIX systems.
+// Platform-specific implementation of Speaker for POSIX systems.
 // It overrides LevelControl and OnOff delegate methods to adjust the master
 // volume of the shared miniaudio engine.
-class PosixSpeakerDevice : public SpeakerDevice, public Clusters::LevelControlDelegate, public Clusters::OnOffDelegate
+class PosixSpeaker : public Speaker, public Clusters::LevelControlDelegate, public Clusters::OnOffDelegate
 {
 public:
     struct Context
@@ -34,8 +33,8 @@ public:
         TimerDelegate & timerDelegate;
     };
 
-    PosixSpeakerDevice(const Context & context, PosixAudioManager & audioManager);
-    ~PosixSpeakerDevice() override;
+    PosixSpeaker(const Context & context, PosixAudioManager & audioManager);
+    ~PosixSpeaker() override;
 
     // LevelControlDelegate
     void OnLevelChanged(uint8_t value) override;
