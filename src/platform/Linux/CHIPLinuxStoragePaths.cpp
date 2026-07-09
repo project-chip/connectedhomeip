@@ -43,19 +43,61 @@ std::string ResolvePath(const std::string & path, const std::string & defaultFil
 }
 } // namespace
 
+// Setter implementations
+void ChipLinuxStoragePaths::SetKVSDataFile(const std::string & path)
+{
+    mKVSDataFile = path;
+}
+
+void ChipLinuxStoragePaths::SetLegacyKVSFile(const char * path)
+{
+    mLegacyKVSFile = path ? path : "";
+}
+
+void ChipLinuxStoragePaths::SetFactoryFile(const std::string & path)
+{
+    mFactoryFile = path;
+}
+
+void ChipLinuxStoragePaths::SetConfigFile(const std::string & path)
+{
+    mConfigFile = path;
+}
+
+void ChipLinuxStoragePaths::SetCountersFile(const std::string & path)
+{
+    mCountersFile = path;
+}
+
+// Getter implementations
+std::string ChipLinuxStoragePaths::GetKVSDataFilePath() const
+{
+    return ResolvePath(mKVSDataFile, CHIP_DEFAULT_DATA_FILENAME);
+}
+
+const char * ChipLinuxStoragePaths::GetLegacyKVSFile() const
+{
+    return mLegacyKVSFile.empty() ? nullptr : mLegacyKVSFile.c_str();
+}
+
+bool ChipLinuxStoragePaths::HasLegacyKVSFile() const
+{
+    return !mLegacyKVSFile.empty();
+}
+
 std::string ChipLinuxStoragePaths::GetFactoryFilePath() const
 {
-    return ResolvePath(factoryFile, CHIP_DEFAULT_FACTORY_FILENAME);
+    return ResolvePath(mFactoryFile, CHIP_DEFAULT_FACTORY_FILENAME);
 }
 
 std::string ChipLinuxStoragePaths::GetConfigFilePath() const
 {
-    return ResolvePath(configFile, CHIP_DEFAULT_CONFIG_FILENAME);
+    return ResolvePath(mConfigFile, CHIP_DEFAULT_CONFIG_FILENAME);
 }
 
 std::string ChipLinuxStoragePaths::GetCountersFilePath() const
 {
-    return ResolvePath(countersFile, CHIP_DEFAULT_COUNTERS_FILENAME);
+    return ResolvePath(mCountersFile, CHIP_DEFAULT_COUNTERS_FILENAME);
 }
 
 ChipLinuxStoragePaths & GetStoragePaths()

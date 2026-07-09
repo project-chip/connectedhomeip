@@ -112,15 +112,16 @@ CHIP_ERROR PosixConfig::Init()
     auto & paths = chip::DeviceLayer::GetStoragePaths();
 
     // Handle legacy KVS path (deprecated --KVS option)
-    if (paths.legacyKvsFile != nullptr)
+    if (paths.HasLegacyKVSFile())
     {
-        return PersistedStorage::KeyValueStoreMgrImpl().Init(paths.legacyKvsFile);
+        return PersistedStorage::KeyValueStoreMgrImpl().Init(paths.GetLegacyKVSFile());
     }
 
     // Use explicit KVS data file path if provided
-    if (!paths.kvsDataFile.empty())
+    std::string kvsDataPath = paths.GetKVSDataFilePath();
+    if (!kvsDataPath.empty())
     {
-        return PersistedStorage::KeyValueStoreMgrImpl().Init(paths.kvsDataFile.c_str());
+        return PersistedStorage::KeyValueStoreMgrImpl().Init(kvsDataPath.c_str());
     }
 
     // Default: use directory-based approach with default filename

@@ -25,6 +25,7 @@
 #pragma once
 
 #include <filesystem>
+#include <optional>
 #include <string>
 
 #ifndef CHIP_DEFAULT_BASE_DIR
@@ -51,25 +52,42 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * @brief Structure holding KVS file paths for Linux platform
+ * @brief Class for managing KVS file paths on Linux platform
  *
- * This structure is populated from command-line arguments in examples/platform/linux/Options.cpp
- * and used by PosixConfig to initialize storage namespaces.
+ * This class encapsulates path management logic for KVS storage files,
+ * providing default filename resolution when directory paths are provided.
  */
-struct ChipLinuxStoragePaths
+class ChipLinuxStoragePaths
 {
-    std::string kvsDataFile;  // Full path to KVS data file (default: /tmp/chip_kvs)
-    std::string factoryFile;  // Full path to factory config file (default: /tmp/chip_factory.ini)
-    std::string configFile;   // Full path to config file (default: /tmp/chip_config.ini)
-    std::string countersFile; // Full path to counters file (default: /tmp/chip_counters.ini)
+public:
+    ChipLinuxStoragePaths() = default;
 
-    // Legacy KVS file path (deprecated, use kvsDataFile instead)
-    const char * legacyKvsFile = nullptr;
+    // Setter methods for configuration
+    void SetKVSDataFile(const std::string & path);
+    void SetLegacyKVSFile(const char * path);
+    void SetFactoryFile(const std::string & path);
+    void SetConfigFile(const std::string & path);
+    void SetCountersFile(const std::string & path);
 
-    // Helper methods to get full file paths with default filename resolution
+    // Getter methods - return full resolved paths
+    std::string GetKVSDataFilePath() const;
+    const char * GetLegacyKVSFile() const;
     std::string GetFactoryFilePath() const;
     std::string GetConfigFilePath() const;
     std::string GetCountersFilePath() const;
+
+    // Check if legacy KVS file is set
+    bool HasLegacyKVSFile() const;
+
+private:
+    // Helper function to resolve a path by appending default filename if needed
+    static std::string ResolvePath(const std::string & path, const std::string & defaultFilename);
+
+    std::string mKVSDataFile;
+    std::string mLegacyKVSFile; // Empty string means not set (equivalent to nullptr)
+    std::string mFactoryFile;
+    std::string mConfigFile;
+    std::string mCountersFile;
 };
 
 /**

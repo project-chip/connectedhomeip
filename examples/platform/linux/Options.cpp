@@ -1105,25 +1105,25 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     // Handle deprecated --KVS option (legacy full path for data file only)
     if (options.KVS != nullptr)
     {
-        paths.legacyKvsFile = options.KVS;
+        paths.SetLegacyKVSFile(options.KVS);
     }
 
     // Set explicit paths if provided
     if (options.KVSDataFile.HasValue())
     {
-        paths.kvsDataFile = options.KVSDataFile.Value();
+        paths.SetKVSDataFile(options.KVSDataFile.Value());
     }
     if (options.KVSFactoryFile.HasValue())
     {
-        paths.factoryFile = options.KVSFactoryFile.Value();
+        paths.SetFactoryFile(options.KVSFactoryFile.Value());
     }
     if (options.KVSConfigFile.HasValue())
     {
-        paths.configFile = options.KVSConfigFile.Value();
+        paths.SetConfigFile(options.KVSConfigFile.Value());
     }
     if (options.KVSCountersFile.HasValue())
     {
-        paths.countersFile = options.KVSCountersFile.Value();
+        paths.SetCountersFile(options.KVSCountersFile.Value());
     }
 
     // Handle --kvs-directory: if provided and explicit file paths are not set,
@@ -1136,21 +1136,21 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
         {
             dir += '/';
         }
-        if (paths.kvsDataFile.empty())
+        if (options.KVSDataFile.HasValue())
         {
-            paths.kvsDataFile = dir + CHIP_DEFAULT_DATA_FILENAME;
+            paths.SetKVSDataFile(dir + CHIP_DEFAULT_DATA_FILENAME);
         }
-        if (paths.factoryFile.empty())
+        if (options.KVSFactoryFile.HasValue())
         {
-            paths.factoryFile = dir + CHIP_DEFAULT_FACTORY_FILENAME;
+            paths.SetFactoryFile(dir + CHIP_DEFAULT_FACTORY_FILENAME);
         }
-        if (paths.configFile.empty())
+        if (options.KVSConfigFile.HasValue())
         {
-            paths.configFile = dir + CHIP_DEFAULT_CONFIG_FILENAME;
+            paths.SetConfigFile(dir + CHIP_DEFAULT_CONFIG_FILENAME);
         }
-        if (paths.countersFile.empty())
+        if (options.KVSCountersFile.HasValue())
         {
-            paths.countersFile = dir + CHIP_DEFAULT_COUNTERS_FILENAME;
+            paths.SetCountersFile(dir + CHIP_DEFAULT_COUNTERS_FILENAME);
         }
     }
 
