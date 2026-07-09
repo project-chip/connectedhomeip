@@ -19,6 +19,7 @@ import json
 import logging
 import time
 from asyncio import Event, Semaphore, create_task, gather, sleep, wait_for
+from contextlib import suppress
 from typing import Optional
 
 from mdns_discovery.data_classes.aaaa_record import AaaaRecord
@@ -445,18 +446,14 @@ class MdnsDiscovery:
             discriminator = txt.get('D')
             if discriminator:
                 add_subtype(f"_L{discriminator}._sub.{commissionable_type}")
-                try:
+                with suppress(ValueError):
                     add_subtype(f"_S{(int(discriminator) >> 8) & 0x0F}._sub.{commissionable_type}")
-                except ValueError:
-                    pass
 
             cm = txt.get('CM')
             if cm:
-                try:
+                with suppress(ValueError):
                     if int(cm) != 0:
                         add_subtype(f"_CM._sub.{commissionable_type}")
-                except ValueError:
-                    pass
 
             vendor_and_product = txt.get('VP')
             if vendor_and_product:
