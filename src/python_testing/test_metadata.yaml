@@ -1,6 +1,42 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
+    - name: TC_COMPRO_2_1.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_2.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_3.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_4.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_5.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_6.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_7.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_8.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
+    - name: TC_COMPRO_2_9.py
+      reason:
+          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
+          runnable in the CI container.
     - name: TC_DD_3_23.py
       reason:
           NFC-Thread hardware setup needed for running this test-case and CI
