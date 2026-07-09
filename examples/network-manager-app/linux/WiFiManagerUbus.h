@@ -19,6 +19,7 @@
 
 #include "UbusManager.h"
 #include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
+#include <string>
 
 namespace chip {
 
@@ -26,10 +27,8 @@ class WiFiManagerUbus
 {
 public:
     WiFiManagerUbus(ubus::UbusManager & ubusManager, app::Clusters::WiFiNetworkManagementServer & server) :
-        mUbusManager(ubusManager), mServer(server), desired_radio(nullptr)
+        mUbusManager(ubusManager), mServer(server), mDesiredRadio("")
     {}
-
-    virtual ~WiFiManagerUbus(void) { free(desired_radio); }
 
     void Init();
 
@@ -43,7 +42,7 @@ private:
     app::Clusters::WiFiNetworkManagementServer & mServer;
     ubus::UbusWatch mUci{ "uci", this };
     ubus::UbusWatch mService{ "service", this };
-    char * desired_radio;
+    std::string mDesiredRadio;
 };
 
 } // namespace chip
