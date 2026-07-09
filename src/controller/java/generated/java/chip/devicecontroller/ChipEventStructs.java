@@ -7636,6 +7636,52 @@ public static class MediaPlaybackClusterStateChangedEvent {
     return output.toString();
   }
 }
+public static class ContentLauncherClusterContentReplicationEvent {
+  public Integer status;
+  private static final long STATUS_ID = 0L;
+
+  public ContentLauncherClusterContentReplicationEvent(
+    Integer status
+  ) {
+    this.status = status;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterContentReplicationEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer status = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ContentLauncherClusterContentReplicationEvent(
+      status
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterContentReplicationEvent {\n");
+    output.append("\tstatus: ");
+    output.append(status);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class AccountLoginClusterLoggedOutEvent {
   public Optional<Long> node;
   public Integer fabricIndex;

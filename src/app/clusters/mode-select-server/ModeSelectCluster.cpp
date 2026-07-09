@@ -23,7 +23,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/mode-select-server/supported-modes-manager.h>
+#include <app/clusters/mode-select-server/SupportedModesManager.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/util.h>

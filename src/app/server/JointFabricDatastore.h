@@ -17,15 +17,19 @@
 
 #pragma once
 
+#include <algorithm>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <functional>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <map>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -58,6 +62,28 @@ struct ACLEntryStruct
 };
 
 } // namespace datastore
+
+namespace detail {
+
+/**
+ * Searches `vec` for the first entry that returns true when passed to `pred`, then marks that entry as committed.
+ *
+ * @param [in,out] vec   The vector to search; the matching entry is mutated in place to mark it committed.
+ * @param [in] pred      Predicate invoked as `bool(const T &)`; the first entry for which it returns true is marked.
+ */
+template <typename T, typename Pred>
+void MarkEntryCommittedIfFound(std::vector<T> & vec, Pred pred)
+{
+    static_assert(std::is_invocable_r_v<bool, Pred, const T &>,
+                  "MarkEntryCommittedIfFound predicate must accept a const T & and return bool");
+    auto it = std::find_if(vec.begin(), vec.end(), pred);
+    if (it != vec.end())
+    {
+        it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    }
+}
+
+} // namespace detail
 
 enum RefreshState
 {
@@ -276,6 +302,33 @@ public:
     }
     VendorId GetAnchorVendorId() { return mAnchorVendorId; }
 
+    /**
+     * We track the FabricIndex of the Joint Fabric so that the datastore can be wiped if the Joint Fabric is removed.
+     */
+    void SetAnchorFabricIndex(FabricIndex anchorFabricIndex) { mAnchorFabricIndex = anchorFabricIndex; }
+    FabricIndex GetAnchorFabricIndex() const { return mAnchorFabricIndex; }
+
+    /**
+     * Runs when a fabric is removed from the node's FabricTable. If the removed fabric is the anchor fabric, the entire datastore
+     * should be cleared. A no-op for any other fabric.
+     */
+    void OnFabricRemoved(FabricIndex fabricIndex)
+    {
+        // The datastore is the anchor's registry for a single joint fabric. Only act when that fabric is
+        // removed; records for any other fabric are not stored here.
+        if (mAnchorFabricIndex == kUndefinedFabricIndex || fabricIndex != mAnchorFabricIndex)
+        {
+            return;
+        }
+
+        ClearAllRecords();
+
+        for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
+        {
+            listener->MarkNodeListChanged();
+        }
+    }
+
     CHIP_ERROR SetFriendlyName(const CharSpan & friendlyName)
     {
         if (friendlyName.size() >= sizeof(mFriendlyNameBuffer))
@@ -421,11 +474,16 @@ public:
     }
 
 private:
+    // Epoch keys are raw group-key secret material. Hold them in a self-zeroizing buffer so they are
+    // wiped on every deallocation path (per-record erase, overwrite, and whole-map/object destruction),
+    // not just the explicit removal helpers.
+    using EpochKeyStorage = Crypto::SensitiveDataBuffer<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
+
     struct GroupKeySetStorage
     {
-        std::vector<uint8_t> epochKey0;
-        std::vector<uint8_t> epochKey1;
-        std::vector<uint8_t> epochKey2;
+        EpochKeyStorage epochKey0;
+        EpochKeyStorage epochKey1;
+        EpochKeyStorage epochKey2;
     };
 
     struct GroupInformationStorage
@@ -439,7 +497,8 @@ private:
     {
         // Friendly names are stored as owned raw bytes for CharSpan (not C-string) semantics.
         std::vector<char> friendlyName;
-        std::vector<uint8_t> icac;
+        // ICAC DER is sensitive credential material; hold it in a self-zeroizing buffer (see EpochKeyStorage).
+        Crypto::SensitiveDataBuffer<Credentials::kMaxDERCertLength> icac;
     };
 
     static constexpr size_t kMaxNodes            = 256;
@@ -455,7 +514,42 @@ private:
     size_t mFriendlyNameBufferLength                      = 0;
     NodeId mAnchorNodeId                                  = kUndefinedNodeId;
     VendorId mAnchorVendorId                              = VendorId::NotSpecified;
+    FabricIndex mAnchorFabricIndex                        = kUndefinedFabricIndex;
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type mDatastoreStatusEntry;
+
+    /**
+     * Clears all stored records and resets anchor identity. Used by OnFabricRemoved() when the joint fabric is removed.
+     * Self-zeroizing buffers wipe their secrets as the containers are cleared.
+     */
+    void ClearAllRecords()
+    {
+        // Erasing the secret-bearing maps destroys the self-zeroizing EpochKeyStorage / ICAC buffers,
+        // wiping their contents.
+        mGroupKeySetStorage.clear();
+        mAdminEntryStorage.clear();
+        mGroupInformationStorage.clear();
+        mEndpointFriendlyNameStorage.clear();
+
+        mNodeInformationEntries.clear();
+        mGroupKeySetList.clear();
+        mAdminEntries.clear();
+        mGroupInformationEntries.clear();
+        mEndpointGroupIDEntries.clear();
+        mEndpointBindingEntries.clear();
+        mNodeKeySetEntries.clear();
+        mACLEntries.clear();
+        mEndpointEntries.clear();
+
+        // Reset anchor identity: with the joint fabric gone, the datastore no longer describes a fabric.
+        memset(mAnchorRootCA, 0, sizeof(mAnchorRootCA));
+        mAnchorRootCALength       = 0;
+        mFriendlyNameBuffer[0]    = '\0';
+        mFriendlyNameBufferLength = 0;
+        mAnchorNodeId             = kUndefinedNodeId;
+        mAnchorVendorId           = VendorId::NotSpecified;
+        mAnchorFabricIndex        = kUndefinedFabricIndex;
+        mDatastoreStatusEntry     = Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type{};
+    }
 
     // TODO: Persist these members to local storage
     std::vector<GenericDatastoreNodeInformationEntry> mNodeInformationEntries;
@@ -499,8 +593,9 @@ private:
     CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
     CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
 
-    void CopyGroupKeySetWithOwnedSpans(const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
-                                       Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination);
+    CHIP_ERROR
+    CopyGroupKeySetWithOwnedSpans(const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
+                                  Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination);
     void RemoveGroupKeySetStorage(uint16_t groupKeySetId);
 
     void SetGroupInformationFriendlyNameWithOwnedStorage(
@@ -519,7 +614,7 @@ private:
     void RemoveEndpointFriendlyNameStorage(NodeId nodeId, EndpointId endpointId);
 
     // Helper methods for copying optional ByteSpan and simple nullable values
-    void CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, std::vector<uint8_t> & storage,
+    void CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, EpochKeyStorage & storage,
                                       DataModel::Nullable<ByteSpan> & destination);
 
     template <typename T>
