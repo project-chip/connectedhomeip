@@ -124,23 +124,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
     InArgs.publish_id = publish_id;
 
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreplied",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnReplied(obj);
-                     }),
-                     this);
 
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnNanReceive(obj);
-                     }),
-                     this);
-    g_signal_connect(
-        mWpaSupplicant.iface.get(), "nanpublish-terminated",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_publish_id, gchar * reason, ConnectivityManagerImpl * self) {
-            return self->OnNanPublishTerminated(term_publish_id, reason);
-        }),
-        this);
     return CHIP_NO_ERROR;
 }
 
@@ -485,27 +469,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    // Connect signal handlers first to ensure D-Bus match rules are registered
-    // before initiating subscription. This prevents a race condition where
-    // instantaneous discovery signals from the supplicant are discarded.
-    g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnDiscoveryResult(obj);
-                     }),
-                     this);
 
-    g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                     G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                         return self->OnNanReceive(obj);
-                     }),
-                     this);
-
-    g_signal_connect(
-        mWpaSupplicant.iface.get(), "nansubscribe-terminated",
-        G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason, ConnectivityManagerImpl * self) {
-            return self->OnNanSubscribeTerminated(term_subscribe_id, reason);
-        }),
-        this);
 
     // Initiate subscription once handlers are registered and ready
     GVariantBuilder builder;
