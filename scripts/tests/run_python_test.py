@@ -269,14 +269,60 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                   ip_packet_capture_dir, run.quiet, run.run)
 
 
-def stop_restart_monitor_thread(
-        restart_monitor_thread: threading.Thread | None,
-        stop_event: threading.Event | None) -> None:
-    if restart_monitor_thread and restart_monitor_thread.is_alive():
-        log.info("Stopping app restart monitor thread")
-        if stop_event:
-            stop_event.set()
-        restart_monitor_thread.join(2.0)
+class AppRestartMonitor:
+    def __init__(self, app_manager_ref: list[AppProcessManager], app_manager_lock: threading.Lock,
+                 config: TestRunConfig, restart_flag_file: str):
+        self.app_manager_ref = app_manager_ref
+        self.app_manager_lock = app_manager_lock
+        self.config = config
+        self.restart_flag_file = restart_flag_file
+        self.stop_event = threading.Event()
+        self.thread: threading.Thread | None = None
+
+    def start(self) -> None:
+        self.thread = threading.Thread(target=self._run, daemon=True)
+        self.thread.start()
+
+    def stop(self, timeout_sec: float = 2.0) -> None:
+        if self.thread and self.thread.is_alive():
+            log.info("Stopping app restart monitor thread")
+            self.stop_event.set()
+            self.thread.join(timeout_sec)
+
+    def _run(self) -> None:
+        while not self.stop_event.is_set():
+            # Try to read the restart flag file
+            if not os.path.exists(self.restart_flag_file):
+                self.stop_event.wait(0.5)
+                continue
+
+            with open(self.restart_flag_file) as f:
+                flag_file_content = f.read().strip()
+
+            # Determine reset type and remove app/ctrl config and storage
+            reset_type = None
+            if flag_file_content == "factory reset":
+                reset_type = FactoryResetType.AppAndController
+            elif flag_file_content == "factory reset app only":
+                reset_type = FactoryResetType.AppOnly
+
+            if reset_type:
+                factory_reset_config_removal(self.config.app_args, self.config.script_args, reset_type)
+
+            # Restart the app
+            log.info("Restarting app '%s'...", self.config.app)
+            new_app_manager = AppProcessManager(self.config)
+            self.app_manager_ref[0].stop()
+            with self.app_manager_lock:
+                new_app_manager.start()
+                self.app_manager_ref[0] = new_app_manager
+
+            # Successfully read the flag file, remove to prevent multiple restarts
+            os.unlink(self.restart_flag_file)
+            log.info("%s requested by test script", flag_file_content.capitalize())
+
+            # Action complete, continue monitoring for additional restart requests
+            log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
@@ -306,8 +352,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
-    restart_monitor_thread = None
-    stop_event = None
+    restart_monitor = None
     app_exit_code = 0
     stream_output = sys.stdout.buffer
     if quiet:
@@ -320,17 +365,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_manager = AppProcessManager(app_config)
         app_manager.start()
         app_manager_ref = [app_manager]
-        stop_event = threading.Event()
-        restart_monitor_thread = threading.Thread(
-            target=monitor_app_restart_requests,
-            args=(
-                app_manager_ref,
-                app_manager_lock,
-                app_config,
-                restart_flag_file,
-                stop_event),
-            daemon=True)
-        restart_monitor_thread.start()
+        restart_monitor = AppRestartMonitor(app_manager_ref, app_manager_lock, app_config, restart_flag_file)
+        restart_monitor.start()
 
     # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
     if "mobile-device-test.py" not in script:
@@ -368,7 +404,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
 
-        stop_restart_monitor_thread(restart_monitor_thread, stop_event)
+        if restart_monitor:
+            restart_monitor.stop()
 
         # Get the current app manager if it exists
         current_app_manager = None
@@ -402,7 +439,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             sys.exit(exit_code)
 
     finally:
-        stop_restart_monitor_thread(restart_monitor_thread, stop_event)
+        if restart_monitor:
+            restart_monitor.stop()
 
         tcpdump.stop()
 
@@ -416,50 +454,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
-def monitor_app_restart_requests(
-        app_manager_ref,
-        app_manager_lock,
-        config: TestRunConfig,
-        restart_flag_file,
-        stop_event: threading.Event | None = None):
 
-    if stop_event is None:
-        stop_event = threading.Event()
-
-    while not stop_event.is_set():
-        # Try to read the restart flag file
-        if not os.path.exists(restart_flag_file):
-            stop_event.wait(0.5)
-            continue
-
-        with open(restart_flag_file) as f:
-            flag_file_content = f.read().strip()
-
-        # Determine reset type and remove app/ctrl config and storage
-        reset_type = None
-        if flag_file_content == "factory reset":
-            reset_type = FactoryResetType.AppAndController
-
-        elif flag_file_content == "factory reset app only":
-            reset_type = FactoryResetType.AppOnly
-
-        if reset_type:
-            factory_reset_config_removal(config.app_args, config.script_args, reset_type)
-
-        # Restart the app
-        log.info("Restarting app '%s'...", config.app)
-        new_app_manager = AppProcessManager(config)
-        app_manager_ref[0].stop()
-        with app_manager_lock:
-            new_app_manager.start()
-            app_manager_ref[0] = new_app_manager
-
-        # Successfully read the flag file, remove to prevent multiple restarts
-        os.unlink(restart_flag_file)
-        log.info("%s requested by test script", flag_file_content.capitalize())
-
-        # Action complete, continue monitoring for additional restart requests
-        log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
 
 
 class FactoryResetType(enum.Enum):
