@@ -277,16 +277,19 @@ class AppRestartMonitor:
     and restarts the app process, then removes the flag file.
     """
 
-    def __init__(self, app_manager_ref: list[AppProcessManager], app_manager_lock: threading.Lock,
-                 config: TestRunConfig, restart_flag_file: str):
-        self.app_manager_ref = app_manager_ref
-        self.app_manager_lock = app_manager_lock
-        self.config = config
+    def __init__(self, restart_flag_file: str):
         self.restart_flag_file = restart_flag_file
+        self.app_manager_ref: list[AppProcessManager] | None = None
+        self.app_manager_lock: threading.Lock | None = None
+        self.config: TestRunConfig | None = None
         self.stop_event = threading.Event()
         self.thread: threading.Thread | None = None
 
-    def start(self) -> None:
+    def start(self, app_manager_ref: list[AppProcessManager], app_manager_lock: threading.Lock,
+              config: TestRunConfig) -> None:
+        self.app_manager_ref = app_manager_ref
+        self.app_manager_lock = app_manager_lock
+        self.config = config
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
 
@@ -359,11 +362,12 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
-    restart_monitor = None
     app_exit_code = 0
     stream_output = sys.stdout.buffer
     if quiet:
         stream_output = io.BytesIO()
+
+    restart_monitor = AppRestartMonitor(restart_flag_file)
     if app:
         if not os.path.exists(app):
             if app is None:
@@ -372,8 +376,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_manager = AppProcessManager(app_config)
         app_manager.start()
         app_manager_ref = [app_manager]
-        restart_monitor = AppRestartMonitor(app_manager_ref, app_manager_lock, app_config, restart_flag_file)
-        restart_monitor.start()
+        restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
 
     # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
     if "mobile-device-test.py" not in script:
@@ -411,8 +414,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
 
-        if restart_monitor:
-            restart_monitor.stop()
+        restart_monitor.stop()
 
         # Get the current app manager if it exists
         current_app_manager = None
@@ -446,8 +448,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             sys.exit(exit_code)
 
     finally:
-        if restart_monitor:
-            restart_monitor.stop()
+        restart_monitor.stop()
 
         tcpdump.stop()
 
