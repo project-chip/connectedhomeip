@@ -59187,6 +59187,8 @@ public class ChipClusters {
     private static final long AVAILABLE_AUDIO_TRACKS_ATTRIBUTE_ID = 8L;
     private static final long ACTIVE_TEXT_TRACK_ATTRIBUTE_ID = 9L;
     private static final long AVAILABLE_TEXT_TRACKS_ATTRIBUTE_ID = 10L;
+    private static final long AVAILABLE_COMMANDS_ATTRIBUTE_ID = 11L;
+    private static final long CONTENT_INFO_ATTRIBUTE_ID = 12L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -59686,6 +59688,14 @@ public class ChipClusters {
       void onSuccess(@Nullable List<ChipStructs.MediaPlaybackClusterTrackStruct> value);
     }
 
+    public interface AvailableCommandsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable List<Long> value);
+    }
+
+    public interface ContentInfoAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.MediaPlaybackClusterContentInfoStruct value);
+    }
+
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -59982,6 +59992,58 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, AVAILABLE_TEXT_TRACKS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readAvailableCommandsAttribute(
+        AvailableCommandsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVAILABLE_COMMANDS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AVAILABLE_COMMANDS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeAvailableCommandsAttribute(
+        AvailableCommandsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AVAILABLE_COMMANDS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable List<Long> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, AVAILABLE_COMMANDS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readContentInfoAttribute(
+        ContentInfoAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CONTENT_INFO_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.MediaPlaybackClusterContentInfoStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CONTENT_INFO_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeContentInfoAttribute(
+        ContentInfoAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CONTENT_INFO_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.MediaPlaybackClusterContentInfoStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CONTENT_INFO_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
