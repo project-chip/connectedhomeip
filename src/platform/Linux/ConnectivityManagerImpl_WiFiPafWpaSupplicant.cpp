@@ -124,7 +124,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
     InArgs.publish_id = publish_id;
 
-
     return CHIP_NO_ERROR;
 }
 
@@ -468,7 +467,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     }
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
 
     // Initiate subscription once handlers are registered and ready
     GVariantBuilder builder;
