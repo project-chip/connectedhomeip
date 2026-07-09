@@ -22,7 +22,8 @@
 
 namespace chip::app {
 
-DynamicEndpointIdAllocator::DynamicEndpointIdAllocator(std::set<EndpointId> reservedIds) : mUsedIds(std::move(reservedIds)), mNext(1)
+DynamicEndpointIdAllocator::DynamicEndpointIdAllocator(std::set<EndpointId> reservedIds) :
+    mUsedIds(std::move(reservedIds)), mNext(1)
 {
     mUsedIds.insert(kRootEndpointId);
     Advance();

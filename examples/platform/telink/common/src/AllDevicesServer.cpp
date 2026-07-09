@@ -28,8 +28,8 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceFactory.h>
-#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/Interface.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
 #include <platform/DeviceControlServer.h>

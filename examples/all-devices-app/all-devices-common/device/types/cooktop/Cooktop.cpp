@@ -82,7 +82,8 @@ Cooktop::Cooktop(TimerDelegate & timerDelegate, Clusters::OnOffDelegate & surfac
     mSurface1(timerDelegate, surface1OnOff, surface1Identify), mSurface2(timerDelegate, surface2OnOff, surface2Identify)
 {}
 
-CHIP_ERROR Cooktop::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR Cooktop::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                             EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
