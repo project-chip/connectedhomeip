@@ -729,10 +729,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         tests exercise a real app but intentionally skip the subscription, so this must not
         gate DUT-only concerns such as the ACL snapshot (which keys off commissioning state, see setup_test).
         """
-        test_file = Path(inspect.getfile(type(self)))
-        if _TEST_TESTING_DIR in test_file.parts:
-            return test_file.name in _WILDCARD_SUBSCRIPTION_ENABLED
-        return True
+        try:
+            # getsourcefile resolves a cached .pyc back to its .py source; fall back to
+            # getfile. Both raise TypeError for a class with no resolvable file (e.g. one
+            # defined dynamically), in which case we keep the safe default (enabled).
+            source_file = inspect.getsourcefile(type(self)) or inspect.getfile(type(self))
+        except TypeError:
+            return True
+        test_file = Path(source_file)
+        if _TEST_TESTING_DIR not in test_file.parts:
+            return True
+        # Normalize a possible .pyc (from the getfile fallback) to match the .py allowlist.
+        return f"{test_file.stem}.py" in _WILDCARD_SUBSCRIPTION_ENABLED
 
     def _effective_verify_wildcard_subscription(self, verify_wildcard_subscription: Optional[bool]) -> bool:
         """Resolve whether to compare a read against the wildcard subscription cache."""
