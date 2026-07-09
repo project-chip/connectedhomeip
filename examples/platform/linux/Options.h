@@ -84,7 +84,6 @@ struct LinuxDeviceOptions
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     const char * command = nullptr;
     const char * PICS    = nullptr;
-    const char * KVS     = nullptr;
     chip::Optional<std::string> KVSDirectory;
     chip::Optional<std::string> KVSDataFile;
     chip::Optional<std::string> KVSFactoryFile;

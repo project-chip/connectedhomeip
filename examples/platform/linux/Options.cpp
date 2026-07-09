@@ -770,7 +770,8 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 
     case kDeviceOption_KVSFilePath:
-        LinuxDeviceOptions::GetInstance().KVS = aValue;
+        // Deprecated: --KVS is now an alias for --kvs-data
+        LinuxDeviceOptions::GetInstance().KVSDataFile.SetValue(std::string(aValue));
         break;
 
     case kDeviceOption_KVSDirectory:
@@ -1101,13 +1102,6 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     // Apply KVS paths to the platform layer after parsing
     auto & options = LinuxDeviceOptions::GetInstance();
     chip::DeviceLayer::ChipLinuxStoragePaths paths;
-
-    // Handle deprecated --KVS option (legacy full path for data file only)
-    // Now treated as explicit KVS data file path
-    if (options.KVS != nullptr)
-    {
-        paths.SetKVSDataFile(options.KVS);
-    }
 
     // Handle --kvs-directory: set base directory for all KVS files
     if (options.KVSDirectory.HasValue())
