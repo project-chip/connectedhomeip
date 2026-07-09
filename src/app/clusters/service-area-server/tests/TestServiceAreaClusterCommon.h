@@ -484,14 +484,14 @@ std::optional<StatusEnum> InvokeResponseStatus(const chip::Testing::ClusterTeste
     return result.response->status;
 }
 
-inline std::optional<SelectAreasStatus> SelectAreasResponseStatus(
-    const chip::Testing::ClusterTester::InvokeResult<Commands::SelectAreasResponse::DecodableType> & result)
+inline std::optional<SelectAreasStatus>
+SelectAreasResponseStatus(const chip::Testing::ClusterTester::InvokeResult<Commands::SelectAreasResponse::DecodableType> & result)
 {
     return InvokeResponseStatus<Commands::SelectAreasResponse::DecodableType, SelectAreasStatus>(result);
 }
 
-inline std::optional<SkipAreaStatus> SkipAreaResponseStatus(
-    const chip::Testing::ClusterTester::InvokeResult<Commands::SkipAreaResponse::DecodableType> & result)
+inline std::optional<SkipAreaStatus>
+SkipAreaResponseStatus(const chip::Testing::ClusterTester::InvokeResult<Commands::SkipAreaResponse::DecodableType> & result)
 {
     return InvokeResponseStatus<Commands::SkipAreaResponse::DecodableType, SkipAreaStatus>(result);
 }
@@ -510,8 +510,8 @@ ProgressElementStatus(const std::optional<Structs::ProgressStruct::DecodableType
     return progress->status;
 }
 
-inline std::optional<bool> ProgressElementHasTotalOperationalTime(
-    const std::optional<Structs::ProgressStruct::DecodableType> & progress)
+inline std::optional<bool>
+ProgressElementHasTotalOperationalTime(const std::optional<Structs::ProgressStruct::DecodableType> & progress)
 {
     VerifyOrReturnValue(progress.has_value(), std::nullopt);
     return progress->totalOperationalTime.HasValue();
