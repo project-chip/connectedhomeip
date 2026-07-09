@@ -20,6 +20,7 @@
 #include <AppRootNode.h>
 #include <DeviceFactoryPlatformOverride.h>
 #include <LinuxCommissionableDataProvider.h>
+#include <PosixAudioManager.h>
 #include <TracingCommandLineArgument.h>
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include <TraceDecoder.h>
@@ -71,12 +72,15 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 using namespace chip::ArgParser;
 
+void ApplicationShutdown();
+
 namespace {
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
+chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
@@ -306,7 +310,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .storageDelegate   = *initParams.persistentStorageDelegate,  //
     });
 
-    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate);
+    RegisterDeviceFactoryOverrides(gTimerDelegate, initParams.persistentStorageDelegate, gAudioManager);
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO(#72056): Once groupcast is enabled by default, this should not be dependent on the app argument.
@@ -478,6 +482,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #if defined(ENABLE_TRACING) && ENABLE_TRACING
     tracing_setup.StopTracing();
 #endif
+
+    ApplicationShutdown();
 }
 
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -555,7 +561,10 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
 } // namespace
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    gAudioManager.Shutdown();
+}
 
 int main(int argc, char * argv[])
 {
