@@ -4518,6 +4518,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveTextTrack";
         case chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
             return "AvailableTextTracks";
+        case chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id:
+            return "AvailableCommands";
+        case chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id:
+            return "ContentInfo";
         case chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::Id:
@@ -4594,6 +4598,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AcceptHeader";
         case chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id:
             return "SupportedStreamingProtocols";
+        case chip::app::Clusters::ContentLauncher::Attributes::Movable::Id:
+            return "Movable";
+        case chip::app::Clusters::ContentLauncher::Attributes::Presets::Id:
+            return "Presets";
         case chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::Id:
@@ -6725,6 +6733,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LaunchContent";
         case chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id:
             return "LaunchURL";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id:
+            return "ContentReplicationRequest";
+        case chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id:
+            return "PlayPreset";
         default:
             return "Unknown";
         }
@@ -7653,6 +7665,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Id:
             return "LauncherResponse";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Id:
+            return "ContentReplicationResponse";
         default:
             return "Unknown";
         }
