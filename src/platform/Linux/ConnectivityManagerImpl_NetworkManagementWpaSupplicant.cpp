@@ -430,35 +430,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
                              return self->_OnWpaInterfaceScanDone(iface, success);
                          }),
                          this);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        g_signal_connect(mWpaSupplicant.iface.get(), "nanreplied",
-                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                             return self->OnReplied(obj);
-                         }),
-                         this);
-        g_signal_connect(mWpaSupplicant.iface.get(), "nanreceive",
-                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                             return self->OnNanReceive(obj);
-                         }),
-                         this);
-        g_signal_connect(
-            mWpaSupplicant.iface.get(), "nanpublish-terminated",
-            G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_publish_id, gchar * reason, ConnectivityManagerImpl * self) {
-                return self->OnNanPublishTerminated(term_publish_id, reason);
-            }),
-            this);
-        g_signal_connect(mWpaSupplicant.iface.get(), "nandiscovery-result",
-                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * obj, ConnectivityManagerImpl * self) {
-                             return self->OnDiscoveryResult(obj);
-                         }),
-                         this);
-        g_signal_connect(
-            mWpaSupplicant.iface.get(), "nansubscribe-terminated",
-            G_CALLBACK(+[](WpaSupplicant1Interface * proxy, guint term_subscribe_id, gchar * reason,
-                           ConnectivityManagerImpl * self) { return self->OnNanSubscribeTerminated(term_subscribe_id, reason); }),
-            this);
-#endif
+        PostWpaInterfaceProxyReady();
     }
     else
     {
