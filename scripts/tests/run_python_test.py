@@ -269,6 +269,16 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                   ip_packet_capture_dir, run.quiet, run.run)
 
 
+def stop_restart_monitor_thread(
+        restart_monitor_thread: typing.Optional[threading.Thread],
+        stop_event: typing.Optional[threading.Event]) -> None:
+    if restart_monitor_thread and restart_monitor_thread.is_alive():
+        log.info("Stopping app restart monitor thread")
+        if stop_event:
+            stop_event.set()
+        restart_monitor_thread.join(2.0)
+
+
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
@@ -297,6 +307,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     app_manager_ref = None
     app_manager_lock = threading.Lock()
     restart_monitor_thread = None
+    stop_event = None
     app_exit_code = 0
     stream_output = sys.stdout.buffer
     if quiet:
@@ -357,11 +368,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
 
-        # Stop the restart monitor thread if it exists
-        if restart_monitor_thread and restart_monitor_thread.is_alive():
-            log.info("Stopping app restart monitor thread")
-            stop_event.set()
-            restart_monitor_thread.join(2.0)
+        stop_restart_monitor_thread(restart_monitor_thread, stop_event)
 
         # Get the current app manager if it exists
         current_app_manager = None
@@ -395,11 +402,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             sys.exit(exit_code)
 
     finally:
-        # Stop the restart monitor thread if it exists
-        if restart_monitor_thread and restart_monitor_thread.is_alive():
-            log.info("Stopping app restart monitor thread")
-            stop_event.set()
-            restart_monitor_thread.join(2.0)
+        stop_restart_monitor_thread(restart_monitor_thread, stop_event)
 
         tcpdump.stop()
 
@@ -418,7 +421,10 @@ def monitor_app_restart_requests(
         app_manager_lock,
         config: TestRunConfig,
         restart_flag_file,
-        stop_event: threading.Event):
+        stop_event: typing.Optional[threading.Event] = None):
+
+    if stop_event is None:
+        stop_event = threading.Event()
 
     while not stop_event.is_set():
         # Try to read the restart flag file
