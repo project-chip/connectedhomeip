@@ -10374,6 +10374,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _languageCode = @"";
 
+        _characteristics = nil;
+
         _displayName = nil;
     }
     return self;
@@ -10384,6 +10386,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterTrackAttributesStruct alloc] init];
 
     other.languageCode = self.languageCode;
+    other.characteristics = self.characteristics;
     other.displayName = self.displayName;
 
     return other;
@@ -10391,7 +10394,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: languageCode:%@; displayName:%@; >", NSStringFromClass([self class]), _languageCode, _displayName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: languageCode:%@; characteristics:%@; displayName:%@; >", NSStringFromClass([self class]), _languageCode, _characteristics, _displayName];
     return descriptionString;
 }
 
@@ -10422,6 +10425,57 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; trackAttributes:%@; >", NSStringFromClass([self class]), _id, _trackAttributes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaPlaybackClusterContentInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contentType = @(0);
+
+        _title = nil;
+
+        _show = nil;
+
+        _season = nil;
+
+        _episode = nil;
+
+        _provider = nil;
+
+        _artist = nil;
+
+        _album = nil;
+
+        _track = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMediaPlaybackClusterContentInfoStruct alloc] init];
+
+    other.contentType = self.contentType;
+    other.title = self.title;
+    other.show = self.show;
+    other.season = self.season;
+    other.episode = self.episode;
+    other.provider = self.provider;
+    other.artist = self.artist;
+    other.album = self.album;
+    other.track = self.track;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentType:%@; title:%@; show:%@; season:%@; episode:%@; provider:%@; artist:%@; album:%@; track:%@; >", NSStringFromClass([self class]), _contentType, _title, _show, _season, _episode, _provider, _artist, _album, _track];
     return descriptionString;
 }
 

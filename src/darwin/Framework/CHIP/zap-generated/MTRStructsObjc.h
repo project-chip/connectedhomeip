@@ -2422,6 +2422,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRMediaPlaybackClusterTrackAttributesStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull languageCode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable characteristics MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable displayName MTR_PROVISIONALLY_AVAILABLE;
 @end
 
@@ -2429,6 +2430,19 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRMediaPlaybackClusterTrackStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull id MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRMediaPlaybackClusterTrackAttributesStruct * _Nullable trackAttributes MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMediaPlaybackClusterContentInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contentType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable title MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable show MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable season MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable episode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable provider MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable artist MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable album MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable track MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
