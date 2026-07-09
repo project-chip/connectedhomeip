@@ -270,6 +270,13 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 
 
 class AppRestartMonitor:
+    """Monitors a temporary flag file to handle factory reset and restart requests from the test script.
+
+    Runs a background daemon thread that periodically checks for the existence of the restart_flag_file.
+    If the file exists, it triggers a factory reset of the app (and optionally controller config/storage)
+    and restarts the app process, then removes the flag file.
+    """
+
     def __init__(self, app_manager_ref: list[AppProcessManager], app_manager_lock: threading.Lock,
                  config: TestRunConfig, restart_flag_file: str):
         self.app_manager_ref = app_manager_ref
