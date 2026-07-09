@@ -27,31 +27,23 @@
 namespace chip {
 namespace DeviceLayer {
 
-namespace {
-// Helper function to resolve a path by appending default filename if needed
-std::string ResolvePath(const std::string & path, const std::string & defaultFilename)
-{
-    std::filesystem::path p(path.empty() ? CHIP_DEFAULT_BASE_DIR : path);
-    std::string pathStr = p.string();
-    bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
-    bool hasExtension   = !p.extension().empty();
-    if (isDirectory || !hasExtension)
-    {
-        p /= defaultFilename;
-    }
-    return p.string();
-}
-} // namespace
+// Constructor implementation
+ChipLinuxStoragePaths::ChipLinuxStoragePaths(const std::string & baseDir) : mBaseDir(baseDir) {}
 
 // Setter implementations
+void ChipLinuxStoragePaths::SetBaseDir(const std::string & baseDir)
+{
+    mBaseDir = baseDir;
+}
+
+std::string ChipLinuxStoragePaths::GetBaseDir() const
+{
+    return mBaseDir;
+}
+
 void ChipLinuxStoragePaths::SetKVSDataFile(const std::string & path)
 {
     mKVSDataFile = path;
-}
-
-void ChipLinuxStoragePaths::SetLegacyKVSFile(const char * path)
-{
-    mLegacyKVSFile = path ? path : "";
 }
 
 void ChipLinuxStoragePaths::SetFactoryFile(const std::string & path)
@@ -69,20 +61,27 @@ void ChipLinuxStoragePaths::SetCountersFile(const std::string & path)
     mCountersFile = path;
 }
 
+// Helper function to resolve a path using base directory and default filename
+std::string ChipLinuxStoragePaths::ResolvePath(const std::string & path, const std::string & defaultFilename) const
+{
+    // If path is explicitly set and non-empty, use it directly
+    if (!path.empty())
+    {
+        return path;
+    }
+
+    // Otherwise, use base directory + default filename
+    std::string baseDir = mBaseDir.empty() ? CHIP_DEFAULT_BASE_DIR : mBaseDir;
+    std::filesystem::path p(baseDir);
+    // Always append default filename when path is empty (user didn't specify explicit file)
+    p /= defaultFilename;
+    return p.string();
+}
+
 // Getter implementations
 std::string ChipLinuxStoragePaths::GetKVSDataFilePath() const
 {
     return ResolvePath(mKVSDataFile, CHIP_DEFAULT_DATA_FILENAME);
-}
-
-const char * ChipLinuxStoragePaths::GetLegacyKVSFile() const
-{
-    return mLegacyKVSFile.empty() ? nullptr : mLegacyKVSFile.c_str();
-}
-
-bool ChipLinuxStoragePaths::HasLegacyKVSFile() const
-{
-    return !mLegacyKVSFile.empty();
 }
 
 std::string ChipLinuxStoragePaths::GetFactoryFilePath() const

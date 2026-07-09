@@ -616,10 +616,10 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
     // KVS paths are already set by ParseArguments() via SetStoragePaths()
-    ChipLogProgress(NotSpecified, "KVS data file: %s",
-                    chip::DeviceLayer::GetStoragePaths().kvsDataFile.empty()
-                        ? "(default)"
-                        : chip::DeviceLayer::GetStoragePaths().kvsDataFile.c_str());
+    {
+        std::string kvsPath = chip::DeviceLayer::GetStoragePaths().GetKVSDataFilePath();
+        ChipLogProgress(NotSpecified, "KVS data file: %s", kvsPath.empty() ? "(default)" : kvsPath.c_str());
+    }
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread
@@ -1064,9 +1064,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif

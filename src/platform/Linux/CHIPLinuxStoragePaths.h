@@ -54,37 +54,41 @@ namespace DeviceLayer {
 /**
  * @brief Class for managing KVS file paths on Linux platform
  *
- * This class encapsulates path management logic for KVS storage files,
- * providing default filename resolution when directory paths are provided.
+ * This class encapsulates path management logic for KVS storage files.
+ *
+ * Usage:
+ * - SetBaseDir() sets the base directory for all storage files
+ * - Setters accept file names or full paths; empty values use base directory + default filename
+ * - Getters return the full resolved path
  */
 class ChipLinuxStoragePaths
 {
 public:
-    ChipLinuxStoragePaths() = default;
+    explicit ChipLinuxStoragePaths(const std::string & baseDir = "");
+
+    // Setter for base directory
+    void SetBaseDir(const std::string & baseDir);
+    std::string GetBaseDir() const;
 
     // Setter methods for configuration
+    // If path is empty, uses base directory + default filename
     void SetKVSDataFile(const std::string & path);
-    void SetLegacyKVSFile(const char * path);
     void SetFactoryFile(const std::string & path);
     void SetConfigFile(const std::string & path);
     void SetCountersFile(const std::string & path);
 
     // Getter methods - return full resolved paths
     std::string GetKVSDataFilePath() const;
-    const char * GetLegacyKVSFile() const;
     std::string GetFactoryFilePath() const;
     std::string GetConfigFilePath() const;
     std::string GetCountersFilePath() const;
 
-    // Check if legacy KVS file is set
-    bool HasLegacyKVSFile() const;
-
 private:
-    // Helper function to resolve a path by appending default filename if needed
-    static std::string ResolvePath(const std::string & path, const std::string & defaultFilename);
+    // Helper function to resolve a path using base directory and default filename
+    std::string ResolvePath(const std::string & path, const std::string & defaultFilename) const;
 
+    std::string mBaseDir;
     std::string mKVSDataFile;
-    std::string mLegacyKVSFile; // Empty string means not set (equivalent to nullptr)
     std::string mFactoryFile;
     std::string mConfigFile;
     std::string mCountersFile;

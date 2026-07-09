@@ -1103,12 +1103,19 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     chip::DeviceLayer::ChipLinuxStoragePaths paths;
 
     // Handle deprecated --KVS option (legacy full path for data file only)
+    // Now treated as explicit KVS data file path
     if (options.KVS != nullptr)
     {
-        paths.SetLegacyKVSFile(options.KVS);
+        paths.SetKVSDataFile(options.KVS);
     }
 
-    // Set explicit paths if provided
+    // Handle --kvs-directory: set base directory for all KVS files
+    if (options.KVSDirectory.HasValue())
+    {
+        paths.SetBaseDir(options.KVSDirectory.Value());
+    }
+
+    // Set explicit paths if provided (these override base directory)
     if (options.KVSDataFile.HasValue())
     {
         paths.SetKVSDataFile(options.KVSDataFile.Value());
@@ -1124,34 +1131,6 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     if (options.KVSCountersFile.HasValue())
     {
         paths.SetCountersFile(options.KVSCountersFile.Value());
-    }
-
-    // Handle --kvs-directory: if provided and explicit file paths are not set,
-    // use the directory as the base for all files
-    if (options.KVSDirectory.HasValue())
-    {
-        std::string dir = options.KVSDirectory.Value();
-        // Ensure directory ends with exactly one slash
-        if (!dir.empty() && dir.back() != '/')
-        {
-            dir += '/';
-        }
-        if (options.KVSDataFile.HasValue())
-        {
-            paths.SetKVSDataFile(dir + CHIP_DEFAULT_DATA_FILENAME);
-        }
-        if (options.KVSFactoryFile.HasValue())
-        {
-            paths.SetFactoryFile(dir + CHIP_DEFAULT_FACTORY_FILENAME);
-        }
-        if (options.KVSConfigFile.HasValue())
-        {
-            paths.SetConfigFile(dir + CHIP_DEFAULT_CONFIG_FILENAME);
-        }
-        if (options.KVSCountersFile.HasValue())
-        {
-            paths.SetCountersFile(dir + CHIP_DEFAULT_COUNTERS_FILENAME);
-        }
     }
 
     chip::DeviceLayer::SetStoragePaths(paths);
