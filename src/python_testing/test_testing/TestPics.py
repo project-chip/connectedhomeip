@@ -26,7 +26,6 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_cl
 
 
 class TestPicsHelpers(MatterBaseTest):
-    requires_dut = False
 
     def test_pics_generation(self):
         xml_cluster, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)

@@ -48,7 +48,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestFactoryResetRequests(MatterBaseTest):
-    requires_dut = False
 
     def desc_TestFactoryResetRequests(self) -> str:
         return "[TestFactoryResetRequests] Test Factory Reset Requests"

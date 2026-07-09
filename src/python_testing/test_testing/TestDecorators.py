@@ -100,7 +100,6 @@ class DecoratorTestRunnerHooks:
 
 
 class TestDecorators(MatterBaseTest):
-    requires_dut = False
 
     def test_checkers(self):
         has_onoff = has_cluster(Clusters.OnOff)

@@ -39,7 +39,6 @@ def run_against_all_spec_revisions(body):
 
 
 class TestSpecParsingDeviceType(DeviceConformanceTests):
-    requires_dut = False
 
     def _create_xmls(self, revision: PrebuiltDataModelDirectory):
         print(f"-------------- Testing against spec revision {revision.dirname}")
