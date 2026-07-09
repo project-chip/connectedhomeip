@@ -45,6 +45,7 @@
 #include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/OOBInfoAccessor.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -192,6 +193,12 @@ public:
         DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+
+        // Register the global OOB info accessor
+        auto oobInfoAccessor = std::make_unique<chip::app::OOBInfoAccessor>();
+        VerifyOrReturnError(oobInfoAccessor, CHIP_ERROR_NO_MEMORY);
+        chip::app::OOBAccessorRegistry::Instance().Register(*oobInfoAccessor);
+        mConstructedAccessors.push_back(std::move(oobInfoAccessor));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
@@ -419,6 +426,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #if PW_RPC_ENABLED
     static chip::app::PigweedAttributeAccessor sPwOobAccessor;
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
+    chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().SetInfoInterceptor(&sPwOobAccessor);
 
     chip::rpc::Init(33000); // TODO: Add an arg for Pw port.
     ChipLogProgress(AppServer, "PW_RPC initialized.");

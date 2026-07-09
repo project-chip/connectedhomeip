@@ -26,20 +26,25 @@
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessor.h>
 
+#include <vector>
+
 namespace chip::app {
 
-class BooleanStateSensorAccessor : public OOBAccessor
+class BooleanStateSensorAccessor : public SetAttributeAccessor
 {
 public:
-    BooleanStateSensorAccessor(BooleanStateSensorDevice & device) : mDevice(device) {}
+    BooleanStateSensorAccessor(BooleanStateSensorDevice & device);
     ~BooleanStateSensorAccessor() override = default;
 
-    std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
+    std::optional<ActionResponse> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) override;
+
+    Span<const ConcreteDataAttributePath> GetSupportedPaths() override;
 
 private:
     std::optional<CHIP_ERROR> SetAttribute(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
 
     BooleanStateSensorDevice & mDevice;
+    std::vector<ConcreteDataAttributePath> mSupportedPaths;
 };
 
 } // namespace chip::app

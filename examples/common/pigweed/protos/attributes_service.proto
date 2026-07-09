@@ -231,7 +231,18 @@ message AttributeWrite {
   AttributeData data = 2;
 }
 
+message AttributePath {
+  uint32 endpoint = 1;
+  uint32 cluster_id = 2;
+  uint32 attribute_id = 3;
+}
+
+message WritableAttributePathsResponse {
+  repeated AttributePath paths = 1;
+}
+
 service Attributes {
   rpc Write(AttributeWrite) returns(pw.protobuf.Empty) {}
   rpc Read(AttributeMetadata) returns(AttributeData) {}
+  rpc GetWriteAttributePaths(pw.protobuf.Empty) returns(WritableAttributePathsResponse) {}
 }

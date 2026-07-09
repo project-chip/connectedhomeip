@@ -23,6 +23,8 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <lib/core/TLVReader.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <variant>
 
 namespace chip {
 namespace rpc {
@@ -59,6 +61,23 @@ public:
     {
         return std::nullopt;
     }
+};
+
+/**
+ * Callback class specifically for handling global Out-of-Band device information and discovery queries.
+ */
+class PigweedDebugInfoInterceptor
+{
+public:
+    PigweedDebugInfoInterceptor()          = default;
+    virtual ~PigweedDebugInfoInterceptor() = default;
+
+    /**
+     * @brief Gets the list of all attribute paths writable via Pw.
+     *
+     * @return A variant containing either the pw::Status failure code or the successful list of paths.
+     */
+    virtual std::variant<::pw::Status, chip::ReadOnlyBuffer<chip::app::ConcreteDataAttributePath>> GetSupportedWritePaths() = 0;
 };
 
 } // namespace rpc

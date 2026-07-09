@@ -25,6 +25,8 @@ source_set("oob-accessors") {
     "OOBAccessorRegistry.h",
     "OOBDataSerializer.cpp",
     "OOBDataSerializer.h",
+    "OOBInfoAccessor.cpp",
+    "OOBInfoAccessor.h",
   ]
 
   public_deps = [

@@ -2,3 +2,4 @@
 chip.rpc.AttributeData.data_bytes max_size:128
 chip.rpc.AttributeData.data_string max_size:128
 chip.rpc.AttributeData.tlv_data max_size:256
+chip.rpc.WritableAttributePathsResponse.paths max_count:100
