@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+from datetime import UTC, datetime
 import json
 import logging
 import os
@@ -38,6 +39,10 @@ DEFAULT_REPOSITORY = "project-chip/connectedhomeip"
 DEFAULT_CONFIG_PATH = ".github/platform_maintainers.yaml"
 
 ELIGIBILITY_COMMENT_MARKER = "<!-- platform-merge-bot-eligibility-marker -->"
+
+# Age threshold (in seconds) to ignore stuck check suites (2 hours)
+STUCK_CHECK_SUITE_THRESHOLD_SECONDS = 7200
+
 
 
 class ValidationCheck(Enum):
@@ -100,7 +105,7 @@ class PlatformMergeBot:
         self.skip_checks = {ValidationCheck(c) for c in (skip_checks or [])}
         self.single_pr_mode = False
         self.groups: dict[str, PlatformGroup] = {}
-        self._bot_username = None
+        self._bot_username: str | None = None
         self.load_config()
 
     @property
@@ -229,6 +234,7 @@ class PlatformMergeBot:
 
         pr_author = pr.user.login
         log.info("Checking PR #%d: '%s' (Author: %s)", pr.number, pr.title, pr_author)
+        is_dependabot = pr_author.lower() == "dependabot[bot]"
 
         if pr.state != "open":
             if self.dry_run and self.single_pr_mode:
@@ -258,7 +264,7 @@ class PlatformMergeBot:
         # Perform file analysis first (saves API calls for ineligible PRs)
         matched_files, uncovered_files = self.analyze_pr_files(pr)
 
-        if uncovered_files:
+        if uncovered_files and not is_dependabot:
             log.info(
                 "PR #%d contains files outside the platform-maintained scope. Skipping. Uncovered files: %s",
                 pr.number,
@@ -269,16 +275,19 @@ class PlatformMergeBot:
 
         # Determine which groups are active (i.e. have changed files)
         active_groups = {name: files for name, files in matched_files.items() if files}
-        if not active_groups:
+        if not active_groups and not is_dependabot:
             log.info("PR #%d has no changed files? Skipping.", pr.number)
             self.remove_eligibility_comment(pr)
             return
 
-        log.info(
-            "PR #%d is fully covered by platform groups: %s",
-            pr.number,
-            list(active_groups.keys()),
-        )
+        if is_dependabot:
+            log.info("PR #%d is a Dependabot PR. Bypassing group coverage checks.", pr.number)
+        else:
+            log.info(
+                "PR #%d is fully covered by platform groups: %s",
+                pr.number,
+                list(active_groups.keys()),
+            )
 
         # Get the commit object once for subsequent status/CI checks
         commit = self.repo.get_commit(sha=pr.head.sha)
@@ -315,16 +324,17 @@ class PlatformMergeBot:
         missing_approvals: dict[str, PlatformGroup] = {}
         valid_approvals_per_group: dict[str, GroupApproval] = {}
 
-        for group_name, files in active_groups.items():
-            group = self.groups[group_name]
-            group_approvers = approvers.intersection(group.maintainers)
-            if not group_approvers:
-                missing_approvals[group_name] = group
-            else:
-                # Pick the first matched approver for documentation
-                valid_approvals_per_group[group_name] = GroupApproval(
-                    sorted(group_approvers)[0], files
-                )
+        if not is_dependabot:
+            for group_name, files in active_groups.items():
+                group = self.groups[group_name]
+                group_approvers = approvers.intersection(group.maintainers)
+                if not group_approvers:
+                    missing_approvals[group_name] = group
+                else:
+                    # Pick the first matched approver for documentation
+                    valid_approvals_per_group[group_name] = GroupApproval(
+                        sorted(group_approvers)[0], files
+                    )
 
         unresolved_threads = []
         if ValidationCheck.COMMENTS not in self.skip_checks:
@@ -343,25 +353,30 @@ class PlatformMergeBot:
         )
 
         if not is_ready:
-            log.info(
-                "PR #%d is eligible but not ready to merge. Updating status comment.",
-                pr.number,
+            reasons = (
+                f"missing_approvals={list(missing_approvals.keys())}, "
+                f"unresolved_threads={len(unresolved_threads)}, "
+                f"ci_passed={ci_passed}, "
+                f"is_mergeable={is_mergeable}"
             )
-            self.post_eligibility_comment(
-                pr,
-                active_groups,
-                missing_approvals,
-                unresolved_threads,
-                ci_passed,
-                is_mergeable,
-            )
+            log.info("PR #%d is not ready to merge. Blocked by: %s", pr.number, reasons)
+            if not is_dependabot:
+                log.info("Updating status comment for PR #%d", pr.number)
+                self.post_eligibility_comment(
+                    pr,
+                    active_groups,
+                    missing_approvals,
+                    unresolved_threads,
+                    ci_passed,
+                    is_mergeable,
+                )
             return
 
         log.info(
             "PR #%d is fully approved, CI passed, no unresolved comments, and ready to merge!",
             pr.number,
         )
-        self.merge_pr(pr, valid_approvals_per_group)
+        self.merge_pr(pr, valid_approvals_per_group, is_dependabot=is_dependabot)
 
     def _is_pullapprove_green(self, commit: Commit) -> bool:
         """Returns True if the pullapprove check exists and is in the 'success' state."""
@@ -517,6 +532,25 @@ class PlatformMergeBot:
 
         for suite in check_suites:
             if suite.status != "completed":
+                # Handle potential timezone-naive datetimes from the API to avoid comparison errors
+                created_at = suite.created_at
+                if created_at.tzinfo is None:
+                    created_at = created_at.replace(tzinfo=UTC)
+                age = datetime.now(UTC) - created_at
+
+                # Ignore stuck check suites that don't run on PRs and remain
+                # 'queued' with 0 runs (invisible in UI but visible in API).
+                if suite.latest_check_runs_count == 0 and age.total_seconds() > STUCK_CHECK_SUITE_THRESHOLD_SECONDS:
+                    log.info(
+                        "PR #%d HEAD commit %s check suite '%s' is not completed (status: '%s') but has 0 runs and is old (%s). Ignoring.",
+                        pr.number,
+                        pr.head.sha[:8],
+                        suite.id,
+                        suite.status,
+                        age,
+                    )
+                    continue
+
                 log.info(
                     "PR #%d HEAD commit %s check suite '%s' is not completed (status: '%s')",
                     pr.number,
@@ -678,18 +712,27 @@ class PlatformMergeBot:
                     log.error("Failed to delete stale comment #%d: %s", comment.id, e)
 
     def merge_pr(
-        self, pr: PullRequest, valid_approvals_per_group: dict[str, GroupApproval]
+        self,
+        pr: PullRequest,
+        valid_approvals_per_group: dict[str, GroupApproval],
+        is_dependabot: bool = False,
     ) -> None:
         """Merges the PR and posts a comment explaining the approvals."""
-        # Generate merge comment explaining reasons
-        merge_reason_comment = "### Platform Maintainers Auto-Merge Executed\n"
-        merge_reason_comment += "This PR has been automatically merged. It contains changes restricted to platform-maintained paths and received the required maintainer approvals:\n\n"
+        if is_dependabot:
+            merge_reason_comment = "### Dependabot Auto-Merge Executed\n"
+            merge_reason_comment += "This PR has been automatically merged because it passed all CI checks.\n"
+            commit_title = f"{pr.title} (Auto-merged by bot)"
+        else:
+            # Generate merge comment explaining reasons
+            merge_reason_comment = "### Platform Maintainers Auto-Merge Executed\n"
+            merge_reason_comment += "This PR has been automatically merged. It contains changes restricted to platform-maintained paths and received the required maintainer approvals:\n\n"
 
-        for group_name, approval in valid_approvals_per_group.items():
-            group = self.groups[group_name]
-            matched_globs = group.get_matched_globs(approval.files)
-            globs_str = ", ".join([f"`{g}`" for g in matched_globs])
-            merge_reason_comment += f"- **{group_name}** changes (matching {globs_str}) approved by @{approval.approver}\n"
+            for group_name, approval in valid_approvals_per_group.items():
+                group = self.groups[group_name]
+                matched_globs = group.get_matched_globs(approval.files)
+                globs_str = ", ".join([f"`{g}`" for g in matched_globs])
+                merge_reason_comment += f"- **{group_name}** changes (matching {globs_str}) approved by @{approval.approver}\n"
+            commit_title = f"{pr.title} (Auto-merged by platform-bot)"
 
         if self.dry_run:
             log.info(
@@ -703,7 +746,7 @@ class PlatformMergeBot:
             # Use squash merge
             pr.merge(
                 merge_method="squash",
-                commit_title=f"{pr.title} (Auto-merged by platform-bot)",
+                commit_title=commit_title,
                 sha=pr.head.sha,
             )
 
@@ -721,7 +764,7 @@ class PlatformMergeBot:
         """Runs the bot, either scanning all open PRs or processing a single PR."""
         self.single_pr_mode = pr_number is not None
         has_errors = False
-        if self.single_pr_mode:
+        if pr_number is not None:
             log.info("Processing single PR #%d...", pr_number)
             try:
                 pr = self.repo.get_pull(pr_number)

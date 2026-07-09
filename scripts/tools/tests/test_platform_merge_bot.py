@@ -15,12 +15,14 @@
 # limitations under the License.
 #
 
+from datetime import UTC, datetime, timedelta
 import json
 import os
 import sys
 import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
+from typing import cast
 
 # Ensure the parent directory is in the path so we can import platform_merge_bot
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -28,7 +30,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from platform_merge_bot import ELIGIBILITY_COMMENT_MARKER, PlatformMergeBot  # noqa: E402
+from platform_merge_bot import ELIGIBILITY_COMMENT_MARKER, PlatformMergeBot, STUCK_CHECK_SUITE_THRESHOLD_SECONDS  # noqa: E402
 
 
 class TestPlatformMergeBot(unittest.TestCase):
@@ -275,7 +277,7 @@ esp32:
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
-        reviews = []
+        reviews: list[MagicMock] = []
         # Existing eligibility comment with different body
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
@@ -296,7 +298,7 @@ esp32:
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
-        reviews = []
+        reviews: list[MagicMock] = []
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
         # First run: posts the eligibility comment
@@ -458,7 +460,7 @@ esp32:
 
     def test_check_and_process_pr_removes_comment_when_no_changed_files(self) -> None:
         """Tests that a stale eligibility comment is deleted if the PR has no changed files."""
-        files = []  # No changed files
+        files: list[MagicMock] = []  # No changed files
         mock_comment = MagicMock()
         mock_comment.user.login = "platform-merge-bot"
         mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
@@ -476,7 +478,7 @@ esp32:
         files = [
             self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp"),
         ]
-        reviews = []
+        reviews: list[MagicMock] = []
 
         # We have two eligibility comments
         mock_comment1 = MagicMock()
@@ -617,10 +619,12 @@ esp32:
         reviews = [self.create_mock_review("doru91", "APPROVED")]
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
-        # Mock in_progress check suite
+        # Mock in_progress check suite (new, so it blocks)
         mock_suite = MagicMock()
         mock_suite.status = "in_progress"
         mock_suite.conclusion = None
+        mock_suite.created_at = datetime.now(UTC)
+        mock_suite.latest_check_runs_count = 0
         mock_success_suite = MagicMock()
         mock_success_suite.status = "completed"
         mock_success_suite.conclusion = "success"
@@ -672,7 +676,7 @@ esp32:
         )
 
         # Mock pullapprove green
-        self.bot._is_pullapprove_green.return_value = True
+        cast(MagicMock, self.bot._is_pullapprove_green).return_value = True
 
         self.bot.check_and_process_pr(mock_pr)
 
@@ -688,7 +692,7 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
         # Mock an unresolved thread
-        self.bot._get_unresolved_threads.return_value = [
+        cast(MagicMock, self.bot._get_unresolved_threads).return_value = [
             {
                 "author": "jmartinez-silabs",
                 "body_preview": "Maybe we could check...",
@@ -731,7 +735,6 @@ esp32:
         self.bot.check_and_process_pr(mock_pr)
 
         # Should log and say "Would merge" in dry-run (which means checking passed and didn't return early)
-        # Note: merge is not called in dry-run, but mock_pr.merge should not be called either.
         # We can assert that analyze_pr_files was called, proving it bypassed the state check.
         mock_pr.get_files.assert_called_once()
 
@@ -747,7 +750,7 @@ esp32:
         self.bot.skip_checks = {ValidationCheck.COMMENTS}
 
         # Mock unresolved threads (should be ignored)
-        self.bot._get_unresolved_threads.return_value = [
+        cast(MagicMock, self.bot._get_unresolved_threads).return_value = [
             {
                 "author": "jmartinez-silabs",
                 "body_preview": "unresolved",
@@ -899,6 +902,144 @@ esp32:
         mock_pr.create_issue_comment.assert_called_once()
         comment_body = mock_pr.create_issue_comment.call_args[0][0]
         self.assertIn("Mergeability state is computing", comment_body)
+
+    def test_check_and_process_pr_dependabot_success(self) -> None:
+        """Tests that a Dependabot PR with passing CI is merged."""
+        files = [
+            self.create_mock_file("some/file.txt"),
+        ]
+        mock_pr = self.create_mock_pr(1, "Bump dep", "dependabot[bot]", files, [])
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_called_once_with(
+            merge_method="squash",
+            commit_title="Bump dep (Auto-merged by bot)",
+            sha="dummy_sha",
+        )
+        mock_pr.create_issue_comment.assert_called_once()
+        self.assertIn(
+            "Dependabot Auto-Merge Executed",
+            mock_pr.create_issue_comment.call_args[0][0],
+        )
+
+    def test_check_and_process_pr_dependabot_failing_ci(self) -> None:
+        """Tests that a Dependabot PR with failing CI is not merged."""
+        files = [
+            self.create_mock_file("some/file.txt"),
+        ]
+        mock_pr = self.create_mock_pr(1, "Bump dep", "dependabot[bot]", files, [])
+
+        # Mock failing CI
+        mock_suite = MagicMock()
+        mock_suite.status = "completed"
+        mock_suite.conclusion = "failure"
+        # 1 failing, 9 succeeding to meet the 10 checks requirement
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        # Should not post eligibility comment for dependabot
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_dependabot_unresolved_comments_does_not_merge(self) -> None:
+        """Tests that a Dependabot PR with unresolved comments is not merged."""
+        files = [self.create_mock_file("some/file.txt")]
+        mock_pr = self.create_mock_pr(1, "Bump dep", "dependabot[bot]", files, [])
+
+        # Mock an unresolved thread
+        cast(MagicMock, self.bot._get_unresolved_threads).return_value = [
+            {
+                "author": "some_user",
+                "body_preview": "unresolved comment",
+                "url": "https://github.com/...",
+            }
+        ]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_dependabot_merge_conflicts_does_not_merge(self) -> None:
+        """Tests that a Dependabot PR with merge conflicts is not merged."""
+        files = [self.create_mock_file("some/file.txt")]
+        mock_pr = self.create_mock_pr(1, "Bump dep", "dependabot[bot]", files, [])
+        mock_pr.mergeable = False
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+    def test_check_and_process_pr_stuck_check_suite_ignored_merges(self) -> None:
+        """Tests that an incomplete check suite with 0 runs and old age is ignored, allowing merge."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock stuck check suite (in_progress, 0 runs, 3 hours old)
+        mock_suite = MagicMock()
+        mock_suite.status = "in_progress"
+        mock_suite.conclusion = None
+        mock_suite.created_at = datetime.now(UTC) - timedelta(seconds=STUCK_CHECK_SUITE_THRESHOLD_SECONDS + 3600)
+        mock_suite.latest_check_runs_count = 0
+
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_called_once()
+
+    def test_check_and_process_pr_new_incomplete_check_suite_blocks(self) -> None:
+        """Tests that a new incomplete check suite with 0 runs blocks merge."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock new incomplete check suite (in_progress, 0 runs, 1 hour old)
+        mock_suite = MagicMock()
+        mock_suite.status = "in_progress"
+        mock_suite.conclusion = None
+        mock_suite.created_at = datetime.now(UTC) - timedelta(seconds=STUCK_CHECK_SUITE_THRESHOLD_SECONDS - 3600)
+        mock_suite.latest_check_runs_count = 0
+
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+
+    def test_check_and_process_pr_active_incomplete_check_suite_blocks(self) -> None:
+        """Tests that an old incomplete check suite with runs (>0) blocks merge."""
+        files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
+        reviews = [self.create_mock_review("doru91", "APPROVED")]
+        mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
+
+        # Mock active old check suite (in_progress, 1 run, 3 hours old)
+        mock_suite = MagicMock()
+        mock_suite.status = "in_progress"
+        mock_suite.conclusion = None
+        mock_suite.created_at = datetime.now(UTC) - timedelta(seconds=STUCK_CHECK_SUITE_THRESHOLD_SECONDS + 3600)
+        mock_suite.latest_check_runs_count = 1
+
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [mock_success_suite] * 9
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
 
 
 if __name__ == "__main__":
