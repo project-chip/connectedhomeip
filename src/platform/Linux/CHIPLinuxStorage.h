@@ -45,6 +45,38 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+/**
+ * @brief Structure holding KVS file paths for Linux platform
+ *
+ * This structure is populated from command-line arguments in examples/platform/linux/Options.cpp
+ * and used by PosixConfig to initialize storage namespaces.
+ */
+struct ChipLinuxStoragePaths
+{
+    std::string kvsDataFile;  // Full path to KVS data file (default: /tmp/chip_kvs)
+    std::string factoryFile;  // Full path to factory config file (default: /tmp/chip_factory.ini)
+    std::string configFile;   // Full path to config file (default: /tmp/chip_config.ini)
+    std::string countersFile; // Full path to counters file (default: /tmp/chip_counters.ini)
+
+    // Legacy KVS file path (deprecated, use kvsDataFile instead)
+    const char * legacyKvsFile = nullptr;
+};
+
+/**
+ * @brief Get the ChipLinuxStoragePaths singleton
+ *
+ * @return ChipLinuxStoragePaths& Reference to the storage paths structure
+ */
+ChipLinuxStoragePaths & GetStoragePaths();
+
+/**
+ * @brief Set the ChipLinuxStoragePaths
+ *
+ * @param paths The storage paths to use
+ */
+void SetStoragePaths(const ChipLinuxStoragePaths & paths);
+
 namespace Internal {
 
 class ChipLinuxStorage : private ChipLinuxStorageIni

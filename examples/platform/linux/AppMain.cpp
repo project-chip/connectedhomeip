@@ -50,7 +50,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Linux/FilesystemStorageLocationProvider.h>
+#include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
@@ -460,83 +460,6 @@ static uint16_t WiFiPAFGet_FreqList(const char * args, std::unique_ptr<uint16_t[
 }
 #endif
 
-class ExampleFilesystemStorageLocationProvider : public chip::DeviceLayer::FilesystemStorageLocationProvider
-{
-private:
-    static std::string DefaultBase() { return std::filesystem::temp_directory_path().string(); }
-
-    /**
-     * @brief Compute the effective path for a storage file based on priority:
-     * 1. Explicit file path (--kvs-data, --kvs-factory, etc.) -> return full path
-     * 2. Legacy --KVS (only for data file) -> return full path
-     * 3. Base directory (--kvs-directory) -> return directory (PosixConfig will append filename)
-     * 4. Default: /tmp (PosixConfig will append filename)
-     *
-     * Note: Returns full path for explicit options, directory for base/default.
-     */
-    static std::string GetEffectivePath(const chip::Optional<std::string> & explicitFile, const char * legacyKVS,
-                                        const chip::Optional<std::string> & baseDirectory, const char * defaultFilename)
-    {
-        // Priority 1: Explicit file path - return full path
-        if (explicitFile.HasValue() && !explicitFile.Value().empty())
-        {
-            return explicitFile.Value();
-        }
-
-        // Priority 2: Legacy KVS (only applies to data file) - return full path
-        if (legacyKVS != nullptr && strlen(legacyKVS) > 0)
-        {
-            return std::string(legacyKVS);
-        }
-
-        // Priority 3: Base directory - return directory path (PosixConfig will append filename)
-        if (baseDirectory.HasValue() && !baseDirectory.Value().empty())
-        {
-            std::string base = baseDirectory.Value();
-            // Ensure trailing slash so PosixConfig knows it's a directory
-            if (base.back() != '/')
-            {
-                base += '/';
-            }
-            return base;
-        }
-
-        // Priority 4: Default - return default directory (PosixConfig will append filename)
-        return DefaultBase() + "/";
-    }
-
-public:
-    const char * LegacyKVS() const override { return LinuxDeviceOptions::GetInstance().KVS; }
-
-    std::string GetFactoryDataLocation() const override
-    {
-        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSFactoryFile,
-                                nullptr, // Legacy KVS doesn't apply to factory
-                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_factory.ini");
-    }
-
-    std::string GetConfigDataLocation() const override
-    {
-        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSConfigFile,
-                                nullptr, // Legacy KVS doesn't apply to config
-                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_config.ini");
-    }
-
-    std::string GetCountersDataLocation() const override
-    {
-        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSCountersFile,
-                                nullptr, // Legacy KVS doesn't apply to counters
-                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_counters.ini");
-    }
-
-    std::string GetKVSDataLocation() const override
-    {
-        return GetEffectivePath(LinuxDeviceOptions::GetInstance().KVSDataFile,
-                                LinuxDeviceOptions::GetInstance().KVS, // Legacy KVS applies here
-                                LinuxDeviceOptions::GetInstance().KVSDirectory, "chip_kvs");
-    }
-};
-
 // Wrapper for DeviceInstanceInfoProvider that allows the example app to set
 // attribute values from the command-line, provide hardcoded values, or fall
 // back to the default DeviceInstanceInfoProvider.
@@ -659,7 +582,6 @@ private:
 };
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
-ExampleFilesystemStorageLocationProvider sExampleProvider;
 
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
                      const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
@@ -693,10 +615,11 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
-    SetFilesystemStorageLocationProvider(&sExampleProvider);
-
-    ChipLogProgress(NotSpecified, "Storage location provider returned %s",
-                    GetFilesystemStorageLocationProvider().GetConfigDataLocation().c_str());
+    // KVS paths are already set by ParseArguments() via SetStoragePaths()
+    ChipLogProgress(NotSpecified, "KVS data file: %s",
+                    chip::DeviceLayer::GetStoragePaths().kvsDataFile.empty()
+                        ? "(default)"
+                        : chip::DeviceLayer::GetStoragePaths().kvsDataFile.c_str());
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread
@@ -1141,9 +1064,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif

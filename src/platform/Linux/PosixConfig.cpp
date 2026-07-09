@@ -30,7 +30,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
-#include <platform/Linux/FilesystemStorageLocationProvider.h>
 #include <platform/Linux/PosixConfig.h>
 
 #include <filesystem>
@@ -109,26 +108,24 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    auto & provider = chip::DeviceLayer::GetFilesystemStorageLocationProvider();
-    if (provider.LegacyKVS() == nullptr)
+    auto & paths = chip::DeviceLayer::GetStoragePaths();
+
+    // Handle legacy KVS path (deprecated --KVS option)
+    if (paths.legacyKvsFile != nullptr)
     {
-        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation());
-        // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
-        // If it's a directory or has no extension, append the default filename
-        std::string pathStr = path.string();
-        bool isDirectory    = pathStr.empty() || pathStr.back() == '/';
-        bool hasExtension   = !path.extension().empty();
-        if (isDirectory || !hasExtension)
-        {
-            // It's a directory or has no extension, append the default filename
-            path /= CHIP_DEFAULT_DATA_FILENAME;
-        }
-        return PersistedStorage::KeyValueStoreMgrImpl().Init(path.c_str());
+        return PersistedStorage::KeyValueStoreMgrImpl().Init(paths.legacyKvsFile);
     }
-    else
+
+    // Use explicit KVS data file path if provided
+    if (!paths.kvsDataFile.empty())
     {
-        return PersistedStorage::KeyValueStoreMgrImpl().Init(provider.LegacyKVS());
+        return PersistedStorage::KeyValueStoreMgrImpl().Init(paths.kvsDataFile.c_str());
     }
+
+    // Default: use directory-based approach with default filename
+    std::filesystem::path path(CHIP_DEFAULT_BASE_DIR);
+    path /= CHIP_DEFAULT_DATA_FILENAME;
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(path.c_str());
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
@@ -505,11 +502,12 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
     ChipLinuxStorage * storage = nullptr;
+    auto & paths               = chip::DeviceLayer::GetStoragePaths();
 
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
     {
         storage = &gChipLinuxFactoryStorage;
-        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetFactoryDataLocation());
+        std::filesystem::path path(paths.factoryFile.empty() ? CHIP_DEFAULT_BASE_DIR : paths.factoryFile);
         // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
         // If it's a directory or has no extension, append the default filename
         std::string pathStr = path.string();
@@ -524,7 +522,7 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
         storage = &gChipLinuxConfigStorage;
-        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetConfigDataLocation());
+        std::filesystem::path path(paths.configFile.empty() ? CHIP_DEFAULT_BASE_DIR : paths.configFile);
         // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
         // If it's a directory or has no extension, append the default filename
         std::string pathStr = path.string();
@@ -539,7 +537,7 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         storage = &gChipLinuxCountersStorage;
-        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetCountersDataLocation());
+        std::filesystem::path path(paths.countersFile.empty() ? CHIP_DEFAULT_BASE_DIR : paths.countersFile);
         // Check if the path already includes a filename (has extension like .ini, .kvs, etc.)
         // If it's a directory or has no extension, append the default filename
         std::string pathStr = path.string();

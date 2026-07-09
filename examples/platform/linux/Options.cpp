@@ -23,6 +23,7 @@
 
 #include "Options.h"
 
+#include <platform/Linux/CHIPLinuxStorage.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -1096,6 +1097,60 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    // Apply KVS paths to the platform layer after parsing
+    auto & options = LinuxDeviceOptions::GetInstance();
+    chip::DeviceLayer::ChipLinuxStoragePaths paths;
+
+    // Handle deprecated --KVS option (legacy full path for data file only)
+    if (options.KVS != nullptr)
+    {
+        paths.legacyKvsFile = options.KVS;
+    }
+
+    // Set explicit paths if provided
+    if (options.KVSDataFile.HasValue())
+    {
+        paths.kvsDataFile = options.KVSDataFile.Value();
+    }
+    if (options.KVSFactoryFile.HasValue())
+    {
+        paths.factoryFile = options.KVSFactoryFile.Value();
+    }
+    if (options.KVSConfigFile.HasValue())
+    {
+        paths.configFile = options.KVSConfigFile.Value();
+    }
+    if (options.KVSCountersFile.HasValue())
+    {
+        paths.countersFile = options.KVSCountersFile.Value();
+    }
+
+    // Handle --kvs-directory: if provided and explicit file paths are not set,
+    // use the directory as the base for all files
+    if (options.KVSDirectory.HasValue())
+    {
+        const std::string & dir = options.KVSDirectory.Value();
+        if (paths.kvsDataFile.empty())
+        {
+            paths.kvsDataFile = dir + "/chip_kvs";
+        }
+        if (paths.factoryFile.empty())
+        {
+            paths.factoryFile = dir + "/chip_factory.ini";
+        }
+        if (paths.configFile.empty())
+        {
+            paths.configFile = dir + "/chip_config.ini";
+        }
+        if (paths.countersFile.empty())
+        {
+            paths.countersFile = dir + "/chip_counters.ini";
+        }
+    }
+
+    chip::DeviceLayer::SetStoragePaths(paths);
+
     return CHIP_NO_ERROR;
 }
 

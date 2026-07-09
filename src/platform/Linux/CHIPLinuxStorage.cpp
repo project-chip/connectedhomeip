@@ -19,7 +19,8 @@
 /**
  *    @file
  *         This file implements a class for managing client application
- *         user-editable settings on Linux platform.
+ *         user-editable settings on Linux platform, and functions for
+ *         managing KVS storage paths.
  *
  */
 
@@ -40,7 +41,23 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+// Implementation of ChipLinuxStoragePaths functions
+
+ChipLinuxStoragePaths & GetStoragePaths()
+{
+    static ChipLinuxStoragePaths sInstance;
+    return sInstance;
+}
+
+void SetStoragePaths(const ChipLinuxStoragePaths & paths)
+{
+    GetStoragePaths() = paths;
+}
+
 namespace Internal {
+
+// Implementation of ChipLinuxStorage class
 
 ChipLinuxStorage::ChipLinuxStorage()
 {
