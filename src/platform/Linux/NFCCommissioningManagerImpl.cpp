@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#undef DEBUG
+#undef CHIP_NFC_DEBUG_LOGGING_ENABLED
 
 /**
  *    @file
@@ -75,7 +75,7 @@ namespace {} // namespace
         return CHIP_ERROR_INTERNAL;                                                                                                \
     }
 
-#ifdef DEBUG
+#ifdef CHIP_NFC_DEBUG_LOGGING_ENABLED
 #define ChipLogProgressNfcDebug(module, ...) ChipLogProgress(module, __VA_ARGS__)
 #else
 #define ChipLogProgressNfcDebug(module, ...)                                                                                       \
@@ -508,7 +508,7 @@ public:
         }
         else
         {
-            ChipLogError(DeviceLayer, "%s failed with error 0x" ChipLogFormatX64, commandName, ChipLogValueX64(result));
+            ChipLogError(DeviceLayer, "SCardTransmit failed with error 0x" ChipLogFormatX64, ChipLogValueX64(result));
             ret = CHIP_ERROR_INTERNAL;
         }
 
