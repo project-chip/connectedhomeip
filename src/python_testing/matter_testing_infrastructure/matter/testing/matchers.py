@@ -21,6 +21,7 @@ This module provides functionality for validating type compatibility between
 received values and expected type specifications.
 """
 
+import types
 import typing
 
 from matter.tlv import float32, uint
@@ -49,7 +50,7 @@ def is_type(received_value, desired_type):
         >>> is_type([1,2,3], list[int])
         True
     """
-    if typing.get_origin(desired_type) == typing.Union:
+    if typing.get_origin(desired_type) in (typing.Union, types.UnionType):
         return any(is_type(received_value, t) for t in typing.get_args(desired_type))
     if typing.get_origin(desired_type) == list:
         if isinstance(received_value, list):

@@ -183,10 +183,24 @@ class Commission:
                 self.info.passcode
             )
 
-        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
-            setupCode=setup_code,
-            nodeId=self.node_id
-        )
+        if self.commissioning_info.commissioning_method == "thread-meshcop":
+            thread_ba_host = self.commissioning_info.thread_ba_host
+            thread_ba_port = self.commissioning_info.thread_ba_port
+
+            if thread_ba_host is None or thread_ba_port is None:
+                raise ValueError("Thread MeshCoP PASE requires both border agent host and port")
+
+            commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+                setupCode=setup_code,
+                nodeId=self.node_id,
+                threadMeshCoPConfig=(thread_ba_host, thread_ba_port),
+            )
+        else:
+            commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+                setupCode=setup_code,
+                nodeId=self.node_id
+            )
+
         if commissionee is None:
             raise RuntimeError("Failed to find or establish PASE session")
 

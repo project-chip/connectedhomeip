@@ -18,7 +18,7 @@
 import datetime
 import random
 import string
-from typing import Callable, Optional, Union
+from typing import Callable, Optional
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -186,8 +186,8 @@ class TLSUtils:
         return x509.load_der_x509_certificate(cert).fingerprint(hashes.SHA256())
 
     async def send_provision_root_command(
-            self, certificate: bytes, caid: Union[Nullable, int] = NullValue,
-            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse, InteractionModelError]:
+            self, certificate: bytes, caid: Nullable | int = NullValue,
+            expected_status: Status = Status.Success) -> Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse | InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate(certificate=certificate, caid=caid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -200,8 +200,8 @@ class TLSUtils:
             return e
 
     async def send_find_root_command(
-            self, caid: Union[Nullable, int] = NullValue,
-            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.FindRootCertificateResponse, InteractionModelError]:
+            self, caid: Nullable | int = NullValue,
+            expected_status: Status = Status.Success) -> Clusters.TlsCertificateManagement.Commands.FindRootCertificateResponse | InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindRootCertificate(caid=caid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -215,7 +215,7 @@ class TLSUtils:
 
     async def send_lookup_root_command(
             self, fingerprint: bytes,
-            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.LookupRootCertificateResponse, InteractionModelError]:
+            expected_status: Status = Status.Success) -> Clusters.TlsCertificateManagement.Commands.LookupRootCertificateResponse | InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.LookupRootCertificate(fingerprint=fingerprint),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -240,8 +240,8 @@ class TLSUtils:
             return e
 
     async def send_csr_command(
-            self, nonce: bytes, ccdid: Union[Nullable, int] = NullValue,
-            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, InteractionModelError]:
+            self, nonce: bytes, ccdid: Nullable | int = NullValue,
+            expected_status: Status = Status.Success) -> Clusters.TlsCertificateManagement.Commands.ClientCSRResponse | InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(ccdid=ccdid, nonce=nonce),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -267,8 +267,8 @@ class TLSUtils:
             return e
 
     async def send_find_client_command(
-            self, ccdid: Union[Nullable, int] = NullValue,
-            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.FindClientCertificateResponse, InteractionModelError]:
+            self, ccdid: Nullable | int = NullValue,
+            expected_status: Status = Status.Success) -> Clusters.TlsCertificateManagement.Commands.FindClientCertificateResponse | InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindClientCertificate(ccdid=ccdid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -282,7 +282,7 @@ class TLSUtils:
 
     async def send_lookup_client_command(
             self, fingerprint: bytes,
-            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.LookupClientCertificateResponse, InteractionModelError]:
+            expected_status: Status = Status.Success) -> Clusters.TlsCertificateManagement.Commands.LookupClientCertificateResponse | InteractionModelError:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.LookupClientCertificate(fingerprint=fingerprint),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -349,13 +349,10 @@ class TLSUtils:
         hostname: bytes,
         port: uint,
         caid: uint,
-        endpoint_id: Union[Nullable, int] = NullValue,
-        ccdid: Union[Nullable, uint] = NullValue,
-        expected_status: Union[Status, MatterIntEnum] = Status.Success,
-    ) -> Union[
-        Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
-        InteractionModelError,
-    ]:
+        endpoint_id: Nullable | int = NullValue,
+        ccdid: Nullable | uint = NullValue,
+        expected_status: Status | MatterIntEnum = Status.Success,
+    ) -> Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse | InteractionModelError:
         try:
             result = await self.test.send_single_cmd(
                 cmd=Clusters.TlsClientManagement.Commands.ProvisionEndpoint(

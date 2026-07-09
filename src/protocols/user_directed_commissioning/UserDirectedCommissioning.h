@@ -115,7 +115,7 @@ public:
 
     bool AddTargetAppInfo(TargetAppInfo vid)
     {
-        if (mNumTargetAppInfos >= sizeof(mTargetAppInfos))
+        if (mNumTargetAppInfos >= MATTER_ARRAY_SIZE(mTargetAppInfos))
         {
             // already at max
             return false;

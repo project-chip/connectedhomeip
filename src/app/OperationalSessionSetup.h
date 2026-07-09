@@ -157,11 +157,6 @@ typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & pee
 class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
 public:
-    // Grants tests controlled access to private state (e.g. forcing mState)
-    // so they can exercise state-dependent behavior such as
-    // IsEstablishingSession() without driving a full CASE handshake.
-    friend class TestOperationalSessionSetupAccess;
-
     struct ConnectionFailureInfo
     {
         const ScopedNodeId peerId;
@@ -245,16 +240,6 @@ public:
                  TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
-
-    /**
-     * Returns true iff this setup object is actively trying to establish a
-     * session (as opposed to idle, uninitialized, or fully connected).
-     */
-    bool IsEstablishingSession() const
-    {
-        return mState == State::NeedsAddress || mState == State::ResolvingAddress || mState == State::HasAddress ||
-            mState == State::Connecting || mState == State::WaitingForRetry;
-    }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;

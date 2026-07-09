@@ -33,6 +33,9 @@ SpeakerDevice::SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clu
 CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                    EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Identify
@@ -41,30 +44,33 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
 
     // OnOff (Mute)
     OnOffCluster::Context onOffContext{ mTimerDelegate };
+    onOffContext.defaults.onOff = true;
 
     mOnOffCluster.Create(endpoint, onOffContext);
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
     // Level Control (Volume)
-    LevelControlCluster::Config lcConfig(endpoint, mTimerDelegate, mLevelDelegate);
+    LevelControlCluster::Config lcConfig(mTimerDelegate, mLevelDelegate);
     lcConfig.WithOnOff(mOnOffCluster.Cluster());
 
     // TODO: The following attributes/features are not required for a Speaker device type.
     // Enable them here temporarily to fully test the LevelControl in CI.
     // When we have a proper level light device type these can be removed.
-    lcConfig.WithInitialCurrentLevel(1);
+    lcConfig.WithInitialCurrentLevel(100);
     lcConfig.WithOnOffTransitionTime(0);
     lcConfig.WithOnTransitionTime(0);
     lcConfig.WithOffTransitionTime(0);
     lcConfig.WithLighting(DataModel::NullNullable);
     lcConfig.WithDefaultMoveRate(DataModel::NullNullable);
 
-    mLevelControlCluster.Create(lcConfig);
+    mLevelControlCluster.Create(endpoint, lcConfig);
     mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void SpeakerDevice::Unregister(CodeDrivenDataModelProvider & provider)
