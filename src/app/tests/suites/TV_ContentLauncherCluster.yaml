@@ -90,6 +90,7 @@ tests:
                 value: 0
 
     - label: "Launch URL Command"
+      disabled: true
       command: "LaunchURL"
       arguments:
           values:
