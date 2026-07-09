@@ -15,24 +15,29 @@
  *    limitations under the License.
  */
 #include <DeviceFactoryPlatformOverride.h>
+#include <PosixAudioManager.h>
 #include <PosixChimeDevice.h>
+#include <PosixSpeakerDevice.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate,
+                                    PosixAudioManager & audioManager)
 {
+    if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
+    {
+        DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
+            return std::make_unique<PosixSpeakerDevice>(PosixSpeakerDevice::Context{ timerDelegate }, audioManager);
+        });
+    }
+
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
-        DeviceFactory::GetInstance().RegisterCreator("chime", [&timerDelegate]() {
-            static const ChimeDevice::Sound kDefaultSounds[] = {
-                { 0, "Ding Dong"_span },
-                { 1, "Ring Ring"_span },
-            };
-            return std::make_unique<PosixChimeDevice>(timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
-        });
+        DeviceFactory::GetInstance().RegisterCreator(
+            "chime", [&timerDelegate, &audioManager]() { return std::make_unique<PosixChimeDevice>(timerDelegate, audioManager); });
     }
 }
 

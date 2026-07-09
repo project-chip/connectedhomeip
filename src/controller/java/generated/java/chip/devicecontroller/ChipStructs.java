@@ -15840,6 +15840,279 @@ public static class ContentLauncherClusterDimensionStruct {
     return output.toString();
   }
 }
+public static class ContentLauncherClusterContentAppInfo {
+  public Integer contentAppVendorID;
+  public Integer contentAppProductID;
+  public String data;
+  private static final long CONTENT_APP_VENDOR_ID_ID = 0L;
+  private static final long CONTENT_APP_PRODUCT_ID_ID = 1L;
+  private static final long DATA_ID = 2L;
+
+  public ContentLauncherClusterContentAppInfo(
+    Integer contentAppVendorID,
+    Integer contentAppProductID,
+    String data
+  ) {
+    this.contentAppVendorID = contentAppVendorID;
+    this.contentAppProductID = contentAppProductID;
+    this.data = data;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTENT_APP_VENDOR_ID_ID, new UIntType(contentAppVendorID)));
+    values.add(new StructElement(CONTENT_APP_PRODUCT_ID_ID, new UIntType(contentAppProductID)));
+    values.add(new StructElement(DATA_ID, new StringType(data)));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterContentAppInfo decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer contentAppVendorID = null;
+    Integer contentAppProductID = null;
+    String data = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTENT_APP_VENDOR_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contentAppVendorID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONTENT_APP_PRODUCT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contentAppProductID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DATA_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          data = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ContentLauncherClusterContentAppInfo(
+      contentAppVendorID,
+      contentAppProductID,
+      data
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterContentAppInfo {\n");
+    output.append("\tcontentAppVendorID: ");
+    output.append(contentAppVendorID);
+    output.append("\n");
+    output.append("\tcontentAppProductID: ");
+    output.append(contentAppProductID);
+    output.append("\n");
+    output.append("\tdata: ");
+    output.append(data);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentLauncherClusterLaunchUrlInfo {
+  public String url;
+  public @Nullable Optional<String> data;
+  public @Nullable Optional<String> contentType;
+  public @Nullable Optional<ArrayList<String>> contentHeaders;
+  public @Nullable Optional<Long> offsetMillisecs;
+  public @Nullable Optional<Integer> queueType;
+  public @Nullable Optional<String> nextUrl;
+  private static final long URL_ID = 0L;
+  private static final long DATA_ID = 1L;
+  private static final long CONTENT_TYPE_ID = 2L;
+  private static final long CONTENT_HEADERS_ID = 3L;
+  private static final long OFFSET_MILLISECS_ID = 4L;
+  private static final long QUEUE_TYPE_ID = 5L;
+  private static final long NEXT_URL_ID = 6L;
+
+  public ContentLauncherClusterLaunchUrlInfo(
+    String url,
+    @Nullable Optional<String> data,
+    @Nullable Optional<String> contentType,
+    @Nullable Optional<ArrayList<String>> contentHeaders,
+    @Nullable Optional<Long> offsetMillisecs,
+    @Nullable Optional<Integer> queueType,
+    @Nullable Optional<String> nextUrl
+  ) {
+    this.url = url;
+    this.data = data;
+    this.contentType = contentType;
+    this.contentHeaders = contentHeaders;
+    this.offsetMillisecs = offsetMillisecs;
+    this.queueType = queueType;
+    this.nextUrl = nextUrl;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(URL_ID, new StringType(url)));
+    values.add(new StructElement(DATA_ID, data != null ? data.<BaseTLVType>map((nonOptionaldata) -> new StringType(nonOptionaldata)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(CONTENT_TYPE_ID, contentType != null ? contentType.<BaseTLVType>map((nonOptionalcontentType) -> new StringType(nonOptionalcontentType)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(CONTENT_HEADERS_ID, contentHeaders != null ? contentHeaders.<BaseTLVType>map((nonOptionalcontentHeaders) -> ArrayType.generateArrayType(nonOptionalcontentHeaders, (elementnonOptionalcontentHeaders) -> new StringType(elementnonOptionalcontentHeaders))).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(OFFSET_MILLISECS_ID, offsetMillisecs != null ? offsetMillisecs.<BaseTLVType>map((nonOptionaloffsetMillisecs) -> new UIntType(nonOptionaloffsetMillisecs)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(QUEUE_TYPE_ID, queueType != null ? queueType.<BaseTLVType>map((nonOptionalqueueType) -> new UIntType(nonOptionalqueueType)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(NEXT_URL_ID, nextUrl != null ? nextUrl.<BaseTLVType>map((nonOptionalnextUrl) -> new StringType(nonOptionalnextUrl)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterLaunchUrlInfo decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String url = null;
+    @Nullable Optional<String> data = null;
+    @Nullable Optional<String> contentType = null;
+    @Nullable Optional<ArrayList<String>> contentHeaders = null;
+    @Nullable Optional<Long> offsetMillisecs = null;
+    @Nullable Optional<Integer> queueType = null;
+    @Nullable Optional<String> nextUrl = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == URL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          url = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == DATA_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          data = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CONTENT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          contentType = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == CONTENT_HEADERS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          contentHeaders = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class)));
+        }
+      } else if (element.contextTagNum() == OFFSET_MILLISECS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          offsetMillisecs = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == QUEUE_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          queueType = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == NEXT_URL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          nextUrl = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new ContentLauncherClusterLaunchUrlInfo(
+      url,
+      data,
+      contentType,
+      contentHeaders,
+      offsetMillisecs,
+      queueType,
+      nextUrl
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterLaunchUrlInfo {\n");
+    output.append("\turl: ");
+    output.append(url);
+    output.append("\n");
+    output.append("\tdata: ");
+    output.append(data);
+    output.append("\n");
+    output.append("\tcontentType: ");
+    output.append(contentType);
+    output.append("\n");
+    output.append("\tcontentHeaders: ");
+    output.append(contentHeaders);
+    output.append("\n");
+    output.append("\toffsetMillisecs: ");
+    output.append(offsetMillisecs);
+    output.append("\n");
+    output.append("\tqueueType: ");
+    output.append(queueType);
+    output.append("\n");
+    output.append("\tnextUrl: ");
+    output.append(nextUrl);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentLauncherClusterReplicationInfo {
+  public @Nullable Optional<ChipStructs.ContentLauncherClusterLaunchUrlInfo> launchUrlInfo;
+  public @Nullable Optional<ChipStructs.ContentLauncherClusterContentAppInfo> contentAppInfo;
+  private static final long LAUNCH_URL_INFO_ID = 0L;
+  private static final long CONTENT_APP_INFO_ID = 1L;
+
+  public ContentLauncherClusterReplicationInfo(
+    @Nullable Optional<ChipStructs.ContentLauncherClusterLaunchUrlInfo> launchUrlInfo,
+    @Nullable Optional<ChipStructs.ContentLauncherClusterContentAppInfo> contentAppInfo
+  ) {
+    this.launchUrlInfo = launchUrlInfo;
+    this.contentAppInfo = contentAppInfo;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LAUNCH_URL_INFO_ID, launchUrlInfo != null ? launchUrlInfo.<BaseTLVType>map((nonOptionallaunchUrlInfo) -> nonOptionallaunchUrlInfo.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(CONTENT_APP_INFO_ID, contentAppInfo != null ? contentAppInfo.<BaseTLVType>map((nonOptionalcontentAppInfo) -> nonOptionalcontentAppInfo.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterReplicationInfo decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Optional<ChipStructs.ContentLauncherClusterLaunchUrlInfo> launchUrlInfo = null;
+    @Nullable Optional<ChipStructs.ContentLauncherClusterContentAppInfo> contentAppInfo = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LAUNCH_URL_INFO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          launchUrlInfo = Optional.of(ChipStructs.ContentLauncherClusterLaunchUrlInfo.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == CONTENT_APP_INFO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          contentAppInfo = Optional.of(ChipStructs.ContentLauncherClusterContentAppInfo.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new ContentLauncherClusterReplicationInfo(
+      launchUrlInfo,
+      contentAppInfo
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterReplicationInfo {\n");
+    output.append("\tlaunchUrlInfo: ");
+    output.append(launchUrlInfo);
+    output.append("\n");
+    output.append("\tcontentAppInfo: ");
+    output.append(contentAppInfo);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ContentLauncherClusterTrackPreferenceStruct {
   public String languageCode;
   public Optional<ArrayList<Integer>> characteristics;
@@ -16367,6 +16640,67 @@ public static class ContentLauncherClusterBrandingInformationStruct {
     output.append("\n");
     output.append("\twaterMark: ");
     output.append(waterMark);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentLauncherClusterContentPresetStruct {
+  public Integer presetID;
+  public String presetName;
+  private static final long PRESET_ID_ID = 0L;
+  private static final long PRESET_NAME_ID = 1L;
+
+  public ContentLauncherClusterContentPresetStruct(
+    Integer presetID,
+    String presetName
+  ) {
+    this.presetID = presetID;
+    this.presetName = presetName;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PRESET_ID_ID, new UIntType(presetID)));
+    values.add(new StructElement(PRESET_NAME_ID, new StringType(presetName)));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterContentPresetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer presetID = null;
+    String presetName = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PRESET_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          presetID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PRESET_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          presetName = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ContentLauncherClusterContentPresetStruct(
+      presetID,
+      presetName
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterContentPresetStruct {\n");
+    output.append("\tpresetID: ");
+    output.append(presetID);
+    output.append("\n");
+    output.append("\tpresetName: ");
+    output.append(presetName);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -17006,6 +17340,112 @@ public static class ContentControlClusterRatingNameStruct {
     output.append("\n");
     output.append("\tratingNameDesc: ");
     output.append(ratingNameDesc);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MediaFileManagementClusterFileDescriptionStruct {
+  public Long fileID;
+  public String name;
+  public Long size;
+  public String mimeType;
+  public String imageUri;
+  private static final long FILE_ID_ID = 0L;
+  private static final long NAME_ID = 1L;
+  private static final long SIZE_ID = 2L;
+  private static final long MIME_TYPE_ID = 3L;
+  private static final long IMAGE_URI_ID = 4L;
+
+  public MediaFileManagementClusterFileDescriptionStruct(
+    Long fileID,
+    String name,
+    Long size,
+    String mimeType,
+    String imageUri
+  ) {
+    this.fileID = fileID;
+    this.name = name;
+    this.size = size;
+    this.mimeType = mimeType;
+    this.imageUri = imageUri;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(FILE_ID_ID, new UIntType(fileID)));
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(SIZE_ID, new UIntType(size)));
+    values.add(new StructElement(MIME_TYPE_ID, new StringType(mimeType)));
+    values.add(new StructElement(IMAGE_URI_ID, new StringType(imageUri)));
+
+    return new StructType(values);
+  }
+
+  public static MediaFileManagementClusterFileDescriptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long fileID = null;
+    String name = null;
+    Long size = null;
+    String mimeType = null;
+    String imageUri = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == FILE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fileID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SIZE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          size = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MIME_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          mimeType = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == IMAGE_URI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          imageUri = castingValue.value(String.class);
+        }
+      }
+    }
+    return new MediaFileManagementClusterFileDescriptionStruct(
+      fileID,
+      name,
+      size,
+      mimeType,
+      imageUri
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MediaFileManagementClusterFileDescriptionStruct {\n");
+    output.append("\tfileID: ");
+    output.append(fileID);
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tsize: ");
+    output.append(size);
+    output.append("\n");
+    output.append("\tmimeType: ");
+    output.append(mimeType);
+    output.append("\n");
+    output.append("\timageUri: ");
+    output.append(imageUri);
     output.append("\n");
     output.append("}\n");
     return output.toString();

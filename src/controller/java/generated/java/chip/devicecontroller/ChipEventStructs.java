@@ -7636,6 +7636,52 @@ public static class MediaPlaybackClusterStateChangedEvent {
     return output.toString();
   }
 }
+public static class ContentLauncherClusterContentReplicationEvent {
+  public Integer status;
+  private static final long STATUS_ID = 0L;
+
+  public ContentLauncherClusterContentReplicationEvent(
+    Integer status
+  ) {
+    this.status = status;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterContentReplicationEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer status = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ContentLauncherClusterContentReplicationEvent(
+      status
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterContentReplicationEvent {\n");
+    output.append("\tstatus: ");
+    output.append(status);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class AccountLoginClusterLoggedOutEvent {
   public Optional<Long> node;
   public Integer fabricIndex;
@@ -7749,6 +7795,67 @@ public static class ContentControlClusterEnteringBlockContentTimeWindowEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("ContentControlClusterEnteringBlockContentTimeWindowEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MediaFileManagementClusterSharedFilesAddedEvent {
+  public Integer requestID;
+  public Integer responseID;
+  private static final long REQUEST_ID_ID = 0L;
+  private static final long RESPONSE_ID_ID = 1L;
+
+  public MediaFileManagementClusterSharedFilesAddedEvent(
+    Integer requestID,
+    Integer responseID
+  ) {
+    this.requestID = requestID;
+    this.responseID = responseID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(REQUEST_ID_ID, new UIntType(requestID)));
+    values.add(new StructElement(RESPONSE_ID_ID, new UIntType(responseID)));
+
+    return new StructType(values);
+  }
+
+  public static MediaFileManagementClusterSharedFilesAddedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer requestID = null;
+    Integer responseID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == REQUEST_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          requestID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RESPONSE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          responseID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MediaFileManagementClusterSharedFilesAddedEvent(
+      requestID,
+      responseID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MediaFileManagementClusterSharedFilesAddedEvent {\n");
+    output.append("\trequestID: ");
+    output.append(requestID);
+    output.append("\n");
+    output.append("\tresponseID: ");
+    output.append(responseID);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }

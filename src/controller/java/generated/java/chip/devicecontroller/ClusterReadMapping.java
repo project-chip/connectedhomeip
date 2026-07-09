@@ -18464,6 +18464,28 @@ public class ClusterReadMapping {
           readContentLauncherSupportedStreamingProtocolsCommandParams
         );
         result.put("readSupportedStreamingProtocolsAttribute", readContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readContentLauncherMovableCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readContentLauncherMovableAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ContentLauncherCluster) cluster).readMovableAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readContentLauncherMovableCommandParams
+        );
+        result.put("readMovableAttribute", readContentLauncherMovableAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readContentLauncherPresetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readContentLauncherPresetsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ContentLauncherCluster) cluster).readPresetsAttribute(
+              (ChipClusters.ContentLauncherCluster.PresetsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedContentLauncherClusterPresetsAttributeCallback(),
+          readContentLauncherPresetsCommandParams
+        );
+        result.put("readPresetsAttribute", readContentLauncherPresetsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readContentLauncherGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readContentLauncherGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -19104,6 +19126,109 @@ public class ClusterReadMapping {
           readContentAppObserverClusterRevisionCommandParams
         );
         result.put("readClusterRevisionAttribute", readContentAppObserverClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readMediaFileManagementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readMediaFileManagementTotalStorageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementTotalStorageAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readTotalStorageAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readMediaFileManagementTotalStorageCommandParams
+        );
+        result.put("readTotalStorageAttribute", readMediaFileManagementTotalStorageAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementAvailableStorageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementAvailableStorageAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readAvailableStorageAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readMediaFileManagementAvailableStorageCommandParams
+        );
+        result.put("readAvailableStorageAttribute", readMediaFileManagementAvailableStorageAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementAvailableFilesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementAvailableFilesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readAvailableFilesAttribute(
+              (ChipClusters.MediaFileManagementCluster.AvailableFilesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaFileManagementClusterAvailableFilesAttributeCallback(),
+          readMediaFileManagementAvailableFilesCommandParams
+        );
+        result.put("readAvailableFilesAttribute", readMediaFileManagementAvailableFilesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementSupportedMimeTypesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementSupportedMimeTypesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readSupportedMimeTypesAttribute(
+              (ChipClusters.MediaFileManagementCluster.SupportedMimeTypesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaFileManagementClusterSupportedMimeTypesAttributeCallback(),
+          readMediaFileManagementSupportedMimeTypesCommandParams
+        );
+        result.put("readSupportedMimeTypesAttribute", readMediaFileManagementSupportedMimeTypesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.MediaFileManagementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaFileManagementClusterGeneratedCommandListAttributeCallback(),
+          readMediaFileManagementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readMediaFileManagementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.MediaFileManagementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaFileManagementClusterAcceptedCommandListAttributeCallback(),
+          readMediaFileManagementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readMediaFileManagementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.MediaFileManagementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaFileManagementClusterAttributeListAttributeCallback(),
+          readMediaFileManagementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readMediaFileManagementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readMediaFileManagementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readMediaFileManagementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaFileManagementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaFileManagementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaFileManagementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readMediaFileManagementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readMediaFileManagementClusterRevisionAttributeInteractionInfo);
      
        return result;
     }
@@ -22930,6 +23055,7 @@ public class ClusterReadMapping {
             put("accountLogin", readAccountLoginInteractionInfo());
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
+            put("mediaFileManagement", readMediaFileManagementInteractionInfo());
             put("audioControl", readAudioControlInteractionInfo());
             put("zoneManagement", readZoneManagementInteractionInfo());
             put("cameraAvStreamManagement", readCameraAvStreamManagementInteractionInfo());
