@@ -20,7 +20,7 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/support/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/DefaultTimerDelegate.h>
 
 using namespace chip::app;
