@@ -472,6 +472,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     {
         // we need to establish a matter hostname separately from the platform's default hostname
         char b[chip::Inet::IPAddress::kMaxStringLength];
+        size_t numAddressesAdded = 0;
         SuccessOrExit(error = service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
         ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
         matterHostname = std::string(service.mHostName) + ".local";
@@ -518,9 +519,33 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
 
                         ExitNow(error = CHIP_ERROR_INTERNAL);
                     }
+
+                    ChipLogDetail(DeviceLayer, "Added address %s (if=%d) for %s", b, static_cast<int>(thisinterface),
+                                  matterHostname.c_str());
+
+                    numAddressesAdded++;
                 }
             }
         }
+
+        // A dedicated Matter hostname is only resolvable if at least one A/AAAA
+        // record backs it. Publishing SRV/PTR/TXT without any address records
+        // yields a service that browses but can never be resolved, and nothing
+        // downstream would ever detect or repair it. Fail loudly instead so the
+        // caller can retry (for example, on a subsequent connectivity-change event).
+
+        if (numAddressesAdded == 0)
+        {
+            ChipLogError(DeviceLayer,
+                         "No publishable addresses for hostname %s (interface id=%d): "
+                         "advertising interface has no usable addresses yet; "
+                         "refusing to publish unresolvable service %s",
+                         matterHostname.c_str(), service.mInterface.GetPlatformInterface(), key.c_str());
+
+            ExitNow(error = CHIP_ERROR_INCORRECT_STATE);
+        }
+
+        ChipLogProgress(DeviceLayer, "Published %zu address record(s) for %s", numAddressesAdded, matterHostname.c_str());
     }
 
     // create the service
