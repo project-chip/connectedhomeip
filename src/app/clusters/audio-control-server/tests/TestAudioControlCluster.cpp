@@ -435,9 +435,15 @@ TEST_F(TestAudioControlCluster, InvokeCommandDefaultCaseReturnsUnsupportedComman
     ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
 
     auto result = cluster.InvokeCommand(invokeRequest, reader, &handler);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_FALSE(result->IsSuccess());
-    EXPECT_EQ(result->GetStatusCode().GetStatus(), Status::UnsupportedCommand);
+    if (result.has_value())
+    {
+        EXPECT_FALSE(result->IsSuccess());
+        EXPECT_EQ(result->GetStatusCode().GetStatus(), Status::UnsupportedCommand);
+    }
+    else
+    {
+        FAIL();
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
