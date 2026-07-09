@@ -27,8 +27,8 @@ namespace app {
 namespace Clusters {
 namespace MediaFileManagement {
 
-using FileDescriptionStruct = Structs::FileDescriptionStruct::Type;
-using AddFileResponseType   = Commands::AddFileResponse::Type;
+using FileDescriptionStruct     = Structs::FileDescriptionStruct::Type;
+using AddFileResponseType       = Commands::AddFileResponse::Type;
 using GetSharedFileResponseType = Commands::GetSharedFileResponse::Type;
 
 class Delegate
@@ -39,19 +39,20 @@ public:
 
     virtual void HandleDeleteFile(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, uint64_t fileID) = 0;
 
-    virtual void HandleRequestSharedFiles(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                          const CharSpan & clientName, uint16_t requestID,
-                                          const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) = 0;
+    virtual void
+    HandleRequestSharedFiles(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const CharSpan & clientName,
+                             uint16_t requestID,
+                             const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) = 0;
 
     virtual void HandleGetSharedFile(CommandResponseHelper<GetSharedFileResponseType> & helper, uint16_t responseID) = 0;
 
     virtual void HandleOfferFile(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const CharSpan & clientName,
                                  const CharSpan & name, uint64_t size, const CharSpan & mimeType, const CharSpan & imageUri) = 0;
 
-    virtual CHIP_ERROR HandleGetAvailableFiles(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR HandleGetAvailableFiles(app::AttributeValueEncoder & aEncoder)     = 0;
     virtual CHIP_ERROR HandleGetSupportedMimeTypes(app::AttributeValueEncoder & aEncoder) = 0;
-    virtual uint64_t HandleGetTotalStorage() = 0;
-    virtual uint64_t HandleGetAvailableStorage() = 0;
+    virtual uint64_t HandleGetTotalStorage()                                              = 0;
+    virtual uint64_t HandleGetAvailableStorage()                                          = 0;
 
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint)      = 0;
     virtual uint16_t GetClusterRevision(chip::EndpointId endpoint) = 0;

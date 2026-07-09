@@ -36,8 +36,7 @@ using Protocols::InteractionModel::Status;
 
 static constexpr size_t kMediaFileManagementDelegateTableSize =
     MATTER_DM_MEDIA_FILE_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-static_assert(kMediaFileManagementDelegateTableSize <= kEmberInvalidEndpointIndex,
-              "MediaFileManagement Delegate table size error");
+static_assert(kMediaFileManagementDelegateTableSize <= kEmberInvalidEndpointIndex, "MediaFileManagement Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
