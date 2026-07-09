@@ -33,3 +33,25 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.cpp"
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.h"
 )
+
+# This is equivalent to BUILD.gn's ota-requestor source set.
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/DefaultOTARequestorEventGenerator.h"
+    "${CLUSTER_DIR}/OTARequestorAttributes.cpp"
+    "${CLUSTER_DIR}/OTARequestorAttributes.h"
+    "${CLUSTER_DIR}/OTARequestorCluster.cpp"
+    "${CLUSTER_DIR}/OTARequestorCluster.h"
+)
+
+# This is equivalent to BUILD.gn's interface source set.
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/OTADownloader.h"
+    "${CLUSTER_DIR}/OTARequestorDriver.h"
+    "${CLUSTER_DIR}/OTARequestorInterface.h"
+    "${CLUSTER_DIR}/OTARequestorStorage.h"
+    "${CLUSTER_DIR}/OTARequestorUserConsentDelegate.h"
+)

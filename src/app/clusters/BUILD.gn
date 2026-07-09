@@ -67,7 +67,6 @@ source_set("clusters") {
     "operational-credentials-server",
     "operational-state-server",
     "ota-provider",
-    "ota-requestor",
     "power-source-server",
     "power-topology-server",
     "pressure-measurement-server",
