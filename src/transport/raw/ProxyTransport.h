@@ -89,7 +89,7 @@ public:
 class DLL_EXPORT ProxyTransportBase : public Base
 {
 public:
-    ProxyTransportBase()          = default;
+    ProxyTransportBase()           = default;
     ~ProxyTransportBase() override = default;
 
     /**
@@ -125,16 +125,17 @@ public:
     void OnProxyMessageReceived(uint16_t sessionId, const uint8_t * data, size_t length);
 
 private:
-    ProxyTransportDelegate * mDelegate  = nullptr;
-    chip::System::Layer *    mSystemLayer = nullptr;
-    uint16_t mSessionId                  = 0;
-    bool     mActive                     = false;
+    ProxyTransportDelegate * mDelegate = nullptr;
+    chip::System::Layer * mSystemLayer = nullptr;
+    uint16_t mSessionId                = 0;
+    bool mActive                       = false;
 };
 
 /** Typed alias to match the BLE/WiFiPAF template pattern. */
 template <size_t /* unused */ = 0>
 class Proxy : public ProxyTransportBase
-{};
+{
+};
 
 } // namespace Transport
 } // namespace chip
