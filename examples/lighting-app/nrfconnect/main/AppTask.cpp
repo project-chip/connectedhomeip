@@ -26,6 +26,7 @@
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -35,7 +36,6 @@
 #include <app/persistence/DeferredAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/InteractionModelEngine.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -306,9 +306,9 @@ CHIP_ERROR AppTask::Init()
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    initParams.dataModelProvider               = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider                = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.dataModelAttributeChangeListener = &GetCustomizedAttributeChangeListener();
-    initParams.testEventTriggerDelegate        = &sTestEventTriggerDelegate;
+    initParams.testEventTriggerDelegate         = &sTestEventTriggerDelegate;
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     // Set up OpenThread configuration when OpenThread is included

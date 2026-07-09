@@ -34,7 +34,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 
-constexpr size_t kTestPathsSize                                        = 10;
+constexpr size_t kTestPathsSize                                    = 10;
 const std::array<ConcreteAttributePath, kTestPathsSize> kTestPaths = {
     ConcreteAttributePath(1, 1, 1),    ConcreteAttributePath(2, 2, 2), ConcreteAttributePath(3, 3, 3),
     ConcreteAttributePath(4, 4, 4),    ConcreteAttributePath(5, 5, 5), ConcreteAttributePath(6, 6, 6),
