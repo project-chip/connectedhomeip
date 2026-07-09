@@ -246,10 +246,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000C" name="IsCommissioningWithoutPower" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
   </attributes>
   <commands>

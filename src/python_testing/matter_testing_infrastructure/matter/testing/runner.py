@@ -25,7 +25,6 @@ import os
 import pathlib
 import re
 import sys
-import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
@@ -249,7 +248,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
 @dataclass
 class TestStep:
-    test_plan_number: typing.Union[int, str]
+    test_plan_number: int | str
     description: str
     expectation: str = ""
     is_commissioning: bool = False

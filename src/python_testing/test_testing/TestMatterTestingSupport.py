@@ -17,7 +17,6 @@
 
 import os
 import time
-import typing
 from datetime import UTC, datetime, timedelta
 
 from mobly import asserts, signals
@@ -67,11 +66,11 @@ def test_type_matching_for_type(test_type, test_nullable: bool = False, test_opt
     vals = get_raw_type_list()
 
     if test_nullable and test_optional:
-        match_type = typing.Union[Nullable, None, test_type]
+        match_type = Nullable | None | test_type
     elif test_nullable:
-        match_type = typing.Union[Nullable, test_type]
+        match_type = Nullable | test_type
     elif test_optional:
-        match_type = typing.Optional[test_type]
+        match_type = test_type | None
     else:
         match_type = test_type
 
