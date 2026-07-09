@@ -72,6 +72,7 @@ source_set("clusters") {
     "power-topology-server",
     "pressure-measurement-server",
     "proximity-ranging-server",
+    "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
     "scenes-server",
