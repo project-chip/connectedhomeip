@@ -18,7 +18,6 @@ cmake_minimum_required(VERSION 3.20)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(REALTEK_COMMON ${CHIP_ROOT}/examples/platform/realtek REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
-get_filename_component(REALTEK_APP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../../../realtek-app REALPATH)
 
 if(EXISTS "${CHIP_ROOT}/src/platform/realtek/zephyr/${BOARD}.overlay")
   set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/realtek/zephyr/${BOARD}.overlay")
@@ -35,36 +34,13 @@ else()
   set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE})
 endif()
 
-# Select configuration file based on board/IC type
-if(BOARD STREQUAL "rtl87x3g_evb")
-    set(CONF_FILE prj_rtl87x3g.conf)
-    get_filename_component(MATTER_VENDOR_DIR ${CHIP_ROOT}/../vendor REALPATH)
-
-    #===========version generation===========
-    include(${REALTEK_APP_DIR}/cmake/version_generate.cmake)
-    generate_version()
-    #===========version generation===========
-
-    #===========post build===========
-    # post build should be called before find_package
-    include(${REALTEK_APP_DIR}/cmake/post_build.cmake)
-    rtk_post_build(APP_NAME chip-realtek-lighting)
-    #===========post build===========
-else()
-    set(CONF_FILE prj.conf)
-endif()
+set(CONF_FILE prj.conf)
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/realtek/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-realtek-lighting-example)
-
-# Move large BSS variables to SRAM to fix DTCM (RAM) overflow
-# This linker script is specific to the rtl87x3g SRAM layout (120KB)
-if(BOARD STREQUAL "rtl87x3g_evb")
-    zephyr_linker_sources(RAM_SECTIONS move_bss_to_sram.ld)
-endif()
 
 include(${CHIP_ROOT}/config/realtek/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
@@ -75,8 +51,9 @@ target_include_directories(app PRIVATE
                            main/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
-                           ${REALTEK_COMMON}/ota
+                           ${REALTEK_COMMON}/bee/ota
                            ${REALTEK_COMMON}/zephyr
+                           ${ZEPHYR_BASE}/../modules/hal/realtek/bee/drivers/wdt/inc
                            ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common)
 
 target_sources(app PRIVATE
@@ -85,15 +62,6 @@ target_sources(app PRIVATE
                main/ZclCallbacks.cpp
                ${REALTEK_COMMON}/zephyr/LEDWidget.cpp
                ${REALTEK_COMMON}/zephyr/matter_button.c)
-
-if(BOARD STREQUAL "rtl87x3g_evb")
-  target_include_directories(app PRIVATE ${MATTER_VENDOR_DIR}/matter_ble)
-  target_sources(app PRIVATE
-                 ${MATTER_VENDOR_DIR}/matter_ble/matter_ble.c
-                 ${MATTER_VENDOR_DIR}/matter_ble/matter_ble_service.c
-                 ${MATTER_VENDOR_DIR}/matter_ble/matter_ble_task.c
-                 ${REALTEK_APP_DIR}/applications/ot-cli/src/alarm.c)
-endif()
 
 target_link_options(app
               PUBLIC
@@ -110,16 +78,12 @@ chip_configure_data_model(app
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
   target_sources(app PRIVATE
-                 ${REALTEK_COMMON}/ota/OTAInitializer.cpp
+                 ${REALTEK_COMMON}/bee/ota/OTAInitializer.cpp
                  ${ZEPHYR_BASE}/../realtek-zephyr-project/applications/matter_common/matter_ota.c)
 endif()
 
-zephyr_compile_options(
-    -Wno-unused-variable
-    -Wno-unused-function
-    -Wno-missing-braces
-    -Wno-parentheses
-)
+# Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70
+add_compile_options(-Wno-error=unused-parameter)
 
 if (CONFIG_CHIP_PW_RPC)
 
@@ -144,7 +108,7 @@ set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRIN
 
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
-add_subdirectory(third_party/connectedhomeip/examples/platform/realtek/pw_sys_io)
+add_subdirectory(third_party/connectedhomeip/examples/platform/realtek/bee/pw_sys_io)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -234,15 +198,15 @@ pw_proto_library(thread_service
 target_sources(app PRIVATE
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/realtek/PigweedLoggerMutex.cpp
-  ${REALTEK_COMMON}/Rpc.cpp
-  ${REALTEK_COMMON}/PigweedLogger.cpp
+  ${REALTEK_COMMON}/bee/Rpc.cpp
+  ${REALTEK_COMMON}/bee/PigweedLogger.cpp
 )
 
 target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
-  ${REALTEK_COMMON}
+  ${REALTEK_COMMON}/bee
   ../../common
   ../../common/pigweed
   ../../common/pigweed/realtek)
