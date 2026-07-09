@@ -117,9 +117,12 @@ class TC_COMPRO_2_5(COMPROBaseTest):
         asserts.assert_greater_equal(original_scan_max_time, 1,
                                      "ScanMaxTime must be >= 1")
 
-        # Step 3 — write ScanMaxTime = original + 1 (clamped to uint8)
+        # Step 3 — write a value different from the original within uint8 range.
+        # original + 1 normally; if already at the 0xFF ceiling use original - 1 so
+        # the written value is genuinely different and the read-back actually proves
+        # the attribute is writable.
         self.step(3)
-        new_scan_max_time = min(original_scan_max_time + 1, 0xFF)
+        new_scan_max_time = original_scan_max_time - 1 if original_scan_max_time >= 0xFF else original_scan_max_time + 1
         logger.info("Writing ScanMaxTime = %d", new_scan_max_time)
         await self.write_single_attribute(
             attribute_value=cp.Attributes.ScanMaxTime(new_scan_max_time),
@@ -153,9 +156,10 @@ class TC_COMPRO_2_5(COMPROBaseTest):
             asserts.assert_greater_equal(original_cache_timeout, 1,
                                          "CacheTimeout must be >= 1")
 
-            # Step 7 — write CacheTimeout = original + 1 (clamped to uint16)
+            # Step 7 — write a value different from the original within uint16 range
+            # (original - 1 when already at the 0xFFFF ceiling, else original + 1).
             self.step(7)
-            new_cache_timeout = min(original_cache_timeout + 1, 0xFFFF)
+            new_cache_timeout = original_cache_timeout - 1 if original_cache_timeout >= 0xFFFF else original_cache_timeout + 1
             logger.info("Writing CacheTimeout = %d", new_cache_timeout)
             await self.write_single_attribute(
                 attribute_value=cp.Attributes.CacheTimeout(new_cache_timeout),

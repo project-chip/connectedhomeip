@@ -71,6 +71,7 @@ from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -134,8 +135,10 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         ed = self._ed_fixture_from_params()
         params = getattr(self, 'user_params', {}) or {}
 
-        # Optional: if the operator knows the ED discriminator, we verify it
-        expected_discriminator = int(params.get('ed_discriminator', 0))
+        # Verify the scan result matches the ED discriminator.  Defaults to 3841
+        # to match EDFixture's default so an ED started via ed_app_path (without an
+        # explicit ed_discriminator) is still validated.
+        expected_discriminator = int(params.get('ed_discriminator', 3841))
         ed_transport = params.get('ed_transport', 'wifipaf')
 
         # Step 1 — commissioning done by framework
@@ -223,14 +226,14 @@ class TC_COMPRO_2_2(COMPROBaseTest):
         # BLE-discovered entries it is null even when the WI feature is on.
         wifipaf_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
         if has_wi and (result.transport & wifipaf_bit):
-            asserts.assert_is_not_none(result.wiFiBand,
-                                       "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
+            asserts.assert_not_equal(result.wiFiBand, NullValue,
+                                     "ScanResultStruct.WiFiBand must be populated for PAFTP results when WI is supported")
 
         # Step 9 — defined but unsupported transport → INVALID_TRANSPORT_TYPE
         # The spec returns INVALID_TRANSPORT_TYPE for defined transport bits not supported
         # by this proxy. Undefined bits return INVALID_COMMAND (reserved-bit check).
-        # Use the first defined transport bit absent from valid_transports; kBle is
-        # always absent since this server never implements BLE scan.
+        # Use the first defined transport bit (kBle/kWiFiPAF) that is absent from
+        # valid_transports; skip the step if the DUT advertises both.
         defined_transports = [
             int(cp.Bitmaps.CapabilitiesBitmap.kBle),
             int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF),

@@ -219,10 +219,21 @@ class TC_COMPRO_2_1(COMPROBaseTest):
         # the following read confirms the stored value is unchanged.
         # ------------------------------------------------------------------
 
-        # Step 11 — Transport: write a different value → UNSUPPORTED_WRITE
+        # Step 11 — Transport: write a different value → UNSUPPORTED_WRITE.
+        # The written value must be a *valid* CapabilitiesBitmap (non-zero, within
+        # the defined-bit mask) that differs from transport_value, so the rejection
+        # is unambiguously UNSUPPORTED_WRITE rather than CONSTRAINT_ERROR (a value of
+        # 0 would violate the min-1 constraint).  Prefer setting an unset defined bit;
+        # if every defined bit is already set, clear the lowest set bit instead.
         self.step(11)
+        valid_mask = self.valid_transport_mask()
+        unset_defined_bits = valid_mask & ~transport
+        if unset_defined_bits:
+            different_transport = transport | (unset_defined_bits & (-unset_defined_bits))
+        else:
+            different_transport = transport & (transport - 1)
         await self.expect_write_rejected(
-            cp.Attributes.Transport(transport ^ int(cp.Bitmaps.CapabilitiesBitmap.kBle)),
+            cp.Attributes.Transport(different_transport),
             "Transport")
 
         # Step 12 — Transport unchanged after the rejected write

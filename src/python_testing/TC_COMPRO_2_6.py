@@ -85,7 +85,9 @@ logger = logging.getLogger(__name__)
 # Timeout for ProxyConnectRequest (seconds)
 CONNECT_TIMEOUT_S = 120
 
-# Minimal 8-byte Matter message used for negative-path ProxyMessageRequest tests.
+# Minimal placeholder message (8 zero bytes) for negative-path ProxyMessageRequest
+# tests.  This is NOT a well-formed Matter frame; it is sufficient only because the
+# DUT rejects the request (UNSUPPORTED_ACCESS / NOT_FOUND / BUSY) before parsing it.
 _MINIMAL_MATTER_MSG = bytes(8)
 
 

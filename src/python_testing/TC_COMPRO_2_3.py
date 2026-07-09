@@ -156,7 +156,7 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         feature_map = await self.read_feature_map()
         if not self.has_feature_bgs(feature_map):
             logger.info("BackgroundScan feature not supported — skipping TC-COMPRO-2.3")
-            self.skip_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
         has_wi = self.has_feature_wi(feature_map)
         ed = self._ed_fixture_from_params()
@@ -297,8 +297,8 @@ class TC_COMPRO_2_3(COMPROBaseTest):
         # null even when the WI feature is supported.
         wifipaf_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
         if has_wi and (result.transport & wifipaf_bit):
-            asserts.assert_is_not_none(result.wiFiBand,
-                                       "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
+            asserts.assert_not_equal(result.wiFiBand, NullValue,
+                                     "CachedResult entry WiFiBand must be populated for PAFTP results when WI is supported")
 
         # Step 10 — read CacheTimeout
         self.step(10)

@@ -141,8 +141,10 @@ CONNECT_TIMEOUT_S = 120
 # ED_NODE_ID + iteration_index to avoid fabric storage collisions.
 ED_NODE_ID = 0x1001
 
-# Minimal Matter MRP message header bytes (8 zero bytes) used for the
-# ResponseTimeout=0 and non-existent-session negative tests.
+# Minimal placeholder message (8 zero bytes) for the ResponseTimeout=0 and
+# non-existent-session negative tests.  This is NOT a well-formed Matter frame;
+# it is sufficient only because the DUT either does not wait for a reply
+# (ResponseTimeout=0) or rejects the request (NOT_FOUND) before parsing it.
 _MINIMAL_MATTER_MSG = bytes(8)
 
 
