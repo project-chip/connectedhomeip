@@ -50,7 +50,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>

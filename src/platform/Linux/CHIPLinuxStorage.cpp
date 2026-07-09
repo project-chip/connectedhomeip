@@ -41,20 +41,6 @@
 
 namespace chip {
 namespace DeviceLayer {
-
-// Implementation of ChipLinuxStoragePaths functions
-
-ChipLinuxStoragePaths & GetStoragePaths()
-{
-    static ChipLinuxStoragePaths sInstance;
-    return sInstance;
-}
-
-void SetStoragePaths(const ChipLinuxStoragePaths & paths)
-{
-    GetStoragePaths() = paths;
-}
-
 namespace Internal {
 
 // Implementation of ChipLinuxStorage class

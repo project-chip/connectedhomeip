@@ -23,7 +23,7 @@
 
 #include "Options.h"
 
-#include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
