@@ -461,9 +461,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
-
-
-
 class FactoryResetType(enum.Enum):
     """Type of factory reset to perform."""
     AppOnly = 0
