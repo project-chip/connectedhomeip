@@ -504,25 +504,25 @@ bool ServiceAreaCluster::IsValidSupportedArea(const AreaStructureWrapper & aArea
 
 bool ServiceAreaCluster::IsUniqueSupportedArea(const AreaStructureWrapper & aArea, bool ignoreAreaId)
 {
-    BitMask<AreaStructureWrapper::IsEqualConfig> config;
-
-    if (ignoreAreaId)
-    {
-        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreAreaID);
-    }
-
-    // If the SupportedMaps attribute is not null, each entry in this list SHALL have a unique value for the combination of the
-    // MapID and LocationInfo fields. If the SupportedMaps attribute is null, each entry in this list SHALL have a unique value for
-    // the LocationInfo field.
-    if (GetNumberOfSupportedMaps() == 0)
-    {
-        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreMapId);
-    }
-
-    uint8_t locationIndex = 0;
+    uint32_t locationIndex = 0;
     AreaStructureWrapper entry;
     while (GetSupportedAreaByIndex(locationIndex++, entry))
     {
+        if (!ignoreAreaId && (aArea.areaID == entry.areaID))
+        {
+            return false;
+        }
+
+        // If the SupportedMaps attribute is not empty, each entry in this list SHALL have a unique value for the combination of
+        // the MapID and AreaInfo fields. If the SupportedMaps attribute is empty, each entry in this list SHALL have a unique
+        // value for the AreaInfo field.
+        BitMask<AreaStructureWrapper::IsEqualConfig> config;
+        config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreAreaID);
+        if (GetNumberOfSupportedMaps() == 0)
+        {
+            config.Set(AreaStructureWrapper::IsEqualConfig::kIgnoreMapId);
+        }
+
         if (aArea.IsEqual(entry, config))
         {
             return false;
@@ -627,7 +627,7 @@ void ServiceAreaCluster::HandleSupportedAreasUpdated()
 
         while (mStorageDelegate.GetProgressElementByIndex(i, tempProgressElement))
         {
-            if (mStorageDelegate.IsSupportedArea(tempProgressElement.areaID))
+            if (!mStorageDelegate.IsSupportedArea(tempProgressElement.areaID))
             {
                 progressToRemoveSpan[progressToRemoveIndex] = tempProgressElement.areaID;
                 progressToRemoveIndex++;
@@ -890,12 +890,7 @@ bool ServiceAreaCluster::RenameSupportedMap(uint32_t aMapId, const CharSpan & ne
 
     while (GetSupportedMapByIndex(loopIndex, entry))
     {
-        if (modifiedIndex == loopIndex)
-        {
-            continue; // don't check local modified map against its own list entry
-        }
-
-        if (entry.IsNameEqual(newMapName))
+        if (modifiedIndex != loopIndex && entry.IsNameEqual(newMapName))
         {
             ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%s'", aMapId,
                          NullTerminated(entry.GetName()).c_str());
@@ -1198,7 +1193,7 @@ bool ServiceAreaCluster::SetProgressStatus(uint32_t aAreaId, OperationalStatusEn
     // TotalOperationalTime SHALL be null if the Status field is not set to Completed or Skipped.
     if ((opStatus != OperationalStatusEnum::kCompleted) && (opStatus != OperationalStatusEnum::kSkipped))
     {
-        progressElement.totalOperationalTime.Emplace(DataModel::NullNullable);
+        progressElement.totalOperationalTime.ClearValue();
     }
 
     // add the updated element to the progress attribute
@@ -1230,8 +1225,8 @@ bool ServiceAreaCluster::SetProgressTotalOperationalTime(uint32_t aAreaId,
     }
 
     // This attribute SHALL be null if the Status field is not set to Completed or Skipped
-    if (((progressElement.status == OperationalStatusEnum::kCompleted) ||
-         (progressElement.status == OperationalStatusEnum::kSkipped)) &&
+    if ((progressElement.status != OperationalStatusEnum::kCompleted &&
+         progressElement.status != OperationalStatusEnum::kSkipped) &&
         !aTotalOperationalTime.IsNull())
     {
         ChipLogError(Zcl,
