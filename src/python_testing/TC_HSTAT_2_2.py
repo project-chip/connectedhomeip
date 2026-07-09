@@ -42,10 +42,10 @@ from itertools import count
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.interaction_model import InteractionModelError, Status
 
 log = logging.getLogger(__name__)
 
