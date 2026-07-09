@@ -25,7 +25,9 @@ extern "C" {
 #include "sl_wifi.h"
 }
 
-sl_wifi_device_configuration_t SLNetGetDefaultDeviceConfiguration(void)
+namespace {
+
+sl_wifi_device_configuration_t GetDefaultDeviceConfiguration(void)
 {
     return { .boot_option = LOAD_NWP_FW,
              .mac_address = nullptr,
@@ -46,7 +48,7 @@ sl_wifi_device_configuration_t SLNetGetDefaultDeviceConfiguration(void)
                               .config_feature_bit_map     = SL_SI91X_ENABLE_ENHANCED_MAX_PSP } };
 }
 
-void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
+void SLApplyWiFiDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
 {
     VerifyOrReturn(configuration != nullptr);
 #ifndef SLI_SI91X_MCU_INTERFACE
@@ -63,10 +65,9 @@ void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configurati
 #endif // RSI_PROCESS_MAX_RX_DATA
 }
 
-void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
-{
 #if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
-
+void SLApplyBLEDeviceConfiguration(sl_wifi_device_configuration_t * configuration)
+{
     VerifyOrReturn(configuration != nullptr);
     configuration->boot_config.coex_mode = SL_SI91X_WLAN_BLE_MODE;
     configuration->boot_config.ext_custom_feature_bit_map |= SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE;
@@ -82,6 +83,17 @@ void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuratio
         );
     configuration->boot_config.ble_ext_feature_bit_map =
         (SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS) | SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES));
-
+}
 #endif // SLI_SI91X_ENABLE_BLE
+
+} // namespace
+
+sl_wifi_device_configuration_t SLNetGetDeviceConfig(void)
+{
+    sl_wifi_device_configuration_t deviceConfiguration = GetDefaultDeviceConfiguration();
+    SLApplyWiFiDeviceConfiguration(&deviceConfiguration);
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+    SLApplyBLEDeviceConfiguration(&deviceConfiguration);
+#endif // SLI_SI91X_ENABLE_BLE
+    return deviceConfiguration;
 }

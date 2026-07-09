@@ -512,9 +512,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // The device configuration must be fully built before sl_net_init, which consumes it.
-    sl_wifi_device_configuration_t deviceConfiguration = SLNetGetDefaultDeviceConfiguration();
-    SLWiFiApplyDeviceConfiguration(&deviceConfiguration);
-    SLBLEApplyDeviceConfiguration(&deviceConfiguration);
+    sl_wifi_device_configuration_t deviceConfiguration = SLNetGetDeviceConfig();
 
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &deviceConfiguration, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));

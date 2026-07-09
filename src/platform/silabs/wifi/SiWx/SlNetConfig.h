@@ -18,12 +18,6 @@
 /**
  * @file SlNetConfig.h
  * @brief Matter SiWx Wi-Fi device configuration.
- *
- * Configuration is built from a default value, then optional parameters are applied:
- *
- *   config = SLNetGetDefaultDeviceConfiguration();
- *   SLWiFiApplyDeviceConfiguration(&config);
- *   SLBLEApplyDeviceConfiguration(&config);
  */
 
 #pragma once
@@ -58,36 +52,14 @@ extern "C" {
 #endif
 
 /**
- * @brief Returns the default SiWx Wi-Fi device configuration.
+ * @brief Returns the SiWx Wi-Fi device configuration for the active build.
  *
- * Provides the base @c sl_wifi_device_configuration_t used to bring up the device. The returned
- * configuration is the starting point that the @c SLWiFiApplyDeviceConfiguration and
- * @c SLBLEApplyDeviceConfiguration functions further customize for the active build options.
+ * Builds the full @c sl_wifi_device_configuration_t used to bring up the device, including
+ * Wi-Fi options (NCP GPIO handshake, IPv6, max RX length) and BLE coexistence when enabled.
  *
- * @return sl_wifi_device_configuration_t The default device configuration by value.
+ * @return sl_wifi_device_configuration_t The device configuration by value.
  */
-sl_wifi_device_configuration_t SLNetGetDefaultDeviceConfiguration(void);
-
-/**
- * @brief Applies the optional Wi-Fi configuration on top of the default configuration.
- *
- * Updates the boot configuration bitmaps for build-time options that are not part of the default
- * configuration (e.g. NCP ULP GPIO handshake and IPv6 support). Safe to call once on a configuration
- * obtained from @c SLNetGetDefaultDeviceConfiguration.
- *
- * @param[in,out] configuration Configuration to update in place. No-op if @c nullptr.
- */
-void SLWiFiApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
-
-/**
- * @brief Applies the BLE coexistence configuration on top of the default configuration.
- *
- * Enables WLAN/BLE coexistence and populates the BLE feature bitmaps from the @c RSI_BLE_* build
- * options. Only available when BLE is enabled (@c SLI_SI91X_ENABLE_BLE).
- *
- * @param[in,out] configuration Configuration to update in place. No-op if @c nullptr.
- */
-void SLBLEApplyDeviceConfiguration(sl_wifi_device_configuration_t * configuration);
+sl_wifi_device_configuration_t SLNetGetDeviceConfig(void);
 
 #ifdef __cplusplus
 }
