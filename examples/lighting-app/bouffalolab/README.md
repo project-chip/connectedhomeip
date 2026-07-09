@@ -82,7 +82,7 @@ BL616 / BL616CL
 │   └── Ethernet         ->  Matter over IP (TCP/UDP)
 ├── BLE                  ->  BLE commissioning (PASE over BLE)
 └── Application
-    ├── BOOT_PIN_RESET   (GPIO 2 on BL616DK, GPIO 38 on BL616CL)
+    ├── BOOT_PIN_RESET   (GPIO 2 on BL616DK, GPIO 36 on BL616CL)
     ├── LED_B_PIN        (GPIO 0)  - blue PWM channel
     ├── LED_R_PIN        (GPIO 1)  - red PWM channel
     └── LED_G_PIN        (GPIO 30) - green PWM channel

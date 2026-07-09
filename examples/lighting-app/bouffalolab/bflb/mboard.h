@@ -27,7 +27,7 @@
 #define CHIP_UART_RX_BUFFSIZE 256
 
 #if defined(BL616CL)
-#define BOOT_PIN_RESET 38
+#define BOOT_PIN_RESET 36
 #elif defined(BL616)
 #define BOOT_PIN_RESET 2
 #endif
