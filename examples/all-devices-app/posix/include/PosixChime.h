@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <device/types/chime/Chime.h>
 #include <PosixAudioManager.h>
+#include <device/types/chime/Chime.h>
 
 namespace chip {
 namespace app {

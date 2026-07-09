@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <device/types/speaker/Speaker.h>
 #include <PosixAudioManager.h>
+#include <device/types/speaker/Speaker.h>
 
 namespace chip {
 namespace app {
