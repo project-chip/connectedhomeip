@@ -17,12 +17,24 @@
  */
 
 #include "clusters/identify/identify-manager.h"
+
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CHIPLogging.h>
 #include <platform/DefaultTimerDelegate.h>
 
 using namespace chip::app;
 
 namespace {
+
+class IdentifyDelegateImpl : public Clusters::IdentifyDelegate
+{
+public:
+    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override { ChipLogProgress(Camera, "OnIdentifyStart"); }
+    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override { ChipLogProgress(Camera, "OnIdentifyStop"); }
+    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override {}
+    bool IsTriggerEffectEnabled() const override { return false; }
+};
 
 DefaultTimerDelegate sTimerDelegate;
 IdentifyDelegateImpl sIdentifyDelegate;
