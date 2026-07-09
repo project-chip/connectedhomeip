@@ -394,7 +394,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)
 
     def get_ota_image_software_version(self, ota_image_path: str) -> int:
-        # Format values  from src/app/ota_image_tool.py
+        """Parse the OTA image header and return the embedded software version.
+
+        Args:
+            ota_image_path (str): Path to the OTA image file to parse.
+
+        Returns:
+            int: Software version read from the OTA image header (TLV context tag 2).
+        """
+        # Format values taken from src/app/ota_image_tool.py
         FIXED_HEADER_FORMAT = '<IQI'
         HEADER_MAGIC = 0x1BEEF11E
         header_tlv = None
@@ -416,8 +424,19 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         return version
 
     async def check_ota_image_version(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, ota_image_path: str) -> int:
-        """Verify the ota image version from the header and compare against the DUT version, confirm we can proceed with the Software Update.
-        If sucessfull return the software version to update.
+        """Verify the OTA image version against the DUT's current software version.
+
+        Reads the software version from the OTA image header and compares it to the
+        SoftwareVersion attribute reported by the DUT, confirming the update can proceed.
+        Fails the test if the OTA image version is not greater than the DUT's current version.
+
+        Args:
+            controller (ChipDeviceCtrl): Controller used to read the DUT's SoftwareVersion attribute.
+            requestor_node_id (int): Node ID of the requestor (DUT) to check the version against.
+            ota_image_path (str): Path to the OTA image file to verify.
+
+        Returns:
+            int: Software version contained in the OTA image, to use as the target update version.
         """
 
         ota_version = self.get_ota_image_software_version(ota_image_path=ota_image_path)
