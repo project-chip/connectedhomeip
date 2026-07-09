@@ -22,19 +22,47 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 
 
 class FakeMdnsDiscovery(MdnsDiscovery):
-    def __init__(self, service_types: list[str], commissionable_services: list[SimpleNamespace]):
+    def __init__(
+        self,
+        service_types: list[str],
+        commissionable_services: list[SimpleNamespace],
+        advertised_subtypes: list[str],
+    ):
         self.service_types = service_types
         self.commissionable_services = commissionable_services
+        self.advertised_subtypes = advertised_subtypes
+        self.ptr_record_queries: list[list[str]] = []
 
-    async def get_all_service_types(self, log_output: bool = False, discovery_timeout_sec: float = 15) -> list[str]:
+    async def get_all_service_types(
+        self,
+        log_output: bool = False,
+        discovery_timeout_sec: float = 15,
+    ) -> list[str]:
         return self.service_types
 
-    async def get_commissionable_services(self, log_output: bool = False, discovery_timeout_sec: float = 15) -> list[SimpleNamespace]:
+    async def get_commissionable_services(
+        self,
+        log_output: bool = False,
+        discovery_timeout_sec: float = 15,
+    ) -> list[SimpleNamespace]:
         return self.commissionable_services
+
+    async def get_ptr_records(
+        self,
+        service_types: list[str],
+        discovery_timeout_sec: float = 15,
+        log_output: bool = False,
+    ) -> list[SimpleNamespace]:
+        self.ptr_record_queries.append(service_types)
+        return [
+            SimpleNamespace(service_type=service_type)
+            for service_type in service_types
+            if service_type in self.advertised_subtypes
+        ]
 
 
 class TestGetCommissionableSubtypes(unittest.IsolatedAsyncioTestCase):
-    async def test_derives_subtypes_when_service_type_enumeration_omits_them(self):
+    async def test_verifies_txt_derived_subtypes_with_ptr_browse(self):
         commissionable_type = MdnsServiceType.COMMISSIONABLE.value
         service_info = SimpleNamespace(
             service_type=commissionable_type,
@@ -46,10 +74,17 @@ class TestGetCommissionableSubtypes(unittest.IsolatedAsyncioTestCase):
             }
         )
 
-        subtypes = await FakeMdnsDiscovery(
+        discovery = FakeMdnsDiscovery(
             service_types=[commissionable_type],
             commissionable_services=[service_info],
-        ).get_commissionable_subtypes()
+            advertised_subtypes=[
+                f"_L3840._sub.{commissionable_type}",
+                f"_S15._sub.{commissionable_type}",
+                f"_CM._sub.{commissionable_type}",
+            ],
+        )
+
+        subtypes = await discovery.get_commissionable_subtypes()
 
         self.assertEqual(
             subtypes,
@@ -57,9 +92,17 @@ class TestGetCommissionableSubtypes(unittest.IsolatedAsyncioTestCase):
                 f"_L3840._sub.{commissionable_type}",
                 f"_S15._sub.{commissionable_type}",
                 f"_CM._sub.{commissionable_type}",
+            ]
+        )
+        self.assertEqual(
+            discovery.ptr_record_queries,
+            [[
+                f"_L3840._sub.{commissionable_type}",
+                f"_S15._sub.{commissionable_type}",
+                f"_CM._sub.{commissionable_type}",
                 f"_V65521._sub.{commissionable_type}",
                 f"_T10._sub.{commissionable_type}",
-            ]
+            ]]
         )
 
     async def test_merges_enumerated_and_discovered_subtypes_without_duplicates(self):
@@ -69,14 +112,17 @@ class TestGetCommissionableSubtypes(unittest.IsolatedAsyncioTestCase):
             txt={'D': '15', 'CM': '0'}
         )
 
-        subtypes = await FakeMdnsDiscovery(
+        discovery = FakeMdnsDiscovery(
             service_types=[
                 commissionable_type,
                 f"_L15._sub.{commissionable_type}",
                 f"_S0._sub.{commissionable_type}",
             ],
             commissionable_services=[service_info],
-        ).get_commissionable_subtypes()
+            advertised_subtypes=[],
+        )
+
+        subtypes = await discovery.get_commissionable_subtypes()
 
         self.assertEqual(
             subtypes,
@@ -85,6 +131,7 @@ class TestGetCommissionableSubtypes(unittest.IsolatedAsyncioTestCase):
                 f"_S0._sub.{commissionable_type}",
             ]
         )
+        self.assertEqual(discovery.ptr_record_queries, [])
 
 
 if __name__ == '__main__':

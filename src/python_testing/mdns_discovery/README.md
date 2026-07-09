@@ -217,9 +217,14 @@ get_commissionable_subtypes()
         ▼
    get_commissionable_services()
         │
-        └── discovers commissionable service PTR and TXT data
+        └── discovers commissionable service TXT data
         ▼
-filters and derives commissionable service subtypes
+derives candidate commissionable service subtypes
+        │
+        ▼
+   get_ptr_records()
+        │
+        └── verifies candidate subtypes with direct PTR browses
         ▼
 returns List[str]
 ```

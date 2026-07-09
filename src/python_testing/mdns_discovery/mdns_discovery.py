@@ -410,10 +410,15 @@ class MdnsDiscovery:
             list[str]: A list of strings representing the discovered commissionable mDNS service subtypes.
         """
         sub_types: list[str] = []
+        candidate_subtypes: list[str] = []
 
         def add_subtype(subtype: str) -> None:
             if subtype and subtype not in sub_types:
                 sub_types.append(subtype)
+
+        def add_candidate_subtype(subtype: str) -> None:
+            if subtype and subtype not in sub_types and subtype not in candidate_subtypes:
+                candidate_subtypes.append(subtype)
 
         commissionable_type = MdnsServiceType.COMMISSIONABLE.value
 
@@ -429,8 +434,9 @@ class MdnsDiscovery:
                 add_subtype(service_type)
 
         # Subtypes are not required to be returned by DNS-SD service type
-        # enumeration. Browse commissionable services and derive the subtype
-        # browse names from the advertised service type and TXT data.
+        # enumeration. Browse commissionable services and derive candidate
+        # subtype browse names from TXT data, then verify those candidates with
+        # direct PTR browses before returning them.
         commissionable_services = await self.get_commissionable_services(
             discovery_timeout_sec=discovery_timeout_sec,
             log_output=False
@@ -445,24 +451,33 @@ class MdnsDiscovery:
 
             discriminator = txt.get('D')
             if discriminator:
-                add_subtype(f"_L{discriminator}._sub.{commissionable_type}")
+                add_candidate_subtype(f"_L{discriminator}._sub.{commissionable_type}")
                 with suppress(ValueError):
-                    add_subtype(f"_S{(int(discriminator) >> 8) & 0x0F}._sub.{commissionable_type}")
+                    add_candidate_subtype(f"_S{(int(discriminator) >> 8) & 0x0F}._sub.{commissionable_type}")
 
             cm = txt.get('CM')
             if cm:
                 with suppress(ValueError):
                     if int(cm) != 0:
-                        add_subtype(f"_CM._sub.{commissionable_type}")
+                        add_candidate_subtype(f"_CM._sub.{commissionable_type}")
 
             vendor_and_product = txt.get('VP')
             if vendor_and_product:
                 vendor_id = vendor_and_product.split('+', 1)[0]
-                add_subtype(f"_V{vendor_id}._sub.{commissionable_type}")
+                add_candidate_subtype(f"_V{vendor_id}._sub.{commissionable_type}")
 
             device_type = txt.get('DT')
             if device_type:
-                add_subtype(f"_T{device_type}._sub.{commissionable_type}")
+                add_candidate_subtype(f"_T{device_type}._sub.{commissionable_type}")
+
+        if candidate_subtypes:
+            ptr_records = await self.get_ptr_records(
+                service_types=candidate_subtypes,
+                discovery_timeout_sec=discovery_timeout_sec,
+                log_output=False,
+            )
+            for ptr_record in ptr_records:
+                add_subtype(ptr_record.service_type)
 
         if log_output:
             log.info(
