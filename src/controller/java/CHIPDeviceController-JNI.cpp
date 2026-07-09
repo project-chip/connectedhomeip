@@ -565,6 +565,7 @@ JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, job
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(maxBDXBlockSize >= 1 && maxBDXBlockSize <= 65535, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogProgress(Controller, "startOTAProvider() called");
     err = wrapper->StartOTAProvider(otaProviderDelegate, static_cast<uint16_t>(maxBDXBlockSize));
