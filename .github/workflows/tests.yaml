@@ -1329,7 +1329,7 @@ jobs:
                 gh_pages: gh-pages
                 allure_history: allure-history
                 subfolder: allure-report/ci_tests
-                keep_reports: 100
+                keep_reports: 200
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
 
