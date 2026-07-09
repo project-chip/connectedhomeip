@@ -1013,7 +1013,8 @@ async def test_TC_OPCREDS_3_8(self):
 
 This verification is enabled by default for DUT tests that do not explicitly
 disable it. Framework tests under `src/python_testing/test_testing/` skip it by
-default (see [When the background subscription runs](#when-the-background-subscription-runs)).
+default (see
+[When the background subscription runs](#when-the-background-subscription-runs)).
 
 ### Overview
 
@@ -1047,15 +1048,15 @@ location**, not by a per-class flag. This is computed by
     device **and** rely on the subscription-cache verification opt back in by
     being listed in `_WILDCARD_SUBSCRIPTION_ENABLED` in `matter_testing.py`.
 
-This replaces the former per-class `requires_dut = False` opt-out flag. That flag
-only ever suppressed the background subscription (it was not a "this test has no
-DUT" signal — several `test_testing/` tests exercise a real app yet still skip
-the subscription), so the decision now lives with the framework and is keyed off
-location. The `_WILDCARD_SUBSCRIPTION_ENABLED` allowlist is maintained by hand
-because there is no reliable static signal that separates "runs against a device"
-from "wants the subscription"; add a `test_testing/` entry there only when a test
-uses the real runner (not `MockTestRunner`) against a device and needs the
-subscription verification.
+This replaces the former per-class `requires_dut = False` opt-out flag. That
+flag only ever suppressed the background subscription (it was not a "this test
+has no DUT" signal — several `test_testing/` tests exercise a real app yet still
+skip the subscription), so the decision now lives with the framework and is
+keyed off location. The `_WILDCARD_SUBSCRIPTION_ENABLED` allowlist is maintained
+by hand because there is no reliable static signal that separates "runs against
+a device" from "wants the subscription"; add a `test_testing/` entry there only
+when a test uses the real runner (not `MockTestRunner`) against a device and
+needs the subscription verification.
 
 To skip the subscription for a DUT test that lives outside `test_testing/`, use
 `disable_wildcard_subscription` / `--no-wildcard-subscription` (see
@@ -1067,11 +1068,11 @@ At certification, the DUT is generally **not** factory-reset between test runs,
 so any DUT state a test mutates must be restored by the framework rather than by
 a reset. The subscription path is designed for this:
 
--   The subscription's own ACL mutation is per-test and self-cleaning: before the
-    subscription starts, the framework snapshots the DUT ACL and appends the
+-   The subscription's own ACL mutation is per-test and self-cleaning: before
+    the subscription starts, the framework snapshots the DUT ACL and appends the
     subscription controller's administer entry; `teardown_test` restores that
-    snapshot. Consecutive tests against an un-reset device therefore each see the
-    same baseline ACL (see [ACL handling](#acl-handling)).
+    snapshot. Consecutive tests against an un-reset device therefore each see
+    the same baseline ACL (see [ACL handling](#acl-handling)).
 -   Framework tests take the non-subscription path by location and never touch
     DUT state, so they cannot perturb a shared device even when interleaved with
     DUT tests.

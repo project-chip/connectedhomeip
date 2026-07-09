@@ -502,8 +502,8 @@ _TEST_TESTING_DIR = "test_testing"
 
 # The tests below are the exception: they run through the real runner against a device and
 # rely on the subscription-cache verification, so they opt back in. (Note: this is purely
-# about the subscription.) There is no static signal that distinguishes "runs against a device" 
-# from "wants the subscription", so this list is maintained by hand: add a test_testing/ file here 
+# about the subscription.) There is no static signal that distinguishes "runs against a device"
+# from "wants the subscription", so this list is maintained by hand: add a test_testing/ file here
 # only if it runs through the real runner (not MockTestRunner) against a device AND needs the subscription-cache verification.
 _WILDCARD_SUBSCRIPTION_ENABLED: frozenset[str] = frozenset({
     "TestCleanupFramework.py",
@@ -513,6 +513,7 @@ _WILDCARD_SUBSCRIPTION_ENABLED: frozenset[str] = frozenset({
     "TestMatterDeviceGraph.py",
     "test_manufacturer_specific_cluster.py",
 })
+
 
 class MatterBaseTest(base_test.BaseTestClass):
     """Base class for Matter Python tests.
@@ -1485,10 +1486,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             # class (e.g. tests that directly manipulate the ACL or count the TH entries), or
             # unless the test's location opts it out (see below).
             #
-            # _wildcard_subscription_enabled_by_location() allows framework/parser unit tests 
-            # under test_testing/ default to skip the subscription so they don't subscribe 
-            # to a device that isn't there, while the real-DUT integration tests that also live there 
-            # are allowlisted. Keeping this decoupled from --commissioning-method avoids coupling to 
+            # _wildcard_subscription_enabled_by_location() allows framework/parser unit tests
+            # under test_testing/ default to skip the subscription so they don't subscribe
+            # to a device that isn't there, while the real-DUT integration tests that also live there
+            # are allowlisted. Keeping this decoupled from --commissioning-method avoids coupling to
             # harness CLI flags whose semantics may shift at certification time.
             if not self._wildcard_subscription_disabled() and self._wildcard_subscription_enabled_by_location():
                 self._start_wildcard_subscription()
