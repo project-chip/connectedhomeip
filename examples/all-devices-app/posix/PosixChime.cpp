@@ -56,7 +56,12 @@ Protocols::InteractionModel::Status PosixChime::PlayChimeSound(uint8_t chimeID)
     {
         return status;
     }
-    mAudioManager.PlaySound(chimeID);
+    CHIP_ERROR err = mAudioManager.PlaySound(chimeID);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "PosixChime: Failed to play sound: %" CHIP_ERROR_FORMAT, err.Format());
+        return Protocols::InteractionModel::Status::Failure;
+    }
     return Protocols::InteractionModel::Status::Success;
 }
 
