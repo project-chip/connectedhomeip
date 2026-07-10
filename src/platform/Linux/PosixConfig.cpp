@@ -39,6 +39,12 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+// Implementation of PosixConfig::Key operator==
+bool PosixConfig::Key::operator==(const Key & other) const
+{
+    return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
+}
+
 static ChipLinuxStorage gChipLinuxDataStorage;
 static ChipLinuxStorage gChipLinuxFactoryStorage;
 static ChipLinuxStorage gChipLinuxConfigStorage;

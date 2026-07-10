@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <cstring>
 #include <inttypes.h>
 
 #include <lib/core/CHIPError.h>
@@ -123,11 +122,6 @@ struct PosixConfig::Key
 
     bool operator==(const Key & other) const;
 };
-
-inline bool PosixConfig::Key::operator==(const Key & other) const
-{
-    return strcmp(Namespace, other.Namespace) == 0 && strcmp(Name, other.Name) == 0;
-}
 
 } // namespace Internal
 } // namespace DeviceLayer
