@@ -23,9 +23,7 @@
 
 #include "Options.h"
 
-#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
 #include <platform/Linux/CHIPLinuxStoragePaths.h>
-#endif
 
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -1102,7 +1100,7 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
+#ifdef CHIP_CONFIG_KVS_PATH
     // Apply KVS paths to the platform layer after parsing
     auto & options = LinuxDeviceOptions::GetInstance();
     chip::DeviceLayer::ChipLinuxStoragePaths paths;
@@ -1132,7 +1130,7 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     }
 
     chip::DeviceLayer::SetStoragePaths(paths);
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
+#endif // CHIP_CONFIG_KVS_PATH
 
     return CHIP_NO_ERROR;
 }

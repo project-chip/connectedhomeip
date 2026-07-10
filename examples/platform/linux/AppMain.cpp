@@ -616,13 +616,13 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
-#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
+#ifdef CHIP_CONFIG_KVS_PATH
     // KVS paths are already set by ParseArguments() via SetStoragePaths()
     {
         std::string kvsPath = chip::DeviceLayer::GetStoragePaths().GetKVSDataFilePath();
         ChipLogProgress(NotSpecified, "KVS data file: %s", kvsPath.empty() ? "(default)" : kvsPath.c_str());
     }
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
+#endif // CHIP_CONFIG_KVS_PATH
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread
