@@ -551,14 +551,13 @@ def check_mergeable(context: PRContext) -> CheckResult:
     mergeable = context.mergeable
     if mergeable is True:
         return CheckResult(passed=True)
-    elif mergeable is False:
+    if mergeable is False:
         return CheckResult(passed=False, message="PR has merge conflicts.")
-    else:
-        return CheckResult(
-            passed=False,
-            message="Mergeability state is computing on GitHub.",
-            details={"computing": True},
-        )
+    return CheckResult(
+        passed=False,
+        message="Mergeability state is computing on GitHub.",
+        details={"computing": True},
+    )
 
 
 def check_platform_approvals(context: PRContext) -> CheckResult:
