@@ -360,7 +360,7 @@ void AppTask::DMThermostatClusterInit(chip::EndpointId endpoint)
 }
 
 // emberAfThermostatClusterInitCallback — weak ZAP entry point. CRTP forwarder into AppTask.
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+void emberAfThermostatClusterInitCallback(chip::EndpointId endpoint)
 {
     CustomerAppTask::GetAppTask().DMThermostatClusterInit(endpoint);
 }
