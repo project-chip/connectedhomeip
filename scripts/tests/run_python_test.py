@@ -187,7 +187,7 @@ class IpPacketCaptureManager:
 
 def run_timeout(run: Metadata) -> float:
     script_timeout = None
-    
+
     if run.script_args is not None:
         p = matter_test_args_parser()
         (args, _) = p.parse_known_args(shlex.split(run.script_args))
@@ -195,13 +195,14 @@ def run_timeout(run: Metadata) -> float:
 
     if run.timeout is not None and script_timeout is not None:
         if run.timeout < script_timeout:
-            log.warning(f"Framework timeout for run '{run.run}' ({run_timeout} s) will expire earlier than script timeout ({script_timeout} s)")
+            log.warning("Run timeout for run '%s' (%f s) will expire earlier than script timeout (%d s)",
+                        run.run, run.timeout, script_timeout)
 
     if run.timeout is not None:
         return run.timeout
     if script_timeout is not None:
         return script_timeout + TestingDefaults.TEST_RUNNER_SLACK_S
-    
+
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
