@@ -130,6 +130,7 @@ class VMFreezeWatchdog(threading.Thread):
     with the monotonic clock. If the monotonic clock jumps or the wall clock drifts
     significantly more than the monotonic clock, it flags a potential VM freeze.
     """
+
     def __init__(self, check_interval_sec=2.0, threshold_sec=5.0):
         """
         Args:
@@ -149,18 +150,18 @@ class VMFreezeWatchdog(threading.Thread):
     def run(self):
         while not self._stop_event.is_set():
             time.sleep(self.check_interval_sec)
-            
+
             curr_wall = time.time()
             curr_mono = time.monotonic()
-            
+
             with self._lock:
                 wall_delta = curr_wall - self.last_wall
                 mono_delta = curr_mono - self.last_mono
-                
+
                 mono_jump = mono_delta > (self.check_interval_sec + self.threshold_sec)
                 drift = wall_delta - mono_delta
                 wall_drift = drift > self.threshold_sec
-                
+
                 if mono_jump or wall_drift:
                     self._freeze_detected = True
                     log.warning(
@@ -168,7 +169,7 @@ class VMFreezeWatchdog(threading.Thread):
                         f"Mono jump: {mono_jump} (delta: {mono_delta:.2f}s), "
                         f"Wall drift: {wall_drift} (drift: {drift:.2f}s)"
                     )
-                
+
                 self.last_wall = curr_wall
                 self.last_mono = curr_mono
 
