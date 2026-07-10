@@ -636,10 +636,11 @@ def action_post_platform_eligibility(context: PRContext) -> None:
 
     active_groups = context.active_groups
     missing_approvals = context.missing_approvals
-    unresolved_threads = context.unresolved_threads
+    comments_skipped = ValidationCheck.COMMENTS in context.skip_checks
+    unresolved_threads = [] if comments_skipped else context.unresolved_threads
 
     ci_skipped = ValidationCheck.CI in context.skip_checks
-    ci_passed = context.ci_passed
+    ci_passed = False if ci_skipped else context.ci_passed
     mergeable = context.mergeable
 
     for group_name, files in active_groups.items():
@@ -750,10 +751,10 @@ def action_post_platform_eligibility(context: PRContext) -> None:
 PLATFORM_MERGE_WORKFLOW = Workflow(
     name="platform_merge",
     gates=[
-        Gate(gate_no_change_requests),
         Gate(gate_no_uncovered_files, on_fail=action_remove_eligibility_comment),
         Gate(gate_has_active_groups, on_fail=action_remove_eligibility_comment),
         Gate(gate_pullapprove_pending, on_fail=action_remove_eligibility_comment),
+        Gate(gate_no_change_requests),
     ],
     checks=[
         check_ci,
