@@ -666,7 +666,7 @@ esp32:
         reviews = [self.create_mock_review("doru91", "APPROVED")]
         mock_comment = MagicMock()
         mock_comment.user.login = "pr-checker-bot"
-        mock_comment.body = "<!-- pr-checker-bot-eligibility-marker -->"
+        mock_comment.body = ELIGIBILITY_COMMENT_MARKER
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, reviews, comments=[mock_comment]
         )
