@@ -137,7 +137,7 @@ CHIP_ERROR ServiceAreaCluster::AcceptedCommands(const ConcreteClusterPath & path
                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     static constexpr DataModel::AcceptedCommandEntry kSelectAreasCommand = ServiceArea::Commands::SelectAreas::kMetadataEntry;
-    static constexpr DataModel::AcceptedCommandEntry kSkipAreaCommand  = ServiceArea::Commands::SkipArea::kMetadataEntry;
+    static constexpr DataModel::AcceptedCommandEntry kSkipAreaCommand    = ServiceArea::Commands::SkipArea::kMetadataEntry;
 
     if (SupportsSkipArea())
     {
