@@ -313,8 +313,7 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mGetPresetsMethod =
-        env->GetMethodID(ContentLauncherClass, "getPresets", "()[Lcom/matter/tv/server/tvapp/ContentLaunchPreset;");
+    mGetPresetsMethod = env->GetMethodID(ContentLauncherClass, "getPresets", "()[Lcom/matter/tv/server/tvapp/ContentLaunchPreset;");
     if (mGetPresetsMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'getPresets' method");
@@ -337,8 +336,7 @@ void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelp
 
     env->ExceptionClear();
     {
-        jobject resp =
-            env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mContentReplicationRequestMethod);
+        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mContentReplicationRequestMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::ContentReplicationRequest");
@@ -349,9 +347,9 @@ void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelp
         }
 
         jclass convergentLaunchResponseClass = env->GetObjectClass(resp);
-        jfieldID statusField = env->GetFieldID(convergentLaunchResponseClass, "status", "I");
-        jint status          = env->GetIntField(resp, statusField);
-        response.status      = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+        jfieldID statusField                 = env->GetFieldID(convergentLaunchResponseClass, "status", "I");
+        jint status                          = env->GetIntField(resp, statusField);
+        response.status                      = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
     }
 
 exit:
@@ -378,8 +376,8 @@ void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchRespon
 
     env->ExceptionClear();
     {
-        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mPlayPresetMethod,
-                                             static_cast<jint>(presetID));
+        jobject resp =
+            env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mPlayPresetMethod, static_cast<jint>(presetID));
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::PlayPreset");
@@ -390,10 +388,10 @@ void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchRespon
         }
 
         jclass convergentLaunchResponseClass = env->GetObjectClass(resp);
-        jfieldID statusField = env->GetFieldID(convergentLaunchResponseClass, "status", "I");
-        jfieldID dataField   = env->GetFieldID(convergentLaunchResponseClass, "data", "Ljava/lang/String;");
-        jint status          = env->GetIntField(resp, statusField);
-        jstring jData        = (jstring) env->GetObjectField(resp, dataField);
+        jfieldID statusField                 = env->GetFieldID(convergentLaunchResponseClass, "status", "I");
+        jfieldID dataField                   = env->GetFieldID(convergentLaunchResponseClass, "data", "Ljava/lang/String;");
+        jint status                          = env->GetIntField(resp, statusField);
+        jstring jData                        = (jstring) env->GetObjectField(resp, dataField);
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         if (jData != nullptr)
@@ -463,12 +461,12 @@ CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEnc
         jint size = env->GetArrayLength(presetsArray);
         for (int i = 0; i < size; i++)
         {
-            jobject presetObj    = env->GetObjectArrayElement(presetsArray, i);
-            jclass presetClass   = env->GetObjectClass(presetObj);
-            jfieldID idField     = env->GetFieldID(presetClass, "presetID", "I");
-            jfieldID nameField   = env->GetFieldID(presetClass, "presetName", "Ljava/lang/String;");
-            jint presetId        = env->GetIntField(presetObj, idField);
-            jstring jPresetName  = (jstring) env->GetObjectField(presetObj, nameField);
+            jobject presetObj   = env->GetObjectArrayElement(presetsArray, i);
+            jclass presetClass  = env->GetObjectClass(presetObj);
+            jfieldID idField    = env->GetFieldID(presetClass, "presetID", "I");
+            jfieldID nameField  = env->GetFieldID(presetClass, "presetName", "Ljava/lang/String;");
+            jint presetId       = env->GetIntField(presetObj, idField);
+            jstring jPresetName = (jstring) env->GetObjectField(presetObj, nameField);
             JniUtfString presetName(env, jPresetName);
 
             chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset;
