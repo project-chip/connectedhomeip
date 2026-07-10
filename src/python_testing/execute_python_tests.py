@@ -178,7 +178,9 @@ class ExecutedTest:
             self.summary.failed_scripts.append(self.script_path)
 
         self.summary.record(self.name, self.status, duration, self.error_message)
-        return self.summary.keep_going
+        if exc_type is not None and issubclass(exc_type, Exception):
+            return self.summary.keep_going
+        return False
 
 
 def load_env_from_yaml(file_path):
