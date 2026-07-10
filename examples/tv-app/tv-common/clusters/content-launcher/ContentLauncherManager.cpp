@@ -17,6 +17,7 @@
  */
 
 #include "ContentLauncherManager.h"
+#include <app-common/clusters/ContentLauncher/Metadata.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <lib/support/Span.h>
@@ -184,7 +185,7 @@ void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelp
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleContentReplicationRequest");
     ContentReplicationResponseType response;
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    (void) helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchResponseType> & helper, uint16_t presetID)
@@ -193,7 +194,7 @@ void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchRespon
     LaunchResponseType response;
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    (void) helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
@@ -255,7 +256,7 @@ uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::ContentLauncher::kRevision;
     }
 
     uint16_t clusterRevision = 0;

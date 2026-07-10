@@ -71,5 +71,4 @@ protected:
 
 private:
     static constexpr uint32_t kEndpointFeatureMap = 0x00FF;
-    static constexpr uint16_t kClusterRevision    = 3;
 };
