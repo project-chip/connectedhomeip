@@ -22,17 +22,17 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-# Ensure the parent directory is in the path so we can import platform_merge_bot
+# Ensure the parent directory is in the path so we can import pr_checker_bot
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # isort: split
 
 # pylint: disable=wrong-import-position
-from platform_merge_bot import ELIGIBILITY_COMMENT_MARKER, PlatformMergeBot  # noqa: E402
+from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot  # noqa: E402
 
 
-class TestPlatformMergeBot(unittest.TestCase):
-    """Unit tests for the platform merge bot."""
+class TestPrCheckerBot(unittest.TestCase):
+    """Unit tests for the PR checker bot."""
 
     def setUp(self) -> None:
         """Sets up the test case by creating a temporary config file and mocking the Github API."""
@@ -58,7 +58,7 @@ esp32:
         self.addCleanup(os.unlink, self.temp_config_name)
 
         # Patch Github initialization so we don't hit the network
-        self.github_patcher = patch("platform_merge_bot.Github")
+        self.github_patcher = patch("pr_checker_bot.Github")
         self.mock_github_class = self.github_patcher.start()
         self.addCleanup(self.github_patcher.stop)
 
@@ -80,13 +80,13 @@ esp32:
         self.mock_repo.get_commit.return_value = self.mock_commit
 
         # Initialize bot under test
-        self.bot = PlatformMergeBot(
+        self.bot = PrCheckerBot(
             token="dummy_token",
             repo_name="dummy/repo",
             config_path=self.temp_config_name,
             dry_run=False,
         )
-        self.bot._bot_username = "platform-merge-bot"
+        self.bot._bot_username = "pr-checker-bot"
         self.bot._get_unresolved_threads = MagicMock(return_value=[])
         self.bot._is_pullapprove_green = MagicMock(return_value=False)
 
@@ -278,7 +278,7 @@ esp32:
         reviews = []
         # Existing eligibility comment with different body
         mock_comment = MagicMock()
-        mock_comment.user.login = "platform-merge-bot"
+        mock_comment.user.login = "pr-checker-bot"
         mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, reviews, comments=[mock_comment]
@@ -306,7 +306,7 @@ esp32:
 
         # Set up the PR to return the posted comment in subsequent get_issue_comments() calls
         mock_comment = MagicMock()
-        mock_comment.user.login = "platform-merge-bot"
+        mock_comment.user.login = "pr-checker-bot"
         mock_comment.body = posted_comment_body
         mock_pr.get_issue_comments.return_value = [mock_comment]
 
@@ -445,7 +445,7 @@ esp32:
             ),  # Uncovered file makes it ineligible
         ]
         mock_comment = MagicMock()
-        mock_comment.user.login = "platform-merge-bot"
+        mock_comment.user.login = "pr-checker-bot"
         mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, [], comments=[mock_comment]
@@ -460,7 +460,7 @@ esp32:
         """Tests that a stale eligibility comment is deleted if the PR has no changed files."""
         files = []  # No changed files
         mock_comment = MagicMock()
-        mock_comment.user.login = "platform-merge-bot"
+        mock_comment.user.login = "pr-checker-bot"
         mock_comment.body = f"{ELIGIBILITY_COMMENT_MARKER}\nSome status info..."
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, [], comments=[mock_comment]
@@ -480,11 +480,11 @@ esp32:
 
         # We have two eligibility comments
         mock_comment1 = MagicMock()
-        mock_comment1.user.login = "platform-merge-bot"
+        mock_comment1.user.login = "pr-checker-bot"
         mock_comment1.body = f"{ELIGIBILITY_COMMENT_MARKER}\nOutdated Info..."
 
         mock_comment2 = MagicMock()
-        mock_comment2.user.login = "platform-merge-bot"
+        mock_comment2.user.login = "pr-checker-bot"
         mock_comment2.body = f"{ELIGIBILITY_COMMENT_MARKER}\nDuplicate Info..."
 
         mock_pr = self.create_mock_pr(
@@ -537,7 +537,7 @@ esp32:
                 temp_name = f.name
             try:
                 with self.assertRaises(ValueError):
-                    PlatformMergeBot(
+                    PrCheckerBot(
                         token="dummy_token",
                         repo_name="dummy/repo",
                         config_path=temp_name,
@@ -665,8 +665,8 @@ esp32:
         files = [self.create_mock_file("src/platform/nxp/SystemTimeSupport.cpp")]
         reviews = [self.create_mock_review("doru91", "APPROVED")]
         mock_comment = MagicMock()
-        mock_comment.user.login = "platform-merge-bot"
-        mock_comment.body = "<!-- platform-merge-bot-eligibility-marker -->"
+        mock_comment.user.login = "pr-checker-bot"
+        mock_comment.body = "<!-- pr-checker-bot-eligibility-marker -->"
         mock_pr = self.create_mock_pr(
             1, "Test PR", "author", files, reviews, comments=[mock_comment]
         )
@@ -742,7 +742,7 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
         # Configure skip check
-        from platform_merge_bot import ValidationCheck
+        from pr_checker_bot import ValidationCheck
 
         self.bot.skip_checks = {ValidationCheck.COMMENTS}
 
@@ -767,7 +767,7 @@ esp32:
         mock_pr = self.create_mock_pr(1, "Test PR", "author", files, reviews)
 
         # Configure skip check
-        from platform_merge_bot import ValidationCheck
+        from pr_checker_bot import ValidationCheck
 
         self.bot.skip_checks = {ValidationCheck.CI}
 
@@ -829,7 +829,7 @@ esp32:
         mock_urlopen.return_value.__enter__.return_value = mock_response
 
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], [])
-        unresolved = PlatformMergeBot._get_unresolved_threads(self.bot, mock_pr)
+        unresolved = PrCheckerBot._get_unresolved_threads(self.bot, mock_pr)
 
         self.assertEqual(len(unresolved), 1)
         self.assertEqual(unresolved[0]["author"], "system")
@@ -848,7 +848,7 @@ esp32:
 
         mock_pr = self.create_mock_pr(1, "Test PR", "author", [], [])
         with self.assertRaises(RuntimeError) as ctx:
-            PlatformMergeBot._get_unresolved_threads(self.bot, mock_pr)
+            PrCheckerBot._get_unresolved_threads(self.bot, mock_pr)
 
         self.assertIn("missing PR repository/pullRequest data", str(ctx.exception))
 

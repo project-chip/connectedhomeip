@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 
-name: Platform Maintainers Auto-Merge
+name: PR Checker Bot
 
 on:
   workflow_dispatch:
@@ -28,8 +28,8 @@ on:
     - cron: "0 */6 * * *"
 
 jobs:
-  platform_merge:
-    name: Platform Auto-Merge Bot
+  pr_checker:
+    name: PR Checker Bot
     runs-on: ubuntu-latest
 
     # Limit to main repo to avoid running on forks
@@ -55,7 +55,7 @@ jobs:
               pygithub==2.3.0 \
               && echo "DONE installing python prerequisites"
 
-      - name: Run Platform Auto-Merge Bot
+      - name: Run PR Checker Bot
         env:
           GH_TOKEN: ${{ secrets.MERGE_BOT_PAT || secrets.MATTER_PAT }}
           DRY_RUN_INPUT: ${{ github.event.inputs.dry_run }}
@@ -66,4 +66,4 @@ jobs:
               DRY_RUN_FLAG="--dry-run"
           fi
           
-          venv/bin/python3 scripts/tools/platform_merge_bot.py $DRY_RUN_FLAG
+          venv/bin/python3 scripts/tools/pr_checker_bot.py $DRY_RUN_FLAG
