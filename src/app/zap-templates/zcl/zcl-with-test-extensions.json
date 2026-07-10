@@ -594,7 +594,8 @@
         "Media Playback": [
             "SampledPosition",
             "ActiveAudioTrack",
-            "ActiveTextTrack"
+            "ActiveTextTrack",
+            "ContentInfo"
         ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],

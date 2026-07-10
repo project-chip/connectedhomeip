@@ -184,7 +184,7 @@ tests:
       command: "Seek"
       arguments:
           values:
-              - name: "position"
+              - name: "Position"
                 value: 1000
       response:
           values:
