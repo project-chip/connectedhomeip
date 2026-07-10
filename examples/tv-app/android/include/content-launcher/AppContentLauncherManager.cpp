@@ -160,6 +160,30 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     return mSupportedStreamingProtocols;
 }
 
+bool AppContentLauncherManager::HandleGetMovable()
+{
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetMovable");
+    return true;
+}
+
+CHIP_ERROR AppContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
+{
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetPresets");
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset1;
+        preset1.presetID   = 1;
+        preset1.presetName = chip::CharSpan::fromCharString("Morning News");
+        ReturnErrorOnFailure(encoder.Encode(preset1));
+
+        chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset2;
+        preset2.presetID   = 2;
+        preset2.presetName = chip::CharSpan::fromCharString("Evening Playlist");
+        ReturnErrorOnFailure(encoder.Encode(preset2));
+
+        return CHIP_NO_ERROR;
+    });
+}
+
 uint32_t AppContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)

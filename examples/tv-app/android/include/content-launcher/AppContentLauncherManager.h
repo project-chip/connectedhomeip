@@ -51,6 +51,8 @@ public:
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
+    bool HandleGetMovable() override;
+    CHIP_ERROR HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder) override;
 
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
@@ -64,8 +66,7 @@ protected:
 private:
     EndpointId mEndpointId;
 
-    // TODO: set this based upon meta data from app
-    static constexpr uint32_t kEndpointFeatureMap = 3;
-    static constexpr uint16_t kClusterRevision    = 2;
+    static constexpr uint32_t kEndpointFeatureMap = 0x00FF;
+    static constexpr uint16_t kClusterRevision    = 3;
     ContentAppAttributeDelegate * mAttributeDelegate;
 };

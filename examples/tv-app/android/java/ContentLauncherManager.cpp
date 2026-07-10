@@ -289,6 +289,203 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(AppServer, "Failed to access 'launchUrl' method");
         env->ExceptionClear();
     }
+
+    mContentReplicationRequestMethod =
+        env->GetMethodID(ContentLauncherClass, "contentReplicationRequest", "()Lcom/matter/tv/server/tvapp/ContentLaunchResponse;");
+    if (mContentReplicationRequestMethod == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access 'contentReplicationRequest' method");
+        env->ExceptionClear();
+    }
+
+    mPlayPresetMethod =
+        env->GetMethodID(ContentLauncherClass, "playPreset", "(I)Lcom/matter/tv/server/tvapp/ContentLaunchResponse;");
+    if (mPlayPresetMethod == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access 'playPreset' method");
+        env->ExceptionClear();
+    }
+
+    mGetMovableMethod = env->GetMethodID(ContentLauncherClass, "getMovable", "()Z");
+    if (mGetMovableMethod == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access 'getMovable' method");
+        env->ExceptionClear();
+    }
+
+    mGetPresetsMethod =
+        env->GetMethodID(ContentLauncherClass, "getPresets", "()[Lcom/matter/tv/server/tvapp/ContentLaunchPreset;");
+    if (mGetPresetsMethod == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access 'getPresets' method");
+        env->ExceptionClear();
+    }
+}
+
+void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper)
+{
+    DeviceLayer::StackUnlock unlock;
+    Commands::ContentReplicationResponse::Type response;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::ContentReplicationRequest");
+    VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mContentReplicationRequestMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
+    {
+        jobject resp =
+            env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mContentReplicationRequestMethod);
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::ContentReplicationRequest");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+
+        jclass convergentLaunchResponseClass = env->GetObjectClass(resp);
+        jfieldID statusField = env->GetFieldID(convergentLaunchResponseClass, "status", "I");
+        jint status          = env->GetIntField(resp, statusField);
+        response.status      = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::ContentReplicationRequest status error: %s", err.AsString());
+        response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kURLNotAvailable;
+    }
+    (void) helper.Success(response);
+}
+
+void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchResponseType> & helper, uint16_t presetID)
+{
+    DeviceLayer::StackUnlock unlock;
+    Commands::LauncherResponse::Type response;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::PlayPreset");
+    VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPlayPresetMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
+    {
+        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mPlayPresetMethod,
+                                             static_cast<jint>(presetID));
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::PlayPreset");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+
+        jclass convergentLaunchResponseClass = env->GetObjectClass(resp);
+        jfieldID statusField = env->GetFieldID(convergentLaunchResponseClass, "status", "I");
+        jfieldID dataField   = env->GetFieldID(convergentLaunchResponseClass, "data", "Ljava/lang/String;");
+        jint status          = env->GetIntField(resp, statusField);
+        jstring jData        = (jstring) env->GetObjectField(resp, dataField);
+
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+        if (jData != nullptr)
+        {
+            JniUtfString dataStr(env, jData);
+            response.data = chip::MakeOptional(dataStr.charSpan());
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::PlayPreset status error: %s", err.AsString());
+        response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kURLNotAvailable;
+    }
+    (void) helper.Success(response);
+}
+
+bool ContentLauncherManager::HandleGetMovable()
+{
+    DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetMovable");
+    VerifyOrReturnValue(mContentLauncherManagerObject.HasValidObjectRef(), false);
+    VerifyOrReturnValue(mGetMovableMethod != nullptr, false);
+
+    env->ExceptionClear();
+    jboolean movable = env->CallBooleanMethod(mContentLauncherManagerObject.ObjectRef(), mGetMovableMethod);
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetMovable");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return false;
+    }
+    return static_cast<bool>(movable);
+}
+
+CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
+{
+    DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JniLocalReferenceScope scope(env);
+
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetPresets");
+    VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetPresetsMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
+
+    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
+        jobjectArray presetsArray =
+            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mGetPresetsMethod);
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetPresets");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        jint size = env->GetArrayLength(presetsArray);
+        for (int i = 0; i < size; i++)
+        {
+            jobject presetObj    = env->GetObjectArrayElement(presetsArray, i);
+            jclass presetClass   = env->GetObjectClass(presetObj);
+            jfieldID idField     = env->GetFieldID(presetClass, "presetID", "I");
+            jfieldID nameField   = env->GetFieldID(presetClass, "presetName", "Ljava/lang/String;");
+            jint presetId        = env->GetIntField(presetObj, idField);
+            jstring jPresetName  = (jstring) env->GetObjectField(presetObj, nameField);
+            JniUtfString presetName(env, jPresetName);
+
+            chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset;
+            preset.presetID   = static_cast<uint8_t>(presetId);
+            preset.presetName = presetName.charSpan();
+            ReturnErrorOnFailure(encoder.Encode(preset));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::GetPresets status error: %s", err.AsString());
+    }
+    return err;
 }
 
 uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
