@@ -1763,7 +1763,7 @@ class ChipDeviceControllerBase:
             commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
 
         Returns:
-            TestOnlyBatchCommandResponse
+            TestOnlyBatchCommandResponse or None
         '''
         self.CheckIsActive()
 
@@ -1891,7 +1891,7 @@ class ChipDeviceControllerBase:
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
 
         Returns:
-            command response. The type of the response is defined by the command.
+            command response or None. The type of the response is defined by the command.
 
         Raises:
             InteractionModelError on error
