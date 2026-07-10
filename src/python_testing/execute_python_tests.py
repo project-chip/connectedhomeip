@@ -127,8 +127,18 @@ class VMFreezeWatchdog(threading.Thread):
     A background watchdog thread that detects VM freezes or severe CPU starvation.
 
     It periodically checks for clock drift by comparing the system wall clock (real time)
-    with the monotonic clock. If the monotonic clock jumps or the wall clock drifts
-    significantly more than the monotonic clock, it flags a potential VM freeze.
+    with the monotonic clock.
+
+    Why this is needed:
+    The Matter SDK uses monotonic time for timers (like MRP). In virtualized environments,
+    if the VM freezes, the hardware clock on the host continues to run. On resume, the
+    guest kernel updates its clocks, causing a sudden jump in both monotonic and real time.
+    This "time compression" causes scheduled timers in the SDK to expire instantly,
+    leading to false test failures (e.g. MRP retry exhaustion).
+
+    We cannot use a "paused" clock (like CPU time) in the SDK because the specification and
+    real-world interactions require physical time. Thus, we must detect these freezes at
+    the test runner level and retry the tests.
     """
 
     def __init__(self, check_interval_sec=2.0, threshold_sec=5.0):
@@ -148,17 +158,21 @@ class VMFreezeWatchdog(threading.Thread):
         self.last_mono = time.monotonic()
 
     def run(self):
-        while not self._stop_event.is_set():
-            time.sleep(self.check_interval_sec)
-
-            curr_wall = time.time()
-            curr_mono = time.monotonic()
-
+        # We use Event.wait() instead of time.sleep() to allow instant thread teardown on stop().
+        while not self._stop_event.wait(self.check_interval_sec):
             with self._lock:
+                curr_wall = time.time()
+                curr_mono = time.monotonic()
+
                 wall_delta = curr_wall - self.last_wall
                 mono_delta = curr_mono - self.last_mono
 
+                # Check for two scenarios of VM clock behavior on resume:
+                # 1. Monotonic clock jumped: mono_delta is much larger than expected sleep time.
                 mono_jump = mono_delta > (self.check_interval_sec + self.threshold_sec)
+
+                # 2. Monotonic clock paused but Wall clock jumped (synced via NTP/integration):
+                # drift between wall clock and monotonic clock is significant.
                 drift = wall_delta - mono_delta
                 wall_drift = drift > self.threshold_sec
 
