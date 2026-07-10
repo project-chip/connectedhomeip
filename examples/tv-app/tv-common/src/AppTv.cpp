@@ -377,10 +377,10 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(contentLauncherAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::AcceptHeader::Id, ARRAY, kDescriptorAttributeArraySize,
                           0), /* accept header list */
     DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::SupportedStreamingProtocols::Id, BITMAP32, 1,
-                              0),                                                            /* streaming protocols */
-    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::Movable::Id, BOOLEAN, 1, 0),      /* movable */
+                              0),                                                       /* streaming protocols */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::Movable::Id, BOOLEAN, 1, 0), /* movable */
     DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::Presets::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* presets */
-    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::FeatureMap::Id, BITMAP32, 4, 0),  /* FeatureMap */
+    DECLARE_DYNAMIC_ATTRIBUTE(ContentLauncher::Attributes::FeatureMap::Id, BITMAP32, 4, 0),                       /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Media Playback cluster attributes
