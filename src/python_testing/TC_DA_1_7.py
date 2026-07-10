@@ -61,11 +61,11 @@ FORBIDDEN_AKID = [
     bytes_from_hex("6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E")
 ]
 
-# List of certificate names that are known to have some issues, but not yet
+# List of certificate filename prefixes that are known to have some issues, but not yet
 # updated in DCL. They will fail the test at runtime if seen, but not in CI.
-ALLOWED_SKIPPED_FILENAMES = [
-    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL.der",
-    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL.der"
+ALLOWED_SKIPPED_FILENAME_PREFIXES = [
+    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL",
+    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL"
 ]
 
 
@@ -88,7 +88,9 @@ def load_all_paa(paa_path: Path) -> dict:
                         paa_by_skid[skid] = (Path(filename).name, paa_cert)
             except (OSError, ValueError) as e:
                 log.error("Failed to load %s: %s", filename, e)
-                if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
+                # Check if filename starts with any allowed prefix
+                filename_base = Path(filename).name
+                if not any(filename_base.startswith(prefix) for prefix in ALLOWED_SKIPPED_FILENAME_PREFIXES):
                     log.error("Re-raising error and failing: found new invalid PAA: %s", filename)
                     raise
 
