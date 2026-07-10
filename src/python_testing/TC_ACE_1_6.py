@@ -738,5 +738,6 @@ class TC_ACE_1_6(MatterBaseTest):
             self.default_controller.RemoveKeySet(keyset_id)
         self.default_controller.RemoveGroupKeys()
 
+
 if __name__ == "__main__":
     default_matter_test_main()

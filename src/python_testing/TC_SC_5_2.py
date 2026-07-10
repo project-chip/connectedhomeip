@@ -548,5 +548,6 @@ class TC_SC_5_2(MatterBaseTest):
             dev_ctrl.RemoveKeySet(keyset_id)
         dev_ctrl.RemoveGroupKeys()
 
+
 if __name__ == "__main__":
     default_matter_test_main()
