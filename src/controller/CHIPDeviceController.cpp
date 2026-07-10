@@ -3930,6 +3930,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     }
     case CommissioningStage::kRemoveWiFiNetworkConfig: {
+        if (!params.GetWiFiCredentials().HasValue())
+        {
+            // Match the guard in kRemoveThreadNetworkConfig below: without configured Wi-Fi
+            // credentials there is no network to remove, so complete the stage with an error
+            // instead of reading the unset credentials Optional.
+            ChipLogError(Controller, "No Wi-Fi credentials configured at commissioner!");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
         NetworkCommissioning::Commands::RemoveNetwork::Type request;
         request.networkID = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);

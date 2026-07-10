@@ -18,7 +18,9 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <app/DeviceProxy.h>
 #include <controller/AutoCommissioner.h>
+#include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/tests/AutoCommissionerTestAccess.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -687,5 +689,59 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
         }
         EXPECT_EQ(result, c.isSecondaryNetworkSupported);
     }
+}
+
+// Minimal DeviceProxy: only GetDeviceId() is exercised on the guarded path.
+class FakeDeviceProxy : public DeviceProxy
+{
+public:
+    void Disconnect() override {}
+    NodeId GetDeviceId() const override { return 0x1122334455667788ULL; }
+    Messaging::ExchangeManager * GetExchangeManager() const override { return nullptr; }
+    Optional<SessionHandle> GetSecureSession() const override { return NullOptional; }
+    bool IsSecureConnected() const override { return false; }
+};
+
+// Captures the CHIP_ERROR that PerformCommissioningStep reports for the stage.
+class CapturingCommissioningDelegate : public CommissioningDelegate
+{
+public:
+    CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override
+    {
+        mParams = params;
+        return CHIP_NO_ERROR;
+    }
+    const CommissioningParameters & GetCommissioningParameters() const override { return mParams; }
+    void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate *) override {}
+    CHIP_ERROR StartCommissioning(DeviceCommissioner *, CommissioneeDeviceProxy *) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport) override
+    {
+        mCalled  = true;
+        mLastErr = err;
+        return CHIP_NO_ERROR; // return success so CommissioningStageComplete does not enter the cleanup path
+    }
+
+    bool mCalled       = false;
+    CHIP_ERROR mLastErr = CHIP_NO_ERROR;
+
+private:
+    CommissioningParameters mParams;
+};
+
+// The kRemoveWiFiNetworkConfig stage should behave like its kRemoveThreadNetworkConfig
+// sibling: when no Wi-Fi credentials are configured there is no network to remove, so the
+// stage completes with CHIP_ERROR_INVALID_ARGUMENT rather than reading the unset Optional.
+TEST(DeviceCommissionerNetworkConfigRemovalTest, RemoveWiFiNetworkConfigWithoutCredentialsFailsGracefully)
+{
+    DeviceCommissioner commissioner; // lightweight ctor + empty dtor; no Init() needed for this path
+    FakeDeviceProxy proxy;
+    CapturingCommissioningDelegate delegate;
+    CommissioningParameters params; // deliberately no Wi-Fi credentials
+
+    commissioner.PerformCommissioningStep(&proxy, CommissioningStage::kRemoveWiFiNetworkConfig, params, &delegate,
+                                          kRootEndpointId, NullOptional);
+
+    EXPECT_TRUE(delegate.mCalled);
+    EXPECT_EQ(delegate.mLastErr, CHIP_ERROR_INVALID_ARGUMENT);
 }
 } // namespace
