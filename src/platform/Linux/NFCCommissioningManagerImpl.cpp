@@ -961,7 +961,7 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
 }
 
 // Start scan on all available readers and scan for NFC Tags.
-CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(void)
+CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders()
 {
     LONG result;
     LPTSTR mszReaders; // LPTSTR is a "typedef char *"
