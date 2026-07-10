@@ -128,7 +128,8 @@ public:
     /** @brief AppTask thread event handler for queued button events */
     static void AppEventHandler(AppEvent * aEvent);
 
-    /** @brief Matter-thread work item: notifies the binding manager that a bound cluster changed to drive the outgoing switch command */
+    /** @brief Matter-thread work item: notifies the binding manager that a bound cluster changed to drive the outgoing switch
+     * command */
     static void SwitchWorkerFunction(intptr_t context);
 
     /** @brief Matter-thread work item: emits a Generic Switch cluster event for the queued switch action */
