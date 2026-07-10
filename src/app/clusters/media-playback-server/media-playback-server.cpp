@@ -163,6 +163,9 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
         case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id: {
             return aEncoder.EncodeEmptyList();
         }
+        case app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id: {
+            return aEncoder.EncodeEmptyList();
+        }
         default: {
             return CHIP_NO_ERROR;
             break;
@@ -194,6 +197,10 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
         return ReadActiveTextTrackAttribute(aEncoder, delegate);
     case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
         return ReadAvailableTextTracksAttribute(aEncoder, delegate);
+    case app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id:
+        return delegate->HandleGetAvailableCommands(aEncoder);
+    case app::Clusters::MediaPlayback::Attributes::ContentInfo::Id:
+        return delegate->HandleGetContentInfo(aEncoder);
     case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id:
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id:
