@@ -37,7 +37,7 @@ _LOG_LEVELS = logging.getLevelNamesMapping()
 DEFAULT_REPOSITORY = "project-chip/connectedhomeip"
 DEFAULT_CONFIG_PATH = ".github/platform_maintainers.yaml"
 
-ELIGIBILITY_COMMENT_MARKER = "<!-- platform-merge-bot-eligibility-marker -->"
+ELIGIBILITY_COMMENT_MARKER = "<!-- pr-checker-bot-eligibility-marker -->"
 
 
 class ValidationCheck(Enum):
@@ -80,7 +80,7 @@ class PlatformGroup:
         return sorted(matched_globs)
 
 
-class PlatformMergeBot:
+class PrCheckerBot:
     """Orchestrates scanning, checking coverage, and auto-merging PRs that affect platform-maintained paths."""
 
     def __init__(
@@ -110,7 +110,7 @@ class PlatformMergeBot:
             try:
                 self._bot_username = self.api.get_user().login.lower()
             except GithubException:
-                self._bot_username = "platform-merge-bot"
+                self._bot_username = "pr-checker-bot"
         return self._bot_username
 
     def load_config(self) -> None:
@@ -405,7 +405,7 @@ class PlatformMergeBot:
             headers={
                 "Authorization": f"Bearer {self.token}",
                 "Content-Type": "application/json",
-                "User-Agent": "platform-merge-bot",
+                "User-Agent": "pr-checker-bot",
             },
             method="POST",
         )
@@ -801,10 +801,10 @@ def main(
     Example Dry-Run and Validation Testing:
     ---------------------------------------
     # Run the bot in dry-run mode on a specific PR (even if closed/merged) to see what it would do:
-    GITHUB_TOKEN=$(gh auth token) python3 scripts/tools/platform_merge_bot.py --dry-run --pr 72779
+    GITHUB_TOKEN=$(gh auth token) python3 scripts/tools/pr_checker_bot.py --dry-run --pr 72779
 
     # Run in dry-run mode, skipping CI and PullApprove status validations:
-    GITHUB_TOKEN=$(gh auth token) python3 scripts/tools/platform_merge_bot.py --dry-run --pr 72779 --skip-check ci --skip-check pullapprove
+    GITHUB_TOKEN=$(gh auth token) python3 scripts/tools/pr_checker_bot.py --dry-run --pr 72779 --skip-check ci --skip-check pullapprove
     """
     coloredlogs.install(
         level=_LOG_LEVELS[log_level.upper()],
@@ -825,7 +825,7 @@ def main(
                 f"Require a token. Set environment variable '{token_env}' (or 'GITHUB_TOKEN') or provide --token-file"
             )
 
-    bot = PlatformMergeBot(
+    bot = PrCheckerBot(
         gh_token, repo, config, dry_run, skip_checks=list(skip_check)
     )
     bot.run(pr_number=pr)
