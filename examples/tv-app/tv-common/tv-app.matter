@@ -3853,6 +3853,98 @@ cluster ContentAppObserver = 1296 {
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
+/** This cluster provides an interface for managing and sharing media files on devices such as Streaming Speakers, Smart TVs, or other media playback devices. */
+provisional cluster MediaFileManagement = 1297 {
+  revision 1;
+
+  enum FileStatusEnum : enum8 {
+    kSuccess = 0;
+    kInsufficientStorage = 1;
+    kInvalidFileID = 2;
+    kAuthenticationFailed = 3;
+    kFileNotAvailable = 4;
+    kInvalidRequest = 5;
+    kUnsupportedMimeType = 6;
+  }
+
+  bitmap Feature : bitmap32 {
+    kMediaSharing = 0x1;
+  }
+
+  struct FileDescriptionStruct {
+    int64u fileID = 0;
+    char_string<128> name = 1;
+    int64u size = 2;
+    long_char_string<256> mimeType = 3;
+    long_char_string<256> imageUri = 4;
+  }
+
+  provisional info event SharedFilesAdded = 0 {
+    int16u requestID = 0;
+    int16u responseID = 1;
+  }
+
+  provisional readonly attribute access(read: manage) int64u totalStorage = 0;
+  provisional readonly attribute access(read: manage) int64u availableStorage = 1;
+  provisional readonly attribute access(read: manage) FileDescriptionStruct availableFiles[] = 2;
+  provisional readonly attribute access(read: manage) char_string supportedMimeTypes[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddFileRequest {
+    char_string<128> name = 0;
+    int64u size = 1;
+    long_char_string<256> mimeType = 2;
+    long_char_string<256> imageUri = 3;
+  }
+
+  response struct AddFileResponse = 1 {
+    FileStatusEnum status = 0;
+    nullable int64u fileID = 1;
+  }
+
+  request struct DeleteFileRequest {
+    int64u fileID = 0;
+  }
+
+  request struct RequestSharedFilesRequest {
+    char_string<128> clientName = 0;
+    int16u requestID = 1;
+    optional nullable char_string supportedMimeTypes[] = 2;
+  }
+
+  request struct GetSharedFileRequest {
+    int16u responseID = 0;
+  }
+
+  response struct GetSharedFileResponse = 5 {
+    FileStatusEnum status = 0;
+    optional nullable FileDescriptionStruct fileDescription = 1;
+  }
+
+  request struct OfferFileRequest {
+    char_string<128> clientName = 0;
+    char_string<128> name = 1;
+    int64u size = 2;
+    long_char_string<256> mimeType = 3;
+    long_char_string<256> imageUri = 4;
+  }
+
+  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage. */
+  command access(invoke: manage) AddFile(AddFileRequest): AddFileResponse = 0;
+  /** Upon receipt, this command SHALL delete the specified media file from the device's storage. */
+  command access(invoke: manage) DeleteFile(DeleteFileRequest): DefaultSuccess = 2;
+  /** Upon receipt, this command SHALL initiate a request for the server to share files with the requesting client. */
+  command RequestSharedFiles(RequestSharedFilesRequest): DefaultSuccess = 3;
+  /** Upon receipt, this command SHALL retrieve information about a file that was previously shared with the requesting client. */
+  command GetSharedFile(GetSharedFileRequest): GetSharedFileResponse = 4;
+  /** Upon receipt, this command SHALL indicate that the requesting client wishes to share a file with the server. */
+  command OfferFile(OfferFileRequest): DefaultSuccess = 6;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 5;
 
@@ -4269,10 +4361,12 @@ endpoint 1 {
     callback attribute availableAudioTracks;
     callback attribute activeTextTrack;
     callback attribute availableTextTracks;
+    callback attribute availableCommands;
+    callback attribute contentInfo;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x003;
+    ram      attribute featureMap default = 0x001F;
     ram      attribute clusterRevision default = 2;
 
     handle command Play;
@@ -4318,13 +4412,18 @@ endpoint 1 {
   }
 
   server cluster ContentLauncher {
+    emits event ContentReplication;
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
-    ram      attribute featureMap default = 0x0003;
+    ram      attribute movable default = 0;
+    callback attribute presets;
+    ram      attribute featureMap default = 0x00FF;
     ram      attribute clusterRevision default = 2;
 
     handle command LaunchContent;
     handle command LaunchURL;
+    handle command ContentReplicationRequest;
+    handle command PlayPreset;
   }
 
   server cluster AudioOutput {
@@ -4377,6 +4476,22 @@ endpoint 1 {
     handle command UnblockUnratedContent;
     handle command SetOnDemandRatingThreshold;
     handle command SetScheduledContentRatingThreshold;
+  }
+
+  server cluster MediaFileManagement {
+    emits event SharedFilesAdded;
+    callback attribute totalStorage default = 0;
+    callback attribute availableStorage default = 0;
+    callback attribute availableFiles;
+    callback attribute supportedMimeTypes;
+    ram      attribute featureMap default = 0x0001;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AddFile;
+    handle command DeleteFile;
+    handle command RequestSharedFiles;
+    handle command GetSharedFile;
+    handle command OfferFile;
   }
 }
 endpoint 2 {
@@ -4495,7 +4610,9 @@ endpoint 3 {
     callback attribute availableAudioTracks;
     callback attribute activeTextTrack;
     callback attribute availableTextTracks;
-    ram      attribute featureMap default = 0x0003;
+    callback attribute availableCommands;
+    callback attribute contentInfo;
+    ram      attribute featureMap default = 0x001F;
     ram      attribute clusterRevision default = 1;
 
     handle command Play;
@@ -4525,13 +4642,18 @@ endpoint 3 {
   }
 
   server cluster ContentLauncher {
+    emits event ContentReplication;
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
-    ram      attribute featureMap default = 0x0003;
+    ram      attribute movable default = 0;
+    callback attribute presets;
+    ram      attribute featureMap default = 0x00FF;
     ram      attribute clusterRevision default = 1;
 
     handle command LaunchContent;
     handle command LaunchURL;
+    handle command ContentReplicationRequest;
+    handle command PlayPreset;
   }
 
   server cluster ApplicationLauncher {
