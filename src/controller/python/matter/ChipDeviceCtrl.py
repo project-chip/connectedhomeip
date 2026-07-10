@@ -1763,7 +1763,7 @@ class ChipDeviceControllerBase:
             commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
 
         Returns:
-            TestOnlyBatchCommandResponse
+            TestOnlyBatchCommandResponse or None
         '''
         self.CheckIsActive()
 
@@ -1778,6 +1778,10 @@ class ChipDeviceControllerBase:
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
             commandRefsOverride=commandRefsOverride).raise_on_error()
+
+        if suppressResponse:
+            return None
+
         return await future
 
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeId: int, endpoint: int,
@@ -1887,7 +1891,7 @@ class ChipDeviceControllerBase:
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
 
         Returns:
-            command response. The type of the response is defined by the command.
+            command response or None. The type of the response is defined by the command.
 
         Raises:
             InteractionModelError on error
@@ -1909,6 +1913,10 @@ class ChipDeviceControllerBase:
                 ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
             res.raise_on_error()
+
+            if suppressResponse:
+                return None
+
             return await future
 
         return await self._run_with_session_retry(nodeId, _send_impl)
