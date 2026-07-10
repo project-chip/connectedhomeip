@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 #pragma once
+#include <app/data-model/Nullable.h>
 #include <clusters/LaundryWasherControls/Enums.h>
 #include <lib/support/Span.h>
-#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
