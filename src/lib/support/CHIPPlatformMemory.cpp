@@ -34,6 +34,25 @@ extern void CHIPPlatformMemoryShutdown()
     return chip::Platform::MemoryShutdown();
 }
 
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+
+extern void * CHIPPlatformMemoryAllocTyped(size_t size, malloc_type_id_t typeId)
+{
+    return chip::Platform::MemoryAllocTyped(size, typeId);
+}
+
+extern void * CHIPPlatformMemoryCallocTyped(size_t num, size_t size, malloc_type_id_t typeId)
+{
+    return chip::Platform::MemoryCallocTyped(num, size, typeId);
+}
+
+extern void * CHIPPlatformMemoryReallocTyped(void * p, size_t size, malloc_type_id_t typeId)
+{
+    return chip::Platform::MemoryReallocTyped(p, size, typeId);
+}
+
+#else
+
 extern void * CHIPPlatformMemoryAlloc(size_t size)
 {
     return chip::Platform::MemoryAlloc(size);
@@ -48,6 +67,8 @@ extern void * CHIPPlatformMemoryRealloc(void * p, size_t size)
 {
     return chip::Platform::MemoryRealloc(p, size);
 }
+
+#endif
 
 extern void CHIPPlatformMemoryFree(void * p)
 {

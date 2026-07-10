@@ -98,16 +98,18 @@ protected:
         return buffer;
     }
 
-    void Alloc(size_t size)
+    template <typename T>
+    void Alloc(size_t elementCount)
     {
         Free();
-        mBuffer = Impl::MemoryAlloc(size);
+        mBuffer = Impl::template MemoryAlloc<T>(elementCount);
     }
 
-    void Calloc(size_t elementCount, size_t elementSize)
+    template <typename T>
+    void Calloc(size_t elementCount)
     {
         Free();
-        mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
+        mBuffer = Impl::template MemoryCalloc<T>(elementCount);
     }
 
 private:
@@ -121,8 +123,16 @@ class PlatformMemoryManagement
 {
 public:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    static void * MemoryAlloc(size_t size) { return chip::Platform::MemoryAlloc(size); }
-    static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
+    template <typename T>
+    static void * MemoryAlloc(size_t num)
+    {
+        return chip::Platform::MemoryAllocTyped<T>(num);
+    }
+    template <typename T>
+    static void * MemoryCalloc(size_t num)
+    {
+        return chip::Platform::MemoryCallocTyped<T>(num);
+    }
 };
 
 } // namespace Impl
@@ -160,14 +170,14 @@ public:
 
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
-        Base::Calloc(elementCount, sizeof(T));
+        Base::template Calloc<T>(elementCount);
         ExecuteConstructors(elementCount);
         return *this;
     }
 
     ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
-        Base::Alloc(elementCount * sizeof(T));
+        Base::template Alloc<T>(elementCount);
         ExecuteConstructors(elementCount);
         return *this;
     }
