@@ -62,6 +62,7 @@ void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
     VerifyOrDie(endpoint == 1); // this cluster is only enabled for endpoint 1.
     LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 
+    // Values that were previously set from ZAPtool-generated .matter file.
     LogErrorOnFailure(LaundryWasherControlsServer::SetNumberOfRinses(endpoint, NumberOfRinsesEnum::kNormal));
     LogErrorOnFailure(LaundryWasherControlsServer::SetSpinSpeedCurrent(endpoint, 1));
 }
