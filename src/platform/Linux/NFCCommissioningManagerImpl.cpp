@@ -109,6 +109,8 @@ private:
     uint32_t mChainedResponseLength = 0;
 
 public:
+    // `handle` ownership is transferred to TagInstance
+    // TagInstance's destructor will release it via SCardDisconnect()
     TagInstance(Transport::NFCBase * base, const char * name, SCARDHANDLE handle, const SCARD_IO_REQUEST * sendPci) :
         nfcBase(base), peerAddress(), // peerAddress will be filled when 'discriminator' is set
         cardHandle(handle), pioSendPci(sendPci)
@@ -122,6 +124,12 @@ public:
         memset(mAPDURxBuffer, 0, sizeof(mAPDURxBuffer));
         memset(mChainedResponseBuffer, 0, sizeof(mChainedResponseBuffer));
     }
+
+    // TagInstance cannot be copied or moved
+    TagInstance(const TagInstance &) = delete;
+    TagInstance & operator=(const TagInstance &) = delete;
+    TagInstance(TagInstance &&) = delete;
+    TagInstance & operator=(TagInstance &&) = delete;
 
     ~TagInstance()
     {
@@ -992,7 +1000,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(void)
     {
         if (*reader != '\0')
         {
-            ReturnErrorOnFailure(ScanReader(reader));
+            LogErrorOnFailure(ScanReader(reader));
 
             // Move the pointer to the next substring
             reader += strlen(reader) + 1;
@@ -1045,6 +1053,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(char * readerName)
         else
         {
             // This couple (readerName, cardHandle) is not known yet: Create a new TagInstance
+            // `cardHandle` ownership is transferred to TagInstance.
+            // TagInstance's destructor will release it via SCardDisconnect()
             auto newTagInstance = std::make_shared<TagInstance>(
                 nfcBase, readerName, cardHandle, (dwActiveProtocol == SCARD_PROTOCOL_T0) ? SCARD_PCI_T0 : SCARD_PCI_T1);
 
