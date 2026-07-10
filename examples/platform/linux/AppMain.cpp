@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <filesystem>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
