@@ -809,6 +809,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::
 
 static void Finalize(chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type & request,
                         Json::Value & value);
 

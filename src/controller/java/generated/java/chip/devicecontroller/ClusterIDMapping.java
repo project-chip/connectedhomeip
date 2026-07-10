@@ -17632,6 +17632,8 @@ public class ClusterIDMapping {
             AvailableAudioTracks(8L),
             ActiveTextTrack(9L),
             AvailableTextTracks(10L),
+            AvailableCommands(11L),
+            ContentInfo(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

@@ -53,6 +53,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::Characte
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::MediaType val)
+{
+    using EnumType = MediaPlayback::MediaType;
+    switch (val)
+    {
+    case EnumType::kGeneric:
+    case EnumType::kTVShow:
+    case EnumType::kMusic:
+    case EnumType::kPodcast:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::PlaybackStateEnum val)
 {
     using EnumType = MediaPlayback::PlaybackStateEnum;
