@@ -26,11 +26,13 @@ using chip::CharSpan;
 using chip::EndpointId;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
-using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
-using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
-using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
-using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
-using PlaybackPreferencesType = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
+using ContentLauncherDelegate        = chip::app::Clusters::ContentLauncher::Delegate;
+using LaunchResponseType             = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
+using ContentReplicationResponseType = chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Type;
+using ParameterType                  = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
+using BrandingInformationType        = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
+using PlaybackPreferencesType        = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
+using ContentPresetStructType        = chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type;
 
 class ContentEntry
 {
@@ -51,8 +53,13 @@ public:
                              bool useCurrentContext) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
+    void HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper) override;
+    void HandlePlayPreset(CommandResponseHelper<LaunchResponseType> & helper, uint16_t presetID) override;
+
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
+    bool HandleGetMovable() override;
+    CHIP_ERROR HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
@@ -63,7 +70,6 @@ protected:
     std::vector<ContentEntry> mContentList;
 
 private:
-    // TODO: set this based upon meta data from app
-    static constexpr uint32_t kEndpointFeatureMap = 3;
-    static constexpr uint16_t kClusterRevision    = 2;
+    static constexpr uint32_t kEndpointFeatureMap = 0x00FF;
+    static constexpr uint16_t kClusterRevision    = 3;
 };

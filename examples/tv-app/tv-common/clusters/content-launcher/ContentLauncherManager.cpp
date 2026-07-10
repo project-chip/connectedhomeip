@@ -179,6 +179,23 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
+void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleContentReplicationRequest");
+    ContentReplicationResponseType response;
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+    (void) helper.Success(response);
+}
+
+void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchResponseType> & helper, uint16_t presetID)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
+    LaunchResponseType response;
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    (void) helper.Success(response);
+}
+
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
@@ -196,6 +213,30 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
     return mSupportedStreamingProtocols;
+}
+
+bool ContentLauncherManager::HandleGetMovable()
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetMovable");
+    return true;
+}
+
+CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetPresets");
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ContentPresetStructType preset1;
+        preset1.presetID   = 1;
+        preset1.presetName = CharSpan::fromCharString("Morning News");
+        ReturnErrorOnFailure(encoder.Encode(preset1));
+
+        ContentPresetStructType preset2;
+        preset2.presetID   = 2;
+        preset2.presetName = CharSpan::fromCharString("Evening Playlist");
+        ReturnErrorOnFailure(encoder.Encode(preset2));
+
+        return CHIP_NO_ERROR;
+    });
 }
 
 uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
