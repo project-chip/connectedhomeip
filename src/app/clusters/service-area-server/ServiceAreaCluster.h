@@ -344,6 +344,8 @@ private:
     const BitMask<ServiceArea::Feature> mFeature;
     const OptionalAttributeSet mOptionalAttributes;
 
+    bool SupportsSkipArea() const;
+
     //*************************************************************************
     // attribute readers
 

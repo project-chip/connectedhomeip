@@ -88,6 +88,7 @@ std::optional<DataModel::ActionReturnStatus> ServiceAreaCluster::InvokeCommand(c
         return HandleSelectAreasCmd(request, req, handler);
     }
     case SkipArea::Id: {
+        VerifyOrReturnValue(SupportsSkipArea(), Status::UnsupportedCommand);
         SkipArea::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
         return HandleSkipAreaCmd(request, req, handler);
@@ -122,12 +123,33 @@ CHIP_ERROR ServiceAreaCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(ServiceArea::Attributes::kMandatoryMetadata), Span(optionalAttrs), enabledOptionalAttributes);
 }
 
+bool ServiceAreaCluster::SupportsSkipArea() const
+{
+    if (mOptionalAttributes.IsSet(ServiceArea::Attributes::CurrentArea::Id))
+    {
+        return true;
+    }
+
+    return mFeature.Has(Feature::kProgressReporting) && mOptionalAttributes.IsSet(ServiceArea::Attributes::Progress::Id);
+}
+
 CHIP_ERROR ServiceAreaCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    static constexpr DataModel::AcceptedCommandEntry kSelectAreasCommand = ServiceArea::Commands::SelectAreas::kMetadataEntry;
+    static constexpr DataModel::AcceptedCommandEntry kSkipAreaCommand  = ServiceArea::Commands::SkipArea::kMetadataEntry;
+
+    if (SupportsSkipArea())
+    {
+        static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
+            kSelectAreasCommand,
+            kSkipAreaCommand,
+        };
+        return builder.ReferenceExisting(Span(kCommands));
+    }
+
     static constexpr DataModel::AcceptedCommandEntry kCommands[] = {
-        ServiceArea::Commands::SelectAreas::kMetadataEntry,
-        ServiceArea::Commands::SkipArea::kMetadataEntry,
+        kSelectAreasCommand,
     };
     return builder.ReferenceExisting(Span(kCommands));
 }
@@ -540,7 +562,7 @@ bool ServiceAreaCluster::ReportEstimatedEndTimeChange(const DataModel::Nullable<
     }
 
     // The value of this attribute SHALL only be reported in the following cases:
-    // - when it changes from null.
+    // - when it changes to or from null.
     if (mEstimatedEndTime.IsNull())
     {
         return true;
@@ -552,9 +574,10 @@ bool ServiceAreaCluster::ReportEstimatedEndTimeChange(const DataModel::Nullable<
         return true;
     }
 
+    // - when it changes to null
     if (aEstimatedEndTime.IsNull())
     {
-        return false;
+        return true;
     }
 
     // From this point we know that mEstimatedEndTime and aEstimatedEndTime are not null and not the same.

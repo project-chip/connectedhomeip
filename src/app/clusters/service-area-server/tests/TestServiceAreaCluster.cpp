@@ -105,8 +105,58 @@ TEST_F(ServiceAreaClusterTest, OptionalAttributesAreAdvertisedWhenEnabled)
     EXPECT_TRUE(HasAttr(Attributes::Progress::Id));
 }
 
-TEST_F(ServiceAreaClusterTest, SelectAreasAndSkipAreaCommandsAreAccepted)
+TEST_F(ServiceAreaClusterTest, SelectAreasCommandIsAlwaysAccepted)
 {
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
+    EXPECT_EQ(mCluster->AcceptedCommands(mCluster->GetPaths()[0], builder), CHIP_NO_ERROR);
+    auto list = builder.TakeBuffer();
+
+    bool hasSelectAreas = false;
+    bool hasSkipArea    = false;
+    for (const auto & entry : list)
+    {
+        if (entry.commandId == Commands::SelectAreas::Id)
+        {
+            hasSelectAreas = true;
+        }
+        if (entry.commandId == Commands::SkipArea::Id)
+        {
+            hasSkipArea = true;
+        }
+    }
+    EXPECT_TRUE(hasSelectAreas);
+    EXPECT_FALSE(hasSkipArea);
+}
+
+TEST_F(ServiceAreaClusterTest, SkipAreaCommandIsAcceptedWhenCurrentAreaIsEnabled)
+{
+    CreateCluster(ClusterConfigWithCurrentArea());
+
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
+    EXPECT_EQ(mCluster->AcceptedCommands(mCluster->GetPaths()[0], builder), CHIP_NO_ERROR);
+    auto list = builder.TakeBuffer();
+
+    bool hasSelectAreas = false;
+    bool hasSkipArea    = false;
+    for (const auto & entry : list)
+    {
+        if (entry.commandId == Commands::SelectAreas::Id)
+        {
+            hasSelectAreas = true;
+        }
+        if (entry.commandId == Commands::SkipArea::Id)
+        {
+            hasSkipArea = true;
+        }
+    }
+    EXPECT_TRUE(hasSelectAreas);
+    EXPECT_TRUE(hasSkipArea);
+}
+
+TEST_F(ServiceAreaClusterTest, SkipAreaCommandIsAcceptedWhenProgressIsEnabled)
+{
+    CreateCluster(ClusterConfigWithProgress());
+
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
     EXPECT_EQ(mCluster->AcceptedCommands(mCluster->GetPaths()[0], builder), CHIP_NO_ERROR);
     auto list = builder.TakeBuffer();
@@ -467,6 +517,22 @@ TEST_F(ServiceAreaClusterTest, EstimatedEndTimeRemainsNullWhileCurrentAreaIsNull
     EXPECT_TRUE(estimatedEndTime.IsNull());
 }
 
+TEST_F(ServiceAreaClusterTest, EstimatedEndTimeChangeToNullIsReported)
+{
+    ServiceAreaCluster::OptionalAttributeSet optionalAttributes;
+    optionalAttributes.Set<ServiceArea::Attributes::CurrentArea::Id>();
+    optionalAttributes.Set<ServiceArea::Attributes::EstimatedEndTime::Id>();
+    CreateCluster({ .optionalAttributes = optionalAttributes });
+
+    SeedBasicAreas();
+    ASSERT_TRUE(mCluster->SetCurrentArea(DataModel::MakeNullable(static_cast<uint32_t>(0))));
+    ASSERT_TRUE(mCluster->SetEstimatedEndTime(DataModel::MakeNullable(static_cast<uint32_t>(500))));
+    mTester->GetDirtyList().clear();
+
+    ASSERT_TRUE(mCluster->SetEstimatedEndTime(DataModel::NullNullable));
+    EXPECT_TRUE(DirtyListContainsAttribute(*mTester, Attributes::EstimatedEndTime::Id));
+}
+
 TEST_F(ServiceAreaClusterTest, EstimatedEndTimeChangeToZeroIsReported)
 {
     ServiceAreaCluster::OptionalAttributeSet optionalAttributes;
@@ -717,8 +783,19 @@ TEST_F(ServiceAreaClusterTest, SelectAreasMatchingCurrentSelectionSucceedsWithou
 //*****************************************************************************
 // SkipArea command
 
+TEST_F(ServiceAreaClusterTest, SkipAreaIsUnsupportedWithoutCurrentAreaOrProgress)
+{
+    SeedBasicAreas();
+    ASSERT_TRUE(mTester->Invoke(MakeSelectAreasRequest({ 0 })).IsSuccess());
+
+    Commands::SkipArea::Type request{ .skippedArea = 0 };
+    auto result = mTester->Invoke(request);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::UnsupportedCommand));
+}
+
 TEST_F(ServiceAreaClusterTest, SkipAreaWithoutSelectedAreasReturnsInvalidAreaList)
 {
+    CreateCluster(ClusterConfigWithCurrentArea());
     SeedBasicAreas();
     Commands::SkipArea::Type request{ .skippedArea = 0 };
     auto result = mTester->Invoke(request);
@@ -728,6 +805,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaWithoutSelectedAreasReturnsInvalidAreaLis
 
 TEST_F(ServiceAreaClusterTest, SkipAreaWithUnknownAreaReturnsInvalidSkippedArea)
 {
+    CreateCluster(ClusterConfigWithCurrentArea());
     SeedBasicAreas();
     ASSERT_TRUE(mTester->Invoke(MakeSelectAreasRequest({ 0 })).IsSuccess());
 
@@ -739,6 +817,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaWithUnknownAreaReturnsInvalidSkippedArea)
 
 TEST_F(ServiceAreaClusterTest, SkipAreaWhileDeviceModeDisallowsSkipReturnsInvalidInMode)
 {
+    CreateCluster(ClusterConfigWithCurrentArea());
     SeedBasicAreas();
     ASSERT_TRUE(mTester->Invoke(MakeSelectAreasRequest({ 0 })).IsSuccess());
     mDelegate.mSkipAreaAllowed = false;
@@ -752,6 +831,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaWhileDeviceModeDisallowsSkipReturnsInvali
 
 TEST_F(ServiceAreaClusterTest, SkipAreaSuccessInvokesDeviceDelegate)
 {
+    CreateCluster(ClusterConfigWithCurrentArea());
     SeedBasicAreas();
     ASSERT_TRUE(mTester->Invoke(MakeSelectAreasRequest({ 0, 1 })).IsSuccess());
 
@@ -764,6 +844,7 @@ TEST_F(ServiceAreaClusterTest, SkipAreaSuccessInvokesDeviceDelegate)
 
 TEST_F(ServiceAreaClusterTest, SkipAreaIsRejectedAfterUnconstrainedSelection)
 {
+    CreateCluster(ClusterConfigWithCurrentArea());
     SeedBasicAreas();
     ASSERT_TRUE(mTester->Invoke(MakeSelectAreasRequest({})).IsSuccess());
 

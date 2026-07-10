@@ -339,6 +339,20 @@ inline ServiceAreaCluster::OptionalAttributeSet AllOptionalAttributes()
     return optionalAttributes;
 }
 
+inline ClusterConfig ClusterConfigWithCurrentArea()
+{
+    ServiceAreaCluster::OptionalAttributeSet optionalAttributes;
+    optionalAttributes.Set<ServiceArea::Attributes::CurrentArea::Id>();
+    return { .optionalAttributes = optionalAttributes };
+}
+
+inline ClusterConfig ClusterConfigWithProgress()
+{
+    ServiceAreaCluster::OptionalAttributeSet optionalAttributes;
+    optionalAttributes.Set<ServiceArea::Attributes::Progress::Id>();
+    return { .features = BitMask<Feature>(Feature::kProgressReporting), .optionalAttributes = optionalAttributes };
+}
+
 inline AreaStructureWrapper MakeNamedArea(uint32_t areaId, const char * name)
 {
     AreaStructureWrapper area;
