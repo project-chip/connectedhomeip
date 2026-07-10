@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <filesystem>
-#include <optional>
 #include <string>
 
 #ifndef CHIP_DEFAULT_BASE_DIR

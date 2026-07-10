@@ -22,6 +22,8 @@
  *
  */
 
+#include <filesystem>
+
 #include <platform/Linux/CHIPLinuxStoragePaths.h>
 
 namespace chip {
