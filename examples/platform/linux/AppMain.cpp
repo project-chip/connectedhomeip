@@ -50,7 +50,9 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
 #include <platform/Linux/CHIPLinuxStoragePaths.h>
+#endif
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
@@ -615,11 +617,13 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
     sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
+#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
     // KVS paths are already set by ParseArguments() via SetStoragePaths()
     {
         std::string kvsPath = chip::DeviceLayer::GetStoragePaths().GetKVSDataFilePath();
         ChipLogProgress(NotSpecified, "KVS data file: %s", kvsPath.empty() ? "(default)" : kvsPath.c_str());
     }
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
 
 #if defined(ENABLE_CHIP_SHELL)
     /* Block SIGINT and SIGTERM. Other threads created by the main thread
@@ -1064,9 +1068,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
