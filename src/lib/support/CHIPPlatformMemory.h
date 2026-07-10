@@ -28,15 +28,31 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifndef CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+#if defined(__APPLE__) && defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED
+#define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 1
+#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos) _MALLOC_TYPED(override, type_param_pos)
+#else
+#define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 0
+#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos)
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+extern void * CHIPPlatformMemoryAllocTyped(size_t size, malloc_type_id_t typeId);
+extern void * CHIPPlatformMemoryCallocTyped(size_t num, size_t size, malloc_type_id_t typeId);
+extern void * CHIPPlatformMemoryReallocTyped(void * p, size_t size, malloc_type_id_t typeId);
+#endif
+
 extern int CHIPPlatformMemoryInit(void * buf, size_t bufSize);
 extern void CHIPPlatformMemoryShutdown();
-extern void * CHIPPlatformMemoryAlloc(size_t size);
-extern void * CHIPPlatformMemoryCalloc(size_t num, size_t size);
-extern void * CHIPPlatformMemoryRealloc(void * p, size_t size);
+extern void * CHIPPlatformMemoryAlloc(size_t size) CHIP_OVERRIDE_MALLOC_TYPED(CHIPPlatformMemoryAllocTyped, 1);
+extern void * CHIPPlatformMemoryCalloc(size_t num, size_t size) CHIP_OVERRIDE_MALLOC_TYPED(CHIPPlatformMemoryCallocTyped, 2);
+extern void * CHIPPlatformMemoryRealloc(void * p, size_t size) CHIP_OVERRIDE_MALLOC_TYPED(CHIPPlatformMemoryReallocTyped, 2);
 extern void CHIPPlatformMemoryFree(void * p);
 
 #ifdef __cplusplus

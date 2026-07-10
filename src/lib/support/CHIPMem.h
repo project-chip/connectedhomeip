@@ -34,6 +34,26 @@
 namespace chip {
 namespace Platform {
 
+#ifndef CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+#if defined(__APPLE__) && defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED
+#define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 1
+#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos) _MALLOC_TYPED(override, type_param_pos)
+#define CHIP_MALLOC_WRAPPER_BEGIN _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wallocator-wrappers\"")
+#define CHIP_MALLOC_WRAPPER_END _Pragma("clang diagnostic pop")
+#else
+#define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 0
+#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos)
+#define CHIP_MALLOC_WRAPPER_BEGIN
+#define CHIP_MALLOC_WRAPPER_END
+#endif
+#endif
+
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+extern void * MemoryAllocTyped(size_t size, malloc_type_id_t typeId);
+extern void * MemoryCallocTyped(size_t num, size_t size, malloc_type_id_t typeId);
+extern void * MemoryReallocTyped(void * p, size_t size, malloc_type_id_t typeId);
+#endif
+
 #define CHIP_ZERO_AT(value)                                                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
@@ -86,7 +106,17 @@ extern void MemoryShutdown();
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void * MemoryAlloc(size_t size);
+extern void * MemoryAlloc(size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryAllocTyped, 1);
+
+CHIP_MALLOC_WRAPPER_BEGIN
+
+template <typename T>
+T * MemoryAllocTyped(size_t num)
+{
+    return static_cast<T *>(MemoryAlloc(num * sizeof(T)));
+}
+
+CHIP_MALLOC_WRAPPER_END
 
 /**
  * This function is called by the CHIP layer to allocate a block of memory for an array of num
@@ -100,7 +130,17 @@ extern void * MemoryAlloc(size_t size);
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void * MemoryCalloc(size_t num, size_t size);
+extern void * MemoryCalloc(size_t num, size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryCallocTyped, 2);
+
+CHIP_MALLOC_WRAPPER_BEGIN
+
+template <typename T>
+T * MemoryCallocTyped(size_t num)
+{
+    return static_cast<T *>(MemoryCalloc(num, sizeof(T)));
+}
+
+CHIP_MALLOC_WRAPPER_END
 
 /**
  * This function is called by the Chip layer to change the size of the memory block pointed to by p.
@@ -120,7 +160,7 @@ extern void * MemoryCalloc(size_t num, size_t size);
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void * MemoryRealloc(void * p, size_t size);
+extern void * MemoryRealloc(void * p, size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryReallocTyped, 2);
 
 /**
  * This function is called by the Chip layer to release a memory block allocated by
@@ -142,7 +182,7 @@ extern void MemoryFree(void * p);
 template <typename T, typename... Args>
 inline T * New(Args &&... args)
 {
-    void * p = MemoryAlloc(sizeof(T));
+    void * p = MemoryAllocTyped<T>(1);
     if (p != nullptr)
     {
         return new (p) T(std::forward<Args>(args)...);
