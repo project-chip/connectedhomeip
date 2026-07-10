@@ -179,9 +179,10 @@ class VMFreezeWatchdog(threading.Thread):
                 if mono_jump or wall_drift:
                     self._freeze_detected = True
                     log.warning(
-                        f"VMFreezeWatchdog: Potential VM freeze detected! "
-                        f"Mono jump: {mono_jump} (delta: {mono_delta:.2f}s), "
-                        f"Wall drift: {wall_drift} (drift: {drift:.2f}s)"
+                        "VMFreezeWatchdog: Potential VM freeze detected! "
+                        "Mono jump: %s (delta: %.2fs), "
+                        "Wall drift: %s (drift: %.2fs)",
+                        mono_jump, mono_delta, wall_drift, drift
                     )
 
                 self.last_wall = curr_wall
@@ -217,7 +218,8 @@ class VMFreezeWatchdog(threading.Thread):
                 return
             except Exception:
                 if self.is_freeze_detected() and attempt <= retries:
-                    log.warning(f"VM freeze detected. Retrying in {delay_sec} seconds (attempt {attempt}/{retries})...")
+                    log.warning("VM freeze detected. Retrying in %d seconds (attempt %d/%d)...",
+                                delay_sec, attempt, retries)
                     time.sleep(delay_sec)
                     continue
                 raise
