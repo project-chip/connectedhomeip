@@ -157,36 +157,40 @@ class VMFreezeWatchdog(threading.Thread):
         self.last_wall = time.time()
         self.last_mono = time.monotonic()
 
+    def check_for_freeze(self):
+        """Checks for clock drift/jump and updates the freeze detection flag."""
+        with self._lock:
+            curr_wall = time.time()
+            curr_mono = time.monotonic()
+
+            wall_delta = curr_wall - self.last_wall
+            mono_delta = curr_mono - self.last_mono
+
+            # Check for two scenarios of VM clock behavior on resume:
+            # 1. Monotonic clock jumped: monotonic elapsed time is much larger than expected sleep time.
+            mono_jump = mono_delta > (self.check_interval_sec + self.threshold_sec)
+
+            # 2. Monotonic clock paused but Wall clock jumped (synced via NTP/integration):
+            # drift between wall clock and monotonic clock is significant.
+            drift = wall_delta - mono_delta
+            wall_drift = drift > self.threshold_sec
+
+            if mono_jump or wall_drift:
+                self._freeze_detected = True
+                log.warning(
+                    "VMFreezeWatchdog: Potential VM freeze detected! "
+                    "Mono jump: %s (delta: %.2fs), "
+                    "Wall drift: %s (drift: %.2fs)",
+                    mono_jump, mono_delta, wall_drift, drift
+                )
+
+            self.last_wall = curr_wall
+            self.last_mono = curr_mono
+
     def run(self):
         # We use Event.wait() instead of time.sleep() to allow instant thread teardown on stop().
         while not self._stop_event.wait(self.check_interval_sec):
-            with self._lock:
-                curr_wall = time.time()
-                curr_mono = time.monotonic()
-
-                wall_delta = curr_wall - self.last_wall
-                mono_delta = curr_mono - self.last_mono
-
-                # Check for two scenarios of VM clock behavior on resume:
-                # 1. Monotonic clock jumped: mono_delta is much larger than expected sleep time.
-                mono_jump = mono_delta > (self.check_interval_sec + self.threshold_sec)
-
-                # 2. Monotonic clock paused but Wall clock jumped (synced via NTP/integration):
-                # drift between wall clock and monotonic clock is significant.
-                drift = wall_delta - mono_delta
-                wall_drift = drift > self.threshold_sec
-
-                if mono_jump or wall_drift:
-                    self._freeze_detected = True
-                    log.warning(
-                        "VMFreezeWatchdog: Potential VM freeze detected! "
-                        "Mono jump: %s (delta: %.2fs), "
-                        "Wall drift: %s (drift: %.2fs)",
-                        mono_jump, mono_delta, wall_drift, drift
-                    )
-
-                self.last_wall = curr_wall
-                self.last_mono = curr_mono
+            self.check_for_freeze()
 
     def is_freeze_detected(self):
         """Returns True if a VM freeze has been detected since the last reset."""
@@ -217,6 +221,9 @@ class VMFreezeWatchdog(threading.Thread):
                 func()
                 return
             except Exception:
+                # Force a synchronous check to catch any freeze that just happened
+                # before the background watchdog thread had a chance to wake up and run.
+                self.check_for_freeze()
                 if self.is_freeze_detected() and attempt <= retries:
                     log.warning("VM freeze detected. Retrying in %d seconds (attempt %d/%d)...",
                                 delay_sec, attempt, retries)
