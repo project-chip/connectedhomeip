@@ -35,7 +35,6 @@
 
 #include <mutex>
 #include <platform/Linux/CHIPLinuxStorageIni.h>
-#include <platform/Linux/CHIPLinuxStoragePaths.h>
 #include <string>
 
 namespace chip {
