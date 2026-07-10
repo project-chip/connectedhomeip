@@ -8500,6 +8500,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AvailableTextTracks";
             break;
 
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableCommandsID:
+            result = @"AvailableCommands";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeContentInfoID:
+            result = @"ContentInfo";
+            break;
+
         case MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
