@@ -26,11 +26,10 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
+from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.exceptions import ChipStackError
-
 
 log = logging.getLogger(__name__)
 
@@ -258,16 +257,16 @@ class TC_CNET_4_12(MatterBaseTest):
 
         # All required endpoint and Threads dataset are set and assigned, Thread dataset as str
         log.info('Precondition: All required arguments are set and assigned, Thread dataset as str: '
-                    f'THREADS_ENDPOINT = {endpoint}, '
-                    f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
-                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
+                 f'THREADS_ENDPOINT = {endpoint}, '
+                 f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
+                 f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
         thread_dataset_1_bytes = thread_dataset_1
         thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
         # All required arguments are set and assigned, Thread dataset as bytes
         log.info('Precondition: All required arguments are set and assigned, Thread dataset as bytes: '
-                    f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
-                    f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2_bytes}')
+                 f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
+                 f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2_bytes}')
 
         # Validate the operational dataset structure (for both datasets)
         log.info("Precondition: Validating THREAD operational datasets")
@@ -278,8 +277,8 @@ class TC_CNET_4_12(MatterBaseTest):
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
         log.info('Precondition: NetworkID : '
-                    f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
-                    f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
+                 f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
+                 f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
 
         # Read the ConnectMaxTimeSeconds attribute after attempting to connect
         connect_max_time_seconds = await self.read_single_attribute_check_success(
@@ -463,13 +462,13 @@ class TC_CNET_4_12(MatterBaseTest):
                 if srv_record and srv_record.addresses and th2_ip not in srv_record.addresses:
                     log.info("Step #11: Device confirmed on THREAD_1ST with new address(es): %s", srv_record.addresses)
                     break
-            except (signals.TestFailure, AssertionError, asyncio.TimeoutError):
+            except (TimeoutError, signals.TestFailure, AssertionError):
                 # Catching expected assertion failures or timeouts from wait_for_srp_update while waiting for the SRP record to migrate subnets
                 pass
             await asyncio.sleep(1)
         else:
-            asserts.fail(f"Step #11: Timeout ({timeout_seconds}s) waiting for device to drop THREAD_2ND IP and return to THREAD_1ST")
-
+            asserts.fail(
+                f"Step #11: Timeout ({timeout_seconds}s) waiting for device to drop THREAD_2ND IP and return to THREAD_1ST")
 
         self.step(12)
         networks = await self.read_single_attribute_check_success(
