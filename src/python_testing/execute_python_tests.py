@@ -27,7 +27,7 @@ import subprocess
 import sys
 import threading
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from xml.dom.minidom import parseString
 from xml.etree.ElementTree import Element, SubElement, tostring
@@ -176,7 +176,7 @@ class ExecutedTest:
 
         if self.status == "failed":
             self.summary.failed_scripts.append(self.script_path)
-        
+
         self.summary.record(self.name, self.status, duration, self.error_message)
         return self.summary.keep_going
 
