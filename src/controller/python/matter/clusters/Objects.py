@@ -48221,6 +48221,8 @@ class MediaPlayback(Cluster):
                 ClusterObjectFieldDescriptor(Label="availableAudioTracks", Tag=0x00000008, Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]]),
                 ClusterObjectFieldDescriptor(Label="activeTextTrack", Tag=0x00000009, Type=typing.Union[None, Nullable, MediaPlayback.Structs.TrackStruct]),
                 ClusterObjectFieldDescriptor(Label="availableTextTracks", Tag=0x0000000A, Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]]),
+                ClusterObjectFieldDescriptor(Label="availableCommands", Tag=0x0000000B, Type=typing.Union[Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="contentInfo", Tag=0x0000000C, Type=typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48239,6 +48241,8 @@ class MediaPlayback(Cluster):
     availableAudioTracks: typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]] = None
     activeTextTrack: typing.Union[None, Nullable, MediaPlayback.Structs.TrackStruct] = None
     availableTextTracks: typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]] = None
+    availableCommands: typing.Union[Nullable, typing.List[uint]] = NullValue
+    contentInfo: typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -48270,6 +48274,17 @@ class MediaPlayback(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 18
+
+        class MediaType(MatterIntEnum):
+            kGeneric = 0x00
+            kTVShow = 0x01
+            kMusic = 0x02
+            kPodcast = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
 
         class PlaybackStateEnum(MatterIntEnum):
             kPlaying = 0x00
@@ -48311,10 +48326,12 @@ class MediaPlayback(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="languageCode", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="displayName", Tag=1, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="characteristics", Tag=1, Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Enums.CharacteristicEnum]]),
+                        ClusterObjectFieldDescriptor(Label="displayName", Tag=2, Type=typing.Union[None, Nullable, str]),
                     ])
 
             languageCode: 'str' = ""
+            characteristics: 'typing.Union[None, Nullable, typing.List[MediaPlayback.Enums.CharacteristicEnum]]' = None
             displayName: 'typing.Union[None, Nullable, str]' = None
 
         @dataclass
@@ -48329,6 +48346,33 @@ class MediaPlayback(Cluster):
 
             id: 'str' = ""
             trackAttributes: 'typing.Union[Nullable, MediaPlayback.Structs.TrackAttributesStruct]' = NullValue
+
+        @dataclass
+        class ContentInfoStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="contentType", Tag=0, Type=MediaPlayback.Enums.MediaType),
+                        ClusterObjectFieldDescriptor(Label="title", Tag=1, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="show", Tag=2, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="season", Tag=3, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="episode", Tag=4, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="provider", Tag=5, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="artist", Tag=6, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="album", Tag=7, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="track", Tag=8, Type=typing.Union[None, Nullable, str]),
+                    ])
+
+            contentType: 'MediaPlayback.Enums.MediaType' = 0
+            title: 'typing.Union[None, Nullable, str]' = None
+            show: 'typing.Union[None, Nullable, str]' = None
+            season: 'typing.Union[None, Nullable, str]' = None
+            episode: 'typing.Union[None, Nullable, str]' = None
+            provider: 'typing.Union[None, Nullable, str]' = None
+            artist: 'typing.Union[None, Nullable, str]' = None
+            album: 'typing.Union[None, Nullable, str]' = None
+            track: 'typing.Union[None, Nullable, str]' = None
 
         @dataclass
         class PlaybackPositionStruct(ClusterObject):
@@ -48743,6 +48787,38 @@ class MediaPlayback(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]])
 
             value: typing.Union[None, Nullable, typing.List[MediaPlayback.Structs.TrackStruct]] = None
+
+        @dataclass
+        class AvailableCommands(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000506
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[uint]])
+
+            value: typing.Union[Nullable, typing.List[uint]] = NullValue
+
+        @dataclass
+        class ContentInfo(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000506
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct])
+
+            value: typing.Union[Nullable, MediaPlayback.Structs.ContentInfoStruct] = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
