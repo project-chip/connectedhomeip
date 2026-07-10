@@ -2660,6 +2660,39 @@ class ChipDeviceControllerBase:
                 self.devCtrl, group_id, keyset_id)
         ).raise_on_error()
 
+    def RemoveGroupInfo(self, group_id: int):
+        '''
+        Removes a group entry from the controller's GroupDataProvider for this fabric.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_RemoveGroupInfo(
+                self.devCtrl, group_id)
+        ).raise_on_error()
+
+    def RemoveKeySet(self, keyset_id: int):
+        '''
+        Removes a KeySet from the controller's GroupDataProvider for this fabric.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_RemoveKeySet(
+                self.devCtrl, keyset_id)
+        ).raise_on_error()
+
+    def RemoveGroupKeys(self):
+        '''
+        Removes all GroupKey mappings from the controller's GroupDataProvider for this fabric.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_RemoveGroupKeys(
+                self.devCtrl)
+        ).raise_on_error()
+
     def CreateManualCode(self, discriminator: int, passcode: int) -> str:
         '''
         Creates a standard flow manual code from the given discriminator and passcode.
@@ -2961,6 +2994,15 @@ class ChipDeviceControllerBase:
 
             self._dmLib.pychip_OpCreds_SetGroupKey.argtypes = [c_void_p, c_uint16, c_uint16]
             self._dmLib.pychip_OpCreds_SetGroupKey.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_RemoveGroupInfo.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_OpCreds_RemoveGroupInfo.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_RemoveKeySet.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_OpCreds_RemoveKeySet.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_RemoveGroupKeys.argtypes = [c_void_p]
+            self._dmLib.pychip_OpCreds_RemoveGroupKeys.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]
