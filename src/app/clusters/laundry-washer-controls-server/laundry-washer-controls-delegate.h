@@ -18,6 +18,7 @@
 #pragma once
 #include <clusters/LaundryWasherControls/Enums.h>
 #include <lib/support/Span.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
