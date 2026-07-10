@@ -34,7 +34,7 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, dm_from_spec
 #   18      -> Matter 1.4 / 1.4.1
 #   19      -> Matter 1.4.2 / 1.5
 #   20      -> Matter 1.5.1
-#   21      -> Matter 1.6 
+#   21      -> Matter 1.6
 # SpecificationVersion (added in Matter 1.3) is used to select the expected value.
 _DATA_MODEL_REVISION_BY_SPEC = {
     PrebuiltDataModelDirectory.k1_3: 17,    # Matter 1.3 (Technically also 1.2, but it has no SpecificationVersion attribute)
