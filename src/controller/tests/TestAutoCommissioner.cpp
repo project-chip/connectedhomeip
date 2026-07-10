@@ -721,7 +721,7 @@ public:
         return CHIP_NO_ERROR; // return success so CommissioningStageComplete does not enter the cleanup path
     }
 
-    bool mCalled       = false;
+    bool mCalled        = false;
     CHIP_ERROR mLastErr = CHIP_NO_ERROR;
 
 private:
@@ -738,8 +738,8 @@ TEST(DeviceCommissionerNetworkConfigRemovalTest, RemoveWiFiNetworkConfigWithoutC
     CapturingCommissioningDelegate delegate;
     CommissioningParameters params; // deliberately no Wi-Fi credentials
 
-    commissioner.PerformCommissioningStep(&proxy, CommissioningStage::kRemoveWiFiNetworkConfig, params, &delegate,
-                                          kRootEndpointId, NullOptional);
+    commissioner.PerformCommissioningStep(&proxy, CommissioningStage::kRemoveWiFiNetworkConfig, params, &delegate, kRootEndpointId,
+                                          NullOptional);
 
     EXPECT_TRUE(delegate.mCalled);
     EXPECT_EQ(delegate.mLastErr, CHIP_ERROR_INVALID_ARGUMENT);
