@@ -809,6 +809,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::
 
 static void Finalize(chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type & request,
                         Json::Value & value);
 
@@ -823,6 +828,21 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::DimensionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::ContentAppInfo::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentAppInfo::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::LaunchUrlInfo::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::LaunchUrlInfo::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::ReplicationInfo::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ReplicationInfo::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::TrackPreferenceStruct::Type & request,
                         Json::Value & value);
@@ -860,6 +880,11 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type & request,
                         Json::Value & value);
@@ -905,6 +930,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl:
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MediaFileManagement::Structs::FileDescriptionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianVertexStruct::Type & request,
                         Json::Value & value);

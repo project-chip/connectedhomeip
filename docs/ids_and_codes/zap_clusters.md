@@ -146,6 +146,7 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
+|       1297 |      0x511 | MediaFileManagement                                     |
 |       1298 |      0x512 | AudioControl                                            |
 |       1360 |      0x550 | ZoneManagement                                          |
 |       1361 |      0x551 | CameraAvStreamManagement                                |

@@ -293,6 +293,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentControl";
     case chip::app::Clusters::ContentAppObserver::Id:
         return "ContentAppObserver";
+    case chip::app::Clusters::MediaFileManagement::Id:
+        return "MediaFileManagement";
     case chip::app::Clusters::AudioControl::Id:
         return "AudioControl";
     case chip::app::Clusters::ZoneManagement::Id:
@@ -4516,6 +4518,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveTextTrack";
         case chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
             return "AvailableTextTracks";
+        case chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id:
+            return "AvailableCommands";
+        case chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id:
+            return "ContentInfo";
         case chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::Id:
@@ -4592,6 +4598,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AcceptHeader";
         case chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id:
             return "SupportedStreamingProtocols";
+        case chip::app::Clusters::ContentLauncher::Attributes::Movable::Id:
+            return "Movable";
+        case chip::app::Clusters::ContentLauncher::Attributes::Presets::Id:
+            return "Presets";
         case chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::Id:
@@ -4749,6 +4759,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ContentAppObserver::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ContentAppObserver::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MediaFileManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::Id:
+            return "TotalStorage";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::Id:
+            return "AvailableStorage";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::Id:
+            return "AvailableFiles";
+        case chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::Id:
+            return "SupportedMimeTypes";
+        case chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -6698,6 +6733,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LaunchContent";
         case chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id:
             return "LaunchURL";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id:
+            return "ContentReplicationRequest";
+        case chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id:
+            return "PlayPreset";
         default:
             return "Unknown";
         }
@@ -6783,6 +6822,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Id:
             return "ContentAppMessage";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MediaFileManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id:
+            return "AddFile";
+        case chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id:
+            return "DeleteFile";
+        case chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id:
+            return "RequestSharedFiles";
+        case chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id:
+            return "GetSharedFile";
+        case chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id:
+            return "OfferFile";
         default:
             return "Unknown";
         }
@@ -7609,6 +7665,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Id:
             return "LauncherResponse";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Id:
+            return "ContentReplicationResponse";
         default:
             return "Unknown";
         }
@@ -7645,6 +7703,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::Id:
             return "ContentAppMessageResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MediaFileManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::Id:
+            return "AddFileResponse";
+        case chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::Id:
+            return "GetSharedFileResponse";
         default:
             return "Unknown";
         }
