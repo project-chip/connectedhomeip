@@ -89,7 +89,10 @@ CHIP_ERROR LaundryWasherControlsCluster::SetSpinSpeedCurrent(DataModel::Nullable
 
     ReturnErrorOnFailure(SpinSpeedIndexValidity(spinSpeedCurrent));
 
-    SetAttributeValue(mSpinSpeedCurrent, spinSpeedCurrent, SpinSpeedCurrent::Id);
+    if (SetAttributeValue(mSpinSpeedCurrent, spinSpeedCurrent, SpinSpeedCurrent::Id) && mDelegate != nullptr)
+    {
+        mDelegate->OnSpinSpeedCurrentChanged(spinSpeedCurrent);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -102,7 +105,10 @@ CHIP_ERROR LaundryWasherControlsCluster::SetNumberOfRinses(NumberOfRinsesEnum nu
 
     ReturnErrorOnFailure(NumberOfRinsesValidity(numberOfRinses));
 
-    SetAttributeValue(mNumberOfRinses, numberOfRinses, NumberOfRinses::Id);
+    if (SetAttributeValue(mNumberOfRinses, numberOfRinses, NumberOfRinses::Id) && mDelegate != nullptr)
+    {
+        mDelegate->OnNumberOfRinsesChanged(numberOfRinses);
+    }
     return CHIP_NO_ERROR;
 }
 

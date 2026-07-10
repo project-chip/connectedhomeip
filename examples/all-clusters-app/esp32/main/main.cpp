@@ -134,7 +134,7 @@ static void InitServer(intptr_t context)
 using namespace chip::app::Clusters::LaundryWasherControls;
 void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
-    LaundryWasherControlsServer::SetDelegate(1, LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+    LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }
 
 #include <examples/all-clusters-app/all-clusters-common/include/laundry-dryer-controls-delegate-impl.h>

@@ -97,6 +97,12 @@ namespace chip::app::Clusters::LaundryWasherControls {
 namespace LaundryWasherControlsServer {
 
 // Delegate should be valid until cluster on the endpoint is destroyed. This will probably happen at the end of the program.
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    VerifyOrDie(delegate != nullptr);
+    SetDelegate(endpoint, *delegate);
+}
+
 void SetDelegate(EndpointId endpoint, Delegate & delegate)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);

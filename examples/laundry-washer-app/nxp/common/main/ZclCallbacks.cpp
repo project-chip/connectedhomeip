@@ -44,5 +44,5 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 using namespace chip::app::Clusters::LaundryWasherControls;
 void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
-    LaundryWasherControlsServer::SetDelegate(endpoint, LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }

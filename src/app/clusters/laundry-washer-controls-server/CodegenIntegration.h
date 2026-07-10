@@ -26,10 +26,15 @@ namespace LaundryWasherControlsServer {
 /**
  * Set the delegate of laundry washer server at endpoint x
  * @param endpoint ID of the endpoint
- * @param delegate The delegate at the endpoint
+ * @param delegate The delegate at the endpoint.
+ * The delegate should be valid until the cluster on the endpoint is destroyed. This will probably happen at the end of the program.
  * @note This function can be called only after Server::Init is called
  */
 void SetDelegate(EndpointId endpoint, Delegate & delegate);
+
+/// Same as SetDelegate, kept for backward compatibility. Use SetDelegate instead.
+/// @param delegate SHOULD NOT be nullptr.
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
 /**
  * API to set/get the SpinSpeedCurrent attribute
