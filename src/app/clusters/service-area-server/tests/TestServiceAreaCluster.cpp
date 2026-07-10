@@ -529,8 +529,7 @@ std::optional<OperationalStatusEnum> ProgressElementStatus(const std::optional<S
     return progress->status;
 }
 
-std::optional<bool>
-ProgressElementHasTotalOperationalTime(const std::optional<Structs::ProgressStruct::DecodableType> & progress)
+std::optional<bool> ProgressElementHasTotalOperationalTime(const std::optional<Structs::ProgressStruct::DecodableType> & progress)
 {
     VerifyOrReturnValue(progress.has_value(), std::nullopt);
     return progress->totalOperationalTime.HasValue();
