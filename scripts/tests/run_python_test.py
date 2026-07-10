@@ -294,7 +294,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              script_timeout: float, quiet: bool, run_name: str):
+              run_timeout: float, quiet: bool, run_name: str):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -373,7 +373,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     try:
         try:
-            test_script_exit_code = test_script_process.wait(script_timeout)
+            test_script_exit_code = test_script_process.wait(run_timeout)
         except TimeoutError as e:
             log.exception("%r", e)
             test_script_exit_code = -1  # Trigger error codepath
