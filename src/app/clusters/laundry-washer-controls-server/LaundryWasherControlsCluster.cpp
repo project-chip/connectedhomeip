@@ -80,7 +80,7 @@ CHIP_ERROR LaundryWasherControlsCluster::Attributes(const ConcreteClusterPath & 
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
-CHIP_ERROR LaundryWasherControlsCluster::SetSpinSpeedCurrent(const DataModel::Nullable<uint8_t> & spinSpeedCurrent)
+CHIP_ERROR LaundryWasherControlsCluster::SetSpinSpeedCurrent(DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
     if (!mFeatures.Has(Feature::kSpin))
     {
@@ -106,7 +106,7 @@ CHIP_ERROR LaundryWasherControlsCluster::SetNumberOfRinses(NumberOfRinsesEnum nu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LaundryWasherControlsCluster::SpinSpeedIndexValidity(const DataModel::Nullable<uint8_t> & spinSpeedCurrent)
+CHIP_ERROR LaundryWasherControlsCluster::SpinSpeedIndexValidity(DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
     if (spinSpeedCurrent.IsNull())
     {
@@ -127,7 +127,7 @@ CHIP_ERROR LaundryWasherControlsCluster::NumberOfRinsesValidity(NumberOfRinsesEn
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_IM_GLOBAL_STATUS(InvalidInState));
     NumberOfRinsesEnum supportedRinse;
-    for (size_t i = 0; i < kMaxSupportedRinsesLength && mDelegate->GetSupportedRinseAtIndex(i, supportedRinse) == CHIP_NO_ERROR;
+    for (uint8_t i = 0; i < kMaxSupportedRinsesLength && mDelegate->GetSupportedRinseAtIndex(i, supportedRinse) == CHIP_NO_ERROR;
          ++i)
     {
         if (numberOfRinses == supportedRinse)

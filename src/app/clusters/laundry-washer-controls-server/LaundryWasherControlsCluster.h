@@ -79,7 +79,7 @@ public:
         NotifySpinSpeedsAttributeChanged();
         NotifySupportedRinsesAttributeChanged();
     }
-    CHIP_ERROR SetSpinSpeedCurrent(const DataModel::Nullable<uint8_t> & spinSpeedCurrent);
+    CHIP_ERROR SetSpinSpeedCurrent(DataModel::Nullable<uint8_t> spinSpeedCurrent);
     CHIP_ERROR SetNumberOfRinses(LaundryWasherControls::NumberOfRinsesEnum numberOfRinses);
     DataModel::Nullable<uint8_t> GetSpinSpeedCurrent() const { return mSpinSpeedCurrent; }
     LaundryWasherControls::NumberOfRinsesEnum GetNumberOfRinses() const { return mNumberOfRinses; }
@@ -93,7 +93,7 @@ public:
     void NotifySupportedRinsesAttributeChanged() { NotifyAttributeChanged(LaundryWasherControls::Attributes::SupportedRinses::Id); }
 
 private:
-    CHIP_ERROR SpinSpeedIndexValidity(const DataModel::Nullable<uint8_t> & spinSpeedCurrent);
+    CHIP_ERROR SpinSpeedIndexValidity(DataModel::Nullable<uint8_t> spinSpeedCurrent);
     CHIP_ERROR NumberOfRinsesValidity(LaundryWasherControls::NumberOfRinsesEnum numberOfRinses);
 
     CHIP_ERROR ReadSpinSpeeds(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder);
