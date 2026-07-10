@@ -34,7 +34,7 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, dm_from_spec
 #   18      -> Matter 1.4 / 1.4.1
 #   19      -> Matter 1.4.2 / 1.5
 #   20      -> Matter 1.5.1
-#   21      -> Matter 1.6 / 1.6.1
+#   21      -> Matter 1.6 
 # SpecificationVersion (added in Matter 1.3) is used to select the expected value.
 _DATA_MODEL_REVISION_BY_SPEC = {
     PrebuiltDataModelDirectory.k1_3: 17,    # Matter 1.3 (Technically also 1.2, but it has no SpecificationVersion attribute)
@@ -44,7 +44,6 @@ _DATA_MODEL_REVISION_BY_SPEC = {
     PrebuiltDataModelDirectory.k1_5: 19,    # Matter 1.5
     PrebuiltDataModelDirectory.k1_5_1: 20,  # Matter 1.5.1
     PrebuiltDataModelDirectory.k1_6: 21,    # Matter 1.6
-    PrebuiltDataModelDirectory.k1_6_1: 21,  # Matter 1.6.1
 }
 
 
@@ -54,7 +53,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
             TestStep(1, "TH reads DataModelRevision (and, when supported, SpecificationVersion) from the DUT.",
                      "Verify that DataModelRevision matches the value expected for the DUT's Matter specification version "
-                     "(17 for 1.2/1.3, 18 for 1.4/1.4.1, 19 for 1.4.2/1.5, 20 for 1.5.1, 21 for 1.6/1.6.1). "
+                     "(17 for 1.2/1.3, 18 for 1.4/1.4.1, 19 for 1.4.2/1.5, 20 for 1.5.1, 21 for 1.6). "
                      "If SpecificationVersion is not supported (pre-1.3 devices), verify the value is 1, 16, or 17."),
             TestStep(2, "TH reads VendorName from the DUT.", "Verify that the VendorName returns a string with max 32 bytes"),
             TestStep(3, "TH reads VendorID from the DUT.", "Verify value is in the range of 0x0001 to 0xFFF4"),
