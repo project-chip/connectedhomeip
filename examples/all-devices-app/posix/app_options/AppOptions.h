@@ -19,7 +19,7 @@
 #pragma once
 
 #include <Options.h>
-#include <devices/device-type-parser/DeviceTypeParser.h>
+#include <app_options/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -33,20 +33,25 @@ public:
     struct AppConfig
     {
         std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
-        uint32_t bleController = 0;
-        bool enableWiFi        = false;
-        std::string kvsPath;
+        std::optional<uint16_t> port;
+        bool enableGroupcast = false;
+        std::string appPipePath;
+        std::vector<std::string> traceTo;
+
         std::optional<uint16_t> discriminator;
         std::optional<uint16_t> vendorId;
         std::optional<uint16_t> productId;
-        std::optional<uint16_t> port;
         std::optional<uint32_t> interfaceId;
-        bool enableGroupcast = false;
+        std::string kvsPath;
+        bool enableWiFi        = false;
+        uint32_t bleController = 0;
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
+
     static const AppConfig & GetConfig();
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
+    static CHIP_ERROR ValidateConfig();
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
@@ -54,4 +59,5 @@ private:
 
     static DeviceTypeParser sParser;
     static AppConfig mConfig;
+    static bool sIsConfigValidated;
 };

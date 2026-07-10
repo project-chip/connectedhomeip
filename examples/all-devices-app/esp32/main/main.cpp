@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <ESP32DimmableLightDevice.h>
+#include <ESP32DimmableLight.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
@@ -25,8 +25,9 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <devices/device-factory/DeviceFactory.h>
-#include <devices/root-node/WifiRootNodeDevice.h>
+#include <device-factory/DeviceFactory.h>
+#include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
+#include <device/types/root-node/WifiRootNode.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <esp_system.h>
@@ -83,7 +84,6 @@ static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
 
 #include "DeviceFactoryPlatformOverride.h"
-#include "Esp32BleRssiRangingAdapter.h"
 
 namespace {
 
@@ -104,7 +104,7 @@ chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
+std::unique_ptr<DeviceInterface> gRootNode;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 DefaultTimerDelegate gTimerDelegate;
 
@@ -223,35 +223,36 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
-        RootNodeDevice::Context {
-            .commissioningWindowManager           = Server::GetInstance().GetCommissioningWindowManager(),   //
-                .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
-                .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
-                .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
-                .accessControl                    = Server::GetInstance().GetAccessControl(),                //
-                .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
-                .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
-                .deviceInstanceInfoProvider       = *provider,                                               //
-                .platformManager                  = DeviceLayer::PlatformMgr(),                              //
-                .groupDataProvider                = gGroupDataProvider,                                      //
-                .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
-                .dnssdServer                      = DnssdServer::Instance(),                                 //
-                .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
-                .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
-                .testEventTriggerDelegate         = testEventTriggerDelegate,                                //
-                .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
-                .eventManagement                  = EventManagement::GetInstance(),                          //
-                .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
-                .timerDelegate                    = gTimerDelegate,                                          //
+    gRootNode = std::make_unique<WifiRootNode>(
+        RootNode::Context {
+            .commissioningWindowManager     = Server::GetInstance().GetCommissioningWindowManager(),   //
+                .configurationManager       = DeviceLayer::ConfigurationMgr(),                         //
+                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
+                .fabricTable                = Server::GetInstance().GetFabricTable(),                  //
+                .accessControl              = Server::GetInstance().GetAccessControl(),                //
+                .persistentStorage          = Server::GetInstance().GetPersistentStorage(),            //
+                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),              //
+                .deviceInstanceInfoProvider = *provider,                                               //
+                .platformManager            = DeviceLayer::PlatformMgr(),                              //
+                .groupDataProvider          = gGroupDataProvider,                                      //
+                .sessionManager             = Server::GetInstance().GetSecureSessionManager(),         //
+                .dnssdServer                = DnssdServer::Instance(),                                 //
+                .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
+                .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
+                .testEventTriggerDelegate   = testEventTriggerDelegate,                                //
+                .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+                .eventManagement            = EventManagement::GetInstance(),                          //
+                .timerDelegate              = gTimerDelegate,                                          //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        WifiRootNodeDevice::WifiContext{
+        WifiRootNode::WifiContext{
             .wifiDriver = sWiFiDriver,
         });
-    err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+
+    ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
+    err = gRootNode->Register(rootAllocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -273,7 +274,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    err = gConstructedDevice->Register(CONFIG_ALL_DEVICES_ENDPOINT, dataModelProvider, kInvalidEndpointId);
+    ConsecutiveEndpointIdAllocator allocator(CONFIG_ALL_DEVICES_ENDPOINT);
+    err = gConstructedDevice->Register(allocator, dataModelProvider);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -303,7 +305,7 @@ void InitServer(intptr_t context)
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
     DeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return std::make_unique<ESP32DimmableLightDevice>(ESP32DimmableLightDevice::Context{
+        return std::make_unique<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,

@@ -20,6 +20,8 @@
 #include "SmokeCoAlarmManager.h"
 #include "platform/CHIPDeviceLayer.h"
 
+#include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 AppTask AppTask::sAppTask;
@@ -42,7 +44,7 @@ CHIP_ERROR AppTask::Init(void)
 void AppTask::SelfTestHandler(AppEvent * aEvent)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    bool success = SmokeCoAlarmServer::Instance().RequestSelfTest(1);
+    bool success = chip::app::Clusters::SmokeCoAlarmServer::Instance().RequestSelfTest(1);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     if (!success)
     {

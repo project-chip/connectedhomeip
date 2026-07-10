@@ -30,6 +30,7 @@
 #include <clusters/AmbientSensingUnion/AttributeIds.h>
 #include <clusters/ApplicationBasic/AttributeIds.h>
 #include <clusters/ApplicationLauncher/AttributeIds.h>
+#include <clusters/AudioControl/AttributeIds.h>
 #include <clusters/AudioOutput/AttributeIds.h>
 #include <clusters/AvAnalysis/AttributeIds.h>
 #include <clusters/BallastConfiguration/AttributeIds.h>
@@ -48,6 +49,7 @@
 #include <clusters/ClosureDimension/AttributeIds.h>
 #include <clusters/ColorControl/AttributeIds.h>
 #include <clusters/CommissionerControl/AttributeIds.h>
+#include <clusters/CommissioningProxy/AttributeIds.h>
 #include <clusters/CommodityMetering/AttributeIds.h>
 #include <clusters/CommodityPrice/AttributeIds.h>
 #include <clusters/CommodityTariff/AttributeIds.h>
@@ -97,6 +99,7 @@
 #include <clusters/LevelControl/AttributeIds.h>
 #include <clusters/LocalizationConfiguration/AttributeIds.h>
 #include <clusters/LowPower/AttributeIds.h>
+#include <clusters/MediaFileManagement/AttributeIds.h>
 #include <clusters/MediaInput/AttributeIds.h>
 #include <clusters/MediaPlayback/AttributeIds.h>
 #include <clusters/Messages/AttributeIds.h>
@@ -147,7 +150,9 @@
 #include <clusters/Switch/AttributeIds.h>
 #include <clusters/TargetNavigator/AttributeIds.h>
 #include <clusters/TemperatureControl/AttributeIds.h>
+#include <clusters/TemperatureControlledCabinetTopology/AttributeIds.h>
 #include <clusters/TemperatureMeasurement/AttributeIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/AttributeIds.h>
 #include <clusters/Thermostat/AttributeIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/AttributeIds.h>
 #include <clusters/ThreadBorderRouterManagement/AttributeIds.h>

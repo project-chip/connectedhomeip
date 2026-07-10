@@ -288,7 +288,7 @@ TEST_F(TestUdcMessages, TestUDCClients)
     EXPECT_EQ(nullptr, mUdcClients.FindUDCClientState(instanceName4));
 
     // test re-activation
-    EXPECT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
+    ASSERT_EQ(CHIP_NO_ERROR, mUdcClients.CreateNewUDCClientState(instanceName4, &state));
     System::Clock::Timestamp expirationTime = state->GetExpirationTime();
     state->SetExpirationTime(expirationTime - System::Clock::Milliseconds64(1));
     EXPECT_EQ((expirationTime - System::Clock::Milliseconds64(1)), state->GetExpirationTime());
@@ -480,6 +480,103 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
 
     // TODO: remove following "force-fail" debug line
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOversizedRotatingId)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName = "servertest1";
+
+    uint8_t idBuffer[500] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), Dnssd::Commission::kInstanceNameMaxLength + 1, instanceName);
+
+    size_t offset = Dnssd::Commission::kInstanceNameMaxLength + 1;
+    TLV::TLVWriter writer;
+    writer.Init(idBuffer + offset, sizeof(idBuffer) - offset);
+
+    TLV::TLVType outerContainerType = TLV::kTLVType_Structure;
+    EXPECT_SUCCESS(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+
+    uint8_t oversizedId[60] = {};
+    memset(oversizedId, 0xAB, sizeof(oversizedId));
+    EXPECT_SUCCESS(writer.PutBytes(TLV::ContextTag(7), oversizedId, sizeof(oversizedId)));
+
+    EXPECT_SUCCESS(writer.EndContainer(outerContainerType));
+    EXPECT_SUCCESS(writer.Finalize());
+
+    size_t totalLen = offset + writer.GetLengthWritten();
+
+    EXPECT_NE(idOut.ReadPayload(idBuffer, totalLen), CHIP_NO_ERROR);
+    EXPECT_EQ(idOut.GetRotatingIdLength(), 0u);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTruncatedPayload)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[5] = { 't', 'e', 's', 't', '\0' };
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationPureHeader)
+{
+    IdentificationDeclaration idOut;
+    const char * instanceName                                       = "servertest1";
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
+    Platform::CopyString(reinterpret_cast<char *>(idBuffer), sizeof(idBuffer), instanceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+    EXPECT_STREQ(idOut.GetInstanceName(), instanceName);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationOob)
+{
+    IdentificationDeclaration idOut;
+    uint8_t idBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(idBuffer, 'A', sizeof(idBuffer));
+
+    const char * deviceName = "test-device";
+    idOut.SetDeviceName(deviceName);
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    EXPECT_EQ(idOut.ReadPayload(idBuffer, sizeof(idBuffer)), CHIP_NO_ERROR);
+
+    EXPECT_STREQ(idOut.GetDeviceName(), deviceName);
+
+    char expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    memset(expectedInstanceName, 'A', Dnssd::Commission::kInstanceNameMaxLength);
+    expectedInstanceName[Dnssd::Commission::kInstanceNameMaxLength] = '\0';
+    EXPECT_STREQ(idOut.GetInstanceName(), expectedInstanceName);
+}
+
+TEST_F(TestUdcMessages, TestUDCIdentificationDeclarationTargetAppInfoOverflow)
+{
+    IdentificationDeclaration id;
+
+    // Add far more target app infos than the fixed array can hold. AddTargetAppInfo must
+    // reject the extras instead of writing past the end of mTargetAppInfos.
+    uint8_t accepted = 0;
+    for (uint16_t i = 0; i < 64; i++)
+    {
+        TargetAppInfo appInfo;
+        appInfo.vendorId  = static_cast<uint16_t>(i + 1);
+        appInfo.productId = static_cast<uint16_t>(i + 100);
+        if (id.AddTargetAppInfo(appInfo))
+        {
+            accepted++;
+        }
+    }
+
+    // The count must be capped and every stored entry must be retrievable.
+    EXPECT_EQ(id.GetNumTargetAppInfos(), accepted);
+    EXPECT_LT(id.GetNumTargetAppInfos(), 64);
+    for (uint8_t i = 0; i < id.GetNumTargetAppInfos(); i++)
+    {
+        TargetAppInfo appInfo;
+        EXPECT_TRUE(id.GetTargetAppInfo(i, appInfo));
+        EXPECT_EQ(appInfo.vendorId, static_cast<uint16_t>(i + 1));
+        EXPECT_EQ(appInfo.productId, static_cast<uint16_t>(i + 100));
+    }
 }
 
 TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)

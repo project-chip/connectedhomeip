@@ -15,7 +15,7 @@
 import enum
 import logging
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
 from matter.idl import matter_idl_types  # to explicitly say 'Enum'
 from matter.idl.matter_idl_types import DataType
@@ -63,7 +63,7 @@ class BasicString:
     """
     idl_name: str
     is_binary: bool
-    max_length: Union[int, None] = None
+    max_length: int | None = None
 
 
 class FundamentalType(enum.Enum):
@@ -366,7 +366,7 @@ class TypeLookupContext:
         return any(s.name == name for s in self.all_bitmaps)
 
 
-def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> BasicInteger | BasicString | FundamentalType | IdlType | IdlEnumType | IdlBitmapType:
     """
     Given a AST data type and a lookup context, match it to a type that can be later
     be used for generation.
