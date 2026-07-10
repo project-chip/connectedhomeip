@@ -66,7 +66,7 @@ void ApplicationInit()
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
 
-    TEMPORARY_RETURN_IGNORED IdentifyInit();
+    LogErrorOnFailure(IdentifyInit());
 
     sCameraAppCommandDelegate.SetCameraDevice(&gCameraDevice);
 }
