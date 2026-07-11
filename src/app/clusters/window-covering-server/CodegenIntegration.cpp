@@ -563,20 +563,10 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     case Attributes::CurrentPositionLiftPercent100ths::Id:
         target  = cluster->GetTargetPositionLiftPercent100ths();
         current = cluster->GetCurrentPositionLiftPercent100ths();
-        if ((OperationalState::Stall != opLift) && (current == target))
-        {
-            ChipLogProgress(Zcl, "Lift stop");
-            OperationalStateSet(endpoint, OperationalStatus::kLift, OperationalState::Stall);
-        }
         break;
     case Attributes::CurrentPositionTiltPercent100ths::Id:
         target  = cluster->GetTargetPositionTiltPercent100ths();
         current = cluster->GetCurrentPositionTiltPercent100ths();
-        if ((OperationalState::Stall != opTilt) && (current == target))
-        {
-            ChipLogProgress(Zcl, "Tilt stop");
-            OperationalStateSet(endpoint, OperationalStatus::kTilt, OperationalState::Stall);
-        }
         break;
     case Attributes::TargetPositionLiftPercent100ths::Id:
         target  = cluster->GetTargetPositionLiftPercent100ths();

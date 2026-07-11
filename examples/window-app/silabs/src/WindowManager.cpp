@@ -677,10 +677,11 @@ void WindowManager::UpdateLCD()
         chip::app::DataModel::Nullable<uint16_t> tilt;
 
         chip::DeviceLayer::PlatformMgr().LockChipStack();
+        auto wc   = FindClusterOnEndpoint(Endpoint());
         Type type = TypeGet(cover.mEndpoint);
 
-        Attributes::CurrentPositionLift::GetDefault(cover.mEndpoint, lift);
-        Attributes::CurrentPositionTilt::GetDefault(cover.mEndpoint, tilt);
+        lift = wc->GetCurrentPositionLiftPercent100ths();
+        tilt = wc->GetCurrentPositionLiftPercent100ths();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!tilt.IsNull() && !lift.IsNull())

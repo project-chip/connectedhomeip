@@ -73,6 +73,11 @@ uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t 
     return outputMax;
 }
 
+bool IsPercent100thsValid(Percent100ths percent100ths)
+{
+    return (percent100ths >= kWcPercent100thsMinOpen) && (percent100ths <= kWcPercent100thsMaxClosed);
+}
+
 } // namespace
 
 namespace chip {
@@ -493,26 +498,6 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
 uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
 {
     return ConvertValue(kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, limits.open, limits.closed, relative);
-}
-
-uint16_t ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
-{
-    return ConvertValue(limits.open, limits.closed, kWcPercent100thsMinOpen, kWcPercent100thsMaxClosed, absolute);
-}
-
-bool IsPercent100thsValid(Percent100ths percent100ths)
-{
-    return (percent100ths >= kWcPercent100thsMinOpen) && (percent100ths <= kWcPercent100thsMaxClosed);
-}
-
-bool IsPercent100thsValid(NPercent100ths percent100ths)
-{
-    if (!percent100ths.IsNull())
-    {
-        return IsPercent100thsValid(percent100ths.Value());
-    }
-
-    return true;
 }
 
 std::optional<DataModel::ActionReturnStatus> WindowCoveringCluster::HandleUpOrOpen()

@@ -223,6 +223,9 @@ private:
     chip::BitMask<SafetyStatus> mSafetyStatus;
 };
 
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
+LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
