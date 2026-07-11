@@ -156,7 +156,7 @@ TEST(TestServiceNaming, TestMakeServiceNameSubtype)
 
     // A buffer too small for the "_I" prefix must be rejected, not written past.
     char tinyBuffer[1];
-    EXPECT_NE(MakeServiceSubtype(tinyBuffer, sizeof(tinyBuffer), filter), CHIP_NO_ERROR);
+    EXPECT_EQ(MakeServiceSubtype(tinyBuffer, sizeof(tinyBuffer), filter), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // None tests.
     filter.type = DiscoveryFilterType::kNone;
