@@ -23,6 +23,7 @@ nxp:
     - "third_party/simw-top-mini/**"
     - "third_party/openthread/platforms/nxp/**"
     - "config/nxp/**"
+    - ".github/workflows/examples-nxp.yaml"
 
 silabs:
   maintainers:
@@ -56,18 +57,34 @@ esp32:
     - "config/esp32/**"
     - "docs/platforms/esp32/**"
 
+telink:
+  maintainers:
+    - s07641069
+    - interfer
+  paths:
+    - "src/platform/telink/**"
+    - "examples/platform/telink/**"
+    - "examples/**/telink/**"
+    - "config/telink/**"
+    - "scripts/tools/telink/**"
+
+realtek:
+  maintainers:
+    - pankore
+    - shensaifeng
+  paths:
+    - "src/platform/realtek/**"
+    - "src/platform/Ameba/**"
+    - "examples/platform/realtek/**"
+    - "examples/platform/ameba/**"
+    - "examples/**/realtek/**"
+    - "examples/**/ameba/**"
+    - "config/realtek/**"
+    - "config/ameba/**"
+    - "scripts/tools/realtek/**"
+
 # --- Proposals / Opt-In Templates ---
 
-# telink:
-#   maintainers:
-#     - s07641069
-#     - interfer
-#   paths:
-#     - "src/platform/telink/**"
-#     - "examples/platform/telink/**"
-#     - "examples/**/telink/**"
-#     - "config/telink/**"
-# 
 # nrfconnect:
 #   maintainers:
 #     - ArekBalysNordic
@@ -88,19 +105,6 @@ esp32:
 #     - "examples/platform/tizen/**"
 #     - "examples/**/tizen/**"
 #     - "config/tizen/**"
-# 
-# realtek:
-#   maintainers:
-#     - pankore
-#   paths:
-#     - "src/platform/realtek/**"
-#     - "src/platform/Ameba/**"
-#     - "examples/platform/realtek/**"
-#     - "examples/platform/ameba/**"
-#     - "examples/**/realtek/**"
-#     - "examples/**/ameba/**"
-#     - "config/realtek/**"
-#     - "config/ameba/**"
 # 
 # asr:
 #   maintainers:

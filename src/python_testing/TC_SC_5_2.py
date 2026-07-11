@@ -541,6 +541,13 @@ class TC_SC_5_2(MatterBaseTest):
         ]
         await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
 
+        # Controller cleanup at end
+        for group_id in [groupId0101, groupId0102, groupId0300, groupId0201]:
+            dev_ctrl.RemoveGroupInfo(group_id)
+        for keyset_id in [keySetId01a3, keySetId01a4]:
+            dev_ctrl.RemoveKeySet(keyset_id)
+        dev_ctrl.RemoveGroupKeys()
+
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -731,6 +731,13 @@ class TC_ACE_1_6(MatterBaseTest):
         # Shut down the unified subscription
         unified_sub.Shutdown()
 
+        # Controller cleanup at end
+        for group_id in [groupID1, groupID2, groupID3]:
+            self.default_controller.RemoveGroupInfo(group_id)
+        for keyset_id in [keySetID1, keySetID3]:
+            self.default_controller.RemoveKeySet(keyset_id)
+        self.default_controller.RemoveGroupKeys()
+
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -144,6 +144,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/groupcast-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/humidistat-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/media-file-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ota-provider-cluster.xml \
@@ -1039,8 +1040,8 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        # Updating the timeout for REPL Tests - Linux (RUN)(TC_[D-O]) takes over 60 minutes consistently in CI
-        timeout-minutes: 70
+        # Updating the timeout for REPL Tests - Linux (RUN) since splits now run in under 30 minutes
+        timeout-minutes: 45
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -1048,18 +1049,23 @@ jobs:
             # Since some of these tests can be flaky, do not fail all matrix parts when a single one fails
             fail-fast: false
             matrix:
-                # This list is empirically created to have a reasonable time split. The "" that runs the "other"
-                # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
-                filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
+                # This list is empirically created to have a reasonable time split of ~30 minutes each.
+                filter: ["", "TC_A", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
                 include:
                     - filter: ""
                       junitxml: out/junit-results/Other-results.xml
-                    - filter: "TC_[A-C]"
-                      junitxml: out/junit-results/TC_A-C-results.xml
-                    - filter: "TC_[D-O]"
-                      junitxml: out/junit-results/TC_D-O-results.xml
-                    - filter: "!TC_[A-O]"
-                      junitxml: out/junit-results/TC_Non-A-O-results.xml
+                    - filter: "TC_A"
+                      junitxml: out/junit-results/TC_A-results.xml
+                    - filter: "TC_[B-C]"
+                      junitxml: out/junit-results/TC_B-C-results.xml
+                    - filter: "TC_[D-F]"
+                      junitxml: out/junit-results/TC_D-F-results.xml
+                    - filter: "TC_[G-M]"
+                      junitxml: out/junit-results/TC_G-M-results.xml
+                    - filter: "TC_[N-S]"
+                      junitxml: out/junit-results/TC_N-S-results.xml
+                    - filter: "!TC_[A-S]"
+                      junitxml: out/junit-results/TC_Non-A-S-results.xml
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
@@ -1289,6 +1295,11 @@ jobs:
           - name: Checkout
             uses: actions/checkout@v7
 
+          # The gh-pages Allure history is handled several times over on this
+          # runner (checkout, history copy, deploy clone), so free up disk first.
+          - name: Maximize runner disk
+            uses: ./.github/actions/maximize-runner-disk
+
           - name: Download all JUnit XML results
             uses: actions/download-artifact@v8
             with:
@@ -1318,7 +1329,7 @@ jobs:
                 gh_pages: gh-pages
                 allure_history: allure-history
                 subfolder: allure-report/ci_tests
-                keep_reports: 2000
+                keep_reports: 200
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
 
@@ -1337,7 +1348,9 @@ jobs:
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 publish_dir: allure-history/allure-report/ci_tests
                 destination_dir: allure-report/ci_tests
-                keep_files: true
+                # keep_files: false prunes reports beyond keep_reports from the
+                # branch; scoped to destination_dir, so other subfolders are kept.
+                keep_files: false
 
           - name: Notify Slack on Failure
             if: failure()
