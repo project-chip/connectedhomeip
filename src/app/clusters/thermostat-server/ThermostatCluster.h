@@ -172,7 +172,7 @@ public:
 
     // AbsMinCoolSetpointLimit
     int16_t GetAbsMinCoolSetpointLimit();
-    
+
     // AbsMaxCoolSetpointLimit
     int16_t GetAbsMaxCoolSetpointLimit();
 

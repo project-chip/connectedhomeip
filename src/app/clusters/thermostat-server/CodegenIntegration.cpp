@@ -19,11 +19,11 @@
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
-#include <app/util/attribute-table.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/Thermostat.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -1266,7 +1266,8 @@ Status Set(EndpointId endpoint, int16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);}
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
+}
 } // namespace AbsMaxCoolSetpointLimit
 
 namespace FeatureMap {
