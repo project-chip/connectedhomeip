@@ -119,7 +119,8 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   @Override
   public ContentLaunchResponse playPreset(int presetID) {
     Log.d(TAG, "playPreset: presetID=" + presetID + " at " + endpoint);
-    return new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Playing preset " + presetID);
+    return new ContentLaunchResponse(
+        ContentLaunchResponse.STATUS_SUCCESS, "Playing preset " + presetID);
   }
 
   @Override
@@ -130,8 +131,7 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   @Override
   public ContentLaunchPreset[] getPresets() {
     return new ContentLaunchPreset[] {
-      new ContentLaunchPreset(1, "Morning News"),
-      new ContentLaunchPreset(2, "Evening Playlist"),
+      new ContentLaunchPreset(1, "Morning News"), new ContentLaunchPreset(2, "Evening Playlist"),
     };
   }
 }
