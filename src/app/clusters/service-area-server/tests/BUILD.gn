@@ -1,4 +1,4 @@
-# Copyright (c) 2025-2026 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,21 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
 
-static_library("service-area-server") {
-  sources = [
-    "ServiceAreaCluster.cpp",
-    "ServiceAreaCluster.h",
-    "service-area-cluster-objects.h",
-    "service-area-delegate.h",
-    "service-area-storage-delegate.cpp",
-    "service-area-storage-delegate.h",
-  ]
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "TestServiceAreaCluster"
+
+  test_sources = [ "TestServiceAreaCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/clusters/service-area-server",
+    "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
