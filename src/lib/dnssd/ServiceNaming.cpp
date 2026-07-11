@@ -141,6 +141,10 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         break;
     case DiscoveryFilterType::kCompressedFabricId:
         requiredSize = snprintf(buffer, bufferLen, "_I");
+        // snprintf returns the length it would have written, so it can exceed bufferLen. Guard it
+        // before using it as an offset and subtracting it, otherwise bufferLen - requiredSize
+        // underflows and Uint64ToHex writes past the buffer.
+        VerifyOrReturnError(requiredSize >= 0 && static_cast<size_t>(requiredSize) < bufferLen, CHIP_ERROR_NO_MEMORY);
         return Encoding::Uint64ToHex(subtype.code, &buffer[requiredSize], bufferLen - static_cast<size_t>(requiredSize),
                                      Encoding::HexFlags::kUppercaseAndNullTerminate);
         break;

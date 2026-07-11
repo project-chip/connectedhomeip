@@ -154,6 +154,10 @@ TEST(TestServiceNaming, TestMakeServiceNameSubtype)
     EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_NO_ERROR);
     EXPECT_STREQ(buffer, "_IABCD12341111BBBB");
 
+    // A buffer too small for the "_I" prefix must be rejected, not written past.
+    char tinyBuffer[1];
+    EXPECT_NE(MakeServiceSubtype(tinyBuffer, sizeof(tinyBuffer), filter), CHIP_NO_ERROR);
+
     // None tests.
     filter.type = DiscoveryFilterType::kNone;
     EXPECT_EQ(MakeServiceSubtype(buffer, sizeof(buffer), filter), CHIP_NO_ERROR);
