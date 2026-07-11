@@ -57,7 +57,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 } // namespace OccupiedCoolingSetpoint
 
 namespace OccupiedHeatingSetpoint {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t & value);
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 } // namespace OccupiedHeatingSetpoint
 
@@ -107,7 +107,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, ControlSequenceOfOp
 } // namespace ControlSequenceOfOperation
 
 namespace SystemMode {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, SystemModeEnum & value);
+Protocols::InteractionModel::Status Get(EndpointId endpoint, SystemModeEnum * value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, SystemModeEnum value);
 } // namespace SystemMode
 
@@ -210,6 +210,34 @@ namespace SetpointHoldExpiryTimestamp {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, DataModel::Nullable<uint32_t> value);
 } // namespace SetpointHoldExpiryTimestamp
+
+// Fixed Attributes
+// The setter for these attributes will only write the startup value for the cluster and should be called
+// before the cluster startup, otherwise the change won't have effect.
+namespace AbsMinHeatSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+} // namespace AbsMinHeatSetpointLimit
+
+namespace AbsMaxHeatSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+} // namespace AbsMaxHeatSetpointLimit
+
+namespace AbsMinCoolSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+} // namespace AbsMinCoolSetpointLimit
+
+namespace AbsMaxCoolSetpointLimit {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
+} // namespace AbsMaxCoolSetpointLimit
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
 
 } // namespace Attributes
 

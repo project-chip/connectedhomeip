@@ -1262,6 +1262,11 @@ CHIP_ERROR ThermostatCluster::GeneratedCommands(const ConcreteClusterPath & path
     return CHIP_NO_ERROR;
 }
 
+uint32_t ThermostatCluster::GetFeatureMap()
+{
+    return mFeatures.Raw();
+}
+
 void ThermostatCluster::SetLocalTemperature(DataModel::Nullable<int16_t> value)
 {
     if (SetAttributeValue(mLocalTemperature, value, LocalTemperature::Id) && mFeatures.Has(Feature::kEvents))
@@ -1296,6 +1301,26 @@ void ThermostatCluster::SetOccupancy(BitMask<OccupancyBitmap> value)
 BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> ThermostatCluster::GetOccupancy()
 {
     return mOccupancy;
+}
+
+int16_t ThermostatCluster::GetAbsMinHeatSetpointLimit()
+{
+    return mAbsMinHeatSetpointLimit;
+}
+
+int16_t ThermostatCluster::GetAbsMaxHeatSetpointLimit()
+{
+    return mAbsMaxHeatSetpointLimit;
+}
+
+int16_t ThermostatCluster::GetAbsMinCoolSetpointLimit()
+{
+    return mAbsMinCoolSetpointLimit;
+}
+
+int16_t ThermostatCluster::GetAbsMaxCoolSetpointLimit()
+{
+    return mAbsMaxCoolSetpointLimit;
 }
 
 void ThermostatCluster::SetLocalTemperatureCalibration(int8_t value)

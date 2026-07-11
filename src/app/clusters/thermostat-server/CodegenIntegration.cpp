@@ -19,6 +19,7 @@
 #include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 
+#include <app/util/attribute-table.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/Thermostat.h>
@@ -365,14 +366,14 @@ Status Set(EndpointId endpoint, int16_t value)
 
 namespace OccupiedHeatingSetpoint {
 
-Status Get(EndpointId endpoint, int16_t & value)
+Status Get(EndpointId endpoint, int16_t * value)
 {
     ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
     }
-    value = cluster->GetOccupiedHeatingSetpoint();
+    *value = cluster->GetOccupiedHeatingSetpoint();
     return Status::Success;
 }
 
@@ -615,14 +616,14 @@ Status Set(EndpointId endpoint, ControlSequenceOfOperationEnum value)
 
 namespace SystemMode {
 
-Status Get(EndpointId endpoint, SystemModeEnum & value)
+Status Get(EndpointId endpoint, SystemModeEnum * value)
 {
     ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
     }
-    value = cluster->GetSystemMode();
+    *value = cluster->GetSystemMode();
     return Status::Success;
 }
 
@@ -1157,6 +1158,145 @@ Status Set(EndpointId endpoint, DataModel::Nullable<uint32_t> value)
 }
 
 } // namespace SetpointHoldExpiryTimestamp
+
+namespace AbsMinHeatSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetAbsMinHeatSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
+}
+
+} // namespace AbsMinHeatSetpointLimit
+
+namespace AbsMaxHeatSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetAbsMaxHeatSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
+}
+
+} // namespace AbsMaxHeatSetpointLimit
+
+namespace AbsMinCoolSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetAbsMinCoolSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
+}
+
+} // namespace AbsMinCoolSetpointLimit
+
+namespace AbsMaxCoolSetpointLimit {
+
+Status Get(EndpointId endpoint, int16_t & value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetAbsMaxCoolSetpointLimit();
+    return Status::Success;
+}
+
+Status Set(EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);}
+} // namespace AbsMaxCoolSetpointLimit
+
+namespace FeatureMap {
+
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
+{
+    ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    *value = cluster->GetFeatureMap();
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace FeatureMap
+
 } // namespace Attributes
 } // namespace Thermostat
 } // namespace Clusters

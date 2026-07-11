@@ -149,6 +149,9 @@ public:
     EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
     // Setters and Getters
+    // FeatureMap
+    uint32_t GetFeatureMap();
+
     // LocalTemperature
     void SetLocalTemperature(DataModel::Nullable<int16_t> value);
     DataModel::Nullable<int16_t> GetLocalTemperature();
@@ -160,6 +163,18 @@ public:
     // Occupancy
     void SetOccupancy(BitMask<OccupancyBitmap> value);
     BitMask<chip::app::Clusters::Thermostat::OccupancyBitmap> GetOccupancy();
+
+    // AbsMinHeatSetpointLimit
+    int16_t GetAbsMinHeatSetpointLimit();
+
+    // AbsMaxHeatSetpointLimit
+    int16_t GetAbsMaxHeatSetpointLimit();
+
+    // AbsMinCoolSetpointLimit
+    int16_t GetAbsMinCoolSetpointLimit();
+    
+    // AbsMaxCoolSetpointLimit
+    int16_t GetAbsMaxCoolSetpointLimit();
 
     // LocalTemperatureCalibration
     void SetLocalTemperatureCalibration(int8_t value);
