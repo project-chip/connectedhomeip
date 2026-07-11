@@ -16,8 +16,8 @@
  */
 #include <DeviceFactoryPlatformOverride.h>
 #include <PosixAudioManager.h>
-#include <PosixChimeDevice.h>
-#include <PosixSpeakerDevice.h>
+#include <PosixChime.h>
+#include <PosixSpeaker.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceFactory.h>
 
@@ -30,14 +30,14 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
     if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
     {
         DeviceFactory::GetInstance().RegisterCreator("speaker", [&timerDelegate, &audioManager]() {
-            return std::make_unique<PosixSpeakerDevice>(PosixSpeakerDevice::Context{ timerDelegate }, audioManager);
+            return std::make_unique<PosixSpeaker>(PosixSpeaker::Context{ timerDelegate }, audioManager);
         });
     }
 
     if constexpr (ALL_DEVICES_ENABLE_CHIME)
     {
         DeviceFactory::GetInstance().RegisterCreator(
-            "chime", [&timerDelegate, &audioManager]() { return std::make_unique<PosixChimeDevice>(timerDelegate, audioManager); });
+            "chime", [&timerDelegate, &audioManager]() { return std::make_unique<PosixChime>(timerDelegate, audioManager); });
     }
 }
 

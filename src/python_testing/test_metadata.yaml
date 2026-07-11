@@ -37,6 +37,8 @@ not_automated:
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_10.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_11.py
+      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
@@ -176,6 +178,8 @@ not_automated:
           onboarding data security requirements)
     - name: TC_GC_common.py
       reason: Shared code for TC_GC, not a standalone test.
+    - name: TC_S_common.py
+      reason: Shared helper code for TC_S, not a standalone test.
     # Items below MUST be fixed eventually.
     - name: TC_MCORE_FS_1_4.py
       reason:

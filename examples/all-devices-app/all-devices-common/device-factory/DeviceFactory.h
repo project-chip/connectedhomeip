@@ -18,46 +18,46 @@
 #pragma once
 
 #include <app_config/enabled_devices.h>
+#include <device/types/aggregator/Aggregator.h>
+#include <device/types/air-purifier/impl/LoggingAirPurifier.h>
+#include <device/types/air-quality-sensor/AirQualitySensor.h>
+#include <device/types/boolean-state-sensor/BooleanStateSensor.h>
+#include <device/types/bridged-node/BridgedNode.h>
+#include <device/types/chime/Chime.h>
+#include <device/types/cooktop/impl/LoggingCooktop.h>
+#include <device/types/device-energy-management/EnergyManagement.h>
+#include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
+#include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
+#include <device/types/dishwasher/Dishwasher.h>
+#include <device/types/extractor-hood/ExtractorHood.h>
+#include <device/types/fan/impl/LoggingFan.h>
+#include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
+#include <device/types/generic-switch/GenericSwitch.h>
+#include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
+#include <device/types/laundry-dryer/LaundryDryer.h>
+#include <device/types/laundry-washer/LaundryWasher.h>
+#include <device/types/light-sensor/impl/IncreasingLightSensor.h>
+#include <device/types/microwave-oven/MicrowaveOven.h>
+#include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
+#include <device/types/mounted-on-off-control/MountedOnOffControl.h>
+#include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <device/types/occupancy-sensor/impl/LoggingOccupancySensor.h>
+#include <device/types/on-off-light-switch/OnOffLightSwitch.h>
+#include <device/types/on-off-light/impl/LoggingOnOffLight.h>
+#include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/oven/impl/LoggingOven.h>
+#include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
+#include <device/types/pressure-sensor/impl/IncreasingPressureSensor.h>
+#include <device/types/proximity-ranger/ProximityRanger.h>
+#include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
+#include <device/types/refrigerator/impl/LoggingRefrigerator.h>
+#include <device/types/robotic-vacuum-cleaner/RoboticVacuumCleaner.h>
+#include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
+#include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
+#include <device/types/speaker/impl/LoggingSpeaker.h>
+#include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
+#include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
-#include <devices/aggregator/AggregatorDevice.h>
-#include <devices/air-purifier/impl/LoggingAirPurifierDevice.h>
-#include <devices/air-quality-sensor/AirQualitySensorDevice.h>
-#include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
-#include <devices/bridged-node/BridgedNodeDevice.h>
-#include <devices/chime/ChimeDevice.h>
-#include <devices/cooktop/impl/LoggingCooktopDevice.h>
-#include <devices/device-energy-management/DeviceEnergyManagementDevice.h>
-#include <devices/dimmable-light/impl/LoggingDimmableLightDevice.h>
-#include <devices/dimmable-plug-in-unit/DimmablePlugInUnitDevice.h>
-#include <devices/dishwasher/DishwasherDevice.h>
-#include <devices/extractor-hood/ExtractorHoodDevice.h>
-#include <devices/fan/impl/LoggingFanDevice.h>
-#include <devices/flow-sensor/impl/IncreasingFlowSensorDevice.h>
-#include <devices/generic-switch/GenericSwitchDevice.h>
-#include <devices/humidity-sensor/impl/IncreasingHumiditySensorDevice.h>
-#include <devices/laundry-dryer/LaundryDryerDevice.h>
-#include <devices/laundry-washer/LaundryWasherDevice.h>
-#include <devices/light-sensor/impl/IncreasingLightSensorDevice.h>
-#include <devices/microwave-oven/MicrowaveOvenDevice.h>
-#include <devices/mounted-dimmable-load-control/MountedDimmableLoadControlDevice.h>
-#include <devices/mounted-on-off-control/MountedOnOffControlDevice.h>
-#include <devices/network-infrastructure-manager/NetworkInfrastructureManagerDevice.h>
-#include <devices/occupancy-sensor/impl/LoggingOccupancySensorDevice.h>
-#include <devices/on-off-light-switch/OnOffLightSwitchDevice.h>
-#include <devices/on-off-light/impl/LoggingOnOffLightDevice.h>
-#include <devices/on-off-plug-in-unit/OnOffPlugInUnitDevice.h>
-#include <devices/oven/impl/LoggingOvenDevice.h>
-#include <devices/power-source/impl/DecreasingBatteryPowerSourceDevice.h>
-#include <devices/pressure-sensor/impl/IncreasingPressureSensorDevice.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
-#include <devices/proximity-ranger/impl/LoggingProximityRangerDevice.h>
-#include <devices/refrigerator/impl/LoggingRefrigeratorDevice.h>
-#include <devices/robotic-vacuum-cleaner/RoboticVacuumCleanerDevice.h>
-#include <devices/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarmDevice.h>
-#include <devices/soil-sensor/impl/IncreasingMoistureSoilSensorDevice.h>
-#include <devices/speaker/impl/LoggingSpeakerDevice.h>
-#include <devices/temperature-sensor/impl/IncreasingTemperatureSensorDevice.h>
-#include <devices/water-valve/WaterValveDevice.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -174,14 +174,14 @@ private:
         {
             RegisterCreator("aggregator", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<AggregatorDevice>(mContext->timerDelegate);
+                return std::make_unique<Aggregator>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_PURIFIER)
         {
             RegisterCreator("air-purifier", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingAirPurifierDevice>(FanLoadDevice::Context{
+                return std::make_unique<LoggingAirPurifier>(FanLoad::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -193,9 +193,9 @@ private:
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 using namespace Clusters::ConcentrationMeasurement;
-                return std::make_unique<AirQualitySensorDevice>(
+                return std::make_unique<AirQualitySensor>(
                     mContext->timerDelegate,
-                    AirQualitySensorDevice::Config{
+                    AirQualitySensor::Config{
                         .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(
                             Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
                             Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor),
@@ -217,112 +217,112 @@ private:
                 static int sBridgedNodeCount = 0;
                 sBridgedNodeCount++;
                 std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
-                return std::make_unique<BridgedNodeDevice>(mContext->timerDelegate,
-                                                           "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+                return std::make_unique<BridgedNode>(mContext->timerDelegate,
+                                                     "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
         {
             RegisterCreator("contact-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<BooleanStateSensorDevice>(
+                return std::make_unique<BooleanStateSensor>(
                     mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
             RegisterAccessorCreator("contact-sensor", [](DeviceInterface & device) {
-                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensor &>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
             RegisterCreator("water-leak-detector", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<BooleanStateSensorDevice>(
+                return std::make_unique<BooleanStateSensor>(
                     mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
             });
             RegisterAccessorCreator("water-leak-detector", [](DeviceInterface & device) {
-                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensorDevice &>(device));
+                return std::make_unique<BooleanStateSensorAccessor>(static_cast<BooleanStateSensor &>(device));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
         {
             RegisterCreator("occupancy-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingOccupancySensorDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingOccupancySensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {
             RegisterCreator("chime", [this]() {
                 VerifyOrDie(mContext.has_value());
-                static const ChimeDevice::Sound kDefaultSounds[] = {
+                static const Chime::Sound kDefaultSounds[] = {
                     { 0, "Ding Dong"_span },
                     { 1, "Ring Ring"_span },
                 };
-                return std::make_unique<ChimeDevice>(mContext->timerDelegate, Span<const ChimeDevice::Sound>(kDefaultSounds));
+                return std::make_unique<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COOKTOP)
         {
             RegisterCreator("cooktop", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingCooktopDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingCooktop>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DEVICE_ENERGY_MANAGEMENT)
         {
             RegisterCreator("device-energy-management", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<DeviceEnergyManagementDevice>(mContext->timerDelegate);
+                return std::make_unique<EnergyManagement>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_LIGHT)
         {
             RegisterCreator("dimmable-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingDimmableLightDevice>(
-                    LoggingDimmableLightDevice::Context{
+                return std::make_unique<LoggingDimmableLight>(
+                    LoggingDimmableLight::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                     },
-                    DimmableLoadDevice::Config{ .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults() });
+                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DIMMABLE_PLUG_IN_UNIT)
         {
             RegisterCreator("dimmable-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<DimmablePlugInUnitDevice>(
-                    LoggingDimmableLightDevice::Context{
+                return std::make_unique<DimmablePlugInUnit>(
+                    LoggingDimmableLight::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                     },
-                    DimmableLoadDevice::Config{ .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults() });
+                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
         {
-            RegisterCreator("dishwasher", []() { return std::make_unique<DishwasherDevice>(); });
+            RegisterCreator("dishwasher", []() { return std::make_unique<Dishwasher>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_DIMMABLE_LOAD_CONTROL)
         {
             RegisterCreator("mounted-dimmable-load-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<MountedDimmableLoadControlDevice>(
-                    LoggingDimmableLightDevice::Context{
+                return std::make_unique<MountedDimmableLoadControl>(
+                    LoggingDimmableLight::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                     },
-                    DimmableLoadDevice::Config{ .levelControl = DimmableLoadDevice::LevelControlConfig::CiPicsDefaults() });
+                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
         {
             RegisterCreator("mounted-on-off-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<MountedOnOffControlDevice>(LoggingOnOffLightDevice::Context{
+                return std::make_unique<MountedOnOffControl>(LoggingOnOffLight::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -333,14 +333,14 @@ private:
         {
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<NetworkInfrastructureManagerDevice>(mContext->storageDelegate);
+                return std::make_unique<NetworkInfrastructureManager>(mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
         {
             RegisterCreator("on-off-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingOnOffLightDevice>(LoggingOnOffLightDevice::Context{
+                return std::make_unique<LoggingOnOffLight>(LoggingOnOffLight::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -351,14 +351,14 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<OnOffLightSwitchDevice>(mContext->timerDelegate);
+                return std::make_unique<OnOffLightSwitch>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
         {
             RegisterCreator("on-off-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<OnOffPlugInUnitDevice>(LoggingOnOffLightDevice::Context{
+                return std::make_unique<OnOffPlugInUnit>(LoggingOnOffLight::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -369,37 +369,36 @@ private:
         {
             RegisterCreator("speaker", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingSpeakerDevice>(
-                    LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
+                return std::make_unique<LoggingSpeaker>(LoggingSpeaker::Context{ .timerDelegate = mContext->timerDelegate });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_OVEN)
         {
             RegisterCreator("oven", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingOvenDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingOven>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_REFRIGERATOR)
         {
             RegisterCreator("refrigerator", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingRefrigeratorDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingRefrigerator>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
-            RegisterCreator("soil-sensor", []() { return std::make_unique<IncreasingMoistureSoilSensorDevice>(); });
+            RegisterCreator("soil-sensor", []() { return std::make_unique<IncreasingMoistureSoilSensor>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
-            RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensorDevice>(); });
+            RegisterCreator("temperature-sensor", []() { return std::make_unique<IncreasingTemperatureSensor>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
         {
             RegisterCreator("extractor-hood", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<ExtractorHoodDevice>(FanLoadDevice::Context{
+                return std::make_unique<ExtractorHood>(FanLoad::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
@@ -417,7 +416,7 @@ private:
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
-                return std::make_unique<LoggingFanDevice>(FanLoadDevice::Context{
+                return std::make_unique<LoggingFan>(FanLoad::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
@@ -433,7 +432,7 @@ private:
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
-                return std::make_unique<LoggingFanDevice>(FanLoadDevice::Context{
+                return std::make_unique<LoggingFan>(FanLoad::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
@@ -446,7 +445,7 @@ private:
         {
             RegisterCreator("generic-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<GenericSwitchDevice>(mContext->timerDelegate);
+                return std::make_unique<GenericSwitch>(mContext->timerDelegate);
             });
         }
 
@@ -454,18 +453,18 @@ private:
         {
             RegisterCreator("proximity-ranger", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingProximityRangerDevice>(mContext->timerDelegate, mContext->storageDelegate);
+                return std::make_unique<LoggingProximityRanger>(mContext->timerDelegate, mContext->storageDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
-            RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSourceDevice>(); });
+            RegisterCreator("power-source", []() { return std::make_unique<DecreasingBatteryPowerSource>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<LoggingOnlySmokeCoAlarmDevice>(mContext->timerDelegate);
+                return std::make_unique<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate);
             });
         }
 
@@ -473,15 +472,15 @@ private:
         {
             RegisterCreator("rain-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<BooleanStateSensorDevice>(
-                    mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
+                return std::make_unique<BooleanStateSensor>(mContext->timerDelegate,
+                                                            Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRainSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_FREEZE_DETECTOR)
         {
             RegisterCreator("water-freeze-detector", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<BooleanStateSensorDevice>(
+                return std::make_unique<BooleanStateSensor>(
                     mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
             });
         }
@@ -489,52 +488,52 @@ private:
         {
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<WaterValveDevice>(mContext->timerDelegate);
+                return std::make_unique<WaterValve>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
         {
             RegisterCreator("humidity-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<IncreasingHumiditySensorDevice>(mContext->timerDelegate);
+                return std::make_unique<IncreasingHumiditySensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
         {
-            RegisterCreator("laundry-dryer", []() { return std::make_unique<LaundryDryerDevice>(); });
+            RegisterCreator("laundry-dryer", []() { return std::make_unique<LaundryDryer>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
-            RegisterCreator("laundry-washer", []() { return std::make_unique<LaundryWasherDevice>(); });
+            RegisterCreator("laundry-washer", []() { return std::make_unique<LaundryWasher>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
             RegisterCreator("light-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<IncreasingLightSensorDevice>(mContext->timerDelegate);
+                return std::make_unique<IncreasingLightSensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
         {
-            RegisterCreator("microwave-oven", []() { return std::make_unique<MicrowaveOvenDevice>(); });
+            RegisterCreator("microwave-oven", []() { return std::make_unique<MicrowaveOven>(); });
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {
             RegisterCreator("pressure-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<IncreasingPressureSensorDevice>(mContext->timerDelegate);
+                return std::make_unique<IncreasingPressureSensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
         {
             RegisterCreator("flow-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<IncreasingFlowSensorDevice>(mContext->timerDelegate);
+                return std::make_unique<IncreasingFlowSensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
-            RegisterCreator("robotic-vacuum-cleaner", []() { return std::make_unique<RoboticVacuumCleanerDevice>(); });
+            RegisterCreator("robotic-vacuum-cleaner", []() { return std::make_unique<RoboticVacuumCleaner>(); });
         }
 
         // at least one device type MUST be enabled

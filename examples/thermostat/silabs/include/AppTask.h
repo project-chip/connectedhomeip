@@ -24,6 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <cstdint>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 struct AppEvent;
 
@@ -70,6 +71,11 @@ public:
      */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
+
+    /**
+     * @brief Thermostat cluster init hook. Registers ThermostatDelegate for preset-related attributes.
+     */
+    void DMThermostatClusterInit(chip::EndpointId endpoint);
 
     /**
      * @brief Initialize the temperature sensor backing this thermostat.

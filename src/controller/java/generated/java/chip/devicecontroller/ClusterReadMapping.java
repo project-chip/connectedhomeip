@@ -18184,6 +18184,17 @@ public class ClusterReadMapping {
           readMediaPlaybackAvailableTextTracksCommandParams
         );
         result.put("readAvailableTextTracksAttribute", readMediaPlaybackAvailableTextTracksAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaPlaybackAvailableCommandsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaPlaybackAvailableCommandsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaPlaybackCluster) cluster).readAvailableCommandsAttribute(
+              (ChipClusters.MediaPlaybackCluster.AvailableCommandsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaPlaybackClusterAvailableCommandsAttributeCallback(),
+          readMediaPlaybackAvailableCommandsCommandParams
+        );
+        result.put("readAvailableCommandsAttribute", readMediaPlaybackAvailableCommandsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readMediaPlaybackGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readMediaPlaybackGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

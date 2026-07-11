@@ -57,7 +57,7 @@ Prerequisites:
     follows:
 
 ```shell
-$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.3.0
+$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.4.1.1
 ```
 
 > **Note**: While some of NXP platforms are supported in Zephyr upstream, we
@@ -65,8 +65,8 @@ $ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp
 > not upstream yet. While you can decide to use nxp-zsdk top of tree, we
 > recommend using a proper release tag delivered by NXP. This will ensure a
 > certain level of quality of the nxp-zsdk in use. Currently, we highly
-> recommend using the `nxp-v4.3.0` tag, based on Zephyr 4.3 release. Reach to
-> your NXP contact for more details.
+> recommend using the `nxp-v4.4.1.1` tag, based on Zephyr 4.4.1 release. Reach
+> to your NXP contact for more details.
 
 Steps to build the example:
 
