@@ -237,20 +237,21 @@ void HandleStep(TransferSession & session, const Step & step)
     }
     case Op::kInjectBlockQuery: {
         BlockQuery msg;
-        msg.BlockCounter = useMirror ? session.GetNextQueryNum() : u32;
+        msg.BlockCounter = useMirror ? session.GetNextBlockNum() : u32;
         Inject(session, Protocols::BDX::Id, to_underlying(MessageType::BlockQuery), EncodeBdxMessage(msg));
         break;
     }
     case Op::kInjectBlockQueryWithSkip: {
         BlockQueryWithSkip msg;
-        msg.BlockCounter = useMirror ? session.GetNextQueryNum() : u32;
+        msg.BlockCounter = useMirror ? session.GetNextBlockNum() : u32;
         msg.BytesToSkip  = u64;
         Inject(session, Protocols::BDX::Id, to_underlying(MessageType::BlockQueryWithSkip), EncodeBdxMessage(msg));
         break;
     }
     case Op::kInjectBlock: {
         Block msg;
-        msg.BlockCounter = useMirror ? session.GetNextBlockNum() : u32;
+        // HandleBlock checks the incoming counter against mLastQueryNum (the query the receiver last sent).
+        msg.BlockCounter = useMirror ? session.GetLastQueryNum() : u32;
         msg.Data         = payload.empty() ? nullptr : payload.data();
         msg.DataLength   = payload.size();
         Inject(session, Protocols::BDX::Id, to_underlying(MessageType::Block), EncodeBdxMessage(msg));
@@ -258,7 +259,7 @@ void HandleStep(TransferSession & session, const Step & step)
     }
     case Op::kInjectBlockEOF: {
         BlockEOF msg;
-        msg.BlockCounter = useMirror ? session.GetNextBlockNum() : u32;
+        msg.BlockCounter = useMirror ? session.GetLastQueryNum() : u32;
         msg.Data         = payload.empty() ? nullptr : payload.data();
         msg.DataLength   = payload.size();
         Inject(session, Protocols::BDX::Id, to_underlying(MessageType::BlockEOF), EncodeBdxMessage(msg));
@@ -266,13 +267,14 @@ void HandleStep(TransferSession & session, const Step & step)
     }
     case Op::kInjectBlockAck: {
         BlockAck msg;
-        msg.BlockCounter = useMirror ? session.GetNextBlockNum() : u32;
+        // HandleBlockAck checks the incoming counter against mLastBlockNum (the block the sender last sent).
+        msg.BlockCounter = useMirror ? session.GetLastBlockNum() : u32;
         Inject(session, Protocols::BDX::Id, to_underlying(MessageType::BlockAck), EncodeBdxMessage(msg));
         break;
     }
     case Op::kInjectBlockAckEOF: {
         BlockAckEOF msg;
-        msg.BlockCounter = useMirror ? session.GetNextBlockNum() : u32;
+        msg.BlockCounter = useMirror ? session.GetLastBlockNum() : u32;
         Inject(session, Protocols::BDX::Id, to_underlying(MessageType::BlockAckEOF), EncodeBdxMessage(msg));
         break;
     }
@@ -389,6 +391,13 @@ std::vector<SessionInput> BdxWholeInputSeeds()
         MkInput(false, 0, 1, 64, 0, 0, { Mk(0, 64, 65, 0, fileDes), Mk(11, 64, 0, 0), Mk(13, 0, 0, 0) }),
         // Responder reject: ReceiveInit -> local Reject.
         MkInput(false, 1, 0, 64, 0, 0, { Mk(0, 64, 0, 0, fileDes), Mk(12, 0, 0, 0) }),
+        // Initiating receiver, ReceiverDrive, MULTI-BLOCK: Accept(len 1024) then 8x (Query, Block) then Query, BlockEOF.
+        // Each Block/BlockEOF uses the mirrored counter; this only progresses past block 1 if the mirror is correct.
+        MkInput(true, 0, 1, 64, 1024, 0,
+                { Mk(1, 64, 0, 1024, {}), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk),
+                  Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0),
+                  Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk),
+                  Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(6, 0, 1, 0, blk) }),
     };
 }
 
