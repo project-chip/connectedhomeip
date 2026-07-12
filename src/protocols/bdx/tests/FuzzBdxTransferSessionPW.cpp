@@ -379,7 +379,8 @@ std::vector<SessionInput> BdxWholeInputSeeds()
         MkInput(true, 1, 0, 64, 0, 0, { Mk(2, 63, 0, 0, {}), Mk(15, 0, 1, 0, blk32), Mk(8, 0, 0, 0) }),
         // Initiating sender, ReceiverDrive: SendAccept -> BlockQuery(mirror) -> PrepareBlock -> BlockAck(counter 0).
         MkInput(true, 1, 1, 64, 0, 0, { Mk(2, 64, 0, 0, {}), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, blk), Mk(7, 0, 0, 0) }),
-        // Initiating sender, ReceiverDrive: SendAccept -> BlockQueryWithSkip(mirror) -> PrepareBlock (covers HandleBlockQueryWithSkip).
+        // Initiating sender, ReceiverDrive: SendAccept -> BlockQueryWithSkip(mirror) -> PrepareBlock (covers
+        // HandleBlockQueryWithSkip).
         MkInput(true, 1, 1, 64, 0, 0, { Mk(2, 64, 0, 0, {}), Mk(4, 0, 1, 0), Mk(15, 0, 0, 0, blk) }),
         // Responder as sender, ReceiverDrive: ReceiveInit -> local Accept -> BlockQuery(mirror) -> PrepareBlock.
         MkInput(false, 1, 1, 64, 0, 0, { Mk(0, 64, 0, 0, fileDes), Mk(11, 64, 0, 0), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, blk) }),
