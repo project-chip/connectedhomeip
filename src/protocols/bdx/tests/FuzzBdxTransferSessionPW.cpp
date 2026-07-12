@@ -383,7 +383,8 @@ std::vector<SessionInput> BdxWholeInputSeeds()
         // HandleBlockQueryWithSkip).
         MkInput(true, 1, 1, 64, 0, 0, { Mk(2, 64, 0, 0, {}), Mk(4, 0, 1, 0), Mk(15, 0, 0, 0, blk) }),
         // Responder as sender, ReceiverDrive: ReceiveInit -> local Accept -> BlockQuery(mirror) -> PrepareBlock.
-        MkInput(false, 1, 1, 64, 0, 0, { Mk(0, 64, 0, 0, fileDes), Mk(11, 64, 0, 0), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, blk) }),
+        // op0 u32 carries the ReceiveInit MaxBlockSize (64); the local Accept's block size must not exceed it.
+        MkInput(false, 1, 1, 64, 0, 0, { Mk(0, 64, 64, 0, fileDes), Mk(11, 64, 0, 0), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, blk) }),
         // Responder as receiver, ReceiverDrive: SendInit -> local Accept (SendAccept branch) -> PrepareBlockQuery.
         MkInput(false, 0, 1, 64, 0, 0, { Mk(0, 64, 65, 0, fileDes), Mk(11, 64, 0, 0), Mk(13, 0, 0, 0) }),
         // Responder reject: ReceiveInit -> local Reject.
