@@ -395,9 +395,9 @@ std::vector<SessionInput> BdxWholeInputSeeds()
         // Each Block/BlockEOF uses the mirrored counter; this only progresses past block 1 if the mirror is correct.
         MkInput(true, 0, 1, 64, 1024, 0,
                 { Mk(1, 64, 0, 1024, {}), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk),
-                  Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0),
-                  Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk),
-                  Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(6, 0, 1, 0, blk) }),
+                  Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk),
+                  Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk),
+                  Mk(13, 0, 0, 0), Mk(6, 0, 1, 0, blk) }),
     };
 }
 
