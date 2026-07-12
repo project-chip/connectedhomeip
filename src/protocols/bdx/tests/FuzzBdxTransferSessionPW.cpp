@@ -338,25 +338,55 @@ Step Mk(uint8_t op, uint16_t a, uint32_t b, uint64_t c, std::vector<uint8_t> pay
     return std::make_tuple(op, a, b, c, std::move(payload));
 }
 
-// Seed step-sequences that walk the session through the deep accept -> query ->
-// block -> blockEOF flow. Random sequences almost never reach it (any malformed
-// step trips the session into an error state, wasting the remaining steps), so
-// these seed the corpus with the multi-block accumulation path the mutator then
-// explores. Op values follow the Op enum; a `u32` with bit0 set requests the
-// mirrored (currently-expected) counter. Setup args are drawn randomly, so each
-// seed only reaches depth when the random setup role is compatible -- which is
-// enough to seed the corpus with the deep code paths.
-std::vector<std::vector<Step>> BdxSeedStepSequences()
+// A complete FUZZ_TEST input: the six setup scalars plus the step vector. The seeds below
+// are whole-input seeds so each step sequence is pinned to the setup role / drive-mode that
+// lets it reach the deep in-progress handlers. (Seeding only the step vector -- as before --
+// left weInitiate/role/drive-mode random, so a deep sequence fired only when the random setup
+// happened to match, and the block-prepare / ack handlers stayed near-uncovered.)
+using SessionInput = std::tuple<bool, uint8_t, uint8_t, uint16_t, uint64_t, uint64_t, std::vector<Step>>;
+
+SessionInput MkInput(bool weInitiate, uint8_t roleByte, uint8_t initFlags, uint16_t initMaxBlock, uint64_t initLength,
+                     uint64_t initOffset, std::vector<Step> steps)
 {
-    const std::vector<uint8_t> block(64, 0xAB);
+    return std::make_tuple(weInitiate, roleByte, initFlags, initMaxBlock, initLength, initOffset, std::move(steps));
+}
+
+// Seeds that walk ONE session through the accept -> query -> block(/EOF) -> ack flow for each
+// role x drive-mode, so the mutator starts inside kTransferInProgress instead of rediscovering
+// the exact (role, drive-mode, ordered messages, matching counters) tuple from random bytes.
+// roleByte: even = receiver, odd = sender. initFlags % 3: 0 = SenderDrive, 1 = ReceiverDrive.
+// For counter-bearing steps, u32 bit0 = 1 requests the session's currently-expected (mirrored)
+// counter. A Block/Ack whose expected counter is odd cannot use the mirror (bit0 doubles as the
+// mirror flag), and the mirror only matches for the first block of a transfer, so these seeds
+// stay single-cycle and use non-mirror even literals for acks (mLastBlockNum == 0 after one block).
+std::vector<SessionInput> BdxWholeInputSeeds()
+{
+    const std::vector<uint8_t> blk(64, 0xAB);
+    const std::vector<uint8_t> blk32(32, 0xCD);
     const std::vector<uint8_t> fileDes = { 't', 'e', 's', 't', '.', 'b', 'i', 'n' };
     return {
-        // initiating receiver: ReceiveAccept(64,len=100) -> query -> Block -> query -> BlockEOF
-        { Mk(1, 64, 0, 100, {}), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, block), Mk(13, 0, 0, 0), Mk(6, 0, 1, 0, block) },
-        // initiating sender: SendAccept(64) -> BlockQuery(mirror) -> PrepareBlock
-        { Mk(2, 64, 0, 0, {}), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, block) },
-        // responder: Init(64,"test.bin") -> local Accept(64) -> BlockQuery(mirror) -> PrepareBlock
-        { Mk(0, 64, 0, 0, fileDes), Mk(11, 64, 0, 0), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, block) },
+        // Initiating receiver, ReceiverDrive: ReceiveAccept -> BlockQuery -> Block -> PrepareBlockAck.
+        MkInput(true, 0, 1, 64, 200, 0, { Mk(1, 64, 0, 200, {}), Mk(13, 0, 0, 0), Mk(5, 0, 1, 0, blk), Mk(16, 0, 0, 0) }),
+        // Initiating receiver, ReceiverDrive, EOF path: ReceiveAccept -> BlockQuery -> BlockEOF -> PrepareBlockAck(EOF).
+        MkInput(true, 0, 1, 64, 200, 0, { Mk(1, 64, 0, 200, {}), Mk(13, 0, 0, 0), Mk(6, 0, 1, 0, blk), Mk(16, 0, 0, 0) }),
+        // Initiating receiver, ReceiverDrive, skip: ReceiveAccept -> PrepareBlockQueryWithSkip.
+        MkInput(true, 0, 1, 64, 0, 0, { Mk(1, 64, 0, 0, {}), Mk(14, 0, 0, 128) }),
+        // Initiating receiver, SenderDrive: ReceiveAccept -> Block -> PrepareBlockAck.
+        MkInput(true, 0, 0, 64, 200, 0, { Mk(1, 63, 0, 200, {}), Mk(5, 0, 1, 0, blk32), Mk(16, 0, 0, 0) }),
+        // Initiating sender, SenderDrive: SendAccept -> PrepareBlock immediately (no query needed).
+        MkInput(true, 1, 0, 64, 0, 0, { Mk(2, 63, 0, 0, {}), Mk(15, 0, 0, 0, blk32) }),
+        // Initiating sender, SenderDrive, EOF: SendAccept -> PrepareBlock(EOF) -> BlockAckEOF(counter 0).
+        MkInput(true, 1, 0, 64, 0, 0, { Mk(2, 63, 0, 0, {}), Mk(15, 0, 1, 0, blk32), Mk(8, 0, 0, 0) }),
+        // Initiating sender, ReceiverDrive: SendAccept -> BlockQuery(mirror) -> PrepareBlock -> BlockAck(counter 0).
+        MkInput(true, 1, 1, 64, 0, 0, { Mk(2, 64, 0, 0, {}), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, blk), Mk(7, 0, 0, 0) }),
+        // Initiating sender, ReceiverDrive: SendAccept -> BlockQueryWithSkip(mirror) -> PrepareBlock (covers HandleBlockQueryWithSkip).
+        MkInput(true, 1, 1, 64, 0, 0, { Mk(2, 64, 0, 0, {}), Mk(4, 0, 1, 0), Mk(15, 0, 0, 0, blk) }),
+        // Responder as sender, ReceiverDrive: ReceiveInit -> local Accept -> BlockQuery(mirror) -> PrepareBlock.
+        MkInput(false, 1, 1, 64, 0, 0, { Mk(0, 64, 0, 0, fileDes), Mk(11, 64, 0, 0), Mk(3, 0, 1, 0), Mk(15, 0, 0, 0, blk) }),
+        // Responder as receiver, ReceiverDrive: SendInit -> local Accept (SendAccept branch) -> PrepareBlockQuery.
+        MkInput(false, 0, 1, 64, 0, 0, { Mk(0, 64, 65, 0, fileDes), Mk(11, 64, 0, 0), Mk(13, 0, 0, 0) }),
+        // Responder reject: ReceiveInit -> local Reject.
+        MkInput(false, 1, 0, 64, 0, 0, { Mk(0, 64, 0, 0, fileDes), Mk(12, 0, 0, 0) }),
     };
 }
 
@@ -411,7 +441,7 @@ FUZZ_TEST(FuzzBdxTransferSessionPW, BdxSessionSequenceDoesNotCrash)
                  Arbitrary<uint64_t>(), // proposed start offset
                  VectorOf(TupleOf(Arbitrary<uint8_t>(), Arbitrary<uint16_t>(), Arbitrary<uint32_t>(), Arbitrary<uint64_t>(),
                                   Arbitrary<std::vector<uint8_t>>()))
-                     .WithMaxSize(kMaxSteps)
-                     .WithSeeds(BdxSeedStepSequences()));
+                     .WithMaxSize(kMaxSteps))
+    .WithSeeds(BdxWholeInputSeeds());
 
 } // namespace
