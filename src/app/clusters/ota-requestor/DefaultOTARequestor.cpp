@@ -835,12 +835,12 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
     if (sessionHandle->AllowsLargePayload())
     {
         initOptions.MaxBlockSize =
-            std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(), static_cast<uint16_t>(kMaxLargeAppMessageLen - kMaxTagLen));
+            std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(), static_cast<uint16_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize));
     }
     else
     {
         initOptions.MaxBlockSize =
-            std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(), static_cast<uint16_t>(kMaxAppMessageLen - kMaxTagLen));
+            std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(), static_cast<uint16_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize));
     }
     initOptions.FileDesLength  = static_cast<uint16_t>(mFileDesignator.size());
     initOptions.FileDesignator = reinterpret_cast<const uint8_t *>(mFileDesignator.data());

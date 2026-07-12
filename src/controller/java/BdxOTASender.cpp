@@ -58,11 +58,11 @@ CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId node
     uint16_t blockSize = 0;
     if (sessionHandle.Value()->AllowsLargePayload())
     {
-        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxLargeAppMessageLen - kMaxTagLen));
+        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize));
     }
     else
     {
-        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxAppMessageLen - kMaxTagLen));
+        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize));
     }
     return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, blockSize, kBdxTimeout, kBdxPollIntervalMs);
 }

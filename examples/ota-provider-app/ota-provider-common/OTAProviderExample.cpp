@@ -324,11 +324,11 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
             chip::SessionHandle sessionHandle = commandObj->GetExchangeContext()->GetSessionHandle();
             if (sessionHandle->AllowsLargePayload())
             {
-                blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxLargeAppMessageLen - kMaxTagLen));
+                blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize));
             }
             else
             {
-                blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxAppMessageLen - kMaxTagLen));
+                blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize));
             }
             CHIP_ERROR error =
                 mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
