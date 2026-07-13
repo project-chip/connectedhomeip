@@ -789,8 +789,7 @@ bool BLEManagerImpl::IsSubscribed(uint16_t conId)
 void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t conn_id)
 {
     PacketBufferHandle buf = System::PacketBufferHandle::New(len, 0);
-    VerifyOrReturn(!buf.IsNull(),
-                   ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
     memcpy(buf->Start(), p_value, len);
     buf->SetDataLength(len);
