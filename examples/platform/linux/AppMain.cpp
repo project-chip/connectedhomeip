@@ -49,7 +49,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
-#if CHIP_DEVICE_LAYER_TARGET_LINUX || CHIP_DEVICE_LAYER_TARGET_TIZEN
+#ifdef CHIP_CONFIG_KVS_PATH
 #include <platform/Linux/CHIPLinuxStoragePaths.h>
 #endif
 #include <platform/RuntimeOptionsProvider.h>
