@@ -226,7 +226,7 @@ void AppTask::SensorTimerEventHandler(void * arg)
     CHIP_ERROR err      = AppInstance().GetAirQualityValue(air_quality);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
-        ChipLogError(AppServer, "GetAirQualityValue() failed: %" CHIP_ERROR_FORMAT ", skipping cluster update",err.Format()));
+        ChipLogError(AppServer, "GetAirQualityValue() failed: %" CHIP_ERROR_FORMAT ", skipping cluster update", err.Format()));
 
     int32_t * air_quality_ptr = new int32_t(air_quality);
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(AppTask::WriteAirQualityToAttribute,
