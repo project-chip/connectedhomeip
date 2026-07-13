@@ -8346,6 +8346,12 @@ bool emberAfAccountLoginClusterLogoutCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AccountLogin::Commands::Logout::DecodableType & commandData);
 /**
+ * @brief Account Login Cluster GetDeviceAuthURI Command callback (from client)
+ */
+bool emberAfAccountLoginClusterGetDeviceAuthURICallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::DecodableType & commandData);
+/**
  * @brief Content Control Cluster UpdatePIN Command callback (from client)
  */
 bool emberAfContentControlClusterUpdatePINCallback(

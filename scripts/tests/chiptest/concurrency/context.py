@@ -32,6 +32,14 @@ with PythonPath("../../../../src/python_testing/matter_testing_infrastructure", 
 
 log = logging.getLogger(__name__)
 
+if sys.platform == "linux":
+    # We have a private /run as we're running in unshare, so we can place it in any place under /run. We don't want it in /tmp, as
+    # we remount it to worker-specific scratchpad.
+    SYNC_MANAGER_PATH = "/run/python_pool_manager.sock"
+else:
+    # Other platforms will fall back to their default.
+    SYNC_MANAGER_PATH = None
+
 
 class StartStopContextMixin(ABC):
     """
