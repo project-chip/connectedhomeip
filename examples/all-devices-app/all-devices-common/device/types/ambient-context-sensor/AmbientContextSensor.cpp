@@ -14,21 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <devices/Types.h>
 #include <device/types/ambient-context-sensor/AmbientContextSensor.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-AmbientContextSensor::AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, AmbientContextSensing::AmbientContextSensingDelegate & delegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAmbientContextSensor, 1)), mConfig(config),
-    mTimerDelegate(timerDelegate), mDelegate(delegate)
+AmbientContextSensor::AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate,
+                                           AmbientContextSensing::AmbientContextSensingDelegate & delegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAmbientContextSensor, 1)),
+    mConfig(config), mTimerDelegate(timerDelegate), mDelegate(delegate)
 {}
 
 CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                EndpointComposition composition)
+                                          EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 

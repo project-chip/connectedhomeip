@@ -33,8 +33,7 @@ class AmbientContextSensingCluster : public DefaultServerCluster, public TimerCo
 public:
     struct Config
     {
-        Config(TimerDelegate & timerDelegate) : mHoldTimeDelegate(timerDelegate)
-        {}
+        Config(TimerDelegate & timerDelegate) : mHoldTimeDelegate(timerDelegate) {}
 
         Config & WithFeatures(BitMask<AmbientContextSensing::Feature> featureMap)
         {
@@ -132,9 +131,9 @@ private:
 
     const BitMask<AmbientContextSensing::Feature> mFeatureMap;
     const OptionalAttributeSet mOptionalAttributeSet;
-    bool mHumanActivityDetected = false;
-    bool mObjectIdentified      = false;
-    bool mAudioContextDetected  = false;
+    bool mHumanActivityDetected                                         = false;
+    bool mObjectIdentified                                              = false;
+    bool mAudioContextDetected                                          = false;
     AmbientContextSensing::AmbientContextSensingDelegate * mACSDelegate = nullptr;
 
     Span<AmbientContextSensing::SemanticTagType> mAmbientContextTypeSupportedList;

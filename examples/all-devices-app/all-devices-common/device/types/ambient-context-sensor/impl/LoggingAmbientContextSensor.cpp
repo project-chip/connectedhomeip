@@ -23,19 +23,19 @@ namespace chip::app::Clusters::AmbientContextSensing {
 
 LoggingAmbientContextSensor::LoggingAmbientContextSensor(TimerDelegate & timerDelegate) :
     AmbientContextSensor(AmbientContextSensingConfig{ timerDelegate }
-                                   .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeatureAllForLog))
-                                   .WithHoldTime(10,
-                                                 {
-                                                     .holdTimeMin     = 1,
-                                                     .holdTimeMax     = 300,
-                                                     .holdTimeDefault = 10,
-                                                 }),
-                               timerDelegate, *this),
+                             .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeatureAllForLog))
+                             .WithHoldTime(10,
+                                           {
+                                               .holdTimeMin     = 1,
+                                               .holdTimeMax     = 300,
+                                               .holdTimeDefault = 10,
+                                           }),
+                         timerDelegate, *this),
     mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0)
 {}
 
 CHIP_ERROR LoggingAmbientContextSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                       EndpointComposition composition)
+                                                 EndpointComposition composition)
 {
     return AmbientContextSensor::Register(endpoint, provider, composition);
 }

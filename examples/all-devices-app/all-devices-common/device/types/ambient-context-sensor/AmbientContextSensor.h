@@ -28,7 +28,8 @@ class AmbientContextSensor : public SingleEndpoint
 public:
     using AmbientContextSensingConfig = Clusters::AmbientContextSensingCluster::Config;
 
-    AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, Clusters::AmbientContextSensing::AmbientContextSensingDelegate & delegate);
+    AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate,
+                         Clusters::AmbientContextSensing::AmbientContextSensingDelegate & delegate);
     ~AmbientContextSensor() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
