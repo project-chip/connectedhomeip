@@ -105,6 +105,9 @@ class SetupCodeType(enum.IntEnum):
 
 
 class TC_SC_4_1(MatterBaseTest):
+    # Cached by get_exposed_device_types() so its per-endpoint Descriptor
+    # reads run once per test instead of once per verification pass
+    _exposed_device_types: Optional[set[int]] = None
 
     def steps_TC_SC_4_1(self):
         return [
@@ -741,7 +744,6 @@ class TC_SC_4_1(MatterBaseTest):
     async def test_TC_SC_4_1(self):
         self.endpoint = self.get_endpoint()
         self.supports_icd = False
-        self._exposed_device_types = None
         self.supports_lit = False
         self.setup_code_type = None
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
