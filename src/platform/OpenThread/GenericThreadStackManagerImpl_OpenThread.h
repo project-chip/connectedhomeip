@@ -174,6 +174,7 @@ private:
     uint64_t mOverrunCount      = 0;
     bool mIsAttached            = false;
     bool mTemporaryRxOnWhenIdle = false;
+    bool mIsAttachPending       = false;
 
     chip::Transport::PeerAddress mRendezvousPeerAddr;
 
@@ -187,6 +188,13 @@ private:
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+    Thread::OperationalDataset mPendingDataset;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mPendingCallback = nullptr;
+
+    static constexpr uint32_t kGracefulDetachTimeoutMs = 1500;
+
+    void _FinishGracefulDetach();
+    static void _OnGracefulDetachTimeout(System::Layer * aLayer, void * aAppState);
 
     void TryNextNetwork();
 
