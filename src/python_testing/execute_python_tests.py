@@ -25,6 +25,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -119,6 +120,120 @@ def load_env_from_yaml(file_path):
     with open(file_path) as f:
         for key, value in yaml.full_load(f).items():
             os.environ[key] = value
+
+
+class VMFreezeWatchdog(threading.Thread):
+    """
+    A background watchdog thread that detects VM freezes or severe CPU starvation.
+
+    It periodically checks for clock drift by comparing the system wall clock (real time)
+    with the monotonic clock.
+
+    Why this is needed:
+    The Matter SDK uses monotonic time for timers (like MRP). In virtualized environments,
+    if the VM freezes, the hardware clock on the host continues to run. On resume, the
+    guest kernel updates its clocks, causing a sudden jump in both monotonic and real time.
+    This "time compression" causes scheduled timers in the SDK to expire instantly,
+    leading to false test failures (e.g. MRP retry exhaustion).
+
+    We cannot use a "paused" clock (like CPU time) in the SDK because the specification and
+    real-world interactions require physical time. Thus, we must detect these freezes at
+    the test runner level and retry the tests.
+    """
+
+    def __init__(self, check_interval_sec=2.0, threshold_sec=5.0):
+        """
+        Args:
+            check_interval_sec (float): How often to check for drift.
+            threshold_sec (float): The minimum drift/jump in seconds to trigger freeze detection.
+        """
+        super().__init__()
+        self.check_interval_sec = check_interval_sec
+        self.threshold_sec = threshold_sec
+        self.daemon = True
+        self._freeze_detected = False
+        self._lock = threading.Lock()
+        self._stop_event = threading.Event()
+        self.last_wall = time.time()
+        self.last_mono = time.monotonic()
+
+    def check_for_freeze(self):
+        """Checks for clock drift/jump and updates the freeze detection flag."""
+        with self._lock:
+            curr_wall = time.time()
+            curr_mono = time.monotonic()
+
+            wall_delta = curr_wall - self.last_wall
+            mono_delta = curr_mono - self.last_mono
+
+            # Check for two scenarios of VM clock behavior on resume:
+            # 1. Monotonic clock jumped: monotonic elapsed time is much larger than expected sleep time.
+            mono_jump = mono_delta > (self.check_interval_sec + self.threshold_sec)
+
+            # 2. Monotonic clock paused but Wall clock jumped (synced via NTP/integration):
+            # drift between wall clock and monotonic clock is significant.
+            drift = wall_delta - mono_delta
+            wall_drift = drift > self.threshold_sec
+
+            if mono_jump or wall_drift:
+                self._freeze_detected = True
+                log.warning(
+                    "VMFreezeWatchdog: Potential VM freeze detected! "
+                    "Mono jump: %s (delta: %.2fs), "
+                    "Wall drift: %s (drift: %.2fs)",
+                    mono_jump, mono_delta, wall_drift, drift
+                )
+
+            self.last_wall = curr_wall
+            self.last_mono = curr_mono
+
+    def run(self):
+        # We use Event.wait() instead of time.sleep() to allow instant thread teardown on stop().
+        while not self._stop_event.wait(self.check_interval_sec):
+            self.check_for_freeze()
+
+    def is_freeze_detected(self):
+        """Returns True if a VM freeze has been detected since the last reset."""
+        with self._lock:
+            return self._freeze_detected
+
+    def reset_freeze_detected(self):
+        """Resets the freeze detection flag and updates baselines to current time."""
+        with self._lock:
+            self._freeze_detected = False
+            self.last_wall = time.time()
+            self.last_mono = time.monotonic()
+
+    def execute_with_retry(self, func, retries=3, delay_sec=10):
+        """
+        Executes a function and retries it if a VM freeze is detected during execution.
+
+        Args:
+            func (callable): The function to execute.
+            retries (int): Maximum number of retries.
+            delay_sec (float): Delay in seconds before retrying.
+        """
+        attempt = 0
+        while attempt <= retries:
+            attempt += 1
+            self.reset_freeze_detected()
+            try:
+                func()
+                return
+            except Exception:
+                # Force a synchronous check to catch any freeze that just happened
+                # before the background watchdog thread had a chance to wake up and run.
+                self.check_for_freeze()
+                if self.is_freeze_detected() and attempt <= retries:
+                    log.warning("VM freeze detected. Retrying in %d seconds (attempt %d/%d)...",
+                                delay_sec, attempt, retries)
+                    time.sleep(delay_sec)
+                    continue
+                raise
+
+    def stop(self):
+        """Stops the watchdog thread."""
+        self._stop_event.set()
 
 
 @click.group()
@@ -231,6 +346,9 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
 
     run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.UTC))
 
+    watchdog = VMFreezeWatchdog()
+    watchdog.start()
+
     failed_scripts = []
     try:
         for script in python_files:
@@ -241,8 +359,11 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
                     print(f"DRY-RUN(skip): {full_command}", flush=True)
                     run_summary.record(os.path.basename(script), "dry_run", time.monotonic() - test_start)
                 else:
-                    print(f"Running command: {full_command}", flush=True)
-                    subprocess.run(full_command, shell=True, check=True)
+                    def run_test():
+                        print(f"Running command: {full_command}", flush=True)
+                        subprocess.run(full_command, shell=True, check=True)
+
+                    watchdog.execute_with_retry(run_test)
                     run_summary.record(os.path.basename(script), "passed", time.monotonic() - test_start)
             except Exception as e:
                 run_summary.record(os.path.basename(script), "failed", time.monotonic() - test_start, error_message=str(e))
@@ -251,6 +372,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
                 else:
                     raise
     finally:
+        watchdog.stop()
         run_summary.total_runs = len(run_summary.results)
         if summary_file is not None:
             run_summary.write_json(summary_file)
