@@ -67,20 +67,13 @@ class TC_HSTAT_2_2(MatterBaseTest):
                 TestStep(next(step), "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to false",
                          "Verify DUT responds w/ status SUCCESS(0x00)"),
                 TestStep(next(step), "TH reads from the DUT the MinSetpoint attribute.", "Store the value as MinSetpointValue"),
+                TestStep(next(step), "TH reads from the DUT the MaxSetpoint attribute.", "Store the value as MaxSetpointValue"),
                 TestStep(next(step), "TH reads from the DUT the Step attribute.", "Store the value as StepValue. "),
-                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue",
-                         "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
-                         "Verify that the DUT response contains MinSetpointValue."),
-                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue + StepValue",
-                         "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
-                         "Verify that the DUT response contains MinSetpointValue + StepValue."),
-                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set to MinSetpointValue + 1",
-                         "Verify DUT responds w/ status SUCCESS(0x00)"),
-                TestStep(next(step), "TH reads from the DUT the UserSetpoint attribute.",
-                         "Verify that the DUT response contains MinSetpointValue."),
                 TestStep(next(step), "TH sends command SetSettings with UserSetpoint set toe MinSetpointValue - 1.",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set toe MaxSetpointValue + 1.",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command SetSettings with UserSetpoint set toe MinSetpointValue + 1.",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 TestStep(next(step), "TH sends command SetSettings with mode set to Humidifier",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
@@ -94,6 +87,46 @@ class TC_HSTAT_2_2(MatterBaseTest):
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
                 TestStep(next(step), "TH sends command SetSettings with MistType set to Cold",
                          "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends command SetSettings with mode set to Dehumidifier",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends command SetSettings with MistType set to Warm",
+                         "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
+                TestStep(next(step), "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 " +
+                         "with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to " +
+                         "PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowContinuous event.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends the SetSettings command to the DUT with the Continuous field set to True.",
+                         "Verify DUT responds w/ status INVALID_IN_STATE(0xCB)"),
+                TestStep(next(step), "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 " +
+                         "with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to " +
+                         "PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowContinuous event.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 " +
+                         "with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to " +
+                         "PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowSleep event.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends the SetSettings command to the DUT with the Sleep field set to True.",
+                         "Verify DUT responds w/ status INVALID_IN_STATE(0xCB)"),
+                TestStep(next(step), "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 " +
+                         "with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to " +
+                         "PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowSleep event.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 " +
+                         "with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to " +
+                         "PIXIT.HSTAT.TEST_EVENT_TRIGGER for DisallowOptimal event.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends the SetSettings command to the DUT with the Optimal field set to True.",
+                         "Verify DUT responds w/ status INVALID_IN_STATE(0xCB)"),
+                TestStep(next(step), "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 " +
+                         "with EnableKey field set to PIXIT.HSTAT.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to " +
+                         "PIXIT.HSTAT.TEST_EVENT_TRIGGER for AllowOptimal event.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends the SetSettings command to the DUT with the Continuous field set to True.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends the SetSettings command to the DUT with the Sleep field set to True.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
+                TestStep(next(step), "TH sends the SetSettings command to the DUT with the Optimal field set to True.",
+                         "Verify DUT responds w/ status SUCCESS(0x00)"),
                 ]
 
     async def read_hstat_attribute_expect_success(self, endpoint, attribute):
