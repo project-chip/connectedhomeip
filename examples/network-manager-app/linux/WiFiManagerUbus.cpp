@@ -33,22 +33,22 @@ using namespace chip::ubus;
 #else
 #define ChipWifiDebug(...)
 #endif
-
+#error COMPILATION CHECK
 namespace chip {
 
 static constexpr int kInvokeTimeout = 2000;
 
 static inline std::string debug_blob_msg(blob_attr * attr)
 {
-    std::string s;
-    const char * json = blobmsg_format_json(msg, true);
+    std::string s{};
+    char * json = blobmsg_format_json(attr, true);
     if (json)
     {
         s = std::string(json);
         free(json);
     }
 
-    return std::string{};
+    return s;
 }
 
 bool WiFiManagerUbus::GetUciBlob(const char * config, const char * type, blob_attr ** blob)
