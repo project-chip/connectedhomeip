@@ -20,7 +20,7 @@ import subprocess
 
 
 def run_command(command):
-    print("Running {}".format(" ".join(command)))
+    print(f"Running {' '.join(command)}")
     return subprocess.check_output(command).decode("utf-8")
 
 

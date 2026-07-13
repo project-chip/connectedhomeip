@@ -208,7 +208,7 @@ def main():
     cmd.extend(args)
 
     if options.debug:
-        sys.stderr.write('Running: {}\n'.format(' '.join(cmd)))
+        sys.stderr.write(f"Running: {' '.join(cmd)}\n")
 
     try:
         flag_string = subprocess.check_output(cmd).decode('utf-8')

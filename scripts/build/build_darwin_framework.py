@@ -96,7 +96,7 @@ def build_darwin_framework(args):
         'CHIP_USE_NETWORK_FRAMEWORK': args.use_network_framework
     }
     for option in options:
-        command += ["{}={}".format(option, "YES" if options[option] else "NO")]
+        command += [f"{option}={'YES' if options[option] else 'NO'}"]
 
     defines = 'GCC_PREPROCESSOR_DEFINITIONS=${inherited} MTR_NO_AVAILABILITY=1'
 
@@ -107,8 +107,8 @@ def build_darwin_framework(args):
 
     if args.clang:
         command += [
-            "CC={}".format(get_file_from_pigweed("clang")),
-            "CXX={}".format(get_file_from_pigweed("clang++")),
+            f"CC={get_file_from_pigweed('clang')}",
+            f"CXX={get_file_from_pigweed('clang++')}",
             "COMPILER_INDEX_STORE_ENABLE=NO",
             "CLANG_ENABLE_MODULES=NO",
         ]

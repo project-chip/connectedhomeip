@@ -36,7 +36,7 @@ def main() -> int:
     try:
         path = subprocess.check_output(cmd, text=True).strip()
     except (OSError, subprocess.SubprocessError) as e:
-        sys.stderr.write("error: failed to run '{}': {}\n".format(" ".join(cmd), e))
+        sys.stderr.write(f"error: failed to run '{' '.join(cmd)}': {e}\n")
         return 1
     # clang echoes the bare filename back when it cannot locate the library;
     # fail loudly rather than emitting a bogus linker input.

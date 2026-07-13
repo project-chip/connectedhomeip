@@ -65,8 +65,9 @@ def write_gn_args(args):
         #  Remove duplicates
         filtered_value = list(dict.fromkeys(filtered_value))
 
-        sys.stdout.write('{} = filter_exclude(string_split("{}", "{}"), [{}])\n'.format(
-            key, f"{GN_SPECIAL_SEPARATOR}-".join(filtered_value), GN_SPECIAL_SEPARATOR, cflag_excludes))
+        filtered_value_fmt = f"{GN_SPECIAL_SEPARATOR}-".join(filtered_value)
+        sys.stdout.write(
+            f'{key} = filter_exclude(string_split("{filtered_value_fmt}", "{GN_SPECIAL_SEPARATOR}"), [{cflag_excludes}])\n')
 
 
 def main():

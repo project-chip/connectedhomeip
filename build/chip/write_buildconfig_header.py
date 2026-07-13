@@ -121,8 +121,8 @@ def WriteHeader(options):
         output_file.write(f'\n#ifndef {options.header_guard}\n')
         output_file.write(f'#define {options.header_guard}\n\n')
 
-        for pair in options.defines:
-            output_file.write('#define {} {}\n'.format(*pair))
+        for key, value in options.defines:
+            output_file.write(f'#define {key} {value}\n')
 
         output_file.write(f'\n#endif  // {options.header_guard}\n')
 

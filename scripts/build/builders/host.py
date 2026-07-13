@@ -737,12 +737,12 @@ class HostBuilder(GnBuilder):
             case HostBoard.ARM64:
                 args.extend([
                     'target_cpu="arm64"',
-                    'sysroot="{}"'.format(self.SysRootPath('SYSROOT_AARCH64'))
+                    f'sysroot="{self.SysRootPath("SYSROOT_AARCH64")}"'
                 ])
             case HostBoard.ARM:
                 args.extend([
                     'target_cpu="arm"',
-                    'sysroot="{}"'.format(self.SysRootPath('SYSROOT_ARMHF')),
+                    f'sysroot="{self.SysRootPath("SYSROOT_ARMHF")}"',
                 ])
             case HostBoard.FAKE:
                 args.extend([

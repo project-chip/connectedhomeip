@@ -174,7 +174,7 @@ class ASRBuilder(GnBuilder):
         if enable_lwip_ip6_hook:
             self.extra_gn_options.append('chip_lwip_ip6_hook=true')
 
-        self.extra_gn_options.append('asr_toolchain_root="{}"'.format(os.environ['ASR_TOOLCHAIN_PATH']))
+        self.extra_gn_options.append(f'asr_toolchain_root="{os.environ["ASR_TOOLCHAIN_PATH"]}"')
 
     def GnBuildArgs(self):
         args = super().GnBuildArgs()

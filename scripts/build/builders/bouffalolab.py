@@ -299,7 +299,7 @@ class _BouffalolabGnBuilder(GnBuilder):
         self.argsOpt.append("chip_generate_link_map_file=true")
 
         try:
-            self.argsOpt.append('bouffalolab_sdk_root="{}"'.format(os.environ['BOUFFALOLAB_SDK_ROOT']))
+            self.argsOpt.append(f'bouffalolab_sdk_root="{os.environ["BOUFFALOLAB_SDK_ROOT"]}"')
         except KeyError as err:
             self.print_enviroment_error()
             raise err

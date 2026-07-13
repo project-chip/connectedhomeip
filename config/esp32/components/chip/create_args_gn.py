@@ -112,6 +112,6 @@ with open(compile_commands_path) as compile_commands_json:
     with open(args.input) as args_input, open(args.output, "w") as args_output:
         args_output.write(args_input.read())
 
-        args_output.write("target_cflags_c = [{}]".format(', '.join(c_flags)))
+        args_output.write(f"target_cflags_c = [{', '.join(c_flags)}]")
         args_output.write("\n")
-        args_output.write("target_cflags_cc = [{}]".format(', '.join(cpp_flags)))
+        args_output.write(f"target_cflags_cc = [{', '.join(cpp_flags)}]")
