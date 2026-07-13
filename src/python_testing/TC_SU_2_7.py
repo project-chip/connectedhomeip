@@ -409,8 +409,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                 self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                                    expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
                 state_transition_event_handler.cancel()
-
-                # At this moment the requestor device must be asking for Consent to Proceed with the Update.
                 self.terminate_provider()
                 await self.request_device_reboot()
             else:

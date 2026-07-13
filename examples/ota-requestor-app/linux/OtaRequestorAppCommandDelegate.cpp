@@ -18,6 +18,7 @@
 
 #include "OtaRequestorAppCommandDelegate.h"
 #include "OTAConsentHandler.h"
+#include <app/clusters/ota-requestor/OTARequestorUserConsentDelegate.h>
 #include <lib/support/Defer.h>
 #include <platform/PlatformManager.h>
 
@@ -71,6 +72,29 @@ Json::Value OtaRequestorAppCommandHandler::BuildCanConsent(uint16_t endpoint)
     return payload;
 }
 
+Json::Value OtaRequestorAppCommandHandler::BuildUserConsentState(uint16_t endpoint, std::string consentState)
+{
+    Json::Value payload(Json::objectValue);
+    chip::ota::UserConsentState ktmpConsentState;
+    
+    if( consentState == "granted" ){
+        ktmpConsentState = chip::ota::UserConsentState::kGranted;
+    }else if ( consentState == "denied" ){
+        ktmpConsentState = chip::ota::UserConsentState::kDenied;
+    }else if ( consentState == "deferred" ){
+        ktmpConsentState = chip::ota::UserConsentState::kObtaining;
+    }else{
+        ChipLogError(SoftwareUpdate, "Invalid  option for ConsentState: %s", consentState.c_str());
+        ktmpConsentState = chip::ota::UserConsentState::kUnknown;
+    }
+
+    gConsentHandler.SetUserConsentState(ktmpConsentState);
+    chip::ota::UserConsentState state = gConsentHandler.GetUserConsentState();
+    payload["UserConsentState"]       = chip::ota::OTARequestorUserConsentDelegate::UserConsentStateToString(state);
+
+    return payload;
+}
+
 void OtaRequestorAppCommandHandler::HandleCommand(intptr_t context)
 {
     auto * self = reinterpret_cast<OtaRequestorAppCommandHandler *>(context);
@@ -83,6 +107,7 @@ void OtaRequestorAppCommandHandler::HandleCommand(intptr_t context)
     auto cleanup = MakeDefer([&]() { Platform::Delete(self); });
 
     std::string name;
+    std::string consentState;
     std::string cluster;
     uint16_t endpoint                         = 0;
     OtaRequestorAppCommandDelegate * delegate = nullptr;
@@ -108,6 +133,31 @@ void OtaRequestorAppCommandHandler::HandleCommand(intptr_t context)
         if (cluster == "OtaSoftwareUpdateRequestor")
         {
             out["Payload"] = self->BuildCanConsent(endpoint);
+        }
+        else
+        {
+            out["Error"] = "Unsupported cluster for snapshot";
+        }
+
+        if (delegate && delegate->GetPipes())
+        {
+            delegate->GetPipes()->WriteToOutPipe(ToString(out));
+        }
+        return;
+    }
+
+    if (name == "SetUserConsentState")
+    {  
+        consentState = self->mCommandPayload["consentState"].asString();
+        Json::Value out(Json::objectValue);
+        out["Name"]     = "UserConsentStateResponse";
+        out["Cluster"]  = cluster;
+        out["Endpoint"] = endpoint;
+
+        if (cluster == "OtaSoftwareUpdateRequestor")
+        {
+
+            out["Payload"] = self->BuildUserConsentState(endpoint, consentState);
         }
         else
         {

@@ -53,6 +53,8 @@ public:
 
     Json::Value BuildCanConsent(uint16_t endpoint);
 
+    Json::Value BuildUserConsentState(uint16_t endpoint, std::string consentState);
+
     struct PrivateCtorTag
     {
     private:

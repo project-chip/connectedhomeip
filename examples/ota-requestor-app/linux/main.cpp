@@ -236,6 +236,7 @@ static void InitOTARequestor(void)
     {
         gUserConsentProvider.SetUserConsentState(gUserConsentState);
         gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+        gConsentHandler.SetUserConsentState(gUserConsentState);
     }
 
     if (gMaxBDXBlockSize)

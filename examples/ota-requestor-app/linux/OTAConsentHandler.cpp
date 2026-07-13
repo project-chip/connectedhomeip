@@ -25,4 +25,14 @@ bool OTAConsentHandler::HasValue() const
     return mRequestorCanConsent.HasValue();
 }
 
+void OTAConsentHandler::SetUserConsentState(chip::ota::UserConsentState state)
+{
+    mUserConsentState = state;
+}
+
+chip::ota::UserConsentState OTAConsentHandler::GetUserConsentState() const
+{
+    return mUserConsentState;
+}
+
 } // namespace chip
