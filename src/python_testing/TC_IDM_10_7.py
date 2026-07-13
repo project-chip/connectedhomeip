@@ -133,6 +133,21 @@ class TC_IDM_10_7(DeviceConformanceTests):
             self.fail_current_test("Missing mandatory clusters in Limited Data Model")
             return
 
+        # If EP0 contains Clusters.NetworkCommissioning, check that MCORE.COM.WIFI and MCORE.COM.THR are set consistently
+        ep0 = limited_data_model.get(0, {})
+        if Clusters.NetworkCommissioning in ep0:
+            asserts.assert_true(
+                self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"),
+                "Clusters.NetworkCommissioning is present in limited_data_model, "
+                "so at least one of MCORE.COM.WIFI or MCORE.COM.THR must be true."
+            )
+        else:
+            asserts.assert_true(
+                not self.check_pics("MCORE.COM.WIFI") and not self.check_pics("MCORE.COM.THR"),
+                "Clusters.NetworkCommissioning is not present in limited_data_model, "
+                "so both MCORE.COM.WIFI and MCORE.COM.THR must be false."
+            )
+
         self.step(4)    # Limited Data Model : Check clusters revisions
         ignore_in_progress_test_event_only_disallowed_for_certification = self.user_params.get(
             "ignore_in_progress_test_event_only_disallowed_for_certification", False)
@@ -179,7 +194,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
             BasicInformation
             GeneralCommissioning
             OperationalCredentials
-            NetworkCommissioning (only if MCORE.COM.WIRELESS is set)
+            NetworkCommissioning (only if MCORE.COM.WIFI or MCORE.COM.THR is set)
         - On every endpoint listed in Endpoint 0 Descriptor.PartsList:
             Descriptor
 
@@ -206,7 +221,7 @@ class TC_IDM_10_7(DeviceConformanceTests):
                 Clusters.OperationalCredentials,
             ]
 
-            if self.check_pics("MCORE.COM.WIRELESS"):
+            if self.check_pics("MCORE.COM.WIFI") or self.check_pics("MCORE.COM.THR"):
                 mandatory_ep0_clusters.append(Clusters.NetworkCommissioning)
 
             for cluster in mandatory_ep0_clusters:
