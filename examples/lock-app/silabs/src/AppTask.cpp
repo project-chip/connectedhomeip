@@ -128,6 +128,24 @@ bool IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
     return (scheduleIndex < kMaxHolidaySchedules);
 }
 
+[[maybe_unused]] const char * LockStateToString(DlLockState lockState)
+{
+    switch (lockState)
+    {
+    case DlLockState::kNotFullyLocked:
+        return "Not Fully Locked";
+    case DlLockState::kLocked:
+        return "Locked";
+    case DlLockState::kUnlocked:
+        return "Unlocked";
+    case DlLockState::kUnlatched:
+        return "Unlatched";
+    case DlLockState::kUnknownEnumValue:
+        break;
+    }
+    return "Unknown";
+}
+
 // ---- Persistent-storage key builders ---------------------------------------
 
 StorageKeyName LockUserEndpoint(EndpointId endpoint, uint16_t userIndex)
