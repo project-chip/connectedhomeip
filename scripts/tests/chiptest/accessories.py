@@ -24,9 +24,9 @@ import multiprocessing
 import subprocess
 import sys
 import threading
+from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Concatenate, ParamSpec, Self, TypeAlias, TypeVar
-from collections.abc import Callable
 from xmlrpc.server import SimpleXMLRPCServer
 
 from chiptest.concurrency.context import StartStopContextMixin, TerminableResource, mp_wrapped_spawn_context

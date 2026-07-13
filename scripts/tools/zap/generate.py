@@ -24,9 +24,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
-from collections.abc import Generator
 
 from clang_format import getClangFormatBinary
 from zap_execution import ZapTool

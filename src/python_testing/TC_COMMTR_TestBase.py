@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-
 from mobly import asserts
 
 import matter.clusters as Clusters

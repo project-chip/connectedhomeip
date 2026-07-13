@@ -17,10 +17,10 @@
 
 import logging
 import re
+from collections.abc import Mapping
 from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import Any
-from collections.abc import Mapping
 
 import yaml
 

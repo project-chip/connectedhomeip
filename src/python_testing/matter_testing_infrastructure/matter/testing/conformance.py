@@ -35,9 +35,9 @@ commands.
 
 import operator
 import xml.etree.ElementTree as ElementTree
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum, auto
-from collections.abc import Callable
 
 from matter.tlv import uint
 

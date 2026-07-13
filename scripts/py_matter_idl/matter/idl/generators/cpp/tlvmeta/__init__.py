@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-from dataclasses import dataclass
 from collections.abc import Generator
+from dataclasses import dataclass
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.storage import GeneratorStorage

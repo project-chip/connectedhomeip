@@ -17,9 +17,9 @@
 import json
 import logging
 import os
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from collections.abc import Iterator
 
 import yaml
 

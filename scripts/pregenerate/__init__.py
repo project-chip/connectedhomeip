@@ -16,8 +16,8 @@
 import fnmatch
 import logging
 import os
-from dataclasses import dataclass, field
 from collections.abc import Iterator
+from dataclasses import dataclass, field
 
 from .type_definitions import IdlFileType, InputIdlFile
 from .using_codegen import (CodegenCppAppPregenerator, CodegenCppClustersTLVMetaPregenerator,

@@ -16,8 +16,8 @@
 #
 
 import asyncio
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from .async_websocket_client import AsyncWebSocketClient
 from .types import WebSocketMessage

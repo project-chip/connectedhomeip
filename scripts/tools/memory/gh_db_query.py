@@ -19,8 +19,8 @@
 import datetime
 import logging
 import sys
-from typing import cast
 from collections.abc import Mapping
+from typing import cast
 
 import memdf.report
 import memdf.util.config

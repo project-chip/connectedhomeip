@@ -22,8 +22,8 @@ import re
 import sys
 import time
 import traceback
-from enum import IntEnum
 from collections.abc import Mapping
+from enum import IntEnum
 from urllib.parse import urljoin
 
 import requests

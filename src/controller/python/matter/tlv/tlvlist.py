@@ -21,8 +21,8 @@ from __future__ import annotations
 
 import dataclasses
 import enum
-from typing import Any
 from collections.abc import Iterator
+from typing import Any
 
 
 class TLVList:

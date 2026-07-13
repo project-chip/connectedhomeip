@@ -28,8 +28,8 @@ import subprocess
 import sys
 import textwrap
 import time
-from dataclasses import dataclass
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 import alive_progress
 import click

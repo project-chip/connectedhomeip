@@ -15,9 +15,9 @@
 import logging
 import os
 import xml.etree.ElementTree
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from enum import Enum, auto
-from collections.abc import MutableMapping
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args

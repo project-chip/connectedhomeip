@@ -32,10 +32,10 @@ import logging
 import queue
 import threading
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
-from collections.abc import Iterable
 
 from mobly import asserts
 

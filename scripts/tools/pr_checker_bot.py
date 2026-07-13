@@ -19,9 +19,9 @@ import json
 import logging
 import os
 import urllib.request
+from collections.abc import Iterable
 from enum import Enum
 from typing import NamedTuple
-from collections.abc import Iterable
 
 import click
 import coloredlogs

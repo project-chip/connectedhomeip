@@ -35,8 +35,8 @@ import json
 import os
 import re
 import uuid
-from typing import TypedDict
 from collections.abc import Sequence
+from typing import TypedDict
 
 try:
     import yaml

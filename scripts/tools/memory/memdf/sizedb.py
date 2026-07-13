@@ -20,9 +20,9 @@ import json
 import logging
 import sqlite3
 import zipfile
+from collections.abc import Iterable
 from pathlib import Path
 from typing import IO
-from collections.abc import Iterable
 
 import memdf.util.sqlite
 

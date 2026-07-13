@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import os
-from dataclasses import dataclass
 from collections.abc import Mapping
+from dataclasses import dataclass
 
 from matter.idl.generators import CodeGenerator
 from matter.idl.generators.cluster_selection import server_side_clusters

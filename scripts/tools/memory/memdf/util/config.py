@@ -19,9 +19,9 @@ import argparse
 import ast
 import logging
 import re
-from typing import Any
-from re import Pattern
 from collections.abc import Mapping, MutableMapping, Sequence
+from re import Pattern
+from typing import Any
 
 import humanfriendly  # type: ignore
 import memdf.util.nd as nd

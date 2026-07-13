@@ -18,8 +18,8 @@ import enum
 import logging
 import threading
 import time
-from dataclasses import dataclass
 from collections.abc import Callable
+from dataclasses import dataclass
 
 from ..native import PyChipError
 from .library_handle import _GetDiscoveryLibraryHandle

@@ -1,8 +1,8 @@
 """
 Matter-specific assertions building on top of Mobly asserts.
 """
-from typing import Any, TypeVar
 from collections.abc import Callable
+from typing import Any, TypeVar
 
 from mobly import asserts
 

@@ -24,8 +24,8 @@ Uses the conditions defined in `check_includes_config.py`.
 
 import re
 import sys
-from re import Pattern
 from collections.abc import Iterable
+from re import Pattern
 
 import check_includes_config as config
 

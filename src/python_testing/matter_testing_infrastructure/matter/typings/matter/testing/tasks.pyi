@@ -1,9 +1,9 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/tasks.py
 
 import threading
-from typing import Any, BinaryIO
-from re import Pattern
 from collections.abc import Callable
+from re import Pattern
+from typing import Any, BinaryIO
 
 def forward_f(f_in: BinaryIO, f_out: BinaryIO,
               cb: Callable[[bytes, bool], bytes] | None = ...,

@@ -18,9 +18,9 @@
 import enum
 import types
 import typing
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field, make_dataclass
 from typing import Any, ClassVar
-from collections.abc import Mapping
 
 from dacite import from_dict  # type: ignore
 

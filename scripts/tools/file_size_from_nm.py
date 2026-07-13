@@ -49,9 +49,9 @@ import fnmatch
 import logging
 import re
 import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from enum import Enum, auto
-from collections.abc import Callable
 
 import click
 import coloredlogs

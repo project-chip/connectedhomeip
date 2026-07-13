@@ -1,9 +1,9 @@
 import asyncio
 import json
 import logging
+from collections.abc import Callable
 from dataclasses import asdict
 from typing import Any
-from collections.abc import Callable
 
 import websockets
 

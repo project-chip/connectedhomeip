@@ -16,8 +16,8 @@
 
 import dataclasses
 import logging
-from typing import Protocol, TypeVar
 from collections.abc import Iterable
+from typing import Protocol, TypeVar
 
 from matter.idl.matter_idl_types import Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 

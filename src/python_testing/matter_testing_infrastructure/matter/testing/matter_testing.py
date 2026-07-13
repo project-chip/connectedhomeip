@@ -32,11 +32,11 @@ import textwrap
 import threading
 import time
 import typing
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
 from typing import Any, TypeAlias
-from collections.abc import Callable
 
 import matter.testing.matchers as matchers
 

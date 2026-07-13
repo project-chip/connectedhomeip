@@ -24,11 +24,11 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
+from collections.abc import Callable
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import Any
-from collections.abc import Callable
 
 import construct  # type: ignore
 from rich.pretty import pprint  # type: ignore
