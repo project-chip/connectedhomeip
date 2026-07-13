@@ -58,7 +58,6 @@ public:
     int16_t GetLocalTemperature(void);
     void UpdateLocalTemperature(int16_t aLocalTemperature);
 
-
     int16_t GetOccupiedCoolingSetpoint(void);
     void SetOccupiedCoolingSetpoint(int16_t aSetpoint);
 

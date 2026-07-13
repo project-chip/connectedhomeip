@@ -333,7 +333,6 @@ void ThermostaticRadiatorValveManager::UpdateLocalTemperature(int16_t aLocalTemp
     });
 }
 
-
 int16_t ThermostaticRadiatorValveManager::GetOccupiedCoolingSetpoint(void)
 {
     int16_t value;
