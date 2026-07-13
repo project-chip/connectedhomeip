@@ -65,7 +65,8 @@ public:
     static void OnTriggerOffWithEffect(OnOffEffect * effect);
 
     /**
-     * @brief Data model hook invoked when a cluster attribute changes
+     * @brief Matter stack callback after a server attribute write, syncs OnOff, LevelControl, and
+     *        ColorControl changes to the LED and display.
      *
      * @param attributePath Endpoint, cluster, and attribute that changed
      * @param type          TLV encoding type of @p value

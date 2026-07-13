@@ -65,8 +65,8 @@ public:
     static void TemperatureUpdateEventHandler(AppEvent * aEvent);
 
     /**
-     * @brief Thermostat-cluster post-attribute-change callback. Logs per-attribute info and
-     *        triggers a UI refresh. Also fans out to the AWS hook when SL_MATTER_ENABLE_AWS is set.
+     * @brief Matter stack callback after a server attribute write, logs Thermostat attributes and
+     *        refreshes the UI.
      *
      * @param attributePath Endpoint, cluster, and attribute that changed
      * @param type          TLV encoding type of @p value

@@ -161,7 +161,7 @@ public:
                                                   chip::OperationalDeviceProxy * peer_device);
 
     /**
-     * @brief Data model hook invoked when a cluster attribute changes.
+     * @brief Matter stack callback after a server attribute write, logs Identify cluster changes.
      *
      * @param attributePath Endpoint, cluster, and attribute that changed
      * @param type          TLV encoding type of @p value
