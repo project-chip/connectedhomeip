@@ -52,7 +52,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value);
 } // namespace LocalTemperatureCalibration
 
 namespace OccupiedCoolingSetpoint {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t & value);
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
 } // namespace OccupiedCoolingSetpoint
 
@@ -102,7 +102,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, BitMask<RemoteSensi
 } // namespace RemoteSensing
 
 namespace ControlSequenceOfOperation {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, ControlSequenceOfOperationEnum & value);
+Protocols::InteractionModel::Status Get(EndpointId endpoint, ControlSequenceOfOperationEnum * value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, ControlSequenceOfOperationEnum value);
 } // namespace ControlSequenceOfOperation
 

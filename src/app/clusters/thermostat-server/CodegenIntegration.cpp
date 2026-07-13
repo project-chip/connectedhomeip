@@ -341,14 +341,14 @@ Status Set(EndpointId endpoint, int8_t value)
 
 namespace OccupiedCoolingSetpoint {
 
-Status Get(EndpointId endpoint, int16_t & value)
+Status Get(EndpointId endpoint, int16_t * value)
 {
     ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
     }
-    value = cluster->GetOccupiedCoolingSetpoint();
+    *value = cluster->GetOccupiedCoolingSetpoint();
     return Status::Success;
 }
 
@@ -591,14 +591,14 @@ Status Set(EndpointId endpoint, BitMask<RemoteSensingBitmap> value)
 
 namespace ControlSequenceOfOperation {
 
-Status Get(EndpointId endpoint, ControlSequenceOfOperationEnum & value)
+Status Get(EndpointId endpoint, ControlSequenceOfOperationEnum * value)
 {
     ThermostatCluster * cluster = FindClusterOnEndpoint(endpoint);
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
     }
-    value = cluster->GetControlSequenceOfOperation();
+    *value = cluster->GetControlSequenceOfOperation();
     return Status::Success;
 }
 
