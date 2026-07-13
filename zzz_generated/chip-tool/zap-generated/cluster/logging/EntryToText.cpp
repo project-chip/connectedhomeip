@@ -4518,6 +4518,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveTextTrack";
         case chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
             return "AvailableTextTracks";
+        case chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id:
+            return "AvailableCommands";
+        case chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id:
+            return "ContentInfo";
         case chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::Id:
@@ -4690,6 +4694,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::AccountLogin::Id: {
         switch (id)
         {
+        case chip::app::Clusters::AccountLogin::Attributes::OAuthLoggedIn::Id:
+            return "OAuthLoggedIn";
         case chip::app::Clusters::AccountLogin::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AccountLogin::Attributes::AcceptedCommandList::Id:
@@ -6770,6 +6776,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Login";
         case chip::app::Clusters::AccountLogin::Commands::Logout::Id:
             return "Logout";
+        case chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
+            return "GetDeviceAuthURI";
         default:
             return "Unknown";
         }
@@ -7681,6 +7689,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Id:
             return "GetSetupPINResponse";
+        case chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id:
+            return "GetDeviceAuthURIResponse";
         default:
             return "Unknown";
         }

@@ -1763,7 +1763,7 @@ class ChipDeviceControllerBase:
             commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
 
         Returns:
-            TestOnlyBatchCommandResponse
+            TestOnlyBatchCommandResponse or None
         '''
         self.CheckIsActive()
 
@@ -1778,6 +1778,10 @@ class ChipDeviceControllerBase:
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
             commandRefsOverride=commandRefsOverride).raise_on_error()
+
+        if suppressResponse:
+            return None
+
         return await future
 
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeId: int, endpoint: int,
@@ -1887,7 +1891,7 @@ class ChipDeviceControllerBase:
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
 
         Returns:
-            command response. The type of the response is defined by the command.
+            command response or None. The type of the response is defined by the command.
 
         Raises:
             InteractionModelError on error
@@ -1909,6 +1913,10 @@ class ChipDeviceControllerBase:
                 ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
             res.raise_on_error()
+
+            if suppressResponse:
+                return None
+
             return await future
 
         return await self._run_with_session_retry(nodeId, _send_impl)
@@ -2363,9 +2371,24 @@ class ChipDeviceControllerBase:
             eventPaths = [self._parseEventPathTuple(
                 v) for v in events] if events else None
 
+            # keepSubscriptions=False -> Server purges existing subscriptions.
+            # Proactively shut down corresponding client-side objects here to:
+            # - Prevent client-side liveness timeouts from marking the secure session defunct.
+            # - Free C++ ReadClient/Exchange context resources early.
+            if reportInterval is not None and not keepSubscriptions:
+                for subscription in list(builtins.chipStack._subscriptions.values()):
+                    if getattr(subscription, 'nodeId', None) == nodeId and subscription._devCtrl == self:
+                        LOGGER.info("Auto-cancelling previous subscription 0x%08x to node %d due to keepSubscriptions=False",
+                                    subscription.subscriptionId, nodeId)
+                        try:
+                            subscription.Shutdown()
+                        except Exception as e:
+                            # Benign: the obsolete subscription might already be terminated by the C++ stack or server.
+                            LOGGER.info("Failed to shut down obsolete subscription: %s", e)
+
             allowLargePayload = payloadCapability in (TransportPayloadCapability.LARGE_PAYLOAD,
                                                       TransportPayloadCapability.MRP_OR_TCP_PAYLOAD)
-            transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
+            transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject, nodeId=nodeId)
             ClusterAttribute.Read(transaction, device=device.deviceProxy,
                                   attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
                                   eventNumberFilter=eventNumberFilter,
@@ -2643,6 +2666,39 @@ class ChipDeviceControllerBase:
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_SetGroupKey(
                 self.devCtrl, group_id, keyset_id)
+        ).raise_on_error()
+
+    def RemoveGroupInfo(self, group_id: int):
+        '''
+        Removes a group entry from the controller's GroupDataProvider for this fabric.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_RemoveGroupInfo(
+                self.devCtrl, group_id)
+        ).raise_on_error()
+
+    def RemoveKeySet(self, keyset_id: int):
+        '''
+        Removes a KeySet from the controller's GroupDataProvider for this fabric.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_RemoveKeySet(
+                self.devCtrl, keyset_id)
+        ).raise_on_error()
+
+    def RemoveGroupKeys(self):
+        '''
+        Removes all GroupKey mappings from the controller's GroupDataProvider for this fabric.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_RemoveGroupKeys(
+                self.devCtrl)
         ).raise_on_error()
 
     def CreateManualCode(self, discriminator: int, passcode: int) -> str:
@@ -2946,6 +3002,15 @@ class ChipDeviceControllerBase:
 
             self._dmLib.pychip_OpCreds_SetGroupKey.argtypes = [c_void_p, c_uint16, c_uint16]
             self._dmLib.pychip_OpCreds_SetGroupKey.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_RemoveGroupInfo.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_OpCreds_RemoveGroupInfo.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_RemoveKeySet.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_OpCreds_RemoveKeySet.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_RemoveGroupKeys.argtypes = [c_void_p]
+            self._dmLib.pychip_OpCreds_RemoveGroupKeys.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]

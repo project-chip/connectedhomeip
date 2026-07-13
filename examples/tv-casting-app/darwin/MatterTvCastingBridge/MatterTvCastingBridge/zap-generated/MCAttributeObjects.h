@@ -197,6 +197,12 @@
 @interface MCMediaPlaybackClusterAvailableTextTracksAttribute : MCAttribute <NSArray *>
 @end
 
+@interface MCMediaPlaybackClusterAvailableCommandsAttribute : MCAttribute <NSArray *>
+@end
+
+@interface MCMediaPlaybackClusterContentInfoAttribute : MCAttribute <MCMediaPlaybackClusterContentInfoStruct *>
+@end
+
 @interface MCMediaPlaybackClusterGeneratedCommandListAttribute : MCAttribute <NSArray *>
 @end
 

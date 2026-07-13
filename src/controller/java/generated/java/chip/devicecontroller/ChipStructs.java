@@ -15492,21 +15492,26 @@ public static class TargetNavigatorClusterTargetInfoStruct {
 }
 public static class MediaPlaybackClusterTrackAttributesStruct {
   public String languageCode;
+  public @Nullable Optional<ArrayList<Integer>> characteristics;
   public @Nullable Optional<String> displayName;
   private static final long LANGUAGE_CODE_ID = 0L;
-  private static final long DISPLAY_NAME_ID = 1L;
+  private static final long CHARACTERISTICS_ID = 1L;
+  private static final long DISPLAY_NAME_ID = 2L;
 
   public MediaPlaybackClusterTrackAttributesStruct(
     String languageCode,
+    @Nullable Optional<ArrayList<Integer>> characteristics,
     @Nullable Optional<String> displayName
   ) {
     this.languageCode = languageCode;
+    this.characteristics = characteristics;
     this.displayName = displayName;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(LANGUAGE_CODE_ID, new StringType(languageCode)));
+    values.add(new StructElement(CHARACTERISTICS_ID, characteristics != null ? characteristics.<BaseTLVType>map((nonOptionalcharacteristics) -> ArrayType.generateArrayType(nonOptionalcharacteristics, (elementnonOptionalcharacteristics) -> new UIntType(elementnonOptionalcharacteristics))).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(DISPLAY_NAME_ID, displayName != null ? displayName.<BaseTLVType>map((nonOptionaldisplayName) -> new StringType(nonOptionaldisplayName)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
@@ -15517,12 +15522,18 @@ public static class MediaPlaybackClusterTrackAttributesStruct {
       return null;
     }
     String languageCode = null;
+    @Nullable Optional<ArrayList<Integer>> characteristics = null;
     @Nullable Optional<String> displayName = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == LANGUAGE_CODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
           languageCode = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == CHARACTERISTICS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          characteristics = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
         }
       } else if (element.contextTagNum() == DISPLAY_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -15533,6 +15544,7 @@ public static class MediaPlaybackClusterTrackAttributesStruct {
     }
     return new MediaPlaybackClusterTrackAttributesStruct(
       languageCode,
+      characteristics,
       displayName
     );
   }
@@ -15543,6 +15555,9 @@ public static class MediaPlaybackClusterTrackAttributesStruct {
     output.append("MediaPlaybackClusterTrackAttributesStruct {\n");
     output.append("\tlanguageCode: ");
     output.append(languageCode);
+    output.append("\n");
+    output.append("\tcharacteristics: ");
+    output.append(characteristics);
     output.append("\n");
     output.append("\tdisplayName: ");
     output.append(displayName);
@@ -15607,6 +15622,172 @@ public static class MediaPlaybackClusterTrackStruct {
     output.append("\n");
     output.append("\ttrackAttributes: ");
     output.append(trackAttributes);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MediaPlaybackClusterContentInfoStruct {
+  public Integer contentType;
+  public @Nullable Optional<String> title;
+  public @Nullable Optional<String> show;
+  public @Nullable Optional<String> season;
+  public @Nullable Optional<String> episode;
+  public @Nullable Optional<String> provider;
+  public @Nullable Optional<String> artist;
+  public @Nullable Optional<String> album;
+  public @Nullable Optional<String> track;
+  private static final long CONTENT_TYPE_ID = 0L;
+  private static final long TITLE_ID = 1L;
+  private static final long SHOW_ID = 2L;
+  private static final long SEASON_ID = 3L;
+  private static final long EPISODE_ID = 4L;
+  private static final long PROVIDER_ID = 5L;
+  private static final long ARTIST_ID = 6L;
+  private static final long ALBUM_ID = 7L;
+  private static final long TRACK_ID = 8L;
+
+  public MediaPlaybackClusterContentInfoStruct(
+    Integer contentType,
+    @Nullable Optional<String> title,
+    @Nullable Optional<String> show,
+    @Nullable Optional<String> season,
+    @Nullable Optional<String> episode,
+    @Nullable Optional<String> provider,
+    @Nullable Optional<String> artist,
+    @Nullable Optional<String> album,
+    @Nullable Optional<String> track
+  ) {
+    this.contentType = contentType;
+    this.title = title;
+    this.show = show;
+    this.season = season;
+    this.episode = episode;
+    this.provider = provider;
+    this.artist = artist;
+    this.album = album;
+    this.track = track;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CONTENT_TYPE_ID, new UIntType(contentType)));
+    values.add(new StructElement(TITLE_ID, title != null ? title.<BaseTLVType>map((nonOptionaltitle) -> new StringType(nonOptionaltitle)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(SHOW_ID, show != null ? show.<BaseTLVType>map((nonOptionalshow) -> new StringType(nonOptionalshow)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(SEASON_ID, season != null ? season.<BaseTLVType>map((nonOptionalseason) -> new StringType(nonOptionalseason)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(EPISODE_ID, episode != null ? episode.<BaseTLVType>map((nonOptionalepisode) -> new StringType(nonOptionalepisode)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(PROVIDER_ID, provider != null ? provider.<BaseTLVType>map((nonOptionalprovider) -> new StringType(nonOptionalprovider)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(ARTIST_ID, artist != null ? artist.<BaseTLVType>map((nonOptionalartist) -> new StringType(nonOptionalartist)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(ALBUM_ID, album != null ? album.<BaseTLVType>map((nonOptionalalbum) -> new StringType(nonOptionalalbum)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(TRACK_ID, track != null ? track.<BaseTLVType>map((nonOptionaltrack) -> new StringType(nonOptionaltrack)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static MediaPlaybackClusterContentInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer contentType = null;
+    @Nullable Optional<String> title = null;
+    @Nullable Optional<String> show = null;
+    @Nullable Optional<String> season = null;
+    @Nullable Optional<String> episode = null;
+    @Nullable Optional<String> provider = null;
+    @Nullable Optional<String> artist = null;
+    @Nullable Optional<String> album = null;
+    @Nullable Optional<String> track = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CONTENT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          contentType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TITLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          title = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == SHOW_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          show = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == SEASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          season = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == EPISODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          episode = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == PROVIDER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          provider = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == ARTIST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          artist = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == ALBUM_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          album = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == TRACK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          track = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new MediaPlaybackClusterContentInfoStruct(
+      contentType,
+      title,
+      show,
+      season,
+      episode,
+      provider,
+      artist,
+      album,
+      track
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MediaPlaybackClusterContentInfoStruct {\n");
+    output.append("\tcontentType: ");
+    output.append(contentType);
+    output.append("\n");
+    output.append("\ttitle: ");
+    output.append(title);
+    output.append("\n");
+    output.append("\tshow: ");
+    output.append(show);
+    output.append("\n");
+    output.append("\tseason: ");
+    output.append(season);
+    output.append("\n");
+    output.append("\tepisode: ");
+    output.append(episode);
+    output.append("\n");
+    output.append("\tprovider: ");
+    output.append(provider);
+    output.append("\n");
+    output.append("\tartist: ");
+    output.append(artist);
+    output.append("\n");
+    output.append("\talbum: ");
+    output.append(album);
+    output.append("\n");
+    output.append("\ttrack: ");
+    output.append(track);
     output.append("\n");
     output.append("}\n");
     return output.toString();

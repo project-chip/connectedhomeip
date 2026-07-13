@@ -18915,6 +18915,48 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedMediaPlaybackClusterAvailableCommandsAttributeCallback implements ChipClusters.MediaPlaybackCluster.AvailableCommandsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaPlaybackClusterContentInfoAttributeCallback implements ChipClusters.MediaPlaybackCluster.ContentInfoAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.MediaPlaybackClusterContentInfoStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.MediaPlaybackClusterContentInfoStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedMediaPlaybackClusterGeneratedCommandListAttributeCallback implements ChipClusters.MediaPlaybackCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19695,6 +19737,36 @@ public class ClusterInfoMapping {
 
       CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("setupPIN", "String");
       responseValues.put(setupPINResponseValue, setupPIN);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedAccountLoginClusterGetDeviceAuthURIResponseCallback implements ChipClusters.AccountLoginCluster.GetDeviceAuthURIResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(String userCode, String verificationURI, Optional<String> verificationURIComplete, Integer expiresIn, Integer interval) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo userCodeResponseValue = new CommandResponseInfo("userCode", "String");
+      responseValues.put(userCodeResponseValue, userCode);
+      CommandResponseInfo verificationURIResponseValue = new CommandResponseInfo("verificationURI", "String");
+      responseValues.put(verificationURIResponseValue, verificationURI);
+      CommandResponseInfo verificationURICompleteResponseValue = new CommandResponseInfo("verificationURIComplete", "Optional<String>");
+      responseValues.put(verificationURICompleteResponseValue, verificationURIComplete);
+      CommandResponseInfo expiresInResponseValue = new CommandResponseInfo("expiresIn", "Integer");
+      responseValues.put(expiresInResponseValue, expiresIn);
+      CommandResponseInfo intervalResponseValue = new CommandResponseInfo("interval", "Integer");
+      responseValues.put(intervalResponseValue, interval);
       callback.onSuccess(responseValues);
     }
 
@@ -32830,6 +32902,18 @@ public class ClusterInfoMapping {
         accountLoginlogoutCommandParams
     );
     accountLoginClusterInteractionInfoMap.put("logout", accountLoginlogoutInteractionInfo);
+
+    Map<String, CommandParameterInfo> accountLogingetDeviceAuthURICommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo accountLogingetDeviceAuthURIInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AccountLoginCluster) cluster)
+          .getDeviceAuthURI((ChipClusters.AccountLoginCluster.GetDeviceAuthURIResponseCallback) callback
+            , 10000);
+        },
+        () -> new DelegatedAccountLoginClusterGetDeviceAuthURIResponseCallback(),
+        accountLogingetDeviceAuthURICommandParams
+      );
+    accountLoginClusterInteractionInfoMap.put("getDeviceAuthURI", accountLogingetDeviceAuthURIInteractionInfo);
 
     commandMap.put("accountLogin", accountLoginClusterInteractionInfoMap);
 

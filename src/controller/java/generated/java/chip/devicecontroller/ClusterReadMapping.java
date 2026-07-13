@@ -18184,6 +18184,17 @@ public class ClusterReadMapping {
           readMediaPlaybackAvailableTextTracksCommandParams
         );
         result.put("readAvailableTextTracksAttribute", readMediaPlaybackAvailableTextTracksAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMediaPlaybackAvailableCommandsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMediaPlaybackAvailableCommandsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MediaPlaybackCluster) cluster).readAvailableCommandsAttribute(
+              (ChipClusters.MediaPlaybackCluster.AvailableCommandsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMediaPlaybackClusterAvailableCommandsAttributeCallback(),
+          readMediaPlaybackAvailableCommandsCommandParams
+        );
+        result.put("readAvailableCommandsAttribute", readMediaPlaybackAvailableCommandsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readMediaPlaybackGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readMediaPlaybackGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18832,7 +18843,18 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readAccountLoginInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAccountLoginGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAccountLoginOAuthLoggedInCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccountLoginOAuthLoggedInAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccountLoginCluster) cluster).readOAuthLoggedInAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readAccountLoginOAuthLoggedInCommandParams
+        );
+        result.put("readOAuthLoggedInAttribute", readAccountLoginOAuthLoggedInAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccountLoginGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccountLoginGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.AccountLoginCluster) cluster).readGeneratedCommandListAttribute(
