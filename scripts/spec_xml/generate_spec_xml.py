@@ -480,12 +480,7 @@ def dump_ids_from_data_model_dirs():
 
         version_len: dict[str, int] = {}
         for version_dir in supported:
-            tag_path = os.path.join(paths.get_data_model_path(), version_dir, 'spec_tag')
-            try:
-                with open(tag_path) as tag_file:
-                    version = tag_file.read().strip()
-            except FileNotFoundError:
-                version = version_dir
+            version = version_dir
             title += f'{version}|'
             version_len[version_dir] = len(version)
             hashes += f'{"-" * version_len[version_dir]}|'
