@@ -9324,11 +9324,17 @@ provisional cluster AmbientSensingUnion = 1074 {
     kNonFunctional = 2;
   }
 
+  struct ContributorStatusChangeStruct {
+    int8u contributorIndex = 0;
+    UnionContributorStatusEnum previousContributorStatus = 1;
+    UnionContributorStatusEnum currentContributorStatus = 2;
+  }
+
   struct UnionContributorStruct {
     nullable node_id contributorNodeID = 0;
     nullable endpoint_no contributorEndpointID = 1;
-    optional char_string<128> contributorName = 2;
-    UnionContributorStatusEnum contributorHealth = 3;
+    nullable char_string<128> contributorName = 2;
+    UnionContributorStatusEnum contributorStatus = 3;
   }
 
   provisional info event UnionContributorAdded = 0 {
@@ -9340,7 +9346,7 @@ provisional cluster AmbientSensingUnion = 1074 {
   }
 
   provisional info event UnionContributorStatusChanged = 2 {
-    UnionContributorStruct statusChangedContributor[] = 0;
+    ContributorStatusChangeStruct contributorStatusChange[] = 0;
   }
 
   attribute char_string<128> unionName = 0;
