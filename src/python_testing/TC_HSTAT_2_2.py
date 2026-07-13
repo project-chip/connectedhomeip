@@ -115,7 +115,8 @@ class TC_HSTAT_2_2(MatterBaseTest):
         cluster = Clusters.Humidistat
         attributes = cluster.Attributes
         features = cluster.Bitmaps.Feature
-        mistBitmap = cluster.Bitmaps.Mist
+        mistBitmap = cluster.Bitmaps.MistTypeBitmap
+
         # supported_attributes = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         feature_map = await self.read_setting(attributes.FeatureMap)

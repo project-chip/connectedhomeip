@@ -279,7 +279,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
             dut_Step = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.Step)
             asserts.assert_greater_equal(dut_Step, 1, "Step attribute cannot be zero")
             asserts.assert_less_equal(dut_Step, dut_MaxSetpoint - dut_MinSetpoint, "Step attribute is greater than MaxSetpoint")
-            asserts.assert_equal(dut_Step % (dut_MaxSetpoint - dut_MinSetpoint), 0,
+            asserts.assert_equal((dut_MaxSetpoint - dut_MinSetpoint) % dut_Step, 0,
                                  "Step attribute is not divisible by (MaxSetpoint - MinSetpoint)")
 
         self.step(next(step))  # Check UserSetpoint attribute
@@ -287,7 +287,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
             dut_UserSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserSetpoint)
             asserts.assert_greater_equal(dut_UserSetpoint, dut_MinSetpoint, "UserSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_UserSetpoint, dut_MaxSetpoint, "UserSetpoint attribute is greater than MaxSetpoint")
-            asserts.assert_equal(dut_UserSetpoint % (dut_MaxSetpoint - dut_MinSetpoint), 0,
+            asserts.assert_equal((dut_UserSetpoint - dut_MinSetpoint) % dut_Step, 0,
                                  "UserSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
 
         self.step(next(step))  # Check TargetSetpoint attribute
@@ -295,7 +295,7 @@ class TC_HSTAT_2_1(MatterBaseTest):
             dut_TargetSetpoint = await self.read_hstat_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetSetpoint)
             asserts.assert_greater_equal(dut_TargetSetpoint, dut_MinSetpoint, "TargetSetpoint attribute is less than MinSetpoint")
             asserts.assert_less_equal(dut_TargetSetpoint, dut_MaxSetpoint, "TargetSetpoint attribute is greater than MaxSetpoint")
-            asserts.assert_equal(dut_TargetSetpoint % (dut_MaxSetpoint - dut_MinSetpoint), 0,
+            asserts.assert_equal((dut_TargetSetpoint - dut_MinSetpoint) % dut_Step,
                                  "TargetSetpoint attribute is not divisible by (MaxSetpoint - MinSetpoint)")
 
         self.step(next(step))  # Check MistType attribute
