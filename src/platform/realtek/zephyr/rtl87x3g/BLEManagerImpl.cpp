@@ -255,7 +255,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(uint16_t conn_id, uint16_t disc_c
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
 {
-    CHIPoBLEConState * bleConnState = GetConnectionState(connectionHandle, true);
+    CHIPoBLEConState * bleConnState = GetConnectionState(connectionHandle, false);
     bool status                     = false;
 
     if (bleConnState != NULL)
@@ -606,6 +606,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
     else
     {
         ChipLogError(DeviceLayer, "ConfigureAdvertisingData error: %" CHIP_ERROR_FORMAT, err.Format());
+        err = CHIP_NO_ERROR;
     }
 
 exit:
@@ -787,8 +788,10 @@ bool BLEManagerImpl::IsSubscribed(uint16_t conId)
 
 void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t conn_id)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
     PacketBufferHandle buf = System::PacketBufferHandle::New(len, 0);
+    VerifyOrReturn(!buf.IsNull(),
+                   ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
+
     memcpy(buf->Start(), p_value, len);
     buf->SetDataLength(len);
 
@@ -804,7 +807,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t 
 void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PacketBufferHandle bufferHandle;
+    static PacketBufferHandle bufferHandle;
     BitFlags<AdditionalDataFields> additionalDataFields;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
 

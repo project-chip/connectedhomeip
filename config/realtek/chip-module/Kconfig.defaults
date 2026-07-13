@@ -113,7 +113,6 @@ config GPIO
     default y
 
 # Bluetooth Low Energy configs
-# Disable BT if RTL87X3G is enabled (RTL87X3G uses Thread only, no BLE)
 
 if !BOARD_RTL87X3G_EVB
 
