@@ -237,7 +237,7 @@
         "ELECTRICAL_PROTECTION_ALARM_CLUSTER": [],
         "GROUPCAST_CLUSTER": ["groupcast"],
         "HUMIDISTAT_CLUSTER": ["humidistat-server"],
-        "MEDIA_FILE_MANAGEMENT_CLUSTER": [],
+        "MEDIA_FILE_MANAGEMENT_CLUSTER": ["media-file-management-server"],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],

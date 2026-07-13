@@ -98,8 +98,8 @@ and easy to test:
       a light) just to reuse code.
     - If multiple device types share a common capability (like dimming or air
       circulation), extract it into an abstract capability base class under
-      `devices/capabilities/<capability-name>/` (e.g.,
-      `devices/capabilities/dimmable-load/`). Concrete leaf devices then inherit
+      `device/capabilities/<capability-name>/` (e.g.,
+      `device/capabilities/dimmable-load/`). Concrete leaf devices then inherit
       publicly from this capability base.
 
 ---
