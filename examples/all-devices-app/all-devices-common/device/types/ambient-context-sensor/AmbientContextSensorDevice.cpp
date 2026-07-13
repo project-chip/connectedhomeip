@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <devices/Types.h>
-#include <devices/ambient-context-sensor/AmbientContextSensorDevice.h>
+#include <device/types/ambient-context-sensor/AmbientContextSensorDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -23,7 +23,7 @@ using namespace chip::app::Clusters;
 namespace chip::app {
 
 AmbientContextSensorDevice::AmbientContextSensorDevice(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, AmbientContextSensing::AmbientContextSensingDelegate & delegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAmbientContextSensor, 1)), mConfig(config),
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAmbientContextSensor, 1)), mConfig(config),
     mTimerDelegate(timerDelegate), mDelegate(delegate)
 {}
 

@@ -18,12 +18,12 @@
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
-#include <devices/interface/SingleEndpointDevice.h>
+#include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class AmbientContextSensorDevice : public SingleEndpointDevice
+class AmbientContextSensorDevice : public SingleEndpoint
 {
 public:
     using AmbientContextSensingConfig = Clusters::AmbientContextSensingCluster::Config;

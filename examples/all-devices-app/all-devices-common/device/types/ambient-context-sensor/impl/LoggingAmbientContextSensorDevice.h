@@ -18,7 +18,7 @@
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/ambient-context-sensor/AmbientContextSensorDevice.h>
+#include <device/types/ambient-context-sensor/AmbientContextSensorDevice.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters::AmbientContextSensing {

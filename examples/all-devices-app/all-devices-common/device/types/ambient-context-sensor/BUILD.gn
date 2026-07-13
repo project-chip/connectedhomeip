@@ -22,7 +22,7 @@ source_set("ambient-context-sensor") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/ambient-context-sensing-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/data-model-providers/codedriven",
@@ -30,4 +30,13 @@ source_set("ambient-context-sensor") {
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+}
+
+source_set("logging") {
+  sources = [
+    "impl/LoggingAmbientContextSensorDevice.cpp",
+    "impl/LoggingAmbientContextSensorDevice.h",
+  ]
+
+  public_deps = [ ":ambient-context-sensor" ]
 }
