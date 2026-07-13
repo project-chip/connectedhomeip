@@ -138,10 +138,12 @@ public:
         if (cardHandle != 0)
         {
             SCardDisconnect(cardHandle, SCARD_LEAVE_CARD);
+            cardHandle = 0;
         }
         if (readerName != nullptr)
         {
             free(readerName);
+            readerName = nullptr;
         }
     }
 
@@ -628,21 +630,18 @@ void NFCCommissioningManagerImpl::_Shutdown()
     // Stop the NFC worker thread
     {
         std::lock_guard<std::mutex> lock(mWorkQueueMutex);
+        mShuttingDown = true;
         mNfcWorkerThreadRunning = false;
+
+        // Discard all pending work immediately.
+        std::queue<NfcWorkItem> emptyQueue;
+        mWorkQueue.swap(emptyQueue);
     }
     mWorkQueueCondition.notify_one();
 
     if (mNfcWorkerThread.joinable())
     {
         mNfcWorkerThread.join();
-    }
-
-    // NFC worker thread is stopped. Clear mTagInstances now so TagInstance destructors
-    // call SCardDisconnect while PC/SC handling is no longer in use by the worker thread.
-    {
-        std::lock_guard<std::mutex> lock(mTagInstancesMutex);
-        mLastTagInstanceUsed = nullptr;
-        mTagInstances.clear();
     }
 }
 
@@ -664,9 +663,13 @@ CHIP_ERROR NFCCommissioningManagerImpl::EnsureWorkerThreadStarted()
                 mWorkerInitCompleted = false;
                 mWorkerInitResult    = CHIP_ERROR_INCORRECT_STATE;
             }
+            {
+                std::lock_guard<std::mutex> queueLock(mWorkQueueMutex);
+                mShuttingDown = false;
+                mNfcWorkerThreadRunning = true;
+            }
 
-            mNfcWorkerThreadRunning = true;
-            mNfcWorkerThread        = std::thread(&NFCCommissioningManagerImpl::NfcWorkerThreadMain, this);
+            mNfcWorkerThread = std::thread(&NFCCommissioningManagerImpl::NfcWorkerThreadMain, this);
         }
     }
 
@@ -683,7 +686,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::RunSyncOnWorker(NfcWorkItem && item)
     SyncWorkContext syncCtx;
     item.syncCtx = &syncCtx;
 
-    EnqueueWork(std::move(item));
+    ReturnErrorOnFailure(EnqueueWork(std::move(item)));
 
     std::unique_lock<std::mutex> lock(syncCtx.mutex);
     syncCtx.cv.wait(lock, [&syncCtx]() { return syncCtx.done; });
@@ -767,13 +770,15 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     return false;
 }
 
-void NFCCommissioningManagerImpl::EnqueueWork(NfcWorkItem && item)
+CHIP_ERROR NFCCommissioningManagerImpl::EnqueueWork(NfcWorkItem && item)
 {
     {
         std::lock_guard<std::mutex> lock(mWorkQueueMutex);
+        VerifyOrReturnError(!mShuttingDown, CHIP_ERROR_SHUT_DOWN);
         mWorkQueue.push(std::move(item));
     }
     mWorkQueueCondition.notify_one();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
@@ -818,7 +823,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
     NfcWorkItem item;
     item.type    = NfcWorkType::kSend;
     item.message = std::move(nfcMessage);
-    EnqueueWork(std::move(item));
+    ReturnErrorOnFailure(EnqueueWork(std::move(item)));
 
     return CHIP_NO_ERROR;
 }
@@ -859,8 +864,8 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
             std::unique_lock<std::mutex> lock(mWorkQueueMutex);
             mWorkQueueCondition.wait(lock, [this]() { return !mWorkQueue.empty() || !mNfcWorkerThreadRunning; });
 
-            // If the thread is signaled to stop and the queue is empty, exit the loop
-            if (!mNfcWorkerThreadRunning && mWorkQueue.empty())
+            // Exit immediately once the worker is stopped.
+            if (!mNfcWorkerThreadRunning)
             {
                 break;
             }
@@ -952,6 +957,33 @@ void NFCCommissioningManagerImpl::NfcWorkerThreadMain()
             item.syncCtx->cv.notify_one();
         }
     }
+
+    // Release all TagInstances before releasing the PC/SC context.
+    std::shared_ptr<TagInstance> lastTagInstanceUsed;
+    std::vector<std::shared_ptr<TagInstance>> tagInstancesToRelease;
+    {
+        std::lock_guard<std::mutex> lock(mTagInstancesMutex);
+
+        if (mLastTagInstanceUsed != nullptr)
+        {
+            mLastTagInstanceUsed->Invalidate();
+        }
+
+        for (auto & instance : mTagInstances)
+        {
+            instance->Invalidate();
+        }
+
+        // Move manager-owned shared_ptr references to local variables so destruction
+        // happens outside the mutex.
+        lastTagInstanceUsed = std::move(mLastTagInstanceUsed);
+        tagInstancesToRelease.swap(mTagInstances);
+    }
+
+    // Drop the manager-owned shared_ptr references outside the mutex so that
+    // TagInstance destructors can run without holding mTagInstancesMutex.
+    lastTagInstanceUsed.reset();
+    tagInstancesToRelease.clear();
 
     if (mPcscContext != 0)
     {
@@ -1162,7 +1194,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::StartDiscoveringTagMatchingAddress(const
     NfcWorkItem item;
     item.type             = NfcWorkType::kScan;
     item.targetIdentifier = tagIdentifier;
-    EnqueueWork(std::move(item));
+    ReturnErrorOnFailure(EnqueueWork(std::move(item)));
 
     return CHIP_NO_ERROR;
 }

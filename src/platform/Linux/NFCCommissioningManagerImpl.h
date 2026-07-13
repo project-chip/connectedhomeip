@@ -220,6 +220,7 @@ private:
     std::mutex mWorkQueueMutex;
     std::condition_variable mWorkQueueCondition;
     std::atomic<bool> mNfcWorkerThreadRunning{ false };
+    bool mShuttingDown = false;
 
     // Mutex protecting the worker thread startup sequence
     std::mutex mWorkerStartMutex;
@@ -237,7 +238,7 @@ private:
 
     // Private methods
     void NfcWorkerThreadMain();
-    void EnqueueWork(NfcWorkItem && item);
+    CHIP_ERROR EnqueueWork(NfcWorkItem && item);
 
     CHIP_ERROR EnsureWorkerThreadStarted();
     CHIP_ERROR RunSyncOnWorker(NfcWorkItem && item);
