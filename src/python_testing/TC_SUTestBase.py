@@ -153,7 +153,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        log.info("Announce command sent %s", cmd_resp)
+        log.info("AnnounceOTA command sent")
         return cmd_resp
 
     async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
