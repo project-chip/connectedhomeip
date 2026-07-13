@@ -19863,6 +19863,17 @@ static id _Nullable DecodeAttributeValueForAccountLoginCluster(AttributeId aAttr
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
+    case Attributes::OAuthLoggedIn::Id: {
+        using TypeInfo = Attributes::OAuthLoggedIn::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
     default: {
         // Not a known AccountLogin attribute.
         break;
