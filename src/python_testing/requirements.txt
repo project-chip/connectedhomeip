@@ -4,7 +4,7 @@ pyasn1_modules
 zeroconf
 ifaddr
 langcodes
-nest-asyncio
 requests
 pycountry
 validators
+nest-asyncio
