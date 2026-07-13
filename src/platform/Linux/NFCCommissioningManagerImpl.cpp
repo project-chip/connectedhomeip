@@ -126,10 +126,10 @@ public:
     }
 
     // TagInstance cannot be copied or moved
-    TagInstance(const TagInstance &) = delete;
+    TagInstance(const TagInstance &)             = delete;
     TagInstance & operator=(const TagInstance &) = delete;
-    TagInstance(TagInstance &&) = delete;
-    TagInstance & operator=(TagInstance &&) = delete;
+    TagInstance(TagInstance &&)                  = delete;
+    TagInstance & operator=(TagInstance &&)      = delete;
 
     ~TagInstance()
     {
