@@ -293,6 +293,10 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ContentControl";
     case chip::app::Clusters::ContentAppObserver::Id:
         return "ContentAppObserver";
+    case chip::app::Clusters::MediaFileManagement::Id:
+        return "MediaFileManagement";
+    case chip::app::Clusters::AudioControl::Id:
+        return "AudioControl";
     case chip::app::Clusters::ZoneManagement::Id:
         return "ZoneManagement";
     case chip::app::Clusters::CameraAvStreamManagement::Id:
@@ -4514,6 +4518,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ActiveTextTrack";
         case chip::app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
             return "AvailableTextTracks";
+        case chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id:
+            return "AvailableCommands";
+        case chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id:
+            return "ContentInfo";
         case chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::MediaPlayback::Attributes::AcceptedCommandList::Id:
@@ -4590,6 +4598,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AcceptHeader";
         case chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id:
             return "SupportedStreamingProtocols";
+        case chip::app::Clusters::ContentLauncher::Attributes::Movable::Id:
+            return "Movable";
+        case chip::app::Clusters::ContentLauncher::Attributes::Presets::Id:
+            return "Presets";
         case chip::app::Clusters::ContentLauncher::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentLauncher::Attributes::AcceptedCommandList::Id:
@@ -4747,6 +4759,86 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ContentAppObserver::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ContentAppObserver::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MediaFileManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::Id:
+            return "TotalStorage";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::Id:
+            return "AvailableStorage";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::Id:
+            return "AvailableFiles";
+        case chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::Id:
+            return "SupportedMimeTypes";
+        case chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AudioControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AudioControl::Attributes::SoftMuted::Id:
+            return "SoftMuted";
+        case chip::app::Clusters::AudioControl::Attributes::PhysicallyMuted::Id:
+            return "PhysicallyMuted";
+        case chip::app::Clusters::AudioControl::Attributes::Volume::Id:
+            return "Volume";
+        case chip::app::Clusters::AudioControl::Attributes::MinDeviceVolume::Id:
+            return "MinDeviceVolume";
+        case chip::app::Clusters::AudioControl::Attributes::MaxDeviceVolume::Id:
+            return "MaxDeviceVolume";
+        case chip::app::Clusters::AudioControl::Attributes::MaxDeviceVolumeDB::Id:
+            return "MaxDeviceVolumeDB";
+        case chip::app::Clusters::AudioControl::Attributes::MaxUserVolume::Id:
+            return "MaxUserVolume";
+        case chip::app::Clusters::AudioControl::Attributes::DefaultStepSize::Id:
+            return "DefaultStepSize";
+        case chip::app::Clusters::AudioControl::Attributes::SetVolumeUnmutePolicy::Id:
+            return "SetVolumeUnmutePolicy";
+        case chip::app::Clusters::AudioControl::Attributes::IncreaseVolumeUnmutePolicy::Id:
+            return "IncreaseVolumeUnmutePolicy";
+        case chip::app::Clusters::AudioControl::Attributes::IncreaseVolumeUnmuteVolume::Id:
+            return "IncreaseVolumeUnmuteVolume";
+        case chip::app::Clusters::AudioControl::Attributes::DecreaseVolumeUnmutePolicy::Id:
+            return "DecreaseVolumeUnmutePolicy";
+        case chip::app::Clusters::AudioControl::Attributes::StartUpMuted::Id:
+            return "StartUpMuted";
+        case chip::app::Clusters::AudioControl::Attributes::StartUpVolume::Id:
+            return "StartUpVolume";
+        case chip::app::Clusters::AudioControl::Attributes::Bass::Id:
+            return "Bass";
+        case chip::app::Clusters::AudioControl::Attributes::Mid::Id:
+            return "Mid";
+        case chip::app::Clusters::AudioControl::Attributes::Treble::Id:
+            return "Treble";
+        case chip::app::Clusters::AudioControl::Attributes::MinCorrection::Id:
+            return "MinCorrection";
+        case chip::app::Clusters::AudioControl::Attributes::MaxCorrection::Id:
+            return "MaxCorrection";
+        case chip::app::Clusters::AudioControl::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AudioControl::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AudioControl::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AudioControl::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AudioControl::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -6323,6 +6415,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveTo";
         case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
             return "Calibrate";
+        case chip::app::Clusters::ClosureControl::Commands::GroupedMoveTo::Id:
+            return "GroupedMoveTo";
         default:
             return "Unknown";
         }
@@ -6334,6 +6428,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetTarget";
         case chip::app::Clusters::ClosureDimension::Commands::Step::Id:
             return "Step";
+        case chip::app::Clusters::ClosureDimension::Commands::GroupedSetTarget::Id:
+            return "GroupedSetTarget";
+        case chip::app::Clusters::ClosureDimension::Commands::GroupedStep::Id:
+            return "GroupedStep";
         default:
             return "Unknown";
         }
@@ -6635,6 +6733,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LaunchContent";
         case chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id:
             return "LaunchURL";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id:
+            return "ContentReplicationRequest";
+        case chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id:
+            return "PlayPreset";
         default:
             return "Unknown";
         }
@@ -6720,6 +6822,42 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Id:
             return "ContentAppMessage";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MediaFileManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id:
+            return "AddFile";
+        case chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id:
+            return "DeleteFile";
+        case chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id:
+            return "RequestSharedFiles";
+        case chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id:
+            return "GetSharedFile";
+        case chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id:
+            return "OfferFile";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AudioControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AudioControl::Commands::Mute::Id:
+            return "Mute";
+        case chip::app::Clusters::AudioControl::Commands::Unmute::Id:
+            return "Unmute";
+        case chip::app::Clusters::AudioControl::Commands::ToggleMuted::Id:
+            return "ToggleMuted";
+        case chip::app::Clusters::AudioControl::Commands::SetVolume::Id:
+            return "SetVolume";
+        case chip::app::Clusters::AudioControl::Commands::IncreaseVolume::Id:
+            return "IncreaseVolume";
+        case chip::app::Clusters::AudioControl::Commands::DecreaseVolume::Id:
+            return "DecreaseVolume";
         default:
             return "Unknown";
         }
@@ -7527,6 +7665,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Id:
             return "LauncherResponse";
+        case chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Id:
+            return "ContentReplicationResponse";
         default:
             return "Unknown";
         }
@@ -7563,6 +7703,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::Id:
             return "ContentAppMessageResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MediaFileManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MediaFileManagement::Commands::AddFileResponse::Id:
+            return "AddFileResponse";
+        case chip::app::Clusters::MediaFileManagement::Commands::GetSharedFileResponse::Id:
+            return "GetSharedFileResponse";
         default:
             return "Unknown";
         }

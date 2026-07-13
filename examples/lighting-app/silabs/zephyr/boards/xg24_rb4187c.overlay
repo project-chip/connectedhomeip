@@ -16,28 +16,35 @@
 
 
 
+/*
+ * slot0 must match slot1 in size for MCUboot's boot_slots_compatible()
+ * check to pass in overwrite-only mode.
+ */
+&slot0_partition {
+    reg = <0x0000c000 DT_SIZE_K(1024)>;
+};
+
 &flash0 {
     partitions {
-        factory_partition: partition@138000 {
-                reg = <0x00138000 DT_SIZE_K(32)>;
-        };
-        settings_partition: partition@140000 {
-                reg = <0x00140000 DT_SIZE_K(32)>;
+        factory_partition: partition@10c000 {
+                reg = <0x0010c000 DT_SIZE_K(32)>;
         };
     };
 };
 
-&slot0_partition {
-    reg = <0x0000c000 DT_SIZE_K(1200)>;
-};
+/delete-node/ &slot1_partition;
 
-&slot1_partition {
-    reg = <0x00148000 DT_SIZE_K(4)>;
-};
+&mx25r80 {
+    partitions {
+        compatible = "fixed-partitions";
+        #address-cells = <1>;
+        #size-cells = <1>;
 
-/* Set 40 kB of storage at the end of the 1536 kB of flash */
-&storage_partition {
-    reg = <0x00149000 DT_SIZE_K(40)>;
+        slot1_partition: partition@0 {
+            label = "image-1";
+            reg = <0x00000000 DT_SIZE_K(1024)>;
+        };
+    };
 };
 
 &dma0 {

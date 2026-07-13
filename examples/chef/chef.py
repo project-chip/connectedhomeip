@@ -840,6 +840,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_VENDOR_ID={options.vid}
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
+                        CHEF_FLAGS += -DCONFIG_CHEF_SAMPLE_NAME=\\"{options.sample_device_type_name}\\"
                         """
                     ))
                 if options.do_clean:

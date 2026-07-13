@@ -35,7 +35,7 @@ import json
 import os
 import re
 import uuid
-from typing import Optional, Sequence, TypedDict, Union
+from typing import Optional, Sequence, TypedDict
 
 try:
     import yaml
@@ -64,7 +64,7 @@ class EndpointType(TypedDict):
     server_clusters: dict[str, ClusterType]
 
 
-def _convert_metadata_name(name: str, code: Union[int, str]) -> str:
+def _convert_metadata_name(name: str, code: int | str) -> str:
     """Converts a name for use in a metadata file - CamelCaseName/ID."""
     # Preserve camel case if it's already there
     name = re.sub(r"([A-Z]+)", r" \1", name).title()
@@ -77,7 +77,7 @@ def _convert_filename(name: str) -> str:
     return re.sub(r"[^a-zA-Z]+", "", name).lower()
 
 
-def _load_matter_device_types() -> dict[Union[int, str], Union[int, str]]:
+def _load_matter_device_types() -> dict[int | str, int | str]:
     """Load matter device type reversible mapping.
 
     This function should be updated to pull from the Matter spec once it is available publicly.

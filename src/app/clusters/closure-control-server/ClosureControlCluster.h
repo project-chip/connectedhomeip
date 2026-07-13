@@ -97,6 +97,11 @@ public:
             mFeatureMap.Set(Feature::kManuallyOperable);
             return *this;
         }
+        Config & WithAccess()
+        {
+            mFeatureMap.Set(Feature::kAccess);
+            return *this;
+        }
         Config & WithCountdownTime(DataModel::Nullable<ElapsedS> initial = DataModel::NullNullable)
         {
             mInitialCountdownTime = initial;
