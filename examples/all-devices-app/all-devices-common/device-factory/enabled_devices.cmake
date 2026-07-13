@@ -41,7 +41,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/AirPurifier.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-purifier/impl/LoggingAirPurifier.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/air-quality-sensor/AirQualitySensor.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/AmbientContextSensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/ambient-context-sensor/AmbientContextSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/BooleanStateSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/bridged-node/BridgedNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/chime/Chime.cpp"
