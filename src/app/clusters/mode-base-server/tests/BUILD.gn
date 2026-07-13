@@ -21,21 +21,12 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestModeBaseCluster"
 
-  test_sources = [
-    "TestMigrateModeBaseServerStorage.cpp",
-    "TestModeBaseCluster.cpp",
-  ]
-
-  sources = [
-    "${chip_root}/src/app/clusters/mode-base-server/MigrateModeBaseServerStorage.cpp",
-    "${chip_root}/src/app/clusters/mode-base-server/MigrateModeBaseServerStorage.h",
-  ]
+  test_sources = [ "TestModeBaseCluster.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app/clusters/mode-base-server",
-    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
