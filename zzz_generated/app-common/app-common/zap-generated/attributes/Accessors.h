@@ -2449,9 +2449,7 @@ namespace ServiceArea {
 namespace Attributes {
 
 namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ClusterRevision
 
 } // namespace Attributes

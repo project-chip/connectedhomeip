@@ -72,10 +72,10 @@ source_set("clusters") {
     "power-topology-server",
     "pressure-measurement-server",
     "proximity-ranging-server",
-    "push-av-stream-transport-server",
     "relative-humidity-measurement-server",
     "resource-monitoring-server",
     "scenes-server",
+    "service-area-server",
     "smoke-co-alarm-server",
     "software-diagnostics-server",
     "soil-measurement-server",
@@ -102,7 +102,11 @@ source_set("clusters") {
     # keep-sorted: end
   ]
 
+  # Separate enable/disable for things that have third_party dependendencies
+  # (give a choice if these dependencies are available or licenses are acceptable)
+
   if (chip_enable_push_av_stream_transport) {
+    # depends on third_party/uriparser
     public_deps += [ "push-av-stream-transport-server" ]
   }
 }
