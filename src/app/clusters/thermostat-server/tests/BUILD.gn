@@ -23,31 +23,6 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestThermostatCluster.cpp" ]
 
-  # The thermostat-server source_set has empty `sources` (the implementation lives in
-  # app_config_dependent_sources), so the cluster sources are compiled directly here.
-  #
-  # CodegenIntegration.cpp is intentionally excluded: it depends on the app-specific
-  # `StaticApplicationConfig::Thermostat` and on `Server::GetInstance()`. The test supplies a small
-  # `Thermostat::GetDelegate()` stub instead (see TestThermostatCluster.cpp).
-  #
-  # NOTE: PR 3a's retained ThermostatAttrAccess helper still uses Ember attribute accessors
-  # (`Attributes::X::Get/Set`); `mock_model` provides that Ember backing for the link. PR 3b removes this
-  # coupling, after which these deps can be slimmed down.
-  sources = [
-    "../PresetStructWithOwnedMembers.cpp",
-    "../PresetStructWithOwnedMembers.h",
-    "../ThermostatCluster.cpp",
-    "../ThermostatCluster.h",
-    "../ThermostatClusterAtomic.cpp",
-    "../ThermostatClusterEvents.cpp",
-    "../ThermostatClusterEvents.h",
-    "../ThermostatClusterPresets.cpp",
-    "../ThermostatClusterPresets.h",
-    "../ThermostatClusterSuggestions.cpp",
-    "../ThermostatSuggestionStructWithOwnedMembers.cpp",
-    "../ThermostatSuggestionStructWithOwnedMembers.h",
-  ]
-
   public_deps = [
     "${chip_root}/src/app/clusters/thermostat-server",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
