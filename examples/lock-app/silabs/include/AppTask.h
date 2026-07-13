@@ -369,11 +369,11 @@ protected:
         }
     };
 
-    UnlatchContext mUnlatchContext;              /**< Set when a remote unbolt/unlatch unlock starts. */
-    LockRequest mPendingRequest;               /**< Newest-wins slot while `IsActuatorBusy()`. */
+    UnlatchContext mUnlatchContext; /**< Set when a remote unbolt/unlatch unlock starts. */
+    LockRequest mPendingRequest;    /**< Newest-wins slot while `IsActuatorBusy()`. */
     bool mHasPendingRequest = false;
-    LockRequest mActiveRemoteAction;           /**< Terminal remote push after actuator completes. */
-    bool mHasActiveRemoteAction = false;
+    LockRequest mActiveRemoteAction; /**< Terminal remote push after actuator completes. */
+    bool mHasActiveRemoteAction          = false;
     LockActuatorState mLockActuatorState = LockActuatorState::kLockCompleted;
 
 private:
@@ -390,10 +390,10 @@ private:
     /** @brief Posts `kEventType_Lock` (auto-relock or unlock after unlatch). */
     static void PostLockActionEvent(int32_t actor, LockAction action);
 
-    static LockRequest sStagedLockRequest;     /**< Chip-thread → AppTask handoff (mutex). */
+    static LockRequest sStagedLockRequest; /**< Chip-thread → AppTask handoff (mutex). */
     static bool sStagedLockRequestValid;
 
-    static osMutexId_t sLockSharedStateMutex;  /**< Protects staged and active remote slots. */
+    static osMutexId_t sLockSharedStateMutex; /**< Protects staged and active remote slots. */
 
     osTimerId_t mLockTimer = nullptr;
 

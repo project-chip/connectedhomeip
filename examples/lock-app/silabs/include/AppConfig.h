@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "silabs_utils.h"
 #include "LockConfig.h"
+#include "silabs_utils.h"
 
 // ---- Door lock Example App Config ----
 
