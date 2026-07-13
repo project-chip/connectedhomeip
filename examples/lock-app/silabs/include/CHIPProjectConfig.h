@@ -142,3 +142,6 @@ static constexpr uint8_t kNumCredentialTypes         = 6;
 #ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 #endif
+
+// Route BaseApplication data-model posts and Rpc button path through CustomerAppTask / AppTaskImpl (CRTP).
+#define CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK
