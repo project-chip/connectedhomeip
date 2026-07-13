@@ -27,6 +27,7 @@
 #include "qPinCfg.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "gpSched.h"
