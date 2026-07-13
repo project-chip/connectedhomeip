@@ -219,6 +219,7 @@ class XmlAttribute:
     # Quality flags from the spec XML <quality> element
     changes_omitted: bool = False   # C quality: attribute changes are not reported in subscriptions
     quieter_reporting: bool = False  # Q quality: attribute may be reported less frequently than normal
+    scene: bool = False   # S quality: attribute value is stored/restored by the Scenes cluster
     atomic_write: bool = False  # Atomic Write quality: written via atomic transaction; staged values not reported until commit
     constraints: Optional[Constraints] = None
 
@@ -711,6 +712,16 @@ class ClusterParser:
         return quality is not None and quality.get('quieterReporting', 'false').lower() == 'true'
 
     @staticmethod
+    def _is_scene_attribute(xml_attribute: ElementTree.Element) -> bool:
+        """Returns True if the attribute carries the Scene (S) quality.
+
+        Attributes with this quality have their value stored and restored by the
+        Scenes cluster.  They correspond to <quality scene="true"/> in the cluster XML.
+        """
+        quality = xml_attribute.find('./quality')
+        return quality is not None and quality.get('scene', 'false').lower() == 'true'
+
+    @staticmethod
     def _is_atomic_write_attribute(xml_attribute: ElementTree.Element) -> bool:
         """
         Returns True if the attribute carries the Atomic Write quality.
@@ -1115,6 +1126,7 @@ class ClusterParser:
                                             write_optional=write_optional,
                                             changes_omitted=self._is_change_omitted_attribute(element),
                                             quieter_reporting=self._is_quieter_reporting_attribute(element),
+                                            scene=self._is_scene_attribute(element),
                                             atomic_write=self._is_atomic_write_attribute(element),
                                             constraints=constraints)
         # Add in the global attributes for the base class

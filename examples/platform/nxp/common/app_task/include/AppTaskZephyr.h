@@ -63,6 +63,12 @@ public:
      */
     virtual CHIP_ERROR AppMatter_Register(void) override;
 
+    /**
+     * \brief This function is called at the begging of the InitServer function.
+     *
+     */
+    virtual void PreInitMatterServerInstance(void) override;
+
 private:
     void DispatchEvent(const AppEvent & event);
 };

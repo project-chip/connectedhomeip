@@ -118,6 +118,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
         MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(endpoint);
         break;
+    case app::Clusters::LaundryWasherControls::Id:
+        MatterLaundryWasherControlsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::RvcRunMode::Id:
         MatterRvcRunModeClusterInitCallback(endpoint);
         break;
@@ -304,6 +307,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
         MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::LaundryWasherControls::Id:
+        MatterLaundryWasherControlsClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::RvcRunMode::Id:
         MatterRvcRunModeClusterShutdownCallback(endpoint, shutdownType);
