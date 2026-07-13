@@ -19,6 +19,7 @@
 #include "ContentLauncherManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <clusters/ContentLauncher/Metadata.h>
 #include <lib/support/Span.h>
 
 #include <list>
@@ -253,7 +254,7 @@ uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return 3;
+        return chip::app::Clusters::ContentLauncher::kRevision;
     }
 
     uint16_t clusterRevision = 0;
