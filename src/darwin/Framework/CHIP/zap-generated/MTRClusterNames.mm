@@ -8500,6 +8500,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AvailableTextTracks";
             break;
 
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableCommandsID:
+            result = @"AvailableCommands";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeContentInfoID:
+            result = @"ContentInfo";
+            break;
+
         case MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8642,6 +8650,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID:
             result = @"SupportedStreamingProtocols";
+            break;
+
+        case MTRAttributeIDTypeClusterContentLauncherAttributeMovableID:
+            result = @"Movable";
+            break;
+
+        case MTRAttributeIDTypeClusterContentLauncherAttributePresetsID:
+            result = @"Presets";
             break;
 
         case MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID:
@@ -12983,6 +12999,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"LaunchURL";
             break;
 
+        case MTRCommandIDTypeClusterContentLauncherCommandContentReplicationRequestID:
+            result = @"ContentReplicationRequest";
+            break;
+
+        case MTRCommandIDTypeClusterContentLauncherCommandPlayPresetID:
+            result = @"PlayPreset";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -15447,6 +15471,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"LauncherResponse";
             break;
 
+        case MTRCommandIDTypeClusterContentLauncherCommandContentReplicationResponseID:
+            result = @"ContentReplicationResponse";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -17766,6 +17794,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeContentLauncherID:
 
         switch (eventID) {
+
+            // Cluster ContentLauncher events
+        case MTREventIDTypeClusterContentLauncherEventContentReplicationID:
+            result = @"ContentReplication";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

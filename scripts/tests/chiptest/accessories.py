@@ -57,7 +57,7 @@ class XmlRpcFuncCall:
 XmlRpcFuncRet: TypeAlias = bool | Exception
 
 
-class XmlRpcServerProcess(WrappedProcess[XmlRpcFuncCall, XmlRpcFuncRet], StartStopContextMixin):
+class XmlRpcServerProcess(WrappedProcess[ProcessConfig, XmlRpcFuncCall, XmlRpcFuncRet], StartStopContextMixin):
     """
     Wrapped subprocess that hosts the XML-RPC endpoint for `AppsRegister`.
 
@@ -171,16 +171,21 @@ class XmlRpcServerProcessManager(threading.Thread):
         try:
             if not self._init_done.wait(timeout=self._proc_config.start_timeout_sec):
                 raise TimeoutError("Failed to start within timeout")
-
+            if isinstance(self._exception, KeyboardInterrupt):
+                raise self._exception
             if self._exception is not None:
                 raise RuntimeError("XMLRPC Manager initialization failed") from self._exception
         except BaseException as start_exc:
             log.error("Stopping XMLRPC Manager after init error: %r", start_exc)
-            self.stop(raise_on_proc_error=False)
+            try:
+                self.stop()
+            except BaseException as stop_exc:
+                log.error("Error when stopping XMLRPC Manager after init error: %r", stop_exc)
+                raise stop_exc.with_traceback(stop_exc.__traceback__) from start_exc
             raise
 
     @with_annotated_exception
-    def stop(self, raise_on_proc_error: bool = True) -> None:
+    def stop(self) -> None:
         if self._stopped:
             log.debug("XMLRPC Manager is already stopped")
             return
@@ -194,11 +199,15 @@ class XmlRpcServerProcessManager(threading.Thread):
             self.join(timeout=self._proc_config.stop_timeout_sec)
 
             # Propagate the exception risen in the thread.
-            if raise_on_proc_error and self._exception is not None:
+            if isinstance(self._exception, KeyboardInterrupt):
+                raise self._exception
+            if self._exception is not None:
                 raise RuntimeError("XMLRPC Manager failed") from self._exception
 
             if self.is_alive():
                 raise TimeoutError("XMLRPC Manager failed to stop within timeout")
+        except KeyboardInterrupt:
+            raise
         except BaseException as e:
             log.error("Error when stopping XMLRPC Manager: %r", e)
             raise
@@ -219,7 +228,7 @@ class XmlRpcServerProcessManager(threading.Thread):
                     except QueueCancelled:
                         log.debug("Stopping on a cancel event")
                         break
-        except Exception as e:
+        except BaseException as e:
             self._exception = e
             self._init_done.set()
 

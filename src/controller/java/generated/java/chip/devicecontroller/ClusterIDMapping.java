@@ -17632,6 +17632,8 @@ public class ClusterIDMapping {
             AvailableAudioTracks(8L),
             ActiveTextTrack(9L),
             AvailableTextTracks(10L),
+            AvailableCommands(11L),
+            ContentInfo(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18223,6 +18225,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             AcceptHeader(0L),
             SupportedStreamingProtocols(1L),
+            Movable(2L),
+            Presets(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18247,7 +18251,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            ContentReplication(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -18269,7 +18274,9 @@ public class ClusterIDMapping {
 
         public enum Command {
             LaunchContent(0L),
-            LaunchURL(1L),;
+            LaunchURL(1L),
+            ContentReplicationRequest(3L),
+            PlayPreset(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -18287,7 +18294,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum LaunchContentCommandField {Search(0),AutoPlay(1),Data(2),PlaybackPreferences(3),UseCurrentContext(4),;
+        }public enum LaunchContentCommandField {Search(0),AutoPlay(1),Data(2),PlaybackPreferences(3),UseCurrentContext(4),ContentAppVendorID(5),ContentAppProductID(6),;
                     private final int id;
                     LaunchContentCommandField(int id) {
                         this.id = id;
@@ -18304,7 +18311,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum LaunchURLCommandField {ContentURL(0),DisplayString(1),BrandingInformation(2),;
+                }public enum LaunchURLCommandField {ContentURL(0),DisplayString(1),BrandingInformation(2),PlaybackPreferences(3),ContentType(4),ContentHeaders(5),OffsetMillisecs(6),QueueType(7),NextUrl(8),;
                     private final int id;
                     LaunchURLCommandField(int id) {
                         this.id = id;
@@ -18315,6 +18322,23 @@ public class ClusterIDMapping {
                     }
                     public static LaunchURLCommandField value(int id) throws NoSuchFieldError {
                         for (LaunchURLCommandField field : LaunchURLCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum PlayPresetCommandField {PresetID(0),;
+                    private final int id;
+                    PlayPresetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PlayPresetCommandField value(int id) throws NoSuchFieldError {
+                        for (PlayPresetCommandField field : PlayPresetCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
