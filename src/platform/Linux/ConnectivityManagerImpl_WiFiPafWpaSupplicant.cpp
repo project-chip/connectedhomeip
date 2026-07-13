@@ -314,7 +314,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
     if (pPafInfo == nullptr)
     {
-        ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %d", publish_id);
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %u", publish_id);
         return;
     }
     if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher)
