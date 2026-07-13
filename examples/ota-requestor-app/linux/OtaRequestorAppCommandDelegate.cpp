@@ -76,14 +76,21 @@ Json::Value OtaRequestorAppCommandHandler::BuildUserConsentState(uint16_t endpoi
 {
     Json::Value payload(Json::objectValue);
     chip::ota::UserConsentState ktmpConsentState;
-    
-    if( consentState == "granted" ){
+
+    if (consentState == "granted")
+    {
         ktmpConsentState = chip::ota::UserConsentState::kGranted;
-    }else if ( consentState == "denied" ){
+    }
+    else if (consentState == "denied")
+    {
         ktmpConsentState = chip::ota::UserConsentState::kDenied;
-    }else if ( consentState == "deferred" ){
+    }
+    else if (consentState == "deferred")
+    {
         ktmpConsentState = chip::ota::UserConsentState::kObtaining;
-    }else{
+    }
+    else
+    {
         ChipLogError(SoftwareUpdate, "Invalid  option for ConsentState: %s", consentState.c_str());
         ktmpConsentState = chip::ota::UserConsentState::kUnknown;
     }
@@ -147,7 +154,7 @@ void OtaRequestorAppCommandHandler::HandleCommand(intptr_t context)
     }
 
     if (name == "SetUserConsentState")
-    {  
+    {
         consentState = self->mCommandPayload["consentState"].asString();
         Json::Value out(Json::objectValue);
         out["Name"]     = "UserConsentStateResponse";
