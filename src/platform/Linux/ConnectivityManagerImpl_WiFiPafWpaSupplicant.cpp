@@ -211,6 +211,11 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, no valid session with discriminator: %u", pPublishSSI->DevInfo);
         return;
     }
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult received for non-subscriber session");
+        return;
+    }
     if ((pPafInfo->id == subscribe_id) && (pPafInfo->peer_id != UINT32_MAX))
     {
         // Reentrance, depends on wpa_supplicant behaviors
@@ -312,8 +317,12 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %d", publish_id);
         return;
     }
-    if ((pPafInfo->role == WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher) && (pPafInfo->peer_id == peer_subscribe_id) &&
-        !memcmp(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6))
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied received for non-publisher session");
+        return;
+    }
+    if ((pPafInfo->peer_id == peer_subscribe_id) && !memcmp(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6))
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, reentrance, publish_id: %u ", publish_id);
         return;
@@ -388,6 +397,17 @@ void ConnectivityManagerImpl::OnNanPublishTerminated(guint public_id, gchar * re
     ChipLogProgress(Controller, "WiFi-PAF: Publish terminated (%u, %s)", public_id, reason);
     WiFiPAFSession sessionInfo  = { .id = public_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+    if (pPafInfo == nullptr)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanPublishTerminated, no valid session with publish_id: %u", public_id);
+        return;
+    }
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanPublishTerminated received for non-publisher session");
+        return;
+    }
     TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 }
 
@@ -396,6 +416,17 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%u, %s)", subscribe_id, reason);
     WiFiPAFSession sessionInfo  = { .id = subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+    if (pPafInfo == nullptr)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanSubscribeTerminated, no valid session with subscribe_id: %u", subscribe_id);
+        return;
+    }
+    if (pPafInfo->role != WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: OnNanSubscribeTerminated received for non-subscriber session");
+        return;
+    }
     TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
     /*
         Indicate the connection event
