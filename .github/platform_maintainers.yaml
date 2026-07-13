@@ -23,6 +23,7 @@ nxp:
     - "third_party/simw-top-mini/**"
     - "third_party/openthread/platforms/nxp/**"
     - "config/nxp/**"
+    - ".github/workflows/examples-nxp.yaml"
 
 silabs:
   maintainers:
