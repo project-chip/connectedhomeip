@@ -25,10 +25,4 @@ namespace chip::app::Clusters::AmbientContextSensing {
 
 AmbientContextSensingCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
-/*
-    This interface provides methods for allocating and retrieving the delegate module of the device.
-    It must be implemented in the delegate implementation.
- */
-AmbientContextSensingDelegate & AllocateDelegate();
-
 } // namespace chip::app::Clusters::AmbientContextSensing

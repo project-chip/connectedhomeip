@@ -28,7 +28,7 @@ class AmbientContextSensorDevice : public SingleEndpointDevice
 public:
     using AmbientContextSensingConfig = Clusters::AmbientContextSensingCluster::Config;
 
-    AmbientContextSensorDevice(AmbientContextSensingConfig config, TimerDelegate & timerDelegate);
+    AmbientContextSensorDevice(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, Clusters::AmbientContextSensing::AmbientContextSensingDelegate & delegate);
     ~AmbientContextSensorDevice() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
@@ -42,6 +42,7 @@ public:
 protected:
     AmbientContextSensingConfig mConfig;
     TimerDelegate & mTimerDelegate;
+    Clusters::AmbientContextSensing::AmbientContextSensingDelegate & mDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AmbientContextSensingCluster> mAmbientContextSensingCluster;
 };

@@ -47,7 +47,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        AmbientContextSensingCluster::Config config(AmbientContextSensing::AllocateDelegate(), gDefaultTimerDelegate);
+        AmbientContextSensingCluster::Config config(gDefaultTimerDelegate);
         config.WithFeatures(BitMask<AmbientContextSensing::Feature>(featureMap));
         config.WithOptionalAttributes(optionalAttributeBits);
         constexpr chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {

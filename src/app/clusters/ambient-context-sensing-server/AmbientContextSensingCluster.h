@@ -33,8 +33,7 @@ class AmbientContextSensingCluster : public DefaultServerCluster, public TimerCo
 public:
     struct Config
     {
-        Config(AmbientContextSensing::AmbientContextSensingDelegate & acsDelegate, TimerDelegate & timerDelegate) :
-            mDelegate(acsDelegate), mHoldTimeDelegate(timerDelegate)
+        Config(TimerDelegate & timerDelegate) : mHoldTimeDelegate(timerDelegate)
         {}
 
         Config & WithFeatures(BitMask<AmbientContextSensing::Feature> featureMap)
@@ -72,7 +71,6 @@ public:
             .holdTimeMax     = AmbientContextSensing::kDefaultHoldTimeMax,
             .holdTimeDefault = AmbientContextSensing::kDefaultHoldTimeDefault
         };
-        AmbientContextSensing::AmbientContextSensingDelegate & mDelegate;
         TimerDelegate & mHoldTimeDelegate;
     };
 
@@ -83,6 +81,7 @@ public:
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType shutdownType) override;
+    void SetDelegate(AmbientContextSensing::AmbientContextSensingDelegate * pDelegate) { mACSDelegate = pDelegate; }
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -136,7 +135,7 @@ private:
     bool mHumanActivityDetected = false;
     bool mObjectIdentified      = false;
     bool mAudioContextDetected  = false;
-    AmbientContextSensing::AmbientContextSensingDelegate & mACSDelegate;
+    AmbientContextSensing::AmbientContextSensingDelegate * mACSDelegate = nullptr;
 
     Span<AmbientContextSensing::SemanticTagType> mAmbientContextTypeSupportedList;
 

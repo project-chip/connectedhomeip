@@ -22,7 +22,7 @@
 namespace chip::app::Clusters::AmbientContextSensing {
 
 LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelegate & timerDelegate) :
-    AmbientContextSensorDevice(AmbientContextSensingConfig{ *this, timerDelegate }
+    AmbientContextSensorDevice(AmbientContextSensingConfig{ timerDelegate }
                                    .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeatureAllForLog))
                                    .WithHoldTime(10,
                                                  {
@@ -30,7 +30,7 @@ LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelega
                                                      .holdTimeMax     = 300,
                                                      .holdTimeDefault = 10,
                                                  }),
-                               timerDelegate),
+                               timerDelegate, *this),
     mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0)
 {}
 

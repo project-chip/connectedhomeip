@@ -22,9 +22,9 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-AmbientContextSensorDevice::AmbientContextSensorDevice(AmbientContextSensingConfig config, TimerDelegate & timerDelegate) :
+AmbientContextSensorDevice::AmbientContextSensorDevice(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, AmbientContextSensing::AmbientContextSensingDelegate & delegate) :
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAmbientContextSensor, 1)), mConfig(config),
-    mTimerDelegate(timerDelegate)
+    mTimerDelegate(timerDelegate), mDelegate(delegate)
 {}
 
 CHIP_ERROR AmbientContextSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -38,6 +38,7 @@ CHIP_ERROR AmbientContextSensorDevice::Register(chip::EndpointId endpoint, CodeD
 
     // Create the ambient context sensing cluster
     mAmbientContextSensingCluster.Create(endpoint, mConfig);
+    AmbientContextSensingCluster().SetDelegate(&mDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mAmbientContextSensingCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);

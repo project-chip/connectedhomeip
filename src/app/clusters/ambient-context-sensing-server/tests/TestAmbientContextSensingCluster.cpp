@@ -235,9 +235,10 @@ TEST_F(TestAmbientContextSensingCluster, TestAttributes)
     chip::Testing::TestServerClusterContext context;
     static TestACSDelegate testACSDelegate;
     AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                          AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }.WithFeatures(
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
                                               BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
     chip::Testing::ClusterTester tester(cluster);
 
     // Read the revision
@@ -375,10 +376,11 @@ TEST_F(TestAmbientContextSensingCluster, TestAmbientContextTypeSupported)
 
     static TestACSDelegate testACSDelegate;
     AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                          AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }.WithFeatures(
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
                                               BitMask<AmbientContextSensing::Feature>(kFeatures)) };
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
 
     Span<SemanticTagType> ACTypeList_support = Span<SemanticTagType>(kACTSupported_dup, MATTER_ARRAY_SIZE(kACTSupported_dup));
     EXPECT_EQ(cluster.SetAmbientContextTypeSupported(ACTypeList_support), CHIP_ERROR_INVALID_ARGUMENT);
@@ -429,10 +431,11 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimeAttribute)
                                                                                         .holdTimeDefault = 100 };
     static TestACSDelegate testACSDelegate;
     AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                          AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                               .WithHoldTime(100, holdTimeLimitsConfig)
                                               .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
     chip::Testing::ClusterTester tester(cluster);
 
     // Verify that we can set a valid hold time via direct method call
@@ -488,10 +491,11 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimePersistence)
     {
         static TestACSDelegate testACSDelegate;
         AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                              AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                              AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                                   .WithHoldTime(kDefaultHoldTime, holdTimeLimitsConfig)
                                                   .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        cluster.SetDelegate(&testACSDelegate);
         chip::Testing::ClusterTester tester(cluster);
 
         uint16_t holdTime = 0;
@@ -505,10 +509,11 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimePersistence)
     {
         static TestACSDelegate testACSDelegate;
         AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                              AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                              AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                                   .WithHoldTime(kDefaultHoldTime, holdTimeLimitsConfig)
                                                   .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR); // Startup will load the default value again
+        cluster.SetDelegate(&testACSDelegate);
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, kNewHoldTime), CHIP_NO_ERROR);
         EXPECT_EQ(cluster.GetHoldTime(), kNewHoldTime);
@@ -519,10 +524,11 @@ TEST_F(TestAmbientContextSensingCluster, TestHoldTimePersistence)
     {
         static TestACSDelegate testACSDelegate;
         AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                              AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                              AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                                   .WithHoldTime(kDefaultHoldTime, holdTimeLimitsConfig)
                                                   .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        cluster.SetDelegate(&testACSDelegate);
         chip::Testing::ClusterTester tester(cluster);
 
         uint16_t holdTime = 0;
@@ -542,10 +548,11 @@ TEST_F(TestAmbientContextSensingCluster, TestAmbientContextDetect)
 
     static TestACSDelegate testACSDelegate;
     AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                          AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                               .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest))
                                               .WithHoldTime(kDefaultHoldTimeDefault, holdTimeLimitsConfig) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
 
     Span<SemanticTagType> ACTypeList_support = Span<SemanticTagType>(g_kACTSupportedArray, MATTER_ARRAY_SIZE(g_kACTSupportedArray));
     EXPECT_EQ(cluster.SetAmbientContextTypeSupported(ACTypeList_support), CHIP_NO_ERROR);
@@ -632,10 +639,11 @@ TEST_F(TestAmbientContextSensingCluster, TestSimultaneousDetectLimit)
 
     static TestACSDelegate testACSDelegate;
     AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                          AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                               .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest))
                                               .WithHoldTime(kDefaultHoldTimeDefault, holdTimeLimitsConfig) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
 
     Span<SemanticTagType> ACTypeList_support = Span<SemanticTagType>(g_kACTSupportedArray, MATTER_ARRAY_SIZE(g_kACTSupportedArray));
     EXPECT_EQ(cluster.SetAmbientContextTypeSupported(ACTypeList_support), CHIP_NO_ERROR);
@@ -693,11 +701,12 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCount)
     };
     static TestACSDelegate testACSDelegate;
     AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                          AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                               .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest))
                                               .WithOptionalAttributes(0xfff)
                                               .WithHoldTime(kDefaultHoldTimeDefault, holdTimeLimitsConfig) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
     chip::Testing::ClusterTester tester(cluster);
 
     // Set the ObjectCountConfig attribute
@@ -776,10 +785,11 @@ TEST_F(TestAmbientContextSensingCluster, TestObjCntThresholdPersistence)
         };
         static TestACSDelegate testACSDelegate;
         AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                              AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                              AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                                   .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest))
                                                   .WithHoldTime(kDefaultHoldTimeDefault, holdTimeLimitsConfig) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        cluster.SetDelegate(&testACSDelegate);
         chip::Testing::ClusterTester tester(cluster);
 
         // Set the supported list
@@ -819,10 +829,11 @@ TEST_F(TestAmbientContextSensingCluster, TestObjCntThresholdPersistence)
         };
         static TestACSDelegate testACSDelegate;
         AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                              AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }
+                                              AmbientContextSensingCluster::Config{ mMockTimerDelegate }
                                                   .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest))
                                                   .WithHoldTime(kDefaultHoldTimeDefault, holdTimeLimitsConfig) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        cluster.SetDelegate(&testACSDelegate);
         chip::Testing::ClusterTester tester(cluster);
         // Set the supported list
         Span<SemanticTagType> ACTypeList = Span<SemanticTagType>(g_kACTSupportedArray, MATTER_ARRAY_SIZE(g_kACTSupportedArray));
@@ -842,9 +853,10 @@ TEST_F(TestAmbientContextSensingCluster, TestPredictActivity)
     chip::Testing::TestServerClusterContext context;
     static TestACSDelegate testACSDelegate;
     AmbientContextSensingCluster cluster{ kTestEndpointId,
-                                          AmbientContextSensingCluster::Config{ testACSDelegate, mMockTimerDelegate }.WithFeatures(
+                                          AmbientContextSensingCluster::Config{ mMockTimerDelegate }.WithFeatures(
                                               BitMask<AmbientContextSensing::Feature>(kFeaturesAllForACSTest)) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    cluster.SetDelegate(&testACSDelegate);
     chip::Testing::ClusterTester tester(cluster);
 
     const uint32_t now =
