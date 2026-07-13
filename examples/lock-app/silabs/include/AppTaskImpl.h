@@ -35,61 +35,59 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    // Common AppTask bring up
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
-    // Lock specific initialization
     CHIP_ERROR InitLock() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLockImpl); }
 
-    // Handle button press
+    // Platform button callback, posts lock action or base application events.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
-    // AppTask thread event handler
+    // AppTask thread handler for lock button press/release actions.
     static void LockButtonActionHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockButtonActionHandlerImpl, aEvent);
     }
 
-    // Timer expiry callback
+    // Timer callback, fires when the unlatch interval expires.
     static void UnlatchCallback(void * argument)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlatchCallbackImpl, argument);
     }
 
-    // AppTask thread event handler
+    // AppTask thread handler, drives lock actuator open/close transitions.
     static void ActuatorMovementEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ActuatorMovementEventHandlerImpl, aEvent);
     }
 
-    // AppTask thread event handler for a queued lock action event
+    // AppTask thread handler for queued lock/unlock actions.
     static void LockActionEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockActionEventHandlerImpl, aEvent);
     }
 
-    // AppTask thread event handler for a queued lock/unlock request
+    // AppTask thread handler for queued lock/unlock requests.
     static void LockRequestEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockRequestEventHandlerImpl, aEvent);
     }
 
-    // Processes a lock request on the AppTask thread
+    // Processes a lock request on the AppTask thread.
     void HandleLockRequestOnAppTask(const AppTask::LockRequest & request)
     {
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, HandleLockRequestOnAppTaskImpl, request);
     }
 
-    // Completes an unlock once the unlatch sequence has finished
+    // Completes an unlock once the unlatch sequence has finished.
     static void UnlockAfterUnlatch(intptr_t context)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlockAfterUnlatchImpl, context);
     }
 
-    // Data model hook invoked when a cluster attribute changes
+    // Matter stack callback after a server attribute write, applies lock-specific attribute side effects.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {

@@ -39,45 +39,43 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    // Common AppTask bring up
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
-    // Light specific initialization
     CHIP_ERROR InitLight() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLightImpl); }
 
-    // Handle button press
+    // Platform button callback, posts light toggle or base application events.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
-    // OnOff cluster callback for the off with effect command
+    // OnOff cluster callback, arms a timed off with effect transition.
     static void OnTriggerOffWithEffect(OnOffEffect * effect)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffectImpl, effect);
     }
 
-    // AppTask thread event handler that applies a light action
+    // Toggles light on/off, updates LED/display, and schedules OnOff cluster sync on the CHIP thread.
     static void LightActionEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightActionEventHandlerImpl, aEvent);
     }
 
-    // Timer expiry callback driving timed light transitions
+    // Timer callback, completes an off with effect transition.
     static void LightTimerEventHandler(void * timerCbArg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightTimerEventHandlerImpl, timerCbArg);
     }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    // AppTask thread event handler for RGB LED control
+    // Updates RGB LED from queued ColorControl changes.
     static void LightControlEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightControlEventHandlerImpl, aEvent);
     }
 #endif
 
-    // Data model hook invoked when a cluster attribute changes
+    // Matter stack callback after a server attribute write, syncs OnOff/LevelControl/ColorControl to LED and display.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {

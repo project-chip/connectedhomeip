@@ -39,41 +39,39 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    // Common AppTask bring up
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
-    // Light switch specific initialization
     CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint)
     {
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, InitLightSwitchImpl, lightSwitchEndpoint, genericSwitchEndpoint);
     }
 
-    // Handle button press
+    // Platform button callback, posts switch action or base application events.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
-    // AppTask thread event handler
+    // AppTask thread handler for queued button events, triggers switch actions on the CHIP task.
     static void AppEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, AppEventHandlerImpl, aEvent);
     }
 
-    // Handler scheduled on the Matter thread to set up the binding table
+    // Handler scheduled on the CHIP thread to set up the binding table.
     static void InitBindingHandler(intptr_t arg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, InitBindingHandlerImpl, arg);
     }
 
-    // Binding manager callback invoked per bound device to send switch command to the target light
+    // Binding manager callback, sends switch commands to bound lights.
     static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
                                           chip::OperationalDeviceProxy * peer_device, void * context)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightSwitchChangedHandlerImpl, binding, peer_device, context);
     }
 
-    // Data model hook invoked when a cluster attribute changes
+    // Matter stack callback after a server attribute write, logs Identify cluster changes.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
