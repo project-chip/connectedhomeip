@@ -256,17 +256,14 @@ class TC_CNET_4_12(MatterBaseTest):
         asserts.assert_true(thread_dataset_2 is not None, "Missing required THREAD_2ND: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
 
         # All required endpoint and Threads dataset are set and assigned, Thread dataset as str
-        log.info('Precondition: All required arguments are set and assigned, Thread dataset as str: '
-                 f'THREADS_ENDPOINT = {endpoint}, '
-                 f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1}, '
-                 f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2}')
+        log.info('Precondition: All required arguments are set and assigned, Thread dataset as str: THREADS_ENDPOINT = %s, THREAD_1ST_OPERATIONALDATASET = %s, PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = %s',
+                 endpoint, thread_dataset_1, thread_dataset_2)
         thread_dataset_1_bytes = thread_dataset_1
         thread_dataset_2_bytes = bytes.fromhex(thread_dataset_2)
 
         # All required arguments are set and assigned, Thread dataset as bytes
-        log.info('Precondition: All required arguments are set and assigned, Thread dataset as bytes: '
-                 f'THREAD_1ST_OPERATIONALDATASET = {thread_dataset_1_bytes}, '
-                 f'PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = {thread_dataset_2_bytes}')
+        log.info('Precondition: All required arguments are set and assigned, Thread dataset as bytes: THREAD_1ST_OPERATIONALDATASET = %s, PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET = %s',
+                 thread_dataset_1_bytes, thread_dataset_2_bytes)
 
         # Validate the operational dataset structure (for both datasets)
         log.info("Precondition: Validating THREAD operational datasets")
@@ -276,9 +273,8 @@ class TC_CNET_4_12(MatterBaseTest):
         # CNET 4.10, ... (add other tests here)
         thread_network_id_bytes_th1 = await self.validate_thread_dataset(thread_dataset_1_bytes, "THREAD_1ST_OPERATIONALDATASET")
         thread_network_id_bytes_th2 = await self.validate_thread_dataset(thread_dataset_2_bytes, "THREAD_2ND_OPERATIONALDATASET")
-        log.info('Precondition: NetworkID : '
-                 f'NetworkID_THREAD_1ST_OPERATIONALDATASET = {thread_network_id_bytes_th1}, '
-                 f'NetworkID_THREAD_2ND_OPERATIONALDATASET = {thread_network_id_bytes_th2}')
+        log.info('Precondition: NetworkID : NetworkID_THREAD_1ST_OPERATIONALDATASET = %s, NetworkID_THREAD_2ND_OPERATIONALDATASET = %s',
+                 thread_network_id_bytes_th1, thread_network_id_bytes_th2)
 
         # Read the ConnectMaxTimeSeconds attribute after attempting to connect
         connect_max_time_seconds = await self.read_single_attribute_check_success(
@@ -396,9 +392,6 @@ class TC_CNET_4_12(MatterBaseTest):
             # device on the second network and by the networks attribute.
             pass
 
-        # TODO: Consider replacing the sleep (connect_max_time + fudge_factor) with dns-sd adverts check as improvement.
-        # Wait for the device to establish connection with the new Thread network
-        # Includes a fudge factor for SRP record propagation.
         log.info("Step #7: Awaiting device on SRP")
         srv_record = await self.wait_for_srp_update()
         asserts.assert_true(srv_record and srv_record.addresses, "No IP addresses found in SRP record")
@@ -453,7 +446,7 @@ class TC_CNET_4_12(MatterBaseTest):
 
         log.info("Step #11: Polling SRP until IP address changes from THREAD_2ND (%s)...", th2_ip)
         start_time = asyncio.get_running_loop().time()
-        timeout_seconds = 180
+        timeout_seconds = 60
 
         while asyncio.get_running_loop().time() - start_time < timeout_seconds:
             try:
