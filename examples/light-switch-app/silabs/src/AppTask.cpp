@@ -429,7 +429,8 @@ void AppTask::ProcessOnOffBindingCommand(CommandId commandId, const Binding::Tab
     {
         VerifyOrDie(peer_device->ConnectionReady());
         Messaging::ExchangeManager * exchangeMgr = peer_device->GetExchangeManager();
-        SessionHandle sessionHandle              = peer_device->GetSecureSession().Value();
+        auto optionalSession                     = peer_device->GetSecureSession();
+        const SessionHandle & sessionHandle      = optionalSession.Value();
 
         switch (commandId)
         {
