@@ -23,13 +23,13 @@
 
 namespace chip::app {
 
-class AmbientContextSensorDevice : public SingleEndpoint
+class AmbientContextSensor : public SingleEndpoint
 {
 public:
     using AmbientContextSensingConfig = Clusters::AmbientContextSensingCluster::Config;
 
-    AmbientContextSensorDevice(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, Clusters::AmbientContextSensing::AmbientContextSensingDelegate & delegate);
-    ~AmbientContextSensorDevice() override = default;
+    AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, Clusters::AmbientContextSensing::AmbientContextSensingDelegate & delegate);
+    ~AmbientContextSensor() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

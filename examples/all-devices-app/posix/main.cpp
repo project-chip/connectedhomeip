@@ -281,7 +281,7 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
         }
         else if (config.type == "ambient-context-sensor")
         {
-            auto * ambientContextSensorDevice = static_cast<AmbientContextSensorDevice *>(device);
+            auto * ambientContextSensorDevice = static_cast<AmbientContextSensor *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::AmbientContextSensingCluster>(
                     &ambientContextSensorDevice->AmbientContextSensingCluster());

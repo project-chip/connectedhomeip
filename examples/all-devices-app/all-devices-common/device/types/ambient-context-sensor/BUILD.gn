@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 
 source_set("ambient-context-sensor") {
   sources = [
-    "AmbientContextSensorDevice.cpp",
-    "AmbientContextSensorDevice.h",
+    "AmbientContextSensor.cpp",
+    "AmbientContextSensor.h",
   ]
 
   public_deps = [
@@ -34,8 +34,8 @@ source_set("ambient-context-sensor") {
 
 source_set("logging") {
   sources = [
-    "impl/LoggingAmbientContextSensorDevice.cpp",
-    "impl/LoggingAmbientContextSensorDevice.h",
+    "impl/LoggingAmbientContextSensor.cpp",
+    "impl/LoggingAmbientContextSensor.h",
   ]
 
   public_deps = [ ":ambient-context-sensor" ]

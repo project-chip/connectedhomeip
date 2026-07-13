@@ -18,7 +18,7 @@
 
 #include <app/clusters/ambient-context-sensing-server/AmbientContextSensingCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device/types/ambient-context-sensor/AmbientContextSensorDevice.h>
+#include <device/types/ambient-context-sensor/AmbientContextSensor.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters::AmbientContextSensing {
@@ -28,11 +28,11 @@ namespace chip::app::Clusters::AmbientContextSensing {
  *
  * This class serves as a simple example of an ambient context sensor.
  */
-class LoggingAmbientContextSensorDevice : public AmbientContextSensorDevice, public AmbientContextSensingDelegate
+class LoggingAmbientContextSensor : public AmbientContextSensor, public AmbientContextSensingDelegate
 {
 public:
-    LoggingAmbientContextSensorDevice(TimerDelegate & timerDelegate);
-    ~LoggingAmbientContextSensorDevice() override = default;
+    LoggingAmbientContextSensor(TimerDelegate & timerDelegate);
+    ~LoggingAmbientContextSensor() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;

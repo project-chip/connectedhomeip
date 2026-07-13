@@ -21,7 +21,7 @@
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
-#include <device/types/ambient-context-sensor/impl/LoggingAmbientContextSensorDevice.h>
+#include <device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
@@ -215,7 +215,7 @@ private:
         {
             RegisterCreator("ambient-context-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return std::make_unique<Clusters::AmbientContextSensing::LoggingAmbientContextSensorDevice>(
+                return std::make_unique<Clusters::AmbientContextSensing::LoggingAmbientContextSensor>(
                     mContext->timerDelegate);
             });
         }

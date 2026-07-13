@@ -14,15 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "LoggingAmbientContextSensorDevice.h"
+#include "LoggingAmbientContextSensor.h"
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip::app::Clusters::AmbientContextSensing {
 
-LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelegate & timerDelegate) :
-    AmbientContextSensorDevice(AmbientContextSensingConfig{ timerDelegate }
+LoggingAmbientContextSensor::LoggingAmbientContextSensor(TimerDelegate & timerDelegate) :
+    AmbientContextSensor(AmbientContextSensingConfig{ timerDelegate }
                                    .WithFeatures(BitMask<AmbientContextSensing::Feature>(kFeatureAllForLog))
                                    .WithHoldTime(10,
                                                  {
@@ -34,25 +34,25 @@ LoggingAmbientContextSensorDevice::LoggingAmbientContextSensorDevice(TimerDelega
     mAmbientContextTypeSupportedBuf{}, mPredictActivityBuf{}, mPredictedActivityList(mPredictActivityBuf, 0)
 {}
 
-CHIP_ERROR LoggingAmbientContextSensorDevice::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+CHIP_ERROR LoggingAmbientContextSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                        EndpointComposition composition)
 {
-    return AmbientContextSensorDevice::Register(endpoint, provider, composition);
+    return AmbientContextSensor::Register(endpoint, provider, composition);
 }
 
-void LoggingAmbientContextSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
+void LoggingAmbientContextSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    AmbientContextSensorDevice::Unregister(provider);
+    AmbientContextSensor::Unregister(provider);
 }
 
 // AmbientContextSensingDelegate implementation
-SemanticTagType * LoggingAmbientContextSensorDevice::GetAmbientContextTypeSupportedBuf(size_t size)
+SemanticTagType * LoggingAmbientContextSensor::GetAmbientContextTypeSupportedBuf(size_t size)
 {
     VerifyOrReturnError(size <= kMaxACTypeSupportedForLog, nullptr);
     return mAmbientContextTypeSupportedBuf;
 }
 
-CHIP_ERROR LoggingAmbientContextSensorDevice::SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList)
+CHIP_ERROR LoggingAmbientContextSensor::SetPredictedActivity(const Span<PredictedActivityType> & predictedActivityList)
 {
     VerifyOrReturnError(predictedActivityList.size() <= kMaxPredictedActivityForLog, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -87,7 +87,7 @@ CHIP_ERROR LoggingAmbientContextSensorDevice::SetPredictedActivity(const Span<Pr
     return CHIP_NO_ERROR;
 }
 
-AmbientContextSensed * LoggingAmbientContextSensorDevice::AllocDetection()
+AmbientContextSensed * LoggingAmbientContextSensor::AllocDetection()
 {
     for (uint8_t id = 0; id < kMaxSimultaneousDetectionLimit; id++)
     {
@@ -103,7 +103,7 @@ AmbientContextSensed * LoggingAmbientContextSensorDevice::AllocDetection()
     return nullptr;
 }
 
-CHIP_ERROR LoggingAmbientContextSensorDevice::DelDetection(AmbientContextSensed * pitem)
+CHIP_ERROR LoggingAmbientContextSensor::DelDetection(AmbientContextSensed * pitem)
 {
     VerifyOrReturnError(pitem != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     const uint8_t id = pitem->id;
@@ -115,7 +115,7 @@ CHIP_ERROR LoggingAmbientContextSensorDevice::DelDetection(AmbientContextSensed 
     return CHIP_NO_ERROR;
 }
 
-uint64_t LoggingAmbientContextSensorDevice::GetEpochNow()
+uint64_t LoggingAmbientContextSensor::GetEpochNow()
 {
     using namespace chip::System::Clock;
     Milliseconds64 timestamp_ms(0);

@@ -15,19 +15,19 @@
  *    limitations under the License.
  */
 #include <devices/Types.h>
-#include <device/types/ambient-context-sensor/AmbientContextSensorDevice.h>
+#include <device/types/ambient-context-sensor/AmbientContextSensor.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-AmbientContextSensorDevice::AmbientContextSensorDevice(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, AmbientContextSensing::AmbientContextSensingDelegate & delegate) :
+AmbientContextSensor::AmbientContextSensor(AmbientContextSensingConfig config, TimerDelegate & timerDelegate, AmbientContextSensing::AmbientContextSensingDelegate & delegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAmbientContextSensor, 1)), mConfig(config),
     mTimerDelegate(timerDelegate), mDelegate(delegate)
 {}
 
-CHIP_ERROR AmbientContextSensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                 EndpointComposition composition)
 {
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
@@ -44,7 +44,7 @@ CHIP_ERROR AmbientContextSensorDevice::Register(chip::EndpointId endpoint, CodeD
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void AmbientContextSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
+void AmbientContextSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
     if (mAmbientContextSensingCluster.IsConstructed())
