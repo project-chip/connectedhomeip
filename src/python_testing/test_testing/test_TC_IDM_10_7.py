@@ -21,13 +21,13 @@ import os
 import sys
 import unittest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-logging.disable(logging.CRITICAL)
+from TC_IDM_10_7 import TC_IDM_10_7
 
 import matter.clusters as Clusters
 
-from TC_IDM_10_7 import TC_IDM_10_7
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+logging.disable(logging.CRITICAL)
 
 
 def make_descriptor_cluster(parts_list=None):
