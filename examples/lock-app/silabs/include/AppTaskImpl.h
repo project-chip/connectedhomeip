@@ -35,57 +35,61 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    // External triggers — entry points that pass context into AppTask (e.g. PostEvent).
-    // Optional override: *Impl().
+    // Common AppTask bring up
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
+    // Lock specific initialization
     CHIP_ERROR InitLock() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLockImpl); }
 
+    // Handle button press
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
-    // AppTask-thread event handler (queued event). Optional override: *Impl().
+    // AppTask thread event handler
     static void LockButtonActionHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockButtonActionHandlerImpl, aEvent);
     }
 
-    // CMSIS osTimer expiry callback (unlatch timer). Optional override: *Impl().
+    // Timer expiry callback
     static void UnlatchCallback(void * argument)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlatchCallbackImpl, argument);
     }
 
-    // AppTask-thread event handler (queued actuator-movement timer event). Optional override: *Impl().
+    // AppTask thread event handler
     static void ActuatorMovementEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ActuatorMovementEventHandlerImpl, aEvent);
     }
 
-    // AppTask-thread event handler (queued lock-action event posted from the Matter / DoorLock
-    // cluster-callback thread or from the FreeRTOS unlatch-timer trampoline). Optional override: *Impl().
+    // AppTask thread event handler for a queued lock action event
     static void LockActionEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockActionEventHandlerImpl, aEvent);
     }
 
+    // AppTask thread event handler for a queued lock/unlock request
     static void LockRequestEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LockRequestEventHandlerImpl, aEvent);
     }
 
+    // Processes a lock request on the AppTask thread
     void HandleLockRequestOnAppTask(const AppTask::LockRequest & request)
     {
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, HandleLockRequestOnAppTaskImpl, request);
     }
 
+    // Completes an unlock once the unlatch sequence has finished
     static void UnlockAfterUnlatch(intptr_t context)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlockAfterUnlatchImpl, context);
     }
 
+    // Data model hook invoked when a cluster attribute changes
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -98,6 +102,7 @@ public:
     // behavior.
     // ---------------------------------------------------------------------
 
+    // Lock command: validate the credential and drive the lock actuator, return true on success
     bool DMDoorLockOnDoorLockCommand(chip::EndpointId endpointId,
                                      const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                      const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
@@ -108,6 +113,7 @@ public:
                                     err);
     }
 
+    // Unlock command: validate the credential and drive the lock actuator, return true on success
     bool DMDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId,
                                        const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                        const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
@@ -118,6 +124,7 @@ public:
                                     err);
     }
 
+    // Unbolt command: validate the credential and retract the bolt, return true on success
     bool DMDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId,
                                        const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                        const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
@@ -128,6 +135,7 @@ public:
                                     err);
     }
 
+    // Credential storage accessors, override to back credentials with custom storage
     bool DMDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential)
     {
@@ -143,6 +151,7 @@ public:
                                     modifier, credentialStatus, credentialType, credentialData);
     }
 
+    // User storage accessors, override to back the user database with custom storage
     bool DMDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
     {
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, DMDoorLockGetUserImpl, endpointId, userIndex, user);
@@ -156,6 +165,7 @@ public:
                                     uniqueId, userStatus, usertype, credentialRule, credentials, totalCredentials);
     }
 
+    // Schedule storage accessors, override to back schedules with custom storage
     DlStatus DMDoorLockGetWeekDaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           EmberAfPluginDoorLockWeekDaySchedule & schedule)
     {
@@ -199,6 +209,7 @@ public:
                                     localStartTime, localEndTime, operatingMode);
     }
 
+    // Auto relock timer expiry: relock the door after the configured relock interval
     void DMDoorLockOnAutoRelock(chip::EndpointId endpointId)
     {
         CRTP_OPTIONAL_VOID_DISPATCH(AppTaskImpl, Derived, DMDoorLockOnAutoRelockImpl, endpointId);
@@ -207,7 +218,8 @@ public:
 private:
     friend Derived;
 
-    /** Default implementations — override in Derived to customize. */
+    // Default *Impl() hooks, each forwards to the matching AppTask method
+    // Override the corresponding hook in CustomerAppTask to customize behavior
 
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 
@@ -235,7 +247,8 @@ private:
         AppTask::DMPostAttributeChangeCallback(attributePath, type, size, value);
     }
 
-    // DoorLock cluster DM defaults — forward to AppTask::DM*.
+    // DoorLock cluster DM defaults, each forwards to the matching AppTask::DM* method
+
     bool DMDoorLockOnDoorLockCommandImpl(chip::EndpointId endpointId,
                                          const chip::app::DataModel::Nullable<chip::FabricIndex> & fabricIdx,
                                          const chip::app::DataModel::Nullable<chip::NodeId> & nodeId,
