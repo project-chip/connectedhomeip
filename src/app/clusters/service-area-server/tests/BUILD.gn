@@ -12,35 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
-
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  # ServiceArea has no standalone library target (its BUILD.gn is an empty
-  # group); the sources are pulled into an app via app_config_dependent_sources.
-  # Compile them directly into the test, mirroring chime-server's
-  # backwards-compatibility test.
-  import(
-      "${chip_root}/src/app/clusters/service-area-server/app_config_dependent_sources.gni")
-
   output_name = "TestServiceAreaCluster"
 
   test_sources = [ "TestServiceAreaCluster.cpp" ]
 
-  # Prefix app_config_dependent_sources with "../" and add to the sources list.
-  sources = []
-  foreach(file, app_config_dependent_sources) {
-    sources += [ "../" + file ]
-  }
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
-    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/app/clusters/service-area-server",
     "${chip_root}/src/app/server-cluster/testing:testing",
-    "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
 }

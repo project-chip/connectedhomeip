@@ -29,6 +29,7 @@
 #endif // DISPLAY_ENABLED
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -349,4 +350,17 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 #ifdef SL_MATTER_ENABLE_AWS
     matterAws::control::AttributeHandler(attributePath.mEndpointId, attributeId);
 #endif // SL_MATTER_ENABLE_AWS
+}
+
+void AppTask::DMThermostatClusterInit(chip::EndpointId endpoint)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    auto & delegate = ThermostatDelegate::GetInstance();
+    SetDefaultDelegate(endpoint, &delegate);
+}
+
+// emberAfThermostatClusterInitCallback — weak ZAP entry point. CRTP forwarder into AppTask.
+void emberAfThermostatClusterInitCallback(chip::EndpointId endpoint)
+{
+    CustomerAppTask::GetAppTask().DMThermostatClusterInit(endpoint);
 }

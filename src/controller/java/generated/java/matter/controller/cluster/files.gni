@@ -162,6 +162,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/LaundryWasherModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/MediaFileManagementClusterFileDescriptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/MediaInputClusterInputInfoStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/MediaPlaybackClusterContentInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/MediaPlaybackClusterPlaybackPositionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/MediaPlaybackClusterTrackAttributesStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/MediaPlaybackClusterTrackStruct.kt",
