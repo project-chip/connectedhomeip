@@ -18915,6 +18915,48 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedMediaPlaybackClusterAvailableCommandsAttributeCallback implements ChipClusters.MediaPlaybackCluster.AvailableCommandsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaPlaybackClusterContentInfoAttributeCallback implements ChipClusters.MediaPlaybackCluster.ContentInfoAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.MediaPlaybackClusterContentInfoStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.MediaPlaybackClusterContentInfoStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedMediaPlaybackClusterGeneratedCommandListAttributeCallback implements ChipClusters.MediaPlaybackCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19234,6 +19276,30 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedContentLauncherClusterContentReplicationResponseCallback implements ChipClusters.ContentLauncherCluster.ContentReplicationResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer status, @Nullable Optional<ChipStructs.ContentLauncherClusterReplicationInfo> replicationInfo) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
+      responseValues.put(statusResponseValue, status);
+      // replicationInfo: Struct ReplicationInfo
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedContentLauncherClusterAcceptHeaderAttributeCallback implements ChipClusters.ContentLauncherCluster.AcceptHeaderAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19245,6 +19311,27 @@ public class ClusterInfoMapping {
     public void onSuccess(List<String> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedContentLauncherClusterPresetsAttributeCallback implements ChipClusters.ContentLauncherCluster.PresetsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ContentLauncherClusterContentPresetStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ContentLauncherClusterContentPresetStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -19658,6 +19745,36 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedAccountLoginClusterGetDeviceAuthURIResponseCallback implements ChipClusters.AccountLoginCluster.GetDeviceAuthURIResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(String userCode, String verificationURI, Optional<String> verificationURIComplete, Integer expiresIn, Integer interval) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo userCodeResponseValue = new CommandResponseInfo("userCode", "String");
+      responseValues.put(userCodeResponseValue, userCode);
+      CommandResponseInfo verificationURIResponseValue = new CommandResponseInfo("verificationURI", "String");
+      responseValues.put(verificationURIResponseValue, verificationURI);
+      CommandResponseInfo verificationURICompleteResponseValue = new CommandResponseInfo("verificationURIComplete", "Optional<String>");
+      responseValues.put(verificationURICompleteResponseValue, verificationURIComplete);
+      CommandResponseInfo expiresInResponseValue = new CommandResponseInfo("expiresIn", "Integer");
+      responseValues.put(expiresInResponseValue, expiresIn);
+      CommandResponseInfo intervalResponseValue = new CommandResponseInfo("interval", "Integer");
+      responseValues.put(intervalResponseValue, interval);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedAccountLoginClusterGeneratedCommandListAttributeCallback implements ChipClusters.AccountLoginCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19980,6 +20097,264 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedContentAppObserverClusterAttributeListAttributeCallback implements ChipClusters.ContentAppObserverCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
+  public static class DelegatedMediaFileManagementClusterAddFileResponseCallback implements ChipClusters.MediaFileManagementCluster.AddFileResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer status, @Nullable Long fileID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
+      responseValues.put(statusResponseValue, status);
+      CommandResponseInfo fileIDResponseValue = new CommandResponseInfo("fileID", "Long");
+      responseValues.put(fileIDResponseValue, fileID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterGetSharedFileResponseCallback implements ChipClusters.MediaFileManagementCluster.GetSharedFileResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer status, @Nullable Optional<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> fileDescription) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
+      responseValues.put(statusResponseValue, status);
+      // fileDescription: Struct FileDescriptionStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedMediaFileManagementClusterAvailableFilesAttributeCallback implements ChipClusters.MediaFileManagementCluster.AvailableFilesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.MediaFileManagementClusterFileDescriptionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterSupportedMimeTypesAttributeCallback implements ChipClusters.MediaFileManagementCluster.SupportedMimeTypesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<String> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.MediaFileManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.MediaFileManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMediaFileManagementClusterAttributeListAttributeCallback implements ChipClusters.MediaFileManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterStartUpMutedAttributeCallback implements ChipClusters.AudioControlCluster.StartUpMutedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Boolean value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Boolean");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterStartUpVolumeAttributeCallback implements ChipClusters.AudioControlCluster.StartUpVolumeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.AudioControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.AudioControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedAudioControlClusterAttributeListAttributeCallback implements ChipClusters.AudioControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -25269,6 +25644,14 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ContentAppObserverCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("contentAppObserver", contentAppObserverClusterInfo);
 
+    ClusterInfo mediaFileManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.MediaFileManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("mediaFileManagement", mediaFileManagementClusterInfo);
+
+    ClusterInfo audioControlClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.AudioControlCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("audioControl", audioControlClusterInfo);
+
     ClusterInfo zoneManagementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ZoneManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("zoneManagement", zoneManagementClusterInfo);
@@ -25491,6 +25874,8 @@ public class ClusterInfoMapping {
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("contentControl").combineCommands(source.get("contentControl"));
     destination.get("contentAppObserver").combineCommands(source.get("contentAppObserver"));
+    destination.get("mediaFileManagement").combineCommands(source.get("mediaFileManagement"));
+    destination.get("audioControl").combineCommands(source.get("audioControl"));
     destination.get("zoneManagement").combineCommands(source.get("zoneManagement"));
     destination.get("cameraAvStreamManagement").combineCommands(source.get("cameraAvStreamManagement"));
     destination.get("cameraAvSettingsUserLevelManagement").combineCommands(source.get("cameraAvSettingsUserLevelManagement"));
@@ -29892,6 +30277,33 @@ public class ClusterInfoMapping {
     );
     closureControlClusterInteractionInfoMap.put("calibrate", closureControlcalibrateInteractionInfo);
 
+    Map<String, CommandParameterInfo> closureControlgroupedMoveToCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureControlgroupedMoveTopositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
+    closureControlgroupedMoveToCommandParams.put("position",closureControlgroupedMoveTopositionCommandParameterInfo);
+
+    CommandParameterInfo closureControlgroupedMoveTolatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Boolean.class);
+    closureControlgroupedMoveToCommandParams.put("latch",closureControlgroupedMoveTolatchCommandParameterInfo);
+
+    CommandParameterInfo closureControlgroupedMoveTospeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureControlgroupedMoveToCommandParams.put("speed",closureControlgroupedMoveTospeedCommandParameterInfo);
+    InteractionInfo closureControlgroupedMoveToInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureControlCluster) cluster)
+        .groupedMoveTo((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("position")
+        , (Optional<Boolean>)
+        commandArguments.get("latch")
+        , (Optional<Integer>)
+        commandArguments.get("speed")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureControlgroupedMoveToCommandParams
+    );
+    closureControlClusterInteractionInfoMap.put("groupedMoveTo", closureControlgroupedMoveToInteractionInfo);
+
     commandMap.put("closureControl", closureControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> closureDimensionClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -29949,6 +30361,60 @@ public class ClusterInfoMapping {
         closureDimensionstepCommandParams
     );
     closureDimensionClusterInteractionInfoMap.put("step", closureDimensionstepInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureDimensiongroupedSetTargetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureDimensiongroupedSetTargetpositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
+    closureDimensiongroupedSetTargetCommandParams.put("position",closureDimensiongroupedSetTargetpositionCommandParameterInfo);
+
+    CommandParameterInfo closureDimensiongroupedSetTargetlatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Boolean.class);
+    closureDimensiongroupedSetTargetCommandParams.put("latch",closureDimensiongroupedSetTargetlatchCommandParameterInfo);
+
+    CommandParameterInfo closureDimensiongroupedSetTargetspeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureDimensiongroupedSetTargetCommandParams.put("speed",closureDimensiongroupedSetTargetspeedCommandParameterInfo);
+    InteractionInfo closureDimensiongroupedSetTargetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureDimensionCluster) cluster)
+        .groupedSetTarget((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("position")
+        , (Optional<Boolean>)
+        commandArguments.get("latch")
+        , (Optional<Integer>)
+        commandArguments.get("speed")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureDimensiongroupedSetTargetCommandParams
+    );
+    closureDimensionClusterInteractionInfoMap.put("groupedSetTarget", closureDimensiongroupedSetTargetInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureDimensiongroupedStepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureDimensiongroupedStepdirectionCommandParameterInfo = new CommandParameterInfo("direction", Integer.class, Integer.class);
+    closureDimensiongroupedStepCommandParams.put("direction",closureDimensiongroupedStepdirectionCommandParameterInfo);
+
+    CommandParameterInfo closureDimensiongroupedStepnumberOfStepsCommandParameterInfo = new CommandParameterInfo("numberOfSteps", Integer.class, Integer.class);
+    closureDimensiongroupedStepCommandParams.put("numberOfSteps",closureDimensiongroupedStepnumberOfStepsCommandParameterInfo);
+
+    CommandParameterInfo closureDimensiongroupedStepspeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureDimensiongroupedStepCommandParams.put("speed",closureDimensiongroupedStepspeedCommandParameterInfo);
+    InteractionInfo closureDimensiongroupedStepInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureDimensionCluster) cluster)
+        .groupedStep((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("direction")
+        , (Integer)
+        commandArguments.get("numberOfSteps")
+        , (Optional<Integer>)
+        commandArguments.get("speed")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureDimensiongroupedStepCommandParams
+    );
+    closureDimensionClusterInteractionInfoMap.put("groupedStep", closureDimensiongroupedStepInteractionInfo);
 
     commandMap.put("closureDimension", closureDimensionClusterInteractionInfoMap);
 
@@ -32137,6 +32603,12 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo contentLauncherlaunchContentuseCurrentContextCommandParameterInfo = new CommandParameterInfo("useCurrentContext", Optional.class, Boolean.class);
     contentLauncherlaunchContentCommandParams.put("useCurrentContext",contentLauncherlaunchContentuseCurrentContextCommandParameterInfo);
+
+    CommandParameterInfo contentLauncherlaunchContentcontentAppVendorIDCommandParameterInfo = new CommandParameterInfo("contentAppVendorID", Optional.class, Integer.class);
+    contentLauncherlaunchContentCommandParams.put("contentAppVendorID",contentLauncherlaunchContentcontentAppVendorIDCommandParameterInfo);
+
+    CommandParameterInfo contentLauncherlaunchContentcontentAppProductIDCommandParameterInfo = new CommandParameterInfo("contentAppProductID", Optional.class, Integer.class);
+    contentLauncherlaunchContentCommandParams.put("contentAppProductID",contentLauncherlaunchContentcontentAppProductIDCommandParameterInfo);
     InteractionInfo contentLauncherlaunchContentInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentLauncherCluster) cluster)
@@ -32156,6 +32628,12 @@ public class ClusterInfoMapping {
            , (Optional<Boolean>)
              commandArguments.get("useCurrentContext")
 
+           , (Optional<Integer>)
+             commandArguments.get("contentAppVendorID")
+
+           , (Optional<Integer>)
+             commandArguments.get("contentAppProductID")
+
             );
         },
         () -> new DelegatedContentLauncherClusterLauncherResponseCallback(),
@@ -32171,6 +32649,22 @@ public class ClusterInfoMapping {
     CommandParameterInfo contentLauncherlaunchURLdisplayStringCommandParameterInfo = new CommandParameterInfo("displayString", Optional.class, String.class);
     contentLauncherlaunchURLCommandParams.put("displayString",contentLauncherlaunchURLdisplayStringCommandParameterInfo);
 
+
+
+    CommandParameterInfo contentLauncherlaunchURLcontentTypeCommandParameterInfo = new CommandParameterInfo("contentType", Optional.class, String.class);
+    contentLauncherlaunchURLCommandParams.put("contentType",contentLauncherlaunchURLcontentTypeCommandParameterInfo);
+
+    CommandParameterInfo contentLauncherlaunchURLcontentHeadersCommandParameterInfo = new CommandParameterInfo("contentHeaders", Optional.class, ArrayList.class);
+    contentLauncherlaunchURLCommandParams.put("contentHeaders",contentLauncherlaunchURLcontentHeadersCommandParameterInfo);
+
+    CommandParameterInfo contentLauncherlaunchURLoffsetMillisecsCommandParameterInfo = new CommandParameterInfo("offsetMillisecs", Optional.class, Long.class);
+    contentLauncherlaunchURLCommandParams.put("offsetMillisecs",contentLauncherlaunchURLoffsetMillisecsCommandParameterInfo);
+
+    CommandParameterInfo contentLauncherlaunchURLqueueTypeCommandParameterInfo = new CommandParameterInfo("queueType", Optional.class, Integer.class);
+    contentLauncherlaunchURLCommandParams.put("queueType",contentLauncherlaunchURLqueueTypeCommandParameterInfo);
+
+    CommandParameterInfo contentLauncherlaunchURLnextUrlCommandParameterInfo = new CommandParameterInfo("nextUrl", Optional.class, String.class);
+    contentLauncherlaunchURLCommandParams.put("nextUrl",contentLauncherlaunchURLnextUrlCommandParameterInfo);
     InteractionInfo contentLauncherlaunchURLInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ContentLauncherCluster) cluster)
@@ -32184,12 +32678,59 @@ public class ClusterInfoMapping {
            , (Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct>)
              commandArguments.get("brandingInformation")
 
+           , (Optional<ChipStructs.ContentLauncherClusterPlaybackPreferencesStruct>)
+             commandArguments.get("playbackPreferences")
+
+           , (Optional<String>)
+             commandArguments.get("contentType")
+
+           , (Optional<ArrayList<String>>)
+             commandArguments.get("contentHeaders")
+
+           , (Optional<Long>)
+             commandArguments.get("offsetMillisecs")
+
+           , (Optional<Integer>)
+             commandArguments.get("queueType")
+
+           , (Optional<String>)
+             commandArguments.get("nextUrl")
+
             );
         },
         () -> new DelegatedContentLauncherClusterLauncherResponseCallback(),
         contentLauncherlaunchURLCommandParams
       );
     contentLauncherClusterInteractionInfoMap.put("launchURL", contentLauncherlaunchURLInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentLaunchercontentReplicationRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo contentLaunchercontentReplicationRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentLauncherCluster) cluster)
+          .contentReplicationRequest((ChipClusters.ContentLauncherCluster.ContentReplicationResponseCallback) callback
+            );
+        },
+        () -> new DelegatedContentLauncherClusterContentReplicationResponseCallback(),
+        contentLaunchercontentReplicationRequestCommandParams
+      );
+    contentLauncherClusterInteractionInfoMap.put("contentReplicationRequest", contentLaunchercontentReplicationRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> contentLauncherplayPresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo contentLauncherplayPresetpresetIDCommandParameterInfo = new CommandParameterInfo("presetID", Integer.class, Integer.class);
+    contentLauncherplayPresetCommandParams.put("presetID",contentLauncherplayPresetpresetIDCommandParameterInfo);
+    InteractionInfo contentLauncherplayPresetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ContentLauncherCluster) cluster)
+        .playPreset((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("presetID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        contentLauncherplayPresetCommandParams
+    );
+    contentLauncherClusterInteractionInfoMap.put("playPreset", contentLauncherplayPresetInteractionInfo);
 
     commandMap.put("contentLauncher", contentLauncherClusterInteractionInfoMap);
 
@@ -32361,6 +32902,18 @@ public class ClusterInfoMapping {
         accountLoginlogoutCommandParams
     );
     accountLoginClusterInteractionInfoMap.put("logout", accountLoginlogoutInteractionInfo);
+
+    Map<String, CommandParameterInfo> accountLogingetDeviceAuthURICommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo accountLogingetDeviceAuthURIInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AccountLoginCluster) cluster)
+          .getDeviceAuthURI((ChipClusters.AccountLoginCluster.GetDeviceAuthURIResponseCallback) callback
+            , 10000);
+        },
+        () -> new DelegatedAccountLoginClusterGetDeviceAuthURIResponseCallback(),
+        accountLogingetDeviceAuthURICommandParams
+      );
+    accountLoginClusterInteractionInfoMap.put("getDeviceAuthURI", accountLogingetDeviceAuthURIInteractionInfo);
 
     commandMap.put("accountLogin", accountLoginClusterInteractionInfoMap);
 
@@ -32644,6 +33197,256 @@ public class ClusterInfoMapping {
     contentAppObserverClusterInteractionInfoMap.put("contentAppMessage", contentAppObservercontentAppMessageInteractionInfo);
 
     commandMap.put("contentAppObserver", contentAppObserverClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> mediaFileManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> mediaFileManagementaddFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementaddFilenameCommandParameterInfo = new CommandParameterInfo("name", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("name",mediaFileManagementaddFilenameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementaddFilesizeCommandParameterInfo = new CommandParameterInfo("size", Long.class, Long.class);
+    mediaFileManagementaddFileCommandParams.put("size",mediaFileManagementaddFilesizeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementaddFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("mimeType",mediaFileManagementaddFilemimeTypeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementaddFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("imageUri",mediaFileManagementaddFileimageUriCommandParameterInfo);
+    InteractionInfo mediaFileManagementaddFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+          .addFile((ChipClusters.MediaFileManagementCluster.AddFileResponseCallback) callback
+           , (String)
+             commandArguments.get("name")
+
+           , (Long)
+             commandArguments.get("size")
+
+           , (String)
+             commandArguments.get("mimeType")
+
+           , (String)
+             commandArguments.get("imageUri")
+
+            );
+        },
+        () -> new DelegatedMediaFileManagementClusterAddFileResponseCallback(),
+        mediaFileManagementaddFileCommandParams
+      );
+    mediaFileManagementClusterInteractionInfoMap.put("addFile", mediaFileManagementaddFileInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementdeleteFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementdeleteFilefileIDCommandParameterInfo = new CommandParameterInfo("fileID", Long.class, Long.class);
+    mediaFileManagementdeleteFileCommandParams.put("fileID",mediaFileManagementdeleteFilefileIDCommandParameterInfo);
+    InteractionInfo mediaFileManagementdeleteFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+        .deleteFile((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("fileID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        mediaFileManagementdeleteFileCommandParams
+    );
+    mediaFileManagementClusterInteractionInfoMap.put("deleteFile", mediaFileManagementdeleteFileInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementrequestSharedFilesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementrequestSharedFilesclientNameCommandParameterInfo = new CommandParameterInfo("clientName", String.class, String.class);
+    mediaFileManagementrequestSharedFilesCommandParams.put("clientName",mediaFileManagementrequestSharedFilesclientNameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementrequestSharedFilesrequestIDCommandParameterInfo = new CommandParameterInfo("requestID", Integer.class, Integer.class);
+    mediaFileManagementrequestSharedFilesCommandParams.put("requestID",mediaFileManagementrequestSharedFilesrequestIDCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementrequestSharedFilessupportedMimeTypesCommandParameterInfo = new CommandParameterInfo("supportedMimeTypes", Optional.class, ArrayList.class);
+    mediaFileManagementrequestSharedFilesCommandParams.put("supportedMimeTypes",mediaFileManagementrequestSharedFilessupportedMimeTypesCommandParameterInfo);
+    InteractionInfo mediaFileManagementrequestSharedFilesInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+        .requestSharedFiles((DefaultClusterCallback) callback
+        , (String)
+        commandArguments.get("clientName")
+        , (Integer)
+        commandArguments.get("requestID")
+        , (Optional<ArrayList<String>>)
+        commandArguments.get("supportedMimeTypes")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        mediaFileManagementrequestSharedFilesCommandParams
+    );
+    mediaFileManagementClusterInteractionInfoMap.put("requestSharedFiles", mediaFileManagementrequestSharedFilesInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementgetSharedFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementgetSharedFileresponseIDCommandParameterInfo = new CommandParameterInfo("responseID", Integer.class, Integer.class);
+    mediaFileManagementgetSharedFileCommandParams.put("responseID",mediaFileManagementgetSharedFileresponseIDCommandParameterInfo);
+    InteractionInfo mediaFileManagementgetSharedFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+          .getSharedFile((ChipClusters.MediaFileManagementCluster.GetSharedFileResponseCallback) callback
+           , (Integer)
+             commandArguments.get("responseID")
+
+            );
+        },
+        () -> new DelegatedMediaFileManagementClusterGetSharedFileResponseCallback(),
+        mediaFileManagementgetSharedFileCommandParams
+      );
+    mediaFileManagementClusterInteractionInfoMap.put("getSharedFile", mediaFileManagementgetSharedFileInteractionInfo);
+
+    Map<String, CommandParameterInfo> mediaFileManagementofferFileCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo mediaFileManagementofferFileclientNameCommandParameterInfo = new CommandParameterInfo("clientName", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("clientName",mediaFileManagementofferFileclientNameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFilenameCommandParameterInfo = new CommandParameterInfo("name", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("name",mediaFileManagementofferFilenameCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFilesizeCommandParameterInfo = new CommandParameterInfo("size", Long.class, Long.class);
+    mediaFileManagementofferFileCommandParams.put("size",mediaFileManagementofferFilesizeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("mimeType",mediaFileManagementofferFilemimeTypeCommandParameterInfo);
+
+    CommandParameterInfo mediaFileManagementofferFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("imageUri",mediaFileManagementofferFileimageUriCommandParameterInfo);
+    InteractionInfo mediaFileManagementofferFileInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MediaFileManagementCluster) cluster)
+        .offerFile((DefaultClusterCallback) callback
+        , (String)
+        commandArguments.get("clientName")
+        , (String)
+        commandArguments.get("name")
+        , (Long)
+        commandArguments.get("size")
+        , (String)
+        commandArguments.get("mimeType")
+        , (String)
+        commandArguments.get("imageUri")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        mediaFileManagementofferFileCommandParams
+    );
+    mediaFileManagementClusterInteractionInfoMap.put("offerFile", mediaFileManagementofferFileInteractionInfo);
+
+    commandMap.put("mediaFileManagement", mediaFileManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> audioControlClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> audioControlmuteCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo audioControlmuteInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .mute((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlmuteCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("mute", audioControlmuteInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControlunmuteCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo audioControlunmuteInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .unmute((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlunmuteCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("unmute", audioControlunmuteInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControltoggleMutedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo audioControltoggleMutedInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .toggleMuted((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControltoggleMutedCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("toggleMuted", audioControltoggleMutedInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControlsetVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo audioControlsetVolumenewVolumeCommandParameterInfo = new CommandParameterInfo("newVolume", Integer.class, Integer.class);
+    audioControlsetVolumeCommandParams.put("newVolume",audioControlsetVolumenewVolumeCommandParameterInfo);
+
+    CommandParameterInfo audioControlsetVolumeunmutePolicyCommandParameterInfo = new CommandParameterInfo("unmutePolicy", Optional.class, Integer.class);
+    audioControlsetVolumeCommandParams.put("unmutePolicy",audioControlsetVolumeunmutePolicyCommandParameterInfo);
+    InteractionInfo audioControlsetVolumeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .setVolume((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("newVolume")
+        , (Optional<Integer>)
+        commandArguments.get("unmutePolicy")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlsetVolumeCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("setVolume", audioControlsetVolumeInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControlincreaseVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo audioControlincreaseVolumestepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", Optional.class, Integer.class);
+    audioControlincreaseVolumeCommandParams.put("stepSize",audioControlincreaseVolumestepSizeCommandParameterInfo);
+
+    CommandParameterInfo audioControlincreaseVolumeunmutePolicyCommandParameterInfo = new CommandParameterInfo("unmutePolicy", Optional.class, Integer.class);
+    audioControlincreaseVolumeCommandParams.put("unmutePolicy",audioControlincreaseVolumeunmutePolicyCommandParameterInfo);
+
+    CommandParameterInfo audioControlincreaseVolumeunmuteVolumeCommandParameterInfo = new CommandParameterInfo("unmuteVolume", Optional.class, Integer.class);
+    audioControlincreaseVolumeCommandParams.put("unmuteVolume",audioControlincreaseVolumeunmuteVolumeCommandParameterInfo);
+    InteractionInfo audioControlincreaseVolumeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .increaseVolume((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("stepSize")
+        , (Optional<Integer>)
+        commandArguments.get("unmutePolicy")
+        , (Optional<Integer>)
+        commandArguments.get("unmuteVolume")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControlincreaseVolumeCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("increaseVolume", audioControlincreaseVolumeInteractionInfo);
+
+    Map<String, CommandParameterInfo> audioControldecreaseVolumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo audioControldecreaseVolumestepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", Optional.class, Integer.class);
+    audioControldecreaseVolumeCommandParams.put("stepSize",audioControldecreaseVolumestepSizeCommandParameterInfo);
+
+    CommandParameterInfo audioControldecreaseVolumeunmutePolicyCommandParameterInfo = new CommandParameterInfo("unmutePolicy", Optional.class, Integer.class);
+    audioControldecreaseVolumeCommandParams.put("unmutePolicy",audioControldecreaseVolumeunmutePolicyCommandParameterInfo);
+    InteractionInfo audioControldecreaseVolumeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.AudioControlCluster) cluster)
+        .decreaseVolume((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("stepSize")
+        , (Optional<Integer>)
+        commandArguments.get("unmutePolicy")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        audioControldecreaseVolumeCommandParams
+    );
+    audioControlClusterInteractionInfoMap.put("decreaseVolume", audioControldecreaseVolumeInteractionInfo);
+
+    commandMap.put("audioControl", audioControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> zoneManagementClusterInteractionInfoMap = new LinkedHashMap<>();
 

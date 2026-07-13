@@ -14,7 +14,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import MutableMapping, Optional, Union
+from typing import MutableMapping, Optional
 
 from matter.idl.matter_idl_types import Idl, ParseMetaData
 
@@ -77,8 +77,8 @@ class AttributeRequirement:
 
 @dataclass
 class ClusterAttributeDeny:
-    cluster_id: Union[str, int]
-    attribute_id: Union[str, int]
+    cluster_id: str | int
+    attribute_id: str | int
 
 
 @dataclass

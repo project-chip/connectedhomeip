@@ -63,6 +63,10 @@
 #include <clusters/ApplicationLauncher/Commands.ipp>
 #include <clusters/ApplicationLauncher/Events.ipp>
 #include <clusters/ApplicationLauncher/Structs.ipp>
+#include <clusters/AudioControl/Attributes.ipp>
+#include <clusters/AudioControl/Commands.ipp>
+#include <clusters/AudioControl/Events.ipp>
+#include <clusters/AudioControl/Structs.ipp>
 #include <clusters/AudioOutput/Attributes.ipp>
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
@@ -335,6 +339,10 @@
 #include <clusters/LowPower/Commands.ipp>
 #include <clusters/LowPower/Events.ipp>
 #include <clusters/LowPower/Structs.ipp>
+#include <clusters/MediaFileManagement/Attributes.ipp>
+#include <clusters/MediaFileManagement/Commands.ipp>
+#include <clusters/MediaFileManagement/Events.ipp>
+#include <clusters/MediaFileManagement/Structs.ipp>
 #include <clusters/MediaInput/Attributes.ipp>
 #include <clusters/MediaInput/Commands.ipp>
 #include <clusters/MediaInput/Events.ipp>
@@ -755,6 +763,7 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
         case Clusters::AccountLogin::Commands::Login::Id:
         case Clusters::AccountLogin::Commands::Logout::Id:
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
             return true;
         default:
             return false;
@@ -1433,6 +1442,10 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::AccountLogin::Commands::Logout::Id:
             return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id:
+            return true;
         default:
             return false;
         }
@@ -1445,6 +1458,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ContentAppObserver::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::MediaFileManagement::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AudioControl::Id: {
         switch (aCommand)
         {
         default:

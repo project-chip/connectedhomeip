@@ -249,10 +249,10 @@ jobs:
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x_retention light-switch-app-ota-factory-data \
-                    out/telink-tl3218x_retention-light-switch-ota-factory-data/zephyr/zephyr.elf \
+                    telink tl3218x_retention light-switch-app-ota \
+                    out/telink-tl3218x_retention-light-switch-ota/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -568,7 +568,7 @@ jobs:
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota' build"
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*

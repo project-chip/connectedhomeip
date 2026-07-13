@@ -139,12 +139,12 @@ class PushAvServerProcess(Subprocess):
         response = self._post_json(f"/streams?interface={interface}")
         return response["id"]
 
-    def update_track_name(self, stream_id: str, trackName: str) -> None:
+    def update_expected_track_names(self, stream_id: str, expected_track_names: list[str]) -> None:
         """
-            Request the server to add a track name associated with stream_id.
-            This is required to validate trackName of the segments that are uploaded.
+        Request the server to set the expected track names for a stream.
+        This is required to validate that uploaded track names match the expected list.
         """
-        self._post_json(endpoint=f"/streams/{stream_id}/trackName", data={"track_name": trackName})
+        self._post_json(endpoint=f"/streams/{stream_id}/expectedTrackNames", data={"expected_track_names": expected_track_names})
 
 
 class PAVSTIUtils:

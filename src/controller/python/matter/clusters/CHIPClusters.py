@@ -8357,6 +8357,15 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "GroupedMoveTo",
+                "args": {
+                    "position": "int",
+                    "latch": "bool",
+                    "speed": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -8443,6 +8452,24 @@ class ChipClusters:
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "Step",
+                "args": {
+                    "direction": "int",
+                    "numberOfSteps": "int",
+                    "speed": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "GroupedSetTarget",
+                "args": {
+                    "position": "int",
+                    "latch": "bool",
+                    "speed": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "GroupedStep",
                 "args": {
                     "direction": "int",
                     "numberOfSteps": "int",
@@ -13216,6 +13243,18 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x0000000B: {
+                "attributeName": "AvailableCommands",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "ContentInfo",
+                "attributeId": 0x0000000C,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13427,6 +13466,8 @@ class ChipClusters:
                     "data": "str",
                     "playbackPreferences": "PlaybackPreferencesStruct",
                     "useCurrentContext": "bool",
+                    "contentAppVendorID": "int",
+                    "contentAppProductID": "int",
                 },
             },
             0x00000001: {
@@ -13436,6 +13477,25 @@ class ChipClusters:
                     "contentURL": "str",
                     "displayString": "str",
                     "brandingInformation": "BrandingInformationStruct",
+                    "playbackPreferences": "PlaybackPreferencesStruct",
+                    "contentType": "str",
+                    "contentHeaders": "str",
+                    "offsetMillisecs": "int",
+                    "queueType": "int",
+                    "nextUrl": "str",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "ContentReplicationRequest",
+                "args": {
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "PlayPreset",
+                "args": {
+                    "presetID": "int",
                 },
             },
         },
@@ -13450,6 +13510,18 @@ class ChipClusters:
                 "attributeName": "SupportedStreamingProtocols",
                 "attributeId": 0x00000001,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "Movable",
+                "attributeId": 0x00000002,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Presets",
+                "attributeId": 0x00000003,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -13734,8 +13806,20 @@ class ChipClusters:
                     "node": "int",
                 },
             },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetDeviceAuthURI",
+                "args": {
+                },
+            },
         },
         "attributes": {
+            0x00000000: {
+                "attributeName": "OAuthLoggedIn",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13995,6 +14079,318 @@ class ChipClusters:
             },
         },
         "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _MEDIA_FILE_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "MediaFileManagement",
+        "clusterId": 0x00000511,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "AddFile",
+                "args": {
+                    "name": "str",
+                    "size": "int",
+                    "mimeType": "str",
+                    "imageUri": "str",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "DeleteFile",
+                "args": {
+                    "fileID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "RequestSharedFiles",
+                "args": {
+                    "clientName": "str",
+                    "requestID": "int",
+                    "supportedMimeTypes": "str",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetSharedFile",
+                "args": {
+                    "responseID": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "OfferFile",
+                "args": {
+                    "clientName": "str",
+                    "name": "str",
+                    "size": "int",
+                    "mimeType": "str",
+                    "imageUri": "str",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "TotalStorage",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "AvailableStorage",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "AvailableFiles",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "SupportedMimeTypes",
+                "attributeId": 0x00000003,
+                "type": "str",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _AUDIO_CONTROL_CLUSTER_INFO = {
+        "clusterName": "AudioControl",
+        "clusterId": 0x00000512,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Mute",
+                "args": {
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "Unmute",
+                "args": {
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "ToggleMuted",
+                "args": {
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "SetVolume",
+                "args": {
+                    "newVolume": "int",
+                    "unmutePolicy": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "IncreaseVolume",
+                "args": {
+                    "stepSize": "int",
+                    "unmutePolicy": "int",
+                    "unmuteVolume": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "DecreaseVolume",
+                "args": {
+                    "stepSize": "int",
+                    "unmutePolicy": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SoftMuted",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "PhysicallyMuted",
+                "attributeId": 0x00000001,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "Volume",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "MinDeviceVolume",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "MaxDeviceVolume",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "MaxDeviceVolumeDB",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "MaxUserVolume",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000007: {
+                "attributeName": "DefaultStepSize",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000008: {
+                "attributeName": "SetVolumeUnmutePolicy",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000009: {
+                "attributeName": "IncreaseVolumeUnmutePolicy",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000A: {
+                "attributeName": "IncreaseVolumeUnmuteVolume",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000B: {
+                "attributeName": "DecreaseVolumeUnmutePolicy",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000C: {
+                "attributeName": "StartUpMuted",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000D: {
+                "attributeName": "StartUpVolume",
+                "attributeId": 0x0000000D,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000E: {
+                "attributeName": "Bass",
+                "attributeId": 0x0000000E,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000F: {
+                "attributeName": "Mid",
+                "attributeId": 0x0000000F,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000010: {
+                "attributeName": "Treble",
+                "attributeId": 0x00000010,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000011: {
+                "attributeName": "MinCorrection",
+                "attributeId": 0x00000011,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000012: {
+                "attributeName": "MaxCorrection",
+                "attributeId": 0x00000012,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -17336,6 +17732,8 @@ class ChipClusters:
         0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
         0x0000050F: _CONTENT_CONTROL_CLUSTER_INFO,
         0x00000510: _CONTENT_APP_OBSERVER_CLUSTER_INFO,
+        0x00000511: _MEDIA_FILE_MANAGEMENT_CLUSTER_INFO,
+        0x00000512: _AUDIO_CONTROL_CLUSTER_INFO,
         0x00000550: _ZONE_MANAGEMENT_CLUSTER_INFO,
         0x00000551: _CAMERA_AV_STREAM_MANAGEMENT_CLUSTER_INFO,
         0x00000552: _CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER_INFO,
@@ -17494,6 +17892,8 @@ class ChipClusters:
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ContentControl": _CONTENT_CONTROL_CLUSTER_INFO,
         "ContentAppObserver": _CONTENT_APP_OBSERVER_CLUSTER_INFO,
+        "MediaFileManagement": _MEDIA_FILE_MANAGEMENT_CLUSTER_INFO,
+        "AudioControl": _AUDIO_CONTROL_CLUSTER_INFO,
         "ZoneManagement": _ZONE_MANAGEMENT_CLUSTER_INFO,
         "CameraAvStreamManagement": _CAMERA_AV_STREAM_MANAGEMENT_CLUSTER_INFO,
         "CameraAvSettingsUserLevelManagement": _CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER_INFO,
