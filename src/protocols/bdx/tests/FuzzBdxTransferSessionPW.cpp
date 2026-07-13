@@ -443,16 +443,21 @@ void BdxSessionSequenceDoesNotCrash(bool weInitiate, uint8_t roleByte, uint8_t i
     }
 }
 
+// The seven parameter domains are wrapped in ONE TupleOf so the whole-input seeds attach at DOMAIN
+// level (WithDomains unpacks a tuple-aggregate domain onto the parameter list). Seeds chained on
+// the FUZZ_TEST registration itself are only loaded through the runtime's seed enumeration, which
+// the libFuzzer-compat mode used by OSS-Fuzz never runs -- domain-level seeds ride the domain's
+// Init() and survive there.
 FUZZ_TEST(FuzzBdxTransferSessionPW, BdxSessionSequenceDoesNotCrash)
-    .WithDomains(Arbitrary<bool>(),     // weInitiate: StartTransfer vs WaitForTransfer
-                 Arbitrary<uint8_t>(),  // role selector
-                 Arbitrary<uint8_t>(),  // drive-mode selector for setup
-                 Arbitrary<uint16_t>(), // proposed MaxBlockSize
-                 Arbitrary<uint64_t>(), // proposed transfer length
-                 Arbitrary<uint64_t>(), // proposed start offset
-                 VectorOf(TupleOf(Arbitrary<uint8_t>(), Arbitrary<uint16_t>(), Arbitrary<uint32_t>(), Arbitrary<uint64_t>(),
-                                  Arbitrary<std::vector<uint8_t>>()))
-                     .WithMaxSize(kMaxSteps))
-    .WithSeeds(BdxWholeInputSeeds());
+    .WithDomains(TupleOf(Arbitrary<bool>(),     // weInitiate: StartTransfer vs WaitForTransfer
+                         Arbitrary<uint8_t>(),  // role selector
+                         Arbitrary<uint8_t>(),  // drive-mode selector for setup
+                         Arbitrary<uint16_t>(), // proposed MaxBlockSize
+                         Arbitrary<uint64_t>(), // proposed transfer length
+                         Arbitrary<uint64_t>(), // proposed start offset
+                         VectorOf(TupleOf(Arbitrary<uint8_t>(), Arbitrary<uint16_t>(), Arbitrary<uint32_t>(), Arbitrary<uint64_t>(),
+                                          Arbitrary<std::vector<uint8_t>>()))
+                             .WithMaxSize(kMaxSteps))
+                     .WithSeeds(BdxWholeInputSeeds()));
 
 } // namespace
