@@ -104,7 +104,6 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
-    /** @brief Returns the active app instance */
     static AppTask & GetAppTask();
 
     /**
@@ -114,7 +113,6 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
-    /** @brief Creates and starts the AppTask thread */
     CHIP_ERROR StartAppTask();
 
     /**
@@ -125,40 +123,73 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-    /** @brief AppTask thread event handler for queued button events */
     static void AppEventHandler(AppEvent * aEvent);
 
-    /** @brief Matter-thread work item: notifies the binding manager that a bound cluster changed to drive the outgoing switch
-     * command */
+    /**
+     * @brief Matter-thread work item: notifies the binding manager that a bound cluster changed to drive the outgoing switch
+     *
+     * @param context Work item pointer passed to PlatformMgr::ScheduleWork
+     */
     static void SwitchWorkerFunction(intptr_t context);
 
-    /** @brief Matter-thread work item: emits a Generic Switch cluster event for the queued switch action */
+    /**
+     * @brief Matter-thread work item: emits a Generic Switch cluster event for the queued switch action.
+     *
+     * @param context Pointer to a GenericSwitchEventData allocated for this work item
+     */
     static void GenericSwitchWorkerFunction(intptr_t context);
 
-    /** @brief Sends an OnOff cluster command to the bound peer device for the given binding entry */
+    /**
+     * @brief Sends an OnOff cluster command to the bound peer device for the given binding entry.
+     *
+     * @param commandId   OnOff cluster command to send
+     * @param binding     Binding table entry identifying the target
+     * @param peer_device Operational session to the bound peer, or nullptr for group bindings
+     */
     static void ProcessOnOffBindingCommand(chip::CommandId commandId, const chip::app::Clusters::Binding::TableEntry & binding,
                                            chip::OperationalDeviceProxy * peer_device);
 
-    /** @brief Sends a LevelControl cluster command to the bound peer device for the given binding entry */
+    /**
+     * @brief Sends a LevelControl cluster command to the bound peer device for the given binding entry.
+     *
+     * @param data        LevelControl command payload and local endpoint context
+     * @param binding     Binding table entry identifying the target
+     * @param peer_device Operational session to the bound peer, or nullptr for group bindings
+     */
     static void ProcessLevelControlBindingCommand(BindingCommandData * data,
                                                   const chip::app::Clusters::Binding::TableEntry & binding,
                                                   chip::OperationalDeviceProxy * peer_device);
 
-    /** @brief Data model hook invoked when a cluster attribute changes */
+    /**
+     * @brief Data model hook invoked when a cluster attribute changes.
+     *
+     * @param attributePath Endpoint, cluster, and attribute that changed
+     * @param type          TLV encoding type of @p value
+     * @param size          Size in bytes of @p value
+     * @param value         Pointer to the new attribute value
+     */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
-    /** @brief Binding manager callback invoked per bound device to send a switch command to the target light */
+    /**
+     * @brief Binding manager callback invoked per bound device to send a switch command to the target light.
+     *
+     * @param binding     Binding table entry for the peer light
+     * @param peer_device Operational session to the bound peer
+     * @param context     Opaque context from the binding manager
+     */
     static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
                                           chip::OperationalDeviceProxy * peer_device, void * context);
 
 protected:
-    /** @brief Override of `BaseApplication::AppInit()` */
     CHIP_ERROR AppInit() override;
 
-    /** @brief Light switch specific initialization */
     CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
 
-    /** @brief Handler scheduled on the Matter thread to set up the binding table */
+    /**
+     * @brief Handler scheduled on the Matter thread to set up the binding table.
+     *
+     * @param arg Opaque argument passed to PlatformMgr::ScheduleWork
+     */
     static void InitBindingHandler(intptr_t arg);
 };

@@ -43,7 +43,6 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
-    /** @brief Returns the active app instance */
     static AppTask & GetAppTask();
 
     /**
@@ -53,7 +52,6 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
-    /** @brief Creates and starts the AppTask thread */
     CHIP_ERROR StartAppTask();
 
     /**
@@ -64,31 +62,46 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-    /** @brief OnOff cluster callback for the off with effect command */
     static void OnTriggerOffWithEffect(OnOffEffect * effect);
 
-    /** @brief Data model hook invoked when a cluster attribute changes */
+    /**
+     * @brief Data model hook invoked when a cluster attribute changes
+     *
+     * @param attributePath Endpoint, cluster, and attribute that changed
+     * @param type          TLV encoding type of @p value
+     * @param size          Size in bytes of @p value
+     * @param value         Pointer to the new attribute value
+     */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
-    /** @brief AppTask thread event handler that applies a light action */
     static void LightActionEventHandler(AppEvent * aEvent);
 
-    /** @brief Timer expiry callback driving timed light transitions */
+    /**
+     * @brief Timer expiry callback driving timed light transitions.
+     *
+     * @param timerCbArg CMSIS timer callback argument
+     */
     static void LightTimerEventHandler(void * timerCbArg);
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    /** @brief AppTask thread event handler for RGB LED control */
     static void LightControlEventHandler(AppEvent * aEvent);
 #endif
 
 protected:
-    /** @brief Override of `BaseApplication::AppInit()` */
     CHIP_ERROR AppInit() override;
 
-    /** @brief Light specific initialization */
+    /**
+     * @brief Create the light transition timer and read initial OnOff/level/color state from the data model.
+     *
+     * @return CHIP_NO_ERROR on success, or APP_ERROR_CREATE_TIMER_FAILED if the timer could not be created.
+     */
     CHIP_ERROR InitLight();
 
-    /** @brief Chip-thread work item: push the OnOff cluster state through `OnOffServer::setOnOffValue` */
+    /**
+     * @brief Chip-thread work item, push the OnOff cluster state through `OnOffServer::setOnOffValue`.
+     *
+     * @param context Opaque work item pointer passed to PlatformMgr::ScheduleWork
+     */
     static void UpdateOnOffClusterState(intptr_t context);
 };
