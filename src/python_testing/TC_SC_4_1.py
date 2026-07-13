@@ -412,6 +412,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # Construct the expected 'Vendor Subtype' _V from the DUT's VendorID
         vendor_subtype = f"_V{int(vendor_id)}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+        assert_valid_vendor_subtype(vendor_subtype)
 
         # TH performs a PTR record query against the 'Vendor Subtype'
         ptr_records = await MdnsDiscovery().get_ptr_records(
@@ -422,10 +423,6 @@ class TC_SC_4_1(MatterBaseTest):
 
         # If present:
         if len(ptr_records) > 0:
-            # Verify that it contains a valid 16-bit variable length decimal
-            # number in ASCII text, omitting any leading zeros 'Vendor Subtype' value
-            assert_valid_vendor_subtype(vendor_subtype)
-
             # Verify that the 'Vendor Subtype' PTR record's instance name
             # is equal to the Discriminator Subtype PTR record's instance name
             vendor_subtype_ptr = ptr_records[0]
@@ -458,9 +455,13 @@ class TC_SC_4_1(MatterBaseTest):
         else:
             candidate_device_types = sorted(exposed_device_types)
 
+        # Construct the candidate 'Devtype Subtype' names
+        candidate_subtypes = [f"_T{dt}._sub.{MdnsServiceType.COMMISSIONABLE.value}" for dt in candidate_device_types]
+        for candidate_subtype in candidate_subtypes:
+            assert_valid_devtype_subtype(candidate_subtype)
+
         # TH performs a PTR record query against each candidate 'Devtype Subtype'
         # concurrently; at most one (the Primary Device Type) should answer
-        candidate_subtypes = [f"_T{dt}._sub.{MdnsServiceType.COMMISSIONABLE.value}" for dt in candidate_device_types]
         results = await asyncio.gather(*[
             MdnsDiscovery().get_ptr_records(
                 service_types=[subtype],
@@ -478,10 +479,6 @@ class TC_SC_4_1(MatterBaseTest):
             asserts.assert_equal(len(answered), 1,
                                  f"Only the Primary Device Type subtype must be advertised, found: {[subtype for _, subtype, _ in answered]}")
             device_type, devtype_subtype, devtype_subtype_ptr = answered[0]
-
-            # Verify that it contains a valid 32-bit variable length decimal
-            # number in ASCII text, omitting any leading zeros 'Devtype Subtype' value
-            assert_valid_devtype_subtype(devtype_subtype)
 
             # Verify that the 'Devtype Subtype' PTR record's instance name
             # is equal to the Discriminator Subtype PTR record's instance name.
