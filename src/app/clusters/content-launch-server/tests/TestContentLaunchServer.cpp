@@ -17,8 +17,8 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/CommandResponseHelper.h>
+#include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <lib/core/CHIPError.h>
 
 using namespace chip;
@@ -33,7 +33,8 @@ class TestDelegate : public Delegate
 public:
     void HandleLaunchContent(CommandResponseHelper<Commands::LauncherResponse::Type> & helper,
                              const DataModel::DecodableList<Structs::ParameterStruct::DecodableType> & parameterList, bool autoplay,
-                             const CharSpan & data, const Optional<Structs::PlaybackPreferencesStruct::DecodableType> playbackPreferences,
+                             const CharSpan & data,
+                             const Optional<Structs::PlaybackPreferencesStruct::DecodableType> playbackPreferences,
                              bool useCurrentContext) override
     {
         mLaunchContentCalled = true;
@@ -53,8 +54,8 @@ public:
     uint32_t GetFeatureMap(EndpointId endpoint) override { return mFeatureMap; }
     uint16_t GetClusterRevision(EndpointId endpoint) override { return 3; }
 
-    bool mLaunchContentCalled = false;
-    bool mLaunchUrlCalled     = false;
+    bool mLaunchContentCalled    = false;
+    bool mLaunchUrlCalled        = false;
     uint32_t mStreamingProtocols = 0x03;
     uint32_t mFeatureMap         = 0x00FF;
 };
