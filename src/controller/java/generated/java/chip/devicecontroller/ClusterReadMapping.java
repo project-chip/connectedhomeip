@@ -18843,7 +18843,18 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readAccountLoginInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAccountLoginGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAccountLoginOAuthLoggedInCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAccountLoginOAuthLoggedInAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AccountLoginCluster) cluster).readOAuthLoggedInAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readAccountLoginOAuthLoggedInCommandParams
+        );
+        result.put("readOAuthLoggedInAttribute", readAccountLoginOAuthLoggedInAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAccountLoginGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAccountLoginGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.AccountLoginCluster) cluster).readGeneratedCommandListAttribute(

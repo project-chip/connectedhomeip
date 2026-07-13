@@ -6013,13 +6013,18 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
-  revision 2;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kOAuth = 0x1;
+  }
 
   fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
     optional node_id node = 0;
     fabric_idx fabricIndex = 254;
   }
 
+  provisional readonly attribute optional boolean OAuthLoggedIn = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6044,12 +6049,22 @@ cluster AccountLogin = 1294 {
     optional node_id node = 0;
   }
 
+  response struct GetDeviceAuthURIResponse = 5 {
+    char_string<16> userCode = 0;
+    long_char_string<256> verificationURI = 1;
+    optional long_char_string<512> verificationURIComplete = 2;
+    int16u expiresIn = 3;
+    int8u interval = 4;
+  }
+
   /** The purpose of this command is to determine if the active user account of the given Content App matches the active user account of a given Commissionee, and when it does, return a Setup PIN which can be used for password-authenticated session establishment (PASE) with the Commissionee. */
   fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
   /** The purpose of this command is to allow the Content App to assume the user account of a given Commissionee by leveraging the Setup PIN input by the user during the commissioning process. */
   fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
   /** The purpose of this command is to instruct the Content App to clear the current user account. */
   fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
+  /** This command initiates OAuth 2.0 Device Authorization Grant flow in a Content App. */
+  fabric timed command access(invoke: administer) GetDeviceAuthURI(): GetDeviceAuthURIResponse = 4;
 }
 
 /** The Test Cluster is meant to validate the generated code */
