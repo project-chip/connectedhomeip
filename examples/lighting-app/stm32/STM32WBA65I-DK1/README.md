@@ -1,6 +1,6 @@
 # Matter STM32 Lighting Example over thread
 
-This example demonstrates the Matter Lighting application on stm32 platform.
+This example demonstrates the Matter Lighting application on stm32wba platform.
 
 ---
 
@@ -18,7 +18,7 @@ Please refer
 guides to get started
 
 ```
-./scripts/build/build_examples.py --target stm32-$stm32_BOARD-lighting build
+./scripts/build/build_examples.py --target stm32-STM32WBA65I-DK1-lighting build
 ```
 
 ## Cluster Control
@@ -48,3 +48,7 @@ The LCD screen displays "BLE connected" when the BLE rendezvous started. The LCD
 screen displays "Network Join" when the board joins thread network. The LCD
 screen displays "LED ON" + the light level when the controller enable the light
 ON and the line is erased when the controller disable the light.
+
+## OTA and OEMiROT application
+
+See dedicated readme : example/platform/stm32/STM32WBA65I-DK1/oemirot/
