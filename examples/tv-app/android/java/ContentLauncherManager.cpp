@@ -361,10 +361,10 @@ exit:
     (void) helper.Success(response);
 }
 
-void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchResponseType> & helper, uint16_t presetID)
+void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint16_t presetID)
 {
     DeviceLayer::StackUnlock unlock;
-    Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -387,27 +387,27 @@ void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchRespon
             goto exit;
         }
 
-        jclass convergentLaunchResponseClass = env->GetObjectClass(resp);
-        jfieldID statusField                 = env->GetFieldID(convergentLaunchResponseClass, "status", "I");
-        jfieldID dataField                   = env->GetFieldID(convergentLaunchResponseClass, "data", "Ljava/lang/String;");
-        jint status                          = env->GetIntField(resp, statusField);
-        jstring jData                        = (jstring) env->GetObjectField(resp, dataField);
+        jclass responseClass = env->GetObjectClass(resp);
+        jfieldID statusField = env->GetFieldID(responseClass, "status", "I");
+        jint status          = env->GetIntField(resp, statusField);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        if (jData != nullptr)
+        if (status == 0)
         {
-            JniUtfString dataStr(env, jData);
-            response.data = chip::MakeOptional(dataStr.charSpan());
+            commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
         }
+        else
+        {
+            commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Failure);
+        }
+        return;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "ContentLauncherManager::PlayPreset status error: %s", err.AsString());
-        response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kURLNotAvailable;
     }
-    (void) helper.Success(response);
+    commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Failure);
 }
 
 bool ContentLauncherManager::HandleGetMovable()

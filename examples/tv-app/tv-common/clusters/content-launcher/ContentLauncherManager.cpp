@@ -187,13 +187,11 @@ void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelp
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
-void ContentLauncherManager::HandlePlayPreset(CommandResponseHelper<LaunchResponseType> & helper, uint16_t presetID)
+void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint16_t presetID)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
-    LaunchResponseType response;
-    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)

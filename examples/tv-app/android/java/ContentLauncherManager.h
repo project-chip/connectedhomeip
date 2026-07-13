@@ -47,7 +47,8 @@ public:
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
     void HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper) override;
-    void HandlePlayPreset(CommandResponseHelper<LaunchResponseType> & helper, uint16_t presetID) override;
+    void HandlePlayPreset(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          uint16_t presetID) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
     bool HandleGetMovable() override;
