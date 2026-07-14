@@ -24,6 +24,7 @@
 #include <clusters/Humidistat/Commands.h>
 #include <clusters/Humidistat/Metadata.h>
 #include <lib/support/CodeUtils.h>
+#include <limits>
 
 using namespace chip;
 using namespace chip::app;
@@ -135,7 +136,7 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
     mSystemState(IsSystemStateSupported(config.systemState) ? config.systemState : DefaultSystemStateForMode(mMode)),
     mUserSetpoint(config.userSetpoint), mMinSetpoint(config.minSetpoint), mMaxSetpoint(config.maxSetpoint), mStep(config.step),
     mTargetSetpoint(config.targetSetpoint), mMistType(config.mistType), mContinuous(config.continuous), mSleep(config.sleep),
-    mOptimal(config.optimal)
+    mOptimal(config.optimal), mCondPumpEnabled(false), mCondRunCount(0)
 {
     VerifyOrDie(IsFeatureConfigurationValid(mFeatures));
 
@@ -280,6 +281,25 @@ void HumidistatCluster::LoadPersistentAttributes()
         }
     }
 
+    if (mFeatures.Has(Feature::kCondPump))
+    {
+        const auto defaultCondPumpEnabled = mCondPumpEnabled;
+        if (!attrPersistence.LoadNativeEndianValue<bool>(
+                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondPumpEnabled::Id), mCondPumpEnabled,
+                defaultCondPumpEnabled))
+        {
+            ChipLogDetail(Zcl, "Humidistat: Unable to load CondPumpEnabled attribute, using default");
+        }
+
+        const auto defaultCondRunCount = mCondRunCount;
+        if (!attrPersistence.LoadNativeEndianValue<uint16_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id,
+                                                                                   CondRunCount::Id),
+                                                             mCondRunCount, defaultCondRunCount))
+        {
+            ChipLogDetail(Zcl, "Humidistat: Unable to load CondRunCount attribute, using default");
+        }
+    }
+
     if (ShouldTargetSetpointMatchUserSetpoint())
     {
         mTargetSetpoint = mUserSetpoint;
@@ -399,6 +419,12 @@ HumidistatCluster::FullOptionalAttributeSet HumidistatCluster::ComputeActiveOpti
     if (mFeatures.Has(Feature::kOptimal))
     {
         active.ForceSet<Optimal::Id>();
+    }
+
+    if (mFeatures.Has(Feature::kCondPump))
+    {
+        active.ForceSet<CondPumpEnabled::Id>();
+        active.ForceSet<CondRunCount::Id>();
     }
 
     return FullOptionalAttributeSet(active);
@@ -618,6 +644,46 @@ CHIP_ERROR HumidistatCluster::SetOptimal(bool optimal)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR HumidistatCluster::SetCondPumpEnabled(bool condPumpEnabled)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kCondPump), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+
+    const bool wasEnabled = mCondPumpEnabled;
+    VerifyOrReturnValue(SetAttributeValue(mCondPumpEnabled, condPumpEnabled, CondPumpEnabled::Id), CHIP_NO_ERROR);
+    if (mContext != nullptr)
+    {
+        uint8_t value = mCondPumpEnabled ? 1 : 0;
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondPumpEnabled::Id), { &value, sizeof(value) }));
+    }
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnCondPumpEnabledChanged(mCondPumpEnabled);
+    }
+
+    if (!wasEnabled && mCondPumpEnabled)
+    {
+        if (mCondRunCount < std::numeric_limits<uint16_t>::max())
+        {
+            ++mCondRunCount;
+        }
+        if (mContext != nullptr)
+        {
+            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, CondRunCount::Id),
+                { reinterpret_cast<const uint8_t *>(&mCondRunCount), sizeof(mCondRunCount) }));
+        }
+
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnCondRunCountChanged(mCondRunCount);
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR HumidistatCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -625,6 +691,7 @@ CHIP_ERROR HumidistatCluster::Attributes(const ConcreteClusterPath & path,
         UserSetpoint::kMetadataEntry, MinSetpoint::kMetadataEntry,    MaxSetpoint::kMetadataEntry,
         Step::kMetadataEntry,         TargetSetpoint::kMetadataEntry, MistType::kMetadataEntry,
         Continuous::kMetadataEntry,   Sleep::kMetadataEntry,          Optimal::kMetadataEntry,
+        CondPumpEnabled::kMetadataEntry, CondRunCount::kMetadataEntry,
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -683,6 +750,12 @@ DataModel::ActionReturnStatus HumidistatCluster::ReadAttribute(const DataModel::
     case Continuous::Id:
         return encoder.Encode(mContinuous);
 
+    case CondPumpEnabled::Id:
+        return encoder.Encode(mCondPumpEnabled);
+
+    case CondRunCount::Id:
+        return encoder.Encode(mCondRunCount);
+
     case Sleep::Id:
         return encoder.Encode(mSleep);
 
@@ -719,6 +792,11 @@ DataModel::ActionReturnStatus HumidistatCluster::WriteAttribute(const DataModel:
         bool value = false;
         ReturnErrorOnFailure(decoder.Decode(value));
         return SetContinuous(value);
+    }
+    case CondPumpEnabled::Id: {
+        bool value = false;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return SetCondPumpEnabled(value);
     }
     case Sleep::Id: {
         bool value = false;
