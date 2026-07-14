@@ -4239,14 +4239,18 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingSc
         ReturnErrorOnFailure(BuildWiFiScanResponseFromServicePropertiesLocked(properties.get(), response));
         services->push_back(response);
 
-        // Snapshot the SSID for debug text BEFORE Reset(); the dispatch helper
-        // copies these bytes by value, so the reset cannot race the deferred
-        // callback.
+        // Snapshot the SSID for the debug text before the reset; the dispatch
+        // helpers copy these bytes by value, so the reset cannot race the
+        // deferred callback.
 
-        const CharSpan debug(reinterpret_cast<const char *>(inOutScanState.mSsid.data()), inOutScanState.mSsid.size());
+        const Internal::WiFiSSIDFixedBuffer ssid = inOutScanState.mSsid;
+        const CharSpan debug(reinterpret_cast<const char *>(ssid.data()), ssid.size());
 
-        // Directed scan resolved: clear scan state so mCount == 0 restores the
-        // idle invariant. Ordering matters -- capture `debug` above first.
+        // Directed scan resolved; reset the SSID and scan count.
+        //
+        // Clear the operation's scan state BEFORE dispatching the
+        // completion result; the snapshot above keeps the reported SSID
+        // stable across the reset.
 
         inOutScanState.Reset();
 
@@ -4485,7 +4489,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiUnresolve
         // Reset the SSID and scan count.
         //
         // Clear the operation's scan state BEFORE dispatching the
-        // terminal result; the snapshot above keeps the reported SSID
+        // completion result; the snapshot above keeps the reported SSID
         // stable across the reset.
 
         inOutScanState.Reset();
