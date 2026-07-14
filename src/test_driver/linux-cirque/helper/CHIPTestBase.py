@@ -364,8 +364,7 @@ class CHIPVirtualHome:
         for device in self.non_ap_devices:
             ret_log = self.get_device_log(device['id'])
             # Use this format for easier sort
-            f_name = '{}-{}-{}.log'.format(device['type'],
-                                           timestamp, device['id'][:8])
+            f_name = f"{device['type']}-{timestamp}-{device['id'][:8]}.log"
             self.logger.debug("device log name: \n%s", f_name)
             with open(os.path.join(log_dir, f_name), 'wb') as fp:
                 fp.write(ret_log)

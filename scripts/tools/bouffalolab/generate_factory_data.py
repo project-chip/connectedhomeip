@@ -348,7 +348,7 @@ def gen_mfd_partition(args, mfd_output):
             d = mfdDict[name]
             if d["sec"] and need_sec:
                 if d["len"] and d["len"] < len(d["data"]):
-                    raise Exception("Data size of {} is over {}".format(name, d["len"]))
+                    raise Exception(f"Data size of {name} is over {d['len']}")
                 sec_tlvs += int_to_2bytearray_l(d["id"])
                 sec_tlvs += int_to_2bytearray_l(len(d["data"]))
                 sec_tlvs += d["data"]
@@ -357,7 +357,7 @@ def gen_mfd_partition(args, mfd_output):
             d = mfdDict[name]
             if not d["sec"] or not need_sec:
                 if d["len"] and d["len"] < len(d["data"]):
-                    raise Exception("Data size of {} is over {}".format(name, d["len"]))
+                    raise Exception(f"Data size of {name} is over {d['len']}")
                 raw_tlvs += int_to_2bytearray_l(d["id"] + MFD_ID_RAW_MASK)
                 raw_tlvs += int_to_2bytearray_l(len(d["data"]))
                 raw_tlvs += d["data"]

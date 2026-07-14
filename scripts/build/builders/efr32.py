@@ -385,7 +385,7 @@ class Efr32Builder(GnBuilder):
             cmd += [f'--dotfile={self.dotfile}']
 
         if args := self.GnBuildArgs():
-            cmd += [f'--args={" ".join(args)}']
+            cmd += [f"--args={' '.join(args)}"]
 
         cmd += [self.output_dir]
 

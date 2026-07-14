@@ -76,7 +76,7 @@ class EventHandler(BaseHandler):
         elif attrs['priority'] == 'critical':
             priority = EventPriority.CRITICAL
         else:
-            raise Exception("Unknown event priority: {}".format(attrs['priority']))
+            raise Exception(f"Unknown event priority: {attrs['priority']}")
 
         self._event = Event(
             priority=priority,
@@ -139,7 +139,7 @@ class AttributeHandler(BaseHandler):
             # Modifier not currently used: fabric scoped exists on the structure itself.
             if 'modifier' in attrs:
                 if attrs['modifier'] != 'fabric-scoped':
-                    raise Exception("UNKNOWN MODIFIER: {}".format(attrs['modifier']))
+                    raise Exception(f"UNKNOWN MODIFIER: {attrs['modifier']}")
 
             if ('role' in attrs) or ('privilege' in attrs):
                 role = AttrsToAccessPrivilege(attrs)
