@@ -169,6 +169,22 @@ TEST_F(TestHumidistatCluster, AttributeList)
                                             }));
     }
 
+    // Support condensate pump feature - only condensate pump attributes should be added.
+    {
+        const BitFlags<Feature> features{ Feature::kDehumidifier, Feature::kCondPump };
+
+        HumidistatCluster cluster(kTestEndpointId, features, {});
+
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                SupportedModes::kMetadataEntry,
+                                                Mode::kMetadataEntry,
+                                                SystemState::kMetadataEntry,
+                                                CondPumpEnabled::kMetadataEntry,
+                                                CondRunCount::kMetadataEntry,
+                                            }));
+    }
+
     // Support sleep alone - only attributes relevant to sleep should be present.
     {
         const BitFlags<Feature> features{ Feature::kDehumidifier };
@@ -371,7 +387,7 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
     config.userSetpoint = 50;
 
     const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier, Feature::kSensor, Feature::kContinuous,
-                                      Feature::kOptimal, Feature::kColdMist };
+                                      Feature::kOptimal, Feature::kColdMist,   Feature::kCondPump };
 
     HumidistatCluster::OptionalAttributeSet optionalAttrs;
     optionalAttrs.Set<Sleep::Id>();
@@ -388,6 +404,7 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
     EXPECT_EQ(tester.WriteAttribute(Continuous::Id, true), CHIP_NO_ERROR);
     EXPECT_EQ(tester.WriteAttribute(Sleep::Id, true), CHIP_NO_ERROR);
     EXPECT_EQ(tester.WriteAttribute(Optimal::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(CondPumpEnabled::Id, true), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.GetMode(), ModeEnum::kHumidifier);
     EXPECT_EQ(cluster.GetUserSetpoint(), 60);
@@ -395,6 +412,16 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
     EXPECT_TRUE(cluster.GetContinuous());
     EXPECT_TRUE(cluster.GetSleep());
     EXPECT_TRUE(cluster.GetOptimal());
+    EXPECT_TRUE(cluster.GetCondPumpEnabled());
+    EXPECT_EQ(cluster.GetCondRunCount(), 1);
+
+    bool condPumpEnabled = false;
+    ASSERT_EQ(tester.ReadAttribute(CondPumpEnabled::Id, condPumpEnabled), CHIP_NO_ERROR);
+    EXPECT_TRUE(condPumpEnabled);
+
+    uint16_t condRunCount = 0;
+    ASSERT_EQ(tester.ReadAttribute(CondRunCount::Id, condRunCount), CHIP_NO_ERROR);
+    EXPECT_EQ(condRunCount, 1);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -882,6 +909,18 @@ public:
         lastOptimal = newOptimal;
     }
 
+    void OnCondPumpEnabledChanged(bool newCondPumpEnabled) override
+    {
+        condPumpEnabledChangedCount++;
+        lastCondPumpEnabled = newCondPumpEnabled;
+    }
+
+    void OnCondRunCountChanged(uint16_t newCondRunCount) override
+    {
+        condRunCountChangedCount++;
+        lastCondRunCount = newCondRunCount;
+    }
+
     int modeChangedCount           = 0;
     int systemStateChangedCount    = 0;
     int userSetpointChangedCount   = 0;
@@ -890,6 +929,8 @@ public:
     int continuousChangedCount     = 0;
     int sleepChangedCount          = 0;
     int optimalChangedCount        = 0;
+    int condPumpEnabledChangedCount = 0;
+    int condRunCountChangedCount    = 0;
 
     std::optional<Humidistat::ModeEnum> lastMode;
     std::optional<Humidistat::SystemStateEnum> lastSystemState;
@@ -899,6 +940,8 @@ public:
     std::optional<bool> lastContinuous;
     std::optional<bool> lastSleep;
     std::optional<bool> lastOptimal;
+    std::optional<bool> lastCondPumpEnabled;
+    std::optional<uint16_t> lastCondRunCount;
 };
 
 TEST_F(TestHumidistatCluster, DelegateCallback_OnModeChanged)
@@ -1072,6 +1115,27 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnOptimalChanged)
     EXPECT_TRUE(cluster.GetOptimal());
     EXPECT_EQ(delegate.optimalChangedCount, 1);
     EXPECT_EQ(delegate.lastOptimal, std::optional<bool>(true));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, DelegateCallback_OnCondPumpChanged)
+{
+    const BitFlags<Feature> features{ Feature::kDehumidifier, Feature::kCondPump };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    CHIP_ERROR err = cluster.SetCondPumpEnabled(true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster.GetCondPumpEnabled());
+    EXPECT_EQ(cluster.GetCondRunCount(), 1);
+    EXPECT_EQ(delegate.condPumpEnabledChangedCount, 1);
+    EXPECT_EQ(delegate.lastCondPumpEnabled, std::optional<bool>(true));
+    EXPECT_EQ(delegate.condRunCountChangedCount, 1);
+    EXPECT_EQ(delegate.lastCondRunCount, std::optional<uint16_t>(1));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
