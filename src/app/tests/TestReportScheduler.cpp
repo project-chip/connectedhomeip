@@ -58,6 +58,7 @@ public:
     void TestReportTiming();
     void TestObserverCallbacks();
     void TestSynchronizedScheduler();
+    void TestReportDeferral();
 
     /// @brief Mimicks the various operations that happen on a subscription transaction after a read handler was created so that
     /// readhandlers are in the expected state for further tests.
@@ -802,6 +803,55 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
     EXPECT_FALSE(node2->CanBeSynced());
 
     syncScheduler.UnregisterAllHandlers();
+    readHandlerPool.ReleaseAll();
+    exchangeCtx->Close();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferral)
+{
+    NullReadHandlerCallback nullCallback;
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+    ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+    // Initialize mock timestamp
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
+    // Dirty read handler (min = 1s, max = 5s)
+    ReadHandler * readHandler1 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 5));
+    readHandler1->ForceDirtyState();
+
+    auto getTimeout = [](ReadHandler * handler) -> System::Clock::Timeout {
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(handler);
+        if (node == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        size_t position;
+        auto pair = sTestTimerDelegate.FindPair(node, position);
+        if (pair == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        return pair->timeout - sTestTimerDelegate.mMockSystemTimestamp;
+    };
+
+    // Verify the scheduled timeout is initially minInterval (1s)
+    sScheduler.RescheduleAllReports();
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+
+    // 1. Defer reports by 3 seconds. Since 3s > minInterval(1s) and 3s < maxInterval(5s), the scheduled timeout should become 3s.
+    sScheduler.DeferReports(System::Clock::Seconds32(3));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
+
+    // 2. Defer reports by 10 seconds. Since 10s > maxInterval(5s), the scheduled timeout should be bounded to maxInterval (5s).
+    sScheduler.DeferReports(System::Clock::Seconds32(10));
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(5));
+
+    // Clean up
+    sScheduler.UnregisterAllHandlers();
     readHandlerPool.ReleaseAll();
     exchangeCtx->Close();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

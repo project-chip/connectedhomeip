@@ -260,5 +260,13 @@ void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messa
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
 
+void CommandResponseSender::OnDelayReport(System::Clock::Timeout aDelay)
+{
+    if (mpReportScheduler != nullptr)
+    {
+        mpReportScheduler->DeferReports(aDelay);
+    }
+}
+
 } // namespace app
 } // namespace chip

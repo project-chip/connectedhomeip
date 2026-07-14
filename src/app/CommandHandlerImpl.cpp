@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <app/CommandHandlerImpl.h>
+#include <crypto/RandUtils.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
@@ -273,6 +274,15 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
+    {
+        InvokeRequestMessage::DelayReportData delayReportData;
+        err = invokeRequestMessage.GetDelayReportData(&delayReportData);
+        VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, Status::InvalidAction);
+        if (err == CHIP_NO_ERROR)
+        {
+            mDelayReportData.SetValue(delayReportData);
+        }
+    }
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
@@ -319,6 +329,17 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     }
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
+
+    if (mDelayReportData.HasValue() && mpCallback != nullptr)
+    {
+        uint32_t delayMs = mDelayReportData.Value().delayMinMs;
+        if (mDelayReportData.Value().delayJitterWindowMs > 0)
+        {
+            delayMs += (chip::Crypto::GetRandU32() % mDelayReportData.Value().delayJitterWindowMs);
+        }
+        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs));
+    }
+
     return Status::Success;
 }
 
@@ -995,6 +1016,16 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory TimedRequest field missing");
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        InvokeRequestMessage::DelayReportData delayReportData;
+        err = invokeRequestMessage.GetDelayReportData(&delayReportData);
+        VerifyOrDieWithMsg(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, DataManagement, "DUT Failure: Failed to read DelayReportData");
+        if (err == CHIP_NO_ERROR)
+        {
+            mDelayReportData.SetValue(delayReportData);
+        }
+    }
     VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement,
                        "DUT Failure: TimedRequest value in message mismatches action");
 
@@ -1054,6 +1085,16 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Unexpected TLV ending of InvokeRequests");
     VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: InvokeRequestMessage TLV is not properly terminated");
+
+    if (mDelayReportData.HasValue() && mpCallback != nullptr)
+    {
+        uint32_t delayMs = mDelayReportData.Value().delayMinMs;
+        if (mDelayReportData.Value().delayJitterWindowMs > 0)
+        {
+            delayMs += (chip::Crypto::GetRandU32() % mDelayReportData.Value().delayJitterWindowMs);
+        }
+        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs));
+    }
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
 

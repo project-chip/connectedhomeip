@@ -61,6 +61,12 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(this);
+    Timeout maxTimeout = Milliseconds32(0);
+    if (mNextMaxTimestamp > now)
+    {
+        maxTimeout = std::chrono::duration_cast<Timeout>(mNextMaxTimestamp - now);
+    }
+    timeout = AdjustTimeout(timeout, maxTimeout, now);
     if (timeout == Milliseconds32(0))
     {
         TimerFired();
@@ -82,6 +88,16 @@ void SynchronizedReportSchedulerImpl::CancelReport()
 bool SynchronizedReportSchedulerImpl::IsReportScheduled(ReadHandler * ReadHandler)
 {
     return mTimerDelegate->IsTimerActive(this);
+}
+
+void SynchronizedReportSchedulerImpl::RescheduleAllReports()
+{
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timeout timeout = Milliseconds32(0);
+    if (CalculateNextReportTimeout(timeout, nullptr, now) == CHIP_NO_ERROR)
+    {
+        TEMPORARY_RETURN_IGNORED(ScheduleReport(timeout, nullptr, now));
+    }
 }
 
 CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMaxInterval(const Timestamp & now)

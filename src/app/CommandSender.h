@@ -356,6 +356,11 @@ public:
      *                  configuration option.
      *               2. Ensure you provide ExtendableCallback.
      */
+    void SetDelayReportData(const InvokeRequestMessage::DelayReportData & aDelayReportData)
+    {
+        mDelayReportData.SetValue(aDelayReportData);
+    }
+
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams);
@@ -675,6 +680,7 @@ private:
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
     bool mAllowLargePayload     = false;
+    Optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
 };
 
 } // namespace app

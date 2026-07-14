@@ -76,6 +76,8 @@ public:
          */
         virtual void DispatchCommand(CommandHandlerImpl & apCommandObj, const ConcreteCommandPath & aCommandPath,
                                      TLV::TLVReader & apPayload) = 0;
+
+        virtual void OnDelayReport(System::Clock::Timeout aDelay) {}
     };
 
     struct InvokeResponseParameters
@@ -265,6 +267,7 @@ public:
      * Check whether the SuppressResponse flag is set.
      */
     bool IsResponseSuppressed() const { return mSuppressResponse; }
+    const Optional<InvokeRequestMessage::DelayReportData> & GetDelayReportData() const { return mDelayReportData; }
 
 protected:
     // Lifetime management for CommandHandler::Handle
@@ -494,6 +497,7 @@ private:
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
     bool mGroupRequest                     = false;
+    Optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
     // TODO(#32486): We should introduce breaking change where calls to add CommandData

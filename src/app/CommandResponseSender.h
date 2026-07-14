@@ -26,6 +26,10 @@
 namespace chip {
 namespace app {
 
+namespace reporting {
+class ReportScheduler;
+} // namespace reporting
+
 // TODO(#30453): Rename CommandResponseSender to CommandResponder in follow up PR
 /**
  * Manages the process of sending InvokeResponseMessage(s) to the requester.
@@ -50,8 +54,9 @@ public:
         virtual void OnDone(CommandResponseSender & apResponderObj) = 0;
     };
 
-    CommandResponseSender(Callback * apCallback, CommandHandlerImpl::Callback * apDispatchCallback) :
-        mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this)
+    CommandResponseSender(Callback * apCallback, CommandHandlerImpl::Callback * apDispatchCallback, reporting::ReportScheduler * apReportScheduler = nullptr) :
+        mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this),
+        mpReportScheduler(apReportScheduler)
     {}
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -65,6 +70,8 @@ public:
                          TLV::TLVReader & apPayload) override;
 
     Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
+
+    void OnDelayReport(System::Clock::Timeout aDelay) override;
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -195,6 +202,7 @@ private:
     State mState = State::ReadyForInvokeResponses;
 
     bool mReportResponseDropped = false;
+    reporting::ReportScheduler * mpReportScheduler = nullptr;
 };
 
 } // namespace app

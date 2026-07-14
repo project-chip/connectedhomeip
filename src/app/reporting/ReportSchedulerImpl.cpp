@@ -55,6 +55,19 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 #endif
 }
 
+void ReportSchedulerImpl::RescheduleAllReports()
+{
+    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    mNodesPool.ForEachActiveObject([this, now](ReadHandlerNode * node) {
+        Milliseconds32 newTimeout;
+        if (this->CalculateNextReportTimeout(newTimeout, node, now) == CHIP_NO_ERROR)
+        {
+            TEMPORARY_RETURN_IGNORED(this->ScheduleReport(newTimeout, node, now));
+        }
+        return Loop::Continue;
+    });
+}
+
 void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
@@ -120,6 +133,12 @@ CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode 
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(node);
+    Timeout maxTimeout = Milliseconds32(0);
+    if (node->GetMaxTimestamp() > now)
+    {
+        maxTimeout = std::chrono::duration_cast<Timeout>(node->GetMaxTimestamp() - now);
+    }
+    timeout = AdjustTimeout(timeout, maxTimeout, now);
     if (timeout == Milliseconds32(0))
     {
         node->TimerFired();

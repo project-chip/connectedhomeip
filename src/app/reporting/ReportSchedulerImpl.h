@@ -82,6 +82,7 @@ public:
      * change), so this method is optional as it might be redundant.
      */
     void OnEnterActiveMode() override;
+    void RescheduleAllReports() override;
 
     /**
      * @brief Similar to the OnTransitionToIdle() method, this implementation does not attempt any synchronization on ICD events,

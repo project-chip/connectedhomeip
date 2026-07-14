@@ -168,6 +168,33 @@ public:
 
     virtual void ReportTimerCallback() = 0;
 
+    virtual void DeferReports(System::Clock::Timeout aDelay)
+    {
+        Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+        Timestamp newDeferralEnd = now + aDelay;
+        if (newDeferralEnd > mDeferralEndTimestamp)
+        {
+            mDeferralEndTimestamp = newDeferralEnd;
+        }
+        RescheduleAllReports();
+    }
+
+    virtual void RescheduleAllReports() = 0;
+
+    System::Clock::Timeout AdjustTimeout(System::Clock::Timeout timeout, System::Clock::Timeout maxTimeout, const Timestamp & now)
+    {
+        if (mDeferralEndTimestamp > now)
+        {
+            System::Clock::Timeout remaining = std::chrono::duration_cast<System::Clock::Timeout>(mDeferralEndTimestamp - now);
+            if (timeout < remaining)
+            {
+                return remaining < maxTimeout ? remaining : maxTimeout;
+            }
+        }
+        return timeout;
+    }
+
+
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
     bool IsReportableNow(ReadHandler * aReadHandler)
@@ -229,6 +256,7 @@ protected:
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
     TimerDelegate * mTimerDelegate;
     uint32_t mNumTotalSubscriptionsEstablished = 0;
+    Timestamp mDeferralEndTimestamp = Timestamp(0);
 };
 }; // namespace reporting
 }; // namespace app

@@ -36,6 +36,13 @@ enum class Tag : uint8_t
     kSuppressResponse = 0,
     kTimedRequest     = 1,
     kInvokeRequests   = 2,
+    kDelayReportData  = 3,
+};
+
+struct DelayReportData
+{
+    uint16_t delayMinMs = 0;
+    uint16_t delayJitterWindowMs = 0;
 };
 
 class Parser : public MessageParser
@@ -70,6 +77,16 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const;
+
+    /**
+     *  @brief Get DelayReportData parameters.
+     *
+     *  @param [out] apDelayReportData    A pointer to the delay report data structure to write to.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetDelayReportData(DelayReportData * const apDelayReportData) const;
 };
 
 class Builder : public MessageBuilder
@@ -90,6 +107,11 @@ public:
      *  @brief This is flag to indication if ths action is part of a timed invoke transaction
      */
     InvokeRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
+
+    /**
+     *  @brief Encode DelayReportData structure.
+     */
+    InvokeRequestMessage::Builder & DelayReport(const DelayReportData & aDelayReportData);
 
     /**
      *  @brief Initialize a InvokeRequests::Builder for writing into the TLV stream

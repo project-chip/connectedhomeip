@@ -113,6 +113,45 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parse
     return apInvokeRequests->Init(reader);
 }
 
+CHIP_ERROR InvokeRequestMessage::Parser::GetDelayReportData(DelayReportData * const apDelayReportData) const
+{
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kDelayReportData), reader));
+    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+
+    TLV::TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
+        {
+        case 0:
+            ReturnErrorOnFailure(reader.Get(apDelayReportData->delayMinMs));
+            break;
+        case 1:
+            ReturnErrorOnFailure(reader.Get(apDelayReportData->delayJitterWindowMs));
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    return reader.ExitContainer(containerType);
+}
+
 CHIP_ERROR InvokeRequestMessage::Builder::InitWithEndBufferReserved(TLV::TLVWriter * const apWriter)
 {
     ReturnErrorOnFailure(Init(apWriter));
@@ -135,6 +174,28 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::TimedRequest(cons
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kTimedRequest), aTimedRequest);
+    }
+    return *this;
+}
+
+InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::DelayReport(const DelayReportData & aDelayReportData)
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        TLV::TLVType containerType;
+        mError = mpWriter->StartContainer(TLV::ContextTag(Tag::kDelayReportData), TLV::kTLVType_Structure, containerType);
+        if (mError == CHIP_NO_ERROR)
+        {
+            mError = mpWriter->Put(TLV::ContextTag(0), aDelayReportData.delayMinMs);
+        }
+        if (mError == CHIP_NO_ERROR)
+        {
+            mError = mpWriter->Put(TLV::ContextTag(1), aDelayReportData.delayJitterWindowMs);
+        }
+        if (mError == CHIP_NO_ERROR)
+        {
+            mError = mpWriter->EndContainer(containerType);
+        }
     }
     return *this;
 }
