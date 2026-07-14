@@ -378,6 +378,23 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_manager_ref = [app_manager]
         restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
 
+    # Ensure we have a value for --timeout if present to avoid have invalid values for timeout while executing the test.
+    split_args = shlex.split(script_args)
+    timeout_key = '--timeout'
+    test_arg_timeout = None
+    timeout_index = split_args.index(timeout_key) if timeout_key in split_args else None
+    if timeout_index is not None:
+        try:
+            # Add one minute to let the test timeout if the test reach the timeout.
+            test_arg_timeout = int(split_args[timeout_index+1])
+            test_arg_timeout += 60
+        except ValueError:
+            log.warning("Invalid value for argument --timeout")
+            exit(1)
+        except IndexError:
+            log.warning("Unable to retrieve the value for argument --timeout")
+            exit(1)
+
     # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
     if "mobile-device-test.py" not in script:
         script_args += f" --restart-flag-file {restart_flag_file}"
@@ -409,7 +426,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_script_process.p.stdin.close()
 
     try:
-        test_script_exit_code = test_script_process.wait()
+        # Some tests have very large execution time (Nightly jobs), we use the --timeout to avoid test to use default timeout
+        if test_arg_timeout is None:
+            # This will use the DEFAULT_TIMEOUT_S
+            test_script_exit_code = test_script_process.wait()
+        else:
+            log.info("Executing the test with a timeout of %d seconds", test_arg_timeout)
+            test_script_exit_code = test_script_process.wait(timeout=test_arg_timeout)
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)

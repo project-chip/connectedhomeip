@@ -1682,6 +1682,45 @@ class MatterBaseTest(base_test.BaseTestClass):
         return global_stash.unstash_globally(self.user_params.get("matter_stack"))
 
     @property
+    def prompt_coordinator(self):
+        """Returns the shared PromptCoordinator for this test instance.
+
+        The coordinator is created lazily on first access and reused for every
+        subsequent call within the same test.  Both the per-step on_timeout
+        callbacks (Component B) and the overall supervisor thread (Component A)
+        route through this object so that prompts are serialised and paused time
+        is tracked correctly.
+        """
+        from matter.testing.prompt_coordinator import PromptCoordinator
+        if not hasattr(self, '_prompt_coordinator'):
+            self._prompt_coordinator = PromptCoordinator()
+        return self._prompt_coordinator
+
+    def make_timeout_callback(self, description: str, extension_sec: float = 600.0) -> Callable:
+        """Return an on_timeout callback that interactively asks the user to extend or abort.
+
+        Pass the result to ``await_all_expected_report_matches`` or
+        ``await_first_value_asserting_no_forbidden`` as the ``on_timeout`` argument.
+        In non-interactive (CI) mode the callback always returns False so the
+        underlying method fails immediately as before.
+
+        Args:
+            description: Short label shown in the prompt (e.g. ``"[STEP_5] download start"``).
+            extension_sec: Seconds to add when the user chooses to extend.
+
+        Returns:
+            Callable with signature ``(pending_descriptions, elapsed_sec, extension_sec) -> bool``.
+        """
+        def _on_timeout(pending_descriptions: list, elapsed_sec: float, extension_sec: float) -> bool:
+            full_desc = f"{description}: {', '.join(pending_descriptions)}"
+            return self.prompt_coordinator.ask_user(
+                description=full_desc,
+                elapsed_sec=elapsed_sec,
+                extension_sec=extension_sec,
+            )
+        return _on_timeout
+
+    @property
     def certificate_authority_manager(self) -> matter.CertificateAuthority.CertificateAuthorityManager:
         """Accesses the Certificate Authority Manager."""
         return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))

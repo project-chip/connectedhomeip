@@ -23,6 +23,8 @@ and endpoint matching.
 
 import asyncio
 import logging
+import threading
+import time
 from enum import IntFlag
 from functools import partial, wraps
 from typing import TYPE_CHECKING, Callable
@@ -247,10 +249,71 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
+async def _run_with_interactive_timeout(coro, timeout_sec: float, coordinator) -> object | None:
+    """Run coro with an interactive overall-timeout supervisor.
+
+    A background thread counts down ``timeout_sec`` of *effective* elapsed time
+    (wall time minus time spent in prompts via the coordinator).  When the deadline
+    is hit in non-interactive mode the task is cancelled immediately; in interactive
+    mode the user is asked whether to extend or abort.
+
+    ``asyncio.CancelledError`` that results from an "abort" choice is caught here and
+    converted to a clean Mobly test-failure signal so the test runner never sees an
+    unhandled cancellation.
+    """
+    loop = asyncio.get_event_loop()
+    task = asyncio.ensure_future(coro)
+    current_timeout = [float(timeout_sec)]
+    wall_start = time.time()
+
+    def _supervisor():
+        while not task.done():
+            time.sleep(5.0)
+            if task.done():
+                break
+            wall_elapsed = time.time() - wall_start
+            effective = wall_elapsed - coordinator.total_prompt_seconds
+            if effective < current_timeout[0]:
+                continue
+
+            def still_needed(): return (time.time() - wall_start - coordinator.total_prompt_seconds) >= current_timeout[0]
+            extended = coordinator.ask_user(
+                description=f"Overall test timeout ({current_timeout[0]:.0f}s) reached",
+                elapsed_sec=effective,
+                extension_sec=current_timeout[0],
+                still_needed=still_needed,
+            )
+            if extended:
+                current_timeout[0] += current_timeout[0]
+            else:
+                loop.call_soon_threadsafe(task.cancel)
+                return
+
+    sv_thread = threading.Thread(target=_supervisor, daemon=True, name="timeout-supervisor")
+    sv_thread.start()
+
+    try:
+        return await task
+    except asyncio.CancelledError:
+        asserts.fail(
+            f"Test aborted by user after overall timeout ({timeout_sec:.0f}s)."
+        )
+        return None  # unreachable; asserts.fail raises signals.TestFailure
+    finally:
+        sv_thread.join(timeout=2.0)
+
+
 def _async_runner(body, test_instance, *args, **kwargs):
+    from matter.testing.prompt_coordinator import PromptCoordinator
+    if not hasattr(test_instance, '_prompt_coordinator'):
+        test_instance._prompt_coordinator = PromptCoordinator()
+
     timeout = getattr(test_instance.matter_test_config,
                       'timeout', None) or test_instance.default_timeout
-    return test_instance.event_loop.run_until_complete(asyncio.wait_for(body(test_instance, *args, **kwargs), timeout=timeout))
+    coordinator = test_instance._prompt_coordinator
+    return test_instance.event_loop.run_until_complete(
+        _run_with_interactive_timeout(body(test_instance, *args, **kwargs), timeout, coordinator)
+    )
 
 
 def async_test_body(body):
