@@ -6141,6 +6141,12 @@ static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
     case Attributes::AvailableTextTracks::Id: {
         return YES;
     }
+    case Attributes::AvailableCommands::Id: {
+        return YES;
+    }
+    case Attributes::ContentInfo::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6395,6 +6401,9 @@ static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
+    case Attributes::OAuthLoggedIn::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

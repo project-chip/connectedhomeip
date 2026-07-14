@@ -9306,6 +9306,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRAmbientSensingUnionClusterContributorStatusChangeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contributorIndex = @(0);
+
+        _previousContributorStatus = @(0);
+
+        _currentContributorStatus = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientSensingUnionClusterContributorStatusChangeStruct alloc] init];
+
+    other.contributorIndex = self.contributorIndex;
+    other.previousContributorStatus = self.previousContributorStatus;
+    other.currentContributorStatus = self.currentContributorStatus;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorIndex:%@; previousContributorStatus:%@; currentContributorStatus:%@; >", NSStringFromClass([self class]), _contributorIndex, _previousContributorStatus, _currentContributorStatus];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRAmbientSensingUnionClusterUnionContributorStruct
 - (instancetype)init
 {
@@ -9317,7 +9350,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _contributorName = nil;
 
-        _contributorHealth = @(0);
+        _contributorStatus = @(0);
     }
     return self;
 }
@@ -9329,14 +9362,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.contributorNodeID = self.contributorNodeID;
     other.contributorEndpointID = self.contributorEndpointID;
     other.contributorName = self.contributorName;
-    other.contributorHealth = self.contributorHealth;
+    other.contributorStatus = self.contributorStatus;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorNodeID:%@; contributorEndpointID:%@; contributorName:%@; contributorHealth:%@; >", NSStringFromClass([self class]), _contributorNodeID, _contributorEndpointID, _contributorName, _contributorHealth];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorNodeID:%@; contributorEndpointID:%@; contributorName:%@; contributorStatus:%@; >", NSStringFromClass([self class]), _contributorNodeID, _contributorEndpointID, _contributorName, _contributorStatus];
     return descriptionString;
 }
 
@@ -9401,7 +9434,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _statusChangedContributor = [NSArray array];
+        _contributorStatusChange = [NSArray array];
     }
     return self;
 }
@@ -9410,14 +9443,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent alloc] init];
 
-    other.statusChangedContributor = self.statusChangedContributor;
+    other.contributorStatusChange = self.contributorStatusChange;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusChangedContributor:%@; >", NSStringFromClass([self class]), _statusChangedContributor];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contributorStatusChange:%@; >", NSStringFromClass([self class]), _contributorStatusChange];
     return descriptionString;
 }
 
@@ -10374,6 +10407,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _languageCode = @"";
 
+        _characteristics = nil;
+
         _displayName = nil;
     }
     return self;
@@ -10384,6 +10419,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterTrackAttributesStruct alloc] init];
 
     other.languageCode = self.languageCode;
+    other.characteristics = self.characteristics;
     other.displayName = self.displayName;
 
     return other;
@@ -10391,7 +10427,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: languageCode:%@; displayName:%@; >", NSStringFromClass([self class]), _languageCode, _displayName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: languageCode:%@; characteristics:%@; displayName:%@; >", NSStringFromClass([self class]), _languageCode, _characteristics, _displayName];
     return descriptionString;
 }
 
@@ -10422,6 +10458,57 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; trackAttributes:%@; >", NSStringFromClass([self class]), _id, _trackAttributes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMediaPlaybackClusterContentInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contentType = @(0);
+
+        _title = nil;
+
+        _show = nil;
+
+        _season = nil;
+
+        _episode = nil;
+
+        _provider = nil;
+
+        _artist = nil;
+
+        _album = nil;
+
+        _track = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMediaPlaybackClusterContentInfoStruct alloc] init];
+
+    other.contentType = self.contentType;
+    other.title = self.title;
+    other.show = self.show;
+    other.season = self.season;
+    other.episode = self.episode;
+    other.provider = self.provider;
+    other.artist = self.artist;
+    other.album = self.album;
+    other.track = self.track;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentType:%@; title:%@; show:%@; season:%@; episode:%@; provider:%@; artist:%@; album:%@; track:%@; >", NSStringFromClass([self class]), _contentType, _title, _show, _season, _episode, _provider, _artist, _album, _track];
     return descriptionString;
 }
 

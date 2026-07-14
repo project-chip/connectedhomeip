@@ -13243,6 +13243,18 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x0000000B: {
+                "attributeName": "AvailableCommands",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "ContentInfo",
+                "attributeId": 0x0000000C,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -13794,8 +13806,20 @@ class ChipClusters:
                     "node": "int",
                 },
             },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetDeviceAuthURI",
+                "args": {
+                },
+            },
         },
         "attributes": {
+            0x00000000: {
+                "attributeName": "OAuthLoggedIn",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

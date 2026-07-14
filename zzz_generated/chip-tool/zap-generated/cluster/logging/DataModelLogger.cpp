@@ -5455,6 +5455,40 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::AmbientSensingUnion::Structs::ContributorStatusChangeStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ContributorIndex", indent + 1, value.contributorIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorIndex'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PreviousContributorStatus", indent + 1, value.previousContributorStatus);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PreviousContributorStatus'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CurrentContributorStatus", indent + 1, value.currentContributorStatus);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentContributorStatus'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::DecodableType & value)
@@ -5485,10 +5519,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("ContributorHealth", indent + 1, value.contributorHealth);
+        CHIP_ERROR err = LogValue("ContributorStatus", indent + 1, value.contributorStatus);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorHealth'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContributorStatus'");
             return err;
         }
     }
@@ -6528,6 +6562,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = LogValue("Characteristics", indent + 1, value.characteristics);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Characteristics'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("DisplayName", indent + 1, value.displayName);
         if (err != CHIP_NO_ERROR)
         {
@@ -6557,6 +6599,87 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TrackAttributes'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ContentType", indent + 1, value.contentType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ContentType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Title", indent + 1, value.title);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Title'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Show", indent + 1, value.show);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Show'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Season", indent + 1, value.season);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Season'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Episode", indent + 1, value.episode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Episode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Provider", indent + 1, value.provider);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Provider'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Artist", indent + 1, value.artist);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Artist'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Album", indent + 1, value.album);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Album'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Track", indent + 1, value.track);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Track'");
             return err;
         }
     }
@@ -13166,10 +13289,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("StatusChangedContributor", indent + 1, value.statusChangedContributor);
+        CHIP_ERROR err = DataModelLogger::LogValue("ContributorStatusChange", indent + 1, value.contributorStatusChange);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StatusChangedContributor'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ContributorStatusChange'");
             return err;
         }
     }
@@ -14584,6 +14707,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("setupPIN", indent + 1, value.setupPIN));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userCode", indent + 1, value.userCode));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("verificationURI", indent + 1, value.verificationURI));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("verificationURIComplete", indent + 1, value.verificationURIComplete));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("expiresIn", indent + 1, value.expiresIn));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("interval", indent + 1, value.interval));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -24175,6 +24310,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AvailableTextTracks", 1, value);
         }
+        case MediaPlayback::Attributes::AvailableCommands::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AvailableCommands", 1, value);
+        }
+        case MediaPlayback::Attributes::ContentInfo::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ContentInfo", 1, value);
+        }
         case MediaPlayback::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -24515,6 +24660,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case AccountLogin::Id: {
         switch (path.mAttributeId)
         {
+        case AccountLogin::Attributes::OAuthLoggedIn::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OAuthLoggedIn", 1, value);
+        }
         case AccountLogin::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -27320,6 +27470,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             AccountLogin::Commands::GetSetupPINResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetSetupPINResponse", 1, value);
+        }
+        case AccountLogin::Commands::GetDeviceAuthURIResponse::Id: {
+            AccountLogin::Commands::GetDeviceAuthURIResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetDeviceAuthURIResponse", 1, value);
         }
         }
         break;
