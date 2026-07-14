@@ -83,6 +83,15 @@ realtek:
     - "config/ameba/**"
     - "scripts/tools/realtek/**"
 
+mt793x:
+    maintainers:
+      - ryan.ho
+      - jason-hy
+    paths:
+      - "src/platform/mt793x/**"
+      - "examples/lighting-app/genio/**"
+      - "third_party/mt793x_sdk/**"
+      
 # --- Proposals / Opt-In Templates ---
 
 # nrfconnect:
@@ -158,13 +167,6 @@ realtek:
 #     - joonhaengHeo
 #   paths:
 #     - "src/platform/webos/**"
-# 
-# mt793x:
-#   maintainers:
-#     - pakls
-#   paths:
-#     - "src/platform/mt793x/**"
-#     - "examples/platform/mt793x/**"
 # 
 # ti:
 #   maintainers:
