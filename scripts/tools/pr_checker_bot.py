@@ -23,6 +23,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from functools import cached_property
 from typing import Any, Callable, Iterable, NamedTuple, cast
+from collections.abc import Iterable
+from enum import Enum
+from typing import NamedTuple
 
 import click
 import coloredlogs
