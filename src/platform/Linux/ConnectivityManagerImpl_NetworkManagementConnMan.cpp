@@ -164,6 +164,14 @@ struct ClientErrorTableEntry
     int mErrno;
 };
 
+using ServiceError = Platform::Linux::Detail::ConnManServiceError;
+
+struct ServiceErrorTableEntry
+{
+    const char * mName;
+    ServiceError mError;
+};
+
 // Global Variables
 
 // clang-format off
@@ -311,14 +319,20 @@ static constexpr char kNetworkPassphraseHasInvalidCharacters[]                  
  *  The maximum number of "active" (connman does not actually do
  *  active, directed scans) scans for a particular SSID before
  *  failing.
+ *
+ *  'chip-tool' and most app-based commissioners will timeout with
+ *  anything longer than this.
  */
-static constexpr size_t kWiFiActiveScanLimit = 4;
+static constexpr size_t kWiFiActiveScanLimit = 2;
 
 /**
  *  The maximum number of scans for connecting to a particular SSID
  *  before failing.
+ *
+ *  'chip-tool' and most app-based commissioners will timeout with
+ *  anything longer than this.
  */
-static constexpr size_t kWiFiConnectScanLimit = 4;
+static constexpr size_t kWiFiConnectScanLimit = 2;
 
 /**
  *  Trailing-edge debounce interval applied between an observed change
@@ -383,6 +397,220 @@ static constexpr std::array<ClientErrorTableEntry, 25> kClientErrorTable =
     // net.connman.Error.Failed is deliberately absent: it is
     // connman's catch-all and carries no information beyond the caller's
     // default.
+}};
+// clang-format on
+
+/**
+ *  connman surfaces neither the IEEE 802.11 status code nor the
+ *  disconnect reason code from wpa_supplicant anywhere on D-Bus (it
+ *  collapses both into the closed "Error" vocabulary above). The
+ *  wpa_supplicant-backed peer implementation reads them directly from
+ *  the supplicant D-Bus interface; we have no equivalent here. Rather
+ *  than fabricate a specific code we do not have, report the generic
+ *  one and let the `AssociationFailureCauseEnum` carry what signal we
+ *  do possess.
+ */
+static constexpr uint16_t kWlanStatusSuccess            = 0;
+static constexpr uint16_t kWlanStatusUnspecifiedFailure = 1;
+
+// clang-format off
+static constexpr ServiceError kServiceErrorNone =
+{
+    Status::kSuccess,
+    AssociationFailureCauseEnum::kUnknown,
+    kWlanStatusSuccess,
+    false,
+    false
+};
+
+static constexpr ServiceError kServiceErrorUnknown =
+{
+    Status::kUnknownError,
+    AssociationFailureCauseEnum::kUnknown,
+    kWlanStatusUnspecifiedFailure,
+    true,
+    true
+};
+
+static constexpr std::array<ServiceErrorTableEntry, 9> kServiceErrorTable =
+{{
+    /**
+     *  The WPA 4-way handshake rejected the pre-shared key: the
+     *  passphrase is wrong. This is the canonical Wi-Fi commissioning
+     *  failure and the one a commissioner most needs rendered
+     *  faithfully, since it is the only one an installer can act on
+     *  directly. Association succeeded; authentication did not.
+     *  Terminal, and a true association failure.
+     */
+    { "invalid-key", {
+            Status::kAuthFailure,
+            AssociationFailureCauseEnum::kAuthenticationFailed,
+            kWlanStatusUnspecifiedFailure,
+            true,
+            true
+        }
+    },
+
+    /**
+     *  IEEE 802.11 authentication failed ahead of, or independently
+     *  of, the 4-way handshake. connman does not distinguish this
+     *  from "invalid-key" in any way Matter can exploit, so it maps
+     *  identically; the distinction survives only in the log.
+     *  Terminal, and a true association failure.
+     */
+    { "auth-failed", {
+            Status::kAuthFailure,
+            AssociationFailureCauseEnum::kAuthenticationFailed,
+            kWlanStatusUnspecifiedFailure,
+            true,
+            true
+        }
+    },
+
+    /**
+     *  Credential rejection above the link layer: EAP for
+     *  WPA-Enterprise, or PPP for cellular. Not reachable for the
+     *  WPA2-PSK networks this implementation presently commissions,
+     *  but it is a credential failure in every sense that matters to
+     *  the commissioner, and it becomes live the moment
+     *  `ConnectWiFiNetworkWithPDCAsync` is implemented. Terminal, and
+     *  a true association failure.
+     */
+    { "login-failed", {
+            Status::kAuthFailure,
+            AssociationFailureCauseEnum::kAuthenticationFailed,
+            kWlanStatusUnspecifiedFailure,
+            true,
+            true
+        }
+    },
+
+    /**
+     *  connman's generic link-establishment failure: the association
+     *  itself did not complete. The credential was never exercised,
+     *  so reporting an authentication failure would be a lie; the
+     *  cause is almost always RF (the AP moved out of range mid-
+     *  connect, refused the association, or is at capacity). Terminal,
+     *  and a true association failure, but of the association rather
+     *  than the authentication.
+     */
+    { "connect-failed", {
+            Status::kOtherConnectionFailure,
+            AssociationFailureCauseEnum::kAssociationFailed,
+            kWlanStatusUnspecifiedFailure,
+            true,
+            true
+        }
+    },
+
+    /**
+     *  The AP refused the station outright, typically by MAC
+     *  filtering or an access control list. Indistinguishable from
+     *  "connect-failed" from the station's perspective, and mapped
+     *  the same way: the association was refused, not the
+     *  credential. Terminal, and a true association failure.
+     */
+    { "blocked", {
+            Status::kOtherConnectionFailure,
+            AssociationFailureCauseEnum::kAssociationFailed,
+            kWlanStatusUnspecifiedFailure,
+            true,
+            true
+        }
+    },
+
+    /**
+     *  The network service vanished between the scan that resolved it
+     *  and the connect that targeted it. Semantically this is
+     *  "the SSID is not there", which is precisely
+     *  `kNetworkNotFound` / `kSsidNotFound` -- and, unlike a generic
+     *  connection failure, it is actionable for an installer, who can
+     *  move the controller closer to the access point. Terminal, and
+     *  a true association failure.
+     */
+    { "out-of-range", {
+            Status::kNetworkNotFound,
+            AssociationFailureCauseEnum::kSsidNotFound,
+            kWlanStatusUnspecifiedFailure,
+            true,
+            true
+        }
+    },
+
+    /**
+     *  DHCP (or DHCPv6) did not yield an address. By the time connman
+     *  runs its DHCP client, association *and* the 4-way handshake
+     *  have both demonstrably succeeded: L2 is up and the credential
+     *  was accepted. The failure is strictly at L3 -- an exhausted
+     *  pool, an absent or unreachable server, or a lease timeout --
+     *  which is exactly `kIPBindFailed`.
+     *
+     *  Deliberately **not** an association failure. The
+     *  `AssociationFailure` event is diagnostic telemetry a fabric
+     *  administrator reads to separate "wrong password" from "bad RF";
+     *  raising one here, where the handshake demonstrably succeeded,
+     *  would corrupt that stream and actively mislead. `OnConnectResult`
+     *  alone tells the true story. Terminal, but not an association
+     *  failure.
+     */
+    { "dhcp-failed", {
+            Status::kIPBindFailed,
+            AssociationFailureCauseEnum::kUnknown,
+            kWlanStatusSuccess,
+            false,
+            true
+        }
+    },
+
+    /**
+     *  connman's Internet reachability probe (WISPr / `online-check`)
+     *  failed. The service has nonetheless reached at least "ready":
+     *  IPv4 and/or IPv6 is configured, which is precisely and
+     *  entirely what Matter's `ConnectNetwork` contract requires.
+     *
+     *  connman's notion of "online" is strictly stronger than
+     *  Matter's, and the gap is not hypothetical: a captive portal,
+     *  an egress-filtered enterprise network, or an air-gapped
+     *  installation will all fail this probe on a network that is
+     *  perfectly commissionable. Letting it veto a connect would hard-
+     *  fail commissioning on networks that work -- and the commissioner
+     *  proves end-to-end reachability itself, via operational discovery
+     *  and CASE, so the device has no business second-guessing it.
+     *
+     *  Hence: neither terminal nor an association failure. Should this
+     *  arrive as a *failure* state at all -- it should not, given the
+     *  service has already reached "ready" -- the state handler
+     *  tolerates it and leaves the connect in flight rather than
+     *  fabricating a terminal error.
+     */
+    { "online-check-failed", {
+            Status::kSuccess,
+            AssociationFailureCauseEnum::kUnknown,
+            kWlanStatusSuccess,
+            false,
+            false
+        }
+    },
+
+    /**
+     *  A cellular SIM PIN is required and was not supplied.
+     *  Unreachable for Wi-Fi, and mapped only so that the table
+     *  covers connman's error vocabulary exhaustively (see connman
+     *  `service.c:error2string()`); an unrecognized value would
+     *  otherwise fall through to `kServiceErrorUnknown` and log.
+     *  Treated as a credential failure, which is what it
+     *  is. Terminal, and nominally an association failure (though on
+     *  Wi-Fi, where the association-started latch will never have
+     *  been set, the event is suppressed regardless).
+     */
+    { "pin-missing", {
+            Status::kAuthFailure,
+            AssociationFailureCauseEnum::kAuthenticationFailed,
+            kWlanStatusUnspecifiedFailure,
+            true,
+            true
+        }
+    }
 }};
 // clang-format on
 
@@ -1302,6 +1530,27 @@ static CHIP_ERROR MapClientError(const GError * inError) noexcept
     return MapClientError(inError, CHIP_ERROR_INTERNAL);
 }
 
+static ServiceError MapServiceError(const char * inServiceError) noexcept
+{
+    // A cleared or absent "Error" is not a failure; callers gate on
+    // mIsTerminal, so return the benign mapping rather than "unknown".
+
+    VerifyOrReturnValue(inServiceError != nullptr, kServiceErrorNone);
+
+    for (const auto & entry : kServiceErrorTable)
+    {
+        if (strcmp(entry.mName, inServiceError) == 0)
+        {
+            return entry.mError;
+        }
+    }
+
+    ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "unrecognized service error '%s'; reporting as unknown",
+                 inServiceError);
+
+    return kServiceErrorUnknown;
+}
+
 } // namespace
 
 // Matter Linux Connectivity Manager Implementation for connman
@@ -1408,8 +1657,11 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::Init(ConnectivityMa
     }
 
     mWiFiActiveScanState.Reset();
-    mWiFiConnectPassphrase.reset();
-    mWiFiConnectScanState.Reset();
+    mWiFiClientConnectPassphrase.reset();
+    mWiFiClusterConnectAssociationStarted = false;
+    mWiFiClusterConnectPending            = false;
+    mWiFiClusterConnectScanState.Reset();
+    mWiFiClusterConnectServiceError.reset();
     mWiFiStationConnected         = false;
     mWiFiStationMode              = ConnectivityManager::kWiFiStationMode_NotSupported;
     mWiFiStationReconnectInterval = {};
@@ -1661,6 +1913,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiManagement()
 
 // Introspection
 
+bool ConnectivityManagerImpl_NetworkManagementConnMan::HasWiFiClusterConnectPendingLocked() const noexcept
+{
+    return mWiFiClusterConnectPending;
+}
+
 /**
  *  @brief
  *    Determine whether a per-family connectivity transition warrants
@@ -1685,6 +1942,17 @@ bool ConnectivityManagerImpl_NetworkManagementConnMan::IsFamilyConnectivityChang
         ((inPending.mConnectivity == NetworkServiceConnectivity::kEstablished) && (inPending.mAddress != inReported.mAddress));
 
     return ((stateChanged && !absorbed) || addressChanged);
+}
+
+bool ConnectivityManagerImpl_NetworkManagementConnMan::IsWiFiPendingConnectServicePathLocked(const char * inPath) const noexcept
+{
+    VerifyOrReturnValue(inPath != nullptr, false);
+    VerifyOrReturnValue(mConnManAgentServer.mPendingService, false);
+
+    const char * const pending = g_dbus_proxy_get_object_path(G_DBUS_PROXY(mConnManAgentServer.mPendingService.get()));
+    VerifyOrReturnValue(pending != nullptr, false);
+
+    return (strcmp(pending, inPath) == 0);
 }
 
 // Wi-Fi Station Control Plane Management
@@ -1876,6 +2144,36 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkA
 
     mConnectivityManagerImpl->SetOneShotConnectCallback(inConnectCallback);
 
+    // Mark the connect in flight. This is the sole gate on the
+    // service state machine driving the Matter completion, and it is
+    // retired by ConcludeWiFiClusterConnectLocked.
+
+    mWiFiClusterConnectPending = true;
+
+    // Unconditionally cache the provided SSID.
+
+    mWiFiClusterConnectScanState.mSsid = inSsid;
+
+    // Unconditionally cache the provided credentials.
+
+    mWiFiClientConnectPassphrase = inCredentials;
+
+    // On any synchronous failure below, `Service.Connect()` was never
+    // issued: connman will never request the credential, and
+    // HandleServiceConnectComplete will never run. Retire the connect
+    // *without* dispatching a Matter completion, since
+    // LinuxWiFiDriver::ConnectNetwork completes the command from the
+    // CHIP_ERROR we return, and drop the one-shot callback that will
+    // now never fire. Disarmed on success.
+
+    auto connectGuard = ScopeExit([&]() {
+        ScrubWiFiClientConnectPassphraseLocked();
+
+        mConnectivityManagerImpl->SetOneShotConnectCallback(nullptr);
+
+        LogErrorOnFailure(ConcludeWiFiClusterConnectLocked());
+    });
+
     // There will be one of two cases here given that connman cannot
     // connect to a service it does not know about or has not seen.
     //
@@ -1900,10 +2198,6 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkA
         ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting to '%.*s'...",
                         static_cast<int>(inSsid.size()), inSsid.data());
 
-        // Cache the provided credentials.
-
-        mWiFiConnectPassphrase = inCredentials;
-
         ReturnErrorOnFailure(HandleServiceConnectRequestLocked(lock, service));
     }
     else
@@ -1915,22 +2209,18 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkA
             kConnManTechnologyPropertyTypeWiFiValue, mConnManClient.mTechnologyProxies.get(), mConnManClient.mTechnologies.get());
         VerifyOrReturnError(technology != nullptr, ChipError(ChipError::Range::kPOSIX, ENOENT));
 
-        // Cache the provided SSID.
-
-        mWiFiConnectScanState.mSsid = inSsid;
-
-        // Cache the provided credentials.
-
-        mWiFiConnectPassphrase = inCredentials;
-
         // Initialize the connect scan count.
 
-        mWiFiConnectScanState.mCount = 1;
+        mWiFiClusterConnectScanState.mCount = 1;
 
         // Attempt to scan for the desired network service.
 
         ReturnErrorOnFailure(TechnologyScanLocked(lock, technology));
     }
+
+    // Success; disarm the scoped clean-up.
+
+    connectGuard.release();
 
     return CHIP_NO_ERROR;
 }
@@ -2293,10 +2583,122 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::BuildWiFiScanRespon
 
 /**
  *  @brief
+ *    Retire an in-flight Wi-Fi connect and dispatch its Matter
+ *    completion, exactly once.
+ *
+ *  The sole completion for `ConnectWiFiNetworkAsync`. Three steps, in
+ *  an order that is not negotiable and is therefore enforced here
+ *  rather than at the multiple call sites in which it is used:
+ *
+ *    1. Snapshot the debug text. `inDebugText` frequently aliases
+ *       `mWiFiClusterConnectScanState.mSsid`, which step 2 clears.
+ *
+ *    2. Retire the connect state, so that any further connman signal for this
+ *       service (the `failure` -> `idle` transition, a late `Agent.ReportError`,
+ *       the `Service.Connect()` reply itself) finds no pending connect and
+ *       drives no second, contradictory result.
+ *
+ *    3. Dispatch `OnConnectResult`, which may temporarily release the
+ *       class lock on its fallback path and therefore must observe
+ *       fully-retired state.
+ *
+ *  Deliberately *not* folded into #DispatchWiFiConnectFinishedLocked: the
+ *  synchronous failure paths out of `ConnectWiFiNetworkAsync` must retire the
+ *  connect via #ConcludeWiFiClusterConnectLocked *without* completing it,
+ *  since `LinuxWiFiDriver::ConnectNetwork` completes those from the returned
+ *  CHIP_ERROR.
+ *
+ *  @sa ConcludeWiFiClusterConnectLocked
+ *  @sa DispatchWiFiConnectFinishedLocked
+ *
+ *  @private
+ *
+ */
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::CompleteWiFiConnectLocked(std::unique_lock<std::mutex> & inOutLock,
+                                                                                       Status inStatus,
+                                                                                       const CharSpan & inDebugText,
+                                                                                       int32_t inReason) noexcept
+{
+    VerifyOrDie(inOutLock.owns_lock());
+
+    ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "completing connect: pending=%u status=%u debug='%.*s'",
+                  HasWiFiClusterConnectPendingLocked(), static_cast<unsigned>(inStatus), static_cast<int>(inDebugText.size()),
+                  inDebugText.data());
+
+    // Exactly-once, structurally. Every completion now funnels through here, so
+    // the guard lives here rather than being re-derived by each caller.
+
+    VerifyOrReturnError(HasWiFiClusterConnectPendingLocked(), CHIP_NO_ERROR);
+
+    // 1. Snapshot before retiring: inDebugText may alias mWiFiClusterConnectScanState.mSsid.
+
+    Internal::WiFiSSIDFixedBuffer debug;
+    debug = ByteSpan(reinterpret_cast<const uint8_t *>(inDebugText.data()), inDebugText.size());
+
+    // 2. Retire.
+
+    ReturnErrorOnFailure(ConcludeWiFiClusterConnectLocked());
+
+    // 3. Complete.
+
+    return DispatchWiFiConnectFinishedLocked(inOutLock, inStatus,
+                                             CharSpan(reinterpret_cast<const char *>(debug.data()), debug.size()), inReason);
+}
+
+/**
+ *  @brief
+ *    Conclude the Matter Network Commissioning Cluster connect: the
+ *    state whose lifetime is that of the Network Commissioning
+ *    Cluster `ConnectNetwork` command.
+ *
+ *  The peer of #ShutdownClientConnectSessionLocked. Retires only the
+ *  state that the Matter Cluster completion renders meaningless (the
+ *  pending gate, the association latch, the latched service error,
+ *  and the connect scan state) so that any further connman signal for
+ *  this service (the `failure` -> `idle` transition, a late
+ *  `Agent.ReportError`, the `Service.Connect()` reply itself) finds
+ *  no pending connect and drives no second, contradictory result.
+ *
+ *  @note
+ *    Which to call: *"has the Network Commissioning Cluster been
+ *    answered?"* -- if it has, this runs. Contrast
+ *    #ShutdownClientConnectSessionLocked, whose test is *"can connman
+ *    still call my agent?"*. The agent, pending service proxy, and
+ *    credential belong to that longer-lived D-Bus scope and are
+ *    deliberately *not* touched here.
+ *
+ *  @note
+ *    Does not clear the one-shot connect callback: that is consumed by
+ *    `OnConnectResult`, which #CompleteWiFiConnectLocked dispatches
+ *    *after* this returns. Clearing it here would wedge the command
+ *    handle.
+ *
+ *  @retval  #CHIP_NO_ERROR  Always.
+ *
+ *  @sa CompleteWiFiConnectLocked
+ *  @sa ShutdownClientConnectSessionLocked
+ *
+ *  @private
+ *
+ */
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConcludeWiFiClusterConnectLocked() noexcept
+{
+    mWiFiClusterConnectPending            = false;
+    mWiFiClusterConnectAssociationStarted = false;
+
+    mWiFiClusterConnectServiceError.reset();
+
+    mWiFiClusterConnectScanState.Reset();
+
+    return CHIP_NO_ERROR;
+}
+
+/**
+ *  @brief
  *    Complete a Wi-Fi connect operation exactly once, deferring off
  *    the class lock.
  *
- *  Drives the Connectivity Manager `OnConnectResult` terminal for a
+ *  Drives the Connectivity Manager `OnConnectResult` completion for a
  *  connect, preferring to defer it onto a fresh Matter event-loop
  *  iteration (via `ScheduleLambda`) so that it runs after the caller
  *  releases `mConnManMutex` and may therefore re-enter this object
@@ -2357,6 +2759,11 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::DispatchWiFiConnect
     // caller's scope releases mConnManMutex before OnConnectResult runs.
     const CHIP_ERROR scheduled = DeviceLayer::SystemLayer().ScheduleLambda([this, inStatus, debugBytes, debugLen, inReason]() {
         const CharSpan debug(reinterpret_cast<const char *>(debugBytes.data()), debugLen);
+
+        ChipLogDetail(
+            DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "dispatching connect result: pending=%u status=%u debug='%.*s'",
+            HasWiFiClusterConnectPendingLocked(), static_cast<unsigned>(inStatus), static_cast<int>(debug.size()), debug.data());
+
         mConnectivityManagerImpl->OnConnectResult(inStatus, debug, inReason);
     });
 
@@ -2386,7 +2793,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::DispatchWiFiConnect
  *    Complete a Wi-Fi scan operation exactly once, deferring off the
  *    class lock.
  *
- *  Drives the Connectivity Manager `OnScanFinished` terminal for a
+ *  Drives the Connectivity Manager `OnScanFinished` completion for a
  *  scan, preferring to defer it onto a fresh Matter event-loop
  *  iteration (via `ScheduleLambda`) so that it runs after the caller
  *  releases `mConnManMutex` and may therefore re-enter this object
@@ -2463,6 +2870,11 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::DispatchWiFiScanFin
         std::unique_ptr<std::vector<WiFiScanResponse>> owned(raw);
         const CharSpan debug(reinterpret_cast<const char *>(debugBytes.data()), debugLen);
         LinuxScanResponseIterator<WiFiScanResponse> iter(owned.get());
+
+        ChipLogDetail(DeviceLayer,
+                      CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "dispatching scan result: status=%u count=%zu debug='%.*s' owned=%u",
+                      static_cast<unsigned>(inStatus), (raw != nullptr) ? raw->size() : 0, static_cast<int>(debug.size()),
+                      debug.data(), owned != nullptr);
 
         mConnectivityManagerImpl->OnScanFinished(inStatus, debug, (owned != nullptr) ? &iter : nullptr);
     });
@@ -3087,21 +3499,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectCompl
 
     VerifyOrReturn(inService != nullptr);
 
-    auto teardown = ScopeExit([&]() {
-        mWiFiConnectScanState.Reset();
+    // connman has replied to Service.Connect() and will request nothing
+    // further for it; retire the D-Bus-call-scoped state unconditionally,
+    // irrespective of which path drove the Matter completion.
 
-        mConnManAgentServer.mPendingService.reset();
-
-        if (mConnManAgentServer.mRegistered)
-        {
-            const CHIP_ERROR status = ManagerUnregisterAgentLocked(lock, MATTER_CONNECTIVITY_MANGER_CONNMAN_AGENT_PATH);
-            if (status != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to unregister agent:%" CHIP_ERROR_FORMAT,
-                             status.Format());
-            }
-        }
-    });
+    auto teardown = ScopeExit([&]() { ShutdownClientConnectSessionLocked(lock); });
 
     const char * path = nullptr;
     ReturnOnFailure(GetObjectPathFromProxyLocked(inService, path));
@@ -3119,34 +3521,55 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectCompl
         debug_text = CharSpan::fromCharString(name);
     }
 
+    // If the service state machine already concluded this connect (at "ready"
+    // or at "failure") the Matter completion has been dispatched with a
+    // *specific* status and the connect state retired. connman emits those
+    // PropertyChanged signals ahead of replying to Connect(), so this is the
+    // ordinary path. Do not dispatch a second, less specific result -- and do
+    // not log a misleading failure for a connect that already succeeded.
+
+    VerifyOrReturn(HasWiFiClusterConnectPendingLocked(),
+                   ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s service %s connect already concluded",
+                                   type, path));
+
     ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s service %s connect done", type, path);
 
-    if (inError == nullptr)
+    // Fallback: Connect() completed without the service ever reaching a
+    // terminal state. This is a synchronous rejection (invalid arguments,
+    // already connected, unsupported) or a D-Bus transport failure: not an
+    // association failure, and connman told us nothing more specific.
+
+    if (inError != nullptr)
     {
-        LogErrorOnFailure(DispatchWiFiConnectFinishedLocked(lock, Status::kSuccess, debug_text, 0));
+        ChipLogError(DeviceLayer,
+                     CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to connect %s service: %s (%" CHIP_ERROR_FORMAT ")", type,
+                     inError->message, MapClientError(inError).Format());
     }
-    else
-    {
-        WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
-        constexpr int reason               = 0;
 
-        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to connect %s service: %s", type,
-                     inError->message);
-
-        LogErrorOnFailure(DispatchWiFiConnectFinishedLocked(lock, Status::kUnknownError, debug_text, reason));
-
-        if (delegate != nullptr)
-        {
-            constexpr uint8_t associationFailureCause   = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
-            constexpr uint16_t associationFailureStatus = WLAN_STATUS_UNSPECIFIED_FAILURE;
-            LogErrorOnFailure(
-                DeviceLayer::SystemLayer().ScheduleLambda([delegate, associationFailureCause, associationFailureStatus]() {
-                    delegate->OnAssociationFailureDetected(associationFailureCause, associationFailureStatus);
-                }));
-        }
-    }
+    LogErrorOnFailure(
+        CompleteWiFiConnectLocked(lock, (inError == nullptr) ? Status::kSuccess : Status::kUnknownError, debug_text, 0));
 }
 
+/**
+ *  @brief
+ *    Register the connman agent and issue an asynchronous
+ *    `Service.Connect()` for a Wi-Fi network service.
+ *
+ *  @note
+ *    Deliberately does *not* dispatch a Matter completion on failure.
+ *    Its two callers have opposite completion contracts:
+ *    `ConnectWiFiNetworkAsync`'s failure is completed by
+ *    `LinuxWiFiDriver::ConnectNetwork` from the returned CHIP_ERROR,
+ *    whereas #HandleWiFiPendingConnectLocked is reached from
+ *    #HandleTechnologyScanComplete, which only logs, and so must
+ *    complete the command itself.
+ *
+ *  @sa ShutdownClientConnectSessionLocked
+ *  @sa HandleWiFiPendingConnectLocked
+ *
+ *  @private
+ *
+ */
 CHIP_ERROR
 ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectRequestLocked(std::unique_lock<std::mutex> & inOutLock,
                                                                                     ConnManService * inService) noexcept
@@ -3154,45 +3577,17 @@ ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectRequestLoc
     VerifyOrDie(inOutLock.owns_lock());
     VerifyOrReturnError(inService != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CharSpan debug_text; // best-effort, for OnConnectResult
-    {
-        const char * path = nullptr;
-        GVariant * props  = nullptr;
-        const char * name = nullptr;
+    // On any failure below, `Service.Connect()` either was not issued or will
+    // not complete; unwind the D-Bus-call-scoped state. Disarmed on success,
+    // where HandleServiceConnectComplete assumes that responsibility.
 
-        if (GetObjectPathFromProxyLocked(G_DBUS_PROXY(inService), path) == CHIP_NO_ERROR &&
-            GetObjectPropertiesFromPathLocked(mConnManClient.mServices.get(), path, props) == CHIP_NO_ERROR &&
-            GetObjectNameFromPropertiesLocked(props, name) == CHIP_NO_ERROR)
-        {
-            debug_text = CharSpan::fromCharString(name);
-        }
-    }
+    auto cleanup = ScopeExit([&]() { ShutdownClientConnectSessionLocked(inOutLock); });
 
-    // On any failure below, unwind the agent registration and surface
-    // an unknown-error connect result. Disarmed on success.
-
-    CHIP_ERROR result = CHIP_NO_ERROR;
-    auto cleanup      = ScopeExit([&]() {
-        if (mConnManAgentServer.mRegistered)
-        {
-            CHIP_ERROR status = ManagerUnregisterAgentLocked(inOutLock, MATTER_CONNECTIVITY_MANGER_CONNMAN_AGENT_PATH);
-            if (status != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to unregister agent:%" CHIP_ERROR_FORMAT,
-                                  status.Format());
-            }
-        }
-
-        LogErrorOnFailure(DispatchWiFiConnectFinishedLocked(inOutLock, Status::kUnknownError, debug_text, result.GetValue()));
-    });
-
-    result = ManagerRegisterAgentLocked(inOutLock, MATTER_CONNECTIVITY_MANGER_CONNMAN_AGENT_PATH);
-    ReturnErrorOnFailure(result);
+    ReturnErrorOnFailure(ManagerRegisterAgentLocked(inOutLock, MATTER_CONNECTIVITY_MANGER_CONNMAN_AGENT_PATH));
 
     mConnManAgentServer.mPendingService.reset(g_object_ref(inService));
 
-    result = ServiceConnectLocked(inOutLock, inService);
-    ReturnErrorOnFailure(result);
+    ReturnErrorOnFailure(ServiceConnectLocked(inOutLock, inService));
 
     // Success; disarm the scoped clean-up.
 
@@ -3274,6 +3669,23 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceProper
         // debounce.
 
         ReturnErrorOnFailure(UpdateNetworkServiceConnectivityLocked());
+    }
+
+    // Independently of, and in addition to, the connectivity
+    // recomputation above, "Error" and "State" changes on the service
+    // backing an in-flight Network Commissioning connect drive that
+    // connect's Matter completion. These are deliberately NOT chained
+    // onto the preceding 'else if': the connectivity concern is about
+    // *any* tracked service type, whereas this is about *the* pending
+    // service, and both must run.
+
+    if (strcmp(inKey, kConnManServicePropertyErrorKey) == 0)
+    {
+        ReturnErrorOnFailure(HandleWiFiPendingConnectServiceErrorChangedLocked(inPath, inType, inValue));
+    }
+    else if (strcmp(inKey, kConnManServicePropertyStateKey) == 0)
+    {
+        ReturnErrorOnFailure(HandleWiFiPendingConnectServiceStateChangedLocked(inOutLock, inPath, inType, inValue));
     }
 
     return CHIP_NO_ERROR;
@@ -3547,11 +3959,238 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingCo
         ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting to '%.*s' after %zu scan(s)...",
                         static_cast<int>(inOutScanState.mSsid.size()), inOutScanState.mSsid.data(), inOutScanState.mCount);
 
-        return HandleServiceConnectRequestLocked(inOutLock, service);
+        const CHIP_ERROR status = HandleServiceConnectRequestLocked(inOutLock, service);
+        if (status == CHIP_NO_ERROR)
+        {
+            // The scan that this connect was waiting on has served
+            // its purpose; clear the liveness sentinel so a
+            // subsequent technology scan completion does not re-enter
+            // and issue a second Service.Connect() (and a second
+            // agent registration) atop the live one. The SSID is
+            // retained: it is still the completion's debug text.
+
+            inOutScanState.mCount = 0;
+        }
+        else
+        {
+            // This path is reached from HandleTechnologyScanComplete, which
+            // merely logs the returned error. No caller will complete the
+            // Network Commissioning command, so complete it here or the
+            // commissioner waits out the fail-safe.
+
+            const CharSpan debug(reinterpret_cast<const char *>(inOutScanState.mSsid.data()), inOutScanState.mSsid.size());
+
+            LogErrorOnFailure(CompleteWiFiConnectLocked(inOutLock, Status::kUnknownError, debug, status.GetValue()));
+        }
+
+        return status;
     }
 
     return HandleWiFiUnresolvedAfterScanLocked(inOutLock, inTechnology, inOutScanState, kWiFiConnectScanLimit,
-                                               "could not connect to", WiFiScanTerminalKind::kConnect);
+                                               "could not connect to", WiFiScanCompletionKind::kConnect);
+}
+
+/**
+ *  @brief
+ *    Latch a connman network service "Error" property change for the
+ *    service backing an in-flight Wi-Fi connect.
+ *
+ *  connman emits `PropertyChanged("Error")` before it emits
+ *  `PropertyChanged("State" = "failure")`, and invokes
+ *  `Agent.ReportError()` only after both. This handler is therefore
+ *  the authoritative, race-free point at which the failure cause
+ *  becomes known; the failure state transition merely consumes what
+ *  is latched here.
+ *
+ *  @note
+ *    connman signals a *cleared* error as the empty string rather than
+ *    by omitting the property; that is handled as a latch reset.
+ *
+ *  @param[in]  inPath
+ *    The service object path whose property changed.
+ *
+ *  @param[in]  inType
+ *    The service type; only Wi-Fi participates.
+ *
+ *  @param[in]  inValue
+ *    The new "Error" property value, of type 's'.
+ *
+ *  @retval  #CHIP_NO_ERROR
+ *    On success, or when the change is not for the pending service.
+ *
+ *  @retval  #CHIP_ERROR_INVALID_ARGUMENT
+ *    If @a inValue is not a string.
+ *
+ *  @sa HandleWiFiPendingConnectServiceStateChangedLocked
+ *  @sa MapServiceError
+ *
+ *  @private
+ */
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingConnectServiceErrorChangedLocked(
+    const char * inPath, const char * inType, GVariant * inValue) noexcept
+{
+    // If the network service type is not Wi-Fi, ignore it.
+
+    VerifyOrReturnError(strcmp(inType, kConnManServicePropertyTypeWiFiValue) == 0, CHIP_NO_ERROR);
+
+    // If the change is not for a Wi-Fi service we are attempting to
+    // connect to, ignore it.
+
+    VerifyOrReturnError(IsWiFiPendingConnectServicePathLocked(inPath), CHIP_NO_ERROR);
+
+    // If the variant is of the wrong type (not 's'), it's an invalid
+    // argument.
+
+    VerifyOrReturnError(g_variant_is_of_type(inValue, G_VARIANT_TYPE_STRING), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const char * const error = g_variant_get_string(inValue, nullptr);
+
+    if ((error == nullptr) || (*error == '\0'))
+    {
+        mWiFiClusterConnectServiceError.reset();
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting service \"%s\" error is now \"%s\"", inPath,
+                     error);
+
+        mWiFiClusterConnectServiceError = MapServiceError(error);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingConnectServiceStateChangedLocked(
+    std::unique_lock<std::mutex> & inOutLock, const char * inPath, const char * inType, GVariant * inValue) noexcept
+{
+    VerifyOrDie(inOutLock.owns_lock());
+
+    // If the network service type is not Wi-Fi, ignore it.
+
+    VerifyOrReturnError(strcmp(inType, kConnManServicePropertyTypeWiFiValue) == 0, CHIP_NO_ERROR);
+
+    // Ensure that the Wi-Fi network service is one we are actually
+    // connecting to. Only the service backing the pending connect
+    // drives the completion. connman multiplexes PropertyChanged
+    // across every service it knows about; a neighboring AP drifting
+    // out of range must not complete our `ConnectWiFiNetwork*Async`
+    // command.
+
+    VerifyOrReturnError(IsWiFiPendingConnectServicePathLocked(inPath), CHIP_NO_ERROR);
+
+    // Absent an in-flight connect there is no completion to drive. This is
+    // what makes the handler idempotent across the ready -> online
+    // transition and immune to the failure -> idle transition that connman
+    // induces once the error is retired.
+
+    VerifyOrReturnError(HasWiFiClusterConnectPendingLocked(), CHIP_NO_ERROR);
+
+    // If the variant is of the wrong type (not 's'), it's an invalid
+    // argument.
+
+    VerifyOrReturnError(g_variant_is_of_type(inValue, G_VARIANT_TYPE_STRING), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const char * const state = g_variant_get_string(inValue, nullptr);
+    VerifyOrReturnError(state != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting service \"%s\" state is now \"%s\"", inPath,
+                    state);
+
+    WiFiDiagnosticsDelegate * const delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (strcmp(state, kConnManServicePropertyStateAssociationValue) == 0)
+    {
+        mWiFiClusterConnectAssociationStarted = true;
+    }
+    else if (strcmp(state, kConnManServicePropertyStateConfigurationValue) == 0)
+    {
+        // Association and the 4-way handshake have both succeeded; L2 is up
+        // and DHCP/SLAAC is running. Report the link, but do not conclude:
+        // dhcp-failed is still reachable from here.
+
+        if (delegate != nullptr)
+        {
+            ReturnLogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda(
+                [delegate]() { delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected)); }));
+        }
+    }
+    else if ((strcmp(state, kConnManServicePropertyStateReadyValue) == 0) ||
+             (strcmp(state, kConnManServicePropertyStateOnlineValue) == 0))
+    {
+        // "ready" means IPv4 and/or IPv6 is configured, which is precisely
+        // Matter's ConnectNetwork contract. Deliberately do NOT hold out for
+        // "online": connman's Internet reachability probe is strictly
+        // stronger than Matter requires and will not fire on an
+        // egress-filtered or captive-portal network that is nonetheless
+        // perfectly commissionable. Note also that when a higher-priority
+        // service is already the default, this service never transitions
+        // ready -> online at all.
+        //
+        // The HasWiFiClusterConnectPendingLocked() gate above makes
+        // the subsequent "online" a no-op on the networks where it
+        // does arrive.
+
+        const CharSpan debug(reinterpret_cast<const char *>(mWiFiClusterConnectScanState.mSsid.data()),
+                             mWiFiClusterConnectScanState.mSsid.size());
+        ReturnErrorOnFailure(CompleteWiFiConnectLocked(inOutLock, Status::kSuccess, debug, 0));
+
+        NotifyWiFiConnectivityChange(kConnectivity_Established);
+    }
+    else if (strcmp(state, kConnManServicePropertyStateFailureValue) == 0)
+    {
+        // The cause was latched by
+        // `HandleWiFiPendingConnectServiceErrorChangedLocked` from
+        // the PropertyChanged("Error") that connman emits ahead of
+        // this transition. A failure state with no latched error
+        // should not happen; report it honestly rather than silently
+        // succeeding.
+
+        const ServiceError mapped = mWiFiClusterConnectServiceError.value_or(kServiceErrorUnknown);
+
+        if (!mapped.mIsTerminal)
+        {
+            // online-check-failed: the service reached at least "ready", so
+            // Matter's contract is already satisfied and this is not a
+            // connect failure. It should not arrive as a *failure* state,
+            // but tolerate it rather than fabricating a terminal error.
+
+            ChipLogProgress(DeviceLayer,
+                            CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "non-terminal service error; ignoring failure state");
+
+            return CHIP_NO_ERROR;
+        }
+
+        if (mapped.mIsAssociationFailure && mWiFiClusterConnectAssociationStarted && (delegate != nullptr))
+        {
+            const uint8_t cause   = static_cast<uint8_t>(mapped.mCause);
+            const uint16_t status = mapped.mAssociationStatus;
+
+            ReturnLogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda(
+                [delegate, cause, status]() { delegate->OnAssociationFailureDetected(cause, status); }));
+        }
+
+        if (delegate != nullptr)
+        {
+            ReturnLogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda(
+                [delegate]() { delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kNotConnected)); }));
+        }
+
+        const CharSpan debug(reinterpret_cast<const char *>(mWiFiClusterConnectScanState.mSsid.data()),
+                             mWiFiClusterConnectScanState.mSsid.size());
+        ReturnErrorOnFailure(CompleteWiFiConnectLocked(inOutLock, mapped.mStatus, debug, 0));
+
+        NotifyWiFiConnectivityChange(kConnectivity_Lost);
+    }
+
+    // "idle" and "disconnect" are intentionally unhandled
+    // here. connman reaches them both on the way *into* a connect and
+    // on the way out of a retired failure; neither is a completion for
+    // an in-flight connect, and treating them as one would deliver a
+    // second, contradictory result to the Network Commissioning
+    // cluster. A connect that stalls short of a completion is the job
+    // of the connect timeout, not of this handler.
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingScanLocked(std::unique_lock<std::mutex> & inOutLock,
@@ -3568,6 +4207,10 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingSc
     // Directed scan: resolve the target SSID against the current service set.
 
     retval = GetWiFiServicePropertiesFromSsidLocked(inOutScanState.mSsid.span(), mConnManClient.mServices.get(), properties);
+
+    ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "directed scan for '%.*s': %s",
+                  static_cast<int>(inOutScanState.mSsid.size()), inOutScanState.mSsid.data(),
+                  (retval == CHIP_NO_ERROR) ? "resolved" : "unresolved");
 
     if (retval == CHIP_NO_ERROR)
     {
@@ -3595,7 +4238,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingSc
     // Not found: hand off to the shared give-up-versus-retry arbiter.
 
     return HandleWiFiUnresolvedAfterScanLocked(inOutLock, inTechnology, inOutScanState, kWiFiActiveScanLimit,
-                                               "no Wi-Fi network found matching", WiFiScanTerminalKind::kScan);
+                                               "no Wi-Fi network found matching", WiFiScanCompletionKind::kScan);
 }
 
 /**
@@ -3667,9 +4310,9 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanCompl
     // If there is a pending asynchronous connect that required a
     // scan, handle it.
 
-    if (mWiFiConnectScanState.IsActive())
+    if (mWiFiClusterConnectScanState.IsActive())
     {
-        ReturnErrorOnFailure(HandleWiFiPendingConnectLocked(inOutLock, inTechnology, mWiFiConnectScanState));
+        ReturnErrorOnFailure(HandleWiFiPendingConnectLocked(inOutLock, inTechnology, mWiFiClusterConnectScanState));
     }
 
     // If there is a pending asynchronous scan, handle it.
@@ -3722,14 +4365,14 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanRetry
  *  scan. This is the shared give-up-versus-retry policy for both
  *  callers: if the scan budget is exhausted (`inOutScanState.mCount`
  *  has reached `inScanLimit`), the SSID is snapshotted for the debug
- *  text, the scan state is reset, and the caller-specific terminal is
+ *  text, the scan state is reset, and the caller-specific completion is
  *  completed exactly once through the corresponding dispatch
  *  primitive; otherwise, another scan is armed via
  *  #HandleWiFiScanRetryLocked and its status is returned.
  *
- *  The terminal disposition is selected by an `inKind` tag rather
+ *  The completion disposition is selected by an `inKind` tag rather
  *  than a caller-supplied callback so that the give-up bookkeeping
- *  (logging, scan-state reset) and the terminal dispatch both live
+ *  (logging, scan-state reset) and the completion dispatch both live
  *  here once, and so that dispatch routes through
  *  #DispatchWiFiScanFinishedLocked or #DispatchWiFiConnectFinishedLocked,
  *  which guarantee exactly-once completion even under scheduler
@@ -3764,23 +4407,23 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanRetry
  *
  *  @param[in]      inScanLimit
  *    The maximum number of Wi-Fi scans permitted before the operation
- *    is abandoned and its terminal is reported.
+ *    is abandoned and its completion is reported.
  *
  *  @param[in]      inReason
  *    A pointer to an immutable null-terminated C string describing
- *    why the SSID is unresolved, used both in the terminal error log
+ *    why the SSID is unresolved, used both in the completion error log
  *    and as the retry log reason.
  *
  *  @param[in]      inKind
- *    Selects the terminal disposition: `#WiFiScanTerminalKind::kScan`
- *    completes `OnScanFinished`; `#WiFiScanTerminalKind::kConnect`
+ *    Selects the completion disposition: `#WiFiScanCompletionKind::kScan`
+ *    completes `OnScanFinished`; `#WiFiScanCompletionKind::kConnect`
  *    completes `OnConnectResult`.
  *
  *  @retval  #CHIP_ERROR_INVALID_ARGUMENT
  *    If `inTechnology` or `inReason` is null.
  *
  *  @retval  #CHIP_ERROR_KEY_NOT_FOUND
- *    If the scan budget is exhausted for `#WiFiScanTerminalKind::kScan`
+ *    If the scan budget is exhausted for `#WiFiScanCompletionKind::kScan`
  *    (advisory; `OnScanFinished` is the authoritative completion).
  *
  *  @retval  #CHIP_NO_ERROR
@@ -3788,7 +4431,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanRetry
  *
  *  @retval  *
  *    Otherwise, a POSIX ENOENT #CHIP_ERROR for an exhausted
- *    `#WiFiScanTerminalKind::kConnect` budget (advisory), or any error
+ *    `#WiFiScanCompletionKind::kConnect` budget (advisory), or any error
  *    returned by #HandleWiFiScanRetryLocked in arming a further scan.
  *
  *  @sa HandleWiFiScanRetryLocked
@@ -3802,7 +4445,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanRetry
  */
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiUnresolvedAfterScanLocked(
     std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology, WiFiScanState & inOutScanState,
-    const size_t & inScanLimit, const char * inReason, WiFiScanTerminalKind inKind) noexcept
+    const size_t & inScanLimit, const char * inReason, WiFiScanCompletionKind inKind) noexcept
 {
     VerifyOrDie(inOutLock.owns_lock());
 
@@ -3814,6 +4457,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiUnresolve
         // Snapshot the SSID for the debug text before the reset; the dispatch
         // helpers copy these bytes by value, so the reset cannot race the
         // deferred callback.
+
         const Internal::WiFiSSIDFixedBuffer ssid = inOutScanState.mSsid;
         const CharSpan debug(reinterpret_cast<const char *>(ssid.data()), ssid.size());
 
@@ -3831,13 +4475,13 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiUnresolve
         switch (inKind)
         {
 
-        case WiFiScanTerminalKind::kScan:
+        case WiFiScanCompletionKind::kScan:
             ReturnErrorOnFailure(DispatchWiFiScanFinishedLocked(inOutLock, Status::kNetworkNotFound, debug, nullptr));
 
             return CHIP_ERROR_KEY_NOT_FOUND;
 
-        case WiFiScanTerminalKind::kConnect:
-            ReturnErrorOnFailure(DispatchWiFiConnectFinishedLocked(inOutLock, Status::kNetworkNotFound, debug, 0));
+        case WiFiScanCompletionKind::kConnect:
+            ReturnErrorOnFailure(CompleteWiFiConnectLocked(inOutLock, Status::kNetworkNotFound, debug, 0));
 
             return ChipError(ChipError::Range::kPOSIX, ENOENT);
         }
@@ -3925,6 +4569,14 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::MaybeSetInterfaceNa
     return CHIP_NO_ERROR;
 }
 
+void ConnectivityManagerImpl_NetworkManagementConnMan::NotifyWiFiConnectivityChange(ConnectivityChange inChange) noexcept
+{
+    const ChipDeviceEvent event{ .Type                   = DeviceEventType::kWiFiConnectivityChange,
+                                 .WiFiConnectivityChange = { .Result = inChange } };
+
+    PlatformMgr().PostEventOrDie(&event);
+}
+
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::RemoveServiceLocked(const char * inPath) noexcept
 {
     VerifyOrReturnError(inPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -3937,6 +4589,90 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::RemoveTechnologyLoc
     VerifyOrReturnError(inPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     return RemoveObjectLocked(mConnManClient.mTechnologies.get(), inPath, mConnManClient.mTechnologyProxies.get());
+}
+
+/**
+ *  @brief
+ *    Scrub and clear the cached Wi-Fi connect credential.
+ *
+ *  The credential's lifetime is that of the D-Bus `Service.Connect()`
+ *  call, not that of any single `Agent.RequestInput`: connman may
+ *  legitimately request input more than once within one connect
+ *  (hidden networks, WPS, and any future `Agent.Error.Retry` reply).
+ *  It is therefore scrubbed by whichever of the two scope terminators
+ *  runs: #ShutdownClientConnectSessionLocked, when `Connect()` was
+ *  issued and has replied; or the abort guard in
+ *  `ConnectWiFiNetworkAsync`, when `Connect()` was never issued at
+ *  all.
+ *
+ *  @note
+ *    The `Locked` suffix denotes the precondition that the caller
+ *    holds `mConnManMutex`.
+ *
+ *  @sa ShutdownClientConnectSessionLocked
+ *
+ *  @private
+ *
+ */
+void ConnectivityManagerImpl_NetworkManagementConnMan::ScrubWiFiClientConnectPassphraseLocked() noexcept
+{
+    if (!mWiFiClientConnectPassphrase.empty())
+    {
+        Crypto::DRBG_get_bytes(mWiFiClientConnectPassphrase.data(), mWiFiClientConnectPassphrase.size());
+
+        mWiFiClientConnectPassphrase.clear();
+    }
+}
+
+/**
+ *  @brief
+ *    Shut down the connman connect session: the state whose lifetime
+ *    is that of the D-Bus `Service.Connect()` call.
+ *
+ *  The peer of #ConcludeWiFiClusterConnectLocked. Retires everything
+ *  connman may still reach into while a connect request is
+ *  outstanding: the registered agent, the pending service proxy
+ *  against which agent requests are path-matched, and the cached
+ *  credential from which `Agent.RequestInput` is answered.
+ *
+ *  @note
+ *    Which to call: *"can connman still call my agent?"* -- if it can,
+ *    the session is live and this must not run. Contrast
+ *    #ConcludeWiFiClusterConnectLocked, whose test is *"has the Network
+ *    Commissioning cluster been answered?"*. The two scopes do not
+ *    nest and do not end together: connman drives the service to
+ *    "ready" or "failure" -- concluding the *Matter* connect -- before
+ *    it replies to `Connect()`, and may request agent input at any
+ *    point until it does.
+ *
+ *  @note
+ *    The `Locked` suffix denotes the precondition that the caller
+ *    holds `mConnManMutex`; this is verified by assertion. The lock
+ *    may be temporarily released by the agent unregistration, which is
+ *    why this takes the lock and #ConcludeWiFiClusterConnectLocked does not.
+ *
+ *  @param[in,out]  inOutLock
+ *    A reference to the mutable, held class lock.
+ *
+ *  @sa ConcludeWiFiClusterConnectLocked
+ *  @sa ScrubWiFiClientConnectPassphraseLocked
+ *
+ *  @private
+ *
+ */
+void ConnectivityManagerImpl_NetworkManagementConnMan::ShutdownClientConnectSessionLocked(
+    std::unique_lock<std::mutex> & inOutLock) noexcept
+{
+    VerifyOrDie(inOutLock.owns_lock());
+
+    if (mConnManAgentServer.mRegistered)
+    {
+        LogErrorOnFailure(ManagerUnregisterAgentLocked(inOutLock, MATTER_CONNECTIVITY_MANGER_CONNMAN_AGENT_PATH));
+    }
+
+    mConnManAgentServer.mPendingService.reset();
+
+    ScrubWiFiClientConnectPassphraseLocked();
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateManagerPropertiesLocked(GVariant * inProperties) noexcept
@@ -4736,16 +5472,11 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRequestInput(C
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
 
-    // Any cached passphrase is scrubbed on every return path.
-
-    auto passphraseGuard = ScopeExit([this]() {
-        if (!mWiFiConnectPassphrase.empty())
-        {
-            Crypto::DRBG_get_bytes(mWiFiConnectPassphrase.data(), mWiFiConnectPassphrase.capacity());
-
-            mWiFiConnectPassphrase.clear();
-        }
-    });
+    // The cached credential is deliberately NOT scrubbed here. Its lifetime is
+    // the D-Bus Service.Connect() call, not this single request: connman may
+    // legitimately call Agent.RequestInput more than once within one connect,
+    // and scrubbing here would fail the second with a misleading "not
+    // available". ShutdownClientConnectSessionLocked owns the scrub.
 
     // Answer the invocation with a G_IO_ERROR and yield the TRUE the
     // agent contract mandates. Safe when there is no invocation to
@@ -4823,11 +5554,12 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRequestInput(C
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
     if (want_passphrase)
     {
-        VerifyOrReturnValue(!mWiFiConnectPassphrase.empty(), fail(G_IO_ERROR_FAILED, "Passphrase requested but not available"));
+        VerifyOrReturnValue(!mWiFiClientConnectPassphrase.empty(),
+                            fail(G_IO_ERROR_FAILED, "Passphrase requested but not available"));
 
         char passphrase[Internal::kMaxWiFiKeyLength + 1];
-        const size_t n = std::min<size_t>(mWiFiConnectPassphrase.size(), Internal::kMaxWiFiKeyLength);
-        memcpy(passphrase, mWiFiConnectPassphrase.data(), n);
+        const size_t n = std::min<size_t>(mWiFiClientConnectPassphrase.size(), Internal::kMaxWiFiKeyLength);
+        memcpy(passphrase, mWiFiClientConnectPassphrase.data(), n);
         passphrase[n] = '\0';
 
         g_variant_builder_add(&builder, "{sv}", kConnManServiceAgentPropertyPassphraseKey, g_variant_new_string(passphrase));
@@ -4896,6 +5628,27 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentReportError(Co
                  inError ? inError : "(null)");
 
     conn_man_agent_complete_report_error(inAgent, inInvocation);
+
+    // Secondary latch only, and deliberately handled inline on the GLib thread
+    // rather than marshaled to the Matter thread: connman emits
+    // PropertyChanged("Error") and PropertyChanged("State" = "failure") ahead of
+    // this call, and those are *already* deferred via ScheduleLambda. Deferring
+    // this as well would queue it strictly behind them -- that is, behind the
+    // ConcludeWiFiClusterConnectLocked that the failure transition performs --
+    // and every guard below would reject it, making the latch dead code.
+    // Handled inline, it can still win that race and serve as the fallback it
+    // is meant to be.
+    //
+    // Never overwrite a latched cause, and never latch for a connect that is no
+    // longer in flight or for a service that is not ours: connman calls
+    // ReportError *after* the failure transition in the ordinary case, and an
+    // unguarded write would arm a stale error for the *next* connect.
+
+    if ((inError != nullptr) && HasWiFiClusterConnectPendingLocked() && IsWiFiPendingConnectServicePathLocked(inPath) &&
+        !mWiFiClusterConnectServiceError.has_value())
+    {
+        mWiFiClusterConnectServiceError = MapServiceError(inError);
+    }
 
     // The connman agent contract requires the handler to report the
     // invocation as handled; there is no path on which we decline it.
