@@ -41609,26 +41609,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_contributorEndpointID);
                 }
                 jobject newElement_0_contributorName;
-                if (!entry_0.contributorName.HasValue())
+                if (entry_0.contributorName.IsNull())
                 {
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
-                                                                                               newElement_0_contributorName);
+                    newElement_0_contributorName = nullptr;
                 }
                 else
                 {
-                    jobject newElement_0_contributorNameInsideOptional;
-                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                        entry_0.contributorName.Value(), newElement_0_contributorNameInsideOptional));
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                        newElement_0_contributorNameInsideOptional, newElement_0_contributorName);
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.contributorName.Value(),
+                                                                                         newElement_0_contributorName));
                 }
-                jobject newElement_0_contributorHealth;
-                std::string newElement_0_contributorHealthClassName     = "java/lang/Integer";
-                std::string newElement_0_contributorHealthCtorSignature = "(I)V";
-                jint jninewElement_0_contributorHealth                  = static_cast<jint>(entry_0.contributorHealth);
+                jobject newElement_0_contributorStatus;
+                std::string newElement_0_contributorStatusClassName     = "java/lang/Integer";
+                std::string newElement_0_contributorStatusCtorSignature = "(I)V";
+                jint jninewElement_0_contributorStatus                  = static_cast<jint>(entry_0.contributorStatus);
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_contributorHealthClassName.c_str(), newElement_0_contributorHealthCtorSignature.c_str(),
-                    jninewElement_0_contributorHealth, newElement_0_contributorHealth);
+                    newElement_0_contributorStatusClassName.c_str(), newElement_0_contributorStatusCtorSignature.c_str(),
+                    jninewElement_0_contributorStatus, newElement_0_contributorStatus);
 
                 {
                     jclass unionContributorStructStructClass_1;
@@ -41644,7 +41640,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID unionContributorStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, unionContributorStructStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;)V",
+                        "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;)V",
                         &unionContributorStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || unionContributorStructStructCtor_1 == nullptr)
                     {
@@ -41655,7 +41651,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 = env->NewObject(unionContributorStructStructClass_1, unionContributorStructStructCtor_1,
                                                   newElement_0_contributorNodeID, newElement_0_contributorEndpointID,
-                                                  newElement_0_contributorName, newElement_0_contributorHealth);
+                                                  newElement_0_contributorName, newElement_0_contributorStatus);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -46963,6 +46959,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::AccountLogin;
         switch (aPath.mAttributeId)
         {
+        case Attributes::OAuthLoggedIn::Id: {
+            using TypeInfo = Attributes::OAuthLoggedIn::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            jboolean jnivalue              = static_cast<jboolean>(cppValue);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
