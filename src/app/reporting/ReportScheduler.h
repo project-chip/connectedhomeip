@@ -170,7 +170,7 @@ public:
 
     virtual void DeferReports(System::Clock::Timeout aDelay)
     {
-        Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+        Timestamp now            = mTimerDelegate->GetCurrentMonotonicTimestamp();
         Timestamp newDeferralEnd = now + aDelay;
         if (newDeferralEnd > mDeferralEndTimestamp)
         {
@@ -193,7 +193,6 @@ public:
         }
         return timeout;
     }
-
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check
@@ -256,7 +255,7 @@ protected:
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
     TimerDelegate * mTimerDelegate;
     uint32_t mNumTotalSubscriptionsEstablished = 0;
-    Timestamp mDeferralEndTimestamp = Timestamp(0);
+    Timestamp mDeferralEndTimestamp            = Timestamp(0);
 };
 }; // namespace reporting
 }; // namespace app

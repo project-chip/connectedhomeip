@@ -41,7 +41,7 @@ enum class Tag : uint8_t
 
 struct DelayReportData
 {
-    uint16_t delayMinMs = 0;
+    uint16_t delayMinMs          = 0;
     uint16_t delayJitterWindowMs = 0;
 };
 

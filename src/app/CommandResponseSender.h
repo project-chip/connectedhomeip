@@ -54,8 +54,10 @@ public:
         virtual void OnDone(CommandResponseSender & apResponderObj) = 0;
     };
 
-    CommandResponseSender(Callback * apCallback, CommandHandlerImpl::Callback * apDispatchCallback, reporting::ReportScheduler * apReportScheduler = nullptr) :
-        mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this),
+    CommandResponseSender(Callback * apCallback, CommandHandlerImpl::Callback * apDispatchCallback,
+                          reporting::ReportScheduler * apReportScheduler = nullptr) :
+        mpCallback(apCallback),
+        mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this),
         mpReportScheduler(apReportScheduler)
     {}
 
@@ -201,7 +203,7 @@ private:
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
-    bool mReportResponseDropped = false;
+    bool mReportResponseDropped                    = false;
     reporting::ReportScheduler * mpReportScheduler = nullptr;
 };
 

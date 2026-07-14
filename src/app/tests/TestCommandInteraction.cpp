@@ -444,13 +444,13 @@ public:
 
     void ResetCounter()
     {
-        onFinalCalledTimes = 0;
+        onFinalCalledTimes       = 0;
         onDelayReportCalledTimes = 0;
-        mLastDelayReport = System::Clock::Timeout::zero();
+        mLastDelayReport         = System::Clock::Timeout::zero();
     }
 
-    int onFinalCalledTimes = 0;
-    int onDelayReportCalledTimes = 0;
+    int onFinalCalledTimes                  = 0;
+    int onDelayReportCalledTimes            = 0;
     System::Clock::Timeout mLastDelayReport = System::Clock::Timeout::zero();
 } mockCommandHandlerDelegate;
 
@@ -2253,7 +2253,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
     EXPECT_EQ(CHIP_NO_ERROR, commandSender.SetCommandSenderConfig(configParameters));
 
     InvokeRequestMessage::DelayReportData delayReportData;
-    delayReportData.delayMinMs = 1000;
+    delayReportData.delayMinMs          = 1000;
     delayReportData.delayJitterWindowMs = 500;
     commandSender.SetDelayReportData(delayReportData);
 
@@ -2284,7 +2284,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandHandler_DelayReportData)
     EXPECT_EQ(status, Protocols::InteractionModel::Status::Success);
 
     EXPECT_EQ(mockCommandHandlerDelegate.onDelayReportCalledTimes, 1);
-    uint64_t delayMs = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(mockCommandHandlerDelegate.mLastDelayReport).count());
+    uint64_t delayMs = static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(mockCommandHandlerDelegate.mLastDelayReport).count());
     EXPECT_GE(delayMs, 1000u);
     EXPECT_LE(delayMs, 1500u);
 }

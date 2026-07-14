@@ -1020,7 +1020,8 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
         CHIP_ERROR err = CHIP_NO_ERROR;
         InvokeRequestMessage::DelayReportData delayReportData;
         err = invokeRequestMessage.GetDelayReportData(&delayReportData);
-        VerifyOrDieWithMsg(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, DataManagement, "DUT Failure: Failed to read DelayReportData");
+        VerifyOrDieWithMsg(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, DataManagement,
+                           "DUT Failure: Failed to read DelayReportData");
         if (err == CHIP_NO_ERROR)
         {
             mDelayReportData.SetValue(delayReportData);

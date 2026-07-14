@@ -494,9 +494,9 @@ private:
     State mState = State::Idle;
     State mBackupState;
     ScopedChangeOnly<bool> mInternalCallToAddResponseData{ false };
-    bool mSuppressResponse                 = false;
-    bool mTimedRequest                     = false;
-    bool mGroupRequest                     = false;
+    bool mSuppressResponse = false;
+    bool mTimedRequest     = false;
+    bool mGroupRequest     = false;
     Optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;

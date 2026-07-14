@@ -92,7 +92,7 @@ bool SynchronizedReportSchedulerImpl::IsReportScheduled(ReadHandler * ReadHandle
 
 void SynchronizedReportSchedulerImpl::RescheduleAllReports()
 {
-    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
     Timeout timeout = Milliseconds32(0);
     if (CalculateNextReportTimeout(timeout, nullptr, now) == CHIP_NO_ERROR)
     {
