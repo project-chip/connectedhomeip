@@ -38,7 +38,6 @@
 import logging
 from glob import glob
 from pathlib import Path
-from typing import Optional
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
@@ -97,7 +96,7 @@ def load_all_paa(paa_path: Path) -> dict:
     return paa_by_skid
 
 
-def extract_akid(cert: Certificate) -> Optional[bytes]:
+def extract_akid(cert: Certificate) -> bytes | None:
     # Find the authority key identifier (if present)
     for extension in cert.extensions:
         if extension.oid == AuthorityKeyIdentifier.oid:

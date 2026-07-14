@@ -17,7 +17,6 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
-from typing import Optional
 
 from runner.runner import Runner
 
@@ -203,7 +202,7 @@ class Esp32Builder(Builder):
         return 'esp32'
 
     @property
-    def TargetFileName(self) -> Optional[str]:
+    def TargetFileName(self) -> str | None:
         if self.board == Esp32Board.C3DevKit:
             return 'sdkconfig.defaults.esp32c3'
         if self.board == Esp32Board.P4FunctionEV:

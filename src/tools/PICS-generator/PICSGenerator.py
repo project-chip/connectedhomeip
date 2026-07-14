@@ -22,7 +22,6 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Optional
 
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
 from rich.console import Console
@@ -45,7 +44,7 @@ xml_clusters = None
 _EVENT_ID_RE = re.compile(r'\.E([0-9A-Fa-f]+)$')
 
 
-def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
+def _extract_event_id(item_number: str | None) -> int | None:
     """Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
 
     Returns None if item_number is missing or doesn't end in '.E<hex>'.
@@ -60,8 +59,8 @@ def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
 
 def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, attributePicsList,
                                acceptedCommandPicsList, generatedCommandPicsList, outputPathStr,
-                               xml_events: Optional[dict[uint, XmlEvent]] = None,
-                               assessment_data: Optional[ConformanceAssessmentData] = None):
+                               xml_events: dict[uint, XmlEvent] | None = None,
+                               assessment_data: ConformanceAssessmentData | None = None):
 
     xmlPath = xmlTemplatePathStr
     fileName = ""

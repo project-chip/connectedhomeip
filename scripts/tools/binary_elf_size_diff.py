@@ -50,7 +50,7 @@ import sys
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import click
 import coloredlogs
@@ -141,7 +141,7 @@ class DiagramInstance:
 class SankeyGroupingRule:
     expr: re.Pattern  # Regex to match
     name: str  # What grouping to place this into
-    color: Optional[str]  # what color to use for this grouping
+    color: str | None  # what color to use for this grouping
 
     # internal state logic: we expect these to be part of sets
     # dictionary key is the target_index
@@ -218,7 +218,7 @@ class SankeyData:
     def add_grouping_rules(self, rules_definition: str):
         self.rules.extend(ParseRules(rules_definition))
 
-    def add_node(self, label: str, color: Optional[str] = None) -> int:
+    def add_node(self, label: str, color: str | None = None) -> int:
         self.labels.append(label)
         self.colors.append(color if color is not None else "blue")
         return len(self.labels) - 1
@@ -275,7 +275,7 @@ def name_transform(name: str) -> str:
     return name
 
 
-def sankey_diagram(input_list: list, sankey_rules: Optional[Any], skip_name_transform: bool):
+def sankey_diagram(input_list: list, sankey_rules: Any | None, skip_name_transform: bool):
     """
     Generates a sankey diagram based on the input list. The input list is expected
     to contain values of (change_type, delta, name, size_in_1, size_in_2)

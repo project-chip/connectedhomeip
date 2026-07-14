@@ -18,7 +18,6 @@ import pathlib
 from dataclasses import dataclass, field
 from datetime import timedelta
 from importlib.resources.abc import Traversable
-from typing import Optional
 
 from matter.testing.defaults import TestingDefaults
 
@@ -27,13 +26,13 @@ from matter.testing.defaults import TestingDefaults
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
     logs_path: pathlib.Path = pathlib.Path(".")
-    paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_controller: Optional[int] = None
+    paa_trust_store_path: pathlib.Path | None = None
+    ble_controller: int | None = None
     commission_only: bool = False
     spec_errata_path: str | Traversable | None = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID
-    case_admin_subject: Optional[int] = None
+    case_admin_subject: int | None = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: list[str] = field(default_factory=list)
@@ -44,18 +43,18 @@ class MatterTestConfig:
     pipe_name_out: str | None = None
     fail_on_skipped_tests: bool = False
 
-    commissioning_method: Optional[str] = None
-    in_test_commissioning_method: Optional[str] = None
+    commissioning_method: str | None = None
+    in_test_commissioning_method: str | None = None
     discriminators: list[int] = field(default_factory=list)
     setup_passcodes: list[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
+    commissionee_ip_address_just_for_testing: str | None = None
     # By default, we start with maximized cert chains, as required for RR-1.1.
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
 
     # Border Agent information for Thread MeshCoP Commissioning
-    thread_ba_host: Optional[str] = None
-    thread_ba_port: Optional[int] = None
+    thread_ba_host: str | None = None
+    thread_ba_port: int | None = None
 
     # By default, let's set validity to 10 years
     certificate_validity_period = int(timedelta(days=10*365).total_seconds())
@@ -63,9 +62,9 @@ class MatterTestConfig:
     qr_code_content: list[str] = field(default_factory=list)
     manual_code: list[str] = field(default_factory=list)
 
-    wifi_ssid: Optional[str] = None
-    wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[bytes] = None
+    wifi_ssid: str | None = None
+    wifi_passphrase: str | None = None
+    thread_operational_dataset: bytes | None = None
 
     pics: dict[str, bool] = field(default_factory=dict)
 
@@ -86,7 +85,7 @@ class MatterTestConfig:
     root_of_trust_index: int = TestingDefaults.TRUST_ROOT_INDEX
 
     # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: Optional[pathlib.Path] = None
+    chip_tool_credentials_path: pathlib.Path | None = None
 
     trace_to: list[str] = field(default_factory=list)
 
@@ -94,7 +93,7 @@ class MatterTestConfig:
     tc_version_to_simulate: int = None
     tc_user_response_to_simulate: int = None
     # path to device attestation revocation set json file
-    dac_revocation_set_path: Optional[pathlib.Path] = None
+    dac_revocation_set_path: pathlib.Path | None = None
 
     legacy: bool = False
 
@@ -105,7 +104,7 @@ class MatterTestConfig:
     no_wildcard_subscription: bool = False
 
     # Restart flag file for rebooting the DUT during test runs
-    restart_flag_file: Optional[pathlib.Path] = None
+    restart_flag_file: pathlib.Path | None = None
 
     # Debug mode to capture attribute dump at end of test modules
     debug: bool = False

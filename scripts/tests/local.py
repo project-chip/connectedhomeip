@@ -28,8 +28,8 @@ import subprocess
 import sys
 import textwrap
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Optional
 
 import alive_progress
 import click
@@ -84,7 +84,7 @@ def _get_native_machine_target():
 _CONFIG_PATH = "out/local_py.ini"
 
 
-def get_coverage_default(coverage: Optional[bool]) -> bool:
+def get_coverage_default(coverage: bool | None) -> bool:
     if coverage is not None:
         return coverage
     config = configparser.ConfigParser()
@@ -95,7 +95,7 @@ def get_coverage_default(coverage: Optional[bool]) -> bool:
         return False
 
 
-def _get_variants(coverage: Optional[bool]):
+def _get_variants(coverage: bool | None):
     """
     compute the build variant suffixes for the given options
     """
@@ -138,7 +138,7 @@ class ApplicationTarget:
     binary: str  # elf binary to run after it is built
 
 
-def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
+def _get_targets(coverage: bool | None) -> list[ApplicationTarget]:
     target_prefix = _get_native_machine_target()
     suffix = _get_variants(coverage)
 
@@ -512,7 +512,7 @@ def _do_build_python():
     )
 
 
-def _do_build_apps(coverage: Optional[bool], ccache: bool):
+def _do_build_apps(coverage: bool | None, ccache: bool):
     """
     Builds example python apps suitable for running all python_tests.
 
@@ -535,7 +535,7 @@ def _do_build_apps(coverage: Optional[bool], ccache: bool):
     subprocess.run(_with_activate(cmd), check=True)
 
 
-def _do_build_basic_apps(coverage: Optional[bool]):
+def _do_build_basic_apps(coverage: bool | None):
     """
     Builds a minimal subset of test applications, specifically
     all-clusters and chip-tool only, for basic tests.
@@ -1160,7 +1160,7 @@ def python_tests(
             sys.exit(1)
 
 
-def _do_build_fabric_sync_apps(coverage: Optional[bool]):
+def _do_build_fabric_sync_apps(coverage: bool | None):
     """
     Build applications used for fabric sync tests
     """

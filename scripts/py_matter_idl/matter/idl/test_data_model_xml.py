@@ -18,7 +18,6 @@ import sys
 import unittest
 from difflib import unified_diff
 from pathlib import Path
-from typing import Optional
 
 try:
     from matter.idl.data_model_xml import ParseSource, ParseXmls
@@ -37,7 +36,7 @@ from matter.idl.matter_idl_types import Idl
 class GeneratorContentStorage(GeneratorStorage):
     def __init__(self):
         super().__init__()
-        self.content: Optional[str] = None
+        self.content: str | None = None
 
     def get_existing_data(self, relative_path: str):
         # Force re-generation each time
