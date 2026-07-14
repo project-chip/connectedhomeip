@@ -21,6 +21,7 @@ import pathlib
 import re
 import sys
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -44,9 +45,41 @@ xml_clusters = None
 # Matches the trailing ".E<hex>" event-id suffix in a PICS itemNumber like "ACL.S.E01".
 _EVENT_ID_RE = re.compile(r'\.E([0-9A-Fa-f]+)$')
 
+# Filename of the MCORE/base template in the CSA PICS XML bundle.
+_BASE_PICS_TEMPLATE_FILENAME = "Base.xml"
+
+# Network Commissioning cluster ID. Used to detect the cluster on any endpoint
+# without depending on it living on EP0.
+_NETWORK_COMMISSIONING_CLUSTER_ID = 0x0031
+
+# Network Commissioning feature bits (see NetworkCommissioningCluster.xml).
+_NETCOMM_FEATURE_BIT_WIFI = 0
+_NETCOMM_FEATURE_BIT_THREAD = 1
+_NETCOMM_FEATURE_BIT_ETHERNET = 2
+
+# Aggregator device type ID (see data_model/.../device_types/Aggregator.xml).
+# Endpoints with this device type identify the device as a Bridge.
+_AGGREGATOR_DEVICE_TYPE_ID = 0x000E
+
+
+@dataclass
+class _BasePicsFacts:
+    is_commissionee: bool = False
+    supports_wifi: bool = False
+    supports_wifi_2g4: bool = False
+    supports_wifi_5g: bool = False
+    supports_thread: bool = False
+    supports_ethernet: bool = False
+    is_server: bool = False
+    is_bridge: bool = False
+    is_ota_requestor: bool = False
+    is_ota_provider: bool = False
+    has_groups_on_multiple_endpoints: bool = False
+
 
 def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
-    """Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
+    """
+    Parse the event id from a PICS itemNumber like 'ACL.S.E01'.
 
     Returns None if item_number is missing or doesn't end in '.E<hex>'.
     """
@@ -56,6 +89,99 @@ def _extract_event_id(item_number: Optional[str]) -> Optional[int]:
     if match is None:
         return None
     return int(match.group(1), 16)
+
+
+def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
+    """
+    Auto-mark the base/MCORE PICS we can derive from the DUT.
+
+    Only flips items with a deterministic protocol readback. Everything else
+    is left at the template default (false) so the reviewer knows to look at it.
+    """
+    template_path = Path(xmlTemplatePathStr) / _BASE_PICS_TEMPLATE_FILENAME
+    if not template_path.exists():
+        console.print(f"[red]Base PICS template ({_BASE_PICS_TEMPLATE_FILENAME}) not found in {xmlTemplatePathStr}; skipping ❌")
+        return
+
+    # itemNumber -> True if we want to flip support to "true". Items not in
+    # this map keep the template value (false).
+    auto_marked: dict[str, bool] = {}
+    if facts.is_commissionee:
+        auto_marked["MCORE.ROLE.COMMISSIONEE"] = True
+
+    # Only mark MCORE.COM.WIFI when we also know at least one band, otherwise
+    # the file ends up internally inconsistent (WIFI=true but no band marked,
+    # which the spec says makes WIFI's M condition unsatisfiable).
+    wifi_marked = False
+    if facts.supports_wifi and (facts.supports_wifi_2g4 or facts.supports_wifi_5g):
+        auto_marked["MCORE.COM.WIFI"] = True
+        wifi_marked = True
+        if facts.supports_wifi_2g4:
+            auto_marked["MCORE.COM.WIFI_2P4GHZ"] = True
+        if facts.supports_wifi_5g:
+            auto_marked["MCORE.COM.WIFI_5GHZ"] = True
+
+    if facts.supports_thread:
+        auto_marked["MCORE.COM.THR"] = True
+
+    if facts.supports_ethernet:
+        auto_marked["MCORE.COM.ETH"] = True
+
+    # Mirror what we actually marked above. Marking WIRELESS without marking
+    # one of WIFI/THR would leave the spec's M condition unsatisfied.
+    if wifi_marked or facts.supports_thread:
+        auto_marked["MCORE.COM.WIRELESS"] = True
+
+    if facts.is_server:
+        auto_marked["MCORE.IDM.S"] = True
+
+    if facts.is_bridge:
+        auto_marked["MCORE.BRIDGE"] = True
+
+    if facts.is_ota_requestor:
+        auto_marked["MCORE.OTA.Requestor"] = True
+
+    if facts.is_ota_provider:
+        auto_marked["MCORE.OTA.Provider"] = True
+
+    if facts.has_groups_on_multiple_endpoints:
+        auto_marked["MCORE.G.MULTIENDPOINT"] = True
+
+    parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
+    tree = ET.parse(template_path, parser)
+    root = tree.getroot()
+
+    marked_count = 0
+    for picsItem in root.iter('picsItem'):
+        itemNumberElement = picsItem.find('itemNumber')
+        if itemNumberElement is None or itemNumberElement.text is None:
+            continue
+        item_id = itemNumberElement.text.strip()
+        if auto_marked.get(item_id):
+            supportElement = picsItem.find('support')
+            if supportElement is not None:
+                supportElement.text = "true"
+                console.print(f"Auto-marked {item_id} in Base.xml ✅")
+                marked_count += 1
+
+    if marked_count == 0:
+        console.print("[yellow]Base.xml: no MCORE items auto-marked (Network Commissioning not detected?)")
+
+    # Preserve the template's leading xml declaration + autogenerated comment
+    # block by streaming raw lines until we hit the root <generalPICS>, then
+    # writing the parsed tree. Matches the style used by GenerateDevicePicsXmlFiles.
+    output_file_path = f"{outputPathStr}{_BASE_PICS_TEMPLATE_FILENAME}"
+    with (open(template_path) as inputFile,
+          open(output_file_path, "wb") as outputFile):
+        header = ""
+        line = inputFile.readline()
+        while line and 'generalPICS' not in line:
+            header += line
+            line = inputFile.readline()
+        outputFile.write(header.encode())
+        tree.write(outputFile, encoding='utf-8', xml_declaration=False)
+
+    console.print(f"[blue]Wrote Base.xml: {output_file_path}")
 
 
 def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, attributePicsList,
@@ -98,7 +224,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         return
 
     # Usage PICS
-    # console.print(clusterPicsCode)
     usageNode = root.find('usage')
     for picsItem in usageNode:
         itemNumberElement = picsItem.find('itemNumber')
@@ -108,7 +233,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         if itemNumberElement.text == f"{clusterPicsCode}":
             console.print("Found usage PICS value in XML template ✅")
             supportElement = picsItem.find('support')
-            # console.print(f"Support: {supportElement.text}")
             supportElement.text = "true"
 
             # Since usage PICS (server or client) is not a list, we can break out when a match is found,
@@ -227,7 +351,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         outputFile.write(xmlHeader.encode())
 
         # Write the PICS XML data
-        tree.write(outputFile)
+        tree.write(outputFile, encoding='utf-8', xml_declaration=False)
 
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
@@ -244,6 +368,17 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
     partsList.insert(0, 0)
     # console.print(partsList)
 
+    # If we got this far the DUT was successfully commissioned, so the
+    # commissionee role bit is always true. is_server is also unconditionally
+    # true: every Matter device that has a Descriptor cluster (which we just
+    # read) is a server. The transport bits get filled in below when we hit
+    # the Network Commissioning cluster on any endpoint.
+    base_pics_facts = _BasePicsFacts(is_commissionee=True, is_server=True)
+
+    # Counts how many endpoints expose the Groups cluster. Used to derive
+    # MCORE.G.MULTIENDPOINT after the parts list walk.
+    groups_endpoint_count = 0
+
     for endpoint in partsList:
         # Test step 2 - Map each available endpoint
         console.print(f"Mapping endpoint: {endpoint}")
@@ -259,10 +394,20 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
         for deviceTypeData in deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
             console.print(f"Device Type: {deviceTypeData.deviceType}")
+            if deviceTypeData.deviceType == _AGGREGATOR_DEVICE_TYPE_ID:
+                base_pics_facts.is_bridge = True
 
         # Read server list
         serverListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.ServerList)])
         serverList = serverListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
+
+        # MCORE base/MCORE auto-marks driven by cluster presence on this endpoint.
+        if Clusters.Groups.id in serverList:
+            groups_endpoint_count += 1
+        if Clusters.OtaSoftwareUpdateRequestor.id in serverList:
+            base_pics_facts.is_ota_requestor = True
+        if Clusters.OtaSoftwareUpdateProvider.id in serverList:
+            base_pics_facts.is_ota_provider = True
 
         for server in serverList:
             featurePicsList = []
@@ -306,6 +451,30 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
             console.print("Collected feature PICS:")
             console.print(featurePicsList)
+
+            # Capture base/MCORE transport bits when we land on Network
+            # Commissioning. Wi-Fi band detail comes from SupportedWiFiBands;
+            # if that read fails we leave Wi-Fi unmarked rather than write a
+            # half-filled file (see GenerateBasePicsXmlFile for the rationale).
+            if server == _NETWORK_COMMISSIONING_CLUSTER_ID:
+                if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_WIFI):
+                    base_pics_facts.supports_wifi = True
+                    try:
+                        wifiBandsResp = await devCtrl.ReadAttribute(
+                            nodeID, [(endpoint, clusterClass.Attributes.SupportedWiFiBands)])
+                        wifiBands = wifiBandsResp[endpoint][clusterClass][clusterClass.Attributes.SupportedWiFiBands]
+                        WiFiBandEnum = Clusters.NetworkCommissioning.Enums.WiFiBandEnum
+                        if WiFiBandEnum.k2g4 in wifiBands:
+                            base_pics_facts.supports_wifi_2g4 = True
+                        if WiFiBandEnum.k5g in wifiBands:
+                            base_pics_facts.supports_wifi_5g = True
+                    except Exception as e:
+                        console.print(f"[yellow]Could not read SupportedWiFiBands on EP{endpoint}: {e}; "
+                                      "leaving MCORE.COM.WIFI* unmarked")
+                if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_THREAD):
+                    base_pics_facts.supports_thread = True
+                if featureMapValue & (1 << _NETCOMM_FEATURE_BIT_ETHERNET):
+                    base_pics_facts.supports_ethernet = True
 
             # Read attribute list
             attributeListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.AttributeList)])
@@ -389,6 +558,13 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             console.print(f"{clusterName} - {clusterPICS}")
 
             GenerateDevicePicsXmlFiles(clusterName, clusterPICS, [], [], [], [], endpointOutputPathStr)
+
+    if groups_endpoint_count >= 2:
+        base_pics_facts.has_groups_on_multiple_endpoints = True
+
+    # Base/MCORE PICS are per-device, not per-endpoint, so this runs once after
+    # the parts list walk completes and writes Base.xml at the device root.
+    GenerateBasePicsXmlFile(base_pics_facts, outputPathStr)
 
 
 def cleanDirectory(pathToClean):
