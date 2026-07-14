@@ -3834,6 +3834,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableAudioTracksID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterMediaPlaybackAttributeActiveTextTrackID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableTextTracksID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableCommandsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterMediaPlaybackAttributeContentInfoID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterMediaPlaybackAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -3922,6 +3924,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster ContentLauncher attributes
     MTRAttributeIDTypeClusterContentLauncherAttributeAcceptHeaderID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
     MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
+    MTRAttributeIDTypeClusterContentLauncherAttributeMovableID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterContentLauncherAttributePresetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterContentLauncherAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -4034,6 +4038,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterAccountLoginAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster AccountLogin attributes
+    MTRAttributeIDTypeClusterAccountLoginAttributeOAuthLoggedInID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterAccountLoginAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -6432,6 +6437,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
     MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTRCommandIDTypeClusterContentLauncherCommandLauncherResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
+    MTRCommandIDTypeClusterContentLauncherCommandContentReplicationRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterContentLauncherCommandContentReplicationResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterContentLauncherCommandPlayPresetID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
 
     // Cluster AudioOutput deprecated command id names
     MTRClusterAudioOutputCommandSelectOutputID
@@ -6484,6 +6492,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTRCommandIDTypeClusterAccountLoginCommandLoginID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTRCommandIDTypeClusterAccountLoginCommandLogoutID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
+    MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
 
     // Cluster ContentControl commands
     MTRCommandIDTypeClusterContentControlCommandUpdatePINID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7277,6 +7287,11 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster MediaPlayback events
     MTREventIDTypeClusterMediaPlaybackEventStateChangedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
+
+    // Cluster ContentLauncher deprecated event names
+
+    // Cluster ContentLauncher events
+    MTREventIDTypeClusterContentLauncherEventContentReplicationID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster AccountLogin deprecated event names
 

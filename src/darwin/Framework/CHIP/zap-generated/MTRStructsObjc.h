@@ -2166,11 +2166,18 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAmbientSensingUnionClusterContributorStatusChangeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contributorIndex MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull previousContributorStatus MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull currentContributorStatus MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRAmbientSensingUnionClusterUnionContributorStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable contributorNodeID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable contributorEndpointID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable contributorName MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull contributorHealth MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull contributorStatus MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2185,7 +2192,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRAmbientSensingUnionClusterUnionContributorStatusChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull statusChangedContributor MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull contributorStatusChange MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2422,6 +2429,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRMediaPlaybackClusterTrackAttributesStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull languageCode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable characteristics MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable displayName MTR_PROVISIONALLY_AVAILABLE;
 @end
 
@@ -2429,6 +2437,19 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRMediaPlaybackClusterTrackStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull id MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRMediaPlaybackClusterTrackAttributesStruct * _Nullable trackAttributes MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRMediaPlaybackClusterContentInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contentType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable title MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable show MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable season MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable episode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable provider MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable artist MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable album MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable track MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -2484,6 +2505,30 @@ MTR_DEPRECATED("Please use MTRContentLauncherClusterDimensionStruct", ios(16.1, 
 @property (nonatomic, copy) NSNumber * _Nonnull width MTR_DEPRECATED("Please use MTRContentLauncherClusterDimensionStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @property (nonatomic, copy) NSNumber * _Nonnull height MTR_DEPRECATED("Please use MTRContentLauncherClusterDimensionStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @property (nonatomic, copy) NSNumber * _Nonnull metric MTR_DEPRECATED("Please use MTRContentLauncherClusterDimensionStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentLauncherClusterContentAppInfo : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contentAppVendorID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull contentAppProductID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull data MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentLauncherClusterLaunchUrlInfo : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull url MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable data MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable contentType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable contentHeaders MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable offsetMillisecs MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable queueType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable nextUrl MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentLauncherClusterReplicationInfo : NSObject <NSCopying>
+@property (nonatomic, copy) MTRContentLauncherClusterLaunchUrlInfo * _Nullable launchUrlInfo MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRContentLauncherClusterContentAppInfo * _Nullable contentAppInfo MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2568,6 +2613,17 @@ MTR_DEPRECATED("Please use MTRContentLauncherClusterBrandingInformationStruct", 
 @property (nonatomic, copy) MTRContentLauncherClusterStyleInformationStruct * _Nullable progressBar MTR_DEPRECATED("Please use MTRContentLauncherClusterBrandingInformationStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @property (nonatomic, copy) MTRContentLauncherClusterStyleInformationStruct * _Nullable splash MTR_DEPRECATED("Please use MTRContentLauncherClusterBrandingInformationStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @property (nonatomic, copy) MTRContentLauncherClusterStyleInformationStruct * _Nullable waterMark MTR_DEPRECATED("Please use MTRContentLauncherClusterBrandingInformationStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentLauncherClusterContentPresetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull presetID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull presetName MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentLauncherClusterContentReplicationEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))

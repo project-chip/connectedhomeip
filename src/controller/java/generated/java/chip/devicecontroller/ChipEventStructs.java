@@ -7227,18 +7227,18 @@ public static class AmbientSensingUnionClusterUnionContributorRemovedEvent {
   }
 }
 public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent {
-  public ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> statusChangedContributor;
-  private static final long STATUS_CHANGED_CONTRIBUTOR_ID = 0L;
+  public ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange;
+  private static final long CONTRIBUTOR_STATUS_CHANGE_ID = 0L;
 
   public AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> statusChangedContributor
+    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange
   ) {
-    this.statusChangedContributor = statusChangedContributor;
+    this.contributorStatusChange = contributorStatusChange;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(STATUS_CHANGED_CONTRIBUTOR_ID, ArrayType.generateArrayType(statusChangedContributor, (elementstatusChangedContributor) -> elementstatusChangedContributor.encodeTlv())));
+    values.add(new StructElement(CONTRIBUTOR_STATUS_CHANGE_ID, ArrayType.generateArrayType(contributorStatusChange, (elementcontributorStatusChange) -> elementcontributorStatusChange.encodeTlv())));
 
     return new StructType(values);
   }
@@ -7247,17 +7247,17 @@ public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<ChipStructs.AmbientSensingUnionClusterUnionContributorStruct> statusChangedContributor = null;
+    ArrayList<ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct> contributorStatusChange = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == STATUS_CHANGED_CONTRIBUTOR_ID) {
+      if (element.contextTagNum() == CONTRIBUTOR_STATUS_CHANGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          statusChangedContributor = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterUnionContributorStruct.decodeTlv(elementcastingValue));
+          contributorStatusChange = castingValue.map((elementcastingValue) -> ChipStructs.AmbientSensingUnionClusterContributorStatusChangeStruct.decodeTlv(elementcastingValue));
         }
       }
     }
     return new AmbientSensingUnionClusterUnionContributorStatusChangedEvent(
-      statusChangedContributor
+      contributorStatusChange
     );
   }
 
@@ -7265,8 +7265,8 @@ public static class AmbientSensingUnionClusterUnionContributorStatusChangedEvent
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("AmbientSensingUnionClusterUnionContributorStatusChangedEvent {\n");
-    output.append("\tstatusChangedContributor: ");
-    output.append(statusChangedContributor);
+    output.append("\tcontributorStatusChange: ");
+    output.append(contributorStatusChange);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -7631,6 +7631,52 @@ public static class MediaPlaybackClusterStateChangedEvent {
     output.append("\n");
     output.append("\taudioAdvanceUnmuted: ");
     output.append(audioAdvanceUnmuted);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentLauncherClusterContentReplicationEvent {
+  public Integer status;
+  private static final long STATUS_ID = 0L;
+
+  public ContentLauncherClusterContentReplicationEvent(
+    Integer status
+  ) {
+    this.status = status;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterContentReplicationEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer status = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ContentLauncherClusterContentReplicationEvent(
+      status
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterContentReplicationEvent {\n");
+    output.append("\tstatus: ");
+    output.append(status);
     output.append("\n");
     output.append("}\n");
     return output.toString();

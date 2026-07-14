@@ -13497,6 +13497,8 @@ private:
 | * AvailableAudioTracks                                              | 0x0008 |
 | * ActiveTextTrack                                                   | 0x0009 |
 | * AvailableTextTracks                                               | 0x000A |
+| * AvailableCommands                                                 | 0x000B |
+| * ContentInfo                                                       | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -14301,10 +14303,14 @@ private:
 | Commands:                                                           |        |
 | * LaunchContent                                                     |   0x00 |
 | * LaunchURL                                                         |   0x01 |
+| * ContentReplicationRequest                                         |   0x03 |
+| * PlayPreset                                                        |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AcceptHeader                                                      | 0x0000 |
 | * SupportedStreamingProtocols                                       | 0x0001 |
+| * Movable                                                           | 0x0002 |
+| * Presets                                                           | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -14312,6 +14318,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * ContentReplication                                                | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -14329,6 +14336,8 @@ public:
         AddArgument("Data", &mRequest.data);
         AddArgument("PlaybackPreferences", &mComplex_PlaybackPreferences, "", Argument::kOptional);
         AddArgument("UseCurrentContext", 0, 1, &mRequest.useCurrentContext);
+        AddArgument("ContentAppVendorID", 0, UINT16_MAX, &mRequest.contentAppVendorID);
+        AddArgument("ContentAppProductID", 0, UINT16_MAX, &mRequest.contentAppProductID);
         ClusterCommand::AddArguments();
     }
 
@@ -14367,11 +14376,18 @@ class ContentLauncherLaunchURL : public ClusterCommand
 {
 public:
     ContentLauncherLaunchURL(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("launch-url", credsIssuerConfig), mComplex_BrandingInformation(&mRequest.brandingInformation)
+        ClusterCommand("launch-url", credsIssuerConfig), mComplex_BrandingInformation(&mRequest.brandingInformation),
+        mComplex_PlaybackPreferences(&mRequest.playbackPreferences), mComplex_ContentHeaders(&mRequest.contentHeaders)
     {
         AddArgument("ContentURL", &mRequest.contentURL);
         AddArgument("DisplayString", &mRequest.displayString);
         AddArgument("BrandingInformation", &mComplex_BrandingInformation, "", Argument::kOptional);
+        AddArgument("PlaybackPreferences", &mComplex_PlaybackPreferences, "", Argument::kOptional);
+        AddArgument("ContentType", &mRequest.contentType);
+        AddArgument("ContentHeaders", &mComplex_ContentHeaders, "", Argument::kOptional);
+        AddArgument("OffsetMillisecs", 0, UINT32_MAX, &mRequest.offsetMillisecs);
+        AddArgument("QueueType", 0, UINT8_MAX, &mRequest.queueType);
+        AddArgument("NextUrl", &mRequest.nextUrl);
         ClusterCommand::AddArguments();
     }
 
@@ -14400,6 +14416,84 @@ private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type mRequest;
     TypedComplexArgument<chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type>>
         mComplex_BrandingInformation;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::Type>>
+        mComplex_PlaybackPreferences;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>>>
+        mComplex_ContentHeaders;
+};
+
+/*
+ * Command ContentReplicationRequest
+ */
+class ContentLauncherContentReplicationRequest : public ClusterCommand
+{
+public:
+    ContentLauncherContentReplicationRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("content-replication-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Type mRequest;
+};
+
+/*
+ * Command PlayPreset
+ */
+class ContentLauncherPlayPreset : public ClusterCommand
+{
+public:
+    ContentLauncherPlayPreset(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("play-preset", credsIssuerConfig)
+    {
+        AddArgument("PresetID", 0, UINT8_MAX, &mRequest.presetID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ContentLauncher::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -14667,8 +14761,10 @@ private:
 | * GetSetupPIN                                                       |   0x00 |
 | * Login                                                             |   0x02 |
 | * Logout                                                            |   0x03 |
+| * GetDeviceAuthURI                                                  |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * OAuthLoggedIn                                                     | 0x0000 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -14790,6 +14886,43 @@ public:
 
 private:
     chip::app::Clusters::AccountLogin::Commands::Logout::Type mRequest;
+};
+
+/*
+ * Command GetDeviceAuthURI
+ */
+class AccountLoginGetDeviceAuthURI : public ClusterCommand
+{
+public:
+    AccountLoginGetDeviceAuthURI(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-device-auth-uri", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -32715,6 +32848,8 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<ReadAttribute>(Id, "available-audio-tracks", Attributes::AvailableAudioTracks::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "active-text-track", Attributes::ActiveTextTrack::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "available-text-tracks", Attributes::AvailableTextTracks::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "available-commands", Attributes::AvailableCommands::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "content-info", Attributes::ContentInfo::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -32751,6 +32886,11 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
             chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type>>>>(
             Id, "available-text-tracks", Attributes::AvailableTextTracks::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>>>(
+            Id, "available-commands", Attributes::AvailableCommands::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::Type>>>(
+            Id, "content-info", Attributes::ContentInfo::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -32774,6 +32914,8 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<SubscribeAttribute>(Id, "available-audio-tracks", Attributes::AvailableAudioTracks::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "active-text-track", Attributes::ActiveTextTrack::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "available-text-tracks", Attributes::AvailableTextTracks::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "available-commands", Attributes::AvailableCommands::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "content-info", Attributes::ContentInfo::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -32956,9 +33098,11 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
-        make_unique<ContentLauncherLaunchContent>(credsIssuerConfig), //
-        make_unique<ContentLauncherLaunchURL>(credsIssuerConfig),     //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
+        make_unique<ContentLauncherLaunchContent>(credsIssuerConfig),             //
+        make_unique<ContentLauncherLaunchURL>(credsIssuerConfig),                 //
+        make_unique<ContentLauncherContentReplicationRequest>(credsIssuerConfig), //
+        make_unique<ContentLauncherPlayPreset>(credsIssuerConfig),                //
         //
         // Attributes
         //
@@ -32966,6 +33110,8 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         make_unique<ReadAttribute>(Id, "accept-header", Attributes::AcceptHeader::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "supported-streaming-protocols", Attributes::SupportedStreamingProtocols::Id,
                                    credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "movable", Attributes::Movable::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -32977,6 +33123,11 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>>(
             Id, "supported-streaming-protocols", 0, UINT32_MAX, Attributes::SupportedStreamingProtocols::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "movable", 0, 1, Attributes::Movable::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type>>>(
+            Id, "presets", Attributes::Presets::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -32992,6 +33143,8 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeAttribute>(Id, "accept-header", Attributes::AcceptHeader::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "supported-streaming-protocols", Attributes::SupportedStreamingProtocols::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "movable", Attributes::Movable::Id, credsIssuerConfig),                             //
+        make_unique<SubscribeAttribute>(Id, "presets", Attributes::Presets::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -33000,8 +33153,10 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                             //
+        make_unique<ReadEvent>(Id, "content-replication", Events::ContentReplication::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                        //
+        make_unique<SubscribeEvent>(Id, "content-replication", Events::ContentReplication::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -33212,20 +33367,24 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),      //
-        make_unique<AccountLoginGetSetupPIN>(credsIssuerConfig), //
-        make_unique<AccountLoginLogin>(credsIssuerConfig),       //
-        make_unique<AccountLoginLogout>(credsIssuerConfig),      //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
+        make_unique<AccountLoginGetSetupPIN>(credsIssuerConfig),      //
+        make_unique<AccountLoginLogin>(credsIssuerConfig),            //
+        make_unique<AccountLoginLogout>(credsIssuerConfig),           //
+        make_unique<AccountLoginGetDeviceAuthURI>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "oauth-logged-in", Attributes::OAuthLoggedIn::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<bool>>(Id, "oauth-logged-in", 0, 1, Attributes::OAuthLoggedIn::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -33238,6 +33397,7 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "oauth-logged-in", Attributes::OAuthLoggedIn::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

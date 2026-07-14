@@ -390,6 +390,12 @@ public class TvCastingApp {
         },
         contentUrl,
         Optional.of(contentDisplayStr),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty());
 
     return true;
@@ -453,6 +459,8 @@ public class TvCastingApp {
         search,
         autoPlay,
         data != null ? Optional.of(data) : Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty());
     return true;

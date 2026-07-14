@@ -8500,6 +8500,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AvailableTextTracks";
             break;
 
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeAvailableCommandsID:
+            result = @"AvailableCommands";
+            break;
+
+        case MTRAttributeIDTypeClusterMediaPlaybackAttributeContentInfoID:
+            result = @"ContentInfo";
+            break;
+
         case MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8642,6 +8650,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID:
             result = @"SupportedStreamingProtocols";
+            break;
+
+        case MTRAttributeIDTypeClusterContentLauncherAttributeMovableID:
+            result = @"Movable";
+            break;
+
+        case MTRAttributeIDTypeClusterContentLauncherAttributePresetsID:
+            result = @"Presets";
             break;
 
         case MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID:
@@ -8820,6 +8836,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster AccountLogin attributes
+        case MTRAttributeIDTypeClusterAccountLoginAttributeOAuthLoggedInID:
+            result = @"OAuthLoggedIn";
+            break;
+
         case MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -12983,6 +13003,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"LaunchURL";
             break;
 
+        case MTRCommandIDTypeClusterContentLauncherCommandContentReplicationRequestID:
+            result = @"ContentReplicationRequest";
+            break;
+
+        case MTRCommandIDTypeClusterContentLauncherCommandPlayPresetID:
+            result = @"PlayPreset";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -13053,6 +13081,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterAccountLoginCommandLogoutID:
             result = @"Logout";
+            break;
+
+        case MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIID:
+            result = @"GetDeviceAuthURI";
             break;
 
         default:
@@ -15447,6 +15479,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"LauncherResponse";
             break;
 
+        case MTRCommandIDTypeClusterContentLauncherCommandContentReplicationResponseID:
+            result = @"ContentReplicationResponse";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -15493,6 +15529,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINResponseID:
             result = @"GetSetupPINResponse";
+            break;
+
+        case MTRCommandIDTypeClusterAccountLoginCommandGetDeviceAuthURIResponseID:
+            result = @"GetDeviceAuthURIResponse";
             break;
 
         default:
@@ -17766,6 +17806,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeContentLauncherID:
 
         switch (eventID) {
+
+            // Cluster ContentLauncher events
+        case MTREventIDTypeClusterContentLauncherEventContentReplicationID:
+            result = @"ContentReplication";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
