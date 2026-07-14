@@ -2599,7 +2599,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetServices(
 
             ReturnOnFailure(GetObjectTypeFromPropertiesLocked(props, type));
 
-            ReturnOnFailure(HandleServicePropertiesChangedLocked(G_DBUS_PROXY(service), path, type, props));
+            ReturnOnFailure(HandleServicePropertiesChangedLocked(lock, G_DBUS_PROXY(service), path, type, props));
         }
     }
     else
@@ -2641,7 +2641,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetTechnolog
 
             ReturnOnFailure(GetObjectTypeFromPropertiesLocked(props, type));
 
-            ReturnOnFailure(HandleTechnologyPropertiesChangedLocked(G_DBUS_PROXY(technology), path, type, props));
+            ReturnOnFailure(HandleTechnologyPropertiesChangedLocked(lock, G_DBUS_PROXY(technology), path, type, props));
         }
     }
     else
@@ -2804,7 +2804,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerServicesChan
         status            = GetObjectTypeFromPropertiesLocked(current, type);
         VerifyOrReturn(status == CHIP_NO_ERROR);
 
-        status = HandleServicePropertiesChangedLocked(G_DBUS_PROXY(service), path, type, props);
+        status = HandleServicePropertiesChangedLocked(inOutLock, G_DBUS_PROXY(service), path, type, props);
         VerifyOrReturn(status == CHIP_NO_ERROR);
     }
 }
@@ -2860,7 +2860,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerTechnologyAd
     status = GetObjectTypeFromPathLocked(mConnManClient.mTechnologies.get(), inPath, type);
     ReturnOnFailure(status);
 
-    status = HandleTechnologyPropertiesChangedLocked(G_DBUS_PROXY(technology), inPath, type, inProperties);
+    status = HandleTechnologyPropertiesChangedLocked(lock, G_DBUS_PROXY(technology), inPath, type, inProperties);
     ReturnOnFailure(status);
 }
 
@@ -2937,7 +2937,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropert
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertiesChangedLocked(
-    const char * inDescription, GDBusProxy * inProxy, const char * inPath, const char * inType, GVariant * inProperties,
+    std::unique_lock<std::mutex> & inOutLock, const char * inDescription, GDBusProxy * inProxy, const char * inPath,
+    const char * inType, GVariant * inProperties,
     TypedObjectPropertiesChangedAnyLockedMethod inTypedObjectPropertiesChangedAnyLockedMethod) noexcept
 {
     VerifyOrReturnError(inDescription != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -2965,7 +2966,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropert
             VerifyOrReturnError(key != nullptr, CHIP_ERROR_INTERNAL);
             VerifyOrReturnError(boxed.get() != nullptr, CHIP_ERROR_INTERNAL);
 
-            ReturnErrorOnFailure((this->*inTypedObjectPropertiesChangedAnyLockedMethod)(inProxy, inPath, inType, key, boxed.get()));
+            ReturnErrorOnFailure(
+                (this->*inTypedObjectPropertiesChangedAnyLockedMethod)(inOutLock, inProxy, inPath, inType, key, boxed.get()));
         }
     }
 
@@ -2973,8 +2975,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropert
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertyChangedAnyLocked(
-    GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inMaybeVariant,
-    TypedObjectPropertyChangedLockedMethod inTypedObjectPropertyChangedLockedMethod) noexcept
+    std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey,
+    GVariant * inMaybeVariant, TypedObjectPropertyChangedLockedMethod inTypedObjectPropertyChangedLockedMethod) noexcept
 {
     VerifyOrReturnError(inProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -2986,7 +2988,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropert
     UnboxedVariant value(inMaybeVariant);
     VerifyOrReturnError(value, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure((this->*inTypedObjectPropertyChangedLockedMethod)(inProxy, inPath, inType, inKey, value.get()));
+    ReturnErrorOnFailure((this->*inTypedObjectPropertyChangedLockedMethod)(inOutLock, inProxy, inPath, inType, inKey, value.get()));
 
     return CHIP_NO_ERROR;
 }
@@ -3112,22 +3114,21 @@ ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectRequestLoc
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertiesChangedLocked(GDBusProxy * inProxy,
-                                                                                                  const char * inPath,
-                                                                                                  const char * inType,
-                                                                                                  GVariant * inProperties) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertiesChangedLocked(
+    std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath, const char * inType,
+    GVariant * inProperties) noexcept
 {
     static const char * const kDescription = "service";
 
     return HandleObjectPropertiesChangedLocked(
-        kDescription, inProxy, inPath, inType, inProperties,
+        inOutLock, kDescription, inProxy, inPath, inType, inProperties,
         &ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedAnyLocked);
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChanged(ConnManService * inService, const char * inKey,
                                                                                     GVariant * inValue) noexcept
 {
-    std::lock_guard<std::mutex> lock(mConnManMutex);
+    std::unique_lock<std::mutex> lock(mConnManMutex);
     const char * path = nullptr;
     const char * type = nullptr;
     CHIP_ERROR status;
@@ -3150,13 +3151,16 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChan
     status = GetObjectTypeFromPathLocked(mConnManClient.mServices.get(), path, type);
     ReturnOnFailure(status);
 
-    status = HandleServicePropertyChangedAnyLocked(G_DBUS_PROXY(inService), path, type, inKey, inValue);
+    status = HandleServicePropertyChangedAnyLocked(lock, G_DBUS_PROXY(inService), path, type, inKey, inValue);
     ReturnOnFailure(status);
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedLocked(
-    GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inValue) noexcept
+    std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey,
+    GVariant * inValue) noexcept
 {
+    VerifyOrDie(inOutLock.owns_lock());
+
     VerifyOrReturnError(inProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inType != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -3189,20 +3193,22 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceProper
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedAnyLocked(
-    GDBusProxy * inService, const char * inPath, const char * inType, const char * inKey, GVariant * inMaybeVariant) noexcept
+    std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inService, const char * inPath, const char * inType, const char * inKey,
+    GVariant * inMaybeVariant) noexcept
 {
     return HandleObjectPropertyChangedAnyLocked(
-        G_DBUS_PROXY(inService), inPath, inType, inKey, inMaybeVariant,
+        inOutLock, G_DBUS_PROXY(inService), inPath, inType, inKey, inMaybeVariant,
         &ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedLocked);
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertiesChangedLocked(
-    GDBusProxy * inProxy, const char * inPath, const char * inType, GVariant * inProperties) noexcept
+    std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath, const char * inType,
+    GVariant * inProperties) noexcept
 {
     static const char * const kDescription = "technology";
 
     return HandleObjectPropertiesChangedLocked(
-        kDescription, inProxy, inPath, inType, inProperties,
+        inOutLock, kDescription, inProxy, inPath, inType, inProperties,
         &ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedAnyLocked);
 }
 
@@ -3210,7 +3216,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyC
                                                                                        const char * inKey,
                                                                                        GVariant * inValue) noexcept
 {
-    std::lock_guard<std::mutex> lock(mConnManMutex);
+    std::unique_lock<std::mutex> lock(mConnManMutex);
     const char * path = nullptr;
     const char * type = nullptr;
     CHIP_ERROR status;
@@ -3233,13 +3239,16 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyC
     status = GetObjectTypeFromPathLocked(mConnManClient.mTechnologies.get(), path, type);
     ReturnOnFailure(status);
 
-    status = HandleTechnologyPropertyChangedAnyLocked(G_DBUS_PROXY(inTechnology), path, type, inKey, inValue);
+    status = HandleTechnologyPropertyChangedAnyLocked(lock, G_DBUS_PROXY(inTechnology), path, type, inKey, inValue);
     ReturnOnFailure(status);
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedLocked(
-    GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inValue) noexcept
+    std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey,
+    GVariant * inValue) noexcept
 {
+    VerifyOrDie(inOutLock.owns_lock());
+
     VerifyOrReturnError(inProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inType != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -3294,10 +3303,11 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPro
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedAnyLocked(
-    GDBusProxy * inTechnology, const char * inPath, const char * inType, const char * inKey, GVariant * inMaybeVariant) noexcept
+    std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inTechnology, const char * inPath, const char * inType,
+    const char * inKey, GVariant * inMaybeVariant) noexcept
 {
     return HandleObjectPropertyChangedAnyLocked(
-        inTechnology, inPath, inType, inKey, inMaybeVariant,
+        inOutLock, inTechnology, inPath, inType, inKey, inMaybeVariant,
         &ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedLocked);
 }
 

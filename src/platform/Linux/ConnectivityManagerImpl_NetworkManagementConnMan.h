@@ -464,9 +464,11 @@ private:
     using ObjectPropertiesChangedLockedMethod = CHIP_ERROR (ConnectivityManagerImpl_NetworkManagementConnMan::*)(
         GDBusProxy * inProxy, const char * inKey, GVariant * inValue) noexcept;
     using TypedObjectPropertiesChangedAnyLockedMethod = CHIP_ERROR (ConnectivityManagerImpl_NetworkManagementConnMan::*)(
-        GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inMaybeVariant) noexcept;
+        std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath, const char * inType,
+        const char * inKey, GVariant * inMaybeVariant) noexcept;
     using TypedObjectPropertyChangedLockedMethod = CHIP_ERROR (ConnectivityManagerImpl_NetworkManagementConnMan::*)(
-        GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inValue) noexcept;
+        std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath, const char * inType,
+        const char * inKey, GVariant * inValue) noexcept;
 
     void AccumulateFamilyConnectivity(const NetworkServiceFamilyConnectivityState & inPending,
                                       const NetworkServiceFamilyConnectivityState & inReported,
@@ -504,28 +506,33 @@ private:
     HandleObjectPropertiesChangedLocked(const char * inDescription, GDBusProxy * inProxy, GVariant * inProperties,
                                         ObjectPropertiesChangedAnyLockedMethod inObjectPropertiesChangedAnyLockedMethod) noexcept;
     CHIP_ERROR HandleObjectPropertiesChangedLocked(
-        const char * inDescription, GDBusProxy * inProxy, const char * inPath, const char * inType, GVariant * inProperties,
+        std::unique_lock<std::mutex> & inOutLock, const char * inDescription, GDBusProxy * inProxy, const char * inPath,
+        const char * inType, GVariant * inProperties,
         TypedObjectPropertiesChangedAnyLockedMethod inTypedObjectPropertiesChangedAnyLockedMethod) noexcept;
     CHIP_ERROR
-    HandleObjectPropertyChangedAnyLocked(GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey,
-                                         GVariant * inMaybeVariant,
+    HandleObjectPropertyChangedAnyLocked(std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy, const char * inPath,
+                                         const char * inType, const char * inKey, GVariant * inMaybeVariant,
                                          TypedObjectPropertyChangedLockedMethod inTypedObjectPropertyChangedLockedMethod) noexcept;
     void HandleServiceConnectComplete(GDBusProxy * inService, const GError * inError) noexcept;
     CHIP_ERROR HandleServiceConnectRequestLocked(std::unique_lock<std::mutex> & inOutLock, ConnManService * inService) noexcept;
-    CHIP_ERROR HandleServicePropertiesChangedLocked(GDBusProxy * inProxy, const char * inPath, const char * inType,
-                                                    GVariant * inProperties) noexcept;
+    CHIP_ERROR HandleServicePropertiesChangedLocked(std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy,
+                                                    const char * inPath, const char * inType, GVariant * inProperties) noexcept;
     void HandleServicePropertyChanged(ConnManService * inService, const char * inKey, GVariant * inValue) noexcept;
-    CHIP_ERROR HandleServicePropertyChangedLocked(GDBusProxy * inProxy, const char * inPath, const char * inType,
-                                                  const char * inKey, GVariant * inValue) noexcept;
-    CHIP_ERROR HandleServicePropertyChangedAnyLocked(GDBusProxy * inService, const char * inPath, const char * inType,
-                                                     const char * inKey, GVariant * inMaybeVariant) noexcept;
-    CHIP_ERROR HandleTechnologyPropertiesChangedLocked(GDBusProxy * inProxy, const char * inPath, const char * inType,
-                                                       GVariant * inProperties) noexcept;
+    CHIP_ERROR HandleServicePropertyChangedLocked(std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy,
+                                                  const char * inPath, const char * inType, const char * inKey,
+                                                  GVariant * inValue) noexcept;
+    CHIP_ERROR HandleServicePropertyChangedAnyLocked(std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inService,
+                                                     const char * inPath, const char * inType, const char * inKey,
+                                                     GVariant * inMaybeVariant) noexcept;
+    CHIP_ERROR HandleTechnologyPropertiesChangedLocked(std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy,
+                                                       const char * inPath, const char * inType, GVariant * inProperties) noexcept;
     void HandleTechnologyPropertyChanged(ConnManTechnology * inTechnology, const char * inKey, GVariant * inValue) noexcept;
-    CHIP_ERROR HandleTechnologyPropertyChangedLocked(GDBusProxy * inProxy, const char * inPath, const char * inType,
-                                                     const char * inKey, GVariant * inValue) noexcept;
-    CHIP_ERROR HandleTechnologyPropertyChangedAnyLocked(GDBusProxy * inTechnology, const char * inPath, const char * inType,
-                                                        const char * inKey, GVariant * inMaybeVariant) noexcept;
+    CHIP_ERROR HandleTechnologyPropertyChangedLocked(std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inProxy,
+                                                     const char * inPath, const char * inType, const char * inKey,
+                                                     GVariant * inValue) noexcept;
+    CHIP_ERROR HandleTechnologyPropertyChangedAnyLocked(std::unique_lock<std::mutex> & inOutLock, GDBusProxy * inTechnology,
+                                                        const char * inPath, const char * inType, const char * inKey,
+                                                        GVariant * inMaybeVariant) noexcept;
     void HandleTechnologyScanComplete(GDBusProxy * inTechnology, const GError * inError) noexcept;
     CHIP_ERROR HandleWiFiBroadcastScanCompleteLocked(std::unique_lock<std::mutex> & inOutLock,
                                                      ConnManTechnology * inTechnology) noexcept;
