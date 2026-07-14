@@ -2558,23 +2558,42 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::BuildWiFiScanRespon
     response.channel  = 0;
     response.wiFiBand = WiFiBandEnum::k5g;
 
-    // By default, ConnMan virtualizes all wireless signal strength in
-    // the qualitative range 0-100; indicate and set the value as
-    // such. In the future, we may be able to return dBm quantiatively
-    // via nl80211 or the Wi-Fi backend. Alternatively, in the future,
-    // the specification and the Network Commissioning Cluster would
+    // connman virtualizes wireless signal strength (cellular and
+    // Wi-Fi alike) into a qualitative 0-100 range. For Wi-Fi it
+    // derives that from the supplicant's dBm in
+    // plugins/wifi.c:calculate_strength():
+    //
+    //     strength = min(120 + dBm, 100)
+    //
+    // which is lossy only at the top: everything at or above -20 dBm
+    // saturates to 100. Nothing on the connman D-Bus surface exposes
+    // the original value.
+    //
+    // The Network Commissioning Cluster's 'ScanNetworksResponse'
+    // carries RSSI in dBm, signed (it has no qualitative
+    // representation, though the SDK-internal WiFiScanResponse does)
+    // so invert the conversion. The result is exact below the
+    // saturation point. Alternatively, in the future, the
+    // specification and the Network Commissioning Cluster would
     // support and pass through a qualitative wireless signal
-    // assessment.
+    // assessment as the SDK-internal structure allows.
+    //
+    // Note the clamp in GetWiFiServiceStrengthLocked is load-bearing:
+    // calculate_strength() has no *lower* bound and returns unsigned
+    // char, so a signal below -120 dBm would wrap. Not reachable from
+    // wpa_supplicant in practice, but the getter's clamp keeps the
+    // arithmetic here total.
     //
     // Strength is best-effort and cosmetic; a failed read leaves the
-    // zero-initialized default. It must not gate the scan result, which
-    // has already been assembled and is about to be reported successful.
+    // zero-initialized default. It must not gate the scan result,
+    // which has already been assembled and is about to be reported
+    // successful.
 
     int8_t strength = 0;
     RETURN_SAFELY_IGNORED GetWiFiServiceStrengthLocked(inProperties, strength);
 
-    response.signal.type     = WirelessSignalType::kQualitative;
-    response.signal.strength = strength;
+    response.signal.type     = WirelessSignalType::kdBm;
+    response.signal.strength = static_cast<int8_t>(strength - 120);
 
     outResponse = response;
 
