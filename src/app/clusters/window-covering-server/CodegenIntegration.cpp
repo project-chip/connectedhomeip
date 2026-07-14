@@ -607,7 +607,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
 void MatterWindowCoveringPluginServerInitCallback() {}
 void MatterWindowCoveringPluginServerShutdownCallback() {}
 
-void __attribute__((weak)) MatterWindowCoveringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+void __attribute__((weak))
+MatterWindowCoveringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
 {
     chip::app::Clusters::WindowCovering::PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }
