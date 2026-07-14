@@ -68,5 +68,4 @@ private:
     jmethodID mPlayPresetMethod                     = nullptr;
     jmethodID mGetMovableMethod                     = nullptr;
     jmethodID mGetPresetsMethod                     = nullptr;
-
 };
