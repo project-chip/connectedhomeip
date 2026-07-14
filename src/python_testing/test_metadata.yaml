@@ -9,6 +9,16 @@ not_automated:
       reason:
           NFC-Thread hardware setup needed for running this test-case and CI
           does not support it
+    - name: TC_SC_TC_2_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_2_2.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_3_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: TC_SC_TC_4_1.py
+      reason: Test requires Thread MeshCoP hardware or simulation.
+    - name: thread_meshcop_testing.py
+      reason: Shared code for Thread MeshCoP tests, not a standalone test.
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
@@ -26,6 +36,8 @@ not_automated:
     - name: TC_CNET_4_9.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_10.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_11.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
@@ -88,6 +100,8 @@ not_automated:
     - name: TestDefaultWarnings.py
       reason: Unit test - does not run against an app
     - name: TestIdChecks.py
+      reason: Unit test - does not run against an app
+    - name: TestCreateNewController.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingDataType.py
       reason: Unit test - does not run against an app
@@ -164,6 +178,13 @@ not_automated:
           onboarding data security requirements)
     - name: TC_GC_common.py
       reason: Shared code for TC_GC, not a standalone test.
+    - name: TC_S_common.py
+      reason: Shared helper code for TC_S, not a standalone test.
+    # Items below MUST be fixed eventually.
+    - name: TC_MCORE_FS_1_4.py
+      reason:
+          Very flaky in CI.
+          https://github.com/project-chip/connectedhomeip/issues/71932
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
@@ -182,6 +203,8 @@ slow_tests:
     - { name: TC_DRLK_2_3.py, duration: 30 seconds }
     - { name: TC_EEVSE_2_6.py, duration: 30 seconds }
     - { name: TC_FAN_3_1.py, duration: 15 seconds }
+    - { name: TC_IDM_2_2.py, duration: 3 minutes }
+    - { name: TC_IDM_4_3.py, duration: 4 minutes }
     - { name: TC_MCORE_FS_1_4.py, duration: 20 seconds }
     - { name: TC_OPSTATE_2_5.py, duration: 1.25 minutes }
     - { name: TC_OPSTATE_2_6.py, duration: 35 seconds }
@@ -194,6 +217,7 @@ slow_tests:
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
+    - { name: TC_JFADMIN_1_4.py, duration: 1.5 minutes }
     - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
     - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
 nightly:
@@ -202,4 +226,3 @@ nightly:
     - { name: TC_SU_2_7.py, duration: 25 minutes }
     - { name: TC_CC_2_2.py, duration: 2.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }
-    - { name: TC_JFADMIN_1_4.py, duration: 5 minutes }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/af-types.h>
 #include <lib/support/Span.h>
 #include <refrigerator-and-temperature-controlled-cabinet-mode.h>
 
@@ -116,7 +117,7 @@ void RefrigeratorAndTemperatureControlledCabinetMode::Shutdown()
     }
 }
 
-void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRefrigeratorAndTemperatureControlledCabinetModeDelegate == nullptr &&
@@ -127,4 +128,15 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
         new ModeBase::Instance(gRefrigeratorAndTemperatureControlledCabinetModeDelegate, 0x1,
                                RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(ModeBase::Feature::kOnOff));
     TEMPORARY_RETURN_IGNORED gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
+}
+
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId,
+                                                                                  MatterClusterShutdownType)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    if (gRefrigeratorAndTemperatureControlledCabinetModeInstance != nullptr)
+    {
+        gRefrigeratorAndTemperatureControlledCabinetModeInstance->Shutdown();
+    }
+    RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
 }

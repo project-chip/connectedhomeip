@@ -42,6 +42,8 @@ chip_test_suite("tests") {
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestCHIPMemString.cpp",
+    "TestCharSpanToStdString.cpp",
+    "TestChunkSplitter.cpp",
     "TestDefer.cpp",
     "TestErrorStr.cpp",
     "TestFixedBuffer.cpp",

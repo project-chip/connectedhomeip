@@ -30,12 +30,14 @@
 
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -365,43 +367,36 @@ struct MessageTestEntry theMessageTestVector[] = {
 
         .expectedMessageCount = 0,
     },
-#if CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
-    // =======================================
-    // Test early-SVE2 workaround
-    // =======================================
     {
-        .name     = "secure group message (no privacy, but invalid P=1 flag)",
+        // Buffer is truncated to exactly 16 bytes (the MIC size), so it passes
+        // the MIC extraction check but is far too short to hold the privacy header.
+        //
+        // msgFlags  = 0x06: version=0, kSourceNodeIdPresent (0x04), kDestinationGroupIdPresent (0x02)
+        // sessionId = 0xdb7d (matches the group key set up by the epoch key below)
+        // secFlags  = 0x81: kPrivacyFlag (0x80) | kGroupSession (0x01)
+        //
+        // PrivacyHeaderLength() = 4 (min) + 8 (source NodeId) + 2 (dest GroupId) = 14
+        // Required buffer for privacy region: offset 4 + length 14 = 18 bytes > 16 bytes → OOB
+        .name     = "private group message (privacy header exceeds buffer length)",
         .peerAddr = "::1",
 
         .payload = "",
+        .plain   = "",
+        .privacy = "\x06\x7d\xdb\x81\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 
-        // messageCounter = 0x12345691
-        .plain     = "\06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
-        .encrypted = "\x06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x91\xe0\x22\x85\xe0\x59\x07\xe0"
-                     "\xd8\x68\x0c\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26", // Includes MIC
-        .privacy   = "\x06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x91\xe0\x22\x85\xe0\x59\x07\xe0"
-                     "\xd8\x68\x0c\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26", // Includes MIC
+        .payloadLength = 0,
+        .plainLength   = 0,
+        .privacyLength = 16,
 
-        .payloadLength   = 0,
-        .plainLength     = 24,
-        .encryptedLength = 40,
-        .privacyLength   = 40,
-
-        .encryptKey = "\xca\x92\xd7\xa0\x94\x2d\x1a\x51\x1a\x0e\x26\xad\x07\x4f\x4c\x2f",
-        .privacyKey = "\xbf\xe9\xda\x01\x6a\x76\x53\x65\xf2\xdd\x97\xa9\xf9\x39\xe4\x25",
-        .epochKey   = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
-
-        .nonce        = "\x01\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00",
-        .privacyNonce = "\xdb\x7d\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26",
+        .epochKey = "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
 
         .sessionId    = 0xdb7d, // 56189
         .peerNodeId   = 0x0000000000000000ULL,
         .groupId      = 2,
         .sourceNodeId = 0x0000000000000002ULL,
 
-        .expectedMessageCount = 1,
+        .expectedMessageCount = 0,
     },
-#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 
 #endif // !CHIP_CONFIG_SECURITY_TEST_MODE
 };
@@ -508,8 +503,14 @@ void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager)
     static secure_channel::MessageCounterManager gMessageCounterManager;
     static chip::TestPersistentStorageDelegate deviceStorage;
     static chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    static bool sInitialized = false;
 
-    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    if (!sInitialized)
+    {
+        EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+        sInitialized = true;
+    }
+
     EXPECT_EQ(CHIP_NO_ERROR,
               sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
@@ -611,5 +612,206 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
 
     sessionManager.Shutdown();
 }
+
+#if !CHIP_CONFIG_SECURITY_TEST_MODE
+class TestGroupPrivacyMessageDelegate : public SessionMessageDelegate
+{
+public:
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
+                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override
+    {
+        mMessageReceived = true;
+        mHeader          = header;
+    }
+
+    bool mMessageReceived = false;
+    PacketHeader mHeader;
+};
+
+static void SetupGroupKeys(SessionManager & sessionManager, FabricIndex & fabricIndex, GroupId groupId, const char * epochKey)
+{
+    using namespace chip::TestCerts;
+
+    // Injects a test fabric
+    FabricTable * fabricTable = sessionManager.GetFabricTable();
+    ASSERT_NE(nullptr, fabricTable);
+    CHIP_ERROR err = fabricTable->AddNewFabricForTestIgnoringCollisions(
+        GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &fabricIndex);
+    EXPECT_EQ(CHIP_NO_ERROR, err);
+
+    // Extracts assigned 64-bit compressed fabric ID span.
+    uint8_t compressedFabricBuf[sizeof(uint64_t)];
+    MutableByteSpan compressedFabricSpan(compressedFabricBuf);
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTable->FindFabricWithIndex(fabricIndex)->GetCompressedFabricIdBytes(compressedFabricSpan));
+
+    // Get pointer to active group data provider
+    GroupDataProvider * provider = GetGroupDataProvider();
+    ASSERT_NE(nullptr, provider);
+
+    // registers symmetric keys under non-zero KeySetID 0x0123.
+    constexpr uint16_t kTestKeysetId = 0x0123;
+    KeySet keySet(kTestKeysetId, GroupDataProvider::SecurityPolicy::kTrustFirst, 1);
+    memcpy(keySet.epoch_keys[0].key, epochKey, 16);
+    keySet.epoch_keys[0].start_time = 0;
+    GroupKey groupKey(groupId, kTestKeysetId);
+    GroupInfo groupInfo(groupId, "Privacy Group");
+
+    // Setup Group key sets, group key maps, and group info
+    EXPECT_EQ(CHIP_NO_ERROR, provider->SetKeySet(fabricIndex, compressedFabricSpan, keySet));
+    EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupKeyAt(fabricIndex, 0, groupKey));
+    EXPECT_EQ(CHIP_NO_ERROR, provider->SetGroupInfoAt(fabricIndex, 0, groupInfo));
+}
+
+TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessagePrivacy)
+{
+    using namespace chip::TestCerts;
+
+    SessionManager sessionManager;
+    TestGroupPrivacyMessageDelegate delegate;
+    TestSessionManagerInit(mContext, sessionManager);
+    sessionManager.SetMessageDelegate(&delegate);
+
+    // Loads test parameters for GroupId 2
+    const MessageTestEntry & testEntry = theMessageTestVector[7];
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+
+    // Instantiates outgoing (for PrepareMessage) session.
+    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+    SessionHandle outgoingHandle(outgoingSession);
+    SessionHolder outgoingHolder(outgoingHandle);
+
+    // Create the test payload header, data, and buffer
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+    const char testPayload[] = "PrivacyTest";
+    System::PacketBufferHandle payloadBuf =
+        MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
+    ASSERT_FALSE(payloadBuf.IsNull());
+
+    // Prepare the group message
+    EncryptedPacketBufferHandle preparedMessage;
+    CHIP_ERROR err =
+        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+    EXPECT_EQ(CHIP_NO_ERROR, err);
+
+    // Unwraps the buffer and verifies PrepareMessage set the privacy flag bit high and set the group session type.
+    PacketHeader decodedHeader;
+    uint16_t headerSize                    = 0;
+    System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
+    ASSERT_FALSE(writableMsg.IsNull());
+    EXPECT_EQ(CHIP_NO_ERROR, decodedHeader.Decode(writableMsg->Start(), writableMsg->DataLength(), &headerSize));
+    EXPECT_TRUE(decodedHeader.IsGroupSession());
+    EXPECT_TRUE(decodedHeader.HasPrivacyFlag());
+
+    // Feeds ciphertext back into transport dispatch to verify PrivacyDecrypt and MIC authentication.
+    IPAddress loopbackAddress;
+    IPAddress::FromString("::1", loopbackAddress);
+    const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
+    sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
+    EXPECT_TRUE(delegate.mMessageReceived);
+
+    // Verify decrypted fields match expectations
+    EXPECT_EQ(delegate.mHeader.GetSessionId(), decodedHeader.GetSessionId());
+    EXPECT_EQ(delegate.mHeader.GetDestinationGroupId().Value(), testEntry.groupId);
+
+    FabricTable * fabricTable = sessionManager.GetFabricTable();
+    ASSERT_NE(nullptr, fabricTable);
+    NodeId expectedSourceNodeId = fabricTable->FindFabricWithIndex(fabricIndex)->GetNodeId();
+    EXPECT_TRUE(delegate.mHeader.GetSourceNodeId().HasValue());
+    EXPECT_EQ(delegate.mHeader.GetSourceNodeId().Value(), expectedSourceNodeId);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManagerDispatch, TestGroupIncomingPrivacyBoundsCheck)
+{
+    using namespace chip::TestCerts;
+
+    SessionManager sessionManager;
+    TestGroupPrivacyMessageDelegate delegate;
+    TestSessionManagerInit(mContext, sessionManager);
+    sessionManager.SetMessageDelegate(&delegate);
+
+    // Loads test parameters for GroupId 2
+    const MessageTestEntry & testEntry = theMessageTestVector[7];
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+
+    // Instantiates outgoing (for PrepareMessage) session.
+    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+    SessionHandle outgoingHandle(outgoingSession);
+    SessionHolder outgoingHolder(outgoingHandle);
+
+    // Create the test payload header, data, and buffer
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+    const char testPayload[] = "PrivacyTest";
+    System::PacketBufferHandle payloadBuf =
+        MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(testPayload), sizeof(testPayload));
+    ASSERT_FALSE(payloadBuf.IsNull());
+
+    // Prepare the group message
+    EncryptedPacketBufferHandle preparedMessage;
+    CHIP_ERROR err =
+        sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(payloadBuf), preparedMessage);
+    EXPECT_EQ(CHIP_NO_ERROR, err);
+
+    System::PacketBufferHandle writableMsg = preparedMessage.CastToWritable();
+    ASSERT_FALSE(writableMsg.IsNull());
+
+    // Shrink the buffer to trigger the bounds check failure in GroupKeyDecryptAttempt.
+    writableMsg->SetDataLength(1);
+
+    IPAddress loopbackAddress;
+    IPAddress::FromString("::1", loopbackAddress);
+    const PeerAddress peerAddress = PeerAddress::UDP(loopbackAddress, CHIP_PORT);
+    sessionManager.OnMessageReceived(peerAddress, std::move(writableMsg));
+
+    // The message should be discarded and NOT received by the delegate.
+    EXPECT_FALSE(delegate.mMessageReceived);
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManagerDispatch, TestGroupPrepareMessageChainedBufferFailure)
+{
+    using namespace chip::TestCerts;
+
+    SessionManager sessionManager;
+    TestSessionManagerInit(mContext, sessionManager);
+
+    // Loads test parameters for GroupId 2
+    const MessageTestEntry & testEntry = theMessageTestVector[7];
+
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    SetupGroupKeys(sessionManager, fabricIndex, testEntry.groupId, testEntry.epochKey);
+
+    // Instantiates outgoing (for PrepareMessage) session.
+    Transport::OutgoingGroupSession outgoingSession(testEntry.groupId, fabricIndex);
+    SessionHandle outgoingHandle(outgoingSession);
+    SessionHolder outgoingHolder(outgoingHandle);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandRequest);
+
+    // Create a chained buffer
+    System::PacketBufferHandle buf1 = MessagePacketBuffer::New(0);
+    System::PacketBufferHandle buf2 = MessagePacketBuffer::New(0);
+    ASSERT_FALSE(buf1.IsNull());
+    ASSERT_FALSE(buf2.IsNull());
+    buf1.AddToEnd(std::move(buf2));
+
+    EXPECT_TRUE(buf1->HasChainedBuffer());
+
+    EncryptedPacketBufferHandle preparedMessage;
+    CHIP_ERROR err = sessionManager.PrepareMessage(outgoingHolder.Get().Value(), payloadHeader, std::move(buf1), preparedMessage);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    sessionManager.Shutdown();
+}
+#endif // !CHIP_CONFIG_SECURITY_TEST_MODE
 
 } // namespace

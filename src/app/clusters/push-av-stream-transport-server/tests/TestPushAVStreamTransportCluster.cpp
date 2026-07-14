@@ -90,17 +90,6 @@ protected:
     chip::Testing::ClusterTester mClusterTester;
 };
 
-static void CheckLogState(EventManagement & aLogMgmt, size_t expectedNumEvents, PriorityLevel aPriority)
-{
-    TLV::TLVReader reader;
-    size_t elementCount;
-    CircularEventBufferWrapper bufWrapper;
-    EXPECT_EQ(aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper), CHIP_NO_ERROR);
-
-    EXPECT_EQ(TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
-
-    EXPECT_EQ(elementCount, expectedNumEvents);
-}
 } // namespace app
 } // namespace chip
 
@@ -403,9 +392,6 @@ protected:
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 {
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -424,9 +410,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     // Create CMAFContainerOptionsStruct object
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -506,10 +489,171 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
     transportOptions.containerOptions = containerOptions;
     EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOptions_StreamCountConstraint)
+{
+    // Test that ValidateIncomingTransportOptions rejects >16 video streams
+    PushAvStreamTransportServerLogic logic(1, BitFlags<Feature>(1));
+
+    // Create valid base transport options
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    // Create valid CMAF container options
+    cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    // Create valid trigger options
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    // Create empty motion zones (valid for this test)
+    uint8_t tlvBuffer[512];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(writer.GetLengthWritten()));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+
+    // Create valid transport options
+    transportOptions.streamUsage      = StreamUsageEnum::kAnalysis;
+    transportOptions.TLSEndpointID    = 1;
+    std::string url                   = "https://192.168.1.100:554/stream/";
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    // Test 1: Create video streams with 17 entries (>kMaxVideoStreams=16)
+    // Use std::vector<std::string> with reserve to keep CharSpan lifetimes stable
+    constexpr size_t kNumTestStreams = 17;
+    std::vector<std::string> videoStreamNames;
+    std::vector<Structs::VideoStreamStruct::Type> videoStreams;
+    videoStreamNames.reserve(kNumTestStreams);
+    videoStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        videoStreamNames.push_back("Stream" + std::to_string(i));
+        Structs::VideoStreamStruct::Type videoStream;
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = CharSpan(videoStreamNames.back().data(), videoStreamNames.back().size());
+        videoStreams.push_back(videoStream);
+    }
+
+    // Encode video streams into TLV
+    uint8_t videoTlvBuffer[1024];
+    TLV::TLVWriter videoWriter;
+    videoWriter.Init(videoTlvBuffer, sizeof(videoTlvBuffer));
+    TLV::TLVWriter videoArrayWriter;
+    err = videoWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & vs : videoStreams)
+    {
+        err = DataModel::Encode(videoArrayWriter, TLV::AnonymousTag(), vs);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = videoWriter.CloseContainer(videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader videoReader;
+    videoReader.Init(videoTlvBuffer, static_cast<uint32_t>(videoWriter.GetLengthWritten()));
+    err = videoReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::VideoStreamStruct::DecodableType> videoDecodableList;
+    err = videoDecodableList.Decode(videoReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.videoStreams.SetValue(videoDecodableList);
+
+    // Should return ConstraintError for >16 video streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
+
+    // Test 2: Create audio streams with 17 entries (>kMaxAudioStreams=16)
+    transportOptions.videoStreams.ClearValue();
+
+    std::vector<std::string> audioStreamNames;
+    std::vector<Structs::AudioStreamStruct::Type> audioStreams;
+    audioStreamNames.reserve(kNumTestStreams);
+    audioStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        audioStreamNames.push_back("AudioStream" + std::to_string(i));
+        Structs::AudioStreamStruct::Type audioStream;
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = CharSpan(audioStreamNames.back().data(), audioStreamNames.back().size());
+        audioStreams.push_back(audioStream);
+    }
+
+    // Encode audio streams into TLV
+    uint8_t audioTlvBuffer[1024];
+    TLV::TLVWriter audioWriter;
+    audioWriter.Init(audioTlvBuffer, sizeof(audioTlvBuffer));
+    TLV::TLVWriter audioArrayWriter;
+    err = audioWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & as : audioStreams)
+    {
+        err = DataModel::Encode(audioArrayWriter, TLV::AnonymousTag(), as);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = audioWriter.CloseContainer(audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader audioReader;
+    audioReader.Init(audioTlvBuffer, static_cast<uint32_t>(audioWriter.GetLengthWritten()));
+    err = audioReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::AudioStreamStruct::DecodableType> audioDecodableList;
+    err = audioDecodableList.Decode(audioReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.audioStreams.SetValue(audioDecodableList);
+
+    // Should return ConstraintError for >16 audio streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
 }
 
 void PrintBufHex(const uint8_t * buf, size_t size)
@@ -531,9 +675,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     /*
      * Test AllocatePushTransport
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -551,11 +692,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -722,20 +860,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     Structs::CMAFContainerOptionsStruct::Type respCMAFContainerOptions = respContainerOptions.CMAFContainerOptions.Value();
     EXPECT_EQ(respCMAFContainerOptions.segmentDuration, 1000);
     EXPECT_EQ(respCMAFContainerOptions.chunkDuration, 500);
-    std::string respTrackName(respCMAFContainerOptions.trackName.data(), respCMAFContainerOptions.trackName.size());
+    std::string respTrackName(respCMAFContainerOptions.trackName.Value().data(), respCMAFContainerOptions.trackName.Value().size());
     EXPECT_EQ(respTrackName, "video");
     EXPECT_FALSE(respCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string respCENCKeyStr(respCMAFContainerOptions.CENCKey.Value().data(),
-                               respCMAFContainerOptions.CENCKey.Value().data() + respCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(respCENCKeyStr, "1234567890ABCDEF");
-
-    std::string respCENCKeyIDStr(respCMAFContainerOptions.CENCKeyID.Value().data(),
-                                 respCMAFContainerOptions.CENCKeyID.Value().data() +
-                                     respCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(respCENCKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test ReadAttribute
@@ -858,19 +985,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     Structs::CMAFContainerOptionsStruct::Type readCMAFContainerOptions = readContainerOptions.CMAFContainerOptions.Value();
     EXPECT_EQ(readCMAFContainerOptions.segmentDuration, 1000);
     EXPECT_EQ(readCMAFContainerOptions.chunkDuration, 500);
-    std::string readTrackName(readCMAFContainerOptions.trackName.data(), readCMAFContainerOptions.trackName.size());
+    std::string readTrackName(readCMAFContainerOptions.trackName.Value().data(), readCMAFContainerOptions.trackName.Value().size());
     EXPECT_EQ(readTrackName, "video");
     EXPECT_FALSE(readCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string cencKeyStr(readCMAFContainerOptions.CENCKey.Value().data(),
-                           readCMAFContainerOptions.CENCKey.Value().data() + readCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "1234567890ABCDEF");
-
-    std::string cencKeyIDStr(readCMAFContainerOptions.CENCKeyID.Value().data(),
-                             readCMAFContainerOptions.CENCKeyID.Value().data() + readCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test DeallocatePushTransport
@@ -893,9 +1010,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     /*
      * Test AllocatePushTransport and persistence of currentConnections list
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -913,11 +1027,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1077,19 +1188,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     Structs::CMAFContainerOptionsStruct::Type lCMAFContainerOptions = containerOptions.CMAFContainerOptions.Value();
     EXPECT_EQ(lCMAFContainerOptions.segmentDuration, 1000);
     EXPECT_EQ(lCMAFContainerOptions.chunkDuration, 500);
-    std::string lTrackName(lCMAFContainerOptions.trackName.data(), lCMAFContainerOptions.trackName.size());
+    std::string lTrackName(lCMAFContainerOptions.trackName.Value().data(), lCMAFContainerOptions.trackName.Value().size());
     EXPECT_EQ(lTrackName, "video");
     EXPECT_FALSE(lCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string lCENCKeyStr(lCMAFContainerOptions.CENCKey.Value().data(),
-                            lCMAFContainerOptions.CENCKey.Value().data() + lCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(lCENCKeyStr, "1234567890ABCDEF");
-
-    std::string lCENCKeyIDStr(lCMAFContainerOptions.CENCKeyID.Value().data(),
-                              lCMAFContainerOptions.CENCKeyID.Value().data() + lCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(lCENCKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test DeallocatePushTransport; This should remove from the in-memory
@@ -1124,9 +1225,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     /*
      * Test AllocatePushTransport
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -1144,11 +1242,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1244,12 +1339,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     cmafContainerOptions.segmentDuration = 30000;
     cmafContainerOptions.chunkDuration   = 1000;
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cencKey   = "ABCDEF1234567890";
-    cencKeyID = "ABCDEF1234567890";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1420,24 +1509,11 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findCMAFContainerOptions.chunkDuration, 1000);
     EXPECT_FALSE(findCMAFContainerOptions.metadataEnabled.HasValue());
 
-    std::string cencKeyStr(findCMAFContainerOptions.CENCKey.Value().data(),
-                           findCMAFContainerOptions.CENCKey.Value().data() + findCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "ABCDEF1234567890");
-
-    std::string cencKeyIDStr(findCMAFContainerOptions.CENCKeyID.Value().data(),
-                             findCMAFContainerOptions.CENCKeyID.Value().data() + findCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "ABCDEF1234567890");
-
     EXPECT_FALSE(iter.Next());
 }
 
 TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTriggerTransport)
 {
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -1455,11 +1531,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1571,10 +1644,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     triggerCommandData.activationReason = TriggerActivationReasonEnum::kUserInitiated;
 
     mServer.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
-
-    EventManagement & logMgmt = EventManagement::GetInstance();
-
-    CheckLogState(logMgmt, 1, PriorityLevel::Info);
 }
 
 } // namespace PushAvStreamTransport

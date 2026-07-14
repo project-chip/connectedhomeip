@@ -23,9 +23,6 @@ declare_args() {
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   sl_wfx_config_softap = false
 
-  # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = true
-
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -77,11 +74,6 @@ config("wifi-platform-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
 
-  if (rs91x_wpa3_transition) {
-    # TODO: Change this macro once WF200 support is provided
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
-  }
-
   # TODO: This defines needs to be here for the spi_multiplex.h configuration header.
   # We need to find a better way to handle this.
   if (!disable_lcd) {
@@ -90,6 +82,7 @@ config("wifi-platform-config") {
   if (use_SiWx917 || wifi_soc) {
     include_dirs += [
       "${chip_root}/src/platform/silabs/SiWx/ble",
+      "${chip_root}/src/platform/silabs/wifi/SiWx",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
       "${wifi_sdk_root}/components/protocol/wifi/inc",
     ]
@@ -123,11 +116,15 @@ source_set("wifi-platform") {
 
   if (use_SiWx917 && !wifi_soc) {
     public_deps += [ "${silabs_platform_dir}/wifi/SiWx/ncp:siwx-ncp" ]
-    sources += [ "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp" ]
+    sources += [
+      "${silabs_platform_dir}/wifi/SiWx/SlNetConfig.cpp",
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+    ]
   }
 
   if (wifi_soc) {
     sources += [
+      "${silabs_platform_dir}/wifi/SiWx/SlNetConfig.cpp",
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",

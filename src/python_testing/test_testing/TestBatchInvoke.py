@@ -55,6 +55,7 @@ how DUT processes commands.
 
 
 class TestBatchInvoke(MatterBaseTest):
+    requires_dut = False
 
     @async_test_body
     async def test_batch_invoke(self):

@@ -4876,7 +4876,7 @@
         }
       ],
       "deviceVersions": [
-        4
+        7
       ],
       "deviceIdentifiers": [
         769
@@ -5509,7 +5509,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x19",
+              "defaultValue": "0x14",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5574,6 +5574,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ThermostatRunningMode",
+              "code": 30,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ThermostatRunningModeEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5797,7 +5813,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x5A3",
+              "defaultValue": "0x7A3",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

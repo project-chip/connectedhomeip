@@ -185,13 +185,20 @@ void AssertKeysEqual(SessionKeystore & keystore, HkdfKeyHandle & left, const Hkd
 } // namespace
   //
 
-#if CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_MBEDTLS
+#if CHIP_CRYPTO_MBEDTLS
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
 {
     *olen = len;
     gs_test_entropy_source_called++;
+    return 0;
+}
+#elif CHIP_CRYPTO_OPENSSL
+
+static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
+{
+    *olen = len;
     return 0;
 }
 
@@ -379,7 +386,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
 
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool areCTsEqual  = memcmp(out_ct_ptr, vector->ct, vector->ct_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; out_ct_ptr is null for zero-length vectors.
+            bool areCTsEqual  = (vector->ct_len == 0) || (memcmp(out_ct_ptr, vector->ct, vector->ct_len) == 0);
             bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
             EXPECT_TRUE(areCTsEqual);
             EXPECT_TRUE(areTagsEqual);
@@ -424,7 +432,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool arePTsEqual = memcmp(vector->pt, out_pt_ptr, vector->pt_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; out_pt_ptr is null for zero-length vectors.
+            bool arePTsEqual = (vector->pt_len == 0) || (memcmp(vector->pt, out_pt_ptr, vector->pt_len) == 0);
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {
@@ -473,7 +482,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool areCTsEqual  = memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; inplace_buffer_ptr is null for zero-length vectors.
+            bool areCTsEqual  = (vector->ct_len == 0) || (memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0);
             bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
             EXPECT_TRUE(areCTsEqual);
             EXPECT_TRUE(areTagsEqual);
@@ -525,7 +535,8 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool arePTsEqual = memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0;
+            // memcmp() requires non-null pointers even when length is 0; inplace_buffer_ptr is null for zero-length vectors.
+            bool arePTsEqual = (vector->pt_len == 0) || (memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0);
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {
@@ -1553,7 +1564,7 @@ TEST_F(TestChipCryptoPAL, TestAddEntropySources)
     EXPECT_EQ(DRBG_get_bytes(buffer, sizeof(buffer)), CHIP_NO_ERROR);
     for (int i = 0; i < 5000 * 2; i++)
     {
-        (void) DRBG_get_bytes(buffer, sizeof(buffer));
+        EXPECT_SUCCESS(DRBG_get_bytes(buffer, sizeof(buffer)));
     }
     EXPECT_GT(gs_test_entropy_source_called, test_entropy_source_call_count);
 }

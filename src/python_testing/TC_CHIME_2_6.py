@@ -120,14 +120,14 @@ class TC_CHIME_2_6(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             if user_response is not None:
-                log.info(f"TC-CHIME-2.6: response '{user_response}' received confirmation of chime sound")
+                log.info("TC-CHIME-2.6: response '%s' received confirmation of chime sound", user_response)
                 asserts.assert_equal(user_response.lower(), "y")
             else:
                 log.info("TC-CHIME-2.6: No response received for chime sound played user prompt")
 
         self.step(6)
         event_data = event_callback.wait_for_event_report(Clusters.Chime.Events.ChimeStartedPlaying, timeout_sec=30)
-        log.info(f"Event data {event_data}")
+        log.info("Event data %s", event_data)
 
         self.step(7)
         asserts.assert_equal(event_data.chimeID, mySelectedChime, "Unexpected value for ChimeID returned")

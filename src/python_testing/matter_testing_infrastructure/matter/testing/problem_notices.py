@@ -16,8 +16,8 @@
 #
 
 from dataclasses import dataclass
-from enum import Enum
-from typing import Optional, Union
+from enum import StrEnum
+from typing import Optional, TypeAlias
 
 from matter.testing.conversions import cluster_id_with_name, format_decimal_and_hex
 from matter.testing.global_attribute_ids import GlobalAttributeIds
@@ -147,14 +147,10 @@ class UnknownProblemLocation:
         return '\n      Unknown Locations - see message for more details'
 
 
-ProblemLocation = Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation, NamespacePathLocation]
-
-# ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
-# appeared in 3.11. To make it JSON serializable easily, multiple inheritance
-# from `str` is used. See https://stackoverflow.com/a/51976841.
+ProblemLocation: TypeAlias = ClusterPathLocation | DeviceTypePathLocation | UnknownProblemLocation | NamespacePathLocation
 
 
-class ProblemSeverity(str, Enum):
+class ProblemSeverity(StrEnum):
     NOTE = "NOTE"
     WARNING = "WARNING"
     ERROR = "ERROR"

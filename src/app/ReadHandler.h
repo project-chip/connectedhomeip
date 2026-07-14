@@ -465,7 +465,13 @@ private:
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
+    // Ensures mExchangeCtx is ready for a send. For priming/chunked reports, validates
+    // and captures the session from the existing exchange. For re-reports (subscription
+    // follow-ups), opens a fresh exchange from mSessionHandle.
+    CHIP_ERROR AcquireExchangeForSend();
+
     friend class TestReadInteraction;
+    friend class TestSessionRelease;
     friend class chip::app::reporting::TestReportingEngine;
     friend class chip::app::reporting::TestReportScheduler;
 

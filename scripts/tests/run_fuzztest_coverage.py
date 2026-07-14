@@ -299,10 +299,10 @@ def run_script_in_interactive_mode():
     return context
 
 
-def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
+def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, show_help):
     fuzz_tests = list_fuzz_test_binaries()
 
-    if help or not fuzz_test:
+    if show_help or not fuzz_test:
         log.info("\nAVAILABLE FUZZTEST BINARIES in 'out' directory (each Binary can have multiple FUZZ_TESTs/TestCases): \n")
         previous_build_target_dir = ""
         for test in fuzz_tests:
@@ -362,9 +362,9 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
 @click.option("--test-case", help="Specific test case to run in continuous mode OR add '--test-case all' to run all Testcases for a few seconds.")
 @click.option("--list-test-cases", is_flag=True, help="List available test cases for the given FuzzTest binary and exit.")
 @click.option("--interactive", is_flag=True, help="Run Script in Interactive Mode (automatically lists FuzzTests, TestCases and allows choosing easily).")
-@click.option('--help', is_flag=True, help="Show this message and exit.")
+@click.option('--help', 'show_help', is_flag=True, help="Show this message and exit.")
 @click.option("--output", help="Optional directory for coverage report (auto-generated if not provided).")
-def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
+def main(fuzz_test, test_case, list_test_cases, interactive, output, show_help):
 
     coloredlogs.install(
         level="DEBUG",
@@ -376,7 +376,7 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
         },
     )
 
-    if help or not fuzz_test:
+    if show_help or not fuzz_test:
         log.info("\nThis Script:")
         log.info("1. Runs Google FuzzTests in CONTINUOUS_FUZZ_MODE or UNIT_TEST_MODE")
         log.info("2. Automatically generates HTML Coverage Report if FuzzTest is coverage-instrumented.\n")
@@ -392,7 +392,7 @@ def main(fuzz_test, test_case, list_test_cases, interactive, output, help):
         if interactive:
             context = run_script_in_interactive_mode()
         else:
-            context = run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help)
+            context = run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, show_help)
 
     except Exception as e:
         log.exception(e)

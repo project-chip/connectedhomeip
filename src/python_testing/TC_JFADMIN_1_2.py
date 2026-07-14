@@ -83,14 +83,15 @@ class TC_JFADMIN_1_2(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             self.admin_passcode = random.randint(20202021, 20202099)
             self.admin_discriminator = random.randint(0, 4095)
+            rpc_port = self.get_random_port()
             # Start JF-Administrator App
             self.jf_admin = AppServerSubprocess(
                 self.jfa_server_app,
                 storage_dir=self.fabric_storage,
-                port=random.randint(5001, 5999),
+                port=self.get_random_port(),
                 discriminator=self.admin_discriminator,
                 passcode=self.admin_passcode,
-                extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", str(rpc_port)])
             self.jf_admin.start(
                 expected_output="Server initialization complete",
                 timeout=10)
@@ -196,11 +197,16 @@ class TC_JFADMIN_1_2(MatterBaseTest):
             attributes=[(self._OPERATIONAL_CREDENTIALS_ENDPOINT, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         icac1 = response[0][Clusters.OperationalCredentials].NOCs[0].icac
-        await self.send_single_cmd(
+        resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
+        self._assert_icac_response_status(
+            resp,
+            Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidPublicKey,
+            "Step 5",
+        )
 
         self.step("6")
         await self._assert_im_error(
@@ -224,11 +230,16 @@ class TC_JFADMIN_1_2(MatterBaseTest):
         await self._arm_failsafe(20)
 
         self.step("10")
-        await self.send_single_cmd(
+        resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
+        self._assert_icac_response_status(
+            resp,
+            Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidPublicKey,
+            "Step 10",
+        )
 
         self.step("11")
         await self._assert_im_error(
@@ -264,14 +275,10 @@ class TC_JFADMIN_1_2(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(other_icac))
-        asserts.assert_true(
-            isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
-            f"Unexpected response type: {type(resp)}",
-        )
-        asserts.assert_equal(
-            resp.statusCode,
+        self._assert_icac_response_status(
+            resp,
             Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidICAC,
-            f"Expected InvalidICAC response status, but got {resp.statusCode}",
+            "Step 14",
         )
 
         self.step("15")
@@ -288,14 +295,10 @@ class TC_JFADMIN_1_2(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac_wrong_public_key.icacBytes))
-        asserts.assert_true(
-            isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
-            f"Unexpected response type: {type(resp)}",
-        )
-        asserts.assert_equal(
-            resp.statusCode,
+        self._assert_icac_response_status(
+            resp,
             Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidPublicKey,
-            f"Expected InvalidPublicKey response status, but got {resp.statusCode}",
+            "Step 15",
         )
 
         self.step("16")
@@ -325,14 +328,10 @@ class TC_JFADMIN_1_2(MatterBaseTest):
             node_id=self.dut_node_id,
             endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(invalid_dn_icac))
-        asserts.assert_true(
-            isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
-            f"Unexpected response type: {type(resp)}",
-        )
-        asserts.assert_equal(
-            resp.statusCode,
+        self._assert_icac_response_status(
+            resp,
             Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidICAC,
-            f"Expected InvalidICAC response status, but got {resp.statusCode}",
+            "Step 16",
         )
 
         self.step("17")
@@ -403,6 +402,17 @@ class TC_JFADMIN_1_2(MatterBaseTest):
                 expected_cluster_status,
                 f"Expected {expected_cluster_status} cluster status, but got {str(cm.exception)}",
             )
+
+    def _assert_icac_response_status(self, resp, expected_status, step_label):
+        asserts.assert_true(
+            isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
+            f"{step_label}: Unexpected response type: {type(resp)}",
+        )
+        asserts.assert_equal(
+            resp.statusCode,
+            expected_status,
+            f"{step_label}: Expected ICACResponse status {expected_status}, but got {resp.statusCode}",
+        )
 
 
 if __name__ == "__main__":

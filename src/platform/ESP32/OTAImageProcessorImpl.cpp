@@ -169,7 +169,9 @@ bool OTAImageProcessorImpl::VerifyPatchHeader(void * imgHeaderData)
     return true;
 }
 
-esp_err_t OTAImageProcessorImpl::VerifyHeaderData(const uint8_t * buf, size_t size, int * index)
+// Accumulates incoming delta OTA patch data until a complete patch header is buffered,
+// then validates it via VerifyPatchHeader.
+esp_err_t OTAImageProcessorImpl::DeltaOTAVerifyHeaderData(const uint8_t * buf, size_t size, int * index)
 {
     static char patchHeader[PATCH_HEADER_SIZE];
     static int headerDataRead = 0;
@@ -185,12 +187,11 @@ esp_err_t OTAImageProcessorImpl::VerifyHeaderData(const uint8_t * buf, size_t si
         {
             *index = PATCH_HEADER_SIZE - headerDataRead;
             memcpy(patchHeader + headerDataRead, buf, *index);
+            headerDataRead = 0;
             if (!VerifyPatchHeader(patchHeader))
             {
                 return ESP_ERR_INVALID_VERSION;
             }
-            headerDataRead      = 0;
-            *index              = PATCH_HEADER_SIZE;
             patchHeaderVerified = true;
         }
     }
@@ -259,6 +260,7 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size
             memcpy(headerData + headerDataRead, buf, index);
 
             esp_image_header_t * header = (esp_image_header_t *) headerData;
+            headerDataRead              = 0;
             if (!VerifyChipId(header->chip_id))
             {
                 return ESP_ERR_INVALID_VERSION;
@@ -266,7 +268,12 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size
             imageProcessor->chipIdVerified = true;
 
             // Write data in headerData buffer.
-            return esp_ota_write(imageProcessor->mOTAUpdateHandle, headerData, IMG_HEADER_LEN);
+            esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, headerData, IMG_HEADER_LEN);
+            if (err != ESP_OK)
+            {
+                ESP_LOGE(TAG, "esp_ota_write failed (%s)!", esp_err_to_name(err));
+                return err;
+            }
         }
     }
 
@@ -322,7 +329,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (imageProcessor->mDeltaOTAUpdateHandle == NULL)
     {
         ChipLogError(SoftwareUpdate, "esp_delta_ota_init failed");
-        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
+        LogErrorOnFailure(imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL));
         return;
     }
 #endif // CONFIG_ENABLE_DELTA_OTA
@@ -332,7 +339,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (chipError != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Failed to start decryption process, err:%" CHIP_ERROR_FORMAT, chipError.Format());
-        imageProcessor->mDownloader->OnPreparedForDownload(chipError);
+        LogErrorOnFailure(imageProcessor->mDownloader->OnPreparedForDownload(chipError));
         return;
     }
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
@@ -360,7 +367,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         ChipLogError(SoftwareUpdate, "Failed to end pre encrypted OTA");
         esp_ota_abort(imageProcessor->mOTAUpdateHandle);
-        imageProcessor->ReleaseBlock();
+        LogErrorOnFailure(imageProcessor->ReleaseBlock());
         PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
@@ -372,7 +379,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         ESP_LOGE(TAG, "esp_delta_ota_finalize() failed (%s)!", esp_err_to_name(err));
         esp_ota_abort(imageProcessor->mOTAUpdateHandle);
-        imageProcessor->ReleaseBlock();
+        LogErrorOnFailure(imageProcessor->ReleaseBlock());
         PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
     }
 
@@ -381,7 +388,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     {
         ESP_LOGE(TAG, "esp_delta_ota_deinit() failed (%s)!", esp_err_to_name(err));
         esp_ota_abort(imageProcessor->mOTAUpdateHandle);
-        imageProcessor->ReleaseBlock();
+        LogErrorOnFailure(imageProcessor->ReleaseBlock());
         PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
     }
 
@@ -492,7 +499,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 #ifdef CONFIG_ENABLE_DELTA_OTA
 
     int index = 0;
-    err       = imageProcessor->VerifyHeaderData(blockToWrite.data(), blockToWrite.size(), &index);
+    err       = imageProcessor->DeltaOTAVerifyHeaderData(blockToWrite.data(), blockToWrite.size(), &index);
 
     if (err != ESP_OK)
     {

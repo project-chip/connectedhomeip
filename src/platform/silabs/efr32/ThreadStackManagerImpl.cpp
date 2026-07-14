@@ -47,6 +47,11 @@ void otAppCliInit(otInstance * aInstance);
 #endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 }
 
+// for compatibility with SLCP
+#ifndef SL_MATTER_OPENTHREAD_NCP_ENABLE
+#define SL_MATTER_OPENTHREAD_NCP_ENABLE 0
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace {
@@ -162,16 +167,6 @@ extern "C" __WEAK void sl_openthread_init(void)
 #include "uart.h"
 #endif
 
-extern "C" otError otPlatUartEnable(void)
-{
-#ifdef PW_RPC_ENABLED
-    return OT_ERROR_NOT_IMPLEMENTED;
-#else
-    // Uart Init is handled in init_efrPlatform.cpp
-    return OT_ERROR_NONE;
-#endif
-}
-
 extern "C" otInstance * otGetInstance(void)
 {
     return sOTInstance;
@@ -189,6 +184,17 @@ extern "C" void sl_ot_create_instance(void)
     // Standard single instance initialization
     sOTInstance = otInstanceInitSingle();
 #endif // SL_OPENTHREAD_MULTI_PAN_ENABLE
+
+    VerifyOrDie(sOTInstance != nullptr);
+
+#if defined(OPENTHREAD_CONFIG_IP6_INIT_EXT_ADDR_POOL_ENABLE) && OPENTHREAD_CONFIG_IP6_INIT_EXT_ADDR_POOL_ENABLE
+    static otNetifAddress sOtIp6UnicastPool[OPENTHREAD_CONFIG_IP6_MAX_EXT_UCAST_ADDRS];
+    static otNetifMulticastAddress sOtIp6MulticastPool[OPENTHREAD_CONFIG_IP6_MAX_EXT_MCAST_ADDRS];
+
+    // Required before otIp6SetEnabled() when cert prebuilt libs use runtime IPv6 address pools
+    VerifyOrDie(otIp6Init(sOTInstance, sOtIp6UnicastPool, OPENTHREAD_CONFIG_IP6_MAX_EXT_UCAST_ADDRS, sOtIp6MulticastPool,
+                          OPENTHREAD_CONFIG_IP6_MAX_EXT_MCAST_ADDRS) == OT_ERROR_NONE);
+#endif
 }
 
 extern "C" void sl_ot_cli_init(void)
@@ -199,7 +205,17 @@ extern "C" void sl_ot_cli_init(void)
 #endif
 }
 
-#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI && !SL_MATTER_OPENTHREAD_NCP_ENABLE
+
+extern "C" otError otPlatUartEnable(void)
+{
+#ifdef PW_RPC_ENABLED
+    return OT_ERROR_NOT_IMPLEMENTED;
+#else
+    // Uart Init is handled in init_efrPlatform.cpp
+    return OT_ERROR_NONE;
+#endif
+}
 
 extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
@@ -239,4 +255,4 @@ extern "C" __WEAK otError otPlatUartDisable(void)
     return OT_ERROR_NOT_IMPLEMENTED;
 }
 
-#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI && !SL_MATTER_OPENTHREAD_NCP_ENABLE
