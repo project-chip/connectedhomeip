@@ -17118,6 +17118,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _messageText = @"";
 
         _responses = nil;
+
+        _languageCode = nil;
+
+        _messageURI = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -17135,6 +17139,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.duration = self.duration;
     other.messageText = self.messageText;
     other.responses = self.responses;
+    other.languageCode = self.languageCode;
+    other.messageURI = self.messageURI;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -17143,7 +17149,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; languageCode:%@; messageURI:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses, _languageCode, _messageURI];
     return descriptionString;
 }
 
@@ -17216,6 +17222,18 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
                     definedValue_0 = ListType_1();
                 }
             }
+        }
+    }
+    {
+        if (self.languageCode != nil) {
+            auto & definedValue_0 = encodableStruct.languageCode.Emplace();
+            definedValue_0 = AsCharSpan(self.languageCode);
+        }
+    }
+    {
+        if (self.messageURI != nil) {
+            auto & definedValue_0 = encodableStruct.messageURI.Emplace();
+            definedValue_0 = AsCharSpan(self.messageURI);
         }
     }
 
