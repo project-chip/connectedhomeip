@@ -688,7 +688,7 @@ Protocols::InteractionModel::Status ThermostatCluster::HandleMaxCoolSetpointLimi
 Protocols::InteractionModel::Status ThermostatCluster::HandleMinSetpointDeadband(int8_t value)
 {
     VerifyOrReturnError(mFeatures.Has(Feature::kAutoMode), Status::UnsupportedAttribute);
-    VerifyOrReturnError(value >= 0 && value <= 127, Status::InvalidValue);
+    VerifyOrReturnError(value >= 0 && value <= 127, Status::ConstraintError);
     SetAttributeValue(mMinSetpointDeadBand, value, MinSetpointDeadBand::Id);
     LogErrorOnFailure(DefaultServerCluster::mContext->attributeStorage.WriteValue(
         { mPath.mEndpointId, Thermostat::Id, MinSetpointDeadBand::Id },
