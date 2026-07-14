@@ -761,7 +761,9 @@ struct KeySetData : PersistableData<kPersistentBufferMax>
         // keys_count
         ReturnErrorOnFailure(reader.Next(TagNumKeys()));
         ReturnErrorOnFailure(reader.Get(keys_count));
-        // TODO(#21614): Enforce maximum number of 3 keys in a keyset
+        // A keyset stores at most kEpochKeysMax operational keys; reject a corrupted count so callers that
+        // index operational_keys by keys_count (e.g. GroupSessionIteratorImpl::Count) stay in bounds.
+        VerifyOrReturnError(keys_count <= KeySet::kEpochKeysMax, CHIP_ERROR_INVALID_TLV_ELEMENT);
         {
             // operational_keys
             ReturnErrorOnFailure(reader.Next(TagGroupCredentials()));
