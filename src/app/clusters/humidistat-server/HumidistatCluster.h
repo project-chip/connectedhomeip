@@ -138,6 +138,9 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
