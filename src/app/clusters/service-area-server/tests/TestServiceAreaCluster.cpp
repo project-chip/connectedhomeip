@@ -460,6 +460,35 @@ size_t CountSupportedAreas(chip::Testing::ClusterTester & tester)
     return count;
 }
 
+std::vector<uint32_t> ReadSupportedAreaIds(chip::Testing::ClusterTester & tester)
+{
+    std::vector<uint32_t> result;
+    DataModel::DecodableList<Structs::AreaStruct::DecodableType> areas;
+    if (!tester.ReadAttribute(Attributes::SupportedAreas::Id, areas).IsSuccess())
+    {
+        return result;
+    }
+
+    auto it = areas.begin();
+    while (it.Next())
+    {
+        result.push_back(it.GetValue().areaID);
+    }
+    return result;
+}
+
+bool Contains(const std::vector<uint32_t> & ids, uint32_t id)
+{
+    for (uint32_t entry : ids)
+    {
+        if (entry == id)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 size_t CountSupportedMaps(chip::Testing::ClusterTester & tester)
 {
     DataModel::DecodableList<Structs::MapStruct::DecodableType> maps;
@@ -943,6 +972,56 @@ TEST_F(ServiceAreaClusterTest, RemovingMapRemovesItsAreas)
 
     EXPECT_EQ(CountSupportedMaps(*mTester), 0u);
     EXPECT_EQ(CountSupportedAreas(*mTester), 0u);
+}
+
+// Regression test for the RemoveSupportedMap packed-buffer index bug.
+//
+// RemoveSupportedMap collects the areaIDs whose mapID matches the removed map
+// into a temporary stack buffer, then removes each. The write into that buffer
+// must use the packed cursor (count of matches so far), not the source cursor
+// (index over all supported areas). When more than one map exists and the areas
+// are interleaved, writing at the source cursor scatters the matches to their
+// source slots; the subsequent reduce_size(<match count>) then keeps only the
+// front of the buffer, so any match whose source index is >= the match count is
+// dropped (never removed, and its MapID keeps pointing at the deleted map), and
+// the unwritten gaps feed uninitialized stack values into RemoveSupportedAreaRaw.
+//
+// Two maps are needed so that removing one leaves GetNumberOfSupportedMaps() > 0
+// and the buggy loop runs (the single-map case above short-circuits through
+// ClearSupportedAreas). The list leads with a map-2 area so the first map-1 match
+// lands past index 0: map-1 areas 100/101/102 sit at source indices 1, 3, 4. With
+// 3 matches, the matches at source index >= 3 (areas 101 and 102) were dropped by
+// the old code. After the fix all three map-1 areas are removed and the two map-2
+// areas are kept.
+TEST_F(ServiceAreaClusterTest, RemoveSupportedMapRemovesAllMatchingAreasWhenSparse)
+{
+    CreateCluster({ .features = BitMask<Feature>(Feature::kMaps), .optionalAttributes = AllOptionalAttributes() });
+
+    ASSERT_TRUE(mCluster->AddSupportedMap(1, "floor one"_span));
+    ASSERT_TRUE(mCluster->AddSupportedMap(2, "floor two"_span));
+
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(200, 2, "two hundred"))); // source index 0: non-match
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(100, 1, "one hundred"))); // source index 1: match
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(201, 2, "two oh one")));  // source index 2: non-match
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(101, 1, "one oh one")));  // source index 3: match, dropped by bug
+    ASSERT_TRUE(AddSupportedArea(*mCluster, MakeMappedArea(102, 1, "one oh two")));  // source index 4: match, dropped by bug
+
+    ASSERT_TRUE(mCluster->RemoveSupportedMap(1));
+
+    std::vector<uint32_t> remaining = ReadSupportedAreaIds(*mTester);
+
+    // Every area that referenced the removed map must be gone; 101 and 102 are the
+    // ones the old code left behind.
+    EXPECT_FALSE(Contains(remaining, 100u));
+    EXPECT_FALSE(Contains(remaining, 101u));
+    EXPECT_FALSE(Contains(remaining, 102u));
+
+    // Areas belonging to the surviving map must be untouched.
+    EXPECT_TRUE(Contains(remaining, 200u));
+    EXPECT_TRUE(Contains(remaining, 201u));
+
+    EXPECT_EQ(remaining.size(), 2u);
+    EXPECT_EQ(CountSupportedMaps(*mTester), 1u);
 }
 
 TEST_F(ServiceAreaClusterTest, ClearingSupportedMapsClearsSupportedAreas)

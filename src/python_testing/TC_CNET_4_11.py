@@ -24,7 +24,6 @@ import shutil  # Only for macOS networksetup
 import socket
 import subprocess
 import time
-from typing import Optional
 
 from mobly import asserts
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
@@ -638,7 +637,7 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
         return ConnectionResult(1, str(e))
 
 
-async def connect_host_wifi(ssid, password) -> Optional[ConnectionResult]:
+async def connect_host_wifi(ssid, password) -> ConnectionResult | None:
     """ Checks in which OS (Linux or Darwin only) the script is running and calls the corresponding connect_wifi_* function. """
 
     os_name = detect_platform()

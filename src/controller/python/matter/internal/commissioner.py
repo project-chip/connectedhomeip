@@ -15,7 +15,6 @@
 #
 import ctypes
 from enum import Enum
-from typing import Optional
 
 from ..configuration import GetCommissionerCAT, GetLocalNodeId
 from ..internal.types import NetworkCredentialsRequested, OperationalCredentialsRequested, PairingComplete
@@ -114,7 +113,7 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
                PairingComplete])
 
 
-commissionerSingleton: Optional[Commissioner] = None
+commissionerSingleton: Commissioner | None = None
 
 
 def GetCommissioner() -> Commissioner:

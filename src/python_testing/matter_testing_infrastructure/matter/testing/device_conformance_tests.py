@@ -16,7 +16,7 @@
 #
 
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
@@ -77,7 +77,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         await super().setup_class_helper()
         self.build_spec_xmls()
 
-    def _get_device_type_id(self, device_type_name: str, xml_device_types: Optional[dict[uint, XmlDeviceType]] = None) -> int:
+    def _get_device_type_id(self, device_type_name: str, xml_device_types: dict[uint, XmlDeviceType] | None = None) -> int:
         if xml_device_types is None:
             xml_device_types = self.xml_device_types
         _id = [_id for _id, dt in xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
