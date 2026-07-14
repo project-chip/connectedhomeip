@@ -275,6 +275,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
     {
+        mDelayReportData.ClearValue();
         InvokeRequestMessage::DelayReportData delayReportData;
         err = invokeRequestMessage.GetDelayReportData(&delayReportData);
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, Status::InvalidAction);
@@ -1018,6 +1019,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
                        "DUT Failure: Mandatory InvokeRequests field missing");
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
+        mDelayReportData.ClearValue();
         InvokeRequestMessage::DelayReportData delayReportData;
         err = invokeRequestMessage.GetDelayReportData(&delayReportData);
         VerifyOrDieWithMsg(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, DataManagement,
