@@ -140,14 +140,12 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         requiredSize = snprintf(buffer, bufferLen, "_D%u", static_cast<uint16_t>(subtype.code));
         break;
     case DiscoveryFilterType::kCompressedFabricId:
-        requiredSize = snprintf(buffer, bufferLen, "_I");
-        // snprintf returns the length it would have written, so it can exceed bufferLen. Guard it
-        // before using it as an offset and subtracting it, otherwise bufferLen - requiredSize
-        // underflows and Uint64ToHex writes past the buffer.
-        VerifyOrReturnError(requiredSize >= 0 && static_cast<size_t>(requiredSize) < bufferLen, CHIP_ERROR_BUFFER_TOO_SMALL);
-        return Encoding::Uint64ToHex(subtype.code, &buffer[requiredSize], bufferLen - static_cast<size_t>(requiredSize),
+        // Make sure the "_I" prefix (2 chars + null) fits before writing it and offsetting past it;
+        // Uint64ToHex validates that the remaining space holds the hex-encoded fabric id.
+        VerifyOrReturnError(bufferLen >= 3, CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buffer, "_I");
+        return Encoding::Uint64ToHex(subtype.code, &buffer[2], bufferLen - 2,
                                      Encoding::HexFlags::kUppercaseAndNullTerminate);
-        break;
     case DiscoveryFilterType::kInstanceName:
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
         break;
