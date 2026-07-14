@@ -88,7 +88,7 @@ def parse_version_from_slt(file_path):
 
 
 def version_tuple(version_str):
-    """Convert version string to tuple of integers for comparison (e.g. 2025.12.2 -> (2025, 12, 2))."""
+    """Convert version string to tuple of integers for comparison (e.g. 2026.6.0 -> (2026, 6, 0))."""
     if not version_str:
         return ()
     main = version_str.split("-")[0].split("+")[0]
@@ -484,8 +484,8 @@ def setup_slt_environment(verbose=False):
     check_silabs_not_submodules(repo_root)
 
     # Using exact version to avoid ambiguity when multiple versions are installed.
-    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2025.12.2")
-    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect/4.0.1")
+    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2026.6.0")
+    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect/4.1.0")
     create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path)
 
     versions = get_installed_sdk_versions(repo_root)
