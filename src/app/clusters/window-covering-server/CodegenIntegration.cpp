@@ -16,9 +16,11 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
 #include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
 #include <app/clusters/window-covering-server/WindowCoveringDelegate.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/static-cluster-config/WindowCovering.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -219,6 +221,21 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
+class WindowCoveringAttributeChangeListener final : public chip::app::DataModel::AttributeChangeListener
+{
+public:
+    void OnAttributeChanged(const chip::app::ConcreteAttributePath & path, chip::app::DataModel::AttributeChangeType type) override
+    {
+        if (path.mClusterId == chip::app::Clusters::WindowCovering::Id)
+        {
+            MatterWindowCoveringClusterServerAttributeChangedCallback(path);
+        }
+    }
+};
+
+WindowCoveringAttributeChangeListener gAttributeChangeListener;
+uint16_t gActiveWindowCoveringEndpoints = 0;
+
 } // namespace
 
 void MatterWindowCoveringClusterInitCallback(EndpointId endpointId)
@@ -235,6 +252,12 @@ void MatterWindowCoveringClusterInitCallback(EndpointId endpointId)
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
+
+    if (gActiveWindowCoveringEndpoints == 0)
+    {
+        CodegenDataModelProvider::Instance().RegisterAttributeChangeListener(gAttributeChangeListener);
+    }
+    gActiveWindowCoveringEndpoints++;
 }
 
 void MatterWindowCoveringClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
@@ -249,6 +272,15 @@ void MatterWindowCoveringClusterShutdownCallback(EndpointId endpointId, MatterCl
             .maxClusterInstanceCount   = kWindowCoveringMaxClusterCount,
         },
         integrationDelegate, shutdownType);
+
+    if (gActiveWindowCoveringEndpoints > 0)
+    {
+        gActiveWindowCoveringEndpoints--;
+        if (gActiveWindowCoveringEndpoints == 0)
+        {
+            CodegenDataModelProvider::Instance().UnregisterAttributeChangeListener(gAttributeChangeListener);
+        }
+    }
 }
 
 namespace chip::app::Clusters::WindowCovering {
@@ -546,40 +578,13 @@ Percent100ths ComputePercent100thsStep(OperationalState direction, Percent100ths
 
 void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
 {
-    auto cluster = FindClusterOnEndpoint(endpoint);
-    VerifyOrDie(cluster != nullptr);
-
     BitMask<Mode> mode;
     BitMask<ConfigStatus> configStatus;
-    NPercent100ths current, target;
 
     ChipLogProgress(Zcl, "WC POST ATTRIBUTE=%u", (unsigned int) attributeId);
 
-    OperationalState opLift = OperationalStateGet(endpoint, OperationalStatus::kLift);
-    OperationalState opTilt = OperationalStateGet(endpoint, OperationalStatus::kTilt);
-
     switch (attributeId)
     {
-    case Attributes::CurrentPositionLiftPercent100ths::Id:
-        target  = cluster->GetTargetPositionLiftPercent100ths();
-        current = cluster->GetCurrentPositionLiftPercent100ths();
-        break;
-    case Attributes::CurrentPositionTiltPercent100ths::Id:
-        target  = cluster->GetTargetPositionTiltPercent100ths();
-        current = cluster->GetCurrentPositionTiltPercent100ths();
-        break;
-    case Attributes::TargetPositionLiftPercent100ths::Id:
-        target  = cluster->GetTargetPositionLiftPercent100ths();
-        current = cluster->GetCurrentPositionLiftPercent100ths();
-        opLift  = ComputeOperationalState(target, current);
-        OperationalStateSet(endpoint, OperationalStatus::kLift, opLift);
-        break;
-    case Attributes::TargetPositionTiltPercent100ths::Id:
-        target  = cluster->GetTargetPositionTiltPercent100ths();
-        current = cluster->GetCurrentPositionTiltPercent100ths();
-        opTilt  = ComputeOperationalState(target, current);
-        OperationalStateSet(endpoint, OperationalStatus::kTilt, opTilt);
-        break;
     case Attributes::Mode::Id:
         mode = ModeGet(endpoint);
         ModePrint(mode);
@@ -601,3 +606,8 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
  */
 void MatterWindowCoveringPluginServerInitCallback() {}
 void MatterWindowCoveringPluginServerShutdownCallback() {}
+
+void __attribute__((weak)) MatterWindowCoveringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    chip::app::Clusters::WindowCovering::PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+}
