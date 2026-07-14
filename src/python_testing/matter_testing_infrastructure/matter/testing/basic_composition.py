@@ -40,7 +40,7 @@ from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlCluster, XmlDeviceType, build_xml_clusters,
-                                         build_xml_device_types, dm_from_spec_version)
+                                         build_xml_device_types, build_xml_discovery_bitmaps, dm_from_spec_version)
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
@@ -274,4 +274,6 @@ class BasicCompositionTests(MatterBaseTest):
         LOGGER.info("----------------------------------------------------------------------------------")
         self.xml_clusters, self.problems = build_xml_clusters(dm, errata_path=errata_path)
         self.xml_device_types, problems = build_xml_device_types(dm)
+        self.problems.extend(problems)
+        self.xml_discovery_bitmaps, problems = build_xml_discovery_bitmaps(dm)
         self.problems.extend(problems)

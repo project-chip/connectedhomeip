@@ -25,6 +25,7 @@ import random
 import re
 import time
 from enum import IntEnum
+from functools import cache
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import assert_valid_icd_key
@@ -33,6 +34,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, instruction_dependency_masks
+from matter.tlv import uint
 
 log = logging.getLogger(__name__)
 
@@ -68,18 +71,20 @@ class ICDTestEventTriggerOperations(IntEnum):
 _cluster = Clusters.Objects.IcdManagement
 uat = _cluster.Bitmaps.UserActiveModeTriggerBitmap
 
-# BitMask for hints that are dependent on UserActiveModeTriggerInstruction
-kUatInstructionDependentBitMask = (
-    uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes |
-    uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kResetButtonSeconds |
-    uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonLightsBlink |
-    uat.kSetupButtonTimes | uat.kAppDefinedButton)
+_ICDM_CLUSTER_ID = uint(0x0046)
 
-# BitMask for hints that REQUIRE the presence of UserActiveModeTriggerInstruction
-kUatInstructionMandatoryBitMask = (
-    uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes |
-    uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds |
-    uat.kSetupButtonTimes | uat.kAppDefinedButton)
+
+@cache
+def uat_instruction_bitmasks(data_model: PrebuiltDataModelDirectory = PrebuiltDataModelDirectory.k1_6) -> tuple[int, int]:
+    """Return (dependent, mandatory) UAT bitmasks scraped from the spec data model.
+
+    A bit is "dependent" if its Instruction Dependency is M or O, and "mandatory" only if it is M.
+    Raises SpecParsingException if the data model lacks the Instruction Dependency column.
+    """
+    clusters, _ = build_xml_clusters(data_model)
+    icd_cluster = clusters[_ICDM_CLUSTER_ID]
+    return instruction_dependency_masks(icd_cluster.bitmaps["UserActiveModeTriggerBitmap"])
+
 
 # BitMask for hints where UserActiveModeTriggerInstruction is a uint (number)
 kUatNumberInstructionBitMask = (
