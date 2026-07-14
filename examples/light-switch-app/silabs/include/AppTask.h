@@ -126,14 +126,15 @@ public:
     static void AppEventHandler(AppEvent * aEvent);
 
     /**
-     * @brief Matter-thread work item: notifies the binding manager that a bound cluster changed to drive the outgoing switch
+     * @brief Notifies the binding manager that a bound cluster changed to drive the outgoing switch. This action is queued to
+     *        the Matter thread/task.
      *
      * @param context Work item pointer passed to PlatformMgr::ScheduleWork
      */
     static void SwitchWorkerFunction(intptr_t context);
 
     /**
-     * @brief Matter-thread work item: emits a Generic Switch cluster event for the queued switch action.
+     * @brief Handler scheduled on the Matter thread to emit a Generic Switch cluster event for the queued switch action.
      *
      * @param context Pointer to a GenericSwitchEventData allocated for this work item
      */

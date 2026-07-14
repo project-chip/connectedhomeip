@@ -100,7 +100,7 @@ protected:
     CHIP_ERROR InitLight();
 
     /**
-     * @brief Chip-thread work item, push the OnOff cluster state through `OnOffServer::setOnOffValue`.
+     * @brief Handler scheduled on the Matter thread to push the OnOff cluster state through `OnOffServer::setOnOffValue`.
      *
      * @param context Opaque work item pointer passed to PlatformMgr::ScheduleWork
      */
