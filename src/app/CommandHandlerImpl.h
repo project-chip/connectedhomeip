@@ -267,7 +267,6 @@ public:
      * Check whether the SuppressResponse flag is set.
      */
     bool IsResponseSuppressed() const { return mSuppressResponse; }
-    const Optional<InvokeRequestMessage::DelayReportData> & GetDelayReportData() const { return mDelayReportData; }
 
 protected:
     // Lifetime management for CommandHandler::Handle
