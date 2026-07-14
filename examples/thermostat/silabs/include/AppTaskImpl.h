@@ -104,4 +104,6 @@ private:
     {
         AppTask::DMPostAttributeChangeCallback(attributePath, type, size, value);
     }
+
+    void DMThermostatClusterInitImpl(chip::EndpointId endpoint) { AppTask::DMThermostatClusterInit(endpoint); }
 };

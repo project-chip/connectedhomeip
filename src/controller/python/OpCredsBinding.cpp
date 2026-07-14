@@ -726,6 +726,30 @@ PyChipError pychip_OpCreds_SetGroupKey(chip::Controller::DeviceCommissioner * de
     return ToPyChipError(err);
 }
 
+PyChipError pychip_OpCreds_RemoveGroupInfo(chip::Controller::DeviceCommissioner * devCtrl, uint16_t groupId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.RemoveGroupInfo(devCtrl->GetFabricIndex(), groupId);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_RemoveKeySet(chip::Controller::DeviceCommissioner * devCtrl, uint16_t keysetId)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.RemoveKeySet(devCtrl->GetFabricIndex(), keysetId);
+    return ToPyChipError(err);
+}
+
+PyChipError pychip_OpCreds_RemoveGroupKeys(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    CHIP_ERROR err = sGroupDataProvider.RemoveGroupKeys(devCtrl->GetFabricIndex());
+    return ToPyChipError(err);
+}
+
 PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, bool enabled)
 {
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
