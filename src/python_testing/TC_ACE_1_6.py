@@ -519,6 +519,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20a: Verify GroupcastTesting event (AccessAllowed: true)
             self.step("20a")
+            # This is the first groupcast tesitng event generated from a step in this test. This means it will be the first
+            # gropucast testing event in the queue and there is no need to use wait_for_event_report_with_duplication()
             event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
@@ -549,6 +551,9 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20d: Check for event (kNoAvailableKey)
             self.step("20d")
+            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is 
+            # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
+            # the DUT and controller. 
             event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
                 current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
