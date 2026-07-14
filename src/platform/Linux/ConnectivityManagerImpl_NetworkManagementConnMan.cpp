@@ -4596,6 +4596,37 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRelease(ConnMa
     return TRUE;
 }
 
+/**
+ *  @brief
+ *    Answer connman's `Agent.RequestInput` with the cached Wi-Fi
+ *    credential.
+ *
+ *  @note
+ *    **Runs on the GLib thread and takes `mConnManMutex` directly.**
+ *    Unlike the connman signal handlers (`OnServicePropertyChanged`
+ *    and friends), which marshal to the Matter thread via
+ *    `ScheduleLambda`, this *cannot*: it must answer the D-Bus method
+ *    invocation synchronously, with the passphrase, before returning.
+ *
+ *    There is no deferral that preserves that contract. This is the
+ *    precedent that also licenses the same treatment in
+ *    #OnAgentReportError.
+ *
+ *  @note
+ *    The cached credential is deliberately **not** scrubbed here.
+ *    connman may legitimately call `RequestInput` more than once
+ *    within a single `Service.Connect()` (hidden networks, WPS, and
+ *    any future `Agent.Error.Retry` reply) and scrubbing on the first
+ *    would fail the second with a misleading "not available".
+ *    #ShutdownClientConnectSessionLocked owns the scrub, at the
+ *    close of the D-Bus call that is the credential's true scope.
+ *
+ *  @sa OnAgentReportError
+ *  @sa ShutdownClientConnectSessionLocked
+ *
+ *  @private
+ *
+ */
 gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRequestInput(ConnManAgent * inAgent,
                                                                                GDBusMethodInvocation * inInvocation,
                                                                                const gchar * inPath,
@@ -4712,6 +4743,46 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRequestInput(C
     return TRUE;
 }
 
+/**
+ *  @brief
+ *    Latch the cause of a connman network service failure reported
+ *    via `Agent.ReportError`, as a fallback to the "Error" property.
+ *
+ *  @note
+ *    **Runs on the GLib thread and takes `mConnManMutex` directly,
+ *    and must not be marshaled to the Matter thread.** This is subtle
+ *    and load-bearing. connman emits, in order:
+ *
+ *      1. `PropertyChanged("Error")`
+ *      2. `PropertyChanged("State" = "failure")`
+ *      3. `Agent.ReportError()`
+ *
+ *    Signals (1) and (2) are *already* deferred onto the Matter
+ *    thread by `OnServicePropertyChanged`, and (2) concludes the
+ *    Matter connect via #ConcludeWiFiClusterConnectLocked, which clears
+ *    the latch and the pending gate. Marshaling this handler as well
+ *    would queue it strictly *behind* both (that is, behind the very
+ *    conclusion that clears what it is trying to set) so its
+ *    `HasWiFiClusterConnectPendingLocked()` guard below would reject it on
+ *    every single connect, rendering the fallback dead code. Handled
+ *    inline on the GLib thread, it can still win that race and serve
+ *    as the fallback it is meant to be.
+ *
+ *  @note
+ *    Secondary latch only;
+ *    #HandleWiFiPendingConnectServiceErrorChangedLocked, driven from
+ *    signal (1), is the primary and normally wins. Hence the
+ *    never-overwrite guard: in the ordinary case this handler arrives
+ *    *after* the failure has already been mapped, dispatched, and
+ *    concluded, and an unguarded write would arm a stale error for
+ *    the *next* connect.
+ *
+ *  @sa HandleWiFiPendingConnectServiceErrorChangedLocked
+ *  @sa OnAgentRequestInput
+ *
+ *  @private
+ *
+ */
 gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentReportError(ConnManAgent * inAgent,
                                                                               GDBusMethodInvocation * inInvocation,
                                                                               const gchar * inPath, const gchar * inError) noexcept
