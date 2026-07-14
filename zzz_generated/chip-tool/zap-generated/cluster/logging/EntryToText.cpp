@@ -3343,6 +3343,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::Humidistat::Id: {
         switch (id)
         {
+        case chip::app::Clusters::Humidistat::Attributes::SupportedModes::Id:
+            return "SupportedModes";
         case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
             return "Mode";
         case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
@@ -3365,6 +3367,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Sleep";
         case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
             return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::CondPumpEnabled::Id:
+            return "CondPumpEnabled";
+        case chip::app::Clusters::Humidistat::Attributes::CondRunCount::Id:
+            return "CondRunCount";
         case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:

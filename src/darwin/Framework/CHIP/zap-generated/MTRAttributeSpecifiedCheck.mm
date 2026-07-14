@@ -4395,6 +4395,9 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Humidistat;
     switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
     case Attributes::Mode::Id: {
         return YES;
     }
@@ -4426,6 +4429,12 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::Optimal::Id: {
+        return YES;
+    }
+    case Attributes::CondPumpEnabled::Id: {
+        return YES;
+    }
+    case Attributes::CondRunCount::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

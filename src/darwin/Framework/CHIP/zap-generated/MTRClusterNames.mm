@@ -6216,6 +6216,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster Humidistat attributes
+        case MTRAttributeIDTypeClusterHumidistatAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
         case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
             result = @"Mode";
             break;
@@ -6258,6 +6262,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterHumidistatAttributeOptimalID:
             result = @"Optimal";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondPumpEnabledID:
+            result = @"CondPumpEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterHumidistatAttributeCondRunCountID:
+            result = @"CondRunCount";
             break;
 
         case MTRAttributeIDTypeClusterHumidistatAttributeGeneratedCommandListID:
