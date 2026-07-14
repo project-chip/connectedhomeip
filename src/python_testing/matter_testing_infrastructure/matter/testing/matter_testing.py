@@ -37,7 +37,7 @@ from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
 from enum import IntFlag
 from pathlib import Path
-from typing import Any, Callable, Optional, TypeAlias
+from typing import Any, TypeAlias
 
 import matter.testing.matchers as matchers
 
