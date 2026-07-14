@@ -48,6 +48,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/Linux/CHIPLinuxStoragePaths.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
@@ -530,8 +531,44 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
-    const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
-    ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
+    // Configure the KVS storage paths before InitChipStack() (which calls
+    // PosixConfig::Init() -> KeyValueStoreMgrImpl().Init()) to avoid a double-init.
+    {
+        auto & paths = DeviceLayer::GetStoragePaths();
+        const auto & config = AppOptions::GetConfig();
+        if (!config.kvsDirectory.empty())
+        {
+            paths.SetBaseDir(config.kvsDirectory);
+        }
+        // --KVS (deprecated) and --kvs-data both set the KVS data file explicitly.
+        // If neither is given but --kvs-directory is, leave the data file empty so
+        // ResolvePath() derives it from baseDir (e.g. /tmp/kvs1/chip_kvs).
+        if (!config.kvsDataFile.empty())
+        {
+            paths.SetKVSDataFile(config.kvsDataFile);
+        }
+        else if (!config.kvsPath.empty())
+        {
+            paths.SetKVSDataFile(config.kvsPath);
+        }
+        else if (config.kvsDirectory.empty())
+        {
+            // No KVS path or directory given: fall back to the compile-time default.
+            paths.SetKVSDataFile(CHIP_CONFIG_KVS_PATH);
+        }
+        if (!config.kvsFactoryFile.empty())
+        {
+            paths.SetFactoryFile(config.kvsFactoryFile);
+        }
+        if (!config.kvsConfigFile.empty())
+        {
+            paths.SetConfigFile(config.kvsConfigFile);
+        }
+        if (!config.kvsCountersFile.empty())
+        {
+            paths.SetCountersFile(config.kvsCountersFile);
+        }
+    }
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
     ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));

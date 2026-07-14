@@ -48,6 +48,11 @@ bool IsExcludedFromWildcard(const std::string & type)
 constexpr uint16_t kOptionDeviceType    = 0xffd0;
 constexpr uint16_t kOptionWiFi          = 0xffd2;
 constexpr uint16_t kOptionKVS           = 0xffd3;
+constexpr uint16_t kOptionKVSDirectory  = 0xffdd;
+constexpr uint16_t kOptionKVSData       = 0xffde;
+constexpr uint16_t kOptionKVSFactory    = 0xffdf;
+constexpr uint16_t kOptionKVSConfig     = 0xffe0;
+constexpr uint16_t kOptionKVSCounters  = 0xffe1;
 constexpr uint16_t kOptionDiscriminator = 0xffd4;
 constexpr uint16_t kOptionVendorId      = 0xffd5;
 constexpr uint16_t kOptionProductId     = 0xffd6;
@@ -128,6 +133,21 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     case kOptionKVS:
         mConfig.kvsPath = value;
         return true;
+    case kOptionKVSDirectory:
+        mConfig.kvsDirectory = value;
+        return true;
+    case kOptionKVSData:
+        mConfig.kvsDataFile = value;
+        return true;
+    case kOptionKVSFactory:
+        mConfig.kvsFactoryFile = value;
+        return true;
+    case kOptionKVSConfig:
+        mConfig.kvsConfigFile = value;
+        return true;
+    case kOptionKVSCounters:
+        mConfig.kvsCountersFile = value;
+        return true;
     case kOptionDiscriminator: {
         char * endptr;
         unsigned long val = strtoul(value, &endptr, 0);
@@ -191,6 +211,11 @@ OptionSet * AppOptions::GetOptions()
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
         { "KVS", kArgumentRequired, kOptionKVS },
+        { "kvs-directory", kArgumentRequired, kOptionKVSDirectory },
+        { "kvs-data", kArgumentRequired, kOptionKVSData },
+        { "kvs-factory", kArgumentRequired, kOptionKVSFactory },
+        { "kvs-config", kArgumentRequired, kOptionKVSConfig },
+        { "kvs-counters", kArgumentRequired, kOptionKVSCounters },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
         { "vendor-id", kArgumentRequired, kOptionVendorId },
         { "product-id", kArgumentRequired, kOptionProductId },
@@ -231,7 +256,22 @@ OptionSet * AppOptions::GetOptions()
 #endif
 
         result += "  --KVS <path>\n";
-        result += "       Path to the Key Value Store file (default: " CHIP_CONFIG_KVS_PATH ")\n\n";
+        result += "       Path to the Key Value Store file (deprecated, use --kvs-data instead)\n\n";
+
+        result += "  --kvs-directory <dirpath>\n";
+        result += "       Base directory for all KVS files. Individual file locations will be derived from this path.\n\n";
+
+        result += "  --kvs-data <filepath>\n";
+        result += "       Full path to the KVS data file.\n\n";
+
+        result += "  --kvs-factory <filepath>\n";
+        result += "       Full path to the Factory KVS file.\n\n";
+
+        result += "  --kvs-config <filepath>\n";
+        result += "       Full path to the Config KVS file.\n\n";
+
+        result += "  --kvs-counters <filepath>\n";
+        result += "       Full path to the Counters KVS file.\n\n";
 
         result += "  --discriminator <number>\n";
         result += "       Discriminator value for commissioning (default: 3840)\n\n";
