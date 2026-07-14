@@ -84,14 +84,14 @@ realtek:
     - "scripts/tools/realtek/**"
 
 mt793x:
-    maintainers:
-      - ryan.ho
-      - jason-hy
-    paths:
-      - "src/platform/mt793x/**"
-      - "examples/lighting-app/genio/**"
-      - "third_party/mt793x_sdk/**"
-      
+  maintainers:
+    - RyanHo-MTK
+    - as23999
+  paths:
+    - "src/platform/mt793x/**"
+    - "examples/lighting-app/genio/**"
+    - "third_party/mt793x_sdk/**"
+
 # --- Proposals / Opt-In Templates ---
 
 # nrfconnect:
