@@ -676,7 +676,6 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 31a: Verify event (AccessAllowed: true)
             self.step("31a")
-            event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
                 current_event_filter_func=lambda data: data.accessAllowed,
