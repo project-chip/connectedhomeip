@@ -459,9 +459,9 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 16e: Validate the DUT rejected the group command via the GroupcastTesting event.
             self.step("16e")
-            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is 
+            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
             # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
-            # the DUT and controller. 
+            # the DUT and controller.
             event_data = event_sub.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
                 current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
@@ -504,7 +504,7 @@ class TC_SC_5_2(MatterBaseTest):
             asserts.assert_equal(event_data.groupcastTestResult,
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
                                  "GroupcastTesting event should report Success")
-            
+
             # Step 16i: Update GroupKeyMap to map 0x0101 to 0x01a4, maintaining 0x0300 to 0x01a3
             self.step("16i")
             mapping = [

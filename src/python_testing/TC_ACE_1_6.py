@@ -551,9 +551,9 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20d: Check for event (kNoAvailableKey)
             self.step("20d")
-            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is 
+            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
             # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
-            # the DUT and controller. 
+            # the DUT and controller.
             event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
                 Clusters.Groupcast.Events.GroupcastTesting,
                 current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
