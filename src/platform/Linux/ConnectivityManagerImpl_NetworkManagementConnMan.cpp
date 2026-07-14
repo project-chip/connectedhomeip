@@ -158,6 +158,12 @@ struct NetworkServiceTypeDescriptor
     const char * mDescription;
 };
 
+struct ClientErrorTableEntry
+{
+    const char * mName;
+    int mErrno;
+};
+
 // Global Variables
 
 // clang-format off
@@ -332,6 +338,53 @@ static constexpr std::array sNetworkServiceTypeDescriptors = {
     NetworkServiceTypeDescriptor{ kConnManObjectPropertyTypeWiFiValue, "Wi-Fi" },
 #endif
 };
+
+/**
+ *  Maps connman's client D-Bus error name space
+ *  (`net.connman.Error.*` and `net.connman.Agent.Error.*`) onto POSIX
+ *  errno values, carried in CHIP_ERROR's kPOSIX range.
+ *
+ *  These are the *synchronous* errors returned from method calls on
+ *  the connman manager, service, and technology interfaces --
+ *  distinct from the closed vocabulary of the service "Error"
+ *  *property*, which describes an asynchronous connection failure and
+ *  is a separate concern.
+ *
+ *  @sa MapClientError
+ */
+// clang-format off
+static constexpr std::array<ClientErrorTableEntry, 25> kClientErrorTable =
+{{
+    { "net.connman.Error.AlreadyConnected",    EISCONN      },
+    { "net.connman.Error.AlreadyDisabled",     EALREADY     },
+    { "net.connman.Error.AlreadyEnabled",      EALREADY     },
+    { "net.connman.Error.AlreadyExists",       EEXIST       },
+    { "net.connman.Error.Canceled",            ECANCELED    },
+    { "net.connman.Error.InProgress",          EINPROGRESS  },
+    { "net.connman.Error.InvalidArguments",    EINVAL       },
+    { "net.connman.Error.InvalidProperty",     EINVAL       },
+    { "net.connman.Error.InvalidService",      EINVAL       },
+    { "net.connman.Error.NoCarrier",           ENOLINK      },
+    { "net.connman.Error.NotConnected",        ENOTCONN     },
+    { "net.connman.Error.NotFound",            ENOENT       },
+    { "net.connman.Error.NotImplemented",      ENOSYS       },
+    { "net.connman.Error.NotRegistered",       ESRCH        },
+    { "net.connman.Error.NotSupported",        EOPNOTSUPP   },
+    { "net.connman.Error.NotUnique",           ENOTUNIQ     },
+    { "net.connman.Error.OperationAborted",    ECONNABORTED },
+    { "net.connman.Error.OperationCanceled",   ECANCELED    },
+    { "net.connman.Error.OperationTimeout",    ETIMEDOUT    },
+    { "net.connman.Error.PassphraseRequired",  ENOKEY       },
+    { "net.connman.Error.PermissionDenied",    EACCES       },
+    { "net.connman.Agent.Error.Canceled",      ECANCELED    },
+    { "net.connman.Agent.Error.Rejected",      ECONNREFUSED },
+    { "net.connman.Agent.Error.Retry",         EAGAIN       }
+
+    // net.connman.Error.Failed is deliberately absent: it is
+    // connman's catch-all and carries no information beyond the caller's
+    // default.
+}};
+// clang-format on
 
 // Function and Method Implementation
 
@@ -1213,6 +1266,40 @@ static CHIP_ERROR UnlockAndInvokeOnGLibContextSync(LockT & inOutLock, Callable &
     VerifyOrDie(inOutLock.owns_lock());
 
     return UnlockAndInvoke(inOutLock, [&]() { return InvokeOnGLibContextSync(std::forward<Callable>(inCallable)); });
+}
+
+static CHIP_ERROR MapClientError(const GError * inError, CHIP_ERROR inDefaultError) noexcept
+{
+    VerifyOrReturnValue(inError != nullptr, inDefaultError);
+
+    // Only a *remote* GError carries a D-Bus error name. A local
+    // GLib/GIO failure (transport teardown, timeout, cancellation)
+    // does not, and must not be run through the connman table.
+    //
+    // NOTE: this depends on the GError not having been passed through
+    // g_dbus_error_strip_remote_error(), which destroys the name.
+
+    VerifyOrReturnValue(g_dbus_error_is_remote_error(inError), inDefaultError);
+
+    GAutoPtr<char> name(g_dbus_error_get_remote_error(inError));
+    VerifyOrReturnValue(name, inDefaultError);
+
+    for (const auto & entry : kClientErrorTable)
+    {
+        if (strcmp(entry.mName, name.get()) == 0)
+        {
+            return ChipError(ChipError::Range::kPOSIX, entry.mErrno);
+        }
+    }
+
+    ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "unrecognized client error '%s'", name.get());
+
+    return inDefaultError;
+}
+
+static CHIP_ERROR MapClientError(const GError * inError) noexcept
+{
+    return MapClientError(inError, CHIP_ERROR_INTERNAL);
 }
 
 } // namespace
@@ -4231,10 +4318,15 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::TechnologySetProper
             conn_man_technology_call_set_property_sync(technology.get(), key.get(), value.get(), nullptr, &err.GetReceiver());
         if (!status || err)
         {
-            ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to set technology %s property %s: %s",
-                         g_dbus_proxy_get_object_path(G_DBUS_PROXY(technology.get())), key.get(), err ? err->message : "unknown");
+            const CHIP_ERROR mapped = MapClientError(err.get());
 
-            return CHIP_ERROR_INTERNAL;
+            ChipLogError(DeviceLayer,
+                         CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to set technology %s property %s: %s (%" CHIP_ERROR_FORMAT
+                                                                 ")",
+                         g_dbus_proxy_get_object_path(G_DBUS_PROXY(technology.get())), key.get(), err ? err->message : "unknown",
+                         mapped.Format());
+
+            return mapped;
         }
 
         return CHIP_NO_ERROR;
