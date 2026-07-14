@@ -44,6 +44,7 @@ if (pw_enable_fuzz_test_targets) {
     test_source = [ "FuzzTLSCertificateManagementPW.cpp" ]
     public_deps = [
       "${chip_root}/src/app/clusters/tls-certificate-management-server",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
       "${chip_root}/src/credentials",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/core",
