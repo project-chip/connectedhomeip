@@ -90,6 +90,14 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+    /**
+     * @brief Matter stack callback triggered after a server attribute changes.
+     *
+     * @param attributePath Endpoint, cluster, and attribute that changed
+     * @param type          TLV encoding type of @p value
+     * @param size          Size in bytes of @p value
+     * @param value         Pointer to the new attribute value
+     */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
@@ -102,13 +110,22 @@ public:
      */
     CHIP_ERROR GetAirQualityValue(int32_t & air_quality);
 
-    // Reads new generated sensor value, stores it, and updates local Air Quality attribute
+    /**
+     * @brief Reads new generated sensor value, stores it, and updates local Air Quality attribute.
+     *
+     * @param arg CMSIS timer callback argument
+     */
     static void SensorTimerEventHandler(void * arg);
 
 protected:
-    /** Override of `BaseApplication::AppInit()`. */
     CHIP_ERROR AppInit() override;
 
-    /** Bring up the air quality sensor app: Matter manager, sensor timer, sensor driver, first reading. */
+    /**
+     * @brief Bring up the air quality sensor app: Matter manager, sensor timer, sensor driver, first reading.
+     *
+     * @return CHIP_NO_ERROR on success, otherwise APP_ERROR_CREATE_TIMER_FAILED if the sensor timer
+     *         could not be created, or MATTER_PLATFORM_ERROR(...) if the air quality sensor driver
+     *         init fails when USE_AIR_QUALITY_SENSOR is set.
+     */
     CHIP_ERROR InitAirQualitySensor();
 };
