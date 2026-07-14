@@ -20,6 +20,7 @@
 
 #include <app/AttributeValueEncoder.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
+#include <clusters/ContentLauncher/Metadata.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/JniReferences.h>
@@ -68,5 +69,4 @@ private:
     jmethodID mGetMovableMethod                     = nullptr;
     jmethodID mGetPresetsMethod                     = nullptr;
 
-    static constexpr uint16_t kClusterRevision = 3;
 };
