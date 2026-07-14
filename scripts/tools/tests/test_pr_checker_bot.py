@@ -29,7 +29,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # isort: split
 
 # pylint: disable=wrong-import-position
-from pr_checker_bot import ELIGIBILITY_COMMENT_MARKER, PrCheckerBot, PRContext, ValidationCheck  # noqa: E402
+from pr_checker_bot import (  # noqa: E402
+    ELIGIBILITY_COMMENT_MARKER,
+    PrCheckerBot,
+    PRContext,
+    UnresolvedThread,
+    ValidationCheck,
+)
 
 
 class TestPrCheckerBot(unittest.TestCase):
@@ -233,7 +239,9 @@ esp32:
             False,
             set(),
         )
-        matched_files, uncovered = context.file_analysis
+        analysis = context.file_analysis
+        matched_files = analysis.matched_files_per_group
+        uncovered = analysis.uncovered_files
 
         self.assertEqual(uncovered, set())
         self.assertEqual(
@@ -243,7 +251,7 @@ esp32:
                 "examples/all-clusters-app/nxp/main.cpp",
             },
         )
-        self.assertEqual(matched_files["esp32"], set())
+        self.assertNotIn("esp32", matched_files)
 
     def test_analyze_pr_files_not_fully_covered(self) -> None:
         """Tests that uncovered files are correctly identified."""
@@ -261,7 +269,9 @@ esp32:
             False,
             set(),
         )
-        matched_files, uncovered = context.file_analysis
+        analysis = context.file_analysis
+        matched_files = analysis.matched_files_per_group
+        uncovered = analysis.uncovered_files
 
         self.assertEqual(uncovered, {"src/app/Command.cpp"})
         self.assertEqual(
@@ -283,7 +293,7 @@ esp32:
             False,
             set(),
         )
-        _, uncovered = context.file_analysis
+        uncovered = context.file_analysis.uncovered_files
 
         self.assertIn("src/app/Command.cpp", uncovered)
 
@@ -771,11 +781,11 @@ esp32:
 
         # Mock an unresolved thread
         self.mock_load_unresolved_threads.return_value = [
-            {
-                "author": "jmartinez-silabs",
-                "body_preview": "Maybe we could check...",
-                "url": "https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
-            }
+            UnresolvedThread(
+                author="jmartinez-silabs",
+                body_preview="Maybe we could check...",
+                url="https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
+            )
         ]
 
         self.bot.check_and_process_pr(mock_pr)
@@ -828,11 +838,11 @@ esp32:
 
         # Mock unresolved threads (should be ignored)
         self.mock_load_unresolved_threads.return_value = [
-            {
-                "author": "jmartinez-silabs",
-                "body_preview": "unresolved",
-                "url": "https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
-            }
+            UnresolvedThread(
+                author="jmartinez-silabs",
+                body_preview="unresolved",
+                url="https://github.com/project-chip/connectedhomeip/pull/1#discussion_r1",
+            )
         ]
 
         self.bot.check_and_process_pr(mock_pr)
@@ -932,8 +942,8 @@ esp32:
         unresolved = context.unresolved_threads
 
         self.assertEqual(len(unresolved), 1)
-        self.assertEqual(unresolved[0]["author"], "system")
-        self.assertIn("Too many review threads", unresolved[0]["body_preview"])
+        self.assertEqual(unresolved[0].author, "system")
+        self.assertIn("Too many review threads", unresolved[0].body_preview)
 
     @patch("urllib.request.urlopen")
     def test_get_unresolved_threads_malformed_graphql_response(

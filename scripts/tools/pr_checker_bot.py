@@ -19,7 +19,9 @@ import json
 import logging
 import os
 import urllib.request
+from dataclasses import dataclass, field
 from enum import Enum
+from functools import cached_property
 from typing import Any, Callable, Iterable, NamedTuple, cast
 
 import click
@@ -62,10 +64,7 @@ class PlatformGroup:
         self.maintainers = sorted({m.strip().lower() for m in maintainers})
         self.paths = sorted({p.strip() for p in paths})
         self.spec = pathspec.PathSpec.from_lines("gitignore", self.paths)
-        self.path_specs = {
-            glob: pathspec.PathSpec.from_lines("gitignore", [glob])
-            for glob in self.paths
-        }
+        self.path_specs = {glob: pathspec.PathSpec.from_lines("gitignore", [glob]) for glob in self.paths}
 
     def matches_file(self, filepath: str) -> bool:
         """Checks if a file path matches this group's configured paths."""
@@ -81,13 +80,38 @@ class PlatformGroup:
         return sorted(matched_globs)
 
 
+@dataclass
+class FileAnalysisResult:
+    matched_files_per_group: dict[str, set[str]]
+    uncovered_files: set[str]
+
+
+@dataclass
+class ReviewStates:
+    approvers: set[str]
+    change_requesters: set[str]
+
+
+@dataclass
+class ApprovalsAnalysisResult:
+    missing_approvals: dict[str, PlatformGroup]
+    valid_approvals: dict[str, GroupApproval]
+
+
+@dataclass
+class UnresolvedThread:
+    author: str
+    body_preview: str
+    url: str
+
+
 class PRContext:
     """State-holder for the PR being processed. Lazily loads and caches API data."""
 
     def __init__(
         self,
         api: Github,
-        token: str,
+        token: str | None,
         repo: Repository,
         pr: PullRequest,
         groups: dict[str, PlatformGroup],
@@ -102,119 +126,91 @@ class PRContext:
         self.dry_run = dry_run
         self.skip_checks = skip_checks
 
-        # Caches
-        self._bot_username: str | None = None
-        self._commit: Commit | None = None
-        self._changed_files: set[str] | None = None
-        self._file_analysis: tuple[dict[str, set[str]], set[str]] | None = None
-        self._review_states: tuple[set[str], set[str]] | None = None
-        self._unresolved_threads: list[dict[str, Any]] | None = None
-        self._ci_passed: bool | None = None
-        self._is_pullapprove_green: bool | None = None
-        self._bot_comments: list[Any] | None = None
-        self._approvals_analysis: (
-            tuple[dict[str, PlatformGroup], dict[str, GroupApproval]] | None
-        ) = None
-
-    @property
+    @cached_property
     def bot_username(self) -> str:
-        if self._bot_username is None:
-            try:
-                self._bot_username = self.api.get_user().login.lower()
-            except GithubException:
-                self._bot_username = "pr-checker-bot"
-        return self._bot_username
+        try:
+            return self.api.get_user().login.lower()
+        except GithubException:
+            return "pr-checker-bot"
 
-    @property
+    @cached_property
     def commit(self) -> Commit:
-        if self._commit is None:
-            self._commit = self.repo.get_commit(sha=self.pr.head.sha)
-        return self._commit
+        return self.repo.get_commit(sha=self.pr.head.sha)
 
-    @property
+    @cached_property
     def changed_files(self) -> set[str]:
-        if self._changed_files is None:
-            files = set()
-            for pr_file in self.pr.get_files():
-                files.add(pr_file.filename)
-                if getattr(pr_file, "previous_filename", None):
-                    files.add(pr_file.previous_filename)
-            self._changed_files = files
-        return self._changed_files
+        files = set()
+        for pr_file in self.pr.get_files():
+            files.add(pr_file.filename)
+            if getattr(pr_file, "previous_filename", None):
+                files.add(pr_file.previous_filename)
+        return files
 
-    @property
-    def file_analysis(self) -> tuple[dict[str, set[str]], set[str]]:
-        if self._file_analysis is None:
-            matched_files_per_group: dict[str, set[str]] = {
-                name: set() for name in self.groups
-            }
-            uncovered_files = set()
-            for filepath in self.changed_files:
-                matched_any = False
-                for group_name, group in self.groups.items():
-                    if group.matches_file(filepath):
-                        matched_files_per_group[group_name].add(filepath)
-                        matched_any = True
-                if not matched_any:
-                    uncovered_files.add(filepath)
-            self._file_analysis = (matched_files_per_group, uncovered_files)
-        return self._file_analysis
+    @cached_property
+    def file_analysis(self) -> FileAnalysisResult:
+        matched_files_per_group: dict[str, set[str]] = {}
+        uncovered_files = set()
+        for filepath in self.changed_files:
+            matched_any = False
+            for group_name, group in self.groups.items():
+                if group.matches_file(filepath):
+                    matched_files_per_group.setdefault(group_name, set()).add(filepath)
+                    matched_any = True
+            if not matched_any:
+                uncovered_files.add(filepath)
+        return FileAnalysisResult(matched_files_per_group, uncovered_files)
 
     @property
     def active_groups(self) -> dict[str, set[str]]:
-        matched, _ = self.file_analysis
-        return {name: files for name, files in matched.items() if files}
+        return self.file_analysis.matched_files_per_group
 
     @property
     def uncovered_files(self) -> set[str]:
-        _, uncovered = self.file_analysis
-        return uncovered
+        return self.file_analysis.uncovered_files
 
     @property
     def is_platform_eligible(self) -> bool:
         return bool(self.active_groups) and not self.uncovered_files
 
-    @property
-    def review_states(self) -> tuple[set[str], set[str]]:
-        if self._review_states is None:
-            user_reviews = {}
-            for review in self.pr.get_reviews():
-                review_user = getattr(review.user, "login", None)
-                if not review_user:
-                    continue
-                user = review_user.lower()
-                if review.state in ("APPROVED", "CHANGES_REQUESTED", "DISMISSED"):
-                    user_reviews[user] = review.state
+    @cached_property
+    def review_states(self) -> ReviewStates:
+        approvers = set()
+        change_requesters = set()
+        for review in self.pr.get_reviews():
+            # review.user can be None if the user account was deleted.
+            review_user = getattr(review.user, "login", None)
+            if not review_user:
+                continue
+            user = review_user.lower()
+            if review.state == "APPROVED":
+                approvers.add(user)
+                change_requesters.discard(user)
+            elif review.state == "CHANGES_REQUESTED":
+                change_requesters.add(user)
+                approvers.discard(user)
+            elif review.state == "DISMISSED":
+                approvers.discard(user)
+                change_requesters.discard(user)
 
-            approvers = {
-                user for user, state in user_reviews.items() if state == "APPROVED"
-            }
-            pr_author = getattr(self.pr.user, "login", None)
-            author = pr_author.lower() if pr_author else ""
-            approvers.discard(author)
-            change_requesters = {
-                user
-                for user, state in user_reviews.items()
-                if state == "CHANGES_REQUESTED"
-            }
-            self._review_states = (approvers, change_requesters)
-        return self._review_states
+        pr_author = getattr(self.pr.user, "login", None)
+        author = pr_author.lower() if pr_author else ""
+        approvers.discard(author)
+
+        return ReviewStates(approvers, change_requesters)
 
     @property
     def approvers(self) -> set[str]:
-        return self.review_states[0]
+        return self.review_states.approvers
 
     @property
     def change_requesters(self) -> set[str]:
-        return self.review_states[1]
+        return self.review_states.change_requesters
 
-    @property
-    def unresolved_threads(self) -> list[dict]:
-        if self._unresolved_threads is None:
-            self._unresolved_threads = self._load_unresolved_threads()
-        return self._unresolved_threads
+    @cached_property
+    def unresolved_threads(self) -> list[UnresolvedThread]:
+        return self._load_unresolved_threads()
 
-    def _load_unresolved_threads(self) -> list[dict]:
+    def _load_unresolved_threads(self) -> list[UnresolvedThread]:
         owner, repo_name = self.repo.full_name.split("/")
         query = """
         query($owner: String!, $name: String!, $number: Int!) {
@@ -252,24 +248,22 @@ class PRContext:
             method="POST",
         )
 
+        if not self.token:
+            if self.dry_run:
+                log.warning("No GitHub token available for GraphQL query; skipping unresolved threads check in dry-run.")
+                return []
+            raise RuntimeError("GitHub token is required for GraphQL unresolved threads query.")
+
         unresolved = []
         try:
             with urllib.request.urlopen(req, timeout=30) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 if "errors" in res_data:
-                    raise RuntimeError(
-                        f"GraphQL API returned errors: {res_data['errors']}"
-                    )
+                    raise RuntimeError(f"GraphQL API returned errors: {res_data['errors']}")
 
                 data = res_data.get("data")
-                if (
-                    not data
-                    or not data.get("repository")
-                    or not data["repository"].get("pullRequest")
-                ):
-                    raise RuntimeError(
-                        f"GraphQL response missing PR repository/pullRequest data: {res_data}"
-                    )
+                if not data or not data.get("repository") or not data["repository"].get("pullRequest"):
+                    raise RuntimeError(f"GraphQL response missing PR repository/pullRequest data: {res_data}")
                 threads_data = data["repository"]["pullRequest"]["reviewThreads"]
                 if threads_data["pageInfo"]["hasNextPage"]:
                     log.warning(
@@ -277,26 +271,18 @@ class PRContext:
                         self.pr.number,
                     )
                     unresolved.append(
-                        {
-                            "author": "system",
-                            "body_preview": "Too many review threads (>100). Please resolve or clean up threads.",
-                            "url": self.pr.html_url + "/files",
-                        }
+                        UnresolvedThread(
+                            author="system",
+                            body_preview="Too many review threads (>100). Please resolve or clean up threads.",
+                            url=self.pr.html_url + "/files",
+                        )
                     )
 
                 threads = threads_data["nodes"]
                 for thread in threads:
                     if not thread["isResolved"]:
-                        first_comment = (
-                            thread["comments"]["nodes"][0]
-                            if thread["comments"]["nodes"]
-                            else None
-                        )
-                        author = (
-                            first_comment["author"]["login"]
-                            if first_comment and first_comment["author"]
-                            else "unknown"
-                        )
+                        first_comment = thread["comments"]["nodes"][0] if thread["comments"]["nodes"] else None
+                        author = first_comment["author"]["login"] if first_comment and first_comment["author"] else "unknown"
                         url = first_comment["url"] if first_comment else ""
                         body_preview = ""
                         if first_comment and first_comment.get("body"):
@@ -304,11 +290,11 @@ class PRContext:
                             if len(body_preview) > 40:
                                 body_preview = body_preview[:37] + "..."
                         unresolved.append(
-                            {
-                                "author": author,
-                                "body_preview": body_preview,
-                                "url": url,
-                            }
+                            UnresolvedThread(
+                                author=author,
+                                body_preview=body_preview,
+                                url=url,
+                            )
                         )
         except Exception as e:
             log.error(
@@ -320,17 +306,17 @@ class PRContext:
 
         return unresolved
 
-    @property
+    @cached_property
     def ci_passed(self) -> bool:
-        if self._ci_passed is None:
-            self._ci_passed = self._check_ci_passed()
-        return self._ci_passed
+        return self._check_ci_passed()
 
     def _check_ci_passed(self) -> bool:
         commit = self.commit
         combined_status = commit.get_combined_status()
         check_suites = list(commit.get_check_suites())
 
+        # Guard against empty checks / premature success when commit is fresh.
+        # A normal PR run has at least 10 combined statuses and check suites.
         total_checks = len(combined_status.statuses) + len(check_suites)
         if total_checks < 10:
             log.info(
@@ -378,11 +364,9 @@ class PRContext:
 
         return True
 
-    @property
+    @cached_property
     def is_pullapprove_green(self) -> bool:
-        if self._is_pullapprove_green is None:
-            self._is_pullapprove_green = self._check_pullapprove_green()
-        return self._is_pullapprove_green
+        return self._check_pullapprove_green()
 
     def _check_pullapprove_green(self) -> bool:
         combined_status = self.commit.get_combined_status()
@@ -395,11 +379,9 @@ class PRContext:
     def mergeable(self) -> bool | None:
         return self.pr.mergeable
 
-    @property
+    @cached_property
     def bot_comments(self) -> list:
-        if self._bot_comments is None:
-            self._bot_comments = self._find_bot_comments()
-        return self._bot_comments
+        return self._find_bot_comments()
 
     def _find_bot_comments(self) -> list:
         bot_comments = []
@@ -410,44 +392,45 @@ class PRContext:
                     bot_comments.append(comment)
         return bot_comments
 
-    @property
-    def approvals_analysis(
-        self,
-    ) -> tuple[dict[str, PlatformGroup], dict[str, GroupApproval]]:
-        if self._approvals_analysis is None:
-            missing_approvals = {}
-            valid_approvals = {}
-            for group_name, files in self.active_groups.items():
-                group = self.groups[group_name]
-                group_approvers = self.approvers.intersection(group.maintainers)
-                if not group_approvers:
-                    missing_approvals[group_name] = group
-                else:
-                    valid_approvals[group_name] = GroupApproval(
-                        sorted(group_approvers)[0], files
-                    )
-            self._approvals_analysis = (missing_approvals, valid_approvals)
-        return self._approvals_analysis
+    @cached_property
+    def approvals_analysis(self) -> ApprovalsAnalysisResult:
+        missing_approvals = {}
+        valid_approvals = {}
+        for group_name, files in self.active_groups.items():
+            group = self.groups[group_name]
+            group_approvers = self.approvers.intersection(group.maintainers)
+            if not group_approvers:
+                missing_approvals[group_name] = group
+            else:
+                valid_approvals[group_name] = GroupApproval(sorted(group_approvers)[0], files)
+        return ApprovalsAnalysisResult(missing_approvals, valid_approvals)
 
     @property
     def missing_approvals(self) -> dict[str, PlatformGroup]:
-        return self.approvals_analysis[0]
+        return self.approvals_analysis.missing_approvals
 
     @property
     def valid_approvals(self) -> dict[str, GroupApproval]:
-        return self.approvals_analysis[1]
+        return self.approvals_analysis.valid_approvals
 
 
+@dataclass
 class CheckResult:
-    def __init__(
-        self, passed: bool, message: str = "", details: dict[str, Any] | None = None
-    ) -> None:
-        self.passed = passed
-        self.message = message
-        self.details = details or {}
+    """Represents the outcome of a workflow validation check."""
+
+    passed: bool
+    message: str = ""
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 class Gate:
+    """Represents a gating condition that must be met before checks are run.
+
+    A gate wraps a function that evaluates the PR context and returns a boolean.
+    If the gate fails (returns False), an optional `on_fail` callback can be executed
+    to perform cleanup or status updates (e.g. removing comments).
+    """
+
     def __init__(
         self,
         fn: Callable[[PRContext], bool],
@@ -456,7 +439,7 @@ class Gate:
         self.fn = fn
         self.on_fail = on_fail
 
-    def run(self, context: PRContext) -> bool:
+    def accept(self, context: PRContext) -> bool:
         passed = self.fn(context)
         if not passed and self.on_fail:
             self.on_fail(context)
@@ -464,6 +447,13 @@ class Gate:
 
 
 class Workflow:
+    """Defines a sequence of gates and checks to process a PR.
+
+    A workflow has a name, a list of gates that must all pass to proceed,
+    a list of checks that determine readiness, and callbacks for success (e.g. merge)
+    and failure (e.g. post status comment).
+    """
+
     def __init__(
         self,
         name: str,
@@ -483,50 +473,55 @@ class Workflow:
 
 
 def gate_no_change_requests(context: PRContext) -> bool:
-    if context.change_requesters:
-        log.info(
-            "PR #%d has active changes requested by: %s. Skipping.",
-            context.pr.number,
-            list(context.change_requesters),
-        )
-        return False
-    return True
+    """Gate condition: ensures the PR has no active changes requested."""
+    if not context.change_requesters:
+        return True
+    log.info(
+        "PR #%d has active changes requested by: %s. Skipping.",
+        context.pr.number,
+        list(context.change_requesters),
+    )
+    return False
 
 
 def gate_no_uncovered_files(context: PRContext) -> bool:
-    if context.uncovered_files:
-        log.info(
-            "PR #%d contains files outside the platform-maintained scope. Skipping. Uncovered files: %s",
-            context.pr.number,
-            list(context.uncovered_files)[:5],
-        )
-        return False
-    return True
+    """Gate condition: ensures all changed files belong to platform maintainer groups."""
+    if not context.uncovered_files:
+        return True
+    log.info(
+        "PR #%d contains files outside the platform-maintained scope. Skipping. Uncovered files: %s",
+        context.pr.number,
+        list(context.uncovered_files)[:5],
+    )
+    return False
 
 
 def gate_has_active_groups(context: PRContext) -> bool:
-    if not context.active_groups:
-        log.info("PR #%d has no changed files in platform groups.", context.pr.number)
-        return False
-    return True
+    """Gate condition: ensures the PR touches at least one platform group."""
+    if context.active_groups:
+        return True
+    log.info("PR #%d has no changed files in platform groups.", context.pr.number)
+    return False
 
 
 def gate_pullapprove_pending(context: PRContext) -> bool:
+    """Gate condition: ensures PullApprove status is not already green (which follows standard flow)."""
     if ValidationCheck.PULLAPPROVE in context.skip_checks:
         return True
-    if context.is_pullapprove_green:
-        log.info(
-            "PR #%d has a successful pullapprove check. Skipping bot merge (standard flow applies).",
-            context.pr.number,
-        )
-        return False
-    return True
+    if not context.is_pullapprove_green:
+        return True
+    log.info(
+        "PR #%d has a successful pullapprove check. Skipping bot merge (standard flow applies).",
+        context.pr.number,
+    )
+    return False
 
 
 # --- Check Functions ---
 
 
 def check_ci(context: PRContext) -> CheckResult:
+    """Check: evaluates whether all CI checks have passed."""
     if ValidationCheck.CI in context.skip_checks:
         return CheckResult(passed=True, message="CI check skipped")
     if context.ci_passed:
@@ -535,6 +530,7 @@ def check_ci(context: PRContext) -> CheckResult:
 
 
 def check_unresolved_comments(context: PRContext) -> CheckResult:
+    """Check: evaluates whether all review comment threads are resolved."""
     if ValidationCheck.COMMENTS in context.skip_checks:
         return CheckResult(passed=True, message="Unresolved comments check skipped")
     threads = context.unresolved_threads
@@ -548,6 +544,7 @@ def check_unresolved_comments(context: PRContext) -> CheckResult:
 
 
 def check_mergeable(context: PRContext) -> CheckResult:
+    """Check: evaluates whether the PR is mergeable cleanly."""
     mergeable = context.mergeable
     if mergeable is True:
         return CheckResult(passed=True)
@@ -561,6 +558,7 @@ def check_mergeable(context: PRContext) -> CheckResult:
 
 
 def check_platform_approvals(context: PRContext) -> CheckResult:
+    """Check: evaluates whether all required platform maintainer approvals are present."""
     if context.missing_approvals:
         return CheckResult(passed=False, message="Needs platform maintainer approvals.")
     return CheckResult(passed=True)
@@ -570,10 +568,12 @@ def check_platform_approvals(context: PRContext) -> CheckResult:
 
 
 def action_noop(context: PRContext) -> None:
+    """No-op action callback."""
     pass
 
 
 def action_remove_eligibility_comment(context: PRContext) -> None:
+    """Deletes any stale eligibility comments posted by the bot on the PR."""
     if context.pr.comments == 0:
         return
     for comment in context.bot_comments:
@@ -591,6 +591,7 @@ def action_remove_eligibility_comment(context: PRContext) -> None:
 
 
 def action_merge_platform(context: PRContext) -> None:
+    """Merges the PR and posts a status explanation comment."""
     valid_approvals_per_group = context.valid_approvals
     merge_reason_comment = "### Platform Maintainers Auto-Merge Executed\n"
     merge_reason_comment += "This PR has been automatically merged. It contains changes restricted to platform-maintained paths and received the required maintainer approvals:\n\n"
@@ -627,12 +628,11 @@ def action_merge_platform(context: PRContext) -> None:
 
 
 def action_post_platform_eligibility(context: PRContext) -> None:
+    """Posts or updates a comment stating the platform auto-merge status of the PR."""
     comment_body = f"{ELIGIBILITY_COMMENT_MARKER}\n"
     comment_body += "### Platform Maintainers Auto-Merge Info\n"
     comment_body += "This PR is restricted to platform-maintained paths and is eligible for auto-merging upon approval from the designated maintainers.\n\n"
-    comment_body += (
-        "To merge, we require at least one approval from each of these groups:\n"
-    )
+    comment_body += "To merge, we require at least one approval from each of these groups:\n"
 
     active_groups = context.active_groups
     missing_approvals = context.missing_approvals
@@ -646,9 +646,7 @@ def action_post_platform_eligibility(context: PRContext) -> None:
     for group_name, files in active_groups.items():
         group = context.groups[group_name]
         maintainer_mentions = ", ".join([f"@{m}" for m in group.maintainers])
-        status = (
-            "❌ Needs approval" if group_name in missing_approvals else "✅ Approved"
-        )
+        status = "❌ Needs approval" if group_name in missing_approvals else "✅ Approved"
         comment_body += f"- **{group_name}**: {maintainer_mentions} ({status})\n"
         comment_body += "  *Paths matched:*\n"
         for glob in group.get_matched_globs(files):
@@ -656,12 +654,7 @@ def action_post_platform_eligibility(context: PRContext) -> None:
 
     comment_body += "\n### Merge Requirements Status\n"
 
-    is_ready = (
-        not missing_approvals
-        and not unresolved_threads
-        and (ci_passed or ci_skipped)
-        and mergeable is True
-    )
+    is_ready = not missing_approvals and not unresolved_threads and (ci_passed or ci_skipped) and mergeable is True
 
     if is_ready:
         comment_body += "✅ **All checks passed. PR is ready for merge.**\n"
@@ -675,11 +668,9 @@ def action_post_platform_eligibility(context: PRContext) -> None:
         if unresolved_threads:
             comment_body += "- ❌ Has unresolved review conversations:\n"
             for thread in unresolved_threads:
-                link_part = f" ([Link]({thread['url']}))" if thread["url"] else ""
-                comment_preview = (
-                    f': *"{thread["body_preview"]}"*' if thread["body_preview"] else ""
-                )
-                comment_body += f"  * Unresolved thread by @{thread['author']}{link_part}{comment_preview}\n"
+                link_part = f" ([Link]({thread.url}))" if thread.url else ""
+                comment_preview = f': *"{thread.body_preview}"*' if thread.body_preview else ""
+                comment_body += f"  * Unresolved thread by @{thread.author}{link_part}{comment_preview}\n"
         else:
             comment_body += "- ✅ All review conversations resolved.\n"
 
@@ -691,9 +682,7 @@ def action_post_platform_eligibility(context: PRContext) -> None:
         if mergeable is True:
             comment_body += "- ✅ No merge conflicts.\n"
         elif mergeable is False:
-            comment_body += (
-                "- ❌ PR has merge conflicts (resolve conflicts before merge).\n"
-            )
+            comment_body += "- ❌ PR has merge conflicts (resolve conflicts before merge).\n"
         else:
             comment_body += "- ⚠️ Mergeability state is computing on GitHub.\n"
 
@@ -772,6 +761,7 @@ WORKFLOWS = {
 
 
 def select_workflow(context: PRContext) -> Workflow | None:
+    """Selects the matching workflow to execute based on PR context."""
     if context.active_groups or context.bot_comments:
         return PLATFORM_MERGE_WORKFLOW
     return None
@@ -782,7 +772,7 @@ class PrCheckerBot:
 
     def __init__(
         self,
-        token: str,
+        token: str | None,
         repo_name: str,
         config_path: str,
         dry_run: bool,
@@ -791,7 +781,7 @@ class PrCheckerBot:
     ) -> None:
         self.token = token
         self.repo_name = repo_name
-        self.api = Github(token)
+        self.api = Github(token) if token else Github()
         self.repo = self.api.get_repo(repo_name)
         self.config_path = config_path
         self.dry_run = dry_run
@@ -810,40 +800,28 @@ class PrCheckerBot:
             content = yaml.safe_load(f)
 
         if not isinstance(content, dict):
-            raise ValueError(
-                "Invalid config file format. Expected a YAML dictionary of groups."
-            )
+            raise ValueError("Invalid config file format. Expected a YAML dictionary of groups.")
 
         for name, data in content.items():
             if not isinstance(name, str):
                 raise ValueError(f"Group name '{name}' must be a string.")
             if not isinstance(data, dict):
-                raise ValueError(
-                    f"Invalid data format for group '{name}'. Expected a dictionary."
-                )
+                raise ValueError(f"Invalid data format for group '{name}'. Expected a dictionary.")
 
             invalid_keys = set(data.keys()) - {"maintainers", "paths"}
             if invalid_keys:
-                raise ValueError(
-                    f"Group '{name}' contains unrecognized keys: {list(invalid_keys)}"
-                )
+                raise ValueError(f"Group '{name}' contains unrecognized keys: {list(invalid_keys)}")
 
             maintainers = data.get("maintainers")
             paths = data.get("paths")
 
             if not isinstance(maintainers, list) or not maintainers:
-                raise ValueError(
-                    f"Group '{name}' must contain a non-empty 'maintainers' list."
-                )
+                raise ValueError(f"Group '{name}' must contain a non-empty 'maintainers' list.")
             if not isinstance(paths, list) or not paths:
-                raise ValueError(
-                    f"Group '{name}' must contain a non-empty 'paths' list."
-                )
+                raise ValueError(f"Group '{name}' must contain a non-empty 'paths' list.")
 
             if not all(isinstance(m, str) and m.strip() for m in maintainers):
-                raise ValueError(
-                    f"Group '{name}' maintainers must be non-empty strings."
-                )
+                raise ValueError(f"Group '{name}' maintainers must be non-empty strings.")
             if not all(isinstance(p, str) and p.strip() for p in paths):
                 raise ValueError(f"Group '{name}' paths must be non-empty strings.")
 
@@ -851,9 +829,7 @@ class PrCheckerBot:
 
         log.info("Loaded %d platform groups from config.", len(self.groups))
 
-    def check_and_process_pr(
-        self, pr: PullRequest, workflow: Workflow | None = None
-    ) -> None:
+    def check_and_process_pr(self, pr: PullRequest, workflow: Workflow | None = None) -> None:
         """Checks the eligibility and readiness of a PR and runs the appropriate workflow."""
         if pr.user is None or not getattr(pr.user, "login", None):
             log.info(
@@ -913,7 +889,7 @@ class PrCheckerBot:
         log.info("Running workflow '%s' for PR #%d", workflow.name, context.pr.number)
 
         for gate in workflow.gates:
-            if not gate.run(context):
+            if not gate.accept(context):
                 log.info("Gate '%s' failed. Aborting workflow.", gate.fn.__name__)
                 return
 
@@ -925,9 +901,8 @@ class PrCheckerBot:
             if not res.passed:
                 all_passed = False
                 log.info("Check '%s' failed: %s", check.__name__, res.message)
-            else:
-                if res.message:
-                    log.info("Check '%s' passed: %s", check.__name__, res.message)
+            elif res.message:
+                log.info("Check '%s' passed: %s", check.__name__, res.message)
 
         if all_passed:
             log.info("All checks passed. Triggering success action.")
@@ -1053,9 +1028,11 @@ def main(
         gh_token = os.environ.get(token_env) or os.environ.get("GITHUB_TOKEN")
 
         if not gh_token:
-            raise click.ClickException(
-                f"Require a token. Set environment variable '{token_env}' (or 'GITHUB_TOKEN') or provide --token-file"
-            )
+            if not dry_run:
+                raise click.ClickException(
+                    f"Require a token. Set environment variable '{token_env}' (or 'GITHUB_TOKEN') or provide --token-file"
+                )
+            log.warning("No GitHub token provided. Running in unauthenticated dry-run mode.")
 
     bot = PrCheckerBot(
         gh_token,
