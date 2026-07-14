@@ -181,15 +181,21 @@ public:
 
     virtual void RescheduleAllReports() = 0;
 
+    System::Clock::Timeout GetRemainingTimeout(const Timestamp & targetTimestamp, const Timestamp & now)
+    {
+        if (targetTimestamp > now)
+        {
+            return std::chrono::duration_cast<System::Clock::Timeout>(targetTimestamp - now);
+        }
+        return System::Clock::Milliseconds32(0);
+    }
+
     System::Clock::Timeout AdjustTimeout(System::Clock::Timeout timeout, System::Clock::Timeout maxTimeout, const Timestamp & now)
     {
-        if (mDeferralEndTimestamp > now)
+        System::Clock::Timeout remaining = GetRemainingTimeout(mDeferralEndTimestamp, now);
+        if (remaining > System::Clock::Milliseconds32(0) && timeout < remaining)
         {
-            System::Clock::Timeout remaining = std::chrono::duration_cast<System::Clock::Timeout>(mDeferralEndTimestamp - now);
-            if (timeout < remaining)
-            {
-                return remaining < maxTimeout ? remaining : maxTimeout;
-            }
+            return remaining < maxTimeout ? remaining : maxTimeout;
         }
         return timeout;
     }
