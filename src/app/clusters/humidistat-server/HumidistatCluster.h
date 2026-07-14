@@ -103,8 +103,8 @@ public:
 
     struct StartupConfiguration
     {
-        Humidistat::ModeEnum mode               = Humidistat::ModeEnum::kOff;
-        Humidistat::SystemStateEnum systemState = Humidistat::SystemStateEnum::kOff;
+        Humidistat::ModeEnum mode               = Humidistat::ModeEnum::kAuto;
+        Humidistat::SystemStateEnum systemState = Humidistat::SystemStateEnum::kIdle;
         chip::Percent userSetpoint              = 50;
         chip::Percent minSetpoint               = 0;
         chip::Percent maxSetpoint               = 100;

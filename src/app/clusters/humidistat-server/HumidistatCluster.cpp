@@ -34,6 +34,94 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
 
+namespace {
+
+bool HasAnyBaseHumidityFeature(BitFlags<Humidistat::Feature> features)
+{
+    return features.Has(Feature::kHumidifier) || features.Has(Feature::kDehumidifier);
+}
+
+bool IsFeatureConfigurationValid(BitFlags<Humidistat::Feature> features)
+{
+    if (!HasAnyBaseHumidityFeature(features))
+    {
+        return false;
+    }
+
+    if (features.Has(Feature::kAuto) && !(features.Has(Feature::kHumidifier) && features.Has(Feature::kDehumidifier)))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+Humidistat::ModeEnum DefaultModeForFeatures(BitFlags<Humidistat::Feature> features)
+{
+    VerifyOrDie(IsFeatureConfigurationValid(features));
+
+    if (features.Has(Feature::kAuto))
+    {
+        return ModeEnum::kAuto;
+    }
+    if (features.Has(Feature::kDehumidifier))
+    {
+        return ModeEnum::kDehumidifier;
+    }
+    if (features.Has(Feature::kFanOnly))
+    {
+        return ModeEnum::kFanOnly;
+    }
+    if (features.Has(Feature::kHumidifier))
+    {
+        return ModeEnum::kHumidifier;
+    }
+
+    // Unreachable: guarded by VerifyOrDie above.
+    return ModeEnum::kAuto;
+}
+
+Humidistat::SystemStateEnum DefaultSystemStateForMode(Humidistat::ModeEnum mode)
+{
+    switch (mode)
+    {
+    case ModeEnum::kHumidifier:
+        return SystemStateEnum::kHumidifying;
+    case ModeEnum::kDehumidifier:
+        return SystemStateEnum::kDehumidifying;
+    case ModeEnum::kFanOnly:
+        return SystemStateEnum::kFan;
+    case ModeEnum::kAuto:
+    default:
+        return SystemStateEnum::kIdle;
+    }
+}
+
+CHIP_ERROR EncodeSupportedModes(BitFlags<Humidistat::Feature> features,
+                                const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    if (features.Has(Feature::kHumidifier))
+    {
+        ReturnErrorOnFailure(encoder.Encode(ModeEnum::kHumidifier));
+    }
+    if (features.Has(Feature::kDehumidifier))
+    {
+        ReturnErrorOnFailure(encoder.Encode(ModeEnum::kDehumidifier));
+    }
+    if (features.Has(Feature::kAuto))
+    {
+        ReturnErrorOnFailure(encoder.Encode(ModeEnum::kAuto));
+    }
+    if (features.Has(Feature::kFanOnly))
+    {
+        ReturnErrorOnFailure(encoder.Encode(ModeEnum::kFanOnly));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
 HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat::Feature> features,
                                      const OptionalAttributeSet & optionalAttributes) :
     HumidistatCluster(endpointId, features, optionalAttributes, StartupConfiguration())
@@ -43,19 +131,33 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
                                      const OptionalAttributeSet & optionalAttributes, const StartupConfiguration & config) :
     DefaultServerCluster({ endpointId, Humidistat::Id }),
     mFeatures(features), mOptionalAttributes(optionalAttributes), mActiveOptional(ComputeActiveOptionalAttributes()),
-    mMode(IsModeSupported(config.mode) ? config.mode : ModeEnum::kOff),
-    mSystemState(IsSystemStateSupported(config.systemState) ? config.systemState : SystemStateEnum::kOff),
+    mMode(IsModeSupported(config.mode) ? config.mode : DefaultModeForFeatures(features)),
+    mSystemState(IsSystemStateSupported(config.systemState) ? config.systemState : DefaultSystemStateForMode(mMode)),
     mUserSetpoint(config.userSetpoint), mMinSetpoint(config.minSetpoint), mMaxSetpoint(config.maxSetpoint), mStep(config.step),
     mTargetSetpoint(config.targetSetpoint), mMistType(config.mistType), mContinuous(config.continuous), mSleep(config.sleep),
     mOptimal(config.optimal)
 {
+    VerifyOrDie(IsFeatureConfigurationValid(mFeatures));
+
+    if ((mMode == ModeEnum::kHumidifier) && !mMistType.HasAny())
+    {
+        if (mFeatures.Has(Feature::kColdMist))
+        {
+            mMistType.Set(MistTypeBitmap::kMistCold);
+        }
+        else if (mFeatures.Has(Feature::kWarmMist))
+        {
+            mMistType.Set(MistTypeBitmap::kMistWarm);
+        }
+    }
+
     // Spec constraints on Quality F (fixed) setpoint attributes.
     VerifyOrDie(config.minSetpoint <= 99);
     VerifyOrDie(config.maxSetpoint >= static_cast<chip::Percent>(config.minSetpoint + 1) && config.maxSetpoint <= 100);
     VerifyOrDie(config.step >= 1 && config.step <= static_cast<chip::Percent>(config.maxSetpoint - config.minSetpoint));
     VerifyOrDie((config.maxSetpoint - config.minSetpoint) % config.step == 0);
-    VerifyOrDie(IsMistTypeSupportable(config.mistType));
-    VerifyOrDie(IsMistTypeConsistentWithMode(mMode, config.mistType));
+    VerifyOrDie(IsMistTypeSupportable(mMistType));
+    VerifyOrDie(IsMistTypeConsistentWithMode(mMode, mMistType));
 
     // Snap initial setpoints to the valid step grid.
     mUserSetpoint   = SnapToNearestStep(mUserSetpoint);
@@ -86,8 +188,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     }
     if (!IsModeSupported(mMode))
     {
-        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported Mode value %u, forcing Off", static_cast<unsigned>(mMode));
-        mMode = ModeEnum::kOff;
+        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported Mode value %u, forcing feature default", static_cast<unsigned>(mMode));
+        mMode = DefaultModeForFeatures(mFeatures);
     }
 
     const auto defaultSystemState = mSystemState;
@@ -98,8 +200,9 @@ void HumidistatCluster::LoadPersistentAttributes()
     }
     if (!IsSystemStateSupported(mSystemState))
     {
-        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported SystemState value %u, forcing Off", static_cast<unsigned>(mSystemState));
-        mSystemState = SystemStateEnum::kOff;
+        ChipLogDetail(Zcl, "Humidistat: Loaded unsupported SystemState value %u, forcing mode default",
+                      static_cast<unsigned>(mSystemState));
+        mSystemState = DefaultSystemStateForMode(mMode);
     }
 
     if (mFeatures.Has(Feature::kSensor))
@@ -187,8 +290,6 @@ bool HumidistatCluster::IsModeSupported(Humidistat::ModeEnum mode) const
 {
     switch (mode)
     {
-    case ModeEnum::kOff:
-        return true;
     case ModeEnum::kHumidifier:
         return mFeatures.Has(Feature::kHumidifier);
     case ModeEnum::kDehumidifier:
@@ -206,7 +307,6 @@ bool HumidistatCluster::IsSystemStateSupported(Humidistat::SystemStateEnum syste
 {
     switch (systemState)
     {
-    case SystemStateEnum::kOff:
     case SystemStateEnum::kIdle:
         return true;
     case SystemStateEnum::kHumidifying:
@@ -545,6 +645,11 @@ DataModel::ActionReturnStatus HumidistatCluster::ReadAttribute(const DataModel::
 {
     switch (request.path.mAttributeId)
     {
+    case SupportedModes::Id:
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+            return EncodeSupportedModes(mFeatures, listEncoder);
+        });
+
     case Humidistat::Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);
 
