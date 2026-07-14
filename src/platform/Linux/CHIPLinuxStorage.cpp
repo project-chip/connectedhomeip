@@ -60,8 +60,9 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
     {
         if (mConfigPath != configFile)
         {
-            ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with a different KVS config file. "
-                                      "Already initialized with: %s, requested: %s",
+            ChipLogError(DeviceLayer,
+                         "ChipLinuxStorage::Init: Attempt to re-initialize with a different KVS config file. "
+                         "Already initialized with: %s, requested: %s",
                          StringOrNullMarker(mConfigPath.c_str()), StringOrNullMarker(configFile));
             return CHIP_ERROR_INCORRECT_STATE;
         }
