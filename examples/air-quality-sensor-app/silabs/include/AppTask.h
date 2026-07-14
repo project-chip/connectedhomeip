@@ -91,7 +91,7 @@ public:
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     /**
-     * @brief Matter stack callback after a server attribute write, logs Identify cluster changes.
+     * @brief Matter stack callback triggered after a server attribute changes.
      *
      * @param attributePath Endpoint, cluster, and attribute that changed
      * @param type          TLV encoding type of @p value

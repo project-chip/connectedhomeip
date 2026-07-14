@@ -65,7 +65,7 @@ public:
     static void TemperatureUpdateEventHandler(AppEvent * aEvent);
 
     /**
-     * @brief Matter stack callback after a server attribute write, logs Thermostat attributes and
+     * @brief Matter stack callback after a server attribute change, logs Thermostat attributes and
      *        refreshes the UI.
      *
      * @param attributePath Endpoint, cluster, and attribute that changed

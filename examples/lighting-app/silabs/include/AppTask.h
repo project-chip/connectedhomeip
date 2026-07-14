@@ -65,7 +65,7 @@ public:
     static void OnTriggerOffWithEffect(OnOffEffect * effect);
 
     /**
-     * @brief Matter stack callback after a server attribute write, syncs OnOff, LevelControl, and
+     * @brief Matter stack callback after a server attribute change, syncs OnOff, LevelControl, and
      *        ColorControl changes to the LED and display.
      *
      * @param attributePath Endpoint, cluster, and attribute that changed

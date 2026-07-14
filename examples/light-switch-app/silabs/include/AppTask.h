@@ -119,7 +119,7 @@ public:
      * @brief Event handler when a button is pressed
      *
      * @param button    APP_FUNCTION_BUTTON or the action button
-     * @param btnAction SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
+     * @param btnAction SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
