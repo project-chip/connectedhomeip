@@ -22,6 +22,7 @@
 #include "ThermostaticRadiatorValveManager.h"
 
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
