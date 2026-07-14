@@ -694,6 +694,47 @@ DataModel::ActionReturnStatus HumidistatCluster::ReadAttribute(const DataModel::
     }
 }
 
+DataModel::ActionReturnStatus HumidistatCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                AttributeValueDecoder & decoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case Mode::Id: {
+        ModeEnum value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return SetMode(value);
+    }
+    case UserSetpoint::Id: {
+        chip::Percent value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return SetUserSetpoint(value);
+    }
+    case MistType::Id: {
+        DataModel::Nullable<chip::BitMask<MistTypeBitmap>> value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        VerifyOrReturnError(!value.IsNull(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        return SetMistType(value.Value());
+    }
+    case Continuous::Id: {
+        bool value = false;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return SetContinuous(value);
+    }
+    case Sleep::Id: {
+        bool value = false;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return SetSleep(value);
+    }
+    case Optimal::Id: {
+        bool value = false;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return SetOptimal(value);
+    }
+    default:
+        return Status::UnsupportedAttribute;
+    }
+}
+
 std::optional<DataModel::ActionReturnStatus> HumidistatCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                               chip::TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)

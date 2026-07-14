@@ -361,6 +361,44 @@ TEST_F(TestHumidistatCluster, SetSettingsMode)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestHumidistatCluster, WriteAttributes)
+{
+    HumidistatCluster::StartupConfiguration config;
+    config.mode         = ModeEnum::kDehumidifier;
+    config.minSetpoint  = 20;
+    config.maxSetpoint  = 80;
+    config.step         = 10;
+    config.userSetpoint = 50;
+
+    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier, Feature::kSensor, Feature::kContinuous,
+                                      Feature::kOptimal, Feature::kColdMist };
+
+    HumidistatCluster::OptionalAttributeSet optionalAttrs;
+    optionalAttrs.Set<Sleep::Id>();
+
+    HumidistatCluster cluster(kTestEndpointId, features, optionalAttrs, config);
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(tester.WriteAttribute(Mode::Id, ModeEnum::kHumidifier), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(60)), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(81)), CHIP_IM_GLOBAL_STATUS(ConstraintError)); // out of range
+    EXPECT_EQ(tester.WriteAttribute(UserSetpoint::Id, static_cast<chip::Percent>(19)), CHIP_IM_GLOBAL_STATUS(ConstraintError)); // out of range    
+    EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(Continuous::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(Sleep::Id, true), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(Optimal::Id, true), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.GetMode(), ModeEnum::kHumidifier);
+    EXPECT_EQ(cluster.GetUserSetpoint(), 60);
+    EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
+    EXPECT_TRUE(cluster.GetContinuous());
+    EXPECT_TRUE(cluster.GetSleep());
+    EXPECT_TRUE(cluster.GetOptimal());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestHumidistatCluster, SetSettingsUserSetpoint)
 {
     HumidistatCluster::StartupConfiguration config;
