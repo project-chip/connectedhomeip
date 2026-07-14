@@ -19,6 +19,7 @@
 
 #include <array>
 #include <mutex>
+#include <optional>
 #include <utility>
 
 #include <gio/gio.h>
@@ -26,6 +27,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/FixedBuffer.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/Linux/dbus/connman/DBusConnManAgent.h>
 #include <platform/Linux/dbus/connman/DBusConnManManager.h>
 #include <platform/Linux/dbus/connman/DBusConnManService.h>
@@ -64,9 +66,56 @@ struct GAutoPtrDeleter<ConnManTechnology>
 
 namespace DeviceLayer {
 
-// Forward Declarations
+namespace Platform {
 
-struct ChipDeviceEvent;
+namespace Linux {
+
+namespace Detail {
+
+/**
+ *  @brief
+ *    A connman network service failure, expressed in Matter terms.
+ *
+ *  connman's service "Error" property is a small, closed vocabulary
+ *  (see connman `service.c:error2string()`). Each value carries an
+ *  implicit claim about *how far* a connect request got, which
+ *  determines not merely which status to report but whether an
+ *  association failure occurred at all.
+ *
+ */
+struct ConnManServiceError
+{
+    /**
+     *  Status for `OnConnectResult`.
+     */
+    DeviceLayer::NetworkCommissioning::Status mStatus;
+
+    /**
+     *  Cause for `OnAssociationFailureDetected`.
+     */
+    app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum mCause;
+
+    /**
+     *  IEEE 802.11 status code, or zero.
+     */
+    uint16_t mAssociationStatus;
+
+    /**
+     *  Whether to delegate to `OnAssociationFailureDetected` at all.
+     */
+    bool mIsAssociationFailure;
+
+    /**
+     *  Whether the connect operation has actually failed.
+     */
+    bool mIsTerminal;
+};
+
+} // namespace Detail
+
+} // namespace Linux
+
+} // namespace Platform
 
 /**
  *  Provides an implementation of the ConnectionManager object
@@ -409,7 +458,7 @@ private:
         size_t mCount;
     };
 
-    enum class WiFiScanTerminalKind : uint8_t
+    enum class WiFiScanCompletionKind : uint8_t
     {
         /**
          *  A Wi-Fi scan was for a connect and is terminating
@@ -434,8 +483,10 @@ private:
 
     // Introspection
 
+    bool HasWiFiClusterConnectPendingLocked() const noexcept;
     static bool IsFamilyConnectivityChangeReportable(const NetworkServiceFamilyConnectivityState & inPending,
                                                      const NetworkServiceFamilyConnectivityState & inReported) noexcept;
+    bool IsWiFiPendingConnectServicePathLocked(const char * inPath) const noexcept;
 
     // Observation
 
@@ -476,6 +527,10 @@ private:
     static CHIP_ERROR
     BuildWiFiScanResponseFromServicePropertiesLocked(GVariant * inProperties,
                                                      DeviceLayer::NetworkCommissioning::WiFiScanResponse & outResponse) noexcept;
+    CHIP_ERROR CompleteWiFiConnectLocked(std::unique_lock<std::mutex> & inOutLock,
+                                         DeviceLayer::NetworkCommissioning::Status inStatus, const CharSpan & inDebugText,
+                                         int32_t inReason) noexcept;
+    CHIP_ERROR ConcludeWiFiClusterConnectLocked() noexcept;
     CHIP_ERROR DispatchWiFiConnectFinishedLocked(std::unique_lock<std::mutex> & inOutLock,
                                                  DeviceLayer::NetworkCommissioning::Status inStatus, const CharSpan & inDebugText,
                                                  int32_t inReason) noexcept;
@@ -538,6 +593,10 @@ private:
                                                      ConnManTechnology * inTechnology) noexcept;
     CHIP_ERROR HandleWiFiPendingConnectLocked(std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology,
                                               WiFiScanState & inOutScanState) noexcept;
+    CHIP_ERROR HandleWiFiPendingConnectServiceErrorChangedLocked(const char * inPath, const char * inType,
+                                                                 GVariant * inValue) noexcept;
+    CHIP_ERROR HandleWiFiPendingConnectServiceStateChangedLocked(std::unique_lock<std::mutex> & inOutLock, const char * inPath,
+                                                                 const char * inType, GVariant * inValue) noexcept;
     CHIP_ERROR HandleWiFiPendingScanLocked(std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology,
                                            WiFiScanState & inOutScanState) noexcept;
     CHIP_ERROR HandleWiFiScanCompleteLocked(std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology) noexcept;
@@ -545,14 +604,17 @@ private:
                                          const char * inReason, WiFiScanState & inOutScanState) noexcept;
     CHIP_ERROR HandleWiFiUnresolvedAfterScanLocked(std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology,
                                                    WiFiScanState & inOutScanState, const size_t & inScanLimit,
-                                                   const char * inReason, WiFiScanTerminalKind inKind) noexcept;
+                                                   const char * inReason, WiFiScanCompletionKind inKind) noexcept;
     CHIP_ERROR ManagerAgentOpLocked(std::unique_lock<std::mutex> & inOutLock, const char * inPath,
                                     ManagerAgentOpFunc inManagerAgentOpFunc, const char * inAction,
                                     const bool & inRegister) noexcept;
     void MaybeClearInterfaceNameLocked(const char * inPath) noexcept;
     CHIP_ERROR MaybeSetInterfaceNameLocked(const char * inType, const char * inInterface) noexcept;
+    void NotifyWiFiConnectivityChange(ConnectivityChange inChange) noexcept;
     CHIP_ERROR RemoveServiceLocked(const char * inPath) noexcept;
     CHIP_ERROR RemoveTechnologyLocked(const char * inPath) noexcept;
+    void ScrubWiFiClientConnectPassphraseLocked() noexcept;
+    void ShutdownClientConnectSessionLocked(std::unique_lock<std::mutex> & inOutLock) noexcept;
     CHIP_ERROR StartNetworkManagementOnGLib() noexcept;
     CHIP_ERROR UpdateManagerPropertiesLocked(GVariant * inProperties) noexcept;
     CHIP_ERROR UpdateNetworkServiceConnectivityLocked() noexcept;
@@ -660,11 +722,29 @@ private:
     GDBusConnManAgent                    mConnManAgentServer CHIP_GUARDED_BY(mConnManMutex);
     ConnectivityManagerImpl *            mConnectivityManagerImpl;
     NetworkServiceStateStorage           mNetworkServiceStates CHIP_GUARDED_BY(mConnManMutex);
+
+    using ServiceError = Platform::Linux::Detail::ConnManServiceError;
+
     WiFiScanState                        mWiFiActiveScanState CHIP_GUARDED_BY(mConnManMutex);
-    Internal::WiFiKeyFixedBuffer         mWiFiConnectPassphrase;
-    WiFiScanState                        mWiFiConnectScanState CHIP_GUARDED_BY(mConnManMutex);
+    Internal::WiFiKeyFixedBuffer         mWiFiClientConnectPassphrase CHIP_GUARDED_BY(mConnManMutex);
+
+    /**
+     *  Whether the pending connect reached "association". Gates
+     *  `OnAssociationFailureDetected`.
+     */
+    bool                                 mWiFiClusterConnectAssociationStarted CHIP_GUARDED_BY(mConnManMutex);
+    bool                                 mWiFiClusterConnectPending CHIP_GUARDED_BY(mConnManMutex);
+    WiFiScanState                        mWiFiClusterConnectScanState CHIP_GUARDED_BY(mConnManMutex);
+    /**
+     *  Cause of the most recent failure on the pending connect's
+     *  service, latched from PropertyChanged("Error") (which connman
+     *  emits ahead of both PropertyChanged("State" = "failure") and
+     *  Agent.ReportError()). Cleared at the start of every connect
+     *  and by `ConcludeWiFiClusterConnectLocked`.
+     */
+    std::optional<ServiceError>          mWiFiClusterConnectServiceError CHIP_GUARDED_BY(mConnManMutex);
     bool                                 mWiFiStationConnected;
-    ConnectivityManager::WiFiStationMode mWiFiStationMode;
+    ConnectivityManager::WiFiStationMode mWiFiStationMode CHIP_GUARDED_BY(mConnManMutex);
     System::Clock::Timeout               mWiFiStationReconnectInterval;
     // clang-format on
 };
