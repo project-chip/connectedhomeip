@@ -62312,6 +62312,7 @@ public class ChipClusters {
   public static class AccountLoginCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1294L;
 
+    private static final long O_AUTH_LOGGED_IN_ATTRIBUTE_ID = 0L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -62397,8 +62398,63 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+
+    public void getDeviceAuthURI(GetDeviceAuthURIResponseCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 4L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long userCodeFieldID = 0L;
+          String userCode = null;
+          final long verificationURIFieldID = 1L;
+          String verificationURI = null;
+          final long verificationURICompleteFieldID = 2L;
+          Optional<String> verificationURIComplete = Optional.empty();
+          final long expiresInFieldID = 3L;
+          Integer expiresIn = null;
+          final long intervalFieldID = 4L;
+          Integer interval = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == userCodeFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.String) {
+                StringType castingValue = element.value(StringType.class);
+                userCode = castingValue.value(String.class);
+              }
+            } else if (element.contextTagNum() == verificationURIFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.String) {
+                StringType castingValue = element.value(StringType.class);
+                verificationURI = castingValue.value(String.class);
+              }
+            } else if (element.contextTagNum() == verificationURICompleteFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.String) {
+                StringType castingValue = element.value(StringType.class);
+                verificationURIComplete = Optional.of(castingValue.value(String.class));
+              }
+            } else if (element.contextTagNum() == expiresInFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                expiresIn = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == intervalFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                interval = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(userCode, verificationURI, verificationURIComplete, expiresIn, interval);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface GetSetupPINResponseCallback extends BaseClusterCallback {
       void onSuccess(String setupPIN);
+    }
+
+    public interface GetDeviceAuthURIResponseCallback extends BaseClusterCallback {
+      void onSuccess(String userCode, String verificationURI, Optional<String> verificationURIComplete, Integer expiresIn, Integer interval);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -62411,6 +62467,32 @@ public class ChipClusters {
 
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
+    }
+
+    public void readOAuthLoggedInAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, O_AUTH_LOGGED_IN_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, O_AUTH_LOGGED_IN_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeOAuthLoggedInAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, O_AUTH_LOGGED_IN_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, O_AUTH_LOGGED_IN_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

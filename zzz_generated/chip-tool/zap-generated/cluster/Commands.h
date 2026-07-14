@@ -14761,8 +14761,10 @@ private:
 | * GetSetupPIN                                                       |   0x00 |
 | * Login                                                             |   0x02 |
 | * Logout                                                            |   0x03 |
+| * GetDeviceAuthURI                                                  |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * OAuthLoggedIn                                                     | 0x0000 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -14884,6 +14886,43 @@ public:
 
 private:
     chip::app::Clusters::AccountLogin::Commands::Logout::Type mRequest;
+};
+
+/*
+ * Command GetDeviceAuthURI
+ */
+class AccountLoginGetDeviceAuthURI : public ClusterCommand
+{
+public:
+    AccountLoginGetDeviceAuthURI(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-device-auth-uri", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::AccountLogin::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::AccountLogin::Commands::GetDeviceAuthURI::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -33328,20 +33367,24 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),      //
-        make_unique<AccountLoginGetSetupPIN>(credsIssuerConfig), //
-        make_unique<AccountLoginLogin>(credsIssuerConfig),       //
-        make_unique<AccountLoginLogout>(credsIssuerConfig),      //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
+        make_unique<AccountLoginGetSetupPIN>(credsIssuerConfig),      //
+        make_unique<AccountLoginLogin>(credsIssuerConfig),            //
+        make_unique<AccountLoginLogout>(credsIssuerConfig),           //
+        make_unique<AccountLoginGetDeviceAuthURI>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "oauth-logged-in", Attributes::OAuthLoggedIn::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<bool>>(Id, "oauth-logged-in", 0, 1, Attributes::OAuthLoggedIn::Id, WriteCommandType::kForceWrite,
+                                          credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -33354,6 +33397,7 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "oauth-logged-in", Attributes::OAuthLoggedIn::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
