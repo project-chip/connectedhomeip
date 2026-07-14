@@ -20,9 +20,11 @@ Unit tests for commissioning status detection functions in commissioning.py.
 
 Tests cover:
 - DNS-SD discovery (_is_device_operational_via_dnssd)
-- Parallel session establishment (_establish_pase_or_case_session)
+- Public wrapper ``is_device_operational_on_fabric_dnssd`` (forwards timeouts)
+- Parallel session establishment (establish_pase_or_case_session)
 - is_commissioned() integration scenarios
 - get_commissioned_fabric_count() integration scenarios
+- CustomCommissioningParameters.resolve_setup_code (ECM + standalone pairing)
 
 Scenarios include factory fresh devices, devices commissioned on the current fabric,
 and devices commissioned on other fabrics.
@@ -38,7 +40,7 @@ from python_path import PythonPath
 
 # Add the python_testing directory to path so mdns_discovery module can be found
 with PythonPath('..', relative_to=__file__):
-    import mdns_discovery.mdns_discovery  # noqa: F401
+    pass  # mdns_discovery is mocked per-test where needed; avoid importing zeroconf here
 
 # Test constants
 TEST_NODE_ID = 1234
@@ -46,6 +48,7 @@ TEST_COMPRESSED_FABRIC_ID = 0x1234567890ABCDEF
 TEST_ENDPOINT = 0
 TEST_DISCRIMINATOR = 3840
 TEST_PASSCODE = 20202021
+OPERATIONAL_SERVICE_TYPE = "_matter._tcp.local."
 
 
 @dataclass
@@ -75,31 +78,9 @@ def build_expected_instance_name(compressed_fabric_id: int, node_id: int) -> str
     return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
 
-def create_mock_attribute_result(fabric_count: int):
-    """Create a mock ReadAttribute result with CommissionedFabrics == fabric_count.
-
-    OperationalCredentials is node-scoped and always on endpoint 0.
-    """
-    try:
-        import matter.clusters as Clusters
-        return {
-            0: {
-                Clusters.OperationalCredentials: {
-                    Clusters.OperationalCredentials.Attributes.CommissionedFabrics: fabric_count
-                }
-            }
-        }
-    except ImportError:
-        mock_opcreds = MagicMock()
-        mock_opcreds_attrs = MagicMock()
-        mock_opcreds_attrs.CommissionedFabrics = fabric_count
-        return {
-            0: {
-                mock_opcreds: {
-                    mock_opcreds_attrs: fabric_count
-                }
-            }
-        }
+def build_expected_instance_qname(compressed_fabric_id: int, node_id: int) -> str:
+    """Build the full operational service instance qname for targeted SRV resolve."""
+    return f"{build_expected_instance_name(compressed_fabric_id, node_id)}.{OPERATIONAL_SERVICE_TYPE}"
 
 
 @contextlib.contextmanager
@@ -109,30 +90,43 @@ def mock_mdns_module():
     This is necessary because the real mdns_discovery depends on zeroconf,
     which may not be installed in unit test environments. By injecting a mock
     module, the `from mdns_discovery.mdns_discovery import MdnsDiscovery`
-    inside _is_device_operational_via_dnssd resolves correctly.
+    and `from mdns_discovery.enums.mdns_service_type import MdnsServiceType`
+    imports inside _is_device_operational_via_dnssd resolve correctly.
     """
+    from enum import Enum
+
+    class MockMdnsServiceType(Enum):
+        OPERATIONAL = OPERATIONAL_SERVICE_TYPE
+
     mock_mdns_mod = MagicMock()
     mock_parent = MagicMock()
     mock_parent.mdns_discovery = mock_mdns_mod
 
-    saved_parent = sys.modules.get('mdns_discovery')
-    saved_child = sys.modules.get('mdns_discovery.mdns_discovery')
+    mock_enums_mod = MagicMock()
+    mock_enums_mod.MdnsServiceType = MockMdnsServiceType
+    mock_enums_parent = MagicMock()
+    mock_enums_parent.mdns_service_type = mock_enums_mod
+
+    saved = {
+        'mdns_discovery': sys.modules.get('mdns_discovery'),
+        'mdns_discovery.mdns_discovery': sys.modules.get('mdns_discovery.mdns_discovery'),
+        'mdns_discovery.enums': sys.modules.get('mdns_discovery.enums'),
+        'mdns_discovery.enums.mdns_service_type': sys.modules.get('mdns_discovery.enums.mdns_service_type'),
+    }
 
     sys.modules['mdns_discovery'] = mock_parent
     sys.modules['mdns_discovery.mdns_discovery'] = mock_mdns_mod
+    sys.modules['mdns_discovery.enums'] = mock_enums_parent
+    sys.modules['mdns_discovery.enums.mdns_service_type'] = mock_enums_mod
 
     try:
         yield mock_mdns_mod
     finally:
-        # Restore original modules
-        if saved_parent is not None:
-            sys.modules['mdns_discovery'] = saved_parent
-        else:
-            sys.modules.pop('mdns_discovery', None)
-        if saved_child is not None:
-            sys.modules['mdns_discovery.mdns_discovery'] = saved_child
-        else:
-            sys.modules.pop('mdns_discovery.mdns_discovery', None)
+        for key, value in saved.items():
+            if value is not None:
+                sys.modules[key] = value
+            else:
+                sys.modules.pop(key, None)
 
 
 # =============================================================================
@@ -156,27 +150,33 @@ async def test_dnssd_device_found_on_this_fabric():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name=expected_instance_name)
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=MockMdnsServiceInfo(
+            instance_name=expected_instance_name
+        ))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
         if not result:
             return "Expected True when device is operational on this fabric"
+        expected_qname = build_expected_instance_qname(TEST_COMPRESSED_FABRIC_ID, TEST_NODE_ID)
+        mock_mdns.get_srv_record.assert_awaited_once_with(
+            service_name=expected_qname,
+            service_type=OPERATIONAL_SERVICE_TYPE,
+            query_timeout_sec=3.0,
+            log_output=False,
+        )
     return None
 
 
 async def test_dnssd_device_on_different_fabric():
     """
-    Test: Device advertising on different fabric (Scenario 3).
+    Test: Targeted SRV resolve for our fabric+node returns no record (Scenario 3).
 
     Scenario: Device is commissioned to another fabric but not ours.
-    Expected: Returns False - device not operational on OUR fabric.
+    Expected: Returns False - our instance name is not advertised.
 
-    Value: Verifies we don't falsely detect devices on other fabrics as ours.
-    The fabric ID in the instance name must match our compressed fabric ID.
+    Value: Verifies that when our fabric+node instance is not advertised, the helper returns False.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
@@ -184,10 +184,7 @@ async def test_dnssd_device_on_different_fabric():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        # Device advertising on different fabric (different compressed fabric ID)
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name="AAAAAAAAAAAAAAAA-00000000000004D2")  # Different fabric, same node
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=None)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -199,10 +196,10 @@ async def test_dnssd_device_on_different_fabric():
 
 async def test_dnssd_no_services_found():
     """
-    Test: No operational services found via DNS-SD.
+    Test: Targeted operational SRV resolve returns no record.
 
-    Scenario: Factory fresh device or device not advertising.
-    Expected: Returns False - no operational advertisements found.
+    Scenario: Factory fresh device or device not advertising on this fabric+node.
+    Expected: Returns False - no SRV record for our instance qname.
 
     Value: Verifies correct behavior when DNS-SD finds nothing,
     which triggers the parallel PASE/CASE fallback.
@@ -213,13 +210,13 @@ async def test_dnssd_no_services_found():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[])
+        mock_mdns.get_srv_record = AsyncMock(return_value=None)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
         if result:
-            return "Expected False when no operational services found"
+            return "Expected False when no operational SRV record is found"
     return None
 
 
@@ -239,7 +236,7 @@ async def test_dnssd_exception_handling():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(side_effect=Exception("DNS-SD network error"))
+        mock_mdns.get_srv_record = AsyncMock(side_effect=Exception("DNS-SD network error"))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         try:
@@ -296,14 +293,14 @@ async def test_dnssd_import_error_propagates():
     return None
 
 
-async def test_dnssd_multiple_services_finds_correct_one():
+async def test_dnssd_targeted_resolve_finds_instance():
     """
-    Test: Multiple services found, one matches our fabric+node.
+    Test: Targeted SRV resolve returns a record for our fabric+node instance.
 
-    Scenario: Network has multiple Matter devices, we find ours.
-    Expected: Returns True when our specific device is in the list.
+    Scenario: Our operational instance is advertised on the network.
+    Expected: Returns True when get_srv_record finds the instance.
 
-    Value: Verifies correct filtering when multiple devices advertise.
+    Value: Verifies the helper queries the specific operational instance qname via get_srv_record.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
@@ -312,40 +309,34 @@ async def test_dnssd_multiple_services_finds_correct_one():
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name="OTHERFABRICID00000-0000000000005678"),
-            MockMdnsServiceInfo(instance_name=expected_instance_name),  # Our device
-            MockMdnsServiceInfo(instance_name="ANOTHERFABRIC0000-0000000000009999"),
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=MockMdnsServiceInfo(
+            instance_name=expected_instance_name
+        ))
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
         if not result:
-            return "Expected True when this fabric's service is in the list"
+            return "Expected True when targeted SRV resolve finds our instance"
     return None
 
 
 async def test_dnssd_same_fabric_different_node():
     """
-    Test: Service for same fabric but different node ID.
+    Test: Targeted SRV resolve for our node returns no record.
 
-    Scenario: Another device on our fabric, but not the one we're looking for.
-    Expected: Returns False - wrong node ID.
+    Scenario: Another device on our fabric advertises, but not the node we query.
+    Expected: Returns False when our instance qname has no SRV record.
 
-    Value: Verifies both fabric AND node ID must match.
+    Value: Verifies both fabric AND node ID are part of the targeted instance name.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
     mock_controller = MockDeviceController()
-    # Same fabric, different node
-    different_node_instance = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, 9999)
 
     with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
-        mock_mdns.get_operational_services = AsyncMock(return_value=[
-            MockMdnsServiceInfo(instance_name=different_node_instance)
-        ])
+        mock_mdns.get_srv_record = AsyncMock(return_value=None)
         mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
@@ -384,11 +375,11 @@ async def test_parallel_session_pase_wins():
     mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail_slow
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         if session_kind != commissioning.EstablishedSessionKind.PASE:
             return f"Expected PASE session, got {session_kind}"
     except Exception as e:
@@ -422,11 +413,11 @@ async def test_parallel_session_case_wins():
     mock_controller.FindOrEstablishPASESession = pase_slow
     mock_controller.GetConnectedDevice = case_success
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         if session_kind != commissioning.EstablishedSessionKind.CASE:
             return f"Expected CASE session, got {session_kind}"
     except Exception as e:
@@ -463,11 +454,11 @@ async def test_parallel_session_first_fails_second_succeeds():
     mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         if session_kind != commissioning.EstablishedSessionKind.PASE:
             return f"Expected PASE after CASE failed first, got {session_kind}"
     except Exception as e:
@@ -501,11 +492,11 @@ async def test_parallel_session_both_fail():
     mock_controller.FindOrEstablishPASESession = pase_fail_fast
     mock_controller.GetConnectedDevice = case_fail_slow
 
-    pase_params = commissioning.PaseParams(
+    commissioning_params = commissioning.CustomCommissioningParameters(
         setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
         return "Should have raised RuntimeError when both fail"
     except RuntimeError as e:
         error_msg = str(e)
@@ -517,9 +508,9 @@ async def test_parallel_session_both_fail():
     return None
 
 
-async def test_parallel_session_no_pase_params():
+async def test_parallel_session_no_commissioning_params():
     """
-    Test: No PASE params provided, only CASE attempted.
+    Test: No CustomCommissioningParameters (``commissioning_params`` is None); only CASE attempted.
 
     Scenario: Caller doesn't have commissioning credentials.
     Expected: Only CASE is attempted (may succeed or fail).
@@ -540,7 +531,7 @@ async def test_parallel_session_no_pase_params():
     mock_controller.GetConnectedDevice = case_success
 
     try:
-        session_kind = await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, None)
+        session_kind = await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, None)
         if session_kind != commissioning.EstablishedSessionKind.CASE:
             return f"CASE-only path should yield CASE, got {session_kind}"
         if not case_called:
@@ -689,7 +680,13 @@ async def test_get_fabric_count_scenario2_operational():
             }
         })
 
-        result = await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
+        result = await commissioning.get_commissioned_fabric_count(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=5.0
+        )
+
+        mock_dnssd.assert_called_once_with(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=5.0
+        )
 
         if result != 2:
             return f"Expected fabric count 2, got {result}"
@@ -700,7 +697,7 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     """
     Test: SCENARIO 1 - Factory fresh device, should return 0.
 
-    Value: Verifies 0 count for uncommissioned devices.
+    Value: Verifies 0 count for uncommissioned devices after caller establishes PASE.
     """
     import matter.clusters as Clusters
     from matter.testing import commissioning
@@ -708,7 +705,7 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel:
 
         mock_dnssd.return_value = False
         mock_parallel.return_value = commissioning.EstablishedSessionKind.PASE
@@ -721,10 +718,13 @@ async def test_get_fabric_count_scenario1_factory_fresh():
             }
         })
 
-        pase_params = commissioning.PaseParams(
+        commissioning_params = commissioning.CustomCommissioningParameters(
             setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, commissioning_params)
+        mock_parallel.assert_called_once_with(mock_controller, TEST_NODE_ID, commissioning_params)
+
         result = await commissioning.get_commissioned_fabric_count(
-            mock_controller, TEST_NODE_ID, pase_params=pase_params
+            mock_controller, TEST_NODE_ID, skip_operational_dnssd_check=True
         )
 
         if result != 0:
@@ -732,25 +732,128 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     return None
 
 
-async def test_get_fabric_count_not_operational_no_pase_params():
+async def test_get_fabric_count_not_operational_no_commissioning_params():
     """
-    Test: Device not operational via DNS-SD and no PASE params provided.
+    Test: Device not operational via DNS-SD; ReadAttribute without prior session can fail.
 
-    Value: Ensures ValueError is raised to prevent timeout.
+    Value: Documents that get_commissioned_fabric_count does not establish sessions; failures propagate.
     """
+    from matter.exceptions import ChipStackError
     from matter.testing import commissioning
 
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd:
         mock_dnssd.return_value = False
+        # ChipStackError is (code: int, msg=None); a single string is misinterpreted as code and breaks % formatting.
+        mock_controller.ReadAttribute = AsyncMock(side_effect=ChipStackError(0, "No CASE session"))
 
         try:
-            await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID, pase_params=None)
-            return "Expected ValueError when not operational and no PASE params"
-        except ValueError as e:
-            if "not operational on this fabric" not in str(e):
+            await commissioning.get_commissioned_fabric_count(mock_controller, TEST_NODE_ID)
+            return "Expected ChipStackError when not operational and ReadAttribute has no session"
+        except ChipStackError as e:  # chipstack-ok: test asserts expected error from get_commissioned_fabric_count when ReadAttribute has no session
+            if "No CASE session" not in str(e):
                 return f"Unexpected error message: {e}"
+    return None
+
+
+# =============================================================================
+# CATEGORY E: CustomCommissioningParameters.resolve_setup_code
+# =============================================================================
+
+
+async def test_commissioning_credentials_setup_code_only():
+    """Standalone pairing: explicit setup_code is returned unchanged."""
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    creds = CustomCommissioningParameters(setup_code="MT:EXPLICIT")
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:EXPLICIT":
+        return f"Expected MT:EXPLICIT, got {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_discriminator_passcode():
+    """Standalone pairing: discriminator + passcode uses controller CreateManualCode."""
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    creds = CustomCommissioningParameters(discriminator=1234, passcode=99999998)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:YNJV7VSC00KA0648G00":
+        return f"Unexpected resolved code: {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_sdk_qr_precedence():
+    """ECM shape: setupQRCode on commissioningParameters wins over manual/pin."""
+    from types import SimpleNamespace
+
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    cp = SimpleNamespace(setupQRCode="MT:FROMQR", setupManualCode="ignored", setupPinCode=0)
+    creds = CustomCommissioningParameters(commissioningParameters=cp, randomDiscriminator=111)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:FROMQR":
+        return f"Expected QR from SDK params, got {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_sdk_manual_when_no_qr():
+    """ECM shape: setupManualCode used when QR empty."""
+    from types import SimpleNamespace
+
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    cp = SimpleNamespace(setupQRCode="", setupManualCode="12345678901", setupPinCode=0)
+    creds = CustomCommissioningParameters(commissioningParameters=cp, randomDiscriminator=222)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "12345678901":
+        return f"Expected manual string, got {got!r}"
+    return None
+
+
+async def test_commissioning_credentials_sdk_pin_with_random_discriminator():
+    """ECM shape: empty QR/manual falls back to CreateManualCode(randomDiscriminator, setupPinCode)."""
+    from types import SimpleNamespace
+
+    from matter.testing.commissioning_types import CustomCommissioningParameters
+
+    ctrl = MockDeviceController()
+    cp = SimpleNamespace(setupQRCode="", setupManualCode="", setupPinCode=TEST_PASSCODE)
+    creds = CustomCommissioningParameters(commissioningParameters=cp, randomDiscriminator=TEST_DISCRIMINATOR)
+    got = creds.resolve_setup_code(ctrl)
+    if got != "MT:YNJV7VSC00KA0648G00":
+        return f"Expected synthesized manual code, got {got!r}"
+    return None
+
+
+# =============================================================================
+# CATEGORY F: is_device_operational_on_fabric_dnssd (public wrapper)
+# =============================================================================
+
+
+async def test_is_device_operational_public_wrapper_forwards_call():
+    """
+    Public wrapper must invoke the internal DNS-SD helper with the same arguments
+    (including discovery_timeout_sec) so matter_asserts and other callers stay aligned.
+    """
+    from matter.testing import commissioning
+
+    mock_controller = MockDeviceController()
+    with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_internal:
+        mock_internal.return_value = True
+        result = await commissioning.is_device_operational_on_fabric_dnssd(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=7.5
+        )
+        if not result:
+            return "Expected True from wrapper when internal check returns True"
+        mock_internal.assert_called_once_with(
+            mock_controller, TEST_NODE_ID, discovery_timeout_sec=7.5
+        )
     return None
 
 
@@ -764,10 +867,10 @@ def main():
         # Category A: DNS-SD Discovery Tests
         ("A1. DNS-SD: device found on THIS fabric", test_dnssd_device_found_on_this_fabric),
         ("A2. DNS-SD: device on DIFFERENT fabric", test_dnssd_device_on_different_fabric),
-        ("A3. DNS-SD: no services found", test_dnssd_no_services_found),
+        ("A3. DNS-SD: no operational SRV record", test_dnssd_no_services_found),
         ("A4. DNS-SD: exception handling", test_dnssd_exception_handling),
         ("A5. DNS-SD: import error propagates", test_dnssd_import_error_propagates),
-        ("A6. DNS-SD: multiple services finds correct one", test_dnssd_multiple_services_finds_correct_one),
+        ("A6. DNS-SD: targeted resolve finds instance", test_dnssd_targeted_resolve_finds_instance),
         ("A7. DNS-SD: same fabric different node", test_dnssd_same_fabric_different_node),
 
         # Category B: Parallel Session Establishment Tests
@@ -775,7 +878,7 @@ def main():
         ("B2. Parallel: CASE wins race", test_parallel_session_case_wins),
         ("B3. Parallel: first fails, second succeeds", test_parallel_session_first_fails_second_succeeds),
         ("B4. Parallel: both fail", test_parallel_session_both_fail),
-        ("B5. Parallel: no PASE params (CASE only)", test_parallel_session_no_pase_params),
+        ("B5. Parallel: no credentials (CASE only)", test_parallel_session_no_commissioning_params),
 
         # Category C: is_commissioned() Tests
         ("C1. is_commissioned: operational shortcircuit",
@@ -790,7 +893,20 @@ def main():
         # Category D: get_commissioned_fabric_count() Tests
         ("D1. get_fabric_count: SCENARIO 2 - operational", test_get_fabric_count_scenario2_operational),
         ("D2. get_fabric_count: SCENARIO 1 - factory fresh", test_get_fabric_count_scenario1_factory_fresh),
-        ("D3. get_fabric_count: not operational, no PASE params", test_get_fabric_count_not_operational_no_pase_params),
+        ("D3. get_fabric_count: not operational, ReadAttribute without session",
+         test_get_fabric_count_not_operational_no_commissioning_params),
+
+        # Category E: CustomCommissioningParameters
+        ("E1. CustomCommissioningParameters: setup_code only", test_commissioning_credentials_setup_code_only),
+        ("E2. CustomCommissioningParameters: discriminator + passcode", test_commissioning_credentials_discriminator_passcode),
+        ("E3. CustomCommissioningParameters: SDK QR precedence", test_commissioning_credentials_sdk_qr_precedence),
+        ("E4. CustomCommissioningParameters: SDK manual when no QR", test_commissioning_credentials_sdk_manual_when_no_qr),
+        ("E5. CustomCommissioningParameters: SDK pin + random discriminator",
+         test_commissioning_credentials_sdk_pin_with_random_discriminator),
+
+        # Category F: public DNS-SD operational wrapper
+        ("F1. is_device_operational_on_fabric_dnssd forwards to internal helper",
+         test_is_device_operational_public_wrapper_forwards_call),
     ]
 
     print("\n" + "=" * 70)
