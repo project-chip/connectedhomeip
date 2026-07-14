@@ -434,8 +434,8 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 16b: Validate the DUT received the group command via the GroupcastTesting event.
             self.step("16b")
-            # This is the first groupcast tesitng event generated from a step in this test. This means it will be the first
-            # gropucast testing event in the queue and there is no need to use wait_for_event_report_with_duplication()
+            # This is the first groupcast testing event generated from a step in this test. This means it will be the first
+            # groupcast testing event in the queue and there is no need to use wait_for_event_report_with_duplication()
             event_data = event_sub.wait_for_event_report(
                 Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupId0101, "Incorrect group ID in GroupcastTesting event")

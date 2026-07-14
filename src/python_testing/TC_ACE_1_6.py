@@ -519,8 +519,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20a: Verify GroupcastTesting event (AccessAllowed: true)
             self.step("20a")
-            # This is the first groupcast tesitng event generated from a step in this test. This means it will be the first
-            # gropucast testing event in the queue and there is no need to use wait_for_event_report_with_duplication()
+            # This is the first groupcast testing event generated from a step in this test. This means it will be the first
+            # groupcast testing event in the queue and there is no need to use wait_for_event_report_with_duplication()
             event_data = groupcast_event_handler.wait_for_event_report(Clusters.Groupcast.Events.GroupcastTesting, timeout_sec=30)
             asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
             asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
