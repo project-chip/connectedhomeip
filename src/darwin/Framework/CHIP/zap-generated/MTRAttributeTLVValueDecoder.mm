@@ -17782,17 +17782,17 @@ static id _Nullable DecodeAttributeValueForAmbientSensingUnionCluster(AttributeI
                 } else {
                     newElement_0.contributorEndpointID = [NSNumber numberWithUnsignedShort:entry_0.contributorEndpointID.Value()];
                 }
-                if (entry_0.contributorName.HasValue()) {
+                if (entry_0.contributorName.IsNull()) {
+                    newElement_0.contributorName = nil;
+                } else {
                     newElement_0.contributorName = AsString(entry_0.contributorName.Value());
                     if (newElement_0.contributorName == nil) {
                         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                         *aError = err;
                         return nil;
                     }
-                } else {
-                    newElement_0.contributorName = nil;
                 }
-                newElement_0.contributorHealth = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorHealth)];
+                newElement_0.contributorStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.contributorStatus)];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -19863,6 +19863,17 @@ static id _Nullable DecodeAttributeValueForAccountLoginCluster(AttributeId aAttr
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
+    case Attributes::OAuthLoggedIn::Id: {
+        using TypeInfo = Attributes::OAuthLoggedIn::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
     default: {
         // Not a known AccountLogin attribute.
         break;
