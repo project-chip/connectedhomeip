@@ -675,6 +675,12 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::AmbientSensingUnion::Structs::ContributorStatusChangeStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AmbientSensingUnion::Structs::ContributorStatusChangeStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AmbientSensingUnion::Structs::UnionContributorStruct::Type & request,
                         Json::Value & value);
 
