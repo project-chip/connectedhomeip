@@ -15,8 +15,17 @@ etc.) to assist with development and code review in the Matter repository.
 ### ZAP XML Generation (Alchemy)
 
 -   **Location**: `.agents/skills/zap-xml-generation/`
--   **Purpose**: Guidance and command patterns for generating and updating ZAP template XMLs from Matter specification AsciiDoc files (`connectedhomeip-spec`) to the Matter SDK (`connectedhomeip`) using the Alchemy CLI (`alchemy zap`).
--   **Triggers**: Automatically activates when modifying or generating ZAP XML artifacts (`src/app/zap-templates/zcl/data-model/chip/*-cluster.xml`, `src/app/zap-templates/zcl/data-model/chip/device-types.xml`, `src/app/zap-templates/zcl/data-model/chip/namespaces.xml`, `src/app/zap-templates/zcl/data-model/chip/global-structs.xml`, `src/app/zap-templates/zcl/data-model/chip/global-enums.xml`), handling `#ifdef` guarded spec attributes, or synchronizing spec-to-SDK data models.
+-   **Purpose**: Guidance and command patterns for generating and updating ZAP
+    template XMLs from Matter specification AsciiDoc files
+    (`connectedhomeip-spec`) to the Matter SDK (`connectedhomeip`) using the
+    Alchemy CLI (`alchemy zap`).
+-   **Triggers**: Automatically activates when modifying or generating ZAP XML
+    artifacts (`src/app/zap-templates/zcl/data-model/chip/*-cluster.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/device-types.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/namespaces.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/global-structs.xml`,
+    `src/app/zap-templates/zcl/data-model/chip/global-enums.xml`), handling
+    `#ifdef` guarded spec attributes, or synchronizing spec-to-SDK data models.
 
 ### GitHub PR Description Writer
 

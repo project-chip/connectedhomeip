@@ -1,11 +1,11 @@
 ---
 name: zap-xml-generation
 description: >-
-    Generates and updates ZAP template XML files (.xml) in the Matter SDK
-    from Matter specification AsciiDoc documents (.adoc) using the Alchemy CLI
-    tool. Use when generating ZAP XMLs from Spec to SDK, updating cluster
-    definitions (src/app/zap-templates/zcl/data-model/chip/*-cluster.xml),
-    adding provisional clusters, updating global structs/enums
+    Generates and updates ZAP template XML files (.xml) in the Matter SDK from
+    Matter specification AsciiDoc documents (.adoc) using the Alchemy CLI tool.
+    Use when generating ZAP XMLs from Spec to SDK, updating cluster definitions
+    (src/app/zap-templates/zcl/data-model/chip/*-cluster.xml), adding
+    provisional clusters, updating global structs/enums
     (src/app/zap-templates/zcl/data-model/chip/global-structs.xml,
     src/app/zap-templates/zcl/data-model/chip/global-enums.xml), updating
     namespaces (src/app/zap-templates/zcl/data-model/chip/namespaces.xml) or
