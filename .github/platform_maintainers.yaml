@@ -83,7 +83,7 @@ realtek:
     - "config/ameba/**"
     - "scripts/tools/realtek/**"
 
-mt793x:
+mediatek:
   maintainers:
     - RyanHo-MTK
     - as23999
