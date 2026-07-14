@@ -39,10 +39,10 @@
 #include <providers/AllDevicesExampleDeviceInstanceInfoProviderImpl.h>
 
 #include <app_options/AppOptions.h>
+#include <app_options/DeviceTypeParser.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
-#include <devices/device-type-parser/DeviceTypeParser.h>
-#include <devices/endpoint-id-allocator/DynamicEndpointIdAllocator.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessor.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CommissionableDataProvider.h>
@@ -60,10 +60,10 @@
 #include <oob-accessors/pigweed/PigweedAttributeAccessor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
 #endif // PW_RPC_ENABLED
-#include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
-#include <devices/interface/SingleEndpointDevice.h>
-#include <devices/occupancy-sensor/OccupancySensorDevice.h>
-#include <devices/on-off-light/impl/LoggingOnOffLightDevice.h>
+#include <device/api/SingleEndpoint.h>
+#include <device/types/boolean-state-sensor/BooleanStateSensor.h>
+#include <device/types/occupancy-sensor/OccupancySensor.h>
+#include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -127,7 +127,6 @@ public:
         TestEventTriggerDelegate * testEventTriggerDelegate;
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
-        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
         TimerDelegate & timerDelegate;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -138,25 +137,24 @@ public:
         mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
         mRootNode(
             {
-                .commissioningWindowManager           = mContext.commissioningWindowManager,       //
-                    .configurationManager             = mContext.configurationManager,             //
-                    .deviceControlServer              = mContext.deviceControlServer,              //
-                    .fabricTable                      = mContext.fabricTable,                      //
-                    .accessControl                    = mContext.accessControl,                    //
-                    .persistentStorage                = mContext.persistentStorage,                //
-                    .failSafeContext                  = mContext.failSafeContext,                  //
-                    .deviceInstanceInfoProvider       = mContext.deviceInstanceInfoProvider,       //
-                    .platformManager                  = mContext.platformManager,                  //
-                    .groupDataProvider                = mContext.groupDataProvider,                //
-                    .sessionManager                   = mContext.sessionManager,                   //
-                    .dnssdServer                      = mContext.dnssdServer,                      //
-                    .deviceLoadStatusProvider         = mContext.deviceLoadStatusProvider,         //
-                    .diagnosticDataProvider           = mContext.diagnosticDataProvider,           //
-                    .testEventTriggerDelegate         = mContext.testEventTriggerDelegate,         //
-                    .dacProvider                      = mContext.dacProvider,                      //
-                    .eventManagement                  = mContext.eventManagement,                  //
-                    .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
-                    .timerDelegate                    = mContext.timerDelegate,                    //
+                .commissioningWindowManager     = mContext.commissioningWindowManager, //
+                    .configurationManager       = mContext.configurationManager,       //
+                    .deviceControlServer        = mContext.deviceControlServer,        //
+                    .fabricTable                = mContext.fabricTable,                //
+                    .accessControl              = mContext.accessControl,              //
+                    .persistentStorage          = mContext.persistentStorage,          //
+                    .failSafeContext            = mContext.failSafeContext,            //
+                    .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider, //
+                    .platformManager            = mContext.platformManager,            //
+                    .groupDataProvider          = mContext.groupDataProvider,          //
+                    .sessionManager             = mContext.sessionManager,             //
+                    .dnssdServer                = mContext.dnssdServer,                //
+                    .deviceLoadStatusProvider   = mContext.deviceLoadStatusProvider,   //
+                    .diagnosticDataProvider     = mContext.diagnosticDataProvider,     //
+                    .testEventTriggerDelegate   = mContext.testEventTriggerDelegate,   //
+                    .dacProvider                = mContext.dacProvider,                //
+                    .eventManagement            = mContext.eventManagement,            //
+                    .timerDelegate              = mContext.timerDelegate,              //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -265,19 +263,19 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
 
         if (config.type == "occupancy-sensor")
         {
-            auto * occupancyDevice = static_cast<OccupancySensorDevice *>(device);
+            auto * occupancyDevice = static_cast<OccupancySensor *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::OccupancySensingCluster>(&occupancyDevice->OccupancySensingCluster());
         }
         else if (config.type == "contact-sensor" || config.type == "water-leak-detector")
         {
-            auto * booleanStateDevice = static_cast<BooleanStateSensorDevice *>(device);
+            auto * booleanStateDevice = static_cast<BooleanStateSensor *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::BooleanStateCluster>(&booleanStateDevice->BooleanState());
         }
         else if (config.type == "on-off-light")
         {
-            auto * lightDevice = static_cast<LoggingOnOffLightDevice *>(device);
+            auto * lightDevice = static_cast<LoggingOnOffLight *>(device);
             gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
                 .RegisterClusterInstance<chip::app::Clusters::OnOffCluster>(&lightDevice->OnOffCluster());
         }
@@ -285,7 +283,7 @@ void SetupNamedPipe(CodeDrivenDataModelDevices & devices, const char * namedPipe
 
     gAllDevicesAppCommandDelegate.GetClusterImplementationRegistry()
         .RegisterClusterInstance<chip::app::Clusters::BasicInformationCluster>(
-            &devices.RootNode().GetRootNodeDevice().BasicInformation());
+            &devices.RootNode().GetRootNode().BasicInformation());
     gAllDevicesAppCommandDelegate.RegisterCommandHandlers();
 
     CHIP_ERROR err = gNamedPipeCommands.Start(namedPipePath, &gAllDevicesAppCommandDelegate);
@@ -344,26 +342,25 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     static CodeDrivenDataModelDevices devices({
-        .storageDelegate                      = *initParams.persistentStorageDelegate,                   //
-            .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),   //
-            .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
-            .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
-            .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
-            .accessControl                    = Server::GetInstance().GetAccessControl(),                //
-            .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
-            .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
-            .deviceInstanceInfoProvider       = *provider,                                               //
-            .platformManager                  = DeviceLayer::PlatformMgr(),                              //
-            .groupDataProvider                = gGroupDataProvider,                                      //
-            .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
-            .dnssdServer                      = DnssdServer::Instance(),                                 //
-            .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
-            .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
-            .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                     //
-            .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
-            .eventManagement                  = EventManagement::GetInstance(),                          //
-            .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
-            .timerDelegate                    = gTimerDelegate,                                          //
+        .storageDelegate                = *initParams.persistentStorageDelegate,                   //
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                         //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                  //
+            .accessControl              = Server::GetInstance().GetAccessControl(),                //
+            .persistentStorage          = Server::GetInstance().GetPersistentStorage(),            //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),              //
+            .deviceInstanceInfoProvider = *provider,                                               //
+            .platformManager            = DeviceLayer::PlatformMgr(),                              //
+            .groupDataProvider          = gGroupDataProvider,                                      //
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),         //
+            .dnssdServer                = DnssdServer::Instance(),                                 //
+            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
+            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
+            .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                     //
+            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+            .eventManagement            = EventManagement::GetInstance(),                          //
+            .timerDelegate              = gTimerDelegate,                                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

@@ -1281,6 +1281,9 @@ static BOOL CommandNeedsTimedInvokeInAccountLoginCluster(AttributeId aAttributeI
     case Commands::Logout::Id: {
         return YES;
     }
+    case Commands::GetDeviceAuthURI::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
