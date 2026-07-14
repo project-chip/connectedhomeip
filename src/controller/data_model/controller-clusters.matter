@@ -11250,11 +11250,11 @@ provisional cluster AudioControl = 1298 {
     optional UnmutePolicyEnum unmutePolicy = 1;
   }
 
-  /** This command SHALL set the value of the SoftMuted attribute to TRUE. */
+  /** This command allows the audio output of the device to be muted. */
   command Mute(): DefaultSuccess = 0;
-  /** This command SHALL set the value of the SoftMuted attribute to FALSE. */
+  /** This command allows the audio output of the device to be unmuted. */
   command Unmute(): DefaultSuccess = 1;
-  /** This command SHALL toggle the state of the SoftMuted attribute. */
+  /** This command allows the audio output of the device to be muted if it is unmuted, or unmuted if it is muted. */
   command ToggleMuted(): DefaultSuccess = 2;
   /** Sets the volume to a specified level. */
   command SetVolume(SetVolumeRequest): DefaultSuccess = 3;
