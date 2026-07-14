@@ -81,6 +81,15 @@ uint32_t MakeU32FromAsciiDecimal(const ByteSpan & val, uint32_t defaultValue = 0
     if (val.size() > 1 && *val.data() == static_cast<uint8_t>('0'))
         return defaultValue;
 
+    // value must be decimal digits only: strtoul() otherwise accepts a leading
+    // sign or whitespace, so a nonconformant TXT value like "+5" or " 5" would
+    // parse as 5 instead of being rejected.
+    for (size_t i = 0; i < val.size(); ++i)
+    {
+        if (val.data()[i] < '0' || val.data()[i] > '9')
+            return defaultValue;
+    }
+
     Platform::CopyString(nullTerminatedValue, sizeof(nullTerminatedValue), val);
 
     char * endPtr;
