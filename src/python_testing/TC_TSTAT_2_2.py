@@ -188,7 +188,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         hasEventsFeature = False
 
         self.step("1a")
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
+        if self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             hasEventsFeature = True
 
             events_callback = EventSubscriptionHandler(expected_cluster=Clusters.Thermostat)
@@ -297,7 +297,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(MinCoolSetpointLimitValue), endpoint_id=endpoint)
 
         self.step("2d")
-        if self.pics_guard(hasCoolingFeature) and await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
+        if self.pics_guard(hasCoolingFeature) and self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
         self.step("3a")
@@ -396,7 +396,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(MaxCoolSetpointLimitValue), endpoint_id=endpoint)
 
         self.step("4d")
-        if self.pics_guard(hasOccupancyFeature and hasCoolingFeature) and await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
+        if self.pics_guard(hasOccupancyFeature and hasCoolingFeature) and self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.UnoccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=0, endpoint=endpoint)
 
         self.step("5a")
@@ -442,7 +442,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(MinHeatSetpointLimitValue), endpoint_id=endpoint)
 
         self.step("5d")
-        if self.pics_guard(hasOccupancyFeature and hasHeatingFeature) and await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
+        if self.pics_guard(hasOccupancyFeature and hasHeatingFeature) and self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.UnoccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=0, endpoint=endpoint)
 
         self.step("6a")
