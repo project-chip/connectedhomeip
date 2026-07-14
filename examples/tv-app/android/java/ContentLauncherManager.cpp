@@ -358,7 +358,7 @@ exit:
         ChipLogError(Zcl, "ContentLauncherManager::ContentReplicationRequest status error: %s", err.AsString());
         response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kURLNotAvailable;
     }
-    (void) helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * commandObj,
@@ -459,20 +459,25 @@ CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEnc
         }
 
         jint size = env->GetArrayLength(presetsArray);
-        for (int i = 0; i < size; i++)
+        if (size > 0)
         {
-            jobject presetObj   = env->GetObjectArrayElement(presetsArray, i);
-            jclass presetClass  = env->GetObjectClass(presetObj);
-            jfieldID idField    = env->GetFieldID(presetClass, "presetID", "I");
-            jfieldID nameField  = env->GetFieldID(presetClass, "presetName", "Ljava/lang/String;");
-            jint presetId       = env->GetIntField(presetObj, idField);
-            jstring jPresetName = (jstring) env->GetObjectField(presetObj, nameField);
-            JniUtfString presetName(env, jPresetName);
+            jobject firstObj     = env->GetObjectArrayElement(presetsArray, 0);
+            jclass presetClass   = env->GetObjectClass(firstObj);
+            jfieldID idField     = env->GetFieldID(presetClass, "presetID", "I");
+            jfieldID nameField   = env->GetFieldID(presetClass, "presetName", "Ljava/lang/String;");
 
-            chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset;
-            preset.presetID   = static_cast<uint8_t>(presetId);
-            preset.presetName = presetName.charSpan();
-            ReturnErrorOnFailure(encoder.Encode(preset));
+            for (int i = 0; i < size; i++)
+            {
+                jobject presetObj    = (i == 0) ? firstObj : env->GetObjectArrayElement(presetsArray, i);
+                jint presetId       = env->GetIntField(presetObj, idField);
+                jstring jPresetName = (jstring) env->GetObjectField(presetObj, nameField);
+                JniUtfString presetName(env, jPresetName);
+
+                chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset;
+                preset.presetID   = static_cast<uint8_t>(presetId);
+                preset.presetName = presetName.charSpan();
+                ReturnErrorOnFailure(encoder.Encode(preset));
+            }
         }
 
         return CHIP_NO_ERROR;

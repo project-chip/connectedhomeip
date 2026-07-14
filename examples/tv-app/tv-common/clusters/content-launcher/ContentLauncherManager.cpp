@@ -185,7 +185,7 @@ void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelp
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleContentReplicationRequest");
     ContentReplicationResponseType response;
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * commandObj,
@@ -222,16 +222,17 @@ bool ContentLauncherManager::HandleGetMovable()
 
 CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
 {
+    using namespace chip::literals;
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetPresets");
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         ContentPresetStructType preset1;
         preset1.presetID   = 1;
-        preset1.presetName = CharSpan::fromCharString("Morning News");
+        preset1.presetName = "Morning News"_span;
         ReturnErrorOnFailure(encoder.Encode(preset1));
 
         ContentPresetStructType preset2;
         preset2.presetID   = 2;
-        preset2.presetName = CharSpan::fromCharString("Evening Playlist");
+        preset2.presetName = "Evening Playlist"_span;
         ReturnErrorOnFailure(encoder.Encode(preset2));
 
         return CHIP_NO_ERROR;

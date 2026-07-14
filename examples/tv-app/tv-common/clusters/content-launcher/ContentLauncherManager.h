@@ -72,5 +72,13 @@ protected:
 
 private:
     // TODO: set this based upon meta data from app
-    static constexpr uint32_t kEndpointFeatureMap = 0x00FF;
+    static constexpr uint32_t kEndpointFeatureMap =
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentSearch) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kURLPlayback) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kAdvancedSeek) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kTextTracks) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kAudioTracks) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentReplication) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentQueueing) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kPresets);
 };

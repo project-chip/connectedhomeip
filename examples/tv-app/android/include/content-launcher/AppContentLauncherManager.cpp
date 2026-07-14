@@ -20,6 +20,7 @@
 
 #include "../../java/ContentAppAttributeDelegate.h"
 #include <app/util/config.h>
+#include <clusters/ContentLauncher/Metadata.h>
 #include <json/json.h>
 #include <lib/support/Span.h>
 
@@ -168,16 +169,17 @@ bool AppContentLauncherManager::HandleGetMovable()
 
 CHIP_ERROR AppContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
 {
+    using namespace chip::literals;
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetPresets");
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset1;
         preset1.presetID   = 1;
-        preset1.presetName = chip::CharSpan::fromCharString("Morning News");
+        preset1.presetName = "Morning News"_span;
         ReturnErrorOnFailure(encoder.Encode(preset1));
 
         chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type preset2;
         preset2.presetID   = 2;
-        preset2.presetName = chip::CharSpan::fromCharString("Evening Playlist");
+        preset2.presetName = "Evening Playlist"_span;
         ReturnErrorOnFailure(encoder.Encode(preset2));
 
         return CHIP_NO_ERROR;
@@ -200,7 +202,7 @@ uint16_t AppContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::ContentLauncher::kRevision;
     }
 
     uint16_t clusterRevision = 0;

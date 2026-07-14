@@ -66,7 +66,15 @@ protected:
 private:
     EndpointId mEndpointId;
 
-    static constexpr uint32_t kEndpointFeatureMap = 0x00FF;
-    static constexpr uint16_t kClusterRevision    = 3;
+    // All Content Launcher features enabled
+    static constexpr uint32_t kEndpointFeatureMap =
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentSearch) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kURLPlayback) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kAdvancedSeek) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kTextTracks) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kAudioTracks) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentReplication) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kContentQueueing) |
+        chip::to_underlying(chip::app::Clusters::ContentLauncher::Feature::kPresets);
     ContentAppAttributeDelegate * mAttributeDelegate;
 };
