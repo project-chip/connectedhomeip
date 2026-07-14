@@ -144,8 +144,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         // Uint64ToHex validates that the remaining space holds the hex-encoded fabric id.
         VerifyOrReturnError(bufferLen >= 3, CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buffer, "_I");
-        return Encoding::Uint64ToHex(subtype.code, &buffer[2], bufferLen - 2,
-                                     Encoding::HexFlags::kUppercaseAndNullTerminate);
+        return Encoding::Uint64ToHex(subtype.code, &buffer[2], bufferLen - 2, Encoding::HexFlags::kUppercaseAndNullTerminate);
     case DiscoveryFilterType::kInstanceName:
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
         break;
