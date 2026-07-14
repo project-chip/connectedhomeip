@@ -227,9 +227,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-humidifierdehumidifier</name>
+        <name>MA-humidity-conditioner</name>
         <domain>CHIP</domain>
-        <typeName>Humidifier/Dehumidifier</typeName>
+        <typeName>Humidity Conditioner</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007D</deviceId>
         <revision editable="false">1</revision>
@@ -237,8 +237,16 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters>
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Humidistat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Humidistat" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="DF" name="DeadFrontBehavior"></feature>
+                    <feature code="LT" name="Lighting">
+                        <disallowConform></disallowConform>
+                    </feature>
+                </features>
+            </include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Water Tank Level Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
