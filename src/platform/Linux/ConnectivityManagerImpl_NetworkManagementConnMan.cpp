@@ -3577,6 +3577,24 @@ ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectRequestLoc
     VerifyOrDie(inOutLock.owns_lock());
     VerifyOrReturnError(inService != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    // Matter's AddOrUpdateWiFiNetwork/ConnectNetwork is
+    // authoritative: the commissioner is the source of truth for the
+    // credential. connman consults the agent only when the service
+    // has no passphrase -- service_connect() short-circuits on a
+    // cached one, and the sticky invalid-key error that would
+    // otherwise force a re-prompt is cleared by connman itself on the
+    // failure -> idle transition. Unconditionally remove any cached
+    // provisioning so that service_connect() is guaranteed to yield
+    // -ENOKEY and drive Agent.RequestInput, which is the only
+    // sanctioned path by which we may supply the credential.
+    //
+    // connman returns net.connman.Error.NotSupported (mapped to
+    // EOPNOTSUPP) when the service was never provisioned (not
+    // favorite, no cached passphrase); which is the state we are
+    // trying to reach. Treat it as success.
+
+    ReturnErrorOnFailure(ServiceRemoveLocked(inOutLock, inService).NoErrorIf(ChipError(ChipError::Range::kPOSIX, EOPNOTSUPP)));
+
     // On any failure below, `Service.Connect()` either was not issued or will
     // not complete; unwind the D-Bus-call-scoped state. Disarmed on success,
     // where HandleServiceConnectComplete assumes that responsibility.
@@ -4975,6 +4993,33 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ServiceConnectLocke
                     inSelf_->OnServiceConnectReady(sourceObject_, res_);
                 }),
             this);
+
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ServiceRemoveLocked(std::unique_lock<std::mutex> & inOutLock,
+                                                                                 ConnManService * inService) noexcept
+{
+    VerifyOrDie(inOutLock.owns_lock());
+
+    VerifyOrReturnError(inService != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    GAutoPtr<ConnManService> service(static_cast<ConnManService *>(g_object_ref(inService)));
+
+    return UnlockAndInvokeOnGLibContextSync(inOutLock, [&]() -> CHIP_ERROR {
+        GAutoPtr<GError> err;
+        gboolean status = conn_man_service_call_remove_sync(service.get(), nullptr, &err.GetReceiver());
+        if (!status || err)
+        {
+            const CHIP_ERROR mapped = MapClientError(err.get());
+
+            ChipLogError(
+                DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to remove service %s: %s (%" CHIP_ERROR_FORMAT ")",
+                g_dbus_proxy_get_object_path(G_DBUS_PROXY(service.get())), err ? err->message : "unknown", mapped.Format());
+
+            return mapped;
+        }
 
         return CHIP_NO_ERROR;
     });

@@ -632,6 +632,7 @@ private:
     CHIP_ERROR ManagerUnregisterAgent(const char * inPath) noexcept;
     CHIP_ERROR ManagerUnregisterAgentLocked(std::unique_lock<std::mutex> & inOutLock, const char * inPath) noexcept;
     CHIP_ERROR ServiceConnectLocked(std::unique_lock<std::mutex> & inOutLock, ConnManService * inService) noexcept;
+    CHIP_ERROR ServiceRemoveLocked(std::unique_lock<std::mutex> & inOutLock, ConnManService * inService) noexcept;
     void ServiceRegisterPropertyChangedOnGLib(ConnManService * inService) noexcept;
     void TechnologyRegisterPropertyChangedOnGLib(ConnManTechnology * inTechnology) noexcept;
     CHIP_ERROR TechnologyScanLocked(std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology) noexcept;
