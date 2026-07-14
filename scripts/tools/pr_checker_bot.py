@@ -21,6 +21,7 @@ import os
 import urllib.request
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
+from datetime import datetime,timedelta, UTC
 from enum import Enum
 from functools import cached_property
 from typing import Any, NamedTuple, cast
@@ -136,6 +137,12 @@ class PRContext:
             return self.api.get_user().login.lower()
         except GithubException:
             return "pr-checker-bot"
+
+    @cached_property
+    def is_dependabot(self) -> bool:
+        if self.pr.user and getattr(self.pr.user, "login", None):
+            return self.pr.user.login.lower() == "dependabot[bot]"
+        return False
 
     @cached_property
     def commit(self) -> Commit:
@@ -369,22 +376,42 @@ class PRContext:
                 )
                 return False
 
+        now = datetime.now(UTC)
         for suite in check_suites:
+            app_name = suite.app.name if suite.app else ""
             if suite.status != "completed":
+                created_at = suite.created_at
+                if created_at.tzinfo is None:
+                    created_at = created_at.replace(tzinfo=UTC)
+
+                age = now - created_at
+                if self.is_dependabot and app_name != "GitHub Actions" and age > timedelta(hours=1):
+                    log.info(
+                        "PR #%d HEAD commit %s check suite '%s' (%s) is pending but ignored (queued for %s)",
+                        self.pr.number,
+                        commit.sha[:8],
+                        suite.id,
+                        app_name,
+                        age,
+                    )
+                    continue
+
                 log.info(
-                    "PR #%d HEAD commit %s check suite '%s' is not completed (status: '%s')",
+                    "PR #%d HEAD commit %s check suite '%s' (%s) is not completed (status: '%s')",
                     self.pr.number,
                     commit.sha[:8],
                     suite.id,
+                    app_name,
                     suite.status,
                 )
                 return False
             if suite.conclusion not in ("success", "neutral", "skipped"):
                 log.info(
-                    "PR #%d HEAD commit %s check suite '%s' failed (conclusion: '%s')",
+                    "PR #%d HEAD commit %s check suite '%s' (%s) failed (conclusion: '%s')",
                     self.pr.number,
                     commit.sha[:8],
                     suite.id,
+                    app_name,
                     suite.conclusion,
                 )
                 return False
@@ -499,6 +526,14 @@ class Workflow:
 
 
 # --- Gate Functions ---
+
+
+def gate_is_dependabot(context: PRContext) -> bool:
+    """Gate condition: ensures the PR author is dependabot[bot]."""
+    if context.is_dependabot:
+        return True
+    log.info("PR #%d author is not dependabot[bot]. Skipping.", context.pr.number)
+    return False
 
 
 def gate_no_change_requests(context: PRContext) -> bool:
@@ -656,6 +691,31 @@ def action_merge_platform(context: PRContext) -> None:
             )
 
 
+def action_merge_dependabot(context: PRContext) -> None:
+    merge_reason_comment = "### Dependabot Auto-Merge Executed\n"
+    merge_reason_comment += "This PR has been automatically merged because it passed all CI checks."
+
+    if context.dry_run:
+        log.info(
+            "[Dry Run] Would post merge comment to PR #%d:\n%s",
+            context.pr.number,
+            merge_reason_comment,
+        )
+        log.info("[Dry Run] Would merge PR #%d (method: squash)", context.pr.number)
+    else:
+        log.info("Merging PR #%d (Dependabot)", context.pr.number)
+        context.pr.merge(
+            merge_method="squash",
+            commit_title=f"{context.pr.title} (Auto-merged by bot)",
+            sha=context.pr.head.sha,
+        )
+        log.info("Posting merge explanation comment to PR #%d", context.pr.number)
+        try:
+            context.pr.create_issue_comment(merge_reason_comment)
+        except GithubException as e:
+            log.error("Failed to post merge comment: %s", e)
+
+
 def action_post_platform_eligibility(context: PRContext) -> None:
     """Posts or updates a status comment detailing why an eligible PR is not yet ready to merge.
 
@@ -772,6 +832,7 @@ def action_post_platform_eligibility(context: PRContext) -> None:
 
 # --- Workflows ---
 
+# PLATFORM_MERGE_WORKFLOW handles PRs that only touch platform-maintained code paths.
 PLATFORM_MERGE_WORKFLOW = Workflow(
     name="platform_merge",
     gates=[
@@ -790,13 +851,32 @@ PLATFORM_MERGE_WORKFLOW = Workflow(
     on_failure=action_post_platform_eligibility,
 )
 
+# DEPENDABOT_MERGE_WORKFLOW handles automated dependency update PRs created by Dependabot.
+DEPENDABOT_MERGE_WORKFLOW = Workflow(
+    name="dependabot_merge",
+    gates=[
+        Gate(gate_is_dependabot),
+        Gate(gate_no_change_requests),
+    ],
+    checks=[
+        check_ci,
+        check_unresolved_comments,
+        check_mergeable,
+    ],
+    on_success=action_merge_dependabot,
+    on_failure=action_noop,
+)
+
 WORKFLOWS = {
     "platform_merge": PLATFORM_MERGE_WORKFLOW,
+    "dependabot_merge": DEPENDABOT_MERGE_WORKFLOW,
 }
 
 
 def select_workflow(context: PRContext) -> Workflow | None:
     """Selects the matching workflow to execute based on PR context."""
+    if context.is_dependabot:
+        return DEPENDABOT_MERGE_WORKFLOW
     if context.active_groups or context.bot_comments:
         return PLATFORM_MERGE_WORKFLOW
     return None

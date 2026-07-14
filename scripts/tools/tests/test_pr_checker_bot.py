@@ -20,6 +20,7 @@ import os
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone, timedelta
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -1016,6 +1017,157 @@ esp32:
         mock_pr.create_issue_comment.assert_called_once()
         comment_body = mock_pr.create_issue_comment.call_args[0][0]
         self.assertIn("Mergeability state is computing", comment_body)
+
+    def test_check_and_process_pr_dependabot_merge(self) -> None:
+        """Tests that a Dependabot PR is merged when all checks pass."""
+        files = [self.create_mock_file("some/random/file.txt")]
+        reviews = []  # Dependabot doesn't need reviews
+        mock_pr = self.create_mock_pr(1, "Bump dependency", "dependabot[bot]", files, reviews)
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        # Should merge and comment
+        self.assertEqual(mock_pr.create_issue_comment.call_count, 1)
+        self.assertIn(
+            "Dependabot Auto-Merge Executed",
+            mock_pr.create_issue_comment.call_args[0][0],
+        )
+        mock_pr.merge.assert_called_once_with(
+            merge_method="squash",
+            commit_title="Bump dependency (Auto-merged by bot)",
+            sha="dummy_sha",
+        )
+
+    def test_check_and_process_pr_dependabot_workflow_non_dependabot_skipped(self) -> None:
+        """Tests that dependabot_merge workflow skips PRs not authored by dependabot[bot]."""
+        self.bot.workflow_name = "dependabot_merge"
+        files = [self.create_mock_file("some/random/file.txt")]
+        mock_pr = self.create_mock_pr(1, "Regular PR", "regular_user", files, [])
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_dependabot_ci_failing(self) -> None:
+        """Tests that a Dependabot PR is not merged if CI fails."""
+        files = [self.create_mock_file("some/random/file.txt")]
+        mock_pr = self.create_mock_pr(1, "Bump dependency", "dependabot[bot]", files, [])
+
+        # Mock CI failure (one failing check suite)
+        mock_suite = MagicMock()
+        mock_suite.status = "completed"
+        mock_suite.conclusion = "failure"
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+        self.mock_commit.get_check_suites.return_value = [mock_suite] + [
+            mock_success_suite
+        ] * 9
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        # Should NOT comment on failure for dependabot (action_noop)
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_dependabot_blocked_by_changes_requested(self) -> None:
+        """Tests that a Dependabot PR is not merged if there are change requests."""
+        files = [self.create_mock_file("some/random/file.txt")]
+        reviews = [self.create_mock_review("maintainer", "CHANGES_REQUESTED")]
+        mock_pr = self.create_mock_pr(1, "Bump dependency", "dependabot[bot]", files, reviews)
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_dependabot_blocked_by_unresolved_comments(self) -> None:
+        """Tests that a Dependabot PR is not merged if there are unresolved comments."""
+        files = [self.create_mock_file("some/random/file.txt")]
+        mock_pr = self.create_mock_pr(1, "Bump dependency", "dependabot[bot]", files, [])
+
+        # Mock unresolved threads
+        self.mock_load_unresolved_threads.return_value = [
+            {"author": "someone", "body_preview": "unresolved comment", "url": "some_url"}
+        ]
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_and_process_pr_dependabot_not_mergeable(self) -> None:
+        """Tests that a Dependabot PR is not merged if it has conflicts."""
+        files = [self.create_mock_file("some/random/file.txt")]
+        mock_pr = self.create_mock_pr(1, "Bump dependency", "dependabot[bot]", files, [])
+        mock_pr.mergeable = False
+
+        self.bot.check_and_process_pr(mock_pr)
+
+        mock_pr.merge.assert_not_called()
+        mock_pr.create_issue_comment.assert_not_called()
+
+    def test_check_ci_ignores_old_non_critical_pending_suites(self) -> None:
+        """Tests that _check_ci_passed ignores pending non-critical suites older than 1 hour for Dependabot."""
+        files = [self.create_mock_file("some/random/file.txt")]
+        mock_pr = self.create_mock_pr(1, "Bump dependency", "dependabot[bot]", files, [])
+
+        now = datetime.now(timezone.utc)
+
+        # 1. Critical suite (GitHub Actions) - pending (queued) - even if old, it should block
+        mock_critical_pending = MagicMock()
+        mock_critical_pending.app.name = "GitHub Actions"
+        mock_critical_pending.status = "queued"
+        mock_critical_pending.conclusion = None
+        mock_critical_pending.created_at = now - timedelta(hours=2)
+
+        # 2. Non-critical suite (GitHub Pages) - pending - old (> 1 hour) - should be ignored
+        mock_non_critical_old_pending = MagicMock()
+        mock_non_critical_old_pending.app.name = "GitHub Pages"
+        mock_non_critical_old_pending.status = "queued"
+        mock_non_critical_old_pending.conclusion = None
+        mock_non_critical_old_pending.created_at = now - timedelta(hours=2)
+
+        # 3. Non-critical suite (Codecov) - pending - young (< 1 hour) - should NOT be ignored (blocks)
+        mock_non_critical_young_pending = MagicMock()
+        mock_non_critical_young_pending.app.name = "Codecov"
+        mock_non_critical_young_pending.status = "queued"
+        mock_non_critical_young_pending.conclusion = None
+        mock_non_critical_young_pending.created_at = now - timedelta(minutes=30)
+
+        # Test Case A: Only old non-critical pending suite present (and some passing suites to meet min 10 checks)
+        # Should MERGE (ignore the old pending non-critical)
+        mock_success_suite = MagicMock()
+        mock_success_suite.status = "completed"
+        mock_success_suite.conclusion = "success"
+
+        self.mock_commit.get_check_suites.return_value = [mock_non_critical_old_pending] + [mock_success_suite] * 9
+
+        self.bot.check_and_process_pr(mock_pr)
+        mock_pr.merge.assert_called_once()
+        mock_pr.reset_mock()
+
+        # Test Case B: Young non-critical pending suite present
+        # Should NOT merge (blocks)
+        self.mock_commit.get_check_suites.return_value = [mock_non_critical_young_pending] + [mock_success_suite] * 9
+        self.bot.check_and_process_pr(mock_pr)
+        mock_pr.merge.assert_not_called()
+        mock_pr.reset_mock()
+
+        # Test Case C: Old critical pending suite present
+        # Should NOT merge (blocks)
+        self.mock_commit.get_check_suites.return_value = [mock_critical_pending] + [mock_success_suite] * 9
+        self.bot.check_and_process_pr(mock_pr)
+        mock_pr.merge.assert_not_called()
+        mock_pr.reset_mock()
+
+        # Test Case D: Same old pending suite but PR is NOT from dependabot (e.g. platform merge)
+        # Should NOT merge (blocks because ignore is dependabot-specific)
+        mock_human_pr = self.create_mock_pr(2, "Platform changes", "doru91", files, [self.create_mock_review("nxpdev", "APPROVED")])
+        self.mock_commit.get_check_suites.return_value = [mock_non_critical_old_pending] + [mock_success_suite] * 9
+        self.bot.check_and_process_pr(mock_human_pr)
+        mock_human_pr.merge.assert_not_called()
 
 
 if __name__ == "__main__":
