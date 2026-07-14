@@ -12,6 +12,12 @@ etc.) to assist with development and code review in the Matter repository.
 -   **Triggers**: Automatically activates when reviewing files ending in
     `_test.py` or located in `src/python_testing`.
 
+### ZAP XML Generation (Alchemy)
+
+-   **Location**: `.agents/skills/zap-xml-generation/`
+-   **Purpose**: Guidance and command patterns for generating and updating ZAP template XMLs from Matter specification AsciiDoc files (`connectedhomeip-spec`) to the Matter SDK (`connectedhomeip`) using the Alchemy CLI (`alchemy zap`).
+-   **Triggers**: Automatically activates when modifying or generating ZAP XML files (`-cluster.xml`, `device-types.xml`, `namespaces.xml`), handling `#ifdef` guarded spec attributes, or synchronizing spec-to-SDK data models.
+
 ### GitHub PR Description Writer
 
 -   **Location**: `.agents/skills/github-pr-description-writer/`
