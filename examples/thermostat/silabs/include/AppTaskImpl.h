@@ -66,7 +66,7 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, TemperatureUpdateEventHandlerImpl, aEvent);
     }
 
-    // Matter stack callback after a server attribute write, logs Thermostat attributes and refreshes the UI.
+    // Matter stack callback after a server attribute change, logs Thermostat attributes and refreshes the UI.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {

@@ -55,7 +55,7 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffectImpl, effect);
     }
 
-    // Toggles light on/off, updates LED/display, and schedules OnOff cluster sync on the CHIP thread.
+    // Toggles light on/off, updates LED/display, and schedules OnOff cluster sync on the Matter thread.
     static void LightActionEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightActionEventHandlerImpl, aEvent);
@@ -75,7 +75,7 @@ public:
     }
 #endif
 
-    // Matter stack callback after a server attribute write, syncs OnOff/LevelControl/ColorControl to LED and display.
+    // Matter stack callback after a server attribute change, syncs OnOff/LevelControl/ColorControl to LED and display.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {

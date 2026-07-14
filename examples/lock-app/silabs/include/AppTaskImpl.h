@@ -87,7 +87,7 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, UnlockAfterUnlatchImpl, context);
     }
 
-    // Matter stack callback after a server attribute write, applies lock-specific attribute side effects.
+    // Matter stack callback after a server attribute change, applies lock-specific attribute side effects.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {

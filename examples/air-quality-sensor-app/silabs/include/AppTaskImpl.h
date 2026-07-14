@@ -57,7 +57,7 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, SensorTimerEventHandlerImpl, arg);
     }
 
-    // Matter stack callback after a server attribute write, logs Identify cluster changes.
+    // Matter stack callback after a server attribute change, logs Identify cluster changes.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {

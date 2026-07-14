@@ -52,13 +52,13 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
-    // AppTask thread handler for queued button events, triggers switch actions on the CHIP task.
+    // AppTask thread handler for queued button events, triggers switch actions on the Matter task.
     static void AppEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, AppEventHandlerImpl, aEvent);
     }
 
-    // Handler scheduled on the CHIP thread to set up the binding table.
+    // Handler scheduled on the Matter thread to set up the binding table.
     static void InitBindingHandler(intptr_t arg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, InitBindingHandlerImpl, arg);
@@ -71,7 +71,7 @@ public:
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightSwitchChangedHandlerImpl, binding, peer_device, context);
     }
 
-    // Matter stack callback after a server attribute write, logs Identify cluster changes.
+    // Matter stack callback after a server attribute change, logs Identify cluster changes.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
