@@ -141,7 +141,7 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     (Clusters.LevelControl.id, Clusters.LevelControl.Commands.MoveToLevel.command_id),
     # TODO: Remove once the On/Off code-driven migration is wired into ZAP/ember apps
     # (CodegenIntegration). The legacy implementation (codegen/on-off-server.cpp) does
-    # not validate OnTime/OffWaitTime <= 0xFFFE; OnOffLightingCluster already does. 
+    # not validate OnTime/OffWaitTime <= 0xFFFE; OnOffLightingCluster already does.
     # So all-devices-app with --device dimmable-light:1 passes, but all-clusters-app fails.
     (Clusters.OnOff.id, Clusters.OnOff.Commands.OnWithTimedOff.command_id),
     # TODO: Remove once DiagnosticLogsCluster validates TransferFileDesignator length
