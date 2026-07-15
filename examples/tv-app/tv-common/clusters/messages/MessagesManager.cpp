@@ -31,7 +31,8 @@ using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageRes
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
-    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
+    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses, const Optional<CharSpan> & /* languageCode */,
+    const Optional<CharSpan> & /* messageUri */)
 {
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
@@ -92,6 +93,16 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
         }
         return CHIP_NO_ERROR;
     });
+}
+
+CHIP_ERROR MessagesManager::HandleGetSupportedLanguageCodes(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeEmptyList();
+}
+
+CHIP_ERROR MessagesManager::HandleGetSupportedMimeTypes(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeEmptyList();
 }
 
 // Global Attributes
