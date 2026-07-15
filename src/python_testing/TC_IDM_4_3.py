@@ -83,7 +83,7 @@ class TC_IDM_4_3(IDMBaseTest):
     def steps_TC_IDM_4_3(self):
         return [
             TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
-                     "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
+                     "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters.", is_commissioning=True),
             TestStep(2, "Activate the subscription between the DUT and the TH for an attribute. Change the value of the attribute which has been subscribed on the DUT by sending a Write command from the TH.",
                      "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent after the MinIntervalFloor time is reached and before the MaxInterval time."),
             TestStep(3, "Activate the subscription between the DUT and the TH for any attribute. KeepSubscriptions flag should be set to False Save the returned MaxInterval value as original_max_interval TH then sends another subscription request message for the same attribute with different parameters than before. KeepSubscriptions flag should be set to False Wait for original_max_interval. Change the value of the attribute requested on the DUT.",
