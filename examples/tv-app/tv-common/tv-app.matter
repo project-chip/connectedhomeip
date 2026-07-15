@@ -4337,13 +4337,16 @@ endpoint 1 {
     emits event MessageQueued;
     emits event MessagePresented;
     emits event MessageComplete;
+    emits event MessageNotPresented;
     callback attribute messages;
     callback attribute activeMessageIDs;
+    callback attribute supportedLanguageCodes;
+    callback attribute supportedMimeTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
 
     handle command PresentMessagesRequest;
     handle command CancelMessagesRequest;

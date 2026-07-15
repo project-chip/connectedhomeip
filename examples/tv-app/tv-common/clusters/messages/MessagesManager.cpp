@@ -31,13 +31,15 @@ using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageRes
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
-    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses, const Optional<CharSpan> & /* languageCode */,
-    const Optional<CharSpan> & /* messageUri */)
+    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses, const Optional<CharSpan> & languageCode,
+    const Optional<CharSpan> & messageUri)
 {
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
-    auto cachedMessage = CachedMessage(messageId, priority, messageControl, startTime, duration,
-                                       std::string(messageText.data(), messageText.size()));
+    auto cachedMessage = CachedMessage(
+        messageId, priority, messageControl, startTime, duration, std::string(messageText.data(), messageText.size()),
+        languageCode.HasValue() ? std::string(languageCode.Value().data(), languageCode.Value().size()) : std::string(),
+        messageUri.HasValue() ? std::string(messageUri.Value().data(), messageUri.Value().size()) : std::string());
     if (responses.HasValue())
     {
         auto iter = responses.Value().begin();
@@ -97,12 +99,19 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
 
 CHIP_ERROR MessagesManager::HandleGetSupportedLanguageCodes(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeEmptyList();
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ReturnErrorOnFailure(encoder.Encode("en-US"_span));
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR MessagesManager::HandleGetSupportedMimeTypes(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeEmptyList();
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        ReturnErrorOnFailure(encoder.Encode("audio/mpeg"_span));
+        ReturnErrorOnFailure(encoder.Encode("audio/ogg"_span));
+        return CHIP_NO_ERROR;
+    });
 }
 
 // Global Attributes
@@ -113,6 +122,9 @@ uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
     FeatureMap.Set(Feature::kConfirmationResponse);
     FeatureMap.Set(Feature::kConfirmationReply);
     FeatureMap.Set(Feature::kProtectedMessages);
+    FeatureMap.Set(Feature::kSpokenMessages);
+    FeatureMap.Set(Feature::kAudioMessages);
+    FeatureMap.Set(Feature::kMultiModalMessages);
 
     uint32_t featureMap = FeatureMap.Raw();
     ChipLogProgress(Zcl, "GetFeatureMap featureMap=%d", featureMap);
