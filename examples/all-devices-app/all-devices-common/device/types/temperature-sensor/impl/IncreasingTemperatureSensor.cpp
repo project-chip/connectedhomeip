@@ -26,7 +26,7 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseTemperatureIntervalSec = System::Clock::Seconds16(10);
-constexpr uint16_t kDefaultTemperatureTolerance                   = 50; // Set tolerance to 0.50 °C
+constexpr uint16_t kDefaultTemperatureTolerance                    = 50; // Set tolerance to 0.50 °C
 
 const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
     .minMeasuredValue = DataModel::MakeNullable<int16_t>(-10),
