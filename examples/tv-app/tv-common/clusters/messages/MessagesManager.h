@@ -50,7 +50,8 @@ struct CachedMessage
 {
     CachedMessage(const CachedMessage & message) :
         mPriority(message.mPriority), mMessageControl(message.mMessageControl), mStartTime(message.mStartTime),
-        mDuration(message.mDuration), mMessageText(message.mMessageText), mOptions(message.mOptions)
+        mDuration(message.mDuration), mMessageText(message.mMessageText), mLanguageCode(message.mLanguageCode),
+        mMessageUri(message.mMessageUri), mOptions(message.mOptions)
     {
         memcpy(mMessageIdBuffer, message.mMessageIdBuffer, sizeof(mMessageIdBuffer));
 
@@ -65,9 +66,11 @@ struct CachedMessage
     CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
-                  const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText) :
+                  const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText,
+                  std::string languageCode, std::string messageUri) :
         mPriority(priority),
-        mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
+        mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText),
+        mLanguageCode(languageCode), mMessageUri(messageUri)
     {
         memcpy(mMessageIdBuffer, messageId.data(), sizeof(mMessageIdBuffer));
     }
@@ -82,26 +85,26 @@ struct CachedMessage
 
     chip::app::Clusters::Messages::Structs::MessageStruct::Type GetMessage()
     {
-        if (mResponseOptions.size() > 0)
-        {
-            chip::app::DataModel::List<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> options(
-                mResponseOptions.data(), mResponseOptions.size());
-            chip::app::Clusters::Messages::Structs::MessageStruct::Type message{ chip::ByteSpan(mMessageIdBuffer),
-                                                                                 mPriority,
-                                                                                 mMessageControl,
-                                                                                 mStartTime,
-                                                                                 mDuration,
-                                                                                 chip::CharSpan::fromCharString(
-                                                                                     mMessageText.c_str()),
-                                                                                 chip::MakeOptional(options) };
-            return message;
-        }
         chip::app::Clusters::Messages::Structs::MessageStruct::Type message{ chip::ByteSpan(mMessageIdBuffer),
                                                                              mPriority,
                                                                              mMessageControl,
                                                                              mStartTime,
                                                                              mDuration,
                                                                              chip::CharSpan::fromCharString(mMessageText.c_str()) };
+        if (mResponseOptions.size() > 0)
+        {
+            chip::app::DataModel::List<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> options(
+                mResponseOptions.data(), mResponseOptions.size());
+            message.responses = chip::MakeOptional(options);
+        }
+        if (!mLanguageCode.empty())
+        {
+            message.languageCode = chip::MakeOptional(chip::CharSpan::fromCharString(mLanguageCode.c_str()));
+        }
+        if (!mMessageUri.empty())
+        {
+            message.messageURI = chip::MakeOptional(chip::CharSpan::fromCharString(mMessageUri.c_str()));
+        }
         return message;
     }
 
@@ -114,6 +117,8 @@ protected:
     const chip::app::DataModel::Nullable<uint64_t> mDuration;
 
     std::string mMessageText;
+    std::string mLanguageCode;
+    std::string mMessageUri;
     uint8_t mMessageIdBuffer[chip::app::Clusters::Messages::kMessageIdLength];
 
     std::vector<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> mResponseOptions;
