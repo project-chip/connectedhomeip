@@ -73,7 +73,7 @@ public:
 
     Protocols::InteractionModel::Status ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request) override;
 
-    void OnDelayReport(System::Clock::Timeout aDelay) override;
+    void OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints) override;
 
     /**
      * Gets the inner exchange context object, without ownership.

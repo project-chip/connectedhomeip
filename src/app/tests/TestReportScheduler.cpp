@@ -59,6 +59,7 @@ public:
     void TestObserverCallbacks();
     void TestSynchronizedScheduler();
     void TestReportDeferral();
+    void TestReportDeferralEndpointSpecific();
 
     /// @brief Mimicks the various operations that happen on a subscription transaction after a read handler was created so that
     /// readhandlers are in the expected state for further tests.
@@ -851,6 +852,72 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferral)
     EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(5));
 
     // Clean up
+    sScheduler.UnregisterAllHandlers();
+    readHandlerPool.ReleaseAll();
+    exchangeCtx->Close();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportDeferralEndpointSpecific)
+{
+    NullReadHandlerCallback nullCallback;
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(nullptr, false);
+    ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
+
+    // Initialize mock timestamp
+    sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
+
+    // Subscription 1 (Endpoint 1, min = 1s, max = 5s)
+    ReadHandler * readHandler1 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 5));
+    // Add path targeting endpoint 1
+    AttributePathParams pathParams1(1, 1, 1);
+    SingleLinkedListNode<AttributePathParams> pathNode1(pathParams1);
+    readHandler1->mpAttributePathList = &pathNode1;
+    readHandler1->ForceDirtyState();
+
+    // Subscription 2 (Endpoint 2, min = 1s, max = 5s)
+    ReadHandler * readHandler2 =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+    EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler2, &sScheduler, 1, 5));
+    // Add path targeting endpoint 2
+    AttributePathParams pathParams2(2, 1, 1);
+    SingleLinkedListNode<AttributePathParams> pathNode2(pathParams2);
+    readHandler2->mpAttributePathList = &pathNode2;
+    readHandler2->ForceDirtyState();
+
+    auto getTimeout = [](ReadHandler * handler) -> System::Clock::Timeout {
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(handler);
+        if (node == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        size_t position;
+        auto pair = sTestTimerDelegate.FindPair(node, position);
+        if (pair == nullptr)
+        {
+            return System::Clock::Timeout::zero();
+        }
+        return pair->timeout - sTestTimerDelegate.mMockSystemTimestamp;
+    };
+
+    sScheduler.RescheduleAllReports();
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(1));
+    EXPECT_EQ(getTimeout(readHandler2), System::Clock::Seconds32(1));
+
+    // Defer reports for Endpoint 1 by 3 seconds.
+    EndpointId targetedEndpoints[] = { 1 };
+    sScheduler.DeferReports(System::Clock::Seconds32(3), Span<const EndpointId>(targetedEndpoints));
+
+    // Subscription 1 (Endpoint 1) should be deferred to 3s.
+    EXPECT_EQ(getTimeout(readHandler1), System::Clock::Seconds32(3));
+    // Subscription 2 (Endpoint 2) should NOT be deferred (remains 1s).
+    EXPECT_EQ(getTimeout(readHandler2), System::Clock::Seconds32(1));
+
+    // Clean up
+    readHandler1->mpAttributePathList = nullptr;
+    readHandler2->mpAttributePathList = nullptr;
     sScheduler.UnregisterAllHandlers();
     readHandlerPool.ReleaseAll();
     exchangeCtx->Close();

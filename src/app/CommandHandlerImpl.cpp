@@ -275,6 +275,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
     {
+        mNumTargetedEndpoints = 0;
         mDelayReportData.ClearValue();
         InvokeRequestMessage::DelayReportData delayReportData;
         err = invokeRequestMessage.GetDelayReportData(&delayReportData);
@@ -338,7 +339,8 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         {
             delayMs += (chip::Crypto::GetRandU32() % mDelayReportData.Value().delayJitterWindowMs);
         }
-        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs));
+        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
+                                  Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
     }
 
     return Status::Success;
@@ -446,6 +448,8 @@ Status CommandHandlerImpl::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetConcreteCommandPath(concretePath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
+    RecordTargetedEndpoint(concretePath.mEndpointId);
+
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         DataModel::InvokeRequest request(concretePath, subjectDescriptor);
@@ -547,6 +551,7 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                       mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
+        RecordTargetedEndpoint(mapping.endpoint_id);
         // Groupcast Testing
         auto & testing = Groupcast::GetTesting();
         if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
@@ -1018,6 +1023,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Mandatory InvokeRequests field missing");
     {
+        mNumTargetedEndpoints = 0;
         CHIP_ERROR err = CHIP_NO_ERROR;
         mDelayReportData.ClearValue();
         InvokeRequestMessage::DelayReportData delayReportData;
@@ -1096,10 +1102,31 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
         {
             delayMs += (chip::Crypto::GetRandU32() % mDelayReportData.Value().delayJitterWindowMs);
         }
-        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs));
+        mpCallback->OnDelayReport(System::Clock::Milliseconds32(delayMs),
+                                  Span<const EndpointId>(mTargetedEndpoints, mNumTargetedEndpoints));
     }
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
+
+void CommandHandlerImpl::RecordTargetedEndpoint(EndpointId endpointId)
+{
+    for (size_t i = 0; i < mNumTargetedEndpoints; ++i)
+    {
+        if (mTargetedEndpoints[i] == endpointId)
+        {
+            return;
+        }
+    }
+    if (mNumTargetedEndpoints < kMaxTargetedEndpoints)
+    {
+        mTargetedEndpoints[mNumTargetedEndpoints++] = endpointId;
+    }
+    else
+    {
+        ChipLogDetail(DataManagement, "Too many targeted endpoints in invoke, capping at %u",
+                      static_cast<unsigned int>(kMaxTargetedEndpoints));
+    }
+}
 
 } // namespace app
 } // namespace chip

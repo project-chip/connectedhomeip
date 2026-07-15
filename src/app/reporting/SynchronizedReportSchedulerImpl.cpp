@@ -61,8 +61,6 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(this);
-    Timeout maxTimeout = GetRemainingTimeout(mNextMaxTimestamp, now);
-    timeout            = AdjustTimeout(timeout, maxTimeout, now);
     if (timeout == Milliseconds32(0))
     {
         TimerFired();

@@ -133,8 +133,6 @@ CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandlerNode 
 {
     // Cancel Report if it is currently scheduled
     mTimerDelegate->CancelTimer(node);
-    Timeout maxTimeout = GetRemainingTimeout(node->GetMaxTimestamp(), now);
-    timeout            = AdjustTimeout(timeout, maxTimeout, now);
     if (timeout == Milliseconds32(0))
     {
         node->TimerFired();

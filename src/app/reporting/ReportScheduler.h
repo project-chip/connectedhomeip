@@ -22,6 +22,7 @@
 #include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/TimerDelegate.h>
+#include <lib/support/Span.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -118,7 +119,7 @@ public:
         bool IsReportableNow(const Timestamp & now) const
         {
             return (mReadHandler->CanStartReporting() &&
-                    ((now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || CanBeSynced())) ||
+                    ((now >= GetMinTimestamp() && (mReadHandler->IsDirty() || now >= GetMaxTimestamp() || CanBeSynced())) ||
                      IsEngineRunScheduled()));
         }
 
@@ -150,14 +151,21 @@ public:
             mScheduler->ReportTimerCallback();
         }
 
-        System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
-        System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+        Timestamp GetMinTimestamp() const { return mMinTimestamp > mDeferralEndTimestamp ? mMinTimestamp : mDeferralEndTimestamp; }
+        Timestamp GetMaxTimestamp() const { return mMaxTimestamp > mDeferralEndTimestamp ? mMaxTimestamp : mDeferralEndTimestamp; }
+
+        void SetDeferralEndTimestamp(const Timestamp & deferralEndTimestamp) { mDeferralEndTimestamp = deferralEndTimestamp; }
+        bool IsInterestedInEndpoints(Span<const EndpointId> targetedEndpoints) const
+        {
+            return mReadHandler->IsInterestedInEndpoints(targetedEndpoints);
+        }
 
     private:
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
         Timestamp mMinTimestamp;
         Timestamp mMaxTimestamp;
+        Timestamp mDeferralEndTimestamp = Timestamp(0);
 
         BitFlags<ReadHandlerNodeFlags> mFlags;
     };
@@ -168,14 +176,18 @@ public:
 
     virtual void ReportTimerCallback() = 0;
 
-    virtual void DeferReports(System::Clock::Timeout aDelay)
+    virtual void DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints = {})
     {
-        Timestamp now            = mTimerDelegate->GetCurrentMonotonicTimestamp();
-        Timestamp newDeferralEnd = now + aDelay;
-        if (newDeferralEnd > mDeferralEndTimestamp)
-        {
-            mDeferralEndTimestamp = newDeferralEnd;
-        }
+        Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+        mNodesPool.ForEachActiveObject([this, now, aDelay, targetedEndpoints](ReadHandlerNode * node) {
+            if (node->IsInterestedInEndpoints(targetedEndpoints))
+            {
+                System::Clock::Timeout remaining = GetRemainingTimeout(node->GetMaxTimestamp(), now);
+                System::Clock::Timeout effectiveDelay = aDelay < remaining ? aDelay : remaining;
+                node->SetDeferralEndTimestamp(now + effectiveDelay);
+            }
+            return Loop::Continue;
+        });
         RescheduleAllReports();
     }
 
@@ -188,16 +200,6 @@ public:
             return std::chrono::duration_cast<System::Clock::Timeout>(targetTimestamp - now);
         }
         return System::Clock::Milliseconds32(0);
-    }
-
-    System::Clock::Timeout AdjustTimeout(System::Clock::Timeout timeout, System::Clock::Timeout maxTimeout, const Timestamp & now)
-    {
-        System::Clock::Timeout remaining = GetRemainingTimeout(mDeferralEndTimestamp, now);
-        if (remaining > System::Clock::Milliseconds32(0) && timeout < remaining)
-        {
-            return remaining < maxTimeout ? remaining : maxTimeout;
-        }
-        return timeout;
     }
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
@@ -261,7 +263,6 @@ protected:
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
     TimerDelegate * mTimerDelegate;
     uint32_t mNumTotalSubscriptionsEstablished = 0;
-    Timestamp mDeferralEndTimestamp            = Timestamp(0);
 };
 }; // namespace reporting
 }; // namespace app
