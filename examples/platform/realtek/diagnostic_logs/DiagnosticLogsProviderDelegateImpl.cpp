@@ -48,7 +48,8 @@ CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & out
     err = CollectLog(sessionHandle, outBuffer, unusedOutIsEndOfLog);
     if (err != CHIP_NO_ERROR)
     {
-        EndLogCollection(sessionHandle);
+        // CollectLog already failed; end the session for cleanup and ignore any secondary error.
+        TEMPORARY_RETURN_IGNORED EndLogCollection(sessionHandle);
         outBuffer.reduce_size(0);
         return err;
     }

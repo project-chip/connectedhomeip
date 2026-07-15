@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 #pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
+#include <clusters/LaundryWasherControls/Enums.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
@@ -49,6 +50,18 @@ public:
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of supported rinses.
      */
     virtual CHIP_ERROR GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse) = 0;
+
+    /**
+     * Callback invoked when the SpinSpeedCurrent attribute is changed.
+     * @note Do not call SetSpinSpeedCurrent() on the cluster from this callback to avoid possible infinite recursion.
+     */
+    virtual void OnSpinSpeedCurrentChanged(DataModel::Nullable<uint8_t> spinSpeedCurrent) {}
+
+    /**
+     * Callback invoked when the NumberOfRinses attribute is changed.
+     * @note Do not call SetNumberOfRinses() on the cluster from this callback to avoid possible infinite recursion.
+     */
+    virtual void OnNumberOfRinsesChanged(NumberOfRinsesEnum numberOfRinses) {}
 };
 
 } // namespace LaundryWasherControls

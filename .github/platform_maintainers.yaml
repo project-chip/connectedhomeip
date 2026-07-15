@@ -7,30 +7,34 @@
 nxp:
   maintainers:
     - doru91
+    - dinabenamar
+    - chapongatien
     # Proposed maintainers (uncomment to activate):
     # - Martin-NXP
-    # - dinabenamar
     # - marian-chereji-nxp
-    # - chapongatien
-    # - andrei-menzopol
     # - sujaygkulkarni-nxp
   paths:
     - "src/platform/nxp/**"
     - "examples/platform/nxp/**"
     - "examples/**/nxp/**"
     - "third_party/nxp/**"
+    - "src/test_driver/nxp/**"
+    - "docs/platforms/nxp/**"
+    - "third_party/simw-top-mini/**"
+    - "third_party/openthread/platforms/nxp/**"
     - "config/nxp/**"
+    - ".github/workflows/examples-nxp.yaml"
 
 silabs:
   maintainers:
     - jmartinez-silabs
+    - jepenven-silabs
+    - lpbeliveau-silabs
     # Proposed maintainers (uncomment to activate):
-    # - mkardous-silabs
     # - chirag-silabs
     # - arun-silabs
     # - rosahay-silabs
-    # - jepenven-silabs
-    # - lpbeliveau-silabs
+
   paths:
     - "src/platform/silabs/**"
     - "examples/platform/silabs/**"
@@ -39,30 +43,59 @@ silabs:
     - "config/silabs/**"
     - "config/efr32/**"
 
+esp32:
+  maintainers:
+    - shubhamdp
+    - wqx6
+    - jadhavrohit924
+  paths:
+    - "src/platform/ESP32/**"
+    - "src/test_driver/esp32/**"
+    - "src/tracing/esp32_diagnostics/**"
+    - "examples/platform/esp32/**"
+    - "examples/**/esp32/**"
+    - "config/esp32/**"
+    - "docs/platforms/esp32/**"
+
+telink:
+  maintainers:
+    - s07641069
+    - interfer
+  paths:
+    - "src/platform/telink/**"
+    - "examples/platform/telink/**"
+    - "examples/**/telink/**"
+    - "config/telink/**"
+    - "scripts/tools/telink/**"
+
+realtek:
+  maintainers:
+    - pankore
+    - shensaifeng
+  paths:
+    - "src/platform/realtek/**"
+    - "src/platform/Ameba/**"
+    - "examples/platform/realtek/**"
+    - "examples/platform/ameba/**"
+    - "examples/**/realtek/**"
+    - "examples/**/ameba/**"
+    - "config/realtek/**"
+    - "config/ameba/**"
+    - "scripts/tools/realtek/**"
+
+stm32:
+  maintainers:
+    - STYoannZamaron
+    - Pierre-B-GHub
+  paths:
+    - "src/platform/stm32/**"
+    - "examples/platform/stm32/**"
+    - "examples/**/stm32/**"
+    - "config/stm32/**"
+    - "third_party/st/**"
+
 # --- Proposals / Opt-In Templates ---
 
-# esp32:
-#   maintainers:
-#     - shubhamdp
-#     - wqx6
-#     - shripad621git
-#     - jadhavrohit924
-#   paths:
-#     - "src/platform/ESP32/**"
-#     - "examples/platform/esp32/**"
-#     - "examples/**/esp32/**"
-#     - "config/esp32/**"
-# 
-# telink:
-#   maintainers:
-#     - s07641069
-#     - interfer
-#   paths:
-#     - "src/platform/telink/**"
-#     - "examples/platform/telink/**"
-#     - "examples/**/telink/**"
-#     - "config/telink/**"
-# 
 # nrfconnect:
 #   maintainers:
 #     - ArekBalysNordic
@@ -83,19 +116,6 @@ silabs:
 #     - "examples/platform/tizen/**"
 #     - "examples/**/tizen/**"
 #     - "config/tizen/**"
-# 
-# realtek:
-#   maintainers:
-#     - pankore
-#   paths:
-#     - "src/platform/realtek/**"
-#     - "src/platform/Ameba/**"
-#     - "examples/platform/realtek/**"
-#     - "examples/platform/ameba/**"
-#     - "examples/**/realtek/**"
-#     - "examples/**/ameba/**"
-#     - "config/realtek/**"
-#     - "config/ameba/**"
 # 
 # asr:
 #   maintainers:
@@ -134,16 +154,7 @@ silabs:
 #     - "examples/platform/qpg/**"
 #     - "examples/**/qpg/**"
 #     - "config/qpg/**"
-# 
-# stm32:
-#   maintainers:
-#     - STYoannZamaron
-#   paths:
-#     - "src/platform/stm32/**"
-#     - "examples/platform/stm32/**"
-#     - "examples/**/stm32/**"
-#     - "config/stm32/**"
-# 
+#
 # webos:
 #   maintainers:
 #     - joonhaengHeo
