@@ -534,7 +534,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     // Configure the KVS storage paths before InitChipStack() (which calls
     // PosixConfig::Init() -> KeyValueStoreMgrImpl().Init()) to avoid a double-init.
     {
-        auto & paths = DeviceLayer::GetStoragePaths();
+        auto & paths        = DeviceLayer::GetStoragePaths();
         const auto & config = AppOptions::GetConfig();
         if (!config.kvsDirectory.empty())
         {

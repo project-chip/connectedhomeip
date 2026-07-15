@@ -622,9 +622,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     // Configure the KVS data file path before InitChipStack() (which calls
     // PosixConfig::Init() -> KeyValueStoreMgrImpl().Init()) to avoid a double-init.
     {
-        const char * kvsPath = (LinuxDeviceOptions::GetInstance().KVS == nullptr)
-            ? CHIP_CONFIG_KVS_PATH
-            : LinuxDeviceOptions::GetInstance().KVS;
+        const char * kvsPath =
+            (LinuxDeviceOptions::GetInstance().KVS == nullptr) ? CHIP_CONFIG_KVS_PATH : LinuxDeviceOptions::GetInstance().KVS;
         DeviceLayer::GetStoragePaths().SetKVSDataFile(kvsPath);
     }
 #endif
