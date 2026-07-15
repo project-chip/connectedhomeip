@@ -125,6 +125,9 @@ class TC_IDM_4_3(IDMBaseTest):
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
+
+        self.step(0)
+      
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         TH: ChipDeviceController = self.default_controller
 
