@@ -179,8 +179,8 @@ TEST_F(TestWindowCoveringCluster, AttributesList_AllFeaturesAndOptionals)
     TestableWindowCoveringCluster cluster(
         kTestEndpointId,
         WindowCoveringCluster::Config(delegate)
-            .WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt, Feature::kPositionAwareLift,
-                                              Feature::kPositionAwareTilt })
+            .WithFeatures(
+                BitFlags<Feature>{ Feature::kLift, Feature::kTilt, Feature::kPositionAwareLift, Feature::kPositionAwareTilt })
             .WithOptionalAttributes(optionals));
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -245,8 +245,7 @@ TEST_F(TestWindowCoveringCluster, AcceptedCommands_LiftAndTilt)
 {
     MockWindowCoveringDelegate delegate;
     TestableWindowCoveringCluster cluster(
-        kTestEndpointId,
-        WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt }));
+        kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt }));
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -302,10 +301,10 @@ TEST_F(TestWindowCoveringCluster, ReadEnabledOptionalDefaults)
     optionals.Set<Attributes::NumberOfActuationsLift::Id>().Set<Attributes::NumberOfActuationsTilt::Id>();
 
     MockWindowCoveringDelegate delegate;
-    TestableWindowCoveringCluster cluster(
-        kTestEndpointId, WindowCoveringCluster::Config(delegate)
-                             .WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt })
-                             .WithOptionalAttributes(optionals));
+    TestableWindowCoveringCluster cluster(kTestEndpointId,
+                                          WindowCoveringCluster::Config(delegate)
+                                              .WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kTilt })
+                                              .WithOptionalAttributes(optionals));
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -419,10 +418,10 @@ TEST_F(TestWindowCoveringCluster, SetterDirtyAndNoOp)
     optionals.Set<Attributes::NumberOfActuationsLift::Id>();
 
     MockWindowCoveringDelegate delegate;
-    TestableWindowCoveringCluster cluster(
-        kTestEndpointId, WindowCoveringCluster::Config(delegate)
-                             .WithFeatures(BitFlags<Feature>{ Feature::kLift })
-                             .WithOptionalAttributes(optionals));
+    TestableWindowCoveringCluster cluster(kTestEndpointId,
+                                          WindowCoveringCluster::Config(delegate)
+                                              .WithFeatures(BitFlags<Feature>{ Feature::kLift })
+                                              .WithOptionalAttributes(optionals));
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
