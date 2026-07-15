@@ -40,7 +40,6 @@ static constexpr Percent100ths kWcPercent100thsCOEF      = 100;
 
 typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
-typedef DataModel::Nullable<uint16_t> NAbsolute;
 typedef Optional<Percent> OPercent;
 typedef Optional<Percent100ths> OPercent100ths;
 
@@ -199,8 +198,6 @@ private:
     HandleGoToLiftPercentage(const Commands::GoToLiftPercentage::DecodableType & fields);
     std::optional<DataModel::ActionReturnStatus>
     HandleGoToTiltPercentage(const Commands::GoToTiltPercentage::DecodableType & fields);
-
-    EndpointId GetEndpointId() { return mPath.mEndpointId; }
 
     WindowCoveringDelegate & mDelegate;
     const BitFlags<WindowCovering::Feature> mFeatureMap;

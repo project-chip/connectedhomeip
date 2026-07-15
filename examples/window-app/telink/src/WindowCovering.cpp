@@ -163,7 +163,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     current = wc->GetCurrentPositionTiltPercent100ths();
     target  = wc->GetTargetPositionTiltPercent100ths();
 
-    UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
+    UpdateOperationalStatus(WindowCoveringType::Tilt, ComputeOperationalState(target, current));
 
     positionToSet.SetNonNull(CalculateSingleStep(WindowCoveringType::Tilt));
     TiltPositionSet(Endpoint(), positionToSet);

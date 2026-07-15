@@ -681,7 +681,7 @@ void WindowManager::UpdateLCD()
         Type type = TypeGet(cover.mEndpoint);
 
         lift = wc->GetCurrentPositionLiftPercent100ths();
-        tilt = wc->GetCurrentPositionLiftPercent100ths();
+        tilt = wc->GetCurrentPositionTiltPercent100ths();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
         if (!tilt.IsNull() && !lift.IsNull())
