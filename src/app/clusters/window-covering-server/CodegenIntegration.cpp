@@ -465,11 +465,11 @@ void ModePrint(const chip::BitMask<Mode> & mode)
                     mode.Has(Mode::kCalibrationMode));
 }
 
-void SafetyStatusSet(chip::EndpointId endpoint, chip::BitMask<SafetyStatus> & newSafetyStatus)
+void SafetyStatusSet(chip::EndpointId endpoint, const chip::BitMask<SafetyStatus> & status)
 {
     auto cluster = FindClusterOnEndpoint(endpoint);
     VerifyOrDie(cluster != nullptr);
-    cluster->SetSafetyStatus(newSafetyStatus);
+    cluster->SetSafetyStatus(status);
 }
 
 chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
