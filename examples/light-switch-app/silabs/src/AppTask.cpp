@@ -31,12 +31,12 @@
 #include "ShellCommands.h"
 #endif // defined(ENABLE_CHIP_SHELL)
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include "lcd.h"
 #if SL_MATTER_QR_CODE_ENABLED
 #include "qrcodegen.h"
 #endif // SL_MATTER_QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
