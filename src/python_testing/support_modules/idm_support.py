@@ -124,13 +124,18 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # State-gated: validated only while the device is identifying; per the Groups
     # cluster spec the command is otherwise discarded with SUCCESS, so field
     # constraints cannot be exercised without an Identify precondition.
+    # Ref: (https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Groups.adoc#76-addgroupifidentifying-command)
     (Clusters.Groups.id, Clusters.Groups.Commands.AddGroupIfIdentifying.command_id),
-    # State-gated: the scene lookup (NOT_FOUND per the cluster spec) precedes field
-    # validation, so testing TransitionTime requires a stored scene as a precondition.
-    (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Commands.RecallScene.command_id),
+    # State-gated: per the Scenes Management spec (RecallScene, Effect on Receipt),
+    # the Group/Scene Table lookups SHALL be performed first, returning
+    # INVALID_COMMAND / NOT_FOUND before TransitionTime is ever consumed. Exercising
+    # its constraint therefore requires a stored scene as a precondition.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Scenes.adoc#912-recallscene-command
+    (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Commands.RecallScene.command_id),    
     # The Thermostat cluster spec mandates INVALID_COMMAND for a handle that is not
     # present in Presets/Schedules; an out-of-constraint handle is first and foremost
     # an unknown handle, so CONSTRAINT_ERROR cannot be observed without state setup.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/app_clusters/Thermostat.adoc#1091-presethandle-field
     (Clusters.Thermostat.id, Clusters.Thermostat.Commands.SetActivePresetRequest.command_id),
     (Clusters.Thermostat.id, Clusters.Thermostat.Commands.SetActiveScheduleRequest.command_id),
     # TODO: Remove once the Level Control code-driven migration is wired into ZAP/ember
@@ -144,14 +149,20 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # not validate OnTime/OffWaitTime <= 0xFFFE; OnOffLightingCluster already does.
     # So all-devices-app with --device dimmable-light:1 passes, but all-clusters-app fails.
     (Clusters.OnOff.id, Clusters.OnOff.Commands.OnWithTimedOff.command_id),
-    # TODO: Remove once DiagnosticLogsCluster validates TransferFileDesignator length
-    # for all RequestedProtocol values; today it is only checked on the BDX path, so a
-    # >32-char designator with protocol=ResponsePayload is accepted.
+    # TODO: Remove once TransferFileDesignator length handling is resolved (SDK fix
+    # or spec clarification): the data model constraint (maxLength 32) is
+    # unconditional, but DiagnosticLogsCluster only enforces it on the BDX path, so
+    # a >32-char designator with RequestedProtocol=ResponsePayload is accepted. The
+    # spec's Effect on Receipt enumerates its status-code exceptions (e.g.
+    # INVALID_COMMAND for out-of-range Intent/RequestedProtocol) and contains no
+    # carve-out exempting the designator from validation for non-BDX protocols.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/service_device_management/DiagnosticLogsCluster.adoc#514-effect-on-receipt
     (Clusters.DiagnosticLogs.id, Clusters.DiagnosticLogs.Commands.RetrieveLogsRequest.command_id),
     # Value-gated: DurationSeconds is only evaluated when TestOperation enables
-    # testing; with the harness's default TestOperation (0 = DisableTesting) the field
+    # testing; with the harness's default TestOperation the field
     # is ignored and the command returns SUCCESS. Enabling test mode to exercise the
     # constraint would put a non-compliant DUT into groupcast testing state.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/71a64a58ee82ddaa1cebea93b9919f01cfaff280/src/service_device_management/Groupcast.adoc#762-durationseconds-field
     (Clusters.Groupcast.id, Clusters.Groupcast.Commands.GroupcastTesting.command_id),
 })
 
