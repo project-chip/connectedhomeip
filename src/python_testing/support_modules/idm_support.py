@@ -680,7 +680,7 @@ class IDMBaseTest(BasicCompositionTests):
         return infos
 
     @staticmethod
-    def _command_field_label(command_class: type[ClusterObjects.ClusterCommand], field_id: int) -> Optional[str]:
+    def _command_field_label(command_class: type[ClusterObjects.ClusterCommand], field_id: int) -> str | None:
         """Map a spec field ID to the generated Python dataclass attribute name via the descriptor tags."""
         for descriptor_field in command_class.descriptor.Fields:
             if descriptor_field.Tag == field_id:
@@ -688,7 +688,7 @@ class IDMBaseTest(BasicCompositionTests):
         return None
 
     @staticmethod
-    def _allowed_lengths(constraints: Constraints) -> Optional[list[int]]:
+    def _allowed_lengths(constraints: Constraints) -> list[int] | None:
         """Interpret an 'allowed' constraint as exact length(s) for string/octstr fields.
 
         Returns sorted integer lengths, or None if the allowed values are not numeric
@@ -771,7 +771,7 @@ class IDMBaseTest(BasicCompositionTests):
                                constraints.min_value - 1))
         return violations
 
-    def _generate_valid_command_field_value(self, field: XmlDataTypeComponent) -> Optional[Any]:
+    def _generate_valid_command_field_value(self, field: XmlDataTypeComponent) -> Any | None:
         """Generate an in-range value for a sibling field, or None to keep the class default.
 
         Only static constraints are considered; fields whose bounds depend on
@@ -801,7 +801,7 @@ class IDMBaseTest(BasicCompositionTests):
                 return constraints.max_value
         return None
 
-    async def check_command_constraint(self, info: CommandFieldInfo) -> Optional[bool]:
+    async def check_command_constraint(self, info: CommandFieldInfo) -> bool | None:
         """Test a single command field's constraints by sending violating payloads.
 
         Sends one Invoke per violated bound, with all sibling fields set to
