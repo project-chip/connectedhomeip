@@ -156,7 +156,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     ChipLogProgress(Controller, "WiFi-PAF: OnDiscoveryResult");
     uint32_t subscribe_id;
     uint32_t peer_publish_id;
-    uint8_t peer_addr[6];
+    uint8_t peer_addr[kMACAddressLength];
     uint32_t srv_proto_type;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -241,7 +241,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     pPafInfo->role    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
     pPafInfo->id      = subscribe_id;
     pPafInfo->peer_id = peer_publish_id;
-    memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
+    memcpy(pPafInfo->peer_addr, peer_addr, kMACAddressLength);
     /*
         Indicate the connection event
     */
@@ -255,7 +255,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     ChipLogProgress(Controller, "WiFi-PAF: OnReplied");
     uint32_t publish_id;
     uint32_t peer_subscribe_id;
-    uint8_t peer_addr[6];
+    uint8_t peer_addr[kMACAddressLength];
     uint32_t srv_proto_type;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -322,7 +322,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied received for non-publisher session");
         return;
     }
-    if ((pPafInfo->peer_id == peer_subscribe_id) && !memcmp(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6))
+    if ((pPafInfo->peer_id == peer_subscribe_id) && !memcmp(pPafInfo->peer_addr, peer_addr, kMACAddressLength))
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, reentrance, publish_id: %u ", publish_id);
         return;
@@ -339,7 +339,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     pPafInfo->role    = WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher;
     pPafInfo->id      = publish_id;
     pPafInfo->peer_id = peer_subscribe_id;
-    memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
+    memcpy(pPafInfo->peer_addr, peer_addr, kMACAddressLength);
     auto handleInitiated = [](intptr_t arg) {
         WiFiPAF::WiFiPAFSession * pInfo = reinterpret_cast<WiFiPAF::WiFiPAFSession *>(arg);
         LogErrorOnFailure(WiFiPAFLayer::GetWiFiPAFLayer().HandleTransportConnectionInitiated(*pInfo));
