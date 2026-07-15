@@ -189,6 +189,9 @@ public:
     CHIP_ERROR SetSleep(bool sleep);
     CHIP_ERROR SetOptimal(bool optimal);
     CHIP_ERROR SetCondPumpEnabled(bool condPumpEnabled);
+    CHIP_ERROR SetCondRunCount(uint16_t condRunCount);
+    CHIP_ERROR ResetCondRunCount();
+    CHIP_ERROR IncrementCondRunCount();
 
     void SetSetSettingsAllowContinuous(bool allow) { mAllowSetSettingsContinuous = allow; }
     void SetSetSettingsAllowSleep(bool allow) { mAllowSetSettingsSleep = allow; }

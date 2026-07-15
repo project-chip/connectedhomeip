@@ -413,7 +413,7 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
     EXPECT_TRUE(cluster.GetSleep());
     EXPECT_TRUE(cluster.GetOptimal());
     EXPECT_TRUE(cluster.GetCondPumpEnabled());
-    EXPECT_EQ(cluster.GetCondRunCount(), 1);
+    EXPECT_EQ(cluster.GetCondRunCount(), 0);
 
     bool condPumpEnabled = false;
     ASSERT_EQ(tester.ReadAttribute(CondPumpEnabled::Id, condPumpEnabled), CHIP_NO_ERROR);
@@ -421,7 +421,7 @@ TEST_F(TestHumidistatCluster, WriteAttributes)
 
     uint16_t condRunCount = 0;
     ASSERT_EQ(tester.ReadAttribute(CondRunCount::Id, condRunCount), CHIP_NO_ERROR);
-    EXPECT_EQ(condRunCount, 1);
+    EXPECT_EQ(condRunCount, 0);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1208,11 +1208,37 @@ TEST_F(TestHumidistatCluster, DelegateCallback_OnCondPumpChanged)
     CHIP_ERROR err = cluster.SetCondPumpEnabled(true);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetCondPumpEnabled());
-    EXPECT_EQ(cluster.GetCondRunCount(), 1);
+    EXPECT_EQ(cluster.GetCondRunCount(), 0);
     EXPECT_EQ(delegate.condPumpEnabledChangedCount, 1);
     EXPECT_EQ(delegate.lastCondPumpEnabled, std::optional<bool>(true));
-    EXPECT_EQ(delegate.condRunCountChangedCount, 1);
-    EXPECT_EQ(delegate.lastCondRunCount, std::optional<uint16_t>(1));
+    EXPECT_EQ(delegate.condRunCountChangedCount, 0);
+    EXPECT_EQ(delegate.lastCondRunCount, std::nullopt);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestHumidistatCluster, CondRunCountIsApplicationDriven)
+{
+    const BitFlags<Feature> features{ Feature::kDehumidifier, Feature::kCondPump };
+    HumidistatCluster cluster(kTestEndpointId, features, {});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    FakeHumidistatDelegate delegate;
+    cluster.SetDelegate(&delegate);
+
+    EXPECT_EQ(cluster.SetCondPumpEnabled(true), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetCondRunCount(), 0);
+
+    EXPECT_EQ(cluster.IncrementCondRunCount(), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.IncrementCondRunCount(), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetCondRunCount(), 2);
+    EXPECT_EQ(delegate.condRunCountChangedCount, 2);
+    EXPECT_EQ(delegate.lastCondRunCount, std::optional<uint16_t>(2));
+
+    EXPECT_EQ(cluster.ResetCondRunCount(), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetCondRunCount(), 0);
+    EXPECT_EQ(delegate.condRunCountChangedCount, 3);
+    EXPECT_EQ(delegate.lastCondRunCount, std::optional<uint16_t>(0));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
