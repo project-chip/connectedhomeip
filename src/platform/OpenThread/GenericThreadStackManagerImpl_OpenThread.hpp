@@ -456,7 +456,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
     {
         mTemporaryRxOnWhenIdle = true;
         linkMode.mRxOnWhenIdle = true;
-        TEMPORARY_RETURN_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
+        RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
     }
 #endif
 
