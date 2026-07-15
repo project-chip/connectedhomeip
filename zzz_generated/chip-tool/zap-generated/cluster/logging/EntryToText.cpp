@@ -7988,7 +7988,7 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
     case 0x0000007C:
         return "Laundry Dryer";
     case 0x0000007D:
-        return "Humidifier/Dehumidifier";
+        return "Humidity Conditioner";
     case 0x00000090:
         return "Network Infrastructure Manager";
     case 0x00000091:
