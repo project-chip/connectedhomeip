@@ -456,6 +456,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
     {
         mTemporaryRxOnWhenIdle = true;
         linkMode.mRxOnWhenIdle = true;
+        // Safe to ignore since this only fails if the instance is null and we perform this check above.
         RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
     }
 #endif
@@ -484,6 +485,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult)
 {
+    VerifyOrReturn(mOTInst);
     if (aResult == nullptr) // scan completed
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -492,6 +494,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
             linkMode.mRxOnWhenIdle    = false;
             mTemporaryRxOnWhenIdle    = false;
+            // Safe to ignore since this only fails if the instance is null and we perform this check above.
             RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
         }
 #endif
