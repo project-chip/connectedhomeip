@@ -971,7 +971,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/service/watchdog_manager/src/sl_watchdog_manager_hal_wdog.c",
         "${efr32_sdk_root}/platform_core/platform/service/watchdog_manager/src/sl_watchdog_manager_platform.c",
         "${efr32_sdk_root}/platform_core/platform/service/watchdog_manager/src/sl_watchdog_manager_power.c",
-        "${efr32_sdk_root}/platform_core/service/watchdog_manager/src/sl_watchdog_manager.c",
+        "${efr32_sdk_root}/platform_core/platform/service/watchdog_manager/src/sl_watchdog_manager.c",
       ]
     }
 
