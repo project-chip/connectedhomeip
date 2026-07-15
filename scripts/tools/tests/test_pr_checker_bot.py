@@ -20,7 +20,7 @@ import os
 import sys
 import tempfile
 import unittest
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -1113,7 +1113,7 @@ esp32:
         files = [self.create_mock_file("some/random/file.txt")]
         mock_pr = self.create_mock_pr(1, "Bump dependency", "dependabot[bot]", files, [])
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         # 1. Critical suite (GitHub Actions) - pending (queued) - even if old, it should block
         mock_critical_pending = MagicMock()

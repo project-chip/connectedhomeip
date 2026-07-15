@@ -21,7 +21,7 @@ import os
 import urllib.request
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
-from datetime import datetime,timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from functools import cached_property
 from typing import Any, NamedTuple, cast
