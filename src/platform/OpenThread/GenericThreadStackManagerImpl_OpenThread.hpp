@@ -492,7 +492,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
             linkMode.mRxOnWhenIdle    = false;
             mTemporaryRxOnWhenIdle    = false;
-            TEMPORARY_RETURN_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
+            RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
         }
 #endif
 
